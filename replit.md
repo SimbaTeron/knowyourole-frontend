@@ -82,11 +82,25 @@ Preferred communication style: Simple, everyday language.
 
 ### UI and Component Libraries
 - **Radix UI**: Headless component primitives (accordion, dialog, dropdown, popover, select, etc.)
-- **Lucide React**: Icon library for UI elements
+- **Lucide React**: Icon library for UI elements (NO emoji icons - brand rule)
+- **Framer Motion**: Spring animations for step transitions, tier cards, and interactions
+- **react-select**: Enhanced dropdown/select for mood input with improved mobile UX
 - **class-variance-authority & clsx**: Utility for conditional className composition
 - **tailwind-merge**: Intelligent Tailwind class merging
 - **cmdk**: Command menu component
 - **wouter**: Lightweight client-side routing
+
+### Theme System
+- **Three-mode theme**: Light (clinical cream), Dark (mysterious amber), Random (7 vibrant themes)
+- **Random themes**: Sunburst Trail, Neon Urban, Forest Whisper, Ocean Drift, Desert Bloom, City Pulse, Meadow Dream
+- **Theme storage**: Persisted in localStorage with automatic application on page load
+- **CSS architecture**: Theme classes applied to container div with PathCanvas background override via CSS selectors
+- **Haptic feedback**: navigator.vibrate() on tier selection, mood input, fun-mode toggle, and CTA interactions
+
+### Accessibility
+- **StepIndicator**: ARIA roles/labels for VoiceOver compatibility
+- **Theme toggle**: Keyboard accessible with focus indicators
+- **Mobile-first**: Touch-optimized interactions with 44px+ tap targets
 
 ### Data and State Management
 - **TanStack Query**: Server state management, caching, and data fetching
