@@ -818,3 +818,251 @@
     inset: -1px;
   }
 }
+
+/* ========================================
+   KNOWROLE THEME SYSTEM
+   ======================================== */
+
+/* Light Clinical Theme */
+.light-clinical {
+  --kr-bg: #FFFFFF;
+  --kr-text: #333333;
+  --kr-primary: #C67B5C;
+  --kr-accent: #8B9A6D;
+}
+.light-clinical .premium-card {
+  background: rgba(255,255,255,0.98);
+  border-color: rgba(51,51,51,0.08);
+}
+.light-clinical .compass-gradient-text {
+  background: linear-gradient(135deg, #333333 0%, #666666 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Dark Mysterious Theme */
+.dark-mysterious {
+  --kr-bg: #1A1A1A;
+  --kr-text: #F5F5F5;
+  --kr-primary: #FFB366;
+  --kr-accent: #FF9933;
+}
+.dark-mysterious .grain-overlay::before {
+  opacity: 0.05;
+}
+.dark-mysterious .premium-card {
+  background: rgba(30,30,30,0.95);
+  border-color: rgba(255,179,102,0.15);
+  box-shadow: 0 0 40px rgba(255,179,102,0.08);
+}
+.dark-mysterious .compass-gradient-text {
+  background: linear-gradient(135deg, #FFB366 0%, #FF9933 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.dark-mysterious .trail-button {
+  background: linear-gradient(135deg, #FFB366 0%, #E6994D 100%);
+}
+.dark-mysterious .tier-card-premium.selected,
+.dark-mysterious .mood-card-premium.selected {
+  background: linear-gradient(165deg, #FFB366 0%, #E6994D 100%);
+}
+
+/* Random Theme Vibes */
+.sunburst-trail-vibe {
+  background: radial-gradient(circle at 50% 30%, #FFF4E6 0%, #FFF8F0 100%);
+}
+.sunburst-trail-vibe .premium-card {
+  background: rgba(255,248,240,0.95);
+  border-color: rgba(255,140,0,0.12);
+}
+.sunburst-trail-vibe .compass-gradient-text {
+  background: linear-gradient(135deg, #FF8C00 0%, #FFB366 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.sunburst-trail-vibe .trail-button {
+  background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+}
+.sunburst-trail-vibe::after {
+  content: "";
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,140,0,0.15) 0%, transparent 70%);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.neon-urban-vibe {
+  background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 100%);
+}
+.neon-urban-vibe .premium-card {
+  background: rgba(26,26,46,0.9);
+  border-color: rgba(0,212,255,0.2);
+  box-shadow: 0 0 30px rgba(0,212,255,0.1), 0 0 60px rgba(255,0,255,0.05);
+}
+.neon-urban-vibe .compass-gradient-text {
+  background: linear-gradient(135deg, #00D4FF 0%, #FF00FF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.neon-urban-vibe .trail-button {
+  background: linear-gradient(135deg, #00D4FF 0%, #7B2FFF 100%);
+}
+.neon-urban-vibe .text-warm-gray { color: #E0E0FF; }
+.neon-urban-vibe .text-terracotta { color: #00D4FF; }
+
+.forest-whisper-vibe {
+  background: linear-gradient(145deg, #F0F7F0 0%, #E8F5E9 100%);
+}
+.forest-whisper-vibe .premium-card {
+  background: rgba(240,247,240,0.95);
+  border-color: rgba(45,90,39,0.1);
+}
+.forest-whisper-vibe .compass-gradient-text {
+  background: linear-gradient(135deg, #2D5A27 0%, #4CAF50 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.forest-whisper-vibe .trail-button {
+  background: linear-gradient(135deg, #2D5A27 0%, #4CAF50 100%);
+}
+
+.ocean-drift-vibe {
+  background: linear-gradient(180deg, #CAF0F8 0%, #E0F7FA 100%);
+}
+.ocean-drift-vibe .premium-card {
+  background: rgba(224,247,250,0.95);
+  border-color: rgba(0,119,182,0.1);
+}
+.ocean-drift-vibe .compass-gradient-text {
+  background: linear-gradient(135deg, #0077B6 0%, #48CAE4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.ocean-drift-vibe .trail-button {
+  background: linear-gradient(135deg, #0077B6 0%, #00B4D8 100%);
+}
+
+.desert-bloom-vibe {
+  background: linear-gradient(135deg, #FFF5EB 0%, #FFECD9 100%);
+}
+.desert-bloom-vibe .premium-card {
+  background: rgba(255,245,235,0.95);
+  border-color: rgba(224,123,57,0.12);
+}
+.desert-bloom-vibe .compass-gradient-text {
+  background: linear-gradient(135deg, #E07B39 0%, #CD5C5C 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.desert-bloom-vibe .trail-button {
+  background: linear-gradient(135deg, #E07B39 0%, #F4A460 100%);
+}
+
+.city-pulse-vibe {
+  background: linear-gradient(145deg, #ECEFF1 0%, #F5F5F5 100%);
+}
+.city-pulse-vibe .premium-card {
+  background: rgba(245,245,245,0.95);
+  border-color: rgba(96,125,139,0.1);
+}
+.city-pulse-vibe .compass-gradient-text {
+  background: linear-gradient(135deg, #607D8B 0%, #78909C 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.city-pulse-vibe .trail-button {
+  background: linear-gradient(135deg, #607D8B 0%, #90A4AE 100%);
+}
+
+.meadow-dream-vibe {
+  background: linear-gradient(135deg, #FFF0F5 0%, #F0FFF0 100%);
+}
+.meadow-dream-vibe .premium-card {
+  background: rgba(255,240,245,0.95);
+  border-color: rgba(221,160,221,0.15);
+}
+.meadow-dream-vibe .compass-gradient-text {
+  background: linear-gradient(135deg, #DDA0DD 0%, #98D8AA 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.meadow-dream-vibe .trail-button {
+  background: linear-gradient(135deg, #DDA0DD 0%, #FFB6C1 100%);
+}
+
+/* Unroll animation for CTA */
+@keyframes unroll {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.animate-unroll {
+  animation: unroll 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-origin: left center;
+}
+
+/* Handwritten style */
+.font-handwritten {
+  font-family: 'Reenie Beanie', cursive;
+  font-size: 1.25em;
+}
+
+/* React-Select custom styling */
+.knowrole-select__control {
+  background: rgba(253,248,243,0.8) !important;
+  border: 1px solid rgba(198,123,92,0.1) !important;
+  border-radius: 0.875rem !important;
+  padding: 0.25rem 0.5rem !important;
+  box-shadow: none !important;
+  transition: all 0.3s ease !important;
+}
+.knowrole-select__control:hover {
+  border-color: rgba(198,123,92,0.2) !important;
+}
+.knowrole-select__control--is-focused {
+  border-color: rgba(198,123,92,0.3) !important;
+  box-shadow: 0 0 0 2px rgba(198,123,92,0.1) !important;
+}
+.knowrole-select__menu {
+  background: #FFFBF7 !important;
+  border: 1px solid rgba(198,123,92,0.1) !important;
+  border-radius: 0.875rem !important;
+  box-shadow: 0 8px 24px rgba(198,123,92,0.12) !important;
+}
+.knowrole-select__option {
+  padding: 0.75rem 1rem !important;
+  transition: all 0.2s ease !important;
+}
+.knowrole-select__option--is-focused {
+  background: rgba(198,123,92,0.08) !important;
+}
+.knowrole-select__option--is-selected {
+  background: #C67B5C !important;
+  color: white !important;
+}
+.knowrole-select__single-value {
+  color: #6B6B6B !important;
+}
+.knowrole-select__indicator-separator {
+  display: none !important;
+}
+.dark .knowrole-select__control {
+  background: rgba(40,35,30,0.6) !important;
+  border-color: rgba(198,123,92,0.15) !important;
+}
+.dark .knowrole-select__menu {
+  background: #1F1B16 !important;
+  border-color: rgba(198,123,92,0.2) !important;
+}
+.dark .knowrole-select__single-value {
+  color: #FDF8F3 !important;
+}
+.dark .knowrole-select__option--is-focused {
+  background: rgba(198,123,92,0.15) !important;
+}

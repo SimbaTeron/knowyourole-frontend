@@ -21,6 +21,21 @@ export default {
         "deep-cream": "#1F1B16",
         "dusty-blue": "#7BA3B5",
         "warm-white": "#FFFBF7",
+        // Theme colors
+        "sunset-amber": "#FFB366",
+        "sage-tint": "rgba(144,238,144,0.1)",
+        "clinical-white": "#FFFFFF",
+        "mysterious-deep": "#1A1A1A",
+        "vibrant-burst": "hsl(350,100%,70%)",
+        // Random theme colors
+        "sunburst-orange": "#FF8C00",
+        "neon-cyan": "#00D4FF",
+        "neon-magenta": "#FF00FF",
+        "forest-green": "#2D5A27",
+        "ocean-blue": "#0077B6",
+        "desert-sand": "#E07B39",
+        "city-steel": "#607D8B",
+        "meadow-pink": "#DDA0DD",
         // Flat / base colors (regular buttons)
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
@@ -96,6 +111,8 @@ export default {
         sans: ["var(--font-sans)"],
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],
+        display: ["Playfair Display", "Georgia", "serif"],
+        handwritten: ["Reenie Beanie", "cursive"],
       },
       keyframes: {
         "accordion-down": {

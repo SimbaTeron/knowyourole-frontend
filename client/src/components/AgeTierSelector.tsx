@@ -1,4 +1,5 @@
 import { Check, Compass, Rocket, Zap, Anchor } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface AgeTier {
   id: string;
@@ -14,12 +15,23 @@ const ageTiers: AgeTier[] = [
   { id: "25+", label: "Adult Anchor", sublabel: "Ages 25+", Icon: Anchor },
 ];
 
+const triggerHaptic = (duration = 50) => {
+  if (navigator.vibrate) {
+    navigator.vibrate(duration);
+  }
+};
+
 interface AgeTierSelectorProps {
   selectedTier: string | null;
   onSelect: (tierId: string) => void;
 }
 
 export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelectorProps) {
+  const handleSelect = (tierId: string) => {
+    triggerHaptic(50);
+    onSelect(tierId);
+  };
+
   return (
     <div className="w-full">
       <div className="text-center mb-8">
@@ -31,27 +43,33 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
         </p>
       </div>
       
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {ageTiers.map((tier, index) => {
           const isSelected = selectedTier === tier.id;
           const Icon = tier.Icon;
           return (
-            <button
+            <motion.button
               key={tier.id}
-              onClick={() => onSelect(tier.id)}
-              className={`group relative p-5 text-left tier-card-premium ${isSelected ? "selected" : ""}`}
-              style={{ 
-                animationDelay: `${index * 0.08}s`,
-                opacity: 0,
-                animation: `slideUp 0.5s ease-out ${index * 0.08}s forwards`
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.4, 
+                delay: index * 0.08,
+                ease: [0.22, 1, 0.36, 1]
               }}
-              aria-label={`Select ${tier.label}`}
+              onClick={() => handleSelect(tier.id)}
+              className={`group relative p-5 text-left tier-card-premium ${isSelected ? "selected" : ""}`}
+              aria-label={`Select ${tier.label}, ${tier.sublabel}`}
               data-testid={`button-tier-${tier.id}`}
             >
               {isSelected && (
-                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-white/25 flex items-center justify-center">
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute top-3 right-3 w-5 h-5 rounded-full bg-white/25 flex items-center justify-center"
+                >
                   <Check className="w-3 h-3 text-white" />
-                </div>
+                </motion.div>
               )}
               
               <div className={`icon-capsule mb-3 ${isSelected ? "active" : ""}`}>
@@ -65,15 +83,21 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
               }`}>
                 {tier.label}
               </span>
-              <span className={`text-xs mt-0.5 block ${
+              <span className={`text-xs mt-0.5 block font-handwritten text-lg ${
                 isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-soft-cream/40"
               }`}>
                 {tier.sublabel}
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>
+
+      <div className="my-5 border-t border-dashed border-terracotta/20" />
+
+      <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 italic">
+        Your age tier helps us tailor the experience
+      </p>
     </div>
   );
 }
