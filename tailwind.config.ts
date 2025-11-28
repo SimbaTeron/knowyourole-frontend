@@ -11,15 +11,16 @@ export default {
         sm: ".1875rem", /* 3px */
       },
       colors: {
-        // KnowRole Nebula Theme Colors
-        "nebula-core": "#E8F0FE",
-        "indigo-deep": "#1E3A5F",
-        "spark-gold": "#FFD700",
-        "coral-drift": "#FF6B6B",
-        "mint-veil": "#A8E6CF",
-        "violet-echo": "#4834D4",
-        "lavender-shift": "#B19CD9",
-        "pink-tide": "#FF9FF3",
+        // KnowRole Everyday Compass Theme
+        "terracotta": "#C67B5C",
+        "terracotta-dark": "#A85D3F",
+        "sage-green": "#8B9A6D",
+        "sage-dark": "#6B7A4D",
+        "warm-gray": "#6B6B6B",
+        "soft-cream": "#FDF8F3",
+        "deep-cream": "#1F1B16",
+        "dusty-blue": "#7BA3B5",
+        "warm-white": "#FFFBF7",
         // Flat / base colors (regular buttons)
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",

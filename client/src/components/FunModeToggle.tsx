@@ -1,4 +1,4 @@
-import { Switch } from "@/components/ui/switch";
+import { Check } from "lucide-react";
 
 interface FunModeToggleProps {
   enabled: boolean;
@@ -7,36 +7,39 @@ interface FunModeToggleProps {
 
 export default function FunModeToggle({ enabled, onToggle }: FunModeToggleProps) {
   return (
-    <div 
-      className={`w-full p-4 rounded-xl transition-all duration-500 ${
-        enabled 
-          ? "bg-gradient-to-r from-pink-tide/20 to-violet-echo/20 dark:from-pink-tide/30 dark:to-violet-echo/30" 
-          : "glass-card"
+    <button
+      onClick={() => onToggle(!enabled)}
+      className={`w-full p-4 rounded-xl transition-all duration-300 border text-left ${
+        enabled
+          ? "bg-sage-green/10 dark:bg-sage-green/20 border-sage-green/40"
+          : "bg-soft-cream dark:bg-deep-cream/60 border-terracotta/10 dark:border-terracotta/20 hover:border-terracotta/30"
       }`}
+      data-testid="button-fun-mode"
+      aria-pressed={enabled}
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className={`text-2xl transition-all duration-300 ${enabled ? "animate-bounce" : ""}`}>
+          <span className={`text-xl transition-transform duration-300 ${enabled ? "animate-gentle-float" : ""}`}>
             😏
           </span>
           <div>
-            <span className="font-semibold text-indigo-deep dark:text-white block">
-              Fun Mode
+            <span className="font-medium text-sm text-warm-gray dark:text-soft-cream block">
+              Add trail twists?
             </span>
-            <span className="text-sm text-indigo-deep/60 dark:text-white/60">
-              Get playful roasts with your results
+            <span className="text-xs text-warm-gray/50 dark:text-soft-cream/40">
+              Get playful insights with your results
             </span>
           </div>
         </div>
         
-        <Switch
-          checked={enabled}
-          onCheckedChange={onToggle}
-          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-pink-tide data-[state=checked]:to-violet-echo"
-          aria-label="Enable Fun Mode"
-          data-testid="switch-fun-mode"
-        />
+        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 ${
+          enabled
+            ? "bg-sage-green border-sage-green"
+            : "border-warm-gray/30 dark:border-soft-cream/30"
+        }`}>
+          {enabled && <Check className="w-3 h-3 text-white" />}
+        </div>
       </div>
-    </div>
+    </button>
   );
 }

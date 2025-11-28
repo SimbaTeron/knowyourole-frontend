@@ -1,0 +1,12 @@
+Refine the existing KnowRole Phase 1 MVP in Replit: Shift from cosmic nebula to relatable "Everyday Compass" theme—warm, grounded journey visuals like hand-drawn paths or journal maps (no stars/space; use soft curved lines as "life trails" that subtly animate on hover, symbolizing trait branches). Keep simple/straightforward: 70% whitespace, mobile-first, A11y (ARIA, WCAG AA). Make it look pro (50-person team polish): Use variable fonts (SF Pro or similar sans with italic weights for dynamism), blob/curved shapes (CSS clip-path for button "path cards"), micro-animations (gentle path "draw" on load via stroke-dasharray), earthy palette tweaks (base #F5F5F0 cream bg, #8B4513 terracotta accents, #90EE90 sage green buttons, #D2B48C warm gray text—swap indigo/violet for grounded tones).
+
+Update App.jsx flow:
+- Title: h1 text-4xl bold mb-4 bg-gradient-to-r from-terracotta to-sage-green bg-clip-text text-transparent: "KnowRole".
+- Subtitle: p mb-6 text-lg opacity-80: "Swipe your everyday path to traits, sparks, and growth." (Relatable riff on nebula tagline).
+- Particles.js fallback to path lines: useEffect for subtle SVG path draw (e.g., <svg class="fixed inset-0 opacity-0.2 z-0" viewBox="0 0 100 100"><path d="M0 50 Q50 0 100 50" stroke="terracotta" fill="none" stroke-dasharray="100" stroke-dashoffset="100" animate to 0 on mount /></svg>—no particles.js if laggy).
+- Tier buttons: Clip-path blob shapes (e.g., clip-path: polygon(0 0, 100% 0, 100% 80%, 80% 100%, 0 100%); rounded with inner glow shadow-lg), icons as simple line art (sun as wavy line, rocket as arrow curve). Hover: Scale 1.02 with path "extend" animation.
+- Mood select: Warm border-terracotta, options with everyday emojis (e.g., 'energized' ☕, 'reflective' 📖, 'stuck' 🛤️).
+- Fun Mode checkbox: Cozy toggle with "Add trail twists? 😏" label, sage-green checkmark.
+- Footer link: p text-sm italic text-warm-gray mt-8: "Chart your everyday constellation of traits →" (hyperlinked, subtle underline animation).
+- Dark mode: Invert to deep cream bg with darker terracotta (class-based).
+- Additional: Add <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet"> for SF Pro font. Ensure responsive (@media max-md: button flex-col). Output updated App.jsx, index.css (add clip-paths, animations), and any new SVG/component. Test: Paths draw smoothly, feels relatable/journal-like.
