@@ -102,6 +102,14 @@ Preferred communication style: Simple, everyday language.
 - **Theme toggle**: Keyboard accessible with focus indicators
 - **Mobile-first**: Touch-optimized interactions with 44px+ tap targets
 
+### Feedback System
+- **FeedbackModal**: Non-intrusive alpha feedback collection (50% random trigger)
+- **Trigger**: Activates after "Begin Your Journey" click with 2-second delay
+- **6 Structured Questions**: Star ratings, Yes/No, dropdowns, and textarea inputs
+- **Google Form Integration**: Replace `YOUR_FORM_ID` in FeedbackModal.tsx with actual Google Form ID
+- **Console Output**: Logs feedback summary as JSON for Sheet export
+- **A11y**: Focus trap, aria-modal=true, Escape key to close
+
 ### Data and State Management
 - **TanStack Query**: Server state management, caching, and data fetching
 - **React Hook Form**: Form state management with validation

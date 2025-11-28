@@ -35,35 +35,59 @@ export default function Home() {
   const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const feedbackTriggeredRef = useRef(false);
-  const hasStartedRef = useRef(false);
+  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
-  const shouldShowFeedback = useCallback(() => {
-    return Math.random() < 0.5;
+  const triggerFeedback = useCallback((delayMs: number = 2000) => {
+    if (feedbackTriggeredRef.current) return;
+    
+    if (Math.random() < 0.5) {
+      if (feedbackTimerRef.current) {
+        clearTimeout(feedbackTimerRef.current);
+      }
+      feedbackTimerRef.current = setTimeout(() => {
+        setShowFeedback(true);
+        feedbackTriggeredRef.current = true;
+      }, delayMs);
+    }
   }, []);
 
   useEffect(() => {
-    if (step === "ready" && !feedbackTriggeredRef.current && hasStartedRef.current) {
-      if (shouldShowFeedback()) {
-        const timer = setTimeout(() => {
-          setShowFeedback(true);
-          feedbackTriggeredRef.current = true;
-        }, 1500);
-        return () => clearTimeout(timer);
+    return () => {
+      if (feedbackTimerRef.current) {
+        clearTimeout(feedbackTimerRef.current);
       }
-    }
-  }, [step, shouldShowFeedback]);
+    };
+  }, []);
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (step !== "tier" && !feedbackTriggeredRef.current && shouldShowFeedback()) {
-        feedbackTriggeredRef.current = true;
+    const handleExitIntent = (e: MouseEvent) => {
+      if (e.clientY <= 5 && step !== "tier" && !feedbackTriggeredRef.current && !showFeedback) {
+        triggerFeedback(0);
       }
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [step, shouldShowFeedback]);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden" && step !== "tier" && !feedbackTriggeredRef.current && !showFeedback) {
+        localStorage.setItem("knowrole-pending-feedback", JSON.stringify({
+          tier: ageTier,
+          mood,
+          funMode,
+          landmark: landmark?.landmark,
+          theme,
+          timestamp: new Date().toISOString()
+        }));
+      }
+    };
+
+    document.addEventListener("mouseleave", handleExitIntent);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener("mouseleave", handleExitIntent);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [step, showFeedback, triggerFeedback, ageTier, mood, funMode, landmark, theme]);
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
@@ -127,7 +151,6 @@ export default function Home() {
 
   const handleStart = () => {
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    hasStartedRef.current = true;
     toast({
       title: "Your journey begins",
       description: landmark 
@@ -135,12 +158,7 @@ export default function Home() {
         : "Mapping your personalized discovery path...",
     });
 
-    if (!feedbackTriggeredRef.current && shouldShowFeedback()) {
-      setTimeout(() => {
-        setShowFeedback(true);
-        feedbackTriggeredRef.current = true;
-      }, 2000);
-    }
+    triggerFeedback(2000);
   };
 
   const getStepNumber = () => {

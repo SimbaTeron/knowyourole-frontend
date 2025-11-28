@@ -54,11 +54,14 @@ export default function FeedbackModal({ isOpen, onClose, tier, selectedTheme }: 
       }
 
       if (e.key === "Tab" && modalRef.current) {
-        const focusableElements = modalRef.current.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
         );
-        const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+        
+        if (focusableElements.length === 0) return;
+        
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
 
         if (e.shiftKey && document.activeElement === firstElement) {
           e.preventDefault();
@@ -113,31 +116,49 @@ export default function FeedbackModal({ isOpen, onClose, tier, selectedTheme }: 
     value: number; 
     onChange: (v: number) => void; 
     label: string;
-  }) => (
-    <div className="flex gap-1" role="radiogroup" aria-label={label}>
-      {[1, 2, 3, 4, 5].map((star) => (
-        <button
-          key={star}
-          type="button"
-          onClick={() => {
-            onChange(star);
-            if (navigator.vibrate) navigator.vibrate(15);
-          }}
-          className={`p-1 rounded transition-all ${
-            star <= value 
-              ? "text-amber-500" 
-              : "text-gray-300 dark:text-gray-600"
-          } hover:scale-110`}
-          aria-label={`${star} star${star > 1 ? "s" : ""}`}
-          aria-checked={star === value}
-          role="radio"
-          data-testid={`star-${label.toLowerCase().replace(/\s+/g, "-")}-${star}`}
-        >
-          <Star className={`w-6 h-6 ${star <= value ? "fill-current" : ""}`} />
-        </button>
-      ))}
-    </div>
-  );
+  }) => {
+    const handleKeyDown = (e: React.KeyboardEvent, star: number) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+        e.preventDefault();
+        onChange(Math.min(5, star + 1));
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+        e.preventDefault();
+        onChange(Math.max(1, star - 1));
+      } else if (e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        onChange(star);
+        if (navigator.vibrate) navigator.vibrate(15);
+      }
+    };
+
+    return (
+      <div className="flex gap-1" role="radiogroup" aria-label={label}>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => {
+              onChange(star);
+              if (navigator.vibrate) navigator.vibrate(15);
+            }}
+            onKeyDown={(e) => handleKeyDown(e, star)}
+            tabIndex={star === value || (value === 0 && star === 1) ? 0 : -1}
+            className={`p-1 rounded transition-all focus:outline-none focus:ring-2 focus:ring-terracotta/50 ${
+              star <= value 
+                ? "text-amber-500" 
+                : "text-gray-300 dark:text-gray-600"
+            } hover:scale-110`}
+            aria-label={`${star} star${star > 1 ? "s" : ""}`}
+            aria-checked={star === value}
+            role="radio"
+            data-testid={`star-${label.toLowerCase().replace(/\s+/g, "-")}-${star}`}
+          >
+            <Star className={`w-6 h-6 ${star <= value ? "fill-current" : ""}`} />
+          </button>
+        ))}
+      </div>
+    );
+  };
 
   const YesNoButtons = ({ 
     value, 
