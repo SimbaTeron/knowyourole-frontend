@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 interface StartButtonProps {
   disabled?: boolean;
@@ -8,19 +7,20 @@ interface StartButtonProps {
 
 export default function StartButton({ disabled = false, onClick }: StartButtonProps) {
   return (
-    <Button
+    <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full p-4 h-auto text-lg font-semibold rounded-lg transition-all ${
+      className={`group w-full py-4 px-6 rounded-2xl font-semibold text-lg transition-all duration-500 flex items-center justify-center gap-3 ${
         disabled
-          ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-          : "bg-gradient-to-r from-violet-echo to-pink-tide text-white shadow-lg"
+          ? "bg-indigo-deep/10 dark:bg-white/10 text-indigo-deep/40 dark:text-white/40 cursor-not-allowed"
+          : "premium-button text-white"
       }`}
       aria-label="Begin discovery journey"
       data-testid="button-start"
     >
-      <Sparkles className="mr-2 h-5 w-5" />
-      Begin Your Discovery
-    </Button>
+      <Sparkles className={`h-5 w-5 transition-all duration-300 ${!disabled && "group-hover:rotate-12"}`} />
+      <span>Begin Discovery</span>
+      <ArrowRight className={`h-5 w-5 transition-all duration-300 ${!disabled && "group-hover:translate-x-1"}`} />
+    </button>
   );
 }

@@ -1,5 +1,4 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface FunModeToggleProps {
   enabled: boolean;
@@ -8,29 +7,36 @@ interface FunModeToggleProps {
 
 export default function FunModeToggle({ enabled, onToggle }: FunModeToggleProps) {
   return (
-    <div className="w-full p-4 bg-white dark:bg-indigo-deep/50 rounded-lg border border-indigo-deep/20 dark:border-nebula-core/20">
-      <div className="flex items-center gap-3">
-        <Checkbox
-          id="fun-mode"
+    <div 
+      className={`w-full p-4 rounded-xl transition-all duration-500 ${
+        enabled 
+          ? "bg-gradient-to-r from-pink-tide/20 to-violet-echo/20 dark:from-pink-tide/30 dark:to-violet-echo/30" 
+          : "glass-card"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className={`text-2xl transition-all duration-300 ${enabled ? "animate-bounce" : ""}`}>
+            😏
+          </span>
+          <div>
+            <span className="font-semibold text-indigo-deep dark:text-white block">
+              Fun Mode
+            </span>
+            <span className="text-sm text-indigo-deep/60 dark:text-white/60">
+              Get playful roasts with your results
+            </span>
+          </div>
+        </div>
+        
+        <Switch
           checked={enabled}
-          onCheckedChange={(checked) => onToggle(checked === true)}
-          className="border-indigo-deep/50 dark:border-nebula-core/50 data-[state=checked]:bg-pink-tide data-[state=checked]:border-pink-tide"
-          aria-label="Enable Fun Mode for playful roasts"
-          data-testid="checkbox-fun-mode"
+          onCheckedChange={onToggle}
+          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-pink-tide data-[state=checked]:to-violet-echo"
+          aria-label="Enable Fun Mode"
+          data-testid="switch-fun-mode"
         />
-        <Label
-          htmlFor="fun-mode"
-          className="flex items-center gap-2 cursor-pointer text-indigo-deep dark:text-nebula-core"
-        >
-          <span className="text-lg">😏</span>
-          <span className="font-medium">Fun Mode: Roast my results?</span>
-        </Label>
       </div>
-      {enabled && (
-        <p className="mt-2 ml-8 text-sm text-pink-tide opacity-80">
-          Brace yourself for some playful personality roasts!
-        </p>
-      )}
     </div>
   );
 }
