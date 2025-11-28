@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PathCanvas from "@/components/PathCanvas";
@@ -10,6 +10,7 @@ import FunModeToggle from "@/components/FunModeToggle";
 import PostalInput from "@/components/PostalInput";
 import LandmarkBadge from "@/components/LandmarkBadge";
 import StartButton from "@/components/StartButton";
+import FeedbackModal from "@/components/FeedbackModal";
 import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 
@@ -32,7 +33,37 @@ export default function Home() {
   const [step, setStep] = useState<Step>("tier");
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const feedbackTriggeredRef = useRef(false);
+  const hasStartedRef = useRef(false);
   const { toast } = useToast();
+
+  const shouldShowFeedback = useCallback(() => {
+    return Math.random() < 0.5;
+  }, []);
+
+  useEffect(() => {
+    if (step === "ready" && !feedbackTriggeredRef.current && hasStartedRef.current) {
+      if (shouldShowFeedback()) {
+        const timer = setTimeout(() => {
+          setShowFeedback(true);
+          feedbackTriggeredRef.current = true;
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [step, shouldShowFeedback]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (step !== "tier" && !feedbackTriggeredRef.current && shouldShowFeedback()) {
+        feedbackTriggeredRef.current = true;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [step, shouldShowFeedback]);
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
@@ -96,12 +127,20 @@ export default function Home() {
 
   const handleStart = () => {
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+    hasStartedRef.current = true;
     toast({
       title: "Your journey begins",
       description: landmark 
         ? `Exploring your ${landmark.landmark} inspired path...`
         : "Mapping your personalized discovery path...",
     });
+
+    if (!feedbackTriggeredRef.current && shouldShowFeedback()) {
+      setTimeout(() => {
+        setShowFeedback(true);
+        feedbackTriggeredRef.current = true;
+      }, 2000);
+    }
   };
 
   const getStepNumber = () => {
@@ -292,6 +331,13 @@ export default function Home() {
           Unfold your trait trail →
         </p>
       </footer>
+
+      <FeedbackModal
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        tier={ageTier || undefined}
+        selectedTheme={theme}
+      />
     </div>
   );
 }
