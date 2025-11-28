@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import KnowRoleHeader from "@/components/KnowRoleHeader";
+import StepIndicator from "@/components/StepIndicator";
 import AgeTierSelector from "@/components/AgeTierSelector";
 import MoodSelector from "@/components/MoodSelector";
 import FunModeToggle from "@/components/FunModeToggle";
@@ -13,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 interface LandmarkInfo {
   landmark: string;
   class: string;
-  icon: string;
+  lucideIcon: string;
   type: string;
   city?: string;
   country?: string;
@@ -31,7 +32,7 @@ export default function Home() {
 
   const handleTierSelect = (tierId: string) => {
     setAgeTier(tierId);
-    setTimeout(() => setStep("mood"), 200);
+    setTimeout(() => setStep("mood"), 250);
   };
 
   const handleMoodComplete = () => {
@@ -58,10 +59,10 @@ export default function Home() {
 
   const handleStart = () => {
     toast({
-      title: "Journey Started",
+      title: "Your journey begins",
       description: landmark 
         ? `Exploring your ${landmark.landmark} inspired path...`
-        : "Preparing your personalized discovery path...",
+        : "Mapping your personalized discovery path...",
     });
   };
 
@@ -75,164 +76,145 @@ export default function Home() {
     }
   };
 
-  const themeClass = landmark?.class || "";
-
   return (
-    <div className="min-h-screen bg-soft-cream dark:bg-deep-cream transition-colors duration-500">
+    <div className="min-h-screen grain-overlay">
       <PathCanvas />
       <KnowRoleHeader />
       
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-5 pt-28 pb-16">
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-5 pt-32 pb-24">
         <div className="w-full max-w-sm">
-          <div className="text-center mb-8 animate-slide-up">
+          <div className="text-center mb-6 animate-fade-in" style={{ animationDuration: '0.8s' }}>
             <p
-              className="text-base text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed"
+              className="text-subhead text-warm-gray dark:text-soft-cream max-w-xs mx-auto"
               data-testid="text-subtitle"
             >
-              Swipe your everyday path to traits, sparks, and growth.
+              Chart your everyday path to discover traits, sparks, and growth
             </p>
           </div>
 
-          <div className="journal-card-elevated rounded-2xl p-6 md:p-7">
-            {step === "tier" && (
-              <AgeTierSelector selectedTier={ageTier} onSelect={handleTierSelect} />
-            )}
+          <StepIndicator currentStep={getStepNumber()} totalSteps={4} />
 
-            {step === "mood" && (
-              <div className="space-y-5">
-                <div className="flex items-center justify-between mb-1">
+          <div className="floating-card">
+            <div className="premium-card rounded-2xl p-7 md:p-8">
+              {step === "tier" && (
+                <AgeTierSelector selectedTier={ageTier} onSelect={handleTierSelect} />
+              )}
+
+              {step === "mood" && (
+                <div className="space-y-6">
                   <button
                     onClick={handleBack}
-                    className="flex items-center gap-1.5 text-sm font-medium text-terracotta transition-colors hover:text-terracotta-dark"
+                    className="flex items-center gap-1.5 text-sm font-medium text-terracotta/80 transition-colors hover:text-terracotta"
                     data-testid="button-back"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Back
+                    <span>Back</span>
                   </button>
-                  <span className="text-xs font-semibold tracking-[0.15em] uppercase text-terracotta">
-                    Step 2 of 4
-                  </span>
-                </div>
 
-                <MoodSelector mood={mood} onMoodChange={setMood} />
-                
-                <FunModeToggle enabled={funMode} onToggle={setFunMode} />
+                  <MoodSelector mood={mood} onMoodChange={setMood} />
+                  
+                  <FunModeToggle enabled={funMode} onToggle={setFunMode} />
 
-                <div className="pt-2">
-                  <button
-                    onClick={handleMoodComplete}
+                  <StartButton
                     disabled={!mood}
-                    className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
-                      mood
-                        ? "trail-button text-white"
-                        : "bg-warm-gray/10 text-warm-gray/40 cursor-not-allowed"
-                    }`}
-                    data-testid="button-continue-mood"
-                  >
-                    Continue
-                  </button>
+                    onClick={handleMoodComplete}
+                    label="Continue"
+                  />
                 </div>
-              </div>
-            )}
+              )}
 
-            {step === "postal" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between mb-1">
+              {step === "postal" && (
+                <div className="space-y-4">
                   <button
                     onClick={handleBack}
-                    className="flex items-center gap-1.5 text-sm font-medium text-terracotta transition-colors hover:text-terracotta-dark"
+                    className="flex items-center gap-1.5 text-sm font-medium text-terracotta/80 transition-colors hover:text-terracotta"
                     data-testid="button-back-postal"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Back
+                    <span>Back</span>
                   </button>
-                  <span className="text-xs font-semibold tracking-[0.15em] uppercase text-terracotta">
-                    Step 3 of 4
-                  </span>
+
+                  <PostalInput
+                    onLandmarkFound={handleLandmarkFound}
+                    onSkip={handleSkipPostal}
+                  />
                 </div>
+              )}
 
-                <PostalInput
-                  onLandmarkFound={handleLandmarkFound}
-                  onSkip={handleSkipPostal}
-                />
-              </div>
-            )}
-
-            {step === "ready" && (
-              <div className="space-y-6 animate-slide-up">
-                <div className="flex items-center justify-between mb-1">
+              {step === "ready" && (
+                <div className="space-y-6" style={{ animation: 'slideUp 0.5s ease-out forwards' }}>
                   <button
                     onClick={handleBack}
-                    className="flex items-center gap-1.5 text-sm font-medium text-terracotta transition-colors hover:text-terracotta-dark"
+                    className="flex items-center gap-1.5 text-sm font-medium text-terracotta/80 transition-colors hover:text-terracotta"
                     data-testid="button-back-ready"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Back
+                    <span>Back</span>
                   </button>
-                  <span className="text-xs font-semibold tracking-[0.15em] uppercase text-sage-green">
-                    Ready!
-                  </span>
-                </div>
 
-                <div className="text-center space-y-4">
-                  <h2 className="text-xl font-semibold text-warm-gray dark:text-soft-cream">
-                    Your path is set
-                  </h2>
-
-                  {landmark && (
-                    <div className="flex justify-center">
-                      <LandmarkBadge
-                        landmark={landmark.landmark}
-                        icon={landmark.icon}
-                        themeClass={landmark.class}
-                        city={landmark.city}
-                      />
+                  <div className="text-center space-y-5">
+                    <div>
+                      <h2 className="text-headline text-warm-gray dark:text-soft-cream mb-1">
+                        You're all set
+                      </h2>
+                      <p className="text-subhead text-warm-gray dark:text-soft-cream text-sm">
+                        Your personalized path awaits
+                      </p>
                     </div>
-                  )}
 
-                  <div className="flex flex-wrap justify-center gap-2 text-sm">
-                    <span className="px-3 py-1 rounded-full bg-terracotta/10 text-terracotta">
-                      {ageTier}
-                    </span>
-                    <span className="px-3 py-1 rounded-full bg-sage-green/10 text-sage-green">
-                      {mood}
-                    </span>
-                    {funMode && (
-                      <span className="px-3 py-1 rounded-full bg-dusty-blue/10 text-dusty-blue">
-                        😏 Fun Mode
-                      </span>
+                    {landmark && (
+                      <div className="flex justify-center py-2">
+                        <LandmarkBadge
+                          landmark={landmark.landmark}
+                          lucideIcon={landmark.lucideIcon}
+                          themeClass={landmark.class}
+                          city={landmark.city}
+                        />
+                      </div>
                     )}
+
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <span className="px-3 py-1.5 rounded-full bg-terracotta/8 text-terracotta text-xs font-medium">
+                        {ageTier}
+                      </span>
+                      <span className="px-3 py-1.5 rounded-full bg-sage-green/10 text-sage-green text-xs font-medium capitalize">
+                        {mood}
+                      </span>
+                      {funMode && (
+                        <span className="px-3 py-1.5 rounded-full bg-dusty-blue/10 text-dusty-blue text-xs font-medium">
+                          Fun Mode
+                        </span>
+                      )}
+                    </div>
                   </div>
+
+                  <StartButton onClick={handleStart} label="Begin Your Journey" />
                 </div>
-
-                <StartButton onClick={handleStart} />
-              </div>
-            )}
-          </div>
-
-          <div className="mt-6 flex justify-center gap-1.5">
-            {[1, 2, 3, 4].map((n) => (
-              <div
-                key={n}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  n === getStepNumber() ? "bg-terracotta w-6" : n < getStepNumber() ? "bg-sage-green w-1.5" : "bg-terracotta/20 w-1.5"
-                }`}
-              />
-            ))}
+              )}
+            </div>
           </div>
         </div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-10 py-4 text-center">
-        <a
-          href="#"
-          className="text-xs italic text-warm-gray/50 dark:text-soft-cream/40 hover:text-terracotta dark:hover:text-terracotta transition-colors group"
-          data-testid="link-footer"
-        >
-          Chart your everyday constellation of traits
-          <span className="inline-block ml-1 transition-transform group-hover:translate-x-0.5">→</span>
-        </a>
+      <footer className="fixed bottom-0 left-0 right-0 z-10 py-5 text-center">
+        <p className="text-micro text-warm-gray/40 dark:text-soft-cream/30">
+          Discover your constellation of traits
+        </p>
       </footer>
+      
+      <style>{`
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.6s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,64 +1,64 @@
 {
   "us": {
-    "New York": { "landmark": "Empire State", "class": "skyline-glow", "icon": "🏢", "type": "urban" },
-    "Los Angeles": { "landmark": "Hollywood Sign", "class": "sunset-boulevard", "icon": "🎬", "type": "urban" },
-    "Chicago": { "landmark": "Willis Tower", "class": "windy-city", "icon": "🌆", "type": "urban" },
-    "San Francisco": { "landmark": "Golden Gate", "class": "bay-bridge", "icon": "🌉", "type": "urban" },
-    "Las Vegas": { "landmark": "The Strip", "class": "neon-lights", "icon": "🎰", "type": "urban" },
-    "Miami": { "landmark": "South Beach", "class": "ocean-drive", "icon": "🌴", "type": "coastal" },
-    "Seattle": { "landmark": "Space Needle", "class": "pacific-mist", "icon": "🗼", "type": "urban" },
-    "Boston": { "landmark": "Freedom Trail", "class": "historic-brick", "icon": "🏛️", "type": "urban" },
-    "Denver": { "landmark": "Rocky Mountains", "class": "mountain-ridge", "icon": "🏔️", "type": "nature" },
-    "Austin": { "landmark": "Capitol Dome", "class": "texas-sunset", "icon": "🤠", "type": "urban" }
+    "New York": { "landmark": "Empire State", "class": "skyline-glow", "lucideIcon": "Building2", "type": "urban" },
+    "Los Angeles": { "landmark": "Hollywood Sign", "class": "sunset-boulevard", "lucideIcon": "Film", "type": "urban" },
+    "Chicago": { "landmark": "Willis Tower", "class": "windy-city", "lucideIcon": "Building", "type": "urban" },
+    "San Francisco": { "landmark": "Golden Gate", "class": "bay-bridge", "lucideIcon": "Landmark", "type": "urban" },
+    "Las Vegas": { "landmark": "The Strip", "class": "neon-lights", "lucideIcon": "Sparkles", "type": "urban" },
+    "Miami": { "landmark": "South Beach", "class": "ocean-drive", "lucideIcon": "Palmtree", "type": "coastal" },
+    "Seattle": { "landmark": "Space Needle", "class": "pacific-mist", "lucideIcon": "Tower", "type": "urban" },
+    "Boston": { "landmark": "Freedom Trail", "class": "historic-brick", "lucideIcon": "Castle", "type": "urban" },
+    "Denver": { "landmark": "Rocky Mountains", "class": "mountain-ridge", "lucideIcon": "Mountain", "type": "nature" },
+    "Austin": { "landmark": "Capitol Dome", "class": "texas-sunset", "lucideIcon": "CircleDot", "type": "urban" }
   },
   "in": {
-    "Delhi": { "landmark": "India Gate", "class": "dome-curve", "icon": "🏛️", "type": "urban" },
-    "Mumbai": { "landmark": "Gateway of India", "class": "monsoon-arch", "icon": "🌊", "type": "coastal" },
-    "Agra": { "landmark": "Taj Mahal", "class": "ivory-dome", "icon": "🕌", "type": "heritage" },
-    "Jaipur": { "landmark": "Hawa Mahal", "class": "pink-city", "icon": "🏰", "type": "heritage" },
-    "Bangalore": { "landmark": "Vidhana Soudha", "class": "garden-city", "icon": "🌳", "type": "urban" },
-    "Kolkata": { "landmark": "Victoria Memorial", "class": "colonial-white", "icon": "🏛️", "type": "heritage" }
+    "Delhi": { "landmark": "India Gate", "class": "dome-curve", "lucideIcon": "Castle", "type": "urban" },
+    "Mumbai": { "landmark": "Gateway of India", "class": "monsoon-arch", "lucideIcon": "Waves", "type": "coastal" },
+    "Agra": { "landmark": "Taj Mahal", "class": "ivory-dome", "lucideIcon": "Crown", "type": "heritage" },
+    "Jaipur": { "landmark": "Hawa Mahal", "class": "pink-city", "lucideIcon": "Castle", "type": "heritage" },
+    "Bangalore": { "landmark": "Vidhana Soudha", "class": "garden-city", "lucideIcon": "Trees", "type": "urban" },
+    "Kolkata": { "landmark": "Victoria Memorial", "class": "colonial-white", "lucideIcon": "Castle", "type": "heritage" }
   },
   "gb": {
-    "London": { "landmark": "Big Ben", "class": "tower-bridge", "icon": "🏰", "type": "urban" },
-    "Edinburgh": { "landmark": "Edinburgh Castle", "class": "highland-stone", "icon": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "type": "heritage" },
-    "Manchester": { "landmark": "Old Trafford", "class": "industrial-red", "icon": "⚽", "type": "urban" }
+    "London": { "landmark": "Big Ben", "class": "tower-bridge", "lucideIcon": "Clock", "type": "urban" },
+    "Edinburgh": { "landmark": "Edinburgh Castle", "class": "highland-stone", "lucideIcon": "Castle", "type": "heritage" },
+    "Manchester": { "landmark": "Old Trafford", "class": "industrial-red", "lucideIcon": "Trophy", "type": "urban" }
   },
   "fr": {
-    "Paris": { "landmark": "Eiffel Tower", "class": "iron-lace", "icon": "🗼", "type": "urban" },
-    "Nice": { "landmark": "Promenade", "class": "riviera-blue", "icon": "🏖️", "type": "coastal" },
-    "Lyon": { "landmark": "Basilica", "class": "silk-city", "icon": "⛪", "type": "heritage" }
+    "Paris": { "landmark": "Eiffel Tower", "class": "iron-lace", "lucideIcon": "TowerControl", "type": "urban" },
+    "Nice": { "landmark": "Promenade", "class": "riviera-blue", "lucideIcon": "Umbrella", "type": "coastal" },
+    "Lyon": { "landmark": "Basilica", "class": "silk-city", "lucideIcon": "Church", "type": "heritage" }
   },
   "jp": {
-    "Tokyo": { "landmark": "Tokyo Tower", "class": "neon-tokyo", "icon": "🗼", "type": "urban" },
-    "Kyoto": { "landmark": "Fushimi Shrine", "class": "torii-red", "icon": "⛩️", "type": "heritage" },
-    "Osaka": { "landmark": "Osaka Castle", "class": "castle-gold", "icon": "🏯", "type": "heritage" }
+    "Tokyo": { "landmark": "Tokyo Tower", "class": "neon-tokyo", "lucideIcon": "Tower", "type": "urban" },
+    "Kyoto": { "landmark": "Fushimi Shrine", "class": "torii-red", "lucideIcon": "Landmark", "type": "heritage" },
+    "Osaka": { "landmark": "Osaka Castle", "class": "castle-gold", "lucideIcon": "Castle", "type": "heritage" }
   },
   "au": {
-    "Sydney": { "landmark": "Opera House", "class": "harbour-sail", "icon": "🎭", "type": "coastal" },
-    "Melbourne": { "landmark": "Flinders Station", "class": "laneway-art", "icon": "🚃", "type": "urban" }
+    "Sydney": { "landmark": "Opera House", "class": "harbour-sail", "lucideIcon": "Theater", "type": "coastal" },
+    "Melbourne": { "landmark": "Flinders Station", "class": "laneway-art", "lucideIcon": "Train", "type": "urban" }
   },
   "cn": {
-    "Beijing": { "landmark": "Great Wall", "class": "dynasty-stone", "icon": "🏯", "type": "heritage" },
-    "Shanghai": { "landmark": "Oriental Pearl", "class": "pudong-glow", "icon": "🌃", "type": "urban" },
-    "Hong Kong": { "landmark": "Victoria Peak", "class": "harbour-lights", "icon": "🌃", "type": "urban" }
+    "Beijing": { "landmark": "Great Wall", "class": "dynasty-stone", "lucideIcon": "Milestone", "type": "heritage" },
+    "Shanghai": { "landmark": "Oriental Pearl", "class": "pudong-glow", "lucideIcon": "Gem", "type": "urban" },
+    "Hong Kong": { "landmark": "Victoria Peak", "class": "harbour-lights", "lucideIcon": "Mountain", "type": "urban" }
   },
   "br": {
-    "Rio de Janeiro": { "landmark": "Christ the Redeemer", "class": "corcovado", "icon": "🗽", "type": "coastal" },
-    "São Paulo": { "landmark": "Paulista Avenue", "class": "urban-jungle", "icon": "🏙️", "type": "urban" }
+    "Rio de Janeiro": { "landmark": "Christ the Redeemer", "class": "corcovado", "lucideIcon": "Landmark", "type": "coastal" },
+    "São Paulo": { "landmark": "Paulista Avenue", "class": "urban-jungle", "lucideIcon": "Building2", "type": "urban" }
   },
   "ae": {
-    "Dubai": { "landmark": "Burj Khalifa", "class": "desert-tower", "icon": "🏙️", "type": "urban" },
-    "Abu Dhabi": { "landmark": "Grand Mosque", "class": "white-marble", "icon": "🕌", "type": "heritage" }
+    "Dubai": { "landmark": "Burj Khalifa", "class": "desert-tower", "lucideIcon": "Building2", "type": "urban" },
+    "Abu Dhabi": { "landmark": "Grand Mosque", "class": "white-marble", "lucideIcon": "Church", "type": "heritage" }
   },
   "it": {
-    "Rome": { "landmark": "Colosseum", "class": "ancient-stone", "icon": "🏛️", "type": "heritage" },
-    "Venice": { "landmark": "Grand Canal", "class": "gondola-blue", "icon": "🚣", "type": "coastal" },
-    "Florence": { "landmark": "Duomo", "class": "renaissance-dome", "icon": "⛪", "type": "heritage" }
+    "Rome": { "landmark": "Colosseum", "class": "ancient-stone", "lucideIcon": "Landmark", "type": "heritage" },
+    "Venice": { "landmark": "Grand Canal", "class": "gondola-blue", "lucideIcon": "Ship", "type": "coastal" },
+    "Florence": { "landmark": "Duomo", "class": "renaissance-dome", "lucideIcon": "Church", "type": "heritage" }
   },
   "fallback": {
-    "urban": { "landmark": "City Center", "class": "global-city", "icon": "🏙️", "type": "urban" },
-    "rural": { "landmark": "Countryside", "class": "world-village", "icon": "🌾", "type": "nature" },
-    "coastal": { "landmark": "Seaside", "class": "ocean-breeze", "icon": "🌊", "type": "coastal" }
+    "urban": { "landmark": "City Center", "class": "global-city", "lucideIcon": "Building2", "type": "urban" },
+    "rural": { "landmark": "Countryside", "class": "world-village", "lucideIcon": "TreePine", "type": "nature" },
+    "coastal": { "landmark": "Seaside", "class": "ocean-breeze", "lucideIcon": "Waves", "type": "coastal" }
   }
 }

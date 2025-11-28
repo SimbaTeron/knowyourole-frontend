@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { MapPin, Loader2, Check, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -26,7 +25,7 @@ const countries = [
 interface LandmarkInfo {
   landmark: string;
   class: string;
-  icon: string;
+  lucideIcon: string;
   type: string;
   city?: string;
   country?: string;
@@ -97,48 +96,48 @@ export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProp
 
       setTimeout(() => {
         onLandmarkFound(landmarkInfo);
-      }, 500);
+      }, 400);
 
     } catch (err) {
-      setError("Couldn't find that location. Try another or skip.");
+      setError("Couldn't find that location");
       const fallbacks = (landmarksData as Record<string, Record<string, LandmarkInfo>>).fallback;
       setTimeout(() => {
         onLandmarkFound({ ...fallbacks.urban, city: "Your City", country: "Unknown" });
-      }, 1500);
+      }, 1200);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full space-y-5 animate-slide-up">
+    <div className="w-full space-y-5">
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-dusty-blue/10 text-dusty-blue text-xs font-medium mb-3">
-          <MapPin className="w-3 h-3" />
-          Optional
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-dusty-blue/8 mb-4">
+          <MapPin className="w-3 h-3 text-dusty-blue" />
+          <span className="text-micro text-dusty-blue">Optional</span>
         </div>
-        <h2 className="text-xl font-semibold text-warm-gray dark:text-soft-cream">
-          Add local flavor?
+        <h2 className="text-headline text-warm-gray dark:text-soft-cream mb-1">
+          Add local flavor
         </h2>
-        <p className="mt-1 text-sm text-warm-gray/60 dark:text-soft-cream/50">
-          Postal code for personalized path themes
+        <p className="text-subhead text-warm-gray dark:text-soft-cream text-sm">
+          Get a theme inspired by your location
         </p>
       </div>
 
       <div className="space-y-3">
         <Select value={countryCode} onValueChange={setCountryCode}>
           <SelectTrigger 
-            className="w-full bg-soft-cream dark:bg-deep-cream/60 border-terracotta/15 dark:border-terracotta/25"
+            className="w-full h-12 bg-soft-cream/60 dark:bg-deep-cream/40 border-terracotta/8 rounded-xl"
             data-testid="select-country"
           >
             <SelectValue placeholder="Select country" />
           </SelectTrigger>
-          <SelectContent className="bg-warm-white dark:bg-deep-cream border-terracotta/20">
+          <SelectContent className="bg-warm-white dark:bg-deep-cream border-terracotta/10 rounded-xl">
             {countries.map((country) => (
               <SelectItem 
                 key={country.code} 
                 value={country.code}
-                className="text-warm-gray dark:text-soft-cream"
+                className="text-warm-gray dark:text-soft-cream rounded-lg"
               >
                 {country.name}
               </SelectItem>
@@ -152,39 +151,38 @@ export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProp
             value={postal}
             onChange={(e) => setPostal(e.target.value)}
             placeholder={selectedCountry?.placeholder || "Enter postal code"}
-            className="w-full p-4 rounded-xl bg-soft-cream dark:bg-deep-cream/60 border border-terracotta/15 dark:border-terracotta/25 text-warm-gray dark:text-soft-cream placeholder:text-warm-gray/40 dark:placeholder:text-soft-cream/30 focus:outline-none focus:border-terracotta/40 transition-colors"
+            className="w-full h-12 px-4 rounded-xl bg-soft-cream/60 dark:bg-deep-cream/40 border border-terracotta/8 text-warm-gray dark:text-soft-cream placeholder:text-warm-gray/35 dark:placeholder:text-soft-cream/25 focus:outline-none focus:border-terracotta/25 focus:ring-2 focus:ring-terracotta/10 transition-all"
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             data-testid="input-postal"
           />
           {foundCity && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-sage-green text-sm">
-              <Check className="w-4 h-4" />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-sage-green text-xs font-medium">
+              <Check className="w-3.5 h-3.5" />
               {foundCity}
             </div>
           )}
         </div>
 
         {error && (
-          <p className="text-xs text-terracotta flex items-center gap-1">
+          <p className="text-xs text-terracotta/80 flex items-center gap-1.5 pl-1">
             <X className="w-3 h-3" />
             {error}
           </p>
         )}
       </div>
 
-      <div className="flex gap-3">
-        <Button
-          variant="ghost"
+      <div className="flex gap-3 pt-1">
+        <button
           onClick={onSkip}
-          className="flex-1 text-warm-gray/70 dark:text-soft-cream/60 hover:text-warm-gray dark:hover:text-soft-cream"
+          className="flex-1 h-12 rounded-xl text-warm-gray/60 dark:text-soft-cream/50 font-medium text-sm hover:text-warm-gray dark:hover:text-soft-cream transition-colors"
           data-testid="button-skip-postal"
         >
-          Skip
-        </Button>
+          Skip this step
+        </button>
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="flex-1 py-3 px-4 rounded-xl trail-button text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+          className="flex-1 h-12 rounded-xl trail-button text-white font-medium text-sm flex items-center justify-center gap-2 disabled:opacity-60"
           data-testid="button-submit-postal"
         >
           {loading ? (
@@ -192,14 +190,14 @@ export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProp
           ) : (
             <>
               <MapPin className="w-4 h-4" />
-              Find My Path
+              Find Location
             </>
           )}
         </button>
       </div>
 
-      <p className="text-center text-xs text-warm-gray/40 dark:text-soft-cream/30 italic">
-        Local flavor only — anonymous aggregate
+      <p className="text-center text-micro text-warm-gray/30 dark:text-soft-cream/20">
+        Anonymous only — no data stored
       </p>
     </div>
   );
