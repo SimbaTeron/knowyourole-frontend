@@ -1076,3 +1076,24 @@
 .dark .knowrole-select__option--is-focused {
   background: rgba(198,123,92,0.15) !important;
 }
+
+/* Feedback Modal Styles */
+.feedback-backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.feedback-question {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .feedback-question {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.feedback-question:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
