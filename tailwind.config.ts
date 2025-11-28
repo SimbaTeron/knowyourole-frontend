@@ -11,6 +11,15 @@ export default {
         sm: ".1875rem", /* 3px */
       },
       colors: {
+        // KnowRole Nebula Theme Colors
+        "nebula-core": "#E8F0FE",
+        "indigo-deep": "#1E3A5F",
+        "spark-gold": "#FFD700",
+        "coral-drift": "#FF6B6B",
+        "mint-veil": "#A8E6CF",
+        "violet-echo": "#4834D4",
+        "lavender-shift": "#B19CD9",
+        "pink-tide": "#FF9FF3",
         // Flat / base colors (regular buttons)
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
