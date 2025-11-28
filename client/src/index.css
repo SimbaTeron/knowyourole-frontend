@@ -266,6 +266,194 @@
   animation-delay: 1s;
 }
 
+/* Landmark Theme Classes */
+.skyline-glow {
+  background: linear-gradient(135deg, #C67B5C 0%, #4A90A4 50%, #2C3E50 100%);
+}
+
+.sunset-boulevard {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FFB347 50%, #C67B5C 100%);
+}
+
+.windy-city {
+  background: linear-gradient(135deg, #5D6D7E 0%, #85929E 50%, #C67B5C 100%);
+}
+
+.bay-bridge {
+  background: linear-gradient(135deg, #C67B5C 0%, #E74C3C 50%, #F39C12 100%);
+}
+
+.neon-lights {
+  background: linear-gradient(135deg, #9B59B6 0%, #E91E63 50%, #FFD700 100%);
+}
+
+.ocean-drive {
+  background: linear-gradient(135deg, #00CED1 0%, #FF69B4 50%, #C67B5C 100%);
+}
+
+.pacific-mist {
+  background: linear-gradient(135deg, #8B9A6D 0%, #5DADE2 50%, #85929E 100%);
+}
+
+.historic-brick {
+  background: linear-gradient(135deg, #A93226 0%, #C67B5C 50%, #8B4513 100%);
+}
+
+.mountain-ridge {
+  background: linear-gradient(135deg, #8B9A6D 0%, #5DADE2 50%, #34495E 100%);
+}
+
+.texas-sunset {
+  background: linear-gradient(135deg, #C67B5C 0%, #FFB347 50%, #8B4513 100%);
+}
+
+.dome-curve {
+  background: linear-gradient(135deg, #C67B5C 0%, #D4A574 50%, #8B4513 100%);
+}
+
+.monsoon-arch {
+  background: linear-gradient(135deg, #3498DB 0%, #1ABC9C 50%, #C67B5C 100%);
+}
+
+.ivory-dome {
+  background: linear-gradient(135deg, #C67B5C 0%, #F5F5DC 50%, #D4A574 100%);
+}
+
+.pink-city {
+  background: linear-gradient(135deg, #E91E63 0%, #FFB6C1 50%, #C67B5C 100%);
+}
+
+.garden-city {
+  background: linear-gradient(135deg, #8B9A6D 0%, #27AE60 50%, #C67B5C 100%);
+}
+
+.colonial-white {
+  background: linear-gradient(135deg, #BDC3C7 0%, #ECF0F1 50%, #C67B5C 100%);
+}
+
+.tower-bridge {
+  background: linear-gradient(135deg, #2C3E50 0%, #A93226 50%, #C67B5C 100%);
+}
+
+.highland-stone {
+  background: linear-gradient(135deg, #5D6D7E 0%, #8B9A6D 50%, #C67B5C 100%);
+}
+
+.industrial-red {
+  background: linear-gradient(135deg, #C0392B 0%, #E74C3C 50%, #C67B5C 100%);
+}
+
+.iron-lace {
+  background: linear-gradient(135deg, #5D6D7E 0%, #85929E 50%, #C67B5C 100%);
+}
+
+.riviera-blue {
+  background: linear-gradient(135deg, #3498DB 0%, #00CED1 50%, #C67B5C 100%);
+}
+
+.silk-city {
+  background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 50%, #C67B5C 100%);
+}
+
+.neon-tokyo {
+  background: linear-gradient(135deg, #E91E63 0%, #00BCD4 50%, #9C27B0 100%);
+}
+
+.torii-red {
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 50%, #C67B5C 100%);
+}
+
+.castle-gold {
+  background: linear-gradient(135deg, #F1C40F 0%, #C67B5C 50%, #8B4513 100%);
+}
+
+.harbour-sail {
+  background: linear-gradient(135deg, #3498DB 0%, #ECF0F1 50%, #C67B5C 100%);
+}
+
+.laneway-art {
+  background: linear-gradient(135deg, #9B59B6 0%, #E91E63 50%, #F39C12 100%);
+}
+
+.dynasty-stone {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #C67B5C 100%);
+}
+
+.pudong-glow {
+  background: linear-gradient(135deg, #00BCD4 0%, #9C27B0 50%, #C67B5C 100%);
+}
+
+.harbour-lights {
+  background: linear-gradient(135deg, #2C3E50 0%, #F39C12 50%, #C67B5C 100%);
+}
+
+.corcovado {
+  background: linear-gradient(135deg, #27AE60 0%, #3498DB 50%, #C67B5C 100%);
+}
+
+.urban-jungle {
+  background: linear-gradient(135deg, #5D6D7E 0%, #27AE60 50%, #C67B5C 100%);
+}
+
+.desert-tower {
+  background: linear-gradient(135deg, #F39C12 0%, #D4A574 50%, #C67B5C 100%);
+}
+
+.white-marble {
+  background: linear-gradient(135deg, #ECF0F1 0%, #BDC3C7 50%, #C67B5C 100%);
+}
+
+.ancient-stone {
+  background: linear-gradient(135deg, #8B4513 0%, #D4A574 50%, #C67B5C 100%);
+}
+
+.gondola-blue {
+  background: linear-gradient(135deg, #3498DB 0%, #1ABC9C 50%, #C67B5C 100%);
+}
+
+.renaissance-dome {
+  background: linear-gradient(135deg, #C0392B 0%, #ECF0F1 50%, #C67B5C 100%);
+}
+
+.global-city {
+  background: linear-gradient(135deg, #5D6D7E 0%, #85929E 50%, #C67B5C 100%);
+}
+
+.world-village {
+  background: linear-gradient(135deg, #8B9A6D 0%, #A8E6CF 50%, #C67B5C 100%);
+}
+
+.ocean-breeze {
+  background: linear-gradient(135deg, #3498DB 0%, #00CED1 50%, #C67B5C 100%);
+}
+
+/* Themed path cards */
+.path-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.path-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+  z-index: 0;
+  transition: opacity 0.3s ease;
+}
+
+.path-card:hover::before {
+  opacity: 0.25;
+}
+
+.path-card.skyline-glow::before { background: linear-gradient(135deg, #4A90A4 0%, #2C3E50 100%); }
+.path-card.dome-curve::before { background: linear-gradient(135deg, #D4A574 0%, #8B4513 100%); }
+.path-card.ivory-dome::before { background: linear-gradient(135deg, #F5F5DC 0%, #D4A574 100%); }
+.path-card.tower-bridge::before { background: linear-gradient(135deg, #A93226 0%, #2C3E50 100%); }
+.path-card.iron-lace::before { background: linear-gradient(135deg, #85929E 0%, #5D6D7E 100%); }
+.path-card.neon-tokyo::before { background: linear-gradient(135deg, #E91E63 0%, #00BCD4 100%); }
+.path-card.global-city::before { background: linear-gradient(135deg, #85929E 0%, #5D6D7E 100%); }
+
 @keyframes draw-path {
   to { stroke-dashoffset: 0; }
 }

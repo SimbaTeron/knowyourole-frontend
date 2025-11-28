@@ -1,0 +1,64 @@
+{
+  "us": {
+    "New York": { "landmark": "Empire State", "class": "skyline-glow", "icon": "🏢", "type": "urban" },
+    "Los Angeles": { "landmark": "Hollywood Sign", "class": "sunset-boulevard", "icon": "🎬", "type": "urban" },
+    "Chicago": { "landmark": "Willis Tower", "class": "windy-city", "icon": "🌆", "type": "urban" },
+    "San Francisco": { "landmark": "Golden Gate", "class": "bay-bridge", "icon": "🌉", "type": "urban" },
+    "Las Vegas": { "landmark": "The Strip", "class": "neon-lights", "icon": "🎰", "type": "urban" },
+    "Miami": { "landmark": "South Beach", "class": "ocean-drive", "icon": "🌴", "type": "coastal" },
+    "Seattle": { "landmark": "Space Needle", "class": "pacific-mist", "icon": "🗼", "type": "urban" },
+    "Boston": { "landmark": "Freedom Trail", "class": "historic-brick", "icon": "🏛️", "type": "urban" },
+    "Denver": { "landmark": "Rocky Mountains", "class": "mountain-ridge", "icon": "🏔️", "type": "nature" },
+    "Austin": { "landmark": "Capitol Dome", "class": "texas-sunset", "icon": "🤠", "type": "urban" }
+  },
+  "in": {
+    "Delhi": { "landmark": "India Gate", "class": "dome-curve", "icon": "🏛️", "type": "urban" },
+    "Mumbai": { "landmark": "Gateway of India", "class": "monsoon-arch", "icon": "🌊", "type": "coastal" },
+    "Agra": { "landmark": "Taj Mahal", "class": "ivory-dome", "icon": "🕌", "type": "heritage" },
+    "Jaipur": { "landmark": "Hawa Mahal", "class": "pink-city", "icon": "🏰", "type": "heritage" },
+    "Bangalore": { "landmark": "Vidhana Soudha", "class": "garden-city", "icon": "🌳", "type": "urban" },
+    "Kolkata": { "landmark": "Victoria Memorial", "class": "colonial-white", "icon": "🏛️", "type": "heritage" }
+  },
+  "gb": {
+    "London": { "landmark": "Big Ben", "class": "tower-bridge", "icon": "🏰", "type": "urban" },
+    "Edinburgh": { "landmark": "Edinburgh Castle", "class": "highland-stone", "icon": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "type": "heritage" },
+    "Manchester": { "landmark": "Old Trafford", "class": "industrial-red", "icon": "⚽", "type": "urban" }
+  },
+  "fr": {
+    "Paris": { "landmark": "Eiffel Tower", "class": "iron-lace", "icon": "🗼", "type": "urban" },
+    "Nice": { "landmark": "Promenade", "class": "riviera-blue", "icon": "🏖️", "type": "coastal" },
+    "Lyon": { "landmark": "Basilica", "class": "silk-city", "icon": "⛪", "type": "heritage" }
+  },
+  "jp": {
+    "Tokyo": { "landmark": "Tokyo Tower", "class": "neon-tokyo", "icon": "🗼", "type": "urban" },
+    "Kyoto": { "landmark": "Fushimi Shrine", "class": "torii-red", "icon": "⛩️", "type": "heritage" },
+    "Osaka": { "landmark": "Osaka Castle", "class": "castle-gold", "icon": "🏯", "type": "heritage" }
+  },
+  "au": {
+    "Sydney": { "landmark": "Opera House", "class": "harbour-sail", "icon": "🎭", "type": "coastal" },
+    "Melbourne": { "landmark": "Flinders Station", "class": "laneway-art", "icon": "🚃", "type": "urban" }
+  },
+  "cn": {
+    "Beijing": { "landmark": "Great Wall", "class": "dynasty-stone", "icon": "🏯", "type": "heritage" },
+    "Shanghai": { "landmark": "Oriental Pearl", "class": "pudong-glow", "icon": "🌃", "type": "urban" },
+    "Hong Kong": { "landmark": "Victoria Peak", "class": "harbour-lights", "icon": "🌃", "type": "urban" }
+  },
+  "br": {
+    "Rio de Janeiro": { "landmark": "Christ the Redeemer", "class": "corcovado", "icon": "🗽", "type": "coastal" },
+    "São Paulo": { "landmark": "Paulista Avenue", "class": "urban-jungle", "icon": "🏙️", "type": "urban" }
+  },
+  "ae": {
+    "Dubai": { "landmark": "Burj Khalifa", "class": "desert-tower", "icon": "🏙️", "type": "urban" },
+    "Abu Dhabi": { "landmark": "Grand Mosque", "class": "white-marble", "icon": "🕌", "type": "heritage" }
+  },
+  "it": {
+    "Rome": { "landmark": "Colosseum", "class": "ancient-stone", "icon": "🏛️", "type": "heritage" },
+    "Venice": { "landmark": "Grand Canal", "class": "gondola-blue", "icon": "🚣", "type": "coastal" },
+    "Florence": { "landmark": "Duomo", "class": "renaissance-dome", "icon": "⛪", "type": "heritage" }
+  },
+  "fallback": {
+    "urban": { "landmark": "City Center", "class": "global-city", "icon": "🏙️", "type": "urban" },
+    "rural": { "landmark": "Countryside", "class": "world-village", "icon": "🌾", "type": "nature" },
+    "coastal": { "landmark": "Seaside", "class": "ocean-breeze", "icon": "🌊", "type": "coastal" }
+  }
+}
