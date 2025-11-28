@@ -6,10 +6,30 @@ import {
 } from "lucide-react";
 
 const iconMap: Record<string, typeof Building2> = {
-  Building2, Film, Building, Landmark, Sparkles, Palmtree, TowerControl,
-  Castle, Mountain, CircleDot, Waves, Crown, Trees, Clock, Trophy,
-  Umbrella, Church, Theater, Train, Milestone, Gem,
-  Ship, TreePine, Tower: TowerControl
+  Building2,
+  Film,
+  Building,
+  Landmark,
+  Sparkles,
+  Palmtree,
+  TowerControl,
+  Castle,
+  Mountain,
+  CircleDot,
+  Waves,
+  Crown,
+  Trees,
+  Clock,
+  Trophy,
+  Umbrella,
+  Church,
+  Theater,
+  Train,
+  Milestone,
+  Gem,
+  Ship,
+  TreePine,
+  Tower: TowerControl,
 };
 
 interface LandmarkBadgeProps {

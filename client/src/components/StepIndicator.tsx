@@ -29,11 +29,6 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
             initial={false}
             animate={{
               scale: step === currentStep ? 1.1 : 1,
-              backgroundColor: step === currentStep 
-                ? "#C67B5C" 
-                : step < currentStep 
-                  ? "#8B9A6D" 
-                  : "rgba(198,123,92,0.08)"
             }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className={`step-pill ${
@@ -43,11 +38,6 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
                 ? "completed"
                 : ""
             }`}
-            style={{
-              background: step === currentStep
-                ? "conic-gradient(from 0deg, #C67B5C, #A85D3F, #C67B5C)"
-                : undefined
-            }}
             aria-current={step === currentStep ? "step" : undefined}
           >
             {step < currentStep ? (

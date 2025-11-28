@@ -868,9 +868,19 @@
   background: linear-gradient(165deg, #FFB366 0%, #E6994D 100%);
 }
 
-/* Random Theme Vibes */
+/* Random Theme Vibes - Hide PathCanvas default background when random theme active */
+.sunburst-trail-vibe [data-testid="path-canvas"] > div:first-child,
+.neon-urban-vibe [data-testid="path-canvas"] > div:first-child,
+.forest-whisper-vibe [data-testid="path-canvas"] > div:first-child,
+.ocean-drift-vibe [data-testid="path-canvas"] > div:first-child,
+.desert-bloom-vibe [data-testid="path-canvas"] > div:first-child,
+.city-pulse-vibe [data-testid="path-canvas"] > div:first-child,
+.meadow-dream-vibe [data-testid="path-canvas"] > div:first-child {
+  opacity: 0 !important;
+}
+
 .sunburst-trail-vibe {
-  background: radial-gradient(circle at 50% 30%, #FFF4E6 0%, #FFF8F0 100%);
+  background: radial-gradient(circle at 50% 30%, #FFF4E6 0%, #FFF8F0 100%) !important;
 }
 .sunburst-trail-vibe .premium-card {
   background: rgba(255,248,240,0.95);
@@ -898,7 +908,7 @@
 }
 
 .neon-urban-vibe {
-  background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 100%);
+  background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 100%) !important;
 }
 .neon-urban-vibe .premium-card {
   background: rgba(26,26,46,0.9);
@@ -917,7 +927,7 @@
 .neon-urban-vibe .text-terracotta { color: #00D4FF; }
 
 .forest-whisper-vibe {
-  background: linear-gradient(145deg, #F0F7F0 0%, #E8F5E9 100%);
+  background: linear-gradient(145deg, #F0F7F0 0%, #E8F5E9 100%) !important;
 }
 .forest-whisper-vibe .premium-card {
   background: rgba(240,247,240,0.95);
@@ -933,7 +943,7 @@
 }
 
 .ocean-drift-vibe {
-  background: linear-gradient(180deg, #CAF0F8 0%, #E0F7FA 100%);
+  background: linear-gradient(180deg, #CAF0F8 0%, #E0F7FA 100%) !important;
 }
 .ocean-drift-vibe .premium-card {
   background: rgba(224,247,250,0.95);
@@ -949,7 +959,7 @@
 }
 
 .desert-bloom-vibe {
-  background: linear-gradient(135deg, #FFF5EB 0%, #FFECD9 100%);
+  background: linear-gradient(135deg, #FFF5EB 0%, #FFECD9 100%) !important;
 }
 .desert-bloom-vibe .premium-card {
   background: rgba(255,245,235,0.95);
@@ -965,7 +975,7 @@
 }
 
 .city-pulse-vibe {
-  background: linear-gradient(145deg, #ECEFF1 0%, #F5F5F5 100%);
+  background: linear-gradient(145deg, #ECEFF1 0%, #F5F5F5 100%) !important;
 }
 .city-pulse-vibe .premium-card {
   background: rgba(245,245,245,0.95);
@@ -981,7 +991,7 @@
 }
 
 .meadow-dream-vibe {
-  background: linear-gradient(135deg, #FFF0F5 0%, #F0FFF0 100%);
+  background: linear-gradient(135deg, #FFF0F5 0%, #F0FFF0 100%) !important;
 }
 .meadow-dream-vibe .premium-card {
   background: rgba(255,240,245,0.95);
