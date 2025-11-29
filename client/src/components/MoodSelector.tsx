@@ -1,14 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Check, Zap, BookOpen, Compass, MapPin, Loader2, ChevronDown, ChevronUp, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CompassNeedle from "./CompassNeedle";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import landmarksData from "@/data/landmarks.json";
 
 interface MoodOption {
@@ -24,18 +17,6 @@ const moodOptions: MoodOption[] = [
   { value: "stuck", label: "Finding my way", description: "Looking for direction and clarity", Icon: Compass },
 ];
 
-const countries = [
-  { code: "us", name: "United States", placeholder: "10001" },
-  { code: "in", name: "India", placeholder: "110001" },
-  { code: "gb", name: "United Kingdom", placeholder: "SW1A 1AA" },
-  { code: "fr", name: "France", placeholder: "75001" },
-  { code: "jp", name: "Japan", placeholder: "100-0001" },
-  { code: "au", name: "Australia", placeholder: "2000" },
-  { code: "cn", name: "China", placeholder: "100000" },
-  { code: "br", name: "Brazil", placeholder: "01310-100" },
-  { code: "ae", name: "UAE", placeholder: "00000" },
-  { code: "it", name: "Italy", placeholder: "00100" },
-];
 
 export interface LandmarkInfo {
   landmark: string;
@@ -61,13 +42,10 @@ interface MoodSelectorProps {
 
 export default function MoodSelector({ mood, onMoodChange, onLandmarkChange, landmark }: MoodSelectorProps) {
   const [showLocalFlavor, setShowLocalFlavor] = useState(false);
-  const [countryCode, setCountryCode] = useState("us");
   const [postal, setPostal] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [foundCity, setFoundCity] = useState<string | null>(null);
-
-  const selectedCountry = countries.find(c => c.code === countryCode);
 
   const handleLocationSubmit = async () => {
     if (!postal.trim()) {
@@ -80,9 +58,9 @@ export default function MoodSelector({ mood, onMoodChange, onLandmarkChange, lan
     setFoundCity(null);
 
     try {
-      const cleanPostal = postal.trim().replace(/\s+/g, "%20");
+      const cleanPostal = postal.trim().replace(/\s+/g, "");
       const response = await fetch(
-        `https://api.zippopotam.us/${countryCode}/${cleanPostal}`
+        `https://api.zippopotam.us/us/${cleanPostal}`
       );
 
       if (!response.ok) {
@@ -92,11 +70,11 @@ export default function MoodSelector({ mood, onMoodChange, onLandmarkChange, lan
       const data = await response.json();
       const city = data.places?.[0]?.["place name"] || "";
       const state = data.places?.[0]?.["state"] || "";
-      const country = data.country || "";
+      const country = "United States";
 
       setFoundCity(city);
 
-      const countryLandmarks = (landmarksData as Record<string, Record<string, LandmarkInfo>>)[countryCode];
+      const countryLandmarks = (landmarksData as Record<string, Record<string, LandmarkInfo>>)["us"];
       
       let landmarkInfo: LandmarkInfo | null = null;
 
@@ -186,12 +164,12 @@ export default function MoodSelector({ mood, onMoodChange, onLandmarkChange, lan
                   }`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span className={`font-bold block text-lg leading-tight ${
+                  <span className={`font-bold block text-2xl leading-tight ${
                     isSelected ? "text-terracotta dark:text-white" : "text-black dark:text-white"
                   }`}>
                     {option.label}
                   </span>
-                  <span className={`text-sm block mt-0.5 ${
+                  <span className={`text-base block mt-1 ${
                     isSelected ? "text-terracotta/80 dark:text-soft-cream/90" : "text-gray-600 dark:text-gray-300"
                   }`}>
                     {option.description}
@@ -246,35 +224,16 @@ export default function MoodSelector({ mood, onMoodChange, onLandmarkChange, lan
             >
               <div className="pt-3 pb-2 space-y-3">
                 <div className="flex gap-2">
-                  <Select value={countryCode} onValueChange={setCountryCode}>
-                    <SelectTrigger 
-                      className="w-32 h-10 bg-soft-cream/60 dark:bg-deep-cream/40 border-terracotta/8 rounded-lg text-sm"
-                      data-testid="select-country-inline"
-                    >
-                      <SelectValue placeholder="Country" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-warm-white dark:bg-deep-cream border-terracotta/10 rounded-xl">
-                      {countries.map((country) => (
-                        <SelectItem 
-                          key={country.code} 
-                          value={country.code}
-                          className="text-warm-gray dark:text-soft-cream rounded-lg text-sm"
-                        >
-                          {country.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
                   <div className="flex-1 relative">
                     <input
                       type="text"
                       value={postal}
                       onChange={(e) => setPostal(e.target.value)}
-                      placeholder={selectedCountry?.placeholder || "Postal code"}
+                      placeholder="Enter ZIP code (e.g. 10001)"
                       className="w-full h-10 px-3 rounded-lg bg-soft-cream/60 dark:bg-deep-cream/40 border border-terracotta/8 text-warm-gray dark:text-soft-cream text-sm placeholder:text-warm-gray/35 dark:placeholder:text-soft-cream/25 focus:outline-none focus:border-terracotta/25 focus:ring-2 focus:ring-terracotta/10 transition-all"
                       onKeyDown={(e) => e.key === "Enter" && handleLocationSubmit()}
                       data-testid="input-postal-inline"
+                      maxLength={5}
                     />
                     {foundCity && (
                       <button

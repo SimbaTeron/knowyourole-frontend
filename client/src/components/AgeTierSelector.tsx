@@ -74,12 +74,12 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
                 </div>
                 
                 <div className="flex-1">
-                  <span className={`font-semibold block text-lg md:text-xl ${
+                  <span className={`font-semibold block text-2xl md:text-3xl ${
                     isSelected ? "text-white" : "text-warm-gray dark:text-soft-cream"
                   }`}>
                     {tier.label}
                   </span>
-                  <span className={`text-sm mt-0.5 block ${
+                  <span className={`text-base mt-1 block ${
                     isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-soft-cream/40"
                   }`}>
                     {tier.sublabel}
