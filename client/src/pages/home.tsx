@@ -1,33 +1,16 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import PathCanvas from "@/components/PathCanvas";
 import KnowRoleHeader from "@/components/KnowRoleHeader";
-import StepIndicator from "@/components/StepIndicator";
 import AgeTierSelector from "@/components/AgeTierSelector";
-import MoodSelector, { LandmarkInfo } from "@/components/MoodSelector";
-import FunModeToggle from "@/components/FunModeToggle";
-import LandmarkBadge from "@/components/LandmarkBadge";
-import StartButton from "@/components/StartButton";
-import Quiz, { QuizScores } from "@/components/Quiz";
-import Results from "@/components/Results";
 import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-
-type Step = "tier" | "mood" | "ready" | "quiz" | "results";
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const [ageTier, setAgeTier] = useState<string | null>(null);
-  const [mood, setMood] = useState("");
-  const [funMode, setFunMode] = useState(false);
-  const [landmark, setLandmark] = useState<LandmarkInfo | null>(null);
-  const [step, setStep] = useState<Step>("tier");
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
-  const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
-  const [quizSessionId, setQuizSessionId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
@@ -63,112 +46,9 @@ export default function Home() {
 
   const handleTierSelect = (tierId: string) => {
     setAgeTier(tierId);
-    setTimeout(() => setStep("mood"), 250);
-  };
-
-  const handleMoodComplete = () => {
-    if (mood) {
-      setStep("ready");
-    }
-  };
-
-  const handleLandmarkChange = (info: LandmarkInfo | null) => {
-    setLandmark(info);
-  };
-
-  const handleBack = () => {
-    if (navigator.vibrate) navigator.vibrate(30);
-    if (step === "mood") setStep("tier");
-    else if (step === "ready") setStep("mood");
-  };
-
-  const handleStart = () => {
-    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    toast({
-      title: "Your journey begins",
-      description: landmark 
-        ? `Exploring your ${landmark.landmark} inspired path...`
-        : "Mapping your personalized discovery path...",
-    });
-
-    setStep("quiz");
-  };
-
-  const handleQuizComplete = async (scores: QuizScores) => {
-    setQuizScores(scores);
-    
-    try {
-      const response = await apiRequest("POST", "/api/score", {
-        tier: ageTier,
-        mood,
-        funMode,
-        landmark: landmark?.landmark,
-        theme,
-        scores,
-      });
-      const data = await response.json();
-      if (data.sessionId) {
-        setQuizSessionId(data.sessionId);
-      }
-    } catch (error) {
-      console.error("Failed to save quiz results:", error);
-    }
-
-    setStep("results");
-  };
-
-  const handleQuizExit = () => {
-    setStep("ready");
-  };
-
-  const handleRestart = () => {
-    setQuizScores(null);
-    setQuizSessionId(null);
-    setStep("tier");
-    setAgeTier(null);
-    setMood("");
-    setFunMode(false);
-    setLandmark(null);
-  };
-
-  const handleShare = async () => {
-    if (!quizScores) return;
-
-    const mbtiType = [
-      quizScores.mbti.E > quizScores.mbti.I ? "E" : "I",
-      quizScores.mbti.S > quizScores.mbti.N ? "S" : "N",
-      quizScores.mbti.T > quizScores.mbti.F ? "T" : "F",
-      quizScores.mbti.J > quizScores.mbti.P ? "J" : "P",
-    ].join("");
-
-    const shareText = `I discovered my personality path! I'm a ${mbtiType} on KnowRole`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "My KnowRole Result",
-          text: shareText,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.log("Share cancelled");
-      }
-    } else {
-      await navigator.clipboard.writeText(shareText);
-      toast({
-        title: "Copied to clipboard",
-        description: "Share your result with friends!",
-      });
-    }
-  };
-
-  const getStepNumber = () => {
-    switch (step) {
-      case "tier": return 1;
-      case "mood": return 2;
-      case "ready": return 3;
-      default: return 1;
-    }
+    sessionStorage.setItem("knowrole-tier", tierId);
+    if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
+    setTimeout(() => setLocation("/mood"), 300);
   };
 
   const getThemeClass = () => {
@@ -178,47 +58,6 @@ export default function Home() {
     if (theme === "dark") return "dark-mysterious";
     return "light-clinical";
   };
-
-  if (step === "quiz" && ageTier) {
-    return (
-      <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
-        <PathCanvas />
-        <Quiz
-          tier={ageTier}
-          mood={mood}
-          funMode={funMode}
-          landmark={landmark?.landmark}
-          theme={theme}
-          onComplete={handleQuizComplete}
-          onExit={handleQuizExit}
-        />
-      </div>
-    );
-  }
-
-  if (step === "results" && quizScores && ageTier) {
-    return (
-      <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
-        <PathCanvas />
-        <KnowRoleHeader 
-          theme={theme} 
-          randomTheme={randomTheme} 
-          onThemeChange={handleThemeChange} 
-        />
-        <Results
-          scores={quizScores}
-          tier={ageTier}
-          mood={mood}
-          funMode={funMode}
-          landmark={landmark?.landmark}
-          theme={theme}
-          sessionId={quizSessionId}
-          onRestart={handleRestart}
-          onShare={handleShare}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
@@ -230,135 +69,33 @@ export default function Home() {
       />
       
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-5 pt-32 pb-24">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-md">
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-6"
+            className="text-center mb-8"
           >
             <p
-              className="text-subhead text-warm-gray dark:text-soft-cream max-w-xs mx-auto leading-6"
+              className="text-lg md:text-xl text-warm-gray dark:text-soft-cream max-w-sm mx-auto leading-relaxed"
               data-testid="text-subtitle"
             >
               Chart your everyday path to discover traits, sparks, and growth
             </p>
           </motion.div>
 
-          <StepIndicator currentStep={getStepNumber()} totalSteps={3} />
-
           <div className="floating-card">
-            <div className="premium-card rounded-2xl p-7 md:p-8">
+            <div className="premium-card rounded-2xl p-6 md:p-8">
               <AnimatePresence mode="wait">
-                {step === "tier" && (
-                  <motion.div
-                    key="tier"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <AgeTierSelector selectedTier={ageTier} onSelect={handleTierSelect} />
-                  </motion.div>
-                )}
-
-                {step === "mood" && (
-                  <motion.div
-                    key="mood"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-5"
-                  >
-                    <button
-                      onClick={handleBack}
-                      className="flex items-center gap-1.5 text-sm font-medium text-terracotta/80 transition-colors hover:text-terracotta"
-                      data-testid="button-back"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      <span>Back</span>
-                    </button>
-
-                    <MoodSelector 
-                      mood={mood} 
-                      onMoodChange={setMood}
-                      onLandmarkChange={handleLandmarkChange}
-                      landmark={landmark}
-                    />
-                    
-                    <FunModeToggle enabled={funMode} onToggle={setFunMode} />
-
-                    <StartButton
-                      disabled={!mood}
-                      onClick={handleMoodComplete}
-                      label="Continue"
-                    />
-                  </motion.div>
-                )}
-
-                {step === "ready" && (
-                  <motion.div
-                    key="ready"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-6"
-                  >
-                    <button
-                      onClick={handleBack}
-                      className="flex items-center gap-1.5 text-sm font-medium text-terracotta/80 transition-colors hover:text-terracotta"
-                      data-testid="button-back-ready"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      <span>Back</span>
-                    </button>
-
-                    <div className="text-center space-y-5">
-                      <div>
-                        <h2 className="text-headline text-warm-gray dark:text-soft-cream mb-1">
-                          You're all set
-                        </h2>
-                        <p className="text-subhead text-warm-gray dark:text-soft-cream text-sm">
-                          Your personalized path awaits
-                        </p>
-                      </div>
-
-                      {landmark && (
-                        <motion.div 
-                          initial={{ scale: 0.9, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ delay: 0.1 }}
-                          className="flex justify-center py-2"
-                        >
-                          <LandmarkBadge
-                            landmark={landmark.landmark}
-                            lucideIcon={landmark.lucideIcon}
-                            themeClass={landmark.class}
-                            city={landmark.city}
-                          />
-                        </motion.div>
-                      )}
-
-                      <div className="flex flex-wrap justify-center gap-2">
-                        <span className="px-3 py-1.5 rounded-full bg-terracotta/8 text-terracotta text-xs font-medium">
-                          {ageTier}
-                        </span>
-                        <span className="px-3 py-1.5 rounded-full bg-sage-green/10 text-sage-green text-xs font-medium capitalize">
-                          {mood}
-                        </span>
-                        {funMode && (
-                          <span className="px-3 py-1.5 rounded-full bg-dusty-blue/10 text-dusty-blue text-xs font-medium">
-                            Fun Mode
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <StartButton onClick={handleStart} label="Begin Your Journey" />
-                  </motion.div>
-                )}
+                <motion.div
+                  key="tier"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <AgeTierSelector selectedTier={ageTier} onSelect={handleTierSelect} />
+                </motion.div>
               </AnimatePresence>
             </div>
           </div>

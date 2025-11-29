@@ -443,25 +443,25 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       )}
                       
                       <h2 
-                        className={`text-base font-semibold ${promptColor}`}
+                        className={`text-xl md:text-2xl font-semibold quiz-question-text ${promptColor}`}
                         data-testid="text-prompt"
                       >
                         {currentQuestion.prompt}
                       </h2>
                     </div>
                     
-                    <div className="flex-1 flex flex-col justify-center gap-3">
+                    <div className="flex-1 flex flex-col justify-center gap-4">
                       <motion.button
                         whileHover={{ scale: 1.03, x: -8 }}
                         whileTap={{ scale: 0.98, x: -20 }}
                         onClick={() => !isTimingOut && handleSwipe("left")}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all p-4 disabled:opacity-50 -ml-2 mr-4"
+                        className="min-h-24 flex items-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all p-4 disabled:opacity-50 -ml-2 mr-4"
                         data-testid="card-option-left"
                       >
                         <div className="flex items-center gap-3 w-full">
-                          <ChevronLeft className="w-6 h-6 text-sage-green flex-shrink-0" />
-                          <p className="text-sm font-bold text-sage-green dark:text-sage-green leading-snug text-left flex-1">
+                          <ChevronLeft className="w-7 h-7 text-sage-green flex-shrink-0" />
+                          <p className="text-base md:text-lg font-bold text-sage-green dark:text-sage-green leading-snug text-left flex-1">
                             {currentQuestion.leftDesc}
                           </p>
                         </div>
@@ -476,14 +476,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         whileTap={{ scale: 0.98, x: 20 }}
                         onClick={() => !isTimingOut && handleSwipe("right")}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all p-4 disabled:opacity-50 ml-4 -mr-2"
+                        className="min-h-24 flex items-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all p-4 disabled:opacity-50 ml-4 -mr-2"
                         data-testid="card-option-right"
                       >
                         <div className="flex items-center gap-3 w-full">
-                          <p className="text-sm font-bold text-terracotta dark:text-terracotta leading-snug text-left flex-1">
+                          <p className="text-base md:text-lg font-bold text-terracotta dark:text-terracotta leading-snug text-left flex-1">
                             {currentQuestion.rightDesc}
                           </p>
-                          <ChevronRight className="w-6 h-6 text-terracotta flex-shrink-0" />
+                          <ChevronRight className="w-7 h-7 text-terracotta flex-shrink-0" />
                         </div>
                       </motion.button>
                     </div>

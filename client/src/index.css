@@ -847,6 +847,10 @@
   --kr-primary: #FFB366;
   --kr-accent: #FF9933;
 }
+.dark-mysterious,
+.dark {
+  color: #F5F5F5;
+}
 .dark-mysterious .grain-overlay::before {
   opacity: 0.05;
 }
@@ -866,6 +870,35 @@
 .dark-mysterious .tier-card-premium.selected,
 .dark-mysterious .mood-card-premium.selected {
   background: linear-gradient(165deg, #FFB366 0%, #E6994D 100%);
+}
+/* Dark mode text visibility fixes */
+.dark .text-warm-gray,
+.dark-mysterious .text-warm-gray {
+  color: #E5E5E5;
+}
+.dark p, .dark span, .dark h1, .dark h2, .dark h3, .dark h4, .dark label,
+.dark-mysterious p, .dark-mysterious span, .dark-mysterious h1, 
+.dark-mysterious h2, .dark-mysterious h3, .dark-mysterious h4, .dark-mysterious label {
+  color: inherit;
+}
+/* Fix answer card text in dark mode */
+.dark .tier-card-premium:not(.selected),
+.dark-mysterious .tier-card-premium:not(.selected) {
+  color: #E5E5E5;
+}
+.dark .mood-card-premium:not(.selected),
+.dark-mysterious .mood-card-premium:not(.selected) {
+  color: #E5E5E5;
+}
+/* Fix quiz question text */
+.dark .quiz-question-text,
+.dark-mysterious .quiz-question-text {
+  color: #F5F5F5 !important;
+}
+/* Fix results text visibility */
+.dark .results-text,
+.dark-mysterious .results-text {
+  color: #E5E5E5;
 }
 
 /* Random Theme Vibes - Hide PathCanvas default background when random theme active */

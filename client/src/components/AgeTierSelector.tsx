@@ -34,69 +34,75 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
 
   return (
     <div className="w-full">
-      <div className="text-center mb-8">
-        <h2 className="text-headline text-warm-gray dark:text-soft-cream mb-2">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl md:text-3xl font-display font-semibold text-warm-gray dark:text-soft-cream mb-2">
           Choose your path
         </h2>
-        <p className="text-subhead text-warm-gray dark:text-soft-cream">
+        <p className="text-base md:text-lg text-warm-gray/70 dark:text-soft-cream/60">
           Select the journey that fits you best
         </p>
       </div>
       
-      <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-3">
         {ageTiers.map((tier, index) => {
           const isSelected = selectedTier === tier.id;
           const Icon = tier.Icon;
           return (
             <motion.button
               key={tier.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ 
                 duration: 0.4, 
                 delay: index * 0.08,
                 ease: [0.22, 1, 0.36, 1]
               }}
               onClick={() => handleSelect(tier.id)}
-              className={`group relative p-5 text-left tier-card-premium ${isSelected ? "selected" : ""}`}
+              className={`group relative w-full p-5 md:p-6 text-left tier-card-premium ${isSelected ? "selected" : ""}`}
               aria-label={`Select ${tier.label}, ${tier.sublabel}`}
               data-testid={`button-tier-${tier.id}`}
             >
-              {isSelected && (
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute top-3 right-3 w-5 h-5 rounded-full bg-white/25 flex items-center justify-center"
-                >
-                  <Check className="w-3 h-3 text-white" />
-                </motion.div>
-              )}
-              
-              <div className={`icon-capsule mb-3 ${isSelected ? "active" : ""}`}>
-                <Icon className={`w-4 h-4 transition-colors ${
-                  isSelected ? "text-white" : "text-terracotta"
-                }`} />
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all ${
+                  isSelected 
+                    ? "bg-white/20" 
+                    : "bg-terracotta/10 dark:bg-sunset-amber/20"
+                }`}>
+                  <Icon className={`w-7 h-7 transition-colors ${
+                    isSelected ? "text-white" : "text-terracotta dark:text-sunset-amber"
+                  }`} />
+                </div>
+                
+                <div className="flex-1">
+                  <span className={`font-semibold block text-lg md:text-xl ${
+                    isSelected ? "text-white" : "text-warm-gray dark:text-soft-cream"
+                  }`}>
+                    {tier.label}
+                  </span>
+                  <span className={`text-sm mt-0.5 block ${
+                    isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-soft-cream/40"
+                  }`}>
+                    {tier.sublabel}
+                  </span>
+                </div>
+
+                {isSelected && (
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="w-8 h-8 rounded-full bg-white/25 flex items-center justify-center"
+                  >
+                    <Check className="w-5 h-5 text-white" />
+                  </motion.div>
+                )}
               </div>
-              
-              <span className={`font-semibold block text-sm ${
-                isSelected ? "text-white" : "text-warm-gray dark:text-soft-cream"
-              }`}>
-                {tier.label}
-              </span>
-              <span className={`text-xs mt-0.5 block font-handwritten text-lg ${
-                isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-soft-cream/40"
-              }`}>
-                {tier.sublabel}
-              </span>
             </motion.button>
           );
         })}
       </div>
 
-      <div className="my-5 border-t border-dashed border-terracotta/20" />
-
-      <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 italic">
-        Your age tier helps us tailor the experience
+      <p className="text-center text-sm text-warm-gray/50 dark:text-soft-cream/40 italic mt-6">
+        Tap to select your age tier
       </p>
     </div>
   );

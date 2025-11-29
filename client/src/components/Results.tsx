@@ -25,6 +25,11 @@ import { useToast } from "@/hooks/use-toast";
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
+interface APIScales {
+  critical: { value: number; traits: string; quest: string };
+  firstPrinciples: { value: number; traits: string; quest: string };
+}
+
 interface ResultsProps {
   scores: QuizScores;
   tier: string;
@@ -33,6 +38,7 @@ interface ResultsProps {
   landmark?: string;
   theme: string;
   sessionId?: string | null;
+  apiScales?: APIScales | null;
   onRestart: () => void;
   onShare: () => void;
 }
@@ -240,7 +246,7 @@ const TRAIT_QUESTS: Record<string, { high: string; low: string }> = {
   },
 };
 
-export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, onRestart, onShare }: ResultsProps) {
+export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, onRestart, onShare }: ResultsProps) {
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
@@ -259,10 +265,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   useEffect(() => {
     const calculated = calculateResult(scores);
+    if (apiScales) {
+      calculated.scales = apiScales;
+    }
     setResult(calculated);
     
     if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
-  }, [scores]);
+  }, [scores, apiScales]);
 
   const handleUpgrade = async () => {
     setIsCheckingOut(true);
@@ -1062,6 +1071,86 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       <p className="text-sm text-violet-900 dark:text-violet-100 italic">
                         "{FUN_MODE_ROASTS[result.mbtiType]}"
                       </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
+              {result.scales && (
+                <motion.div
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 }}
+                >
+                  <Card className="bg-gradient-to-br from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 border-indigo-200 dark:border-indigo-800">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Brain className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                        Thinking Scales
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pb-4 space-y-4">
+                      <div className="p-3 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+                            Critical Thinking
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                              {result.scales.critical.value}/5
+                            </span>
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((n) => (
+                                <Star
+                                  key={n}
+                                  className={`w-3.5 h-3.5 ${
+                                    n <= result.scales!.critical.value
+                                      ? "text-indigo-500 fill-indigo-500"
+                                      : "text-indigo-200 dark:text-indigo-700"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                          {result.scales.critical.traits}
+                        </p>
+                        <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 mt-1 italic">
+                          Quest: {result.scales.critical.quest}
+                        </p>
+                      </div>
+
+                      <div className="p-3 rounded-lg bg-cyan-50/50 dark:bg-cyan-900/30 border border-cyan-100 dark:border-cyan-800">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-semibold text-cyan-900 dark:text-cyan-200">
+                            First Principles
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm font-bold text-cyan-600 dark:text-cyan-400">
+                              {result.scales.firstPrinciples.value}/5
+                            </span>
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((n) => (
+                                <Star
+                                  key={n}
+                                  className={`w-3.5 h-3.5 ${
+                                    n <= result.scales!.firstPrinciples.value
+                                      ? "text-cyan-500 fill-cyan-500"
+                                      : "text-cyan-200 dark:text-cyan-700"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-xs text-cyan-700 dark:text-cyan-300">
+                          {result.scales.firstPrinciples.traits}
+                        </p>
+                        <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 mt-1 italic">
+                          Quest: {result.scales.firstPrinciples.quest}
+                        </p>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
