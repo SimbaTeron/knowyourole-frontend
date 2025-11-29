@@ -589,6 +589,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       </header>
 
       <main className="px-4 max-w-md mx-auto space-y-6">
+        {/* TIER 1: PRE-FEEDBACK (TEASER) - Always visible */}
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -605,10 +606,15 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2" data-testid="text-primary-role">
                 {result.primaryRole.title}
               </h3>
-              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green mb-4">
+              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green mb-3">
                 <TrendingUp className="w-3 h-3" />
                 <span className="text-sm font-semibold">{result.primaryRole.salary}</span>
               </div>
+              <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-xs mx-auto">
+                {result.primaryRole.desc} {result.mbtiType.includes('E') 
+                  ? "Your natural energy and communication style make you well-suited for this role." 
+                  : "Your thoughtful, focused approach brings unique value to this field."}
+              </p>
               
               <div className="grid grid-cols-1 gap-4 mt-6">
                 <motion.div 
@@ -665,69 +671,75 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </Card>
         </motion.div>
 
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="grid grid-cols-2 gap-3"
-        >
-          <Card className="bg-white dark:bg-gray-800 border-terracotta/20">
-            <CardContent className="p-4 text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-terracotta/10 mb-2">
-                <Brain className="w-5 h-5 text-terracotta" aria-hidden="true" />
-              </div>
-              <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-1">MBTI Type</p>
-              <p className="text-lg font-bold font-mono text-terracotta" data-testid="text-mbti">
-                {result.mbtiType}
-              </p>
-              <p className="text-sm font-medium text-warm-gray dark:text-soft-cream">
-                {result.mbtiLabel}
-              </p>
-            </CardContent>
-          </Card>
+        {/* TIER 2: POST-FEEDBACK (FULL) - MBTI/DISC side-by-side cards */}
+        {isFull && (
+          <motion.div
+            initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="grid grid-cols-2 gap-3"
+          >
+            <Card className="bg-white dark:bg-gray-800 border-terracotta/20">
+              <CardContent className="p-4 text-center">
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-terracotta/10 mb-2">
+                  <Brain className="w-5 h-5 text-terracotta" aria-hidden="true" />
+                </div>
+                <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-1">MBTI Type</p>
+                <p className="text-lg font-bold font-mono text-terracotta" data-testid="text-mbti">
+                  {result.mbtiType}
+                </p>
+                <p className="text-sm font-medium text-warm-gray dark:text-soft-cream">
+                  {result.mbtiLabel}
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card className={`${discColorMap[result.discColor] || "bg-sage-green text-white"} border-0`}>
-            <CardContent className="p-4 text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mb-2">
-                <Award className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <p className="text-xs opacity-70 mb-1">DISC Style</p>
-              <p className="text-lg font-bold" data-testid="text-disc">
-                {result.discLabel}
-              </p>
-              <p className="text-sm font-medium opacity-90">
-                {result.discStyle}-type
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
+            <Card className={`${discColorMap[result.discColor] || "bg-sage-green text-white"} border-0`}>
+              <CardContent className="p-4 text-center">
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mb-2">
+                  <Award className="w-5 h-5" aria-hidden="true" />
+                </div>
+                <p className="text-xs opacity-70 mb-1">DISC Style</p>
+                <p className="text-lg font-bold" data-testid="text-disc">
+                  {result.discLabel}
+                </p>
+                <p className="text-sm font-medium opacity-90">
+                  {result.discStyle}-type
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          <Card className="bg-white dark:bg-gray-800">
-            <CardContent className="p-4">
-              <p className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-2">Top Big Five Trait</p>
-              <div className="flex items-center gap-3">
-                {(() => {
-                  const Icon = TRAIT_ICONS[topTrait[0] as keyof typeof TRAIT_ICONS];
-                  const colors = TRAIT_COLORS[topTrait[0] as keyof typeof TRAIT_COLORS];
-                  return (
-                    <div 
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full ${colors.bg} text-white text-base`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span className="font-semibold">{TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]}</span>
-                      <span className="opacity-80 font-bold">{topTrait[1]}%</span>
-                    </div>
-                  );
-                })()}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* TIER 2: Top Big Five Trait badge (only post-feedback) */}
+        {isFull && (
+          <motion.div
+            initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            <Card className="bg-white dark:bg-gray-800">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-2">Top Big Five Trait</p>
+                <div className="flex items-center gap-3">
+                  {(() => {
+                    const Icon = TRAIT_ICONS[topTrait[0] as keyof typeof TRAIT_ICONS];
+                    const colors = TRAIT_COLORS[topTrait[0] as keyof typeof TRAIT_COLORS];
+                    return (
+                      <div 
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full ${colors.bg} text-white text-base`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="font-semibold">{TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]}</span>
+                        <span className="opacity-80 font-bold">{topTrait[1]}%</span>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {!isFull && (
           <motion.div
@@ -1098,85 +1110,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </motion.div>
               )}
 
-              {result.scales && (
-                <motion.div
-                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.45 }}
-                >
-                  <Card className="bg-gradient-to-br from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 border-indigo-200 dark:border-indigo-800">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Brain className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                        Thinking Scales
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pb-4 space-y-4">
-                      <div className="p-3 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
-                            Critical Thinking
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                              {result.scales.critical.value}/5
-                            </span>
-                            <div className="flex">
-                              {[1, 2, 3, 4, 5].map((n) => (
-                                <Star
-                                  key={n}
-                                  className={`w-3.5 h-3.5 ${
-                                    n <= result.scales!.critical.value
-                                      ? "text-indigo-500 fill-indigo-500"
-                                      : "text-indigo-200 dark:text-indigo-700"
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                          {result.scales.critical.traits}
-                        </p>
-                        <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 mt-1 italic">
-                          Quest: {result.scales.critical.quest}
-                        </p>
-                      </div>
-
-                      <div className="p-3 rounded-lg bg-cyan-50/50 dark:bg-cyan-900/30 border border-cyan-100 dark:border-cyan-800">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-semibold text-cyan-900 dark:text-cyan-200">
-                            First Principles
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-sm font-bold text-cyan-600 dark:text-cyan-400">
-                              {result.scales.firstPrinciples.value}/5
-                            </span>
-                            <div className="flex">
-                              {[1, 2, 3, 4, 5].map((n) => (
-                                <Star
-                                  key={n}
-                                  className={`w-3.5 h-3.5 ${
-                                    n <= result.scales!.firstPrinciples.value
-                                      ? "text-cyan-500 fill-cyan-500"
-                                      : "text-cyan-200 dark:text-cyan-700"
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-xs text-cyan-700 dark:text-cyan-300">
-                          {result.scales.firstPrinciples.traits}
-                        </p>
-                        <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 mt-1 italic">
-                          Quest: {result.scales.firstPrinciples.quest}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
+              {/* Thinking Scales moved to Premium tier as combined "Analytical Thinking" */}
 
               <motion.div
                 initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
@@ -1241,6 +1175,25 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     </CardContent>
                   </Card>
 
+                  <Card className="bg-white dark:bg-gray-800 border-violet-300 dark:border-violet-700">
+                    <CardContent className="p-4">
+                      <h5 className="text-sm font-bold text-violet-700 dark:text-violet-300 mb-3 flex items-center gap-2">
+                        <BookOpen className="w-4 h-4" />
+                        Deep Dive Analysis
+                      </h5>
+                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70 space-y-3">
+                        <p><strong>Why {result?.primaryRole.title}?</strong></p>
+                        <p className="leading-relaxed">
+                          Your {result?.mbtiType} personality type reveals a natural inclination toward {result?.mbtiType.includes('N') ? 'abstract thinking and future possibilities' : 'practical solutions and concrete details'}. Combined with your {result?.discStyle}-style DISC profile, which emphasizes {result?.discStyle === 'D' ? 'decisive action and results-driven leadership' : result?.discStyle === 'I' ? 'enthusiasm and collaborative energy' : result?.discStyle === 'S' ? 'steady reliability and supportive teamwork' : 'analytical precision and quality standards'}, you bring a unique blend of strengths to this role.
+                        </p>
+                        <p className="leading-relaxed">
+                          Your Big Five profile shows strong {TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]?.toLowerCase() || 'characteristics'}, which suggests you {topTrait[1] > 60 ? 'naturally excel in environments that leverage this trait' : 'can develop this area further with the right opportunities'}. People with your combination typically thrive when given {result?.mbtiType.includes('E') ? 'collaborative projects and team leadership opportunities' : 'focused time and space to develop deep expertise'}. Your results indicate strong potential for growth in {result?.primaryRole.title} and related fields.
+                        </p>
+                        <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-2 italic">Based on comprehensive analysis of your {scores.responses.length} quiz responses and personality profile.</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   <Card className="bg-white dark:bg-gray-800 border-amber-300 dark:border-amber-700">
                     <CardContent className="p-4">
                       <h5 className="text-sm font-bold text-amber-700 dark:text-amber-300 mb-3 flex items-center gap-2">
@@ -1249,27 +1202,83 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       </h5>
                       <div className="space-y-3">
                         <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
-                          <p className="text-sm font-semibold text-warm-gray dark:text-soft-cream">Creative Consultant</p>
-                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">$60K-120K · Bridge ideas with strategic vision</p>
+                          <p className="text-sm font-semibold text-warm-gray dark:text-soft-cream">
+                            {result?.mbtiType.includes('N') ? 'Innovation Strategist' : 'Operations Specialist'}
+                          </p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mb-1">
+                            {result?.mbtiType.includes('N') ? '$70K-130K' : '$55K-95K'}
+                          </p>
+                          <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
+                            {result?.mbtiType.includes('N') 
+                              ? 'Your intuitive thinking style makes you excellent at spotting trends and developing creative solutions. This role leverages your ability to see the big picture while connecting dots others might miss.'
+                              : 'Your practical, detail-oriented approach makes you ideal for streamlining processes and ensuring quality. You excel at turning complex tasks into efficient workflows.'}
+                          </p>
                         </div>
                         <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
-                          <p className="text-sm font-semibold text-warm-gray dark:text-soft-cream">Workshop Facilitator</p>
-                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">$50K-95K · Guide teams through collaborative discovery</p>
+                          <p className="text-sm font-semibold text-warm-gray dark:text-soft-cream">
+                            {result?.discStyle === 'I' || result?.discStyle === 'D' ? 'Team Lead / Facilitator' : 'Technical Specialist'}
+                          </p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mb-1">
+                            {result?.discStyle === 'I' || result?.discStyle === 'D' ? '$60K-110K' : '$65K-120K'}
+                          </p>
+                          <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
+                            {result?.discStyle === 'I' || result?.discStyle === 'D'
+                              ? 'Your natural ability to energize and motivate others positions you well for leadership roles. You bring enthusiasm that inspires collaboration and drives projects forward.'
+                              : 'Your methodical approach and attention to detail make you invaluable in technical roles. You thrive when given space to develop deep expertise and deliver high-quality work.'}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white dark:bg-gray-800 border-violet-300 dark:border-violet-700">
+                  <Card className="bg-gradient-to-br from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 border-indigo-200 dark:border-indigo-800">
                     <CardContent className="p-4">
-                      <h5 className="text-sm font-bold text-violet-700 dark:text-violet-300 mb-3 flex items-center gap-2">
-                        <BookOpen className="w-4 h-4" />
-                        Deep Dive Analysis
+                      <h5 className="text-sm font-bold text-indigo-700 dark:text-indigo-300 mb-3 flex items-center gap-2">
+                        <Brain className="w-4 h-4" />
+                        Analytical Thinking
                       </h5>
-                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70 space-y-2">
-                        <p><strong>Why {result?.primaryRole.title}?</strong></p>
-                        <p>Your unique combination of {result?.mbtiType} personality with {result?.discStyle} drive aligns perfectly with this role. Your high scores in key traits suggest you'd thrive in environments that value {result?.mbtiType.includes('E') ? 'collaboration and energy' : 'focus and depth'}.</p>
-                        <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-2 italic">Based on analysis of your quiz responses and personality profile.</p>
+                      <div className="p-3 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+                            Problem-Solving Ability
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {(() => {
+                              const critScore = result?.scales?.critical?.value || 3;
+                              const fpScore = result?.scales?.firstPrinciples?.value || 2;
+                              const combinedScore = Math.min(3, Math.round((critScore + fpScore) / 3.5));
+                              return (
+                                <>
+                                  <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                                    {combinedScore}/3
+                                  </span>
+                                  <div className="flex">
+                                    {[1, 2, 3].map((n) => (
+                                      <Star
+                                        key={n}
+                                        className={`w-4 h-4 ${
+                                          n <= combinedScore
+                                            ? "text-indigo-500 fill-indigo-500"
+                                            : "text-indigo-200 dark:text-indigo-700"
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                        <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
+                          This score combines your critical thinking and first-principles reasoning abilities. {result?.scales?.critical?.value && result.scales.critical.value >= 3 
+                            ? "You demonstrate strong analytical skills and can break down complex problems effectively." 
+                            : "You have room to grow in analytical thinking - practice questioning assumptions and seeking root causes."}
+                        </p>
+                        {result?.scales?.critical?.quest && (
+                          <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 mt-2 italic">
+                            Growth tip: {result.scales.critical.quest}
+                          </p>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -1293,7 +1302,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   <Card className="bg-white dark:bg-gray-800 border-pink-300 dark:border-pink-700">
                     <CardContent className="p-4">
                       <h5 className="text-sm font-bold text-pink-700 dark:text-pink-300 mb-3 flex items-center gap-2">
-                        <Star className="w-4 h-4" />
+                        <RefreshCw className="w-4 h-4" />
                         Retest Versions
                       </h5>
                       <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70">
