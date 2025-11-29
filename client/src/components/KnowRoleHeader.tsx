@@ -46,20 +46,21 @@ export default function KnowRoleHeader({ theme, randomTheme, onThemeChange }: Kn
           <img 
             src={appIcon} 
             alt="KnowRole compass icon" 
-            className="w-10 h-10 rounded-xl shadow-md object-cover"
-            data-testid="img-app-icon"
+            className="w-14 h-14 rounded-xl shadow-md object-cover"
+            data-testid="img-app-icon-left"
           />
-          <div className="flex flex-col">
-            <h1
-              className="text-display compass-gradient-text"
-              data-testid="text-title"
-            >
-              KnowRole
-            </h1>
-            <p className="text-micro text-warm-gray/50 dark:text-soft-cream/40">
-              Your everyday compass
-            </p>
-          </div>
+          <h1
+            className="text-display compass-gradient-text"
+            data-testid="text-title"
+          >
+            KnowRole
+          </h1>
+          <img 
+            src={appIcon} 
+            alt="KnowRole compass icon" 
+            className="w-14 h-14 rounded-xl shadow-md object-cover"
+            data-testid="img-app-icon-right"
+          />
         </div>
 
         <ThemeToggle

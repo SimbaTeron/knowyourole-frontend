@@ -28,6 +28,8 @@ const quizScoresSchema = z.object({
   })),
   engagement: z.number(),
   wildcardBoost: z.boolean(),
+  criticalWildcard: z.number().optional().default(0),
+  firstPrinciplesWildcard: z.number().optional().default(0),
 });
 
 const quizSubmitSchema = z.object({
@@ -100,6 +102,45 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
 
   const mbtiInfo = MBTI_LABELS[mbtiType] || MBTI_LABELS.INTP;
 
+  const mbtiTotal = mbti.E + mbti.I + mbti.S + mbti.N + mbti.T + mbti.F + mbti.J + mbti.P;
+  const discTotal = disc.D + disc.I + disc.S + disc.C;
+  
+  const mbtiT_pct = mbtiTotal > 0 ? (mbti.T / (mbti.T + mbti.F)) * 100 : 50;
+  const mbtiN_pct = mbtiTotal > 0 ? (mbti.N / (mbti.S + mbti.N)) * 100 : 50;
+  const big5O_pct = bigFiveProfile.openness;
+  const discC_pct = discTotal > 0 ? (disc.C / discTotal) * 100 : 25;
+  const discI_pct = discTotal > 0 ? (disc.I / discTotal) * 100 : 25;
+  
+  const criticalWildcardBoost = (scores.criticalWildcard || 0) * 20;
+  const firstPrinciplesWildcardBoost = (scores.firstPrinciplesWildcard || 0) * 20;
+  
+  const criticalProxy = (mbtiT_pct + big5O_pct + discC_pct) / 3;
+  const firstPrinciplesProxy = (mbtiN_pct + big5O_pct + discI_pct) / 3;
+  
+  const criticalRaw = (criticalProxy * 0.8) + (criticalWildcardBoost * 0.2);
+  const firstPrinciplesRaw = (firstPrinciplesProxy * 0.8) + (firstPrinciplesWildcardBoost * 0.2);
+  
+  const toScale = (pct: number) => Math.max(1, Math.min(5, Math.round(pct / 20)));
+  
+  const criticalScale = toScale(criticalRaw);
+  const firstPrinciplesScale = toScale(firstPrinciplesRaw);
+
+  const CRITICAL_QUESTS = [
+    "Question one 'obvious' fact today",
+    "Debate 1 belief you hold",
+    "Ask 'why' three times in a row",
+    "Find the flaw in a popular argument",
+    "Play devil's advocate once today",
+  ];
+  
+  const FIRST_PRINCIPLES_QUESTS = [
+    "Break a problem into its atoms",
+    "Rebuild one idea from scratch",
+    "Ask 'what if we started over?'",
+    "Strip away assumptions on 1 topic",
+    "Define the core truth beneath",
+  ];
+
   return {
     mbtiType,
     mbtiBlend: `${mbtiType}-${primaryDisc}`,
@@ -111,6 +152,22 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
     engagement: scores.engagement,
     totalQuestions: scores.responses.length,
     avgResponseTime: scores.responses.reduce((a, b) => a + b.timeSpent, 0) / scores.responses.length,
+    criticalScale,
+    firstPrinciplesScale,
+    criticalQuest: CRITICAL_QUESTS[criticalScale - 1],
+    firstPrinciplesQuest: FIRST_PRINCIPLES_QUESTS[firstPrinciplesScale - 1],
+    scales: {
+      critical: {
+        value: criticalScale,
+        traits: "T/O dissects sharply",
+        quest: CRITICAL_QUESTS[criticalScale - 1],
+      },
+      firstPrinciples: {
+        value: firstPrinciplesScale,
+        traits: "N/O rebuilds from ground up",
+        quest: FIRST_PRINCIPLES_QUESTS[firstPrinciplesScale - 1],
+      },
+    },
   };
 }
 
