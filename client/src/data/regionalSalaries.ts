@@ -91,6 +91,49 @@ const techRoles = ["Software Developer", "UX Designer", "Data Analyst", "Product
 const healthcareRoles = ["Nurse", "Doctor", "Physical Therapist", "Pharmacist", "Dental Hygienist", "Veterinarian"];
 const tradeRoles = ["Electrician", "Plumber", "HVAC Technician", "Carpenter", "Mechanic", "Welder"];
 
+const cityAliases: Record<string, string> = {
+  "new york city": "new york",
+  "nyc": "new york",
+  "manhattan": "new york",
+  "brooklyn": "new york",
+  "queens": "new york",
+  "bronx": "new york",
+  "staten island": "new york",
+  "beverly hills": "los angeles",
+  "santa monica": "los angeles",
+  "hollywood": "los angeles",
+  "pasadena": "los angeles",
+  "long beach": "los angeles",
+  "san jose": "san francisco",
+  "oakland": "san francisco",
+  "palo alto": "san francisco",
+  "mountain view": "san francisco",
+  "cupertino": "san francisco",
+  "fremont": "san francisco",
+  "sunnyvale": "san francisco",
+  "redwood city": "san francisco",
+  "bellevue": "seattle",
+  "redmond": "seattle",
+  "tacoma": "seattle",
+  "cambridge": "boston",
+  "somerville": "boston",
+  "brookline": "boston",
+  "round rock": "austin",
+  "boulder": "denver",
+  "lakewood": "denver",
+  "marietta": "atlanta",
+  "decatur": "atlanta",
+  "sandy springs": "atlanta",
+  "fort worth": "dallas",
+  "arlington": "dallas",
+  "plano": "dallas",
+  "the woodlands": "houston",
+  "sugar land": "houston",
+  "scottsdale": "phoenix",
+  "tempe": "phoenix",
+  "mesa": "phoenix"
+};
+
 export function getRegionalSalary(role: string, city?: string, state?: string): { salary: string; hasRegionalData: boolean; growthOutlook: string } {
   const baseRole = Object.keys(nationalBaseSalaries).find(r => 
     role.toLowerCase().includes(r.toLowerCase()) || r.toLowerCase().includes(role.toLowerCase())
@@ -105,7 +148,11 @@ export function getRegionalSalary(role: string, city?: string, state?: string): 
   }
   
   const baseSalary = nationalBaseSalaries[baseRole];
-  const normalizedCity = city?.toLowerCase().trim();
+  let normalizedCity = city?.toLowerCase().trim();
+  
+  if (normalizedCity && cityAliases[normalizedCity]) {
+    normalizedCity = cityAliases[normalizedCity];
+  }
   
   if (!normalizedCity || !metroMultipliers[normalizedCity]) {
     const lowK = Math.round(baseSalary.low / 1000);

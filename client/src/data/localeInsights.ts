@@ -262,6 +262,8 @@ export function getLocaleInsight(city: string, state?: string): LocaleInsight | 
   }
   
   const cityAliases: Record<string, string> = {
+    "new york city": "new york",
+    "nyc": "new york",
     "manhattan": "new york",
     "brooklyn": "new york",
     "queens": "new york",
