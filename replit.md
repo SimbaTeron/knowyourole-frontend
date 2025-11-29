@@ -73,7 +73,7 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
 
 - **zippopotam.us**: Postal code to city lookup.
 - **Stripe**: Payment processing for KnowRole Pro, integrated via `stripe-replit-sync` for managing subscriptions and webhooks.
-- **Google Sheets API**: Data export integration for quiz sessions, feedback, and questions database. Endpoints: POST `/api/export/sheets/sessions` (exports all quiz data with feedback to Google Sheets), POST `/api/export/sheets/questions` (exports questions database).
+- **Google Sheets API**: Data export integration for quiz sessions, feedback, and questions database. **Auto-export enabled**: New quiz results are automatically appended to the Quiz Sessions spreadsheet (ID: 1VT6hlq-AM1DKjB4l9SrFx_WqqPwFjI3cCZpZnjoRvRI) when feedback is submitted. Preserves existing formatting. Manual export endpoints: POST `/api/export/sheets/sessions` (full re-export), POST `/api/export/sheets/questions` (exports questions database).
 
 ### Databases
 
