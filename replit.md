@@ -102,14 +102,34 @@ Preferred communication style: Simple, everyday language.
 
 ### Locality Theme System
 - **City themes data**: `client/src/data/cityThemes.ts` - 100+ cities with NFL/sports team colors
-- **City matching**: Exact match + curated alias map (e.g., "Beverly Hills" → "Los Angeles" → "Rams")
+- **City matching**: Exact match + curated alias map (e.g., "Beverly Hills" → "Los Angeles")
+- **Hidden team names**: Theme labels (e.g., "Giants", "Rams") are NOT displayed in UI - colors only
 - **Regional fallback**: Generic regional themes (Northeast, Southeast, Midwest, etc.) for non-major cities
 - **API integration**: zippopotam.us API for postal code → city lookup
+- **City aliases**: "new york city" → "new york", "nyc" → "new york", etc. for API matching
 - **CSS variables**: 
   - `--locality-primary`, `--locality-secondary`, `--locality-accent`
   - `--locality-text-on-primary`, `--locality-text-on-secondary` for contrast safety
 - **Scoped classes**: `.locality-gradient`, `.locality-primary-bg`, `.locality-secondary-bg`
 - **Context provider**: `LocalityThemeContext` manages locality state and applies CSS variables
+
+### Locale Insights System
+- **Data file**: `client/src/data/localeInsights.ts` - Metro-specific career insights
+- **Major metros covered**: NYC, LA, SF, Chicago, Miami, Seattle, Austin, Boston, Denver, Atlanta
+- **Insight types**: General, introvert, extrovert, analytical, creative perspectives
+- **Personalized matching**: Based on MBTI (E/I) and DISC/MBTI analytical traits
+- **Opportunity tags**: Industry-specific opportunities per metro (Finance, Tech, Entertainment, etc.)
+- **Regional fallback**: Generic regional insights for non-major cities based on state
+
+### Regional Salary System
+- **Data file**: `client/src/data/regionalSalaries.ts` - Metro-adjusted salary ranges
+- **Base salaries**: 64 common roles with national base ranges
+- **Metro multipliers**: 20 major metros with cost-of-living adjustments:
+  - NYC: 1.35x, SF: 1.45x, LA: 1.25x, Seattle: 1.3x, Boston: 1.25x
+  - Chicago: 1.1x, Austin: 1.15x, Denver: 1.1x, Miami: 1.1x, Atlanta: 1.05x
+- **Industry bonuses**: Additional multipliers for tech, healthcare, and trade roles
+- **Fallback display**: Growth outlook text when no regional data available
+- **City aliases**: Comprehensive mapping for suburb → metro matching
 
 ### Accessibility
 - **StepIndicator**: ARIA roles/labels for VoiceOver compatibility
@@ -126,6 +146,11 @@ Preferred communication style: Simple, everyday language.
 - **A11y**: Focus management, keyboard navigation, aria-modal=true, reduced-motion support
 
 ### Quiz Flow
+- **Multi-Phase Quiz Structure**:
+  - Opening Multi-Choice Question: 4 tappable boxes ("What energizes you most?")
+  - Binary Quiz: 19-28 swipe/click questions with timer
+  - Final Multi-Choice Question: 4 tappable boxes (problem-solving approach)
+  - Feedback Modal: 3 quick questions before results
 - **Question Pool**: 129 total questions with tier-based distribution:
   - 7-12: 30 questions (15 base count per quiz)
   - 13-18: 25 questions (25 base count per quiz)
@@ -197,6 +222,7 @@ Preferred communication style: Simple, everyday language.
   - Team Compatibility Cards (MBTI pairing scores with collaboration tips)
   - 30-Day Growth Quest (personalized challenges targeting weakest Big Five trait)
   - Analytical Thinking Score (combined Critical Thinking + First Principles)
+  - Critical Thinking Tips: 3 personalized improvement suggestions based on scores
   - Arc Tracker (personality evolution over time)
   - Retest Versions (compare your growth)
 - **CTA Design**: Compelling locked-state card with animated crown badge, 6-feature grid, price callout, trust badges
