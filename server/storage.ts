@@ -41,6 +41,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   saveQuizSession(session: QuizSession): Promise<QuizSession>;
   getQuizSession(id: string): Promise<QuizSession | undefined>;
+  getAllQuizSessions(): Promise<QuizSession[]>;
   saveFeedback(feedback: InsertFeedback): Promise<Feedback>;
   getAllFeedback(): Promise<Feedback[]>;
 }
@@ -80,6 +81,12 @@ export class MemStorage implements IStorage {
 
   async getQuizSession(id: string): Promise<QuizSession | undefined> {
     return this.quizSessions.get(id);
+  }
+
+  async getAllQuizSessions(): Promise<QuizSession[]> {
+    return Array.from(this.quizSessions.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   }
 
   async saveFeedback(insertFeedback: InsertFeedback): Promise<Feedback> {

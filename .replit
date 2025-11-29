@@ -30,6 +30,10 @@ externalPort = 3001
 localPort = 44741
 externalPort = 3003
 
+[[ports]]
+localPort = 46179
+externalPort = 4200
+
 [env]
 PORT = "5000"
 
@@ -55,4 +59,4 @@ args = "npm run dev"
 waitForPort = 5000
 
 [agent]
-integrations = ["stripe:1.0.0"]
+integrations = ["stripe:1.0.0", "google-sheet:1.0.0"]

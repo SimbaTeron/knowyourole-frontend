@@ -20,6 +20,7 @@ export type User = typeof users.$inferSelect;
 export const feedback = pgTable("feedback", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   sessionId: text("session_id"),
+  usefulApp: text("useful_app"),
   resultsAccurate: text("results_accurate"),
   questionsEngaging: text("questions_engaging"),
   wouldShare: text("would_share"),

@@ -482,6 +482,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   
   const [showJustKidding, setShowJustKidding] = useState(false);
   
+  const [usefulApp, setUsefulApp] = useState<string>("");
   const [resultsAccurate, setResultsAccurate] = useState<string>("");
   const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
   const [wouldShare, setWouldShare] = useState<string>("");
@@ -605,7 +606,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     }
   };
 
-  const allFeedbackAnswered = resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "" && suggestions.trim().length > 0;
+  const allFeedbackAnswered = usefulApp !== "" && resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "" && suggestions.trim().length > 0;
 
   const handleShowFullResults = async () => {
     if (!allFeedbackAnswered) return;
@@ -614,6 +615,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     
     const feedbackData = {
       sessionId: sessionId || null,
+      usefulApp,
       resultsAccurate,
       questionsEngaging,
       wouldShare,
@@ -1325,18 +1327,59 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-terracotta/10 mb-3">
                     <MessageCircle className="w-6 h-6 text-terracotta" />
                   </div>
-                  <h3 className="text-lg font-bold text-warm-gray dark:text-soft-cream">
+                  <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream whitespace-nowrap">
                     Complete for More Free Insights!
                   </h3>
                   <p className="text-sm text-warm-gray/60 dark:text-soft-cream/50 mt-1">
-                    Answer 3 quick questions to unlock your full dashboard
+                    Answer questions to unlock dashboard
                   </p>
                 </div>
 
                 <div className="space-y-5">
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
+                      <legend className="text-lg font-medium text-warm-gray dark:text-soft-cream mb-3">
+                        Useful App?
+                      </legend>
+                    </Label>
+                    <div 
+                      className="flex justify-between w-full gap-2" 
+                      role="radiogroup"
+                      aria-label="Rate app usefulness"
+                    >
+                      <ToggleButton 
+                        value="no" 
+                        currentValue={usefulApp} 
+                        onChange={setUsefulApp}
+                        variant="no"
+                        testId="toggle-useful-no"
+                      >
+                        No
+                      </ToggleButton>
+                      <ToggleButton 
+                        value="somewhat" 
+                        currentValue={usefulApp} 
+                        onChange={setUsefulApp}
+                        variant="middle"
+                        testId="toggle-useful-somewhat"
+                      >
+                        Somewhat
+                      </ToggleButton>
+                      <ToggleButton 
+                        value="yes" 
+                        currentValue={usefulApp} 
+                        onChange={setUsefulApp}
+                        variant="yes"
+                        testId="toggle-useful-yes"
+                      >
+                        Yes
+                      </ToggleButton>
+                    </div>
+                  </fieldset>
+
+                  <fieldset className="space-y-2">
+                    <Label asChild>
+                      <legend className="text-lg font-medium text-warm-gray dark:text-soft-cream mb-3">
                         Results feel accurate?
                       </legend>
                     </Label>
@@ -1352,22 +1395,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         variant="no"
                         testId="toggle-accurate-no"
                       >
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Frown className="w-4 h-4" />
-                          No
-                        </span>
+                        No
                       </ToggleButton>
                       <ToggleButton 
-                        value="so-so" 
+                        value="somewhat" 
                         currentValue={resultsAccurate} 
                         onChange={setResultsAccurate}
                         variant="middle"
-                        testId="toggle-accurate-soso"
+                        testId="toggle-accurate-somewhat"
                       >
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Meh className="w-4 h-4" />
-                          So-so
-                        </span>
+                        Somewhat
                       </ToggleButton>
                       <ToggleButton 
                         value="yes" 
@@ -1376,17 +1413,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         variant="yes"
                         testId="toggle-accurate-yes"
                       >
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Smile className="w-4 h-4" />
-                          Yes!
-                        </span>
+                        Yes
                       </ToggleButton>
                     </div>
                   </fieldset>
 
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
+                      <legend className="text-lg font-medium text-warm-gray dark:text-soft-cream mb-3">
                         Questions engaging?
                       </legend>
                     </Label>
@@ -1402,22 +1436,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         variant="no"
                         testId="toggle-engaging-no"
                       >
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Frown className="w-4 h-4" />
-                          No
-                        </span>
+                        No
                       </ToggleButton>
                       <ToggleButton 
-                        value="so-so" 
+                        value="somewhat" 
                         currentValue={questionsEngaging} 
                         onChange={setQuestionsEngaging}
                         variant="middle"
-                        testId="toggle-engaging-soso"
+                        testId="toggle-engaging-somewhat"
                       >
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Meh className="w-4 h-4" />
-                          So-so
-                        </span>
+                        Somewhat
                       </ToggleButton>
                       <ToggleButton 
                         value="yes" 
@@ -1426,17 +1454,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         variant="yes"
                         testId="toggle-engaging-yes"
                       >
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Smile className="w-4 h-4" />
-                          Yes!
-                        </span>
+                        Yes
                       </ToggleButton>
                     </div>
                   </fieldset>
 
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
+                      <legend className="text-lg font-medium text-warm-gray dark:text-soft-cream mb-3">
                         Would share with a friend?
                       </legend>
                     </Label>
@@ -1452,10 +1477,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         variant="no"
                         testId="toggle-share-no"
                       >
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Frown className="w-4 h-4" />
-                          No
-                        </span>
+                        No
                       </ToggleButton>
                       <ToggleButton 
                         value="yes" 
@@ -1464,10 +1486,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         variant="yes"
                         testId="toggle-share-yes"
                       >
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Smile className="w-4 h-4" />
-                          Yes!
-                        </span>
+                        Yes
                       </ToggleButton>
                     </div>
                   </fieldset>
@@ -1475,22 +1494,22 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   <div className="space-y-2">
                     <Label 
                       htmlFor="suggestions" 
-                      className="text-sm font-medium text-warm-gray dark:text-soft-cream"
+                      className="text-lg font-medium text-warm-gray dark:text-soft-cream"
                     >
                       Suggestions for improvement?
                     </Label>
                     <Textarea
                       id="suggestions"
-                      placeholder="Suggestions for improvement? (Timing, design, etc.)"
+                      placeholder="Share your thoughts (timing, design, features, etc.)"
                       value={suggestions}
                       onChange={(e) => setSuggestions(e.target.value)}
-                      maxLength={1000}
+                      maxLength={2000}
                       rows={3}
                       className="resize-none text-sm"
                       data-testid="textarea-suggestions"
                     />
                     <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 text-right">
-                      {suggestions.length}/1000
+                      {suggestions.length}/2000
                     </p>
                   </div>
 

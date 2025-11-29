@@ -32,7 +32,7 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
 - **Results Dashboard**: Displays a Big Five Radar chart (340px, single-letter axis labels O/C/E/A/N with color-coded matching trait colors), MBTI/DISC/Big Five stacked vertically with plain-language explanations ("How you think and make decisions", "How you act and work with others", "Your core personality strength"), and personalized role recommendations (200+ clusters including trades, first responders, manufacturing, agriculture) based on personality traits. Free tier gets 4-5 sentence personalized summary incorporating MBTI, DISC, and Big Five insights. "Also Consider" section moved to premium tier. Includes "Fun Mode" enhancements with playful titles and roasts, and a "Test Mode" for premium feature preview (persistent sticky header with Crown icon and "DONATE HERE" teal button).
 - **Just Kidding Interstitial**: After clicking the $0.02 Unlock Premium button, users see a playful "Just Kidding!" overlay with "Premium is Free (For Now)" message, "Proceed to Results" button to unlock premium features for free during testing, and "Donate $0.02 (Alpha Feedback)" button for those who want to support development.
 - **EmojiMoodMixer**: Interactive mood mixing component on the mood page where users tap two mood ingredients (Happy, Calm, Curious, Determined, Creative, Social) to "brew" a hybrid personality hint in a cauldron animation.
-- **Feedback System**: A `FeedbackModal` collects user feedback post-quiz, with a timer-based skip option.
+- **Feedback System**: Redesigned feedback section with 5 questions: Useful App?, Results feel accurate?, Questions engaging?, Would share with a friend? (No/Yes), and Suggestions (2000 char limit). Header displays "Complete for More Free Insights!" in 2x larger font, questions use larger labels, and no emojis on buttons.
 - **Location and Geocoding**: Simplified zip code input (US and Canada only, no country selector) with auto-detection. Utilizes zippopotam.us API for postal code to city lookup, then maps to sports team colors via cityThemes.ts. Influences locality themes, locale insights, and regional salary adjustments.
 - **Locale Insights System**: Provides metro-specific career insights based on personality traits, with regional fallbacks.
 - **Regional Salary System**: Offers metro-adjusted salary ranges for common roles, with industry bonuses and growth outlook text.
@@ -73,6 +73,7 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
 
 - **zippopotam.us**: Postal code to city lookup.
 - **Stripe**: Payment processing for KnowRole Pro, integrated via `stripe-replit-sync` for managing subscriptions and webhooks.
+- **Google Sheets API**: Data export integration for quiz sessions, feedback, and questions database. Endpoints: POST `/api/export/sheets/sessions` (exports all quiz data with feedback to Google Sheets), POST `/api/export/sheets/questions` (exports questions database).
 
 ### Databases
 

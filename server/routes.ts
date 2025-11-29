@@ -336,6 +336,7 @@ export async function registerRoutes(
     try {
       const feedbackData = {
         sessionId: req.body.sessionId || null,
+        usefulApp: req.body.usefulApp || null,
         resultsAccurate: req.body.resultsAccurate || null,
         questionsEngaging: req.body.questionsEngaging || null,
         wouldShare: req.body.wouldShare || null,
@@ -516,6 +517,156 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Archetypes fetch error:", error);
       res.status(500).json({ error: "Failed to fetch archetypes" });
+    }
+  });
+
+  // Google Sheets Export - Export all quiz sessions with feedback to Google Sheets
+  app.post("/api/export/sheets/sessions", async (_req: Request, res: Response) => {
+    try {
+      const { createOrGetSpreadsheet, clearAndWriteSheet, formatTimezone } = await import("./googleSheets");
+      const fs = await import("fs");
+      const path = await import("path");
+      
+      // Get all quiz sessions and feedback
+      const allSessions = await storage.getAllQuizSessions();
+      const allFeedback = await storage.getAllFeedback();
+      
+      // Create feedback lookup by sessionId
+      const feedbackMap = new Map<string, any>();
+      allFeedback.forEach(f => {
+        if (f.sessionId) feedbackMap.set(f.sessionId, f);
+      });
+      
+      // Read questions database
+      const questionsPath = path.join(process.cwd(), "client/src/data/questions.json");
+      const questionsData = JSON.parse(fs.readFileSync(questionsPath, "utf-8"));
+      const questionsMap = new Map<number, any>();
+      questionsData.questions.forEach((q: any) => questionsMap.set(q.id, q));
+      
+      // Create spreadsheet
+      const spreadsheetId = await createOrGetSpreadsheet("KnowRole Quiz Data");
+      
+      // Build sessions data with all info in one row
+      const sessionsHeader = [
+        "Timestamp (Local)", "Session ID", "Age Tier", "Mood", "Fun Mode", "Theme",
+        "MBTI Type", "MBTI Blend", "DISC Style", "Title", "Spark",
+        "Openness", "Conscientiousness", "Extraversion", "Agreeableness", "Neuroticism",
+        "Total Questions", "Avg Response Time (s)", "Engagement Score",
+        "Useful App?", "Results Accurate?", "Questions Engaging?", "Would Share?", "Suggestions",
+        "All Responses (Q#:Choice)"
+      ];
+      
+      const sessionsRows = [sessionsHeader];
+      
+      for (const session of allSessions) {
+        const feedback = feedbackMap.get(session.id);
+        const responses = session.responses || [];
+        const responsesStr = responses
+          .map((r: any) => {
+            const q = questionsMap.get(r.questionId);
+            const choiceText = q?.options?.[r.choice] ?? String(r.choice);
+            return `Q${r.questionId}:${choiceText}`;
+          })
+          .join("; ");
+        
+        const result = session.result || {};
+        const bigFive = result.bigFiveProfile || {};
+        
+        sessionsRows.push([
+          formatTimezone(session.createdAt),
+          session.id || "",
+          session.tier || "",
+          session.mood || "",
+          session.funMode ? "Yes" : "No",
+          session.theme || "",
+          result.mbtiType || "",
+          result.mbtiBlend || "",
+          result.discStyle || "",
+          result.title || "",
+          result.spark || "",
+          bigFive.openness ?? "",
+          bigFive.conscientiousness ?? "",
+          bigFive.extraversion ?? "",
+          bigFive.agreeableness ?? "",
+          bigFive.neuroticism ?? "",
+          result.totalQuestions ?? "",
+          result.avgResponseTime?.toFixed(2) || "",
+          result.engagement ?? "",
+          feedback?.usefulApp || "",
+          feedback?.resultsAccurate || "",
+          feedback?.questionsEngaging || "",
+          feedback?.wouldShare || "",
+          feedback?.suggestions || "",
+          responsesStr
+        ]);
+      }
+      
+      await clearAndWriteSheet(spreadsheetId, "Quiz Sessions", sessionsRows);
+      
+      res.json({ 
+        success: true, 
+        spreadsheetId,
+        url: `https://docs.google.com/spreadsheets/d/${spreadsheetId}`,
+        sessionsExported: allSessions.length
+      });
+    } catch (error) {
+      console.error("Google Sheets export error:", error);
+      res.status(500).json({ error: "Failed to export to Google Sheets" });
+    }
+  });
+
+  // Google Sheets Export - Export questions database
+  app.post("/api/export/sheets/questions", async (_req: Request, res: Response) => {
+    try {
+      const { createOrGetSpreadsheet, clearAndWriteSheet } = await import("./googleSheets");
+      const fs = await import("fs");
+      const path = await import("path");
+      
+      // Read questions database
+      const questionsPath = path.join(process.cwd(), "client/src/data/questions.json");
+      const questionsData = JSON.parse(fs.readFileSync(questionsPath, "utf-8"));
+      
+      // Create spreadsheet
+      const spreadsheetId = await createOrGetSpreadsheet("KnowRole Questions Database");
+      
+      // Build questions data
+      const questionsHeader = [
+        "ID", "Prompt", "Left Option", "Right Option", "Left Description", "Right Description",
+        "Left Meta", "Right Meta", "Psychology Type", "Time (s)", "Age Tier", "Version", "Paid", "Wildcard"
+      ];
+      
+      const questionsRows = [questionsHeader];
+      
+      for (const q of questionsData.questions) {
+        questionsRows.push([
+          q.id,
+          q.prompt,
+          q.options[0],
+          q.options[1],
+          q.leftDesc,
+          q.rightDesc,
+          q.optionMeta[0],
+          q.optionMeta[1],
+          q.psych,
+          q.time,
+          q.tier,
+          q.version,
+          q.paid ? "Yes" : "No",
+          q.wildcard ? "Yes" : "No"
+        ]);
+      }
+      
+      await clearAndWriteSheet(spreadsheetId, "Questions", questionsRows);
+      
+      res.json({ 
+        success: true, 
+        spreadsheetId,
+        url: `https://docs.google.com/spreadsheets/d/${spreadsheetId}`,
+        questionsExported: questionsData.questions.length
+      });
+    } catch (error) {
+      console.error("Google Sheets questions export error:", error);
+      res.status(500).json({ error: "Failed to export questions to Google Sheets" });
     }
   });
 
