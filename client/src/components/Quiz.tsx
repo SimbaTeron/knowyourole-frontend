@@ -1,10 +1,103 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap, RotateCcw, MapPin } from "lucide-react";
+import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import questionsData from "@/data/questions.json";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
+
+interface MultiChoiceOption {
+  id: string;
+  label: string;
+  icon: "creative" | "analytical" | "people" | "learning" | "hands" | "mind" | "discuss" | "research";
+  weights: {
+    mbti?: Partial<Record<"E" | "I" | "S" | "N" | "T" | "F" | "J" | "P", number>>;
+    disc?: Partial<Record<"D" | "I" | "S" | "C", number>>;
+    bigFive?: Partial<Record<"O" | "C" | "E" | "A" | "N", number>>;
+  };
+}
+
+interface MultiChoiceQuestion {
+  id: string;
+  prompt: string;
+  subtitle: string;
+  options: MultiChoiceOption[];
+}
+
+const OPENING_QUESTION: MultiChoiceQuestion = {
+  id: "opening",
+  prompt: "What energizes you most right now?",
+  subtitle: "Pick the one that feels most like you",
+  options: [
+    {
+      id: "creative",
+      label: "Creating something new",
+      icon: "creative",
+      weights: { mbti: { N: 2, P: 1 }, disc: { I: 1 }, bigFive: { O: 3 } }
+    },
+    {
+      id: "analytical",
+      label: "Solving practical problems",
+      icon: "analytical",
+      weights: { mbti: { T: 2, S: 1 }, disc: { D: 1, C: 1 }, bigFive: { C: 2 } }
+    },
+    {
+      id: "people",
+      label: "Connecting with people",
+      icon: "people",
+      weights: { mbti: { E: 2, F: 1 }, disc: { I: 2 }, bigFive: { E: 3, A: 1 } }
+    },
+    {
+      id: "learning",
+      label: "Understanding how things work",
+      icon: "learning",
+      weights: { mbti: { I: 1, N: 1, T: 1 }, disc: { C: 2 }, bigFive: { O: 2, C: 1 } }
+    }
+  ]
+};
+
+const FINAL_QUESTION: MultiChoiceQuestion = {
+  id: "final",
+  prompt: "When tackling a challenge, you naturally...",
+  subtitle: "Almost there! One more insight",
+  options: [
+    {
+      id: "hands",
+      label: "Jump in and figure it out hands-on",
+      icon: "hands",
+      weights: { mbti: { E: 1, S: 2, P: 1 }, disc: { D: 2 }, bigFive: { E: 1 } }
+    },
+    {
+      id: "mind",
+      label: "Plan it out mentally first",
+      icon: "mind",
+      weights: { mbti: { I: 1, N: 1, J: 2 }, disc: { C: 2 }, bigFive: { C: 2 } }
+    },
+    {
+      id: "discuss",
+      label: "Talk it through with others",
+      icon: "discuss",
+      weights: { mbti: { E: 2, F: 1 }, disc: { I: 2, S: 1 }, bigFive: { E: 2, A: 1 } }
+    },
+    {
+      id: "research",
+      label: "Research until you feel ready",
+      icon: "research",
+      weights: { mbti: { I: 2, N: 1, J: 1 }, disc: { C: 2, S: 1 }, bigFive: { C: 2, O: 1 } }
+    }
+  ]
+};
+
+const MULTI_CHOICE_ICONS: Record<MultiChoiceOption["icon"], typeof Sparkles> = {
+  creative: Sparkles,
+  analytical: Wrench,
+  people: Users,
+  learning: Book,
+  hands: Wrench,
+  mind: Brain,
+  discuss: MessageCircle,
+  research: Search
+};
 
 interface Question {
   id: number;
@@ -89,9 +182,15 @@ const READABLE_RANDOM_COLORS = [
   { accent: "bg-teal-600", text: "text-white" },
 ];
 
+type QuizPhase = "opening" | "quiz" | "final";
+
 export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
   const tierConfig = questionsData.tierConfig[tier as keyof typeof questionsData.tierConfig] || questionsData.tierConfig["19-25"];
   const { teamName, isLocalitySet } = useLocalityTheme();
+  
+  const [quizPhase, setQuizPhase] = useState<QuizPhase>("opening");
+  const [openingChoice, setOpeningChoice] = useState<string | null>(null);
+  const [finalChoice, setFinalChoice] = useState<string | null>(null);
   
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -242,6 +341,73 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     });
   }, []);
 
+  const applyMultiChoiceWeights = useCallback((option: MultiChoiceOption) => {
+    setScores(prev => {
+      const newScores = { ...prev };
+      
+      if (option.weights.mbti) {
+        Object.entries(option.weights.mbti).forEach(([trait, weight]) => {
+          if (trait in newScores.mbti && weight) {
+            newScores.mbti = { 
+              ...newScores.mbti, 
+              [trait]: newScores.mbti[trait as keyof typeof newScores.mbti] + weight 
+            };
+          }
+        });
+      }
+      
+      if (option.weights.disc) {
+        Object.entries(option.weights.disc).forEach(([trait, weight]) => {
+          if (trait in newScores.disc && weight) {
+            newScores.disc = { 
+              ...newScores.disc, 
+              [trait]: newScores.disc[trait as keyof typeof newScores.disc] + weight 
+            };
+          }
+        });
+      }
+      
+      if (option.weights.bigFive) {
+        Object.entries(option.weights.bigFive).forEach(([trait, weight]) => {
+          if (trait in newScores.bigFive && weight) {
+            newScores.bigFive = { 
+              ...newScores.bigFive, 
+              [trait]: newScores.bigFive[trait as keyof typeof newScores.bigFive] + weight 
+            };
+          }
+        });
+      }
+      
+      return newScores;
+    });
+  }, []);
+
+  const handleOpeningChoice = useCallback((optionId: string) => {
+    const option = OPENING_QUESTION.options.find(o => o.id === optionId);
+    if (!option) return;
+    
+    if (navigator.vibrate) navigator.vibrate(50);
+    setOpeningChoice(optionId);
+    applyMultiChoiceWeights(option);
+    
+    setTimeout(() => {
+      setQuizPhase("quiz");
+    }, 400);
+  }, [applyMultiChoiceWeights]);
+
+  const handleFinalChoice = useCallback((optionId: string) => {
+    const option = FINAL_QUESTION.options.find(o => o.id === optionId);
+    if (!option) return;
+    
+    if (navigator.vibrate) navigator.vibrate(50);
+    setFinalChoice(optionId);
+    applyMultiChoiceWeights(option);
+    
+    setTimeout(() => {
+      onComplete(scores);
+    }, 400);
+  }, [applyMultiChoiceWeights, onComplete, scores]);
+
   const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false) => {
     if (questions.length === 0 || currentIndex >= questions.length) return;
     
@@ -272,7 +438,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       };
       
       if (currentIndex >= questions.length - 1) {
-        setTimeout(() => onComplete(updatedScores), 300);
+        setTimeout(() => setQuizPhase("final"), 300);
       }
       
       return updatedScores;
@@ -283,7 +449,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, onComplete, x]);
+  }, [currentIndex, questions, questionStartTime, processScore, x]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut) return;
@@ -324,6 +490,128 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   const currentQuestion = questions[currentIndex];
   
+  const renderMultiChoiceQuestion = (
+    question: MultiChoiceQuestion, 
+    selectedChoice: string | null,
+    onSelect: (id: string) => void,
+    isOpening: boolean
+  ) => (
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
+                isOpening 
+                  ? "bg-gradient-to-br from-terracotta to-dusty-blue" 
+                  : "bg-gradient-to-br from-sage-green to-dusty-blue"
+              }`}
+            >
+              {isOpening ? (
+                <Sparkles className="w-8 h-8 text-white" />
+              ) : (
+                <Lightbulb className="w-8 h-8 text-white" />
+              )}
+            </motion.div>
+            
+            <p className="text-sm text-warm-gray/60 dark:text-soft-cream/50 mb-2">
+              {question.subtitle}
+            </p>
+            <h2 className="text-2xl font-bold text-warm-gray dark:text-soft-cream">
+              {question.prompt}
+            </h2>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            {question.options.map((option, idx) => {
+              const Icon = MULTI_CHOICE_ICONS[option.icon];
+              const isSelected = selectedChoice === option.id;
+              
+              return (
+                <motion.button
+                  key={option.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: isSelected ? 1.05 : 1 }}
+                  transition={{ delay: idx * 0.1 }}
+                  onClick={() => onSelect(option.id)}
+                  disabled={!!selectedChoice}
+                  className={`
+                    relative p-6 rounded-2xl border-2 transition-all duration-300
+                    flex flex-col items-center justify-center gap-3 text-center
+                    min-h-[140px]
+                    ${isSelected 
+                      ? "border-terracotta bg-terracotta/10 dark:bg-terracotta/20 scale-105" 
+                      : "border-terracotta/20 dark:border-terracotta/30 bg-soft-cream/50 dark:bg-gray-800 hover:border-terracotta/50 hover:bg-terracotta/5"
+                    }
+                    ${selectedChoice && !isSelected ? "opacity-50" : ""}
+                  `}
+                  data-testid={`button-choice-${option.id}`}
+                >
+                  <div className={`
+                    w-12 h-12 rounded-full flex items-center justify-center
+                    ${isSelected 
+                      ? "bg-terracotta text-white" 
+                      : "bg-terracotta/10 dark:bg-terracotta/20 text-terracotta"
+                    }
+                  `}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <span className={`
+                    text-sm font-medium leading-tight
+                    ${isSelected 
+                      ? "text-terracotta" 
+                      : "text-warm-gray dark:text-soft-cream"
+                    }
+                  `}>
+                    {option.label}
+                  </span>
+                  
+                  {isSelected && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-terracotta text-white flex items-center justify-center"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </motion.div>
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
+          
+          {!isOpening && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-6"
+            >
+              Your answers shape your personalized results
+            </motion.p>
+          )}
+        </motion.div>
+      </main>
+    </div>
+  );
+
+  if (quizPhase === "opening") {
+    return renderMultiChoiceQuestion(OPENING_QUESTION, openingChoice, handleOpeningChoice, true);
+  }
+
+  if (quizPhase === "final") {
+    return renderMultiChoiceQuestion(FINAL_QUESTION, finalChoice, handleFinalChoice, false);
+  }
+  
   if (questions.length === 0 || !currentQuestion) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
@@ -361,14 +649,13 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             <span className="text-sm font-medium text-warm-gray dark:text-soft-cream">
               {currentIndex + 1}/{questions.length}
             </span>
-            {useLocalityColors && teamName && (
+            {useLocalityColors && isLocalitySet && (
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full locality-gradient"
+                className="flex items-center gap-1 px-2 py-1 rounded-full locality-gradient"
               >
                 <MapPin className="w-3 h-3" />
-                <span className="text-xs font-medium">{teamName}</span>
               </motion.div>
             )}
             {fastResponses >= 3 && (

@@ -5,7 +5,7 @@ import {
   Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame,
   MessageCircle, Frown, Meh, Smile, Lock, Crown, Star, Gift, BookOpen,
   Rocket, Timer, CheckCircle2, Calendar, ArrowRight, Shield, Compass, 
-  Mountain, Sunrise, CircleDot, Play
+  Mountain, Sunrise, CircleDot, Play, Building2, DollarSign
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +25,8 @@ import type { QuizScores } from "./Quiz";
 import rolesData from "@/data/roles.json";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
+import { getLocaleInsight, getPersonalizedInsight, type LocaleInsight } from "@/data/localeInsights";
+import { getRegionalSalary, shouldShowSalary } from "@/data/regionalSalaries";
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -457,7 +459,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
-  const { teamName, isLocalitySet } = useLocalityTheme();
+  const { teamName, cityName, stateName, isLocalitySet } = useLocalityTheme();
+  
+  const localeInsight = cityName ? getLocaleInsight(cityName, stateName || undefined) : null;
   
   const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
@@ -837,10 +841,24 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2" data-testid="text-primary-role">
                 {result.primaryRole.title}
               </h3>
-              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green mb-3">
-                <TrendingUp className="w-3 h-3" />
-                <span className="text-sm font-semibold">{result.primaryRole.salary}</span>
-              </div>
+              {(() => {
+                const regionalInfo = getRegionalSalary(result.primaryRole.title, cityName || undefined, stateName || undefined);
+                const displaySalary = regionalInfo.hasRegionalData ? regionalInfo.salary : result.primaryRole.salary;
+                return (
+                  <div className="space-y-1 mb-3">
+                    <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green">
+                      {regionalInfo.hasRegionalData ? <DollarSign className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
+                      <span className="text-sm font-semibold">{displaySalary}</span>
+                      {regionalInfo.hasRegionalData && cityName && (
+                        <span className="text-xs opacity-70">in {cityName}</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                      {regionalInfo.growthOutlook}
+                    </p>
+                  </div>
+                );
+              })()}
               <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-xs mx-auto">
                 {result.primaryRole.desc} {result.mbtiType.includes('E') 
                   ? "Your natural energy and communication style make you well-suited for this role." 
@@ -992,6 +1010,53 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       </div>
                     );
                   })()}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Locale Insights Card - shows personalized insights based on location */}
+        {isFull && localeInsight && (
+          <motion.div
+            initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75 }}
+          >
+            <Card className="bg-gradient-to-br from-dusty-blue/10 to-sage-green/10 dark:from-dusty-blue/20 dark:to-sage-green/20 border-dusty-blue/20">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-dusty-blue/20 dark:bg-dusty-blue/30 flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-dusty-blue" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-sm font-bold text-warm-gray dark:text-soft-cream">
+                        Your {localeInsight.city} Edge
+                      </h4>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-dusty-blue/10 text-dusty-blue">
+                        {localeInsight.metro}
+                      </span>
+                    </div>
+                    <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed mb-3">
+                      {getPersonalizedInsight(
+                        cityName,
+                        stateName,
+                        result.mbtiType.startsWith('E'),
+                        result.mbtiType.includes('T') || result.discStyle === 'C'
+                      )}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {localeInsight.opportunities.slice(0, 4).map((opp) => (
+                        <span 
+                          key={opp}
+                          className="text-xs px-2 py-1 rounded-full bg-sage-green/10 text-sage-green"
+                        >
+                          {opp}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -1765,6 +1830,79 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                             ? "You demonstrate strong analytical skills and break down complex problems effectively." 
                             : "You have room to grow in analytical thinking. Focus on questioning assumptions."}
                         </p>
+                      </div>
+                      
+                      {/* Critical Thinking Tips Section */}
+                      <div className="mt-4 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                        <h6 className="text-xs font-bold text-indigo-800 dark:text-indigo-200 uppercase tracking-wide mb-3 flex items-center gap-2">
+                          <Lightbulb className="w-3.5 h-3.5" />
+                          Sharpen Your Thinking
+                        </h6>
+                        <div className="space-y-2.5">
+                          {(() => {
+                            const critScore = result?.scales?.critical?.value || 0;
+                            const fpScore = result?.scales?.firstPrinciples?.value || 0;
+                            
+                            const tips = [];
+                            
+                            if (critScore < 3) {
+                              tips.push({
+                                tip: "Practice the '5 Whys' technique when facing problems",
+                                desc: "Ask 'why' five times to get to the root cause"
+                              });
+                              tips.push({
+                                tip: "Challenge your first conclusion",
+                                desc: "Consider 2-3 alternative explanations before deciding"
+                              });
+                            }
+                            
+                            if (fpScore < 3) {
+                              tips.push({
+                                tip: "Break complex problems into smaller parts",
+                                desc: "Identify the fundamental components before solving"
+                              });
+                              tips.push({
+                                tip: "Question 'best practices' and conventional wisdom",
+                                desc: "Ask if assumptions still apply to your situation"
+                              });
+                            }
+                            
+                            if (critScore >= 3 && fpScore >= 3) {
+                              tips.push({
+                                tip: "Teach analytical thinking to others",
+                                desc: "Explaining deepens your own understanding"
+                              });
+                              tips.push({
+                                tip: "Tackle harder problems in new domains",
+                                desc: "Apply your skills to unfamiliar territory"
+                              });
+                            }
+                            
+                            tips.push({
+                              tip: "Read arguments you disagree with",
+                              desc: "Understanding opposing views sharpens reasoning"
+                            });
+                            
+                            return tips.slice(0, 3).map((item, idx) => (
+                              <div 
+                                key={idx}
+                                className="flex items-start gap-2 p-2.5 rounded-lg bg-white/50 dark:bg-gray-800/50"
+                              >
+                                <div className="w-5 h-5 rounded-full bg-indigo-200 dark:bg-indigo-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                  <span className="text-xs font-bold text-indigo-700 dark:text-indigo-200">{idx + 1}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
+                                    {item.tip}
+                                  </p>
+                                  <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
+                                    {item.desc}
+                                  </p>
+                                </div>
+                              </div>
+                            ));
+                          })()}
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

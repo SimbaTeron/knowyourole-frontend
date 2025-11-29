@@ -234,14 +234,6 @@ export default function LocationPage() {
                       {detectedCity}{detectedState ? `, ${detectedState}` : ""}
                     </span>
                   </div>
-                  {teamName && (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-soft-cream/80 dark:bg-deep-cream/50 border border-terracotta/10">
-                      <Sparkles className="w-4 h-4 locality-primary-text" />
-                      <span className="text-sm text-warm-gray dark:text-soft-cream">
-                        Theme: <span className="font-medium locality-gradient-text">{teamName}</span>
-                      </span>
-                    </div>
-                  )}
                 </motion.div>
               )}
               

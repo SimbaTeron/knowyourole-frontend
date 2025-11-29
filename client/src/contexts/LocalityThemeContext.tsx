@@ -5,6 +5,7 @@ interface LocalityThemeContextType {
   localityTheme: LocalityTheme | null;
   teamName: string | null;
   cityName: string | null;
+  stateName: string | null;
   setLocality: (city: string, state?: string, country?: string) => void;
   clearLocality: () => void;
   isLocalitySet: boolean;
@@ -15,6 +16,7 @@ const LocalityThemeContext = createContext<LocalityThemeContextType | undefined>
 export function LocalityThemeProvider({ children }: { children: React.ReactNode }) {
   const [localityTheme, setLocalityTheme] = useState<LocalityTheme | null>(null);
   const [cityName, setCityName] = useState<string | null>(null);
+  const [stateName, setStateName] = useState<string | null>(null);
   const [teamName, setTeamName] = useState<string | null>(null);
 
   const applyLocalityColors = useCallback((theme: LocalityTheme) => {
@@ -57,6 +59,7 @@ export function LocalityThemeProvider({ children }: { children: React.ReactNode 
     const theme = getLocalityTheme(city, state, country);
     setLocalityTheme(theme);
     setCityName(city);
+    setStateName(state || null);
     setTeamName(theme.team);
     applyLocalityColors(theme);
     
@@ -71,6 +74,7 @@ export function LocalityThemeProvider({ children }: { children: React.ReactNode 
   const clearLocality = useCallback(() => {
     setLocalityTheme(null);
     setCityName(null);
+    setStateName(null);
     setTeamName(null);
     clearLocalityColors();
     sessionStorage.removeItem("knowrole-locality");
@@ -83,6 +87,7 @@ export function LocalityThemeProvider({ children }: { children: React.ReactNode 
         const { city, state, country, theme } = JSON.parse(stored);
         setLocalityTheme(theme);
         setCityName(city);
+        setStateName(state || null);
         setTeamName(theme.team);
         applyLocalityColors(theme);
       } catch (e) {
@@ -97,6 +102,7 @@ export function LocalityThemeProvider({ children }: { children: React.ReactNode 
         localityTheme,
         teamName,
         cityName,
+        stateName,
         setLocality,
         clearLocality,
         isLocalitySet: localityTheme !== null
