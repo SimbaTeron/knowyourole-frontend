@@ -5,6 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import appIcon from "@assets/image (5)_1764388202854.jpg";
 
 interface KnowRoleHeaderProps {
   theme: ThemeMode;
@@ -14,7 +15,7 @@ interface KnowRoleHeaderProps {
 
 export default function KnowRoleHeader({ theme, randomTheme, onThemeChange }: KnowRoleHeaderProps) {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-6">
+    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-lg mx-auto flex justify-between items-center">
         <Popover>
           <PopoverTrigger asChild>
@@ -41,16 +42,24 @@ export default function KnowRoleHeader({ theme, randomTheme, onThemeChange }: Kn
           </PopoverContent>
         </Popover>
         
-        <div className="flex flex-col items-center">
-          <h1
-            className="text-display compass-gradient-text"
-            data-testid="text-title"
-          >
-            KnowRole
-          </h1>
-          <p className="text-micro text-warm-gray/50 dark:text-soft-cream/40 mt-1">
-            Your everyday compass
-          </p>
+        <div className="flex items-center gap-3">
+          <img 
+            src={appIcon} 
+            alt="KnowRole compass icon" 
+            className="w-10 h-10 rounded-xl shadow-md object-cover"
+            data-testid="img-app-icon"
+          />
+          <div className="flex flex-col">
+            <h1
+              className="text-display compass-gradient-text"
+              data-testid="text-title"
+            >
+              KnowRole
+            </h1>
+            <p className="text-micro text-warm-gray/50 dark:text-soft-cream/40">
+              Your everyday compass
+            </p>
+          </div>
         </div>
 
         <ThemeToggle

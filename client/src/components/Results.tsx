@@ -3,7 +3,7 @@ import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, Trophy, Target, Brain, Heart, Users, RefreshCw, Share2, 
   Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame,
-  MessageCircle, Frown, Meh, Smile
+  MessageCircle, Frown, Meh, Smile, Lock, Crown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -505,29 +505,72 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           transition={{ delay: 0.5 }}
         >
           <Card className="overflow-hidden border-2 border-terracotta/30 bg-gradient-to-br from-terracotta/5 to-transparent">
-            <CardContent className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
-                  <Briefcase className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs text-terracotta font-medium mb-0.5">Your Primary Role Match</p>
-                  <h3 className="text-lg font-bold text-warm-gray dark:text-soft-cream" data-testid="text-primary-role">
-                    {result.primaryRole.title}
-                  </h3>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1 text-sage-green">
-                    <TrendingUp className="w-3 h-3" />
-                    <span className="text-xs font-medium">{result.primaryRole.salary}</span>
-                  </div>
+            <CardContent className="p-6 text-center">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="w-12 h-12 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
+                  <Briefcase className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <p className="text-sm text-warm-gray/80 dark:text-soft-cream/80">
-                Your <span className="font-semibold text-terracotta">{result.mbtiType}-{result.discStyle}</span> analytical drive 
-                {result.bigFiveProfile.O > 60 ? " and creative openness" : ""} 
-                {result.bigFiveProfile.C > 60 ? " plus steady focus" : ""} make you ideal for this path—{result.primaryRole.desc.toLowerCase()}
-              </p>
+              <p className="text-xs text-terracotta font-medium mb-1 tracking-wide uppercase">Your Primary Role Match</p>
+              <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2" data-testid="text-primary-role">
+                {result.primaryRole.title}
+              </h3>
+              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green mb-4">
+                <TrendingUp className="w-3 h-3" />
+                <span className="text-sm font-semibold">{result.primaryRole.salary}</span>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4 mt-6">
+                <motion.div 
+                  initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="text-center px-4 py-5 rounded-2xl bg-terracotta/8 dark:bg-terracotta/15 border border-terracotta/20"
+                >
+                  <Brain className="w-6 h-6 text-terracotta mx-auto mb-2" />
+                  <p className="text-xs text-terracotta font-semibold tracking-wide uppercase mb-1">MBTI {result.mbtiType}</p>
+                  <p className="text-sm text-warm-gray dark:text-soft-cream leading-relaxed">
+                    {result.mbtiDesc}
+                  </p>
+                </motion.div>
+                
+                <motion.div 
+                  initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.7 }}
+                  className="text-center px-4 py-5 rounded-2xl bg-sage-green/8 dark:bg-sage-green/15 border border-sage-green/20"
+                >
+                  <Award className="w-6 h-6 text-sage-green mx-auto mb-2" />
+                  <p className="text-xs text-sage-green font-semibold tracking-wide uppercase mb-1">DISC {result.discStyle}</p>
+                  <p className="text-sm text-warm-gray dark:text-soft-cream leading-relaxed">
+                    {result.discDesc}
+                  </p>
+                </motion.div>
+                
+                <motion.div 
+                  initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="text-center px-4 py-5 rounded-2xl bg-dusty-blue/8 dark:bg-dusty-blue/15 border border-dusty-blue/20"
+                >
+                  {(() => {
+                    const topTraitKey = topTrait[0] as keyof typeof TRAIT_ICONS;
+                    const TopIcon = TRAIT_ICONS[topTraitKey];
+                    const topValue = topTrait[1];
+                    return (
+                      <>
+                        <TopIcon className="w-6 h-6 text-dusty-blue mx-auto mb-2" />
+                        <p className="text-xs text-dusty-blue font-semibold tracking-wide uppercase mb-1">
+                          Big Five {TRAIT_LABELS[topTraitKey]} {topValue}%
+                        </p>
+                        <p className="text-sm text-warm-gray dark:text-soft-cream leading-relaxed">
+                          {topValue > 50 ? result.bigFiveLabels[topTrait[0]]?.high : result.bigFiveLabels[topTrait[0]]?.low}
+                        </p>
+                      </>
+                    );
+                  })()}
+                </motion.div>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -602,27 +645,25 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
-            <Card className="bg-soft-cream/50 dark:bg-gray-800 border-2 border-terracotta/20">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center">
-                    <MessageCircle className="w-5 h-5 text-terracotta" />
+            <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-md">
+              <CardContent className="p-6">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-terracotta/10 mb-3">
+                    <MessageCircle className="w-6 h-6 text-terracotta" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-warm-gray dark:text-soft-cream">
-                      Quick Feedback
-                    </h3>
-                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-                      Help us improve to unlock your full results
-                    </p>
-                  </div>
+                  <h3 className="text-lg font-bold text-warm-gray dark:text-soft-cream">
+                    Complete for More Free Insights!
+                  </h3>
+                  <p className="text-sm text-warm-gray/60 dark:text-soft-cream/50 mt-1">
+                    Answer 3 quick questions to unlock your full dashboard
+                  </p>
                 </div>
 
                 <div className="space-y-5">
                   <fieldset className="space-y-2">
                     <Label asChild>
                       <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
-                        Results feel accurate? <span className="text-red-500">*</span>
+                        Results feel accurate?
                       </legend>
                     </Label>
                     <div 
@@ -672,7 +713,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   <fieldset className="space-y-2">
                     <Label asChild>
                       <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
-                        Questions engaging? <span className="text-red-500">*</span>
+                        Questions engaging?
                       </legend>
                     </Label>
                     <div 
@@ -722,7 +763,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   <fieldset className="space-y-2">
                     <Label asChild>
                       <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
-                        Would share with a friend? <span className="text-red-500">*</span>
+                        Would share with a friend?
                       </legend>
                     </Label>
                     <div 
@@ -762,11 +803,11 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       htmlFor="suggestions" 
                       className="text-sm font-medium text-warm-gray dark:text-soft-cream"
                     >
-                      Any suggestions? <span className="text-red-500">*</span>
+                      Suggestions for improvement?
                     </Label>
                     <Textarea
                       id="suggestions"
-                      placeholder="Timing, design, questions..."
+                      placeholder="Suggestions for improvement? (Timing, design, etc.)"
                       value={suggestions}
                       onChange={(e) => setSuggestions(e.target.value)}
                       maxLength={1000}
@@ -793,6 +834,30 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       All fields required to unlock full dashboard
                     </p>
                   )}
+                  
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 text-center mb-2">
+                      Or provide detailed feedback via our form
+                    </p>
+                    <div className="rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-700/50">
+                      <iframe
+                        src="https://docs.google.com/forms/d/e/1FAIpQLSfKnowRoleFeedback/viewform?embedded=true"
+                        width="100%"
+                        height="400"
+                        frameBorder="0"
+                        marginHeight={0}
+                        marginWidth={0}
+                        title="Feedback Form"
+                        className="w-full"
+                        data-testid="iframe-google-form"
+                      >
+                        Loading feedback form...
+                      </iframe>
+                    </div>
+                    <p className="text-xs text-warm-gray/40 dark:text-soft-cream/30 text-center mt-2">
+                      Anon/email opt-in available
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -984,6 +1049,50 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </Card>
                 </motion.div>
               )}
+
+              <motion.div
+                initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-300 dark:border-amber-700">
+                  <CardContent className="p-5 text-center">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-800/50 mb-3">
+                      <Crown className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <h4 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2">
+                      Unlock Deep Insights
+                    </h4>
+                    <p className="text-sm text-amber-700 dark:text-amber-300 mb-4 max-w-xs mx-auto">
+                      Get arc tracking, retest versions, and unlimited access to personality evolution over time.
+                    </p>
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                      <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                        <Lock className="w-3 h-3" />
+                        <span>Arc Tracker</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                        <Lock className="w-3 h-3" />
+                        <span>Retest Versions</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                        <Lock className="w-3 h-3" />
+                        <span>Full History</span>
+                      </div>
+                    </div>
+                    <Button
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8"
+                      data-testid="button-upgrade"
+                    >
+                      <Crown className="w-4 h-4 mr-2" />
+                      Unlock for $9 One-Time
+                    </Button>
+                    <p className="text-xs text-amber-600/60 dark:text-amber-400/60 mt-3">
+                      No subscription. Access forever.
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </>
           )}
         </AnimatePresence>
