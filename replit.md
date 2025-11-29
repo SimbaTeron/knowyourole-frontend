@@ -172,8 +172,14 @@ Preferred communication style: Simple, everyday language.
 - **Premium Features**:
   - +2 Extra Role Matches
   - Deep Dive Analysis (explains why you fit each role)
+  - Personality Evolution Timeline (life stage growth predictions based on MBTI)
+  - Team Compatibility Cards (MBTI pairing scores with collaboration tips)
+  - 30-Day Growth Quest (personalized challenges targeting weakest Big Five trait)
+  - Analytical Thinking Score (combined Critical Thinking + First Principles)
   - Arc Tracker (personality evolution over time)
   - Retest Versions (compare your growth)
+- **CTA Design**: Compelling locked-state card with animated crown badge, 6-feature grid, price callout, trust badges
+- **State Management**: Growth Quest tracks completions by trait+week+index for proper scoping
 - **Endpoints**:
   - `GET /api/stripe/products` - List available products with prices
   - `POST /api/stripe/checkout` - Create checkout session

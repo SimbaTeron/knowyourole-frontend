@@ -3,7 +3,9 @@ import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, Trophy, Target, Brain, Heart, Users, RefreshCw, Share2, 
   Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame,
-  MessageCircle, Frown, Meh, Smile, Lock, Crown, Star, Gift, BookOpen
+  MessageCircle, Frown, Meh, Smile, Lock, Crown, Star, Gift, BookOpen,
+  Rocket, Timer, CheckCircle2, Calendar, ArrowRight, Shield, Compass, 
+  Mountain, Sunrise, CircleDot, Play
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -246,6 +248,184 @@ const TRAIT_QUESTS: Record<string, { high: string; low: string }> = {
   },
 };
 
+// Team Compatibility Data
+const COMPATIBILITY_MATRIX: Record<string, { match: string; score: number; tip: string }[]> = {
+  "INTJ": [
+    { match: "ENTP", score: 92, tip: "Sparks fly when vision meets debate" },
+    { match: "ENFP", score: 85, tip: "You ground their ideas, they expand yours" },
+    { match: "INFJ", score: 78, tip: "Deep thinkers who finish each other's theories" },
+  ],
+  "INTP": [
+    { match: "ENTJ", score: 88, tip: "They execute what you architect" },
+    { match: "ENFP", score: 84, tip: "Infectious enthusiasm meets logic" },
+    { match: "INTJ", score: 80, tip: "Two strategists building empires" },
+  ],
+  "ENTJ": [
+    { match: "INTP", score: 88, tip: "Your drive + their depth = unstoppable" },
+    { match: "ENFP", score: 82, tip: "They bring the heart to your ambition" },
+    { match: "ISTP", score: 79, tip: "Doers who get things done, fast" },
+  ],
+  "ENTP": [
+    { match: "INTJ", score: 92, tip: "Debate partners who build something real" },
+    { match: "INFJ", score: 87, tip: "They see through you—and you love it" },
+    { match: "ENFJ", score: 81, tip: "Charm meets depth for big impact" },
+  ],
+  "INFJ": [
+    { match: "ENFP", score: 95, tip: "The golden pair—magic happens here" },
+    { match: "ENTP", score: 87, tip: "Intellectual soulmates with edge" },
+    { match: "INTJ", score: 78, tip: "Visionaries planning the future together" },
+  ],
+  "INFP": [
+    { match: "ENFJ", score: 91, tip: "They champion your quiet brilliance" },
+    { match: "ENTJ", score: 82, tip: "Opposites that balance beautifully" },
+    { match: "INTJ", score: 78, tip: "Deep thinkers with mutual respect" },
+  ],
+  "ENFJ": [
+    { match: "INFP", score: 91, tip: "You inspire their hidden potential" },
+    { match: "ISFP", score: 84, tip: "Gentle souls creating harmony" },
+    { match: "ENTP", score: 81, tip: "Ideas + action = world-changing" },
+  ],
+  "ENFP": [
+    { match: "INFJ", score: 95, tip: "Deep connection, endless possibility" },
+    { match: "INTJ", score: 85, tip: "Grounded visionary partnership" },
+    { match: "ENTJ", score: 82, tip: "Dream big, then make it happen" },
+  ],
+  "ISTJ": [
+    { match: "ESFP", score: 85, tip: "They loosen you up, you keep them focused" },
+    { match: "ESTP", score: 80, tip: "Action-oriented partners in crime" },
+    { match: "ISFJ", score: 78, tip: "Reliable duo that never drops the ball" },
+  ],
+  "ISFJ": [
+    { match: "ESFP", score: 88, tip: "Fun meets thoughtfulness" },
+    { match: "ESTP", score: 82, tip: "Adventure with a safety net" },
+    { match: "ENFP", score: 79, tip: "Warmth amplified exponentially" },
+  ],
+  "ESTJ": [
+    { match: "ISFP", score: 84, tip: "They soften your edges, beautifully" },
+    { match: "ISTP", score: 81, tip: "No-nonsense efficiency together" },
+    { match: "ESFJ", score: 78, tip: "Leaders who build community" },
+  ],
+  "ESFJ": [
+    { match: "ISFP", score: 88, tip: "Harmonizers creating safe spaces" },
+    { match: "ISTP", score: 82, tip: "You organize, they troubleshoot" },
+    { match: "ENFP", score: 80, tip: "Social butterflies together" },
+  ],
+  "ISTP": [
+    { match: "ESTJ", score: 81, tip: "You fix it, they ship it" },
+    { match: "ESFJ", score: 82, tip: "Structure meets spontaneity" },
+    { match: "ESTP", score: 78, tip: "Adventure buddies with skills" },
+  ],
+  "ISFP": [
+    { match: "ESFJ", score: 88, tip: "Artistic soul + caring heart" },
+    { match: "ESTJ", score: 84, tip: "They believe in your vision" },
+    { match: "ENFJ", score: 84, tip: "Champions of your creativity" },
+  ],
+  "ESTP": [
+    { match: "ISFJ", score: 82, tip: "They keep you grounded" },
+    { match: "ISTJ", score: 80, tip: "Reliable adventurers" },
+    { match: "ESFP", score: 79, tip: "Double the fun, double the action" },
+  ],
+  "ESFP": [
+    { match: "ISFJ", score: 88, tip: "Balance of fun and warmth" },
+    { match: "ISTJ", score: 85, tip: "Yin and yang perfection" },
+    { match: "ESTP", score: 79, tip: "Life of every party, together" },
+  ],
+};
+
+// Personality Evolution Timeline Data
+const EVOLUTION_STAGES: Record<string, { current: string; growth: string; peak: string; mature: string }> = {
+  "E": {
+    current: "Social energy drives your connections",
+    growth: "Learning when to recharge solo",
+    peak: "Masterful at reading room energy",
+    mature: "Wise mentor who uplifts others",
+  },
+  "I": {
+    current: "Deep inner world shapes your thinking",
+    growth: "Sharing insights with trusted circle",
+    peak: "Strategic networker with depth",
+    mature: "Sage with profound influence",
+  },
+  "N": {
+    current: "Future possibilities excite you",
+    growth: "Grounding vision in practical steps",
+    peak: "Innovator turning dreams to reality",
+    mature: "Visionary guiding next generation",
+  },
+  "S": {
+    current: "Present details anchor your world",
+    growth: "Expanding to see the bigger picture",
+    peak: "Expert at turning ideas into action",
+    mature: "Master craftsperson of life",
+  },
+  "T": {
+    current: "Logic guides your decisions",
+    growth: "Integrating emotional intelligence",
+    peak: "Balanced leader with sharp insight",
+    mature: "Wise strategist with heart",
+  },
+  "F": {
+    current: "Values drive your choices",
+    growth: "Setting boundaries that serve you",
+    peak: "Empathic leader who inspires",
+    mature: "Compassionate wisdom keeper",
+  },
+  "J": {
+    current: "Structure brings you peace",
+    growth: "Embracing calculated spontaneity",
+    peak: "Flexible planner who adapts",
+    mature: "Orchestrator of complex projects",
+  },
+  "P": {
+    current: "Adaptability is your superpower",
+    growth: "Building sustainable routines",
+    peak: "Creative executor with follow-through",
+    mature: "Renaissance spirit with focus",
+  },
+};
+
+// 30-Day Growth Quest Challenges
+const GROWTH_QUESTS: Record<string, { week1: string[]; week2: string[]; week3: string[]; week4: string[] }> = {
+  "O": {
+    week1: ["Try one new food or drink", "Listen to a genre of music you've never explored", "Take a different route to a familiar place", "Read an article about something you know nothing about", "Draw or doodle for 5 minutes"],
+    week2: ["Watch a documentary on an unfamiliar topic", "Start a conversation with someone new", "Try a 10-minute meditation", "Cook something without a recipe", "Visit a new neighborhood or shop"],
+    week3: ["Learn 5 words in a new language", "Experiment with a new hobby for 30 minutes", "Challenge one belief you hold", "Create something from scratch", "Attend a free online class"],
+    week4: ["Write about your ideal day 10 years from now", "Try an unusual combination of flavors", "Ask someone about their passion and truly listen", "Complete a creative project you started", "Reflect: what new thing will you keep doing?"],
+  },
+  "C": {
+    week1: ["Set one timer today to stay on track", "Write down 3 tasks before starting your day", "Complete one small task before checking your phone", "Organize one drawer or digital folder", "Review your day for 2 minutes before bed"],
+    week2: ["Block 30 min for deep work, no distractions", "Create a simple checklist for a recurring task", "Set a reminder for something you keep forgetting", "Do the hardest task first tomorrow", "Track one habit (water, steps, etc.)"],
+    week3: ["Plan your entire next week on Sunday", "Automate or delegate one small thing", "Finish something you've been putting off", "Review what's working and what's not", "Say no to one low-priority request"],
+    week4: ["Create a 90-day goal with milestones", "Build a morning or evening routine", "Audit your commitments—what can you drop?", "Celebrate a completed goal, any size", "Reflect: what systems help you most?"],
+  },
+  "E": {
+    week1: ["Compliment someone genuinely today", "Start a casual chat with a stranger", "Call instead of text one friend", "Attend one social event this week", "Share something personal with a trusted person"],
+    week2: ["Organize a small gathering (2+ people)", "Practice active listening in every convo", "Join an online community or forum", "Collaborate on a project with someone", "Express appreciation to 3 people"],
+    week3: ["Lead a group activity or meeting", "Reconnect with someone from your past", "Volunteer or help at a community event", "Give a small presentation or share a skill", "Introduce two people who might click"],
+    week4: ["Host a dinner or video call hangout", "Mentor or teach someone briefly", "Plan a future social event on your calendar", "Reflect on your social wins this month", "Share your growth journey with a friend"],
+  },
+  "A": {
+    week1: ["Let someone go first in line today", "Send an encouraging message to someone", "Listen without giving advice once", "Do a small favor without being asked", "Apologize for something, even if small"],
+    week2: ["Ask someone how they're really doing", "Donate or give away one item", "Offer help to a colleague or friend", "Write a thank-you note (physical or digital)", "Be patient with someone who frustrates you"],
+    week3: ["Volunteer your time for 1 hour", "Give genuine praise in a group setting", "Resolve a minor conflict peacefully", "Support someone's idea even if you disagree", "Share credit for a success"],
+    week4: ["Forgive someone (even silently)", "Perform a random act of kindness", "Celebrate someone else's win publicly", "Practice empathy with a difficult person", "Reflect: how has kindness changed you?"],
+  },
+  "N": {
+    week1: ["Name 3 things you're grateful for", "Breathe deeply for 2 minutes", "Limit news intake to 10 minutes today", "Take a 15-minute walk outside", "Journal one worry, then close the book"],
+    week2: ["Try a 5-minute body scan meditation", "Reduce caffeine or sugar today", "Practice box breathing: 4-4-4-4", "Set boundaries on one stressor", "Do something purely for fun"],
+    week3: ["Identify one recurring worry pattern", "Create a worry time (15 min, then stop)", "Exercise for 20 minutes", "Reach out to someone supportive", "Practice self-compassion when you slip"],
+    week4: ["Celebrate small emotional wins", "Build a go-to calm-down ritual", "Plan regular stress-relief activities", "Track your mood for insight", "Reflect: what helps you feel centered?"],
+  },
+};
+
+// Get weakest Big Five trait for Growth Quest
+function getWeakestTrait(bigFive: { O: number; C: number; E: number; A: number; N: number }): string {
+  const entries = Object.entries(bigFive);
+  // For Neuroticism, higher is "weaker" (more stress), so we invert
+  const adjusted = entries.map(([k, v]) => [k, k === 'N' ? 100 - v : v] as [string, number]);
+  return adjusted.reduce((a, b) => a[1] < b[1] ? a : b)[0];
+}
+
 export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, onRestart, onShare }: ResultsProps) {
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
@@ -260,6 +440,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [wouldShare, setWouldShare] = useState<string>("");
   const [suggestions, setSuggestions] = useState<string>("");
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  
+  // Premium feature states
+  const [selectedQuestWeek, setSelectedQuestWeek] = useState<1 | 2 | 3 | 4>(1);
+  const [completedChallenges, setCompletedChallenges] = useState<Set<string>>(new Set());
   
   const chartRef = useRef<ChartJS<"radar">>(null);
   const traitButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
@@ -1156,102 +1340,345 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   transition={{ delay: 0.7 }}
                   className="space-y-4"
                 >
-                  <Card className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-2 border-emerald-400 dark:border-emerald-600">
-                    <CardContent className="p-5 text-center">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-800/50 mb-3">
-                        <Crown className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                      <h4 className="text-lg font-bold text-emerald-800 dark:text-emerald-200 mb-2">
-                        Premium Unlocked!
+                  {/* Premium Badge */}
+                  <Card className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-900/30 dark:via-teal-900/20 dark:to-cyan-900/20 border-2 border-emerald-400 dark:border-emerald-600 overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-200/40 to-transparent rounded-bl-full" />
+                    <CardContent className="p-5 text-center relative z-10">
+                      <motion.div 
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", duration: 0.5 }}
+                        className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg mb-3"
+                      >
+                        <Crown className="w-7 h-7 text-white" />
+                      </motion.div>
+                      <h4 className="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-1">
+                        Premium Unlocked
                       </h4>
-                      <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-1">
-                        You now have access to all premium features.
+                      <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                        Welcome to your full personality journey
                       </p>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white dark:bg-gray-800 border-violet-300 dark:border-violet-700">
-                    <CardContent className="p-4">
-                      <h5 className="text-sm font-bold text-violet-700 dark:text-violet-300 mb-3 flex items-center gap-2">
-                        <BookOpen className="w-4 h-4" />
+                  {/* Deep Dive Analysis */}
+                  <Card className="bg-white dark:bg-gray-800 border-violet-200 dark:border-violet-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-violet-400 via-purple-500 to-fuchsia-500" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-violet-700 dark:text-violet-300 mb-4 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-violet-100 dark:bg-violet-900/50">
+                          <BookOpen className="w-4 h-4" />
+                        </div>
                         Deep Dive Analysis
                       </h5>
-                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70 space-y-3">
-                        <p><strong>Why {result?.primaryRole.title}?</strong></p>
+                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70 space-y-4">
+                        <div className="p-4 rounded-xl bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 border border-violet-100 dark:border-violet-800">
+                          <p className="font-semibold text-violet-800 dark:text-violet-200 mb-2">Why {result?.primaryRole.title}?</p>
+                          <p className="leading-relaxed text-sm">
+                            Your <span className="font-semibold text-violet-600 dark:text-violet-400">{result?.mbtiType}</span> personality type reveals a natural inclination toward {result?.mbtiType.includes('N') ? 'abstract thinking and future possibilities' : 'practical solutions and concrete details'}. Combined with your <span className="font-semibold text-violet-600 dark:text-violet-400">{result?.discLabel}</span> DISC profile, you bring a unique blend of strengths.
+                          </p>
+                        </div>
                         <p className="leading-relaxed">
-                          Your {result?.mbtiType} personality type reveals a natural inclination toward {result?.mbtiType.includes('N') ? 'abstract thinking and future possibilities' : 'practical solutions and concrete details'}. Combined with your {result?.discStyle}-style DISC profile, which emphasizes {result?.discStyle === 'D' ? 'decisive action and results-driven leadership' : result?.discStyle === 'I' ? 'enthusiasm and collaborative energy' : result?.discStyle === 'S' ? 'steady reliability and supportive teamwork' : 'analytical precision and quality standards'}, you bring a unique blend of strengths to this role.
+                          Your Big Five profile shows strong <span className="font-medium">{TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]?.toLowerCase() || 'characteristics'}</span> ({topTrait[1]}%), suggesting you {topTrait[1] > 60 ? 'naturally excel in environments that leverage this trait' : 'can develop this area further with the right opportunities'}. People with your combination typically thrive when given {result?.mbtiType.includes('E') ? 'collaborative projects and team leadership opportunities' : 'focused time and space to develop deep expertise'}.
                         </p>
-                        <p className="leading-relaxed">
-                          Your Big Five profile shows strong {TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]?.toLowerCase() || 'characteristics'}, which suggests you {topTrait[1] > 60 ? 'naturally excel in environments that leverage this trait' : 'can develop this area further with the right opportunities'}. People with your combination typically thrive when given {result?.mbtiType.includes('E') ? 'collaborative projects and team leadership opportunities' : 'focused time and space to develop deep expertise'}. Your results indicate strong potential for growth in {result?.primaryRole.title} and related fields.
+                        <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 italic flex items-center gap-1.5">
+                          <Shield className="w-3 h-3" />
+                          Based on {scores.responses.length} quiz responses
                         </p>
-                        <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-2 italic">Based on comprehensive analysis of your {scores.responses.length} quiz responses and personality profile.</p>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white dark:bg-gray-800 border-amber-300 dark:border-amber-700">
-                    <CardContent className="p-4">
-                      <h5 className="text-sm font-bold text-amber-700 dark:text-amber-300 mb-3 flex items-center gap-2">
-                        <Gift className="w-4 h-4" />
+                  {/* +2 Extra Role Matches */}
+                  <Card className="bg-white dark:bg-gray-800 border-amber-200 dark:border-amber-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-red-400" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-amber-700 dark:text-amber-300 mb-4 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/50">
+                          <Gift className="w-4 h-4" />
+                        </div>
                         +2 Extra Role Matches
                       </h5>
                       <div className="space-y-3">
-                        <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
-                          <p className="text-sm font-semibold text-warm-gray dark:text-soft-cream">
-                            {result?.mbtiType.includes('N') ? 'Innovation Strategist' : 'Operations Specialist'}
-                          </p>
-                          <p className="text-xs text-amber-600 dark:text-amber-400 mb-1">
-                            {result?.mbtiType.includes('N') ? '$70K-130K' : '$55K-95K'}
-                          </p>
-                          <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
-                            {result?.mbtiType.includes('N') 
-                              ? 'Your intuitive thinking style makes you excellent at spotting trends and developing creative solutions. This role leverages your ability to see the big picture while connecting dots others might miss.'
-                              : 'Your practical, detail-oriented approach makes you ideal for streamlining processes and ensuring quality. You excel at turning complex tasks into efficient workflows.'}
-                          </p>
+                        <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-100 dark:border-amber-800">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <p className="font-semibold text-warm-gray dark:text-soft-cream">
+                                {result?.mbtiType.includes('N') ? 'Innovation Strategist' : 'Operations Specialist'}
+                              </p>
+                              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mb-2">
+                                {result?.mbtiType.includes('N') ? '$70K-130K' : '$55K-95K'}
+                              </p>
+                              <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
+                                {result?.mbtiType.includes('N') 
+                                  ? 'Your intuitive thinking makes you excellent at spotting trends and developing creative solutions.'
+                                  : 'Your practical approach makes you ideal for streamlining processes and ensuring quality.'}
+                              </p>
+                            </div>
+                            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center flex-shrink-0">
+                              <Rocket className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                            </div>
+                          </div>
                         </div>
-                        <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
-                          <p className="text-sm font-semibold text-warm-gray dark:text-soft-cream">
-                            {result?.discStyle === 'I' || result?.discStyle === 'D' ? 'Team Lead / Facilitator' : 'Technical Specialist'}
-                          </p>
-                          <p className="text-xs text-amber-600 dark:text-amber-400 mb-1">
-                            {result?.discStyle === 'I' || result?.discStyle === 'D' ? '$60K-110K' : '$65K-120K'}
-                          </p>
-                          <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
-                            {result?.discStyle === 'I' || result?.discStyle === 'D'
-                              ? 'Your natural ability to energize and motivate others positions you well for leadership roles. You bring enthusiasm that inspires collaboration and drives projects forward.'
-                              : 'Your methodical approach and attention to detail make you invaluable in technical roles. You thrive when given space to develop deep expertise and deliver high-quality work.'}
-                          </p>
+                        <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-100 dark:border-amber-800">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <p className="font-semibold text-warm-gray dark:text-soft-cream">
+                                {result?.discStyle === 'I' || result?.discStyle === 'D' ? 'Team Lead / Facilitator' : 'Technical Specialist'}
+                              </p>
+                              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mb-2">
+                                {result?.discStyle === 'I' || result?.discStyle === 'D' ? '$60K-110K' : '$65K-120K'}
+                              </p>
+                              <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
+                                {result?.discStyle === 'I' || result?.discStyle === 'D'
+                                  ? 'Your natural ability to energize others positions you well for leadership roles.'
+                                  : 'Your methodical approach makes you invaluable in technical roles requiring deep expertise.'}
+                              </p>
+                            </div>
+                            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center flex-shrink-0">
+                              <Briefcase className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-br from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 border-indigo-200 dark:border-indigo-800">
-                    <CardContent className="p-4">
-                      <h5 className="text-sm font-bold text-indigo-700 dark:text-indigo-300 mb-3 flex items-center gap-2">
-                        <Brain className="w-4 h-4" />
-                        Analytical Thinking
+                  {/* Personality Evolution Timeline - NEW FEATURE */}
+                  <Card className="bg-white dark:bg-gray-800 border-cyan-200 dark:border-cyan-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-cyan-700 dark:text-cyan-300 mb-4 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-cyan-100 dark:bg-cyan-900/50">
+                          <Compass className="w-4 h-4" />
+                        </div>
+                        Personality Evolution Timeline
                       </h5>
-                      <div className="p-3 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
-                            Problem-Solving Ability
+                      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-4">
+                        How your {result?.mbtiType} traits typically evolve through life stages
+                      </p>
+                      
+                      <div className="relative">
+                        {/* Timeline line */}
+                        <div className="absolute left-4 top-6 bottom-6 w-0.5 bg-gradient-to-b from-cyan-300 via-blue-400 to-indigo-500 dark:from-cyan-600 dark:via-blue-500 dark:to-indigo-400" />
+                        
+                        <div className="space-y-4">
+                          {/* Now */}
+                          <div className="flex items-start gap-4 pl-1">
+                            <div className="w-7 h-7 rounded-full bg-cyan-100 dark:bg-cyan-900/50 flex items-center justify-center flex-shrink-0 z-10 border-2 border-white dark:border-gray-800">
+                              <CircleDot className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                            </div>
+                            <div className="flex-1 pb-2">
+                              <p className="text-xs font-bold text-warm-gray dark:text-soft-cream uppercase tracking-wide">Now</p>
+                              <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60">{EVOLUTION_STAGES[result?.mbtiType?.[0] as keyof typeof EVOLUTION_STAGES]?.current || "Building your foundation"}</p>
+                            </div>
+                          </div>
+                          {/* Growth */}
+                          <div className="flex items-start gap-4 pl-1">
+                            <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0 z-10 border-2 border-white dark:border-gray-800">
+                              <Sunrise className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div className="flex-1 pb-2">
+                              <p className="text-xs font-bold text-warm-gray dark:text-soft-cream uppercase tracking-wide">Growth</p>
+                              <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60">{EVOLUTION_STAGES[result?.mbtiType?.[0] as keyof typeof EVOLUTION_STAGES]?.growth || "Expanding your horizons"}</p>
+                            </div>
+                          </div>
+                          {/* Peak */}
+                          <div className="flex items-start gap-4 pl-1">
+                            <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center flex-shrink-0 z-10 border-2 border-white dark:border-gray-800">
+                              <Mountain className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                            </div>
+                            <div className="flex-1 pb-2">
+                              <p className="text-xs font-bold text-warm-gray dark:text-soft-cream uppercase tracking-wide">Peak</p>
+                              <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60">{EVOLUTION_STAGES[result?.mbtiType?.[0] as keyof typeof EVOLUTION_STAGES]?.peak || "Mastering your craft"}</p>
+                            </div>
+                          </div>
+                          {/* Wisdom */}
+                          <div className="flex items-start gap-4 pl-1">
+                            <div className="w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center flex-shrink-0 z-10 border-2 border-white dark:border-gray-800">
+                              <Crown className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                            </div>
+                            <div className="flex-1 pb-2">
+                              <p className="text-xs font-bold text-warm-gray dark:text-soft-cream uppercase tracking-wide">Wisdom</p>
+                              <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60">{EVOLUTION_STAGES[result?.mbtiType?.[0] as keyof typeof EVOLUTION_STAGES]?.mature || "Sharing your knowledge"}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Team Compatibility Cards - NEW FEATURE */}
+                  <Card className="bg-white dark:bg-gray-800 border-pink-200 dark:border-pink-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-pink-400 via-rose-500 to-red-400" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-pink-700 dark:text-pink-300 mb-4 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-pink-100 dark:bg-pink-900/50">
+                          <Users className="w-4 h-4" />
+                        </div>
+                        Team Compatibility
+                      </h5>
+                      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-4">
+                        Best personality matches for collaboration
+                      </p>
+                      
+                      <div className="space-y-3">
+                        {(COMPATIBILITY_MATRIX[result?.mbtiType || "INTJ"] || COMPATIBILITY_MATRIX["INTJ"]).map((match, idx) => (
+                          <div key={idx} className="p-3 rounded-xl bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border border-pink-100 dark:border-pink-800">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-pink-700 dark:text-pink-300">{result?.mbtiType} + {match.match}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-lg font-bold text-pink-600 dark:text-pink-400">{match.score}%</span>
+                                <div className="flex">
+                                  {[1, 2, 3].map((n) => (
+                                    <Heart
+                                      key={n}
+                                      className={`w-3 h-3 ${n <= Math.ceil(match.score / 35) ? 'text-pink-500 fill-pink-500' : 'text-pink-200 dark:text-pink-800'}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 italic">"{match.tip}"</p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* 30-Day Growth Quest - NEW FEATURE */}
+                  <Card className="bg-white dark:bg-gray-800 border-emerald-200 dark:border-emerald-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-emerald-700 dark:text-emerald-300 mb-2 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+                          <Target className="w-4 h-4" />
+                        </div>
+                        30-Day Growth Quest
+                      </h5>
+                      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-4">
+                        Personalized challenges to strengthen your {TRAIT_LABELS[getWeakestTrait(result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 }) as keyof typeof TRAIT_LABELS]?.toLowerCase() || "growth area"}
+                      </p>
+                      
+                      {/* Week selector */}
+                      <div className="flex gap-2 mb-4">
+                        {([1, 2, 3, 4] as const).map((week) => (
+                          <button
+                            key={week}
+                            onClick={() => setSelectedQuestWeek(week)}
+                            className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+                              selectedQuestWeek === week
+                                ? 'bg-emerald-500 text-white shadow-md'
+                                : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-800/50'
+                            }`}
+                            data-testid={`button-quest-week-${week}`}
+                          >
+                            Week {week}
+                          </button>
+                        ))}
+                      </div>
+                      
+                      {/* Challenges list */}
+                      <div className="space-y-2">
+                        {(() => {
+                          const weakTrait = getWeakestTrait(result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 });
+                          const quests = GROWTH_QUESTS[weakTrait] || GROWTH_QUESTS["O"];
+                          const weekKey = `week${selectedQuestWeek}` as keyof typeof quests;
+                          const challenges = quests[weekKey] || [];
+                          
+                          return challenges.slice(0, 5).map((challenge, idx) => {
+                            const challengeId = `${weakTrait}-w${selectedQuestWeek}-${idx}`;
+                            const isCompleted = completedChallenges.has(challengeId);
+                            
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => {
+                                  const newSet = new Set(completedChallenges);
+                                  if (isCompleted) {
+                                    newSet.delete(challengeId);
+                                  } else {
+                                    newSet.add(challengeId);
+                                    if (navigator.vibrate) navigator.vibrate(30);
+                                  }
+                                  setCompletedChallenges(newSet);
+                                }}
+                                className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition-all ${
+                                  isCompleted
+                                    ? 'bg-emerald-100 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-700'
+                                    : 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
+                                }`}
+                                data-testid={`button-challenge-${idx}`}
+                              >
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                                  isCompleted
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-emerald-200 dark:bg-emerald-800 text-emerald-600 dark:text-emerald-400'
+                                }`}>
+                                  {isCompleted ? (
+                                    <CheckCircle2 className="w-4 h-4" />
+                                  ) : (
+                                    <span className="text-xs font-bold">{idx + 1}</span>
+                                  )}
+                                </div>
+                                <p className={`text-sm flex-1 ${
+                                  isCompleted
+                                    ? 'text-emerald-700 dark:text-emerald-300 line-through opacity-75'
+                                    : 'text-warm-gray dark:text-soft-cream'
+                                }`}>
+                                  {challenge}
+                                </p>
+                              </button>
+                            );
+                          });
+                        })()}
+                      </div>
+                      
+                      {/* Progress indicator */}
+                      <div className="mt-4 pt-4 border-t border-emerald-100 dark:border-emerald-800">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                            {completedChallenges.size} / 20 challenges completed
                           </span>
                           <div className="flex items-center gap-1">
+                            <Flame className={`w-4 h-4 ${completedChallenges.size >= 5 ? 'text-orange-500' : 'text-gray-300 dark:text-gray-600'}`} />
+                            <span className={`font-bold ${completedChallenges.size >= 5 ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'}`}>
+                              {completedChallenges.size >= 5 ? `${Math.floor(completedChallenges.size / 5)} week streak!` : 'Start your streak'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Analytical Thinking */}
+                  <Card className="bg-gradient-to-br from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 border-indigo-200 dark:border-indigo-800">
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-indigo-700 dark:text-indigo-300 mb-4 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
+                          <Brain className="w-4 h-4" />
+                        </div>
+                        Analytical Thinking
+                      </h5>
+                      <div className="p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 border border-indigo-100 dark:border-indigo-800">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+                            Problem-Solving Score
+                          </span>
+                          <div className="flex items-center gap-2">
                             {(() => {
                               const critScore = result?.scales?.critical?.value || 3;
                               const fpScore = result?.scales?.firstPrinciples?.value || 2;
                               const combinedScore = Math.min(3, Math.round((critScore + fpScore) / 3.5));
                               return (
                                 <>
-                                  <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                                    {combinedScore}/3
-                                  </span>
-                                  <div className="flex">
+                                  <div className="flex gap-0.5">
                                     {[1, 2, 3].map((n) => (
                                       <Star
                                         key={n}
-                                        className={`w-4 h-4 ${
+                                        className={`w-5 h-5 ${
                                           n <= combinedScore
                                             ? "text-indigo-500 fill-indigo-500"
                                             : "text-indigo-200 dark:text-indigo-700"
@@ -1265,101 +1692,127 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           </div>
                         </div>
                         <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
-                          This score combines your critical thinking and first-principles reasoning abilities. {result?.scales?.critical?.value && result.scales.critical.value >= 3 
-                            ? "You demonstrate strong analytical skills and can break down complex problems effectively." 
-                            : "You have room to grow in analytical thinking - practice questioning assumptions and seeking root causes."}
+                          {result?.scales?.critical?.value && result.scales.critical.value >= 3 
+                            ? "You demonstrate strong analytical skills and break down complex problems effectively." 
+                            : "You have room to grow in analytical thinking. Focus on questioning assumptions."}
                         </p>
-                        {result?.scales?.critical?.quest && (
-                          <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 mt-2 italic">
-                            Growth tip: {result.scales.critical.quest}
-                          </p>
-                        )}
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-700">
-                    <CardContent className="p-4">
-                      <h5 className="text-sm font-bold text-blue-700 dark:text-blue-300 mb-3 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4" />
+                  {/* Arc Tracker */}
+                  <Card className="bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-blue-700 dark:text-blue-300 mb-4 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/50">
+                          <TrendingUp className="w-4 h-4" />
+                        </div>
                         Arc Tracker
                       </h5>
-                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70">
-                        <p className="mb-2">Track how your personality evolves over time. Take the quiz again in 3-6 months to see your growth.</p>
-                        <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
-                          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          <span>First assessment: {new Date().toLocaleDateString()}</span>
+                      <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center flex-shrink-0">
+                          <Calendar className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">First Assessment</p>
+                          <p className="text-xs text-blue-600 dark:text-blue-400">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">Retake in 3-6 months to track growth</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white dark:bg-gray-800 border-pink-300 dark:border-pink-700">
-                    <CardContent className="p-4">
-                      <h5 className="text-sm font-bold text-pink-700 dark:text-pink-300 mb-3 flex items-center gap-2">
-                        <RefreshCw className="w-4 h-4" />
-                        Retest Versions
-                      </h5>
-                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70">
-                        <p>Compare your results across multiple assessments to see how your strengths develop and new interests emerge.</p>
-                        <Button variant="outline" size="sm" className="mt-3 border-pink-300 text-pink-700 hover:bg-pink-50 dark:border-pink-600 dark:text-pink-300 dark:hover:bg-pink-900/20" onClick={onRestart}>
-                          Take Quiz Again
-                        </Button>
-                      </div>
+                  {/* Retest Button */}
+                  <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border-pink-200 dark:border-pink-800">
+                    <CardContent className="p-5 text-center">
+                      <RefreshCw className="w-8 h-8 text-pink-500 mx-auto mb-3" />
+                      <h5 className="text-base font-bold text-pink-700 dark:text-pink-300 mb-2">Ready for a Retest?</h5>
+                      <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60 mb-4">
+                        Compare your results to see how you've evolved
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        className="border-pink-300 text-pink-700 hover:bg-pink-100 dark:border-pink-600 dark:text-pink-300 dark:hover:bg-pink-900/30" 
+                        onClick={onRestart}
+                        data-testid="button-retest"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Take Quiz Again
+                      </Button>
                     </CardContent>
                   </Card>
                 </motion.div>
               ) : (
+                /* COMPELLING CTA - Locked State */
                 <motion.div
                   initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 }}
                 >
-                  <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-300 dark:border-amber-700">
-                    <CardContent className="p-5 text-center">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-800/50 mb-3">
-                        <Crown className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                      </div>
-                      <h4 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2">
-                        Unlock Deep Insights
-                      </h4>
-                      <p className="text-sm text-amber-700 dark:text-amber-300 mb-4 max-w-xs mx-auto">
-                        Get comprehensive role analysis, personality evolution tracking, and expanded career matches.
-                      </p>
-                      
-                      <div className="grid grid-cols-2 gap-2 mb-4 text-left">
-                        <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
-                          <Gift className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">+2 Extra Role Matches</p>
-                            <p className="text-xs text-amber-600 dark:text-amber-400">Expanded career options</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
-                          <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Deep Dive Analysis</p>
-                            <p className="text-xs text-amber-600 dark:text-amber-400">Why you fit each role</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
-                          <TrendingUp className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Arc Tracker</p>
-                            <p className="text-xs text-amber-600 dark:text-amber-400">Personality over time</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
-                          <Star className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Retest Versions</p>
-                            <p className="text-xs text-amber-600 dark:text-amber-400">Compare your growth</p>
-                          </div>
-                        </div>
+                  <Card className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-yellow-950/20 border-2 border-amber-400/50 dark:border-amber-600/50 overflow-hidden relative">
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-300/20 to-transparent rounded-bl-full" />
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-300/20 to-transparent rounded-tr-full" />
+                    
+                    <CardContent className="p-6 relative z-10">
+                      {/* Premium badge */}
+                      <div className="text-center mb-5">
+                        <motion.div 
+                          className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-red-400 shadow-lg shadow-orange-500/30 mb-4"
+                          animate={{ scale: [1, 1.05, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        >
+                          <Crown className="w-8 h-8 text-white" />
+                        </motion.div>
+                        
+                        <h4 className="text-xl font-bold text-amber-900 dark:text-amber-100 mb-1">
+                          Unlock Your Full Potential
+                        </h4>
+                        <p className="text-sm text-amber-700 dark:text-amber-300">
+                          Go deeper with premium insights
+                        </p>
                       </div>
                       
+                      {/* Feature grid - 6 features */}
+                      <div className="grid grid-cols-2 gap-3 mb-5">
+                        {[
+                          { icon: Gift, title: "+2 Role Matches", desc: "More career paths" },
+                          { icon: BookOpen, title: "Deep Dive", desc: "Full analysis" },
+                          { icon: Compass, title: "Evolution Map", desc: "Life stage growth" },
+                          { icon: Users, title: "Compatibility", desc: "Team matching" },
+                          { icon: Target, title: "30-Day Quest", desc: "Growth challenges" },
+                          { icon: TrendingUp, title: "Arc Tracker", desc: "Track progress" },
+                        ].map((feature, idx) => (
+                          <div 
+                            key={idx}
+                            className="flex items-start gap-2.5 p-3 rounded-xl bg-white/60 dark:bg-gray-800/40 border border-amber-200/50 dark:border-amber-700/50"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                              <feature.icon className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-amber-900 dark:text-amber-100">{feature.title}</p>
+                              <p className="text-xs text-amber-600 dark:text-amber-400">{feature.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Price callout */}
+                      <div className="bg-white/80 dark:bg-gray-800/60 rounded-2xl p-4 mb-4 border border-amber-200 dark:border-amber-700 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <span className="text-2xl font-bold text-amber-900 dark:text-amber-100">$9</span>
+                          <span className="text-sm text-amber-600 dark:text-amber-400">one-time</span>
+                        </div>
+                        <p className="text-xs text-amber-700 dark:text-amber-300">
+                          Lifetime access. No subscription. Ever.
+                        </p>
+                      </div>
+                      
+                      {/* CTA Button */}
                       <Button
-                        className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8"
+                        className="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-base py-6 shadow-lg shadow-orange-500/30 transition-all"
                         onClick={handleUpgrade}
                         disabled={isCheckingOut}
                         data-testid="button-upgrade"
@@ -1369,20 +1822,30 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
                             />
-                            Loading...
+                            Processing...
                           </>
                         ) : (
                           <>
-                            <Crown className="w-4 h-4 mr-2" />
-                            Unlock for $9 One-Time
+                            <Rocket className="w-5 h-5 mr-2" />
+                            Unlock Premium Now
+                            <ArrowRight className="w-5 h-5 ml-2" />
                           </>
                         )}
                       </Button>
-                      <p className="text-xs text-amber-600/60 dark:text-amber-400/60 mt-3">
-                        No subscription. Access forever. Support indie development.
-                      </p>
+                      
+                      {/* Trust badges */}
+                      <div className="flex items-center justify-center gap-4 mt-4 text-xs text-amber-600/70 dark:text-amber-400/70">
+                        <span className="flex items-center gap-1">
+                          <Shield className="w-3 h-3" />
+                          Secure checkout
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Heart className="w-3 h-3" />
+                          Support indie dev
+                        </span>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
