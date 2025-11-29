@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap } from "lucide-react";
+import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import questionsData from "@/data/questions.json";
@@ -73,6 +73,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [showPauseMenu, setShowPauseMenu] = useState(false);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [fastResponses, setFastResponses] = useState(0);
+  const [showMissNudge, setShowMissNudge] = useState(false);
+  const [missCount, setMissCount] = useState(0);
   
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-ROTATION_RANGE, 0, ROTATION_RANGE]);
@@ -123,8 +125,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }, [isPaused, currentIndex, questions.length]);
 
   const handleTimeout = useCallback(() => {
-    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    handleSwipe(Math.random() > 0.5 ? "right" : "left", true);
+    if (navigator.vibrate) navigator.vibrate(100);
+    setShowMissNudge(true);
+    setMissCount(prev => prev + 1);
+    
+    setTimeout(() => {
+      setShowMissNudge(false);
+      handleSwipe(Math.random() > 0.5 ? "right" : "left", true);
+    }, 1500);
   }, [currentIndex, questions]);
 
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1) => {
@@ -460,6 +468,35 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 Progress: {currentIndex + 1}/{questions.length} questions
               </p>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showMissNudge && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+            className="fixed inset-x-0 top-1/3 z-50 flex justify-center px-4"
+            data-testid="nudge-miss"
+          >
+            <div className="bg-gradient-to-r from-terracotta to-dusty-blue rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-3">
+              <motion.div
+                animate={{ rotate: [0, -15, 15, -15, 0] }}
+                transition={{ duration: 0.5 }}
+              >
+                <RotateCcw className="w-6 h-6 text-soft-cream" />
+              </motion.div>
+              <div>
+                <p className="text-soft-cream font-display font-semibold text-lg">
+                  Close! Retry path?
+                </p>
+                <p className="text-soft-cream/70 text-xs">
+                  Auto-selecting in a moment...
+                </p>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
