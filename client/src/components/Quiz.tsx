@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search } from "lucide-react";
+import { Timer, Pause, Play, Zap, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import questionsData from "@/data/questions.json";
@@ -215,6 +215,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [currentQuip, setCurrentQuip] = useState(TIMEOUT_QUIPS[0]);
   const [missCount, setMissCount] = useState(0);
   const [vibrantColorIndex, setVibrantColorIndex] = useState(0);
+  const [hasInteracted, setHasInteracted] = useState(false);
   
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-ROTATION_RANGE, 0, ROTATION_RANGE]);
@@ -410,6 +411,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false) => {
     if (questions.length === 0 || currentIndex >= questions.length) return;
+    
+    if (!hasInteracted) setHasInteracted(true);
     
     const question = questions[currentIndex];
     const choiceIndex: 0 | 1 = direction === "left" ? 0 : 1;
@@ -757,48 +760,45 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       </h2>
                     </div>
                     
-                    <div className="flex-1 flex flex-col justify-center gap-4">
+                    <div className="flex-1 flex flex-col justify-center gap-3">
                       <motion.button
-                        whileHover={{ scale: 1.03, x: -8 }}
-                        whileTap={{ scale: 0.98, x: -20 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97, rotate: -3 }}
                         onClick={() => !isTimingOut && handleSwipe("left")}
                         disabled={isTimingOut}
-                        className="min-h-24 flex items-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all p-4 disabled:opacity-50 -ml-2 mr-4"
+                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all p-4 disabled:opacity-50"
                         data-testid="card-option-left"
+                        aria-label={`Choose: ${currentQuestion.leftDesc}`}
                       >
-                        <div className="flex items-center gap-3 w-full">
-                          <ChevronLeft className="w-7 h-7 text-sage-green flex-shrink-0" />
-                          <p className="text-base md:text-lg font-bold text-sage-green dark:text-sage-green leading-snug text-left flex-1">
-                            {currentQuestion.leftDesc}
-                          </p>
-                        </div>
+                        <p className="text-lg md:text-xl font-bold text-sage-green dark:text-sage-green leading-snug text-center">
+                          {currentQuestion.leftDesc}
+                        </p>
                       </motion.button>
                       
-                      <div className="flex items-center justify-center">
-                        <span className="text-warm-gray/40 dark:text-soft-cream/30 text-xs font-medium tracking-wider">SWIPE or TAP</span>
-                      </div>
-                      
                       <motion.button
-                        whileHover={{ scale: 1.03, x: 8 }}
-                        whileTap={{ scale: 0.98, x: 20 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97, rotate: 3 }}
                         onClick={() => !isTimingOut && handleSwipe("right")}
                         disabled={isTimingOut}
-                        className="min-h-24 flex items-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all p-4 disabled:opacity-50 ml-4 -mr-2"
+                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all p-4 disabled:opacity-50"
                         data-testid="card-option-right"
+                        aria-label={`Choose: ${currentQuestion.rightDesc}`}
                       >
-                        <div className="flex items-center gap-3 w-full">
-                          <p className="text-base md:text-lg font-bold text-terracotta dark:text-terracotta leading-snug text-left flex-1">
-                            {currentQuestion.rightDesc}
-                          </p>
-                          <ChevronRight className="w-7 h-7 text-terracotta flex-shrink-0" />
-                        </div>
+                        <p className="text-lg md:text-xl font-bold text-terracotta dark:text-terracotta leading-snug text-center">
+                          {currentQuestion.rightDesc}
+                        </p>
                       </motion.button>
                     </div>
                     
-                    <div className="flex justify-between items-center pt-3 text-xs text-warm-gray/50 dark:text-soft-cream/40">
-                      <span>Swipe left</span>
-                      <span>Swipe right</span>
-                    </div>
+                    {currentIndex === 0 && (
+                      <motion.div 
+                        initial={{ opacity: 1 }}
+                        animate={{ opacity: hasInteracted ? 0 : 1 }}
+                        className="text-center pt-2 text-xs text-warm-gray/50 dark:text-soft-cream/40"
+                      >
+                        Tap a card or swipe to choose
+                      </motion.div>
+                    )}
                   </div>
                 </div>
               </motion.div>

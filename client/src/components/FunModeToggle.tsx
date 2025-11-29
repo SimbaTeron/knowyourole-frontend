@@ -115,12 +115,12 @@ export default function FunModeToggle({ enabled, onToggle }: FunModeToggleProps)
         </div>
         
         <div className="flex-1 text-left">
-          <span className={`font-bold text-base block leading-tight ${
+          <span className={`font-bold text-xl md:text-2xl block leading-tight ${
             enabled ? "text-terracotta" : "text-black dark:text-white"
           }`}>
             {enabled ? "Fun Mode Active!" : "Add Personality Twists"}
           </span>
-          <span className={`text-sm block ${
+          <span className={`text-base block mt-1 ${
             enabled ? "text-terracotta/70" : "text-gray-600 dark:text-gray-300"
           }`}>
             {enabled 
