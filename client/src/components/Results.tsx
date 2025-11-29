@@ -186,11 +186,11 @@ function calculateResult(scores: QuizScores): PersonalityResult {
 }
 
 const TRAIT_COLORS = {
-  O: { bg: "bg-violet-500", text: "text-violet-600", fill: "rgba(139, 92, 246, 0.3)", border: "rgb(139, 92, 246)" },
-  C: { bg: "bg-blue-500", text: "text-blue-600", fill: "rgba(59, 130, 246, 0.3)", border: "rgb(59, 130, 246)" },
-  E: { bg: "bg-amber-500", text: "text-amber-600", fill: "rgba(245, 158, 11, 0.3)", border: "rgb(245, 158, 11)" },
-  A: { bg: "bg-emerald-500", text: "text-emerald-600", fill: "rgba(16, 185, 129, 0.3)", border: "rgb(16, 185, 129)" },
-  N: { bg: "bg-rose-500", text: "text-rose-600", fill: "rgba(244, 63, 94, 0.3)", border: "rgb(244, 63, 94)" },
+  O: { bg: "bg-violet-500", text: "text-violet-600", fill: "rgba(139, 92, 246, 0.3)", border: "rgb(139, 92, 246)", ring: "ring-violet-500" },
+  C: { bg: "bg-blue-500", text: "text-blue-600", fill: "rgba(59, 130, 246, 0.3)", border: "rgb(59, 130, 246)", ring: "ring-blue-500" },
+  E: { bg: "bg-amber-500", text: "text-amber-600", fill: "rgba(245, 158, 11, 0.3)", border: "rgb(245, 158, 11)", ring: "ring-amber-500" },
+  A: { bg: "bg-emerald-500", text: "text-emerald-600", fill: "rgba(16, 185, 129, 0.3)", border: "rgb(16, 185, 129)", ring: "ring-emerald-500" },
+  N: { bg: "bg-rose-500", text: "text-rose-600", fill: "rgba(244, 63, 94, 0.3)", border: "rgb(244, 63, 94)", ring: "ring-rose-500" },
 };
 
 const TRAIT_ICONS = {
@@ -464,9 +464,8 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const localeInsight = cityName ? getLocaleInsight(cityName, stateName || undefined) : null;
   
   const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
-  const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">("teaser");
-  const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(false);
-  const [showJokeReveal, setShowJokeReveal] = useState(false);
+  const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
+  const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium);
   
   const [resultsAccurate, setResultsAccurate] = useState<string>("");
   const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
@@ -494,17 +493,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     
     if (isTestPremium) {
       console.log('[DEV MODE] Premium features unlocked for testing via ?test_premium=true');
-      // Show joke reveal after 2.5 seconds in test mode
-      const jokeTimer = setTimeout(() => {
-        setShowJokeReveal(true);
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
-        setTimeout(() => {
-          setIsPremiumUnlocked(true);
-          setDashboardStage("full");
-          setShowJokeReveal(false);
-        }, 2500);
-      }, 2500);
-      return () => clearTimeout(jokeTimer);
     }
   }, [scores, apiScales, isTestPremium]);
 
@@ -700,6 +688,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     }],
   };
 
+  const traitLabelColors = [
+    TRAIT_COLORS.O.border,
+    TRAIT_COLORS.C.border,
+    TRAIT_COLORS.E.border,
+    TRAIT_COLORS.A.border,
+    TRAIT_COLORS.N.border,
+  ];
+
   const radarOptions = {
     responsive: true,
     maintainAspectRatio: true,
@@ -712,14 +708,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           stepSize: 25,
           color: chartColors.tickColor,
           backdropColor: "transparent",
-          font: { size: 10 },
+          font: { size: 11 },
         },
         grid: { color: chartColors.gridColor },
         angleLines: { color: chartColors.gridColor },
         pointLabels: {
-          color: chartColors.tickColor,
-          font: { size: 12, weight: 600 as const },
-          callback: (label: string) => label,
+          color: (context: { index?: number }) => {
+            const idx = context.index ?? 0;
+            return traitLabelColors[idx] ?? chartColors.tickColor;
+          },
+          font: { size: 14, weight: 700 as const },
         },
       },
     },
@@ -805,49 +803,39 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   return (
     <div className="min-h-screen pb-36 bg-white dark:bg-gray-900">
-      {/* Just Kidding! Joke Reveal Overlay for test mode */}
-      <AnimatePresence>
-        {showJokeReveal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.5, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-8 rounded-3xl shadow-2xl text-center max-w-xs mx-4"
+      {/* Persistent Test Mode Premium Banner */}
+      {isTestPremium && (
+        <motion.div
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          className="sticky top-0 z-50 bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-600 px-4 py-3 shadow-lg"
+          data-testid="banner-test-premium"
+        >
+          <div className="max-w-md mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                <Crown className="w-5 h-5 text-yellow-300" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold text-white leading-tight">Just Kidding! Premium Unlocked</p>
+                <p className="text-xs text-white/80">Enjoy the full experience on us</p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              className="bg-white text-teal-600 hover:bg-white/90 font-bold shadow-md flex-shrink-0"
+              onClick={() => window.open('https://buy.stripe.com/test_00g4iR5Zz3pz5QA145', '_blank')}
+              data-testid="button-donate-tip"
             >
-              <motion.div
-                animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="text-6xl mb-4"
-              >
-                <PartyPopper className="w-16 h-16 mx-auto text-white" />
-              </motion.div>
-              <h2 className="text-2xl font-bold text-white mb-2">Just Kidding!</h2>
-              <p className="text-lg text-white/90 font-medium mb-4">Premium Unlocked</p>
-              <p className="text-sm text-white/70 mb-5">
-                Enjoy the full experience on us.<br />Love it? Consider a tip!
-              </p>
-              <Button
-                variant="outline"
-                className="bg-white/20 border-white/40 text-white hover:bg-white/30"
-                onClick={() => window.open('https://buy.stripe.com/test_00g4iR5Zz3pz5QA145', '_blank')}
-                data-testid="button-donate-tip"
-              >
-                <Heart className="w-4 h-4 mr-2" />
-                Donate Here
-              </Button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <Heart className="w-4 h-4 mr-1.5 fill-current" />
+              Donate Here
+            </Button>
+          </div>
+        </motion.div>
+      )}
       
-      <header className="pt-10 pb-6 px-4 text-center">
+      <header className={`${isTestPremium ? 'pt-6' : 'pt-10'} pb-6 px-4 text-center`}>
         <motion.div
           initial={shouldReduceMotion ? {} : { scale: 0 }}
           animate={{ scale: 1 }}
@@ -934,13 +922,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   className="text-center px-2 py-4 rounded-xl bg-terracotta/8 dark:bg-terracotta/15 border border-terracotta/20"
                 >
                   <Brain className="w-5 h-5 text-terracotta mx-auto mb-1.5" />
-                  <p className="text-lg font-bold text-terracotta font-mono mb-0.5" data-testid="text-mbti-teaser">
-                    {result.mbtiType}
-                  </p>
-                  <p className="text-[10px] text-terracotta/80 font-medium leading-tight line-clamp-2">
+                  <p className="text-sm font-bold text-terracotta mb-0.5 leading-tight line-clamp-2" data-testid="text-mbti-teaser">
                     {funMode && FUN_MODE_TITLES[result.mbtiType] 
                       ? FUN_MODE_TITLES[result.mbtiType]
                       : result.mbtiLabel}
+                  </p>
+                  <p className="text-[10px] text-terracotta/60 font-mono">
+                    ({result.mbtiType})
                   </p>
                 </motion.div>
                 
@@ -951,13 +939,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   className="text-center px-2 py-4 rounded-xl bg-sage-green/8 dark:bg-sage-green/15 border border-sage-green/20"
                 >
                   <Award className="w-5 h-5 text-sage-green mx-auto mb-1.5" />
-                  <p className="text-lg font-bold text-sage-green mb-0.5" data-testid="text-disc-teaser">
-                    {result.discStyle}
-                  </p>
-                  <p className="text-[10px] text-sage-green/80 font-medium leading-tight line-clamp-2">
+                  <p className="text-sm font-bold text-sage-green mb-0.5 leading-tight line-clamp-2" data-testid="text-disc-teaser">
                     {funMode && FUN_MODE_DISC[result.discStyle] 
                       ? FUN_MODE_DISC[result.discStyle].nickname
                       : result.discLabel}
+                  </p>
+                  <p className="text-[10px] text-sage-green/60 font-mono">
+                    ({result.discStyle}-type)
                   </p>
                 </motion.div>
                 
@@ -974,11 +962,11 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     return (
                       <>
                         <TopIcon className="w-5 h-5 text-dusty-blue mx-auto mb-1.5" />
-                        <p className="text-lg font-bold text-dusty-blue mb-0.5" data-testid="text-bigfive-teaser">
-                          {TRAIT_LABELS[topTraitKey].slice(0, 4)}
+                        <p className="text-sm font-bold text-dusty-blue mb-0.5 leading-tight" data-testid="text-bigfive-teaser">
+                          {TRAIT_LABELS[topTraitKey]}
                         </p>
-                        <p className="text-[10px] text-dusty-blue/80 font-medium leading-tight">
-                          {topValue}%
+                        <p className="text-[10px] text-dusty-blue/60 font-mono">
+                          ({topValue}%)
                         </p>
                       </>
                     );
@@ -1005,13 +993,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-1">
                   {funMode ? "Your Title" : "MBTI Type"}
                 </p>
-                <p className="text-lg font-bold font-mono text-terracotta" data-testid="text-mbti">
-                  {result.mbtiType}
-                </p>
-                <p className="text-sm font-medium text-warm-gray dark:text-soft-cream">
+                <p className="text-base font-bold text-terracotta leading-tight" data-testid="text-mbti">
                   {funMode && FUN_MODE_TITLES[result.mbtiType] 
                     ? FUN_MODE_TITLES[result.mbtiType]
                     : result.mbtiLabel}
+                </p>
+                <p className="text-xs font-mono text-terracotta/60 mt-0.5">
+                  ({result.mbtiType})
                 </p>
               </CardContent>
             </Card>
@@ -1024,15 +1012,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 <p className="text-xs opacity-70 mb-1">
                   {funMode ? "Your Vibe" : "DISC Style"}
                 </p>
-                <p className="text-lg font-bold" data-testid="text-disc">
+                <p className="text-base font-bold leading-tight" data-testid="text-disc">
                   {funMode && FUN_MODE_DISC[result.discStyle] 
                     ? FUN_MODE_DISC[result.discStyle].nickname 
                     : result.discLabel}
                 </p>
-                <p className="text-sm font-medium opacity-90">
-                  {funMode && FUN_MODE_DISC[result.discStyle]
-                    ? result.discStyle + "-type energy"
-                    : result.discStyle + "-type"}
+                <p className="text-xs font-mono opacity-60 mt-0.5">
+                  ({result.discStyle}-type)
                 </p>
               </CardContent>
             </Card>
@@ -1334,7 +1320,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </CardHeader>
                   <CardContent className="pb-4">
                     <div 
-                      className="w-full aspect-square max-w-[280px] mx-auto"
+                      className="w-full aspect-square max-w-[340px] mx-auto"
                       role="img"
                       aria-label={`Big Five personality radar chart: ${traitKeys.map(k => `${TRAIT_LABELS[k as keyof typeof TRAIT_LABELS]} ${result.bigFiveProfile[k as keyof typeof result.bigFiveProfile]}%`).join(", ")}`}
                     >
@@ -1342,7 +1328,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     </div>
                     
                     <div 
-                      className="flex flex-wrap justify-center gap-2 mt-4"
+                      className="flex flex-wrap justify-center gap-2.5 mt-5"
                       role="group"
                       aria-label="Select a trait to learn more"
                     >
@@ -1359,18 +1345,18 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                             onClick={() => handleTraitSelect(trait, index)}
                             onKeyDown={(e) => handleTraitKeyDown(e, trait, index)}
                             tabIndex={focusedTraitIndex === -1 ? (index === 0 ? 0 : -1) : (focusedTraitIndex === index ? 0 : -1)}
-                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                            className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-semibold transition-all ${
                               isSelected 
-                                ? `${colors.bg} text-white ring-2 ring-offset-2 ring-${colors.bg}` 
+                                ? `${colors.bg} text-white ring-2 ring-offset-2 ${colors.ring}` 
                                 : `bg-gray-100 dark:bg-gray-700 ${colors.text} hover:scale-105`
                             }`}
                             aria-pressed={isSelected}
                             aria-label={`${TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]} petal ${value}%. ${isSelected ? "Selected" : "Click to learn more"}`}
                             data-testid={`button-trait-${trait.toLowerCase()}`}
                           >
-                            <Icon className="w-3 h-3" aria-hidden="true" />
+                            <Icon className="w-4 h-4" aria-hidden="true" />
                             <span>{TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]}</span>
-                            <span className="opacity-70">{value}%</span>
+                            <span className="opacity-70 font-bold">{value}%</span>
                           </button>
                         );
                       })}
@@ -1413,33 +1399,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </Card>
               </motion.div>
 
-              <motion.div
-                initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <Card className="bg-white dark:bg-gray-800">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Lightbulb className="w-4 h-4 text-amber-500" aria-hidden="true" />
-                      Growth Quests
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pb-4 space-y-3">
-                    {getQuests().map((quest, idx) => (
-                      <div 
-                        key={idx}
-                        className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
-                      >
-                        <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-800 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-amber-600 dark:text-amber-300 text-xs font-bold">{idx + 1}</span>
-                        </div>
-                        <p className="text-sm text-amber-900 dark:text-amber-100">{quest}</p>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </motion.div>
+              {/* Growth Quests moved to Premium tier */}
 
               {funMode && FUN_MODE_ROASTS[result.mbtiType] && (
                 <motion.div
@@ -1492,13 +1452,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           <Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-0.5">More Role Matches</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-0.5">Role Matches</p>
                           <p className="text-sm text-gray-400 dark:text-gray-500 blur-[2px] select-none">
                             {result.secondaryRole.title}
                           </p>
                           <p className="text-xs text-sage-green/80 mt-2 flex items-center gap-1">
                             <Crown className="w-3 h-3" />
-                            Unlock +2 role matches with Pro
+                            Unlock role matches with Pro
                           </p>
                         </div>
                       </div>
@@ -1580,7 +1540,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     </CardContent>
                   </Card>
 
-                  {/* +2 Extra Role Matches */}
+                  {/* Role Matches (Premium) */}
                   <Card className="bg-white dark:bg-gray-800 border-amber-200 dark:border-amber-800 overflow-hidden">
                     <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-red-400" />
                     <CardContent className="p-5">
@@ -1588,7 +1548,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/50">
                           <Gift className="w-4 h-4" />
                         </div>
-                        +2 Extra Role Matches
+                        Role Matches
                       </h5>
                       <div className="space-y-3">
                         <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-100 dark:border-amber-800">
@@ -2038,14 +1998,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         </p>
                       </div>
                       
-                      {/* Feature grid - 6 features */}
+                      {/* Feature grid - 6 features (reordered) */}
                       <div className="grid grid-cols-2 gap-3 mb-5">
                         {[
-                          { icon: Gift, title: "+2 Role Matches", desc: "More career paths" },
                           { icon: BookOpen, title: "Deep Dive", desc: "Full analysis" },
-                          { icon: Compass, title: "Evolution Map", desc: "Life stage growth" },
-                          { icon: Users, title: "Compatibility", desc: "Team matching" },
+                          { icon: Gift, title: "Role Matches", desc: "More career paths" },
                           { icon: Target, title: "30-Day Quest", desc: "Growth challenges" },
+                          { icon: Users, title: "Compatibility", desc: "Team matching" },
+                          { icon: Compass, title: "Evolution Map", desc: "Life stage growth" },
                           { icon: TrendingUp, title: "Arc Tracker", desc: "Track progress" },
                         ].map((feature, idx) => (
                           <div 

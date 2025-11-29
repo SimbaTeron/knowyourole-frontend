@@ -9,7 +9,7 @@ interface AgeTier {
 }
 
 const ageTiers: AgeTier[] = [
-  { id: "7-12", label: "Mini Explorer", sublabel: "Ages 7-12", Icon: Compass },
+  { id: "7-12", label: "Mini Explorer", sublabel: "Ages 12 and under", Icon: Compass },
   { id: "13-18", label: "Teen Navigator", sublabel: "Ages 13-18", Icon: Rocket },
   { id: "19-25", label: "Young Trailblazer", sublabel: "Ages 19-25", Icon: Zap },
   { id: "25+", label: "Adult Anchor", sublabel: "Ages 25+", Icon: Anchor },
@@ -79,7 +79,7 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
                   }`}>
                     {tier.label}
                   </span>
-                  <span className={`text-base mt-1 block ${
+                  <span className={`text-xl md:text-2xl mt-1 block font-medium ${
                     isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-soft-cream/40"
                   }`}>
                     {tier.sublabel}
