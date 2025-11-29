@@ -1,5 +1,7 @@
 import { google } from 'googleapis';
 
+export const QUIZ_SESSIONS_SPREADSHEET_ID = '1VT6hlq-AM1DKjB4l9SrFx_WqqPwFjI3cCZpZnjoRvRI';
+
 let connectionSettings: any;
 
 async function getAccessToken() {
@@ -184,4 +186,57 @@ export function formatTimezone(isoDate: string): string {
     timeZoneName: 'short',
   });
   return formatter.format(date);
+}
+
+export async function autoExportQuizSession(
+  session: any,
+  feedback: any,
+  questionsMap: Map<number, any>
+): Promise<void> {
+  try {
+    const responses = session.responses || [];
+    const responsesStr = responses
+      .map((r: any) => {
+        const q = questionsMap.get(r.questionId);
+        const choiceText = q?.options?.[r.choice] ?? String(r.choice);
+        return `Q${r.questionId}:${choiceText}`;
+      })
+      .join("; ");
+    
+    const result = session.result || {};
+    const bigFive = result.bigFiveProfile || {};
+    
+    const row = [
+      formatTimezone(session.createdAt),
+      session.id || "",
+      session.tier || "",
+      session.mood || "",
+      session.funMode ? "Yes" : "No",
+      session.theme || "",
+      result.mbtiType || "",
+      result.mbtiBlend || "",
+      result.discStyle || "",
+      result.title || "",
+      result.spark || "",
+      bigFive.openness ?? "",
+      bigFive.conscientiousness ?? "",
+      bigFive.extraversion ?? "",
+      bigFive.agreeableness ?? "",
+      bigFive.neuroticism ?? "",
+      result.totalQuestions ?? "",
+      result.avgResponseTime?.toFixed(2) || "",
+      result.engagement ?? "",
+      feedback?.usefulApp || "",
+      feedback?.resultsAccurate || "",
+      feedback?.questionsEngaging || "",
+      feedback?.wouldShare || "",
+      feedback?.suggestions || "",
+      responsesStr
+    ];
+    
+    await appendToSheet(QUIZ_SESSIONS_SPREADSHEET_ID, "Quiz Sessions", [row]);
+    console.log(`Auto-exported quiz session ${session.id} to Google Sheets`);
+  } catch (error) {
+    console.error("Failed to auto-export quiz session:", error);
+  }
 }

@@ -352,6 +352,29 @@ export async function registerRoutes(
       const saved = await storage.saveFeedback(feedbackData);
       console.log("Feedback saved:", saved.id);
       
+      // Auto-export to Google Sheets
+      if (feedbackData.sessionId) {
+        try {
+          const { autoExportQuizSession } = await import("./googleSheets");
+          const fs = await import("fs");
+          const path = await import("path");
+          
+          const session = await storage.getQuizSession(feedbackData.sessionId);
+          if (session) {
+            // Build questions map for response formatting
+            const questionsPath = path.join(process.cwd(), "client/src/data/questions.json");
+            const questionsData = JSON.parse(fs.readFileSync(questionsPath, "utf-8"));
+            const questionsArray = questionsData.questions || questionsData || [];
+            const questionsMap = new Map<number, any>();
+            questionsArray.forEach((q: any) => questionsMap.set(q.id, q));
+            
+            await autoExportQuizSession(session, feedbackData, questionsMap);
+          }
+        } catch (exportError) {
+          console.error("Auto-export failed (non-blocking):", exportError);
+        }
+      }
+      
       res.json({ success: true, id: saved.id });
     } catch (error) {
       console.error("Feedback save error:", error);
