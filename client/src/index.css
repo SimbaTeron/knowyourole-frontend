@@ -165,6 +165,69 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
+/* Locality Theme System - Sports team colors applied as accents */
+:root {
+  --locality-primary: 145 55% 30%;
+  --locality-secondary: 45 70% 50%;
+  --locality-accent: 0 0% 100%;
+  --locality-primary-hex: #2C5530;
+  --locality-secondary-hex: #C9A227;
+  --locality-accent-hex: #FFFFFF;
+  --locality-text-on-primary: 0 0% 100%;
+  --locality-text-on-secondary: 0 0% 10%;
+}
+
+/* Locality themed elements use scoped classes, not global palette overrides */
+
+.locality-themed .locality-primary-bg {
+  background-color: hsl(var(--locality-primary));
+  color: hsl(var(--locality-text-on-primary));
+}
+
+.locality-themed .locality-secondary-bg {
+  background-color: hsl(var(--locality-secondary));
+  color: hsl(var(--locality-text-on-secondary));
+}
+
+.locality-themed .locality-primary-text {
+  color: hsl(var(--locality-primary));
+}
+
+.locality-themed .locality-secondary-text {
+  color: hsl(var(--locality-secondary));
+}
+
+.locality-themed .locality-accent-text {
+  color: hsl(var(--locality-accent));
+}
+
+.locality-themed .locality-primary-border {
+  border-color: hsl(var(--locality-primary));
+}
+
+.locality-themed .locality-secondary-border {
+  border-color: hsl(var(--locality-secondary));
+}
+
+.locality-gradient {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--locality-primary)) 0%,
+    hsl(var(--locality-secondary)) 100%
+  );
+}
+
+.locality-gradient-text {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--locality-primary)) 0%,
+    hsl(var(--locality-secondary)) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 @layer base {
   * {
     @apply border-border;

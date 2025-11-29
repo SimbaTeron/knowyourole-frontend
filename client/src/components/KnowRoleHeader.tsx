@@ -1,5 +1,5 @@
 import { Settings } from "lucide-react";
-import ThemeToggle, { ThemeMode, RandomTheme } from "./ThemeToggle";
+import ThemeToggle, { ThemeMode } from "./ThemeToggle";
 import {
   Popover,
   PopoverContent,
@@ -9,11 +9,10 @@ import appIcon from "@assets/image (5)_1764388202854.jpg";
 
 interface KnowRoleHeaderProps {
   theme: ThemeMode;
-  randomTheme: RandomTheme | null;
-  onThemeChange: (theme: ThemeMode, randomTheme?: RandomTheme) => void;
+  onThemeChange: (theme: ThemeMode) => void;
 }
 
-export default function KnowRoleHeader({ theme, randomTheme, onThemeChange }: KnowRoleHeaderProps) {
+export default function KnowRoleHeader({ theme, onThemeChange }: KnowRoleHeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-lg mx-auto flex justify-between items-center">
@@ -65,7 +64,6 @@ export default function KnowRoleHeader({ theme, randomTheme, onThemeChange }: Kn
 
         <ThemeToggle
           currentTheme={theme}
-          currentRandomTheme={randomTheme}
           onThemeChange={onThemeChange}
         />
       </div>

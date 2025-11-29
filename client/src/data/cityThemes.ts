@@ -1465,6 +1465,49 @@ const countryToRegion: Record<string, string> = {
   "AE": "asia"
 };
 
+const cityAliases: Record<string, string> = {
+  "new york city": "new york",
+  "nyc": "new york",
+  "manhattan": "new york",
+  "la": "los angeles",
+  "beverly hills": "los angeles",
+  "hollywood": "los angeles",
+  "santa monica": "los angeles",
+  "long beach": "los angeles",
+  "pasadena": "los angeles",
+  "south loop": "chicago",
+  "downtown chicago": "chicago",
+  "sf": "san francisco",
+  "downtown dallas": "dallas",
+  "downtown phoenix": "phoenix",
+  "downtown denver": "denver",
+  "downtown seattle": "seattle",
+  "downtown boston": "boston",
+  "downtown miami": "miami",
+  "miami beach": "miami",
+  "downtown atlanta": "atlanta",
+  "downtown detroit": "detroit",
+  "downtown minneapolis": "minneapolis",
+  "downtown san diego": "san diego",
+  "downtown tampa": "tampa",
+  "downtown baltimore": "baltimore",
+  "downtown pittsburgh": "pittsburgh",
+  "downtown cleveland": "cleveland",
+  "downtown new orleans": "new orleans",
+  "downtown las vegas": "las vegas",
+  "the strip": "las vegas",
+  "downtown portland": "portland",
+  "downtown austin": "austin",
+  "downtown nashville": "nashville",
+  "downtown indianapolis": "indianapolis",
+  "downtown charlotte": "charlotte",
+  "downtown jacksonville": "jacksonville",
+  "downtown memphis": "memphis",
+  "downtown buffalo": "buffalo",
+  "downtown cincinnati": "cincinnati",
+  "downtown kansas city": "kansas city",
+};
+
 export function getCityTheme(city: string, state?: string, country?: string): CityTheme | null {
   const normalizedCity = city.toLowerCase().trim();
   
@@ -1477,7 +1520,15 @@ export function getCityTheme(city: string, state?: string, country?: string): Ci
     }
   }
   
-  return cityThemes[normalizedCity] || null;
+  if (cityThemes[normalizedCity]) {
+    return cityThemes[normalizedCity];
+  }
+  
+  if (cityAliases[normalizedCity]) {
+    return cityThemes[cityAliases[normalizedCity]] || null;
+  }
+  
+  return null;
 }
 
 export function getRegionalTheme(state?: string, country?: string): LocalityTheme {

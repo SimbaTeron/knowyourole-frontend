@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 import { Zap, BookOpen, HelpCircle, ArrowRight, SkipForward } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
-import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
-import randomThemesData from "@/data/random-themes.json";
+import { ThemeMode } from "@/components/ThemeToggle";
 
 const MOODS = [
   { id: "energized", label: "Energized", desc: "Ready to take on anything", icon: Zap },
@@ -17,12 +16,11 @@ export default function MoodPage() {
   const [, setLocation] = useLocation();
   const [mood, setMood] = useState<string | null>(null);
   const [theme, setTheme] = useState<ThemeMode>("light");
-  const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
     const storedMood = sessionStorage.getItem("knowrole-mood");
-    if (stored) {
+    if (stored && (stored === "light" || stored === "dark")) {
       setTheme(stored);
       if (stored === "dark") {
         document.documentElement.classList.add("dark");
@@ -33,28 +31,16 @@ export default function MoodPage() {
     }
   }, []);
 
-  const handleThemeChange = (newTheme: ThemeMode, newRandomTheme?: RandomTheme) => {
+  const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
     localStorage.setItem("knowrole-theme", newTheme);
     
     document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-    document.body.classList.remove(
-      "sunburst-trail-vibe", "neon-urban-vibe", "forest-whisper-vibe",
-      "ocean-drift-vibe", "desert-bloom-vibe", "city-pulse-vibe", "meadow-dream-vibe"
-    );
 
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark", "dark-mysterious");
-      setRandomTheme(null);
-    } else if (newTheme === "light") {
+    } else {
       document.documentElement.classList.add("light-clinical");
-      setRandomTheme(null);
-    } else if (newTheme === "random") {
-      const themes = randomThemesData.themes;
-      const randomIndex = Math.floor(Math.random() * themes.length);
-      const selectedTheme = newRandomTheme || themes[randomIndex];
-      setRandomTheme(selectedTheme);
-      document.body.classList.add(`${selectedTheme.id}-vibe`);
     }
   };
 
@@ -79,9 +65,6 @@ export default function MoodPage() {
   };
 
   const getThemeClass = () => {
-    if (theme === "random" && randomTheme) {
-      return `${randomTheme.id}-vibe`;
-    }
     return theme === "dark" ? "dark-mysterious" : "light-clinical";
   };
 
@@ -91,7 +74,6 @@ export default function MoodPage() {
       <CompactHeader
         onBack={handleBack}
         currentTheme={theme}
-        currentRandomTheme={randomTheme}
         onThemeChange={handleThemeChange}
       />
 

@@ -5,8 +5,8 @@ import { MapPin, Compass, ArrowRight, SkipForward, Sparkles } from "lucide-react
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import FunModeToggle from "@/components/FunModeToggle";
-import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
-import randomThemesData from "@/data/random-themes.json";
+import { ThemeMode } from "@/components/ThemeToggle";
+import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import landmarksData from "@/data/landmarks.json";
 
 interface LandmarkResult {
@@ -22,14 +22,14 @@ export default function LocationPage() {
   const [funMode, setFunMode] = useState(false);
   const [landmark, setLandmark] = useState<LandmarkResult | null>(null);
   const [theme, setTheme] = useState<ThemeMode>("light");
-  const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
+  const { setLocality, teamName, isLocalitySet } = useLocalityTheme();
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
     const storedFunMode = sessionStorage.getItem("knowrole-funmode");
     const storedLandmark = sessionStorage.getItem("knowrole-landmark");
     
-    if (stored) {
+    if (stored && (stored === "light" || stored === "dark")) {
       setTheme(stored);
       if (stored === "dark") {
         document.documentElement.classList.add("dark");
@@ -43,56 +43,77 @@ export default function LocationPage() {
     }
   }, []);
 
-  const handleThemeChange = (newTheme: ThemeMode, newRandomTheme?: RandomTheme) => {
+  const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
     localStorage.setItem("knowrole-theme", newTheme);
     
     document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-    document.body.classList.remove(
-      "sunburst-trail-vibe", "neon-urban-vibe", "forest-whisper-vibe",
-      "ocean-drift-vibe", "desert-bloom-vibe", "city-pulse-vibe", "meadow-dream-vibe"
-    );
 
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark", "dark-mysterious");
-      setRandomTheme(null);
-    } else if (newTheme === "light") {
+    } else {
       document.documentElement.classList.add("light-clinical");
-      setRandomTheme(null);
-    } else if (newTheme === "random") {
-      const themes = randomThemesData.themes;
-      const randomIndex = Math.floor(Math.random() * themes.length);
-      const selectedTheme = newRandomTheme || themes[randomIndex];
-      setRandomTheme(selectedTheme);
-      document.body.classList.add(`${selectedTheme.id}-vibe`);
     }
   };
 
-  const lookupLandmark = (code: string, countryCode: string) => {
-    const countryData = (landmarksData as Record<string, Record<string, { landmark: string; theme?: string }>>)[countryCode];
-    if (!countryData) return null;
+  const [isLoading, setIsLoading] = useState(false);
+  const [detectedCity, setDetectedCity] = useState<string | null>(null);
+  const [detectedState, setDetectedState] = useState<string | null>(null);
+
+  const lookupPostalCode = async (code: string, countryCode: string) => {
+    if (code.length < 3) return;
     
-    const prefix = code.substring(0, 3).toUpperCase();
-    const cityData = countryData[prefix];
-    
-    if (cityData) {
-      return {
-        landmark: cityData.landmark,
-        city: prefix,
-        theme: cityData.theme,
-      };
+    setIsLoading(true);
+    try {
+      const cleanPostal = code.trim().replace(/\s+/g, "%20");
+      const response = await fetch(
+        `https://api.zippopotam.us/${countryCode}/${cleanPostal}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Location not found");
+      }
+
+      const data = await response.json();
+      const city = data.places?.[0]?.["place name"] || "";
+      const state = data.places?.[0]?.["state abbreviation"] || data.places?.[0]?.["state"] || "";
+      
+      if (city) {
+        setDetectedCity(city);
+        setDetectedState(state);
+        
+        setLocality(city, state, countryCode);
+        
+        const countryData = (landmarksData as Record<string, Record<string, { landmark: string; theme?: string }>>)[countryCode.toLowerCase()];
+        if (countryData) {
+          for (const [cityName, info] of Object.entries(countryData)) {
+            if (city.toLowerCase().includes(cityName.toLowerCase()) ||
+                cityName.toLowerCase().includes(city.toLowerCase())) {
+              const landmarkResult = {
+                landmark: info.landmark,
+                city: cityName,
+                theme: info.theme,
+              };
+              setLandmark(landmarkResult);
+              sessionStorage.setItem("knowrole-landmark", JSON.stringify(landmarkResult));
+              break;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Could not look up postal code:", err);
+    } finally {
+      setIsLoading(false);
     }
-    return null;
   };
 
   const handlePostalChange = (value: string) => {
     setPostalCode(value);
-    if (value.length >= 3) {
-      const result = lookupLandmark(value, country);
-      if (result) {
-        setLandmark(result);
-        sessionStorage.setItem("knowrole-landmark", JSON.stringify(result));
-      }
+    if (value.length >= 5 && country === "US") {
+      lookupPostalCode(value, country);
+    } else if (value.length >= 3) {
+      lookupPostalCode(value, country);
     }
   };
 
@@ -117,9 +138,6 @@ export default function LocationPage() {
   };
 
   const getThemeClass = () => {
-    if (theme === "random" && randomTheme) {
-      return `${randomTheme.id}-vibe`;
-    }
     return theme === "dark" ? "dark-mysterious" : "light-clinical";
   };
 
@@ -129,7 +147,6 @@ export default function LocationPage() {
       <CompactHeader
         onBack={handleBack}
         currentTheme={theme}
-        currentRandomTheme={randomTheme}
         onThemeChange={handleThemeChange}
       />
 
@@ -192,7 +209,43 @@ export default function LocationPage() {
                 />
               </div>
               
-              {landmark && (
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-terracotta/10"
+                >
+                  <div className="w-4 h-4 border-2 border-terracotta/30 border-t-terracotta rounded-full animate-spin" />
+                  <span className="text-sm text-warm-gray/70 dark:text-soft-cream/60">
+                    Finding your area...
+                  </span>
+                </motion.div>
+              )}
+              
+              {!isLoading && detectedCity && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="space-y-2"
+                >
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg locality-gradient text-white">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      {detectedCity}{detectedState ? `, ${detectedState}` : ""}
+                    </span>
+                  </div>
+                  {teamName && (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-soft-cream/80 dark:bg-deep-cream/50 border border-terracotta/10">
+                      <Sparkles className="w-4 h-4 locality-primary-text" />
+                      <span className="text-sm text-warm-gray dark:text-soft-cream">
+                        Theme: <span className="font-medium locality-gradient-text">{teamName}</span>
+                      </span>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+              
+              {!isLoading && !detectedCity && landmark && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}

@@ -3,8 +3,7 @@ import { useLocation } from "wouter";
 import PathCanvas from "@/components/PathCanvas";
 import Quiz, { QuizScores } from "@/components/Quiz";
 import Results from "@/components/Results";
-import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
-import randomThemesData from "@/data/random-themes.json";
+import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -16,7 +15,6 @@ interface APIScales {
 export default function QuizPage() {
   const [, setLocation] = useLocation();
   const [theme, setTheme] = useState<ThemeMode>("light");
-  const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
   const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
   const [quizSessionId, setQuizSessionId] = useState<string | null>(null);
   const [apiScales, setApiScales] = useState<APIScales | null>(null);
@@ -31,38 +29,26 @@ export default function QuizPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
-    if (stored) {
+    if (stored && (stored === "light" || stored === "dark")) {
       setTheme(stored);
       if (stored === "dark") {
         document.documentElement.classList.add("dark", "dark-mysterious");
-      } else if (stored === "light") {
+      } else {
         document.documentElement.classList.add("light-clinical");
       }
     }
   }, []);
 
-  const handleThemeChange = (newTheme: ThemeMode, newRandomTheme?: RandomTheme) => {
+  const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
     localStorage.setItem("knowrole-theme", newTheme);
     
     document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-    document.body.classList.remove(
-      "sunburst-trail-vibe", "neon-urban-vibe", "forest-whisper-vibe",
-      "ocean-drift-vibe", "desert-bloom-vibe", "city-pulse-vibe", "meadow-dream-vibe"
-    );
 
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark", "dark-mysterious");
-      setRandomTheme(null);
-    } else if (newTheme === "light") {
+    } else {
       document.documentElement.classList.add("light-clinical");
-      setRandomTheme(null);
-    } else if (newTheme === "random") {
-      const themes = randomThemesData.themes;
-      const randomIndex = Math.floor(Math.random() * themes.length);
-      const selectedTheme = newRandomTheme || themes[randomIndex];
-      setRandomTheme(selectedTheme);
-      document.body.classList.add(`${selectedTheme.id}-vibe`);
     }
   };
 
@@ -144,9 +130,6 @@ export default function QuizPage() {
   };
 
   const getThemeClass = () => {
-    if (theme === "random" && randomTheme) {
-      return `${randomTheme.id}-vibe`;
-    }
     return theme === "dark" ? "dark-mysterious" : "light-clinical";
   };
 

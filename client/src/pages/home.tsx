@@ -4,17 +4,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import PathCanvas from "@/components/PathCanvas";
 import KnowRoleHeader from "@/components/KnowRoleHeader";
 import AgeTierSelector from "@/components/AgeTierSelector";
-import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
+import { ThemeMode } from "@/components/ThemeToggle";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const [ageTier, setAgeTier] = useState<string | null>(null);
   const [theme, setTheme] = useState<ThemeMode>("light");
-  const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
-    if (stored) {
+    if (stored && (stored === "light" || stored === "dark")) {
       setTheme(stored);
       if (stored === "dark") {
         document.documentElement.classList.add("dark");
@@ -22,25 +21,16 @@ export default function Home() {
     }
   }, []);
 
-  const handleThemeChange = (newTheme: ThemeMode, newRandomTheme?: RandomTheme) => {
+  const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
     localStorage.setItem("knowrole-theme", newTheme);
     
     document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-    document.body.classList.remove(
-      "sunburst-trail-vibe", "neon-urban-vibe", "forest-whisper-vibe",
-      "ocean-drift-vibe", "desert-bloom-vibe", "city-pulse-vibe", "meadow-dream-vibe"
-    );
 
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark", "dark-mysterious");
-      setRandomTheme(null);
-    } else if (newTheme === "light") {
+    } else {
       document.documentElement.classList.add("light-clinical");
-      setRandomTheme(null);
-    } else if (newTheme === "random" && newRandomTheme) {
-      setRandomTheme(newRandomTheme);
-      document.body.classList.add(`${newRandomTheme.id}-vibe`);
     }
   };
 
@@ -52,11 +42,7 @@ export default function Home() {
   };
 
   const getThemeClass = () => {
-    if (theme === "random" && randomTheme) {
-      return `${randomTheme.id}-vibe`;
-    }
-    if (theme === "dark") return "dark-mysterious";
-    return "light-clinical";
+    return theme === "dark" ? "dark-mysterious" : "light-clinical";
   };
 
   return (
@@ -64,7 +50,6 @@ export default function Home() {
       <PathCanvas />
       <KnowRoleHeader 
         theme={theme} 
-        randomTheme={randomTheme} 
         onThemeChange={handleThemeChange} 
       />
       

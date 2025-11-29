@@ -1,20 +1,18 @@
-import { ArrowLeft, Sun, Moon, Sparkles } from "lucide-react";
+import { ArrowLeft, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
-import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
+import { ThemeMode } from "@/components/ThemeToggle";
 
 interface CompactHeaderProps {
   onBack?: () => void;
   showBack?: boolean;
   currentTheme: ThemeMode;
-  currentRandomTheme: RandomTheme | null;
-  onThemeChange: (theme: ThemeMode, randomTheme?: RandomTheme) => void;
+  onThemeChange: (theme: ThemeMode) => void;
 }
 
 export default function CompactHeader({
   onBack,
   showBack = true,
   currentTheme,
-  currentRandomTheme,
   onThemeChange,
 }: CompactHeaderProps) {
   const triggerHaptic = (duration = 30) => {
@@ -23,21 +21,15 @@ export default function CompactHeader({
     }
   };
 
-  const cycleTheme = () => {
+  const toggleTheme = () => {
     triggerHaptic(20);
-    if (currentTheme === "light") {
-      onThemeChange("dark");
-    } else if (currentTheme === "dark") {
-      onThemeChange("random");
-    } else {
-      onThemeChange("light");
-    }
+    onThemeChange(currentTheme === "light" ? "dark" : "light");
   };
 
   const getThemeIcon = () => {
-    if (currentTheme === "dark") return <Moon className="w-4 h-4" />;
-    if (currentTheme === "random") return <Sparkles className="w-4 h-4" />;
-    return <Sun className="w-4 h-4" />;
+    return currentTheme === "dark" 
+      ? <Moon className="w-4 h-4" /> 
+      : <Sun className="w-4 h-4" />;
   };
 
   return (
@@ -69,9 +61,9 @@ export default function CompactHeader({
         </div>
 
         <button
-          onClick={cycleTheme}
+          onClick={toggleTheme}
           className="w-10 h-10 rounded-xl bg-soft-cream/60 dark:bg-deep-cream/40 backdrop-blur-sm border border-terracotta/8 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-terracotta/20 text-warm-gray dark:text-soft-cream"
-          aria-label={`Current theme: ${currentTheme}. Tap to change.`}
+          aria-label={`Switch to ${currentTheme === "light" ? "dark" : "light"} mode`}
           data-testid="button-compact-theme"
         >
           {getThemeIcon()}
