@@ -674,10 +674,61 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </div>
           
           <div className="flex items-center gap-1.5">
-            <Timer className={`w-4 h-4 ${timerProgress < 30 ? "text-red-500" : "text-terracotta"}`} />
-            <span className={`text-sm font-mono font-medium ${timerProgress < 30 ? "text-red-500" : "text-warm-gray dark:text-soft-cream"}`}>
-              {timeRemaining.toFixed(1)}s
-            </span>
+            <AnimatePresence mode="wait">
+              {timeRemaining <= 3 ? (
+                <motion.div
+                  key="ring"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                  className="relative w-8 h-8 flex items-center justify-center"
+                >
+                  <svg className="w-8 h-8 -rotate-90" viewBox="0 0 32 32">
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="14"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      className="text-gray-200 dark:text-gray-700"
+                    />
+                    <motion.circle
+                      cx="16"
+                      cy="16"
+                      r="14"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      className="text-red-500"
+                      initial={{ pathLength: 1 }}
+                      animate={{ pathLength: timeRemaining / 3 }}
+                      style={{
+                        strokeDasharray: "88",
+                        strokeDashoffset: 0,
+                      }}
+                    />
+                  </svg>
+                  <span className="absolute text-[10px] font-bold text-red-500">
+                    {Math.ceil(timeRemaining)}
+                  </span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="timer"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                  className="flex items-center gap-1.5"
+                >
+                  <Timer className={`w-4 h-4 ${timerProgress < 30 ? "text-red-500" : "text-terracotta"}`} />
+                  <span className={`text-sm font-mono font-medium ${timerProgress < 30 ? "text-red-500" : "text-warm-gray dark:text-soft-cream"}`}>
+                    {timeRemaining.toFixed(1)}s
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
         
