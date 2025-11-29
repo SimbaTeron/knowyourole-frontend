@@ -103,12 +103,27 @@ Preferred communication style: Simple, everyday language.
 - **Mobile-first**: Touch-optimized interactions with 44px+ tap targets
 
 ### Feedback System
-- **FeedbackModal**: Non-intrusive alpha feedback collection (50% random trigger)
-- **Trigger**: Activates after "Begin Your Journey" click with 2-second delay
-- **6 Structured Questions**: Star ratings, Yes/No, dropdowns, and textarea inputs
-- **Google Form Integration**: Replace `YOUR_FORM_ID` in FeedbackModal.tsx with actual Google Form ID
-- **Console Output**: Logs feedback summary as JSON for Sheet export
-- **A11y**: Focus trap, aria-modal=true, Escape key to close
+- **FeedbackModal**: Post-quiz feedback collection with 3 key questions
+- **Trigger**: Appears immediately after completing all 10 quiz questions
+- **3 Streamlined Questions**: Engagement rating (1-5), share likelihood (yes/no), accuracy feeling (1-5)
+- **20-second Timer**: Auto-unlocks skip button for accessibility; guaranteed unlock after countdown
+- **Skip Option**: "Skip and view results" button respects user time
+- **Console Output**: Logs feedback summary as JSON for analytics
+- **A11y**: Focus management, keyboard navigation, aria-modal=true, reduced-motion support
+
+### Quiz Flow
+- **10 Questions**: Descriptive binary scenarios with vivid 10-15 word options
+- **Timer**: Per-question countdown with visual progress indicator
+- **Swipe/Click Input**: Both swipe gestures and click/tap supported
+- **Guard Conditions**: Robust handling of edge cases (empty questions, quiz completion)
+- **Score Tracking**: MBTI, DISC, and Big Five trait accumulation per question
+
+### Results Dashboard
+- **Big Five Radar**: Chart.js radar visualization with interactive petals
+- **MBTI Card**: Type name, label (e.g., "Architect"), and description
+- **DISC Card**: Dominant style with color-coded indicator
+- **Role Recommendations**: 150+ role clusters with salary ranges and descriptions
+- **Role Matching Algorithm**: Uses MBTI type + DISC style + dominant Big Five traits
 
 ### Data and State Management
 - **TanStack Query**: Server state management, caching, and data fetching

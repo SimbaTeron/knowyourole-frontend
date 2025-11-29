@@ -230,25 +230,33 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     processScore(question, choiceIndex);
     
-    setScores(prev => ({
-      ...prev,
-      responses: [...prev.responses, {
-        questionId: question.id,
-        choice: choiceIndex,
-        timeSpent,
-        swipeDirection: direction
-      }],
-      engagement: prev.engagement + (isTimeout ? -0.5 : 1)
-    }));
+    const newResponse = {
+      questionId: question.id,
+      choice: choiceIndex,
+      timeSpent,
+      swipeDirection: direction
+    };
+    
+    setScores(prev => {
+      const updatedScores = {
+        ...prev,
+        responses: [...prev.responses, newResponse],
+        engagement: prev.engagement + (isTimeout ? -0.5 : 1)
+      };
+      
+      if (currentIndex >= questions.length - 1) {
+        setTimeout(() => onComplete(updatedScores), 300);
+      }
+      
+      return updatedScores;
+    });
     
     x.set(0);
     
-    if (currentIndex >= questions.length - 1) {
-      setTimeout(() => onComplete(scores), 300);
-    } else {
+    if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, scores, onComplete, x]);
+  }, [currentIndex, questions, questionStartTime, processScore, onComplete, x]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut) return;
@@ -287,7 +295,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     }
   };
 
-  if (questions.length === 0) {
+  const currentQuestion = questions[currentIndex];
+  
+  if (questions.length === 0 || !currentQuestion) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <motion.div
@@ -299,7 +309,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     );
   }
 
-  const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const timerProgress = (timeRemaining / currentQuestion.time) * 100;
   

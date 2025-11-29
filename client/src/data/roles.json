@@ -440,6 +440,150 @@
       "primary": { "title": "Bus Driver", "salary": "$35K-55K", "desc": "Transport communities with steady reliability" },
       "secondary": { "title": "Rideshare Driver", "salary": "$30K-60K", "desc": "Connect people with flexible service" }
     },
+    "intp-s-c-high": {
+      "primary": { "title": "Database Administrator", "salary": "$75K-120K", "desc": "Manage data systems with methodical precision" },
+      "secondary": { "title": "Technical Archivist", "salary": "$50K-80K", "desc": "Organize technical knowledge systematically" }
+    },
+    "intj-i-o-high": {
+      "primary": { "title": "Game Designer", "salary": "$65K-120K", "desc": "Create immersive game systems with strategic depth" },
+      "secondary": { "title": "UX Architect", "salary": "$90K-150K", "desc": "Design intuitive user experiences" }
+    },
+    "entp-c-c-high": {
+      "primary": { "title": "Patent Attorney", "salary": "$120K-200K", "desc": "Protect innovations with legal expertise" },
+      "secondary": { "title": "Technical Consultant", "salary": "$90K-160K", "desc": "Solve complex technical problems" }
+    },
+    "entj-s-o-high": {
+      "primary": { "title": "Healthcare Administrator", "salary": "$90K-150K", "desc": "Lead medical organizations with efficiency" },
+      "secondary": { "title": "University Dean", "salary": "$120K-200K", "desc": "Shape academic institutions" }
+    },
+    "infj-d-o-high": {
+      "primary": { "title": "Organizational Development Specialist", "salary": "$70K-110K", "desc": "Transform workplace cultures" },
+      "secondary": { "title": "Executive Recruiter", "salary": "$80K-150K", "desc": "Match leaders with organizations" }
+    },
+    "infp-c-a-high": {
+      "primary": { "title": "Marriage Counselor", "salary": "$55K-90K", "desc": "Guide couples through challenges" },
+      "secondary": { "title": "Child Psychologist", "salary": "$65K-110K", "desc": "Support young minds with care" }
+    },
+    "enfj-c-o-high": {
+      "primary": { "title": "Curriculum Designer", "salary": "$60K-100K", "desc": "Create transformative learning experiences" },
+      "secondary": { "title": "Training Director", "salary": "$80K-130K", "desc": "Develop organizational talent" }
+    },
+    "enfp-s-a-high": {
+      "primary": { "title": "Life Coach", "salary": "$50K-150K", "desc": "Inspire personal transformation" },
+      "secondary": { "title": "Wellness Coordinator", "salary": "$45K-75K", "desc": "Promote holistic health" }
+    },
+    "istj-s-c-high": {
+      "primary": { "title": "Insurance Underwriter", "salary": "$60K-100K", "desc": "Assess risk with careful analysis" },
+      "secondary": { "title": "Claims Adjuster", "salary": "$50K-80K", "desc": "Evaluate cases methodically" }
+    },
+    "isfj-d-c-high": {
+      "primary": { "title": "Office Manager", "salary": "$45K-70K", "desc": "Keep operations running smoothly" },
+      "secondary": { "title": "Executive Assistant", "salary": "$50K-80K", "desc": "Support leaders with dedication" }
+    },
+    "estj-s-a-high": {
+      "primary": { "title": "School Principal", "salary": "$80K-130K", "desc": "Lead educational communities" },
+      "secondary": { "title": "Program Director", "salary": "$65K-110K", "desc": "Manage programs effectively" }
+    },
+    "esfj-d-c-high": {
+      "primary": { "title": "Wedding Planner", "salary": "$45K-100K", "desc": "Create perfect celebrations" },
+      "secondary": { "title": "Conference Organizer", "salary": "$50K-85K", "desc": "Coordinate major events" }
+    },
+    "istp-s-c-high": {
+      "primary": { "title": "Aircraft Mechanic", "salary": "$55K-90K", "desc": "Maintain aircraft with precision" },
+      "secondary": { "title": "Marine Technician", "salary": "$50K-85K", "desc": "Service vessels expertly" }
+    },
+    "isfp-c-a-high": {
+      "primary": { "title": "Makeup Artist", "salary": "$35K-80K", "desc": "Transform appearances with artistry" },
+      "secondary": { "title": "Costume Designer", "salary": "$40K-90K", "desc": "Create character looks" }
+    },
+    "estp-c-c-high": {
+      "primary": { "title": "Construction Manager", "salary": "$70K-130K", "desc": "Build projects on time and budget" },
+      "secondary": { "title": "Site Supervisor", "salary": "$55K-90K", "desc": "Oversee construction operations" }
+    },
+    "esfp-d-o-high": {
+      "primary": { "title": "Talent Agent", "salary": "$50K-200K+", "desc": "Discover and develop stars" },
+      "secondary": { "title": "Promoter", "salary": "$40K-120K", "desc": "Generate buzz and excitement" }
+    },
+    "startup-d-o-high": {
+      "primary": { "title": "Growth Hacker", "salary": "$80K-150K", "desc": "Scale businesses with creative tactics" },
+      "secondary": { "title": "Product Hunt Champion", "salary": "$70K-130K", "desc": "Launch products successfully" }
+    },
+    "startup-i-o-high": {
+      "primary": { "title": "Community Builder", "salary": "$60K-110K", "desc": "Grow passionate user communities" },
+      "secondary": { "title": "Content Marketer", "salary": "$55K-95K", "desc": "Tell compelling brand stories" }
+    },
+    "startup-c-c-high": {
+      "primary": { "title": "Technical Co-Founder", "salary": "$100K-300K+", "desc": "Build core product technology" },
+      "secondary": { "title": "DevOps Lead", "salary": "$90K-160K", "desc": "Scale infrastructure efficiently" }
+    },
+    "startup-s-a-high": {
+      "primary": { "title": "People Operations", "salary": "$65K-110K", "desc": "Build thriving startup cultures" },
+      "secondary": { "title": "Customer Advocate", "salary": "$50K-85K", "desc": "Champion user needs" }
+    },
+    "remote-d-o-high": {
+      "primary": { "title": "Digital Nomad Consultant", "salary": "$80K-180K", "desc": "Work globally with flexibility" },
+      "secondary": { "title": "Remote Team Lead", "salary": "$90K-150K", "desc": "Manage distributed teams" }
+    },
+    "remote-c-c-high": {
+      "primary": { "title": "Full Stack Developer", "salary": "$100K-180K", "desc": "Build complete applications independently" },
+      "secondary": { "title": "Technical Writer", "salary": "$70K-110K", "desc": "Document complex systems clearly" }
+    },
+    "gig-d-e-high": {
+      "primary": { "title": "Freelance Consultant", "salary": "$75K-200K+", "desc": "Provide expertise on your terms" },
+      "secondary": { "title": "Independent Contractor", "salary": "$50K-150K", "desc": "Control your work schedule" }
+    },
+    "gig-i-o-high": {
+      "primary": { "title": "Social Media Influencer", "salary": "$30K-500K+", "desc": "Build audiences and partnerships" },
+      "secondary": { "title": "Content Creator", "salary": "$40K-200K+", "desc": "Create engaging digital content" }
+    },
+    "sustainability-d-o-high": {
+      "primary": { "title": "Sustainability Director", "salary": "$90K-160K", "desc": "Lead green initiatives" },
+      "secondary": { "title": "Clean Energy Consultant", "salary": "$80K-140K", "desc": "Guide renewable transitions" }
+    },
+    "sustainability-s-a-high": {
+      "primary": { "title": "Environmental Educator", "salary": "$45K-70K", "desc": "Inspire eco-conscious living" },
+      "secondary": { "title": "Conservation Coordinator", "salary": "$40K-65K", "desc": "Protect natural resources" }
+    },
+    "wellness-i-a-high": {
+      "primary": { "title": "Mindfulness Coach", "salary": "$50K-120K", "desc": "Guide inner peace journeys" },
+      "secondary": { "title": "Meditation Teacher", "salary": "$40K-90K", "desc": "Lead contemplative practices" }
+    },
+    "wellness-s-o-high": {
+      "primary": { "title": "Holistic Health Practitioner", "salary": "$55K-100K", "desc": "Treat the whole person" },
+      "secondary": { "title": "Acupuncturist", "salary": "$60K-110K", "desc": "Apply traditional healing arts" }
+    },
+    "digital-d-c-high": {
+      "primary": { "title": "E-commerce Director", "salary": "$100K-180K", "desc": "Scale online retail operations" },
+      "secondary": { "title": "Digital Transformation Lead", "salary": "$110K-190K", "desc": "Modernize business processes" }
+    },
+    "digital-i-o-high": {
+      "primary": { "title": "Social Media Manager", "salary": "$50K-90K", "desc": "Build brand presence online" },
+      "secondary": { "title": "Digital Marketing Specialist", "salary": "$55K-95K", "desc": "Drive online engagement" }
+    },
+    "real-estate-d-c-high": {
+      "primary": { "title": "Real Estate Developer", "salary": "$100K-500K+", "desc": "Create valuable properties" },
+      "secondary": { "title": "Property Manager", "salary": "$55K-95K", "desc": "Maintain real estate portfolios" }
+    },
+    "real-estate-i-a-high": {
+      "primary": { "title": "Luxury Real Estate Agent", "salary": "$80K-300K+", "desc": "Connect elite buyers with dream homes" },
+      "secondary": { "title": "Relocation Specialist", "salary": "$50K-85K", "desc": "Ease major life transitions" }
+    },
+    "gaming-c-o-high": {
+      "primary": { "title": "Game Developer", "salary": "$70K-130K", "desc": "Create interactive entertainment" },
+      "secondary": { "title": "Level Designer", "salary": "$60K-100K", "desc": "Craft engaging game worlds" }
+    },
+    "gaming-i-e-high": {
+      "primary": { "title": "E-sports Manager", "salary": "$60K-150K", "desc": "Lead competitive gaming teams" },
+      "secondary": { "title": "Gaming Streamer", "salary": "$30K-500K+", "desc": "Entertain gaming audiences" }
+    },
+    "fashion-o-high": {
+      "primary": { "title": "Fashion Designer", "salary": "$55K-150K", "desc": "Create wearable art" },
+      "secondary": { "title": "Stylist", "salary": "$45K-120K", "desc": "Curate personal aesthetics" }
+    },
+    "fashion-d-c-high": {
+      "primary": { "title": "Fashion Buyer", "salary": "$60K-110K", "desc": "Select trending inventory" },
+      "secondary": { "title": "Retail Director", "salary": "$80K-140K", "desc": "Lead fashion retail operations" }
+    },
     "default": {
       "primary": { "title": "Career Explorer", "salary": "Varies", "desc": "Discover your unique path through self-reflection" },
       "secondary": { "title": "Skill Builder", "salary": "Varies", "desc": "Develop versatile abilities for any direction" }

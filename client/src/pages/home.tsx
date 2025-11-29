@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PathCanvas from "@/components/PathCanvas";
@@ -26,7 +26,7 @@ interface LandmarkInfo {
   country?: string;
 }
 
-type Step = "tier" | "mood" | "postal" | "ready" | "quiz" | "results";
+type Step = "tier" | "mood" | "postal" | "ready" | "quiz" | "feedback" | "results";
 
 export default function Home() {
   const [ageTier, setAgeTier] = useState<string | null>(null);
@@ -36,62 +36,8 @@ export default function Home() {
   const [step, setStep] = useState<Step>("tier");
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
-  const [showFeedback, setShowFeedback] = useState(false);
   const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
-  const feedbackTriggeredRef = useRef(false);
-  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
-
-  const triggerFeedback = useCallback((delayMs: number = 2000) => {
-    if (feedbackTriggeredRef.current) return;
-    
-    if (Math.random() < 0.5) {
-      if (feedbackTimerRef.current) {
-        clearTimeout(feedbackTimerRef.current);
-      }
-      feedbackTimerRef.current = setTimeout(() => {
-        setShowFeedback(true);
-        feedbackTriggeredRef.current = true;
-      }, delayMs);
-    }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (feedbackTimerRef.current) {
-        clearTimeout(feedbackTimerRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleExitIntent = (e: MouseEvent) => {
-      if (e.clientY <= 5 && step !== "tier" && !feedbackTriggeredRef.current && !showFeedback) {
-        triggerFeedback(0);
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden" && step !== "tier" && !feedbackTriggeredRef.current && !showFeedback) {
-        localStorage.setItem("knowrole-pending-feedback", JSON.stringify({
-          tier: ageTier,
-          mood,
-          funMode,
-          landmark: landmark?.landmark,
-          theme,
-          timestamp: new Date().toISOString()
-        }));
-      }
-    };
-
-    document.addEventListener("mouseleave", handleExitIntent);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener("mouseleave", handleExitIntent);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [step, showFeedback, triggerFeedback, ageTier, mood, funMode, landmark, theme]);
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
@@ -181,8 +127,11 @@ export default function Home() {
       console.error("Failed to save quiz results:", error);
     }
 
+    setStep("feedback");
+  };
+
+  const handleFeedbackComplete = () => {
     setStep("results");
-    triggerFeedback(2000);
   };
 
   const handleQuizExit = () => {
@@ -260,11 +209,22 @@ export default function Home() {
           onComplete={handleQuizComplete}
           onExit={handleQuizExit}
         />
+      </div>
+    );
+  }
+
+  if (step === "feedback" && quizScores) {
+    return (
+      <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
+        <PathCanvas />
+        <KnowRoleHeader 
+          theme={theme} 
+          randomTheme={randomTheme} 
+          onThemeChange={handleThemeChange} 
+        />
         <FeedbackModal
-          isOpen={showFeedback}
-          onClose={() => setShowFeedback(false)}
-          tier={ageTier}
-          selectedTheme={theme}
+          isOpen={true}
+          onComplete={handleFeedbackComplete}
         />
       </div>
     );
@@ -288,12 +248,6 @@ export default function Home() {
           theme={theme}
           onRestart={handleRestart}
           onShare={handleShare}
-        />
-        <FeedbackModal
-          isOpen={showFeedback}
-          onClose={() => setShowFeedback(false)}
-          tier={ageTier}
-          selectedTheme={theme}
         />
       </div>
     );
@@ -466,16 +420,9 @@ export default function Home() {
 
       <footer className="fixed bottom-0 left-0 right-0 z-10 py-5 text-center">
         <p className="text-sm italic font-handwritten text-warm-gray/50 dark:text-soft-cream/40 cursor-pointer hover:text-terracotta transition-colors">
-          Unfold your trait trail →
+          Unfold your trait trail
         </p>
       </footer>
-
-      <FeedbackModal
-        isOpen={showFeedback}
-        onClose={() => setShowFeedback(false)}
-        tier={ageTier || undefined}
-        selectedTheme={theme}
-      />
     </div>
   );
 }

@@ -1,61 +1,98 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, ThumbsUp, ThumbsDown, Send } from "lucide-react";
+import { Clock, Star, MessageCircle, ThumbsUp, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface FeedbackData {
-  tier?: string;
-  intuitiveRating: number;
-  funSwipes: boolean | null;
-  moodLocationRating: number;
-  traitsRating: number;
-  traitsContext: string;
-  themePreference: string;
-  themeWhy: string;
-  oneChange: string;
-}
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface FeedbackModalProps {
   isOpen: boolean;
-  onClose: () => void;
-  tier?: string;
-  selectedTheme?: string;
+  onComplete: () => void;
 }
 
-export default function FeedbackModal({ isOpen, onClose, tier, selectedTheme }: FeedbackModalProps) {
-  const [feedback, setFeedback] = useState<FeedbackData>({
-    tier: tier,
-    intuitiveRating: 0,
-    funSwipes: null,
-    moodLocationRating: 0,
-    traitsRating: 0,
-    traitsContext: "",
-    themePreference: selectedTheme || "light",
-    themeWhy: "",
-    oneChange: ""
-  });
-  const [showGoogleForm, setShowGoogleForm] = useState(false);
+const UNLOCK_TIME = 20;
+
+export default function FeedbackModal({ isOpen, onComplete }: FeedbackModalProps) {
+  const [timeRemaining, setTimeRemaining] = useState(UNLOCK_TIME);
+  const [canUnlock, setCanUnlock] = useState(false);
+  const [question1, setQuestion1] = useState<string>("");
+  const [question2, setQuestion2] = useState<string>("");
+  const [question3, setQuestion3] = useState<string>("");
   const modalRef = useRef<HTMLDivElement>(null);
   const firstFocusableRef = useRef<HTMLButtonElement>(null);
+  const unlockStartTime = useRef<number>(0);
+
+  const prefersReducedMotion = typeof window !== "undefined" 
+    ? window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches 
+    : false;
+
+  const checkTimeElapsed = useCallback(() => {
+    if (unlockStartTime.current === 0) return false;
+    const elapsed = (Date.now() - unlockStartTime.current) / 1000;
+    return elapsed >= UNLOCK_TIME;
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    setTimeRemaining(UNLOCK_TIME);
+    setCanUnlock(false);
+    unlockStartTime.current = Date.now();
+    
+    const timer = setInterval(() => {
+      const elapsed = (Date.now() - unlockStartTime.current) / 1000;
+      const remaining = Math.max(0, UNLOCK_TIME - elapsed);
+      
+      setTimeRemaining(remaining);
+      
+      if (remaining <= 0) {
+        setCanUnlock(true);
+        clearInterval(timer);
+      }
+    }, 100);
+
+    const fallbackTimeout = setTimeout(() => {
+      setCanUnlock(true);
+    }, (UNLOCK_TIME + 1) * 1000);
+    
+    return () => {
+      clearInterval(timer);
+      clearTimeout(fallbackTimeout);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && checkTimeElapsed()) {
+        setCanUnlock(true);
+        setTimeRemaining(0);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [isOpen, checkTimeElapsed]);
 
   useEffect(() => {
     if (isOpen && firstFocusableRef.current) {
-      firstFocusableRef.current.focus();
+      setTimeout(() => firstFocusableRef.current?.focus(), 100);
     }
   }, [isOpen]);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
-      
-      if (e.key === "Escape") {
-        onClose();
+      if (e.key === "Escape" && canUnlock) {
+        handleSubmit();
         return;
       }
 
       if (e.key === "Tab" && modalRef.current) {
         const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
         );
         
         if (focusableElements.length === 0) return;
@@ -75,7 +112,7 @@ export default function FeedbackModal({ isOpen, onClose, tier, selectedTheme }: 
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, canUnlock]);
 
   useEffect(() => {
     if (isOpen) {
@@ -89,333 +126,260 @@ export default function FeedbackModal({ isOpen, onClose, tier, selectedTheme }: 
   }, [isOpen]);
 
   const handleSubmit = () => {
-    if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+    if (navigator.vibrate) navigator.vibrate(50);
     
-    const summary = {
-      tier: feedback.tier,
-      intuitiveRating: feedback.intuitiveRating,
-      funSwipes: feedback.funSwipes,
-      moodLocationRating: feedback.moodLocationRating,
-      traitsRating: feedback.traitsRating,
-      traitsContext: feedback.traitsContext,
-      themePreference: feedback.themePreference,
-      themeWhy: feedback.themeWhy,
-      oneChange: feedback.oneChange,
+    const feedbackData = {
+      engagementRating: question1,
+      wouldShare: question2,
+      accuracyRating: question3,
       timestamp: new Date().toISOString()
     };
+    console.log("Quick Path Feedback:", feedbackData);
     
-    console.log("KnowRole Feedback Summary:", summary);
-    setShowGoogleForm(true);
+    onComplete();
   };
 
-  const StarRating = ({ 
-    value, 
-    onChange, 
-    label 
-  }: { 
-    value: number; 
-    onChange: (v: number) => void; 
-    label: string;
-  }) => {
-    const handleKeyDown = (e: React.KeyboardEvent, star: number) => {
-      if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-        e.preventDefault();
-        onChange(Math.min(5, star + 1));
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-        e.preventDefault();
-        onChange(Math.max(1, star - 1));
-      } else if (e.key === " " || e.key === "Enter") {
-        e.preventDefault();
-        onChange(star);
-        if (navigator.vibrate) navigator.vibrate(15);
-      }
-    };
-
-    return (
-      <div className="flex gap-1" role="radiogroup" aria-label={label}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => {
-              onChange(star);
-              if (navigator.vibrate) navigator.vibrate(15);
-            }}
-            onKeyDown={(e) => handleKeyDown(e, star)}
-            tabIndex={star === value || (value === 0 && star === 1) ? 0 : -1}
-            className={`p-1 rounded transition-all focus:outline-none focus:ring-2 focus:ring-terracotta/50 ${
-              star <= value 
-                ? "text-amber-500" 
-                : "text-gray-300 dark:text-gray-600"
-            } hover:scale-110`}
-            aria-label={`${star} star${star > 1 ? "s" : ""}`}
-            aria-checked={star === value}
-            role="radio"
-            data-testid={`star-${label.toLowerCase().replace(/\s+/g, "-")}-${star}`}
-          >
-            <Star className={`w-6 h-6 ${star <= value ? "fill-current" : ""}`} />
-          </button>
-        ))}
-      </div>
-    );
+  const handleSkip = () => {
+    if (navigator.vibrate) navigator.vibrate(30);
+    onComplete();
   };
 
-  const YesNoButtons = ({ 
-    value, 
-    onChange 
-  }: { 
-    value: boolean | null; 
-    onChange: (v: boolean) => void;
-  }) => (
-    <div className="flex gap-2" role="radiogroup" aria-label="Fun and quick swipes">
-      <button
-        type="button"
-        onClick={() => {
-          onChange(true);
-          if (navigator.vibrate) navigator.vibrate(15);
-        }}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${
-          value === true
-            ? "bg-sage-green/20 border-sage-green text-sage-green"
-            : "border-gray-200 dark:border-gray-700 text-gray-500"
-        } hover:scale-105`}
-        aria-label="Yes"
-        aria-checked={value === true}
-        role="radio"
-        data-testid="button-fun-yes"
-      >
-        <ThumbsUp className="w-4 h-4" />
-        <span className="text-sm font-medium">Yes</span>
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          onChange(false);
-          if (navigator.vibrate) navigator.vibrate(15);
-        }}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${
-          value === false
-            ? "bg-terracotta/20 border-terracotta text-terracotta"
-            : "border-gray-200 dark:border-gray-700 text-gray-500"
-        } hover:scale-105`}
-        aria-label="No"
-        aria-checked={value === false}
-        role="radio"
-        data-testid="button-fun-no"
-      >
-        <ThumbsDown className="w-4 h-4" />
-        <span className="text-sm font-medium">No</span>
-      </button>
-    </div>
-  );
+  const allAnswered = question1 !== "" && question2 !== "" && question3 !== "";
+  const canProceed = canUnlock || allAnswered;
+
+  const animationProps = prefersReducedMotion 
+    ? {} 
+    : { initial: { scale: 0.9, opacity: 0, y: 20 }, animate: { scale: 1, opacity: 1, y: 0 }, exit: { scale: 0.9, opacity: 0, y: 20 } };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={prefersReducedMotion ? {} : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          exit={prefersReducedMotion ? {} : { opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 feedback-backdrop"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="feedback-title"
+          aria-describedby="feedback-description"
           data-testid="feedback-modal-overlay"
         >
           <motion.div
             ref={modalRef}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-xl p-6 shadow-2xl"
+            {...animationProps}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto relative"
             data-testid="feedback-modal"
           >
-            <button
-              ref={firstFocusableRef}
-              onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Close feedback modal"
-              data-testid="button-close-feedback"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {!showGoogleForm ? (
-              <>
-                <div className="mb-6 pr-8">
-                  <h2 
-                    id="feedback-title" 
-                    className="text-xl font-semibold text-gray-900 dark:text-white"
-                  >
-                    Quick Feedback Trail?
-                  </h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Takes 30s — helps shape paths!
-                  </p>
-                </div>
-
-                <div className="space-y-5">
-                  <div className="feedback-question" data-testid="question-intuitive">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      1. Intuitive path choice?
-                    </label>
-                    <StarRating
-                      value={feedback.intuitiveRating}
-                      onChange={(v) => setFeedback({ ...feedback, intuitiveRating: v })}
-                      label="Intuitive path choice"
-                    />
-                  </div>
-
-                  <div className="feedback-question" data-testid="question-fun">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      2. Fun/quick swipes?
-                    </label>
-                    <YesNoButtons
-                      value={feedback.funSwipes}
-                      onChange={(v) => setFeedback({ ...feedback, funSwipes: v })}
-                    />
-                  </div>
-
-                  <div className="feedback-question" data-testid="question-mood-location">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      3. Mood/location felt like "you"?
-                    </label>
-                    <StarRating
-                      value={feedback.moodLocationRating}
-                      onChange={(v) => setFeedback({ ...feedback, moodLocationRating: v })}
-                      label="Mood location rating"
-                    />
-                  </div>
-
-                  <div className="feedback-question" data-testid="question-traits">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      4. Useful traits/sparks?
-                    </label>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <StarRating
-                        value={feedback.traitsRating}
-                        onChange={(v) => setFeedback({ ...feedback, traitsRating: v })}
-                        label="Useful traits rating"
-                      />
-                      <select
-                        value={feedback.traitsContext}
-                        onChange={(e) => setFeedback({ ...feedback, traitsContext: e.target.value })}
-                        className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta"
-                        aria-label="Context for traits usefulness"
-                        data-testid="select-traits-context"
-                      >
-                        <option value="">Context...</option>
-                        <option value="career">Career</option>
-                        <option value="mental-health">Mental Health</option>
-                        <option value="relationships">Relationships</option>
-                        <option value="personal-growth">Personal Growth</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="feedback-question" data-testid="question-theme">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      5. Theme vibe?
-                    </label>
-                    <div className="space-y-2">
-                      <select
-                        value={feedback.themePreference}
-                        onChange={(e) => setFeedback({ ...feedback, themePreference: e.target.value })}
-                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta"
-                        aria-label="Theme preference"
-                        data-testid="select-theme-preference"
-                      >
-                        <option value="light">Light (Clinical Cream)</option>
-                        <option value="dark">Dark (Mysterious Amber)</option>
-                        <option value="random">Random (Vibrant Vibes)</option>
-                      </select>
-                      <textarea
-                        value={feedback.themeWhy}
-                        onChange={(e) => setFeedback({ ...feedback, themeWhy: e.target.value })}
-                        placeholder="Why this theme resonates..."
-                        rows={2}
-                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta resize-none"
-                        aria-label="Why this theme"
-                        data-testid="textarea-theme-why"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="feedback-question" data-testid="question-change">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      6. One change you'd make?
-                    </label>
-                    <textarea
-                      value={feedback.oneChange}
-                      onChange={(e) => {
-                        if (e.target.value.length <= 280) {
-                          setFeedback({ ...feedback, oneChange: e.target.value });
-                        }
-                      }}
-                      placeholder="Your thoughts..."
-                      rows={3}
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta resize-none"
-                      aria-label="One change suggestion"
-                      data-testid="textarea-one-change"
-                    />
-                    <p className="text-xs text-gray-400 mt-1 text-right">
-                      {feedback.oneChange.length}/280
-                    </p>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleSubmit}
-                  className="w-full mt-6 bg-gradient-to-r from-terracotta to-terracotta/80 hover:from-terracotta/90 hover:to-terracotta/70 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all"
-                  data-testid="button-send-feedback"
-                >
-                  <Send className="w-4 h-4" />
-                  Send Sparks!
-                </Button>
-              </>
-            ) : (
-              <div className="space-y-4">
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                    Almost there!
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Optional: Submit via form for detailed tracking
-                  </p>
-                </div>
-                
-                <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                  <iframe
-                    src="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?embedded=true"
-                    width="100%"
-                    height="400"
-                    frameBorder="0"
-                    marginHeight={0}
-                    marginWidth={0}
-                    title="KnowRole Feedback Form"
-                    className="bg-white"
-                    data-testid="google-form-iframe"
-                  >
-                    Loading form...
-                  </iframe>
-                </div>
-
-                <p className="text-xs text-gray-400 text-center">
-                  Your local feedback was already saved. This form is optional for additional insights.
-                </p>
-
-                <Button
-                  onClick={onClose}
-                  variant="outline"
-                  className="w-full"
-                  data-testid="button-close-after-submit"
-                >
-                  Done
-                </Button>
-              </div>
+            {canUnlock && (
+              <button
+                ref={firstFocusableRef}
+                onClick={handleSkip}
+                className="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Skip feedback and view results"
+                data-testid="button-skip-feedback"
+              >
+                <X className="w-5 h-5" />
+              </button>
             )}
+
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-terracotta/10 mb-3">
+                <MessageCircle className="w-6 h-6 text-terracotta" />
+              </div>
+              
+              <h2 
+                id="feedback-title"
+                className="text-xl font-display font-bold text-warm-gray dark:text-soft-cream"
+              >
+                Quick Path Check
+              </h2>
+              
+              <p id="feedback-description" className="text-sm text-warm-gray/70 dark:text-soft-cream/60 mt-1">
+                {UNLOCK_TIME}s to unlock your results
+              </p>
+              
+              {!canUnlock && (
+                <div 
+                  className="flex items-center justify-center gap-2 mt-3"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  <Clock className="w-4 h-4 text-terracotta" aria-hidden="true" />
+                  <span className="text-lg font-medium font-mono text-terracotta">
+                    {Math.ceil(timeRemaining)}s
+                  </span>
+                </div>
+              )}
+              
+              {canUnlock && !allAnswered && (
+                <motion.p 
+                  initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-sm text-sage-green font-medium mt-3"
+                  aria-live="polite"
+                >
+                  Unlocked! View your results now or answer below.
+                </motion.p>
+              )}
+            </div>
+
+            <div className="space-y-6">
+              <fieldset className="space-y-3">
+                <Label asChild>
+                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amber-500" aria-hidden="true" />
+                    How engaging were the questions?
+                  </legend>
+                </Label>
+                <RadioGroup 
+                  value={question1} 
+                  onValueChange={setQuestion1}
+                  className="flex justify-between"
+                  aria-label="Question engagement rating from 1 to 5"
+                >
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <div key={value} className="flex flex-col items-center gap-1">
+                      <RadioGroupItem 
+                        value={value.toString()} 
+                        id={`q1-${value}`}
+                        className="border-2 data-[state=checked]:border-terracotta data-[state=checked]:text-terracotta"
+                        data-testid={`radio-engagement-${value}`}
+                      />
+                      <Label 
+                        htmlFor={`q1-${value}`}
+                        className="text-xs text-warm-gray/60 dark:text-soft-cream/50 cursor-pointer"
+                      >
+                        {value}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                <div className="flex justify-between text-xs text-warm-gray/50 dark:text-soft-cream/40 px-1" aria-hidden="true">
+                  <span>Meh</span>
+                  <span>Loved it!</span>
+                </div>
+              </fieldset>
+
+              <fieldset className="space-y-3">
+                <Label asChild>
+                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream flex items-center gap-2">
+                    <ThumbsUp className="w-4 h-4 text-sage-green" aria-hidden="true" />
+                    Would you share KnowRole with a friend?
+                  </legend>
+                </Label>
+                <RadioGroup 
+                  value={question2} 
+                  onValueChange={setQuestion2}
+                  className="flex gap-4"
+                  aria-label="Would you share with a friend"
+                >
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem 
+                      value="yes" 
+                      id="q2-yes" 
+                      className="border-2 data-[state=checked]:border-sage-green data-[state=checked]:text-sage-green" 
+                      data-testid="radio-share-yes"
+                    />
+                    <Label htmlFor="q2-yes" className="text-sm cursor-pointer">Yes, totally!</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem 
+                      value="maybe" 
+                      id="q2-maybe" 
+                      className="border-2 data-[state=checked]:border-dusty-blue data-[state=checked]:text-dusty-blue" 
+                      data-testid="radio-share-maybe"
+                    />
+                    <Label htmlFor="q2-maybe" className="text-sm cursor-pointer">Maybe later</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem 
+                      value="no" 
+                      id="q2-no" 
+                      className="border-2 data-[state=checked]:border-warm-gray data-[state=checked]:text-warm-gray" 
+                      data-testid="radio-share-no"
+                    />
+                    <Label htmlFor="q2-no" className="text-sm cursor-pointer">Not yet</Label>
+                  </div>
+                </RadioGroup>
+              </fieldset>
+
+              <fieldset className="space-y-3">
+                <Label asChild>
+                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream flex items-center gap-2">
+                    <Star className="w-4 h-4 text-dusty-blue" aria-hidden="true" />
+                    How accurate does your result feel?
+                  </legend>
+                </Label>
+                <RadioGroup 
+                  value={question3} 
+                  onValueChange={setQuestion3}
+                  className="flex justify-between"
+                  aria-label="Result accuracy rating from 1 to 5"
+                >
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <div key={value} className="flex flex-col items-center gap-1">
+                      <RadioGroupItem 
+                        value={value.toString()} 
+                        id={`q3-${value}`}
+                        className="border-2 data-[state=checked]:border-dusty-blue data-[state=checked]:text-dusty-blue"
+                        data-testid={`radio-accuracy-${value}`}
+                      />
+                      <Label 
+                        htmlFor={`q3-${value}`}
+                        className="text-xs text-warm-gray/60 dark:text-soft-cream/50 cursor-pointer"
+                      >
+                        {value}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                <div className="flex justify-between text-xs text-warm-gray/50 dark:text-soft-cream/40 px-1" aria-hidden="true">
+                  <span>Way off</span>
+                  <span>Spot on!</span>
+                </div>
+              </fieldset>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              <Button
+                onClick={handleSubmit}
+                disabled={!canProceed}
+                className="w-full bg-terracotta hover:bg-terracotta/90 disabled:opacity-50 disabled:cursor-not-allowed min-h-12 text-base font-semibold"
+                data-testid="button-view-results"
+                aria-describedby={!canProceed ? "unlock-hint" : undefined}
+              >
+                {allAnswered 
+                  ? "View My Results" 
+                  : canUnlock 
+                    ? "Skip to Results" 
+                    : `Unlock in ${Math.ceil(timeRemaining)}s...`
+                }
+              </Button>
+              
+              {!canUnlock && !allAnswered && (
+                <p id="unlock-hint" className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                  Answer all 3 questions to unlock immediately
+                </p>
+              )}
+              
+              {allAnswered && (
+                <motion.p 
+                  initial={prefersReducedMotion ? {} : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center text-xs text-sage-green"
+                  aria-live="polite"
+                >
+                  Thanks for your feedback! Ready to see your results.
+                </motion.p>
+              )}
+            </div>
+
+            <p className="text-center text-xs text-warm-gray/40 dark:text-soft-cream/30 mt-4">
+              Your feedback shapes KnowRole's future
+            </p>
           </motion.div>
         </motion.div>
       )}
