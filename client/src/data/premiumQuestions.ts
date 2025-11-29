@@ -72,6 +72,31 @@ export const CAREER_BRANCH_Q2: Record<string, PremiumBranchQuestion> = {
       }
     ]
   },
+  service: {
+    id: "branch2-service",
+    prompt: "What kind of service sparks you?",
+    subtitle: "Service path refinement",
+    options: [
+      {
+        id: "hands-on-help",
+        label: "Help hands-on",
+        icon: "Wrench",
+        desc: "Fix things, build solutions, get dirty"
+      },
+      {
+        id: "guide-chats",
+        label: "Guide through chats",
+        icon: "MessageCircle",
+        desc: "Counseling, coaching, conversations"
+      },
+      {
+        id: "care-routines",
+        label: "Care routines",
+        icon: "Heart",
+        desc: "Healthcare, wellness, daily support"
+      }
+    ]
+  },
   professional: {
     id: "branch2-professional",
     prompt: "What drives your professional satisfaction?",

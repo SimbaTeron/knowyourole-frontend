@@ -794,6 +794,36 @@ export const cityThemes: Record<string, CityTheme> = {
     textOnPrimary: "light",
     textOnSecondary: "light"
   },
+  "el paso": {
+    city: "El Paso",
+    state: "TX",
+    country: "US",
+    team: "Miners",
+    sport: "college",
+    colors: { primary: "#FF8200", secondary: "#041E42", accent: "#FFFFFF" },
+    textOnPrimary: "dark",
+    textOnSecondary: "light"
+  },
+  "virginia beach": {
+    city: "Virginia Beach",
+    state: "VA",
+    country: "US",
+    team: "Commanders",
+    sport: "nfl",
+    colors: { primary: "#5A1414", secondary: "#FFB612", accent: "#FFFFFF" },
+    textOnPrimary: "light",
+    textOnSecondary: "dark"
+  },
+  "colorado springs": {
+    city: "Colorado Springs",
+    state: "CO",
+    country: "US",
+    team: "Broncos",
+    sport: "nfl",
+    colors: { primary: "#FB4F14", secondary: "#002244", accent: "#FFFFFF" },
+    textOnPrimary: "light",
+    textOnSecondary: "light"
+  },
   "glendale": {
     city: "Glendale",
     state: "AZ",

@@ -5,6 +5,7 @@ import { Zap, BookOpen, HelpCircle, ArrowRight, SkipForward } from "lucide-react
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
+import EmojiMoodMixer from "@/components/EmojiMoodMixer";
 
 const MOODS = [
   { id: "energized", label: "Energized", desc: "Ready to take on anything", icon: Zap },
@@ -141,6 +142,9 @@ export default function MoodPage() {
               );
             })}
           </div>
+          
+          {/* Mood Mixer - Fun interactive element */}
+          <EmojiMoodMixer />
         </div>
       </main>
 

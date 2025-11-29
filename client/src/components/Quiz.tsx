@@ -169,6 +169,11 @@ const TIMEOUT_QUIPS = [
   { quip: "Deep thoughts deserve cosmic help" },
   { quip: "Your subconscious knew the answer all along" },
   { quip: "Let the wind carry this decision forward" },
+  { quip: "Adventure awaits—fate flipped the card!" },
+  { quip: "The compass spun and landed here" },
+  { quip: "Sometimes the road picks the traveler" },
+  { quip: "Your inner compass knew the way" },
+  { quip: "The trail blazed itself this time" },
 ];
 
 const READABLE_RANDOM_COLORS = [

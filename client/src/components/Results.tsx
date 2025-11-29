@@ -466,6 +466,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
   const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium);
+  const [showJustKidding, setShowJustKidding] = useState(false);
   
   const [resultsAccurate, setResultsAccurate] = useState<string>("");
   const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
@@ -496,21 +497,17 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     }
   }, [scores, apiScales, isTestPremium]);
 
-  // DEV MODE: Set to true to bypass Stripe and preview premium features
+  // DEV MODE: Set to true to show Just Kidding page before premium unlock
   const DEV_BYPASS_PAYMENT = true;
   
   const handleUpgrade = async () => {
     setIsCheckingOut(true);
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
     
-    // DEV MODE: Skip payment and unlock premium immediately
+    // Show Just Kidding interstitial instead of payment
     if (DEV_BYPASS_PAYMENT) {
-      console.log('[DEV MODE] Payment bypassed - unlocking premium features for preview');
-      toast({
-        title: "Premium Unlocked (Dev Mode)",
-        description: "Payment bypassed for testing. You can now see premium features!",
-      });
-      setIsPremiumUnlocked(true);
+      console.log('[DEV MODE] Showing Just Kidding interstitial');
+      setShowJustKidding(true);
       setIsCheckingOut(false);
       return;
     }
@@ -672,7 +669,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const topTrait = sortedBigFive[0];
 
   const radarData = {
-    labels: Object.keys(result.bigFiveProfile).map(k => TRAIT_LABELS[k as keyof typeof TRAIT_LABELS]),
+    labels: Object.keys(result.bigFiveProfile), // Single letters: O, C, E, A, N
     datasets: [{
       label: "Your Profile",
       data: Object.values(result.bigFiveProfile),
@@ -801,8 +798,106 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     );
   };
 
+  const handleProceedToResults = () => {
+    if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+    setShowJustKidding(false);
+    setIsPremiumUnlocked(true);
+    toast({
+      title: "Premium Unlocked",
+      description: "Enjoy your full personality insights!",
+    });
+  };
+
+  const handleDonateClick = async () => {
+    try {
+      const checkoutRes = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: 'price_1QSLNwLbanWmBvNo4RScLlvO', mode: 'payment' }),
+      });
+      const checkoutData = await checkoutRes.json();
+      if (checkoutData.url) {
+        window.location.href = checkoutData.url;
+      }
+    } catch (error) {
+      window.open('https://buy.stripe.com/test_00g4iR5Zz3pz5QA145', '_blank');
+    }
+  };
+
   return (
     <div className="min-h-screen pb-36 bg-white dark:bg-gray-900">
+      {/* Just Kidding Interstitial Overlay */}
+      <AnimatePresence>
+        {showJustKidding && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            data-testid="overlay-just-kidding"
+          >
+            <motion.div
+              initial={{ scale: 0.8, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 50 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-gradient-to-br from-teal-50 via-cyan-50 to-teal-100 dark:from-teal-900/90 dark:via-cyan-900/80 dark:to-teal-800/90 rounded-3xl p-8 mx-4 max-w-sm w-full text-center shadow-2xl border-2 border-teal-200 dark:border-teal-700"
+            >
+              <motion.p 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 400 }}
+                className="text-4xl font-bold text-teal-600 dark:text-teal-300 italic mb-4"
+                style={{ fontFamily: "'Georgia', serif", textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}
+              >
+                Just Kidding!
+              </motion.p>
+              
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
+                className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center mx-auto mb-4 shadow-lg"
+              >
+                <Crown className="w-10 h-10 text-white" />
+              </motion.div>
+              
+              <p className="text-lg font-semibold text-teal-700 dark:text-teal-200 mb-2">
+                Premium is Free (For Now)
+              </p>
+              <p className="text-sm text-teal-600/80 dark:text-teal-300/70 mb-6">
+                We're testing! Your two cents (literally $0.02) helps us build something great.
+              </p>
+              
+              <div className="space-y-3">
+                <Button
+                  className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold py-4 text-lg shadow-lg"
+                  onClick={handleProceedToResults}
+                  data-testid="button-proceed-results"
+                >
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                  Proceed to Results
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full border-2 border-teal-400 text-teal-600 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-900/50 font-semibold py-4"
+                  onClick={handleDonateClick}
+                  data-testid="button-donate-kidding"
+                >
+                  <Heart className="w-4 h-4 mr-2" />
+                  Donate $0.02 (Alpha Feedback)
+                </Button>
+              </div>
+              
+              <p className="text-xs text-teal-500/60 dark:text-teal-400/50 mt-4">
+                All features unlocked free during testing
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Persistent Test Mode Premium Banner */}
       {isTestPremium && (
         <motion.div
@@ -990,76 +1085,80 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </Card>
         </motion.div>
 
-        {/* TIER 2: POST-FEEDBACK (FULL) - MBTI/DISC side-by-side cards */}
+        {/* TIER 2: POST-FEEDBACK (FULL) - MBTI/DISC/Big Five stacked vertically with plain-language explanations */}
         {isFull && (
           <motion.div
             initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="grid grid-cols-2 gap-3"
+            className="space-y-3"
           >
+            {/* MBTI Card */}
             <Card className="bg-white dark:bg-gray-800 border-terracotta/20">
-              <CardContent className="p-4 text-center">
-                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-terracotta/10 mb-2">
-                  <Brain className="w-5 h-5 text-terracotta" aria-hidden="true" />
-                </div>
-                <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-1">
-                  {funMode ? "Your Title" : "MBTI Type"}
-                </p>
-                <p className="text-base font-bold text-terracotta leading-tight" data-testid="text-mbti">
-                  {funMode && FUN_MODE_TITLES[result.mbtiType] 
-                    ? FUN_MODE_TITLES[result.mbtiType]
-                    : result.mbtiLabel}
-                </p>
-                <p className="text-xs font-mono text-terracotta/60 mt-0.5">
-                  ({result.mbtiType})
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className={`${discColorMap[result.discColor] || "bg-sage-green text-white"} border-0`}>
-              <CardContent className="p-4 text-center">
-                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mb-2">
-                  <Award className="w-5 h-5" aria-hidden="true" />
-                </div>
-                <p className="text-xs opacity-70 mb-1">
-                  {funMode ? "Your Vibe" : "DISC Style"}
-                </p>
-                <p className="text-base font-bold leading-tight" data-testid="text-disc">
-                  {funMode && FUN_MODE_DISC[result.discStyle] 
-                    ? FUN_MODE_DISC[result.discStyle].nickname 
-                    : result.discLabel}
-                </p>
-                <p className="text-xs font-mono opacity-60 mt-0.5">
-                  ({result.discStyle}-type)
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-        {/* TIER 2: Top Big Five Trait badge (only post-feedback) */}
-        {isFull && (
-          <motion.div
-            initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            <Card className="bg-white dark:bg-gray-800">
               <CardContent className="p-4">
-                <p className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-2">Top Big Five Trait</p>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-terracotta/10 flex items-center justify-center">
+                    <Brain className="w-6 h-6 text-terracotta" aria-hidden="true" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-0.5">
+                      How you think and make decisions
+                    </p>
+                    <p className="text-lg font-bold text-terracotta leading-tight" data-testid="text-mbti">
+                      {funMode && FUN_MODE_TITLES[result.mbtiType] 
+                        ? FUN_MODE_TITLES[result.mbtiType]
+                        : result.mbtiLabel}
+                      <span className="text-sm font-mono text-terracotta/60 ml-2">({result.mbtiType})</span>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* DISC Card */}
+            <Card className={`${discColorMap[result.discColor] || "bg-sage-green text-white"} border-0`}>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                    <Award className="w-6 h-6" aria-hidden="true" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs opacity-70 mb-0.5">
+                      How you act and work with others
+                    </p>
+                    <p className="text-lg font-bold leading-tight" data-testid="text-disc">
+                      {funMode && FUN_MODE_DISC[result.discStyle] 
+                        ? FUN_MODE_DISC[result.discStyle].nickname 
+                        : result.discLabel}
+                      <span className="text-sm font-mono opacity-60 ml-2">({result.discStyle}-type)</span>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Big Five Card */}
+            <Card className="bg-white dark:bg-gray-800 border-dusty-blue/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-4">
                   {(() => {
                     const Icon = TRAIT_ICONS[topTrait[0] as keyof typeof TRAIT_ICONS];
                     const colors = TRAIT_COLORS[topTrait[0] as keyof typeof TRAIT_COLORS];
                     return (
-                      <div 
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full ${colors.bg} text-white text-base`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span className="font-semibold">{TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]}</span>
-                        <span className="opacity-80 font-bold">{topTrait[1]}%</span>
-                      </div>
+                      <>
+                        <div className={`flex-shrink-0 w-12 h-12 rounded-full ${colors.bg} flex items-center justify-center`}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-0.5">
+                            Your core personality strength
+                          </p>
+                          <p className={`text-lg font-bold leading-tight ${colors.text}`} data-testid="text-bigfive">
+                            {TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]}
+                            <span className="text-sm font-mono opacity-60 ml-2">({topTrait[1]}%)</span>
+                          </p>
+                        </div>
+                      </>
                     );
                   })()}
                 </div>
@@ -1451,34 +1550,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
               {/* Thinking Scales moved to Premium tier as combined "Analytical Thinking" */}
 
-              {!isPremiumUnlocked && (
-                <motion.div
-                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Card className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-gray-200 dark:border-gray-700 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                          <Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-0.5">Role Matches</p>
-                          <p className="text-sm text-gray-400 dark:text-gray-500 blur-[2px] select-none">
-                            {result.secondaryRole.title}
-                          </p>
-                          <p className="text-xs text-sage-green/80 mt-2 flex items-center gap-1">
-                            <Crown className="w-3 h-3" />
-                            Unlock role matches with Pro
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
 
               {landmark && (
                 <motion.div
@@ -2007,79 +2078,64 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           Unlock Your Full Potential
                         </h4>
                         <p className="text-sm text-amber-700 dark:text-amber-300">
-                          Go deeper with premium insights
+                          <Lightbulb className="w-3 h-3 inline mr-1" />
+                          Discover why <span className="font-semibold">{result.primaryRole.title}</span> fits your unique profile
                         </p>
                       </div>
                       
-                      {/* Feature grid - 6 features (reordered) */}
-                      <div className="grid grid-cols-2 gap-3 mb-5">
+                      {/* Feature list - 3 features only */}
+                      <div className="space-y-3 mb-5">
                         {[
                           { icon: BookOpen, title: "Deep Dive", desc: "Full analysis" },
                           { icon: Gift, title: "Role Matches", desc: "More career paths" },
-                          { icon: Target, title: "30-Day Quest", desc: "Growth challenges" },
-                          { icon: Users, title: "Compatibility", desc: "Team matching" },
-                          { icon: Compass, title: "Evolution Map", desc: "Life stage growth" },
-                          { icon: TrendingUp, title: "Arc Tracker", desc: "Track progress" },
+                          { icon: Target, title: "30-Day Quest", desc: "Growth challenges and more" },
                         ].map((feature, idx) => (
                           <div 
                             key={idx}
-                            className="flex items-start gap-2.5 p-3 rounded-xl bg-white/60 dark:bg-gray-800/40 border border-amber-200/50 dark:border-amber-700/50"
+                            className="flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-gray-800/40 border border-amber-200/50 dark:border-amber-700/50"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
-                              <feature.icon className="w-4 h-4 text-white" />
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                              <feature.icon className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                              <p className="text-xs font-bold text-amber-900 dark:text-amber-100">{feature.title}</p>
+                              <p className="text-sm font-bold text-amber-900 dark:text-amber-100">{feature.title}</p>
                               <p className="text-xs text-amber-600 dark:text-amber-400">{feature.desc}</p>
                             </div>
                           </div>
                         ))}
                       </div>
                       
-                      {/* Price callout */}
-                      <div className="bg-white/80 dark:bg-gray-800/60 rounded-2xl p-4 mb-4 border border-amber-200 dark:border-amber-700 text-center">
-                        <div className="flex items-center justify-center gap-2 mb-2">
-                          <span className="text-2xl font-bold text-amber-900 dark:text-amber-100">$9</span>
-                          <span className="text-sm text-amber-600 dark:text-amber-400">one-time</span>
-                        </div>
-                        <p className="text-xs text-amber-700 dark:text-amber-300">
-                          Lifetime access. No subscription. Ever.
-                        </p>
-                      </div>
-                      
-                      {/* CTA Button */}
+                      {/* One Large CTA Button with Price */}
                       <Button
-                        className="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-base py-6 shadow-lg shadow-orange-500/30 transition-all"
+                        className="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold py-8 shadow-lg shadow-orange-500/30 transition-all flex flex-col items-center justify-center gap-1"
                         onClick={handleUpgrade}
                         disabled={isCheckingOut}
                         data-testid="button-upgrade"
                       >
                         {isCheckingOut ? (
-                          <>
+                          <div className="flex items-center gap-2">
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
+                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                             />
-                            Processing...
-                          </>
+                            <span>Processing...</span>
+                          </div>
                         ) : (
                           <>
-                            <Rocket className="w-5 h-5 mr-2" />
-                            Unlock Premium Now
-                            <ArrowRight className="w-5 h-5 ml-2" />
+                            <span className="text-3xl font-black">$0.02</span>
+                            <span className="text-lg font-bold flex items-center gap-2">
+                              <Rocket className="w-5 h-5" />
+                              Unlock Premium Now
+                              <ArrowRight className="w-5 h-5" />
+                            </span>
+                            <span className="text-xs font-normal opacity-90">Lifetime access. No Subscription. Ever.</span>
                           </>
                         )}
                       </Button>
                       
-                      {/* Why this role link */}
-                      <p className="text-center text-xs text-amber-700/80 dark:text-amber-300/80 mt-3">
-                        <Lightbulb className="w-3 h-3 inline mr-1" />
-                        Discover <span className="font-semibold">why {result.primaryRole.title}</span> fits your unique profile
-                      </p>
-                      
                       {/* Trust badges */}
-                      <div className="flex items-center justify-center gap-4 mt-3 text-xs text-amber-600/70 dark:text-amber-400/70">
+                      <div className="flex items-center justify-center gap-4 mt-4 text-xs text-amber-600/70 dark:text-amber-400/70">
                         <span className="flex items-center gap-1">
                           <Shield className="w-3 h-3" />
                           Secure checkout
