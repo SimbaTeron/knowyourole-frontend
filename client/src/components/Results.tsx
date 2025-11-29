@@ -1417,30 +1417,34 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
               {/* Thinking Scales moved to Premium tier as combined "Analytical Thinking" */}
 
-              <motion.div
-                initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <Card className="bg-white dark:bg-gray-800 border-sage-green/30">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-sage-green/20 flex items-center justify-center flex-shrink-0">
-                        <Briefcase className="w-4 h-4 text-sage-green" />
+              {!isPremiumUnlocked && (
+                <motion.div
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Card className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-gray-200 dark:border-gray-700 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                          <Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-0.5">More Role Matches</p>
+                          <p className="text-sm text-gray-400 dark:text-gray-500 blur-[2px] select-none">
+                            {result.secondaryRole.title}
+                          </p>
+                          <p className="text-xs text-sage-green/80 mt-2 flex items-center gap-1">
+                            <Crown className="w-3 h-3" />
+                            Unlock +2 role matches with Pro
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-xs text-sage-green font-medium mb-0.5">Also Consider</p>
-                        <h4 className="text-base font-semibold text-warm-gray dark:text-soft-cream">
-                          {result.secondaryRole.title}
-                        </h4>
-                        <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">
-                          {result.secondaryRole.salary}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
 
               {landmark && (
                 <motion.div
