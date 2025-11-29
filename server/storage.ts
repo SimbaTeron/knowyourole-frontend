@@ -1,4 +1,4 @@
-import { type User, type InsertUser } from "@shared/schema";
+import { type User, type InsertUser, type InsertFeedback, type Feedback } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface QuizSession {
@@ -41,15 +41,19 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   saveQuizSession(session: QuizSession): Promise<QuizSession>;
   getQuizSession(id: string): Promise<QuizSession | undefined>;
+  saveFeedback(feedback: InsertFeedback): Promise<Feedback>;
+  getAllFeedback(): Promise<Feedback[]>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private quizSessions: Map<string, QuizSession>;
+  private feedbackEntries: Map<string, Feedback>;
 
   constructor() {
     this.users = new Map();
     this.quizSessions = new Map();
+    this.feedbackEntries = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -76,6 +80,23 @@ export class MemStorage implements IStorage {
 
   async getQuizSession(id: string): Promise<QuizSession | undefined> {
     return this.quizSessions.get(id);
+  }
+
+  async saveFeedback(insertFeedback: InsertFeedback): Promise<Feedback> {
+    const id = randomUUID();
+    const feedback: Feedback = {
+      ...insertFeedback,
+      id,
+      createdAt: new Date(),
+    };
+    this.feedbackEntries.set(id, feedback);
+    return feedback;
+  }
+
+  async getAllFeedback(): Promise<Feedback[]> {
+    return Array.from(this.feedbackEntries.values()).sort(
+      (a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+    );
   }
 }
 

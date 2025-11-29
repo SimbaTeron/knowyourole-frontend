@@ -329,5 +329,43 @@ export async function registerRoutes(
     }
   });
 
+  // Feedback submission endpoint
+  app.post("/api/feedback", async (req: Request, res: Response) => {
+    try {
+      const feedbackData = {
+        sessionId: req.body.sessionId || null,
+        resultsAccurate: req.body.resultsAccurate || null,
+        questionsEngaging: req.body.questionsEngaging || null,
+        wouldShare: req.body.wouldShare || null,
+        suggestions: req.body.suggestions || null,
+        mbtiType: req.body.mbtiType || null,
+        discStyle: req.body.discStyle || null,
+        primaryRole: req.body.primaryRole || null,
+        tier: req.body.tier || null,
+        mood: req.body.mood || null,
+        funMode: req.body.funMode ?? null,
+      };
+
+      const saved = await storage.saveFeedback(feedbackData);
+      console.log("Feedback saved:", saved.id);
+      
+      res.json({ success: true, id: saved.id });
+    } catch (error) {
+      console.error("Feedback save error:", error);
+      res.status(500).json({ error: "Failed to save feedback" });
+    }
+  });
+
+  // Get all feedback (owner access for Google Sheets export)
+  app.get("/api/feedback", async (_req: Request, res: Response) => {
+    try {
+      const allFeedback = await storage.getAllFeedback();
+      res.json({ feedback: allFeedback });
+    } catch (error) {
+      console.error("Feedback fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch feedback" });
+    }
+  });
+
   return httpServer;
 }

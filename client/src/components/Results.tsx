@@ -342,19 +342,38 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   const allFeedbackAnswered = resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "" && suggestions.trim().length > 0;
 
-  const handleShowFullResults = () => {
+  const handleShowFullResults = async () => {
     if (!allFeedbackAnswered) return;
     
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
     
     const feedbackData = {
-      q1_accurate: resultsAccurate,
-      q2_engaging: questionsEngaging,
-      q3_share: wouldShare,
-      openText: suggestions,
+      sessionId: sessionId || null,
+      resultsAccurate,
+      questionsEngaging,
+      wouldShare,
+      suggestions,
+      mbtiType: result?.mbtiType || null,
+      discStyle: result?.discStyle || null,
+      primaryRole: result?.primaryRole.title || null,
+      tier,
+      mood,
+      funMode,
       timestamp: new Date().toISOString()
     };
-    console.log("Quick Path Feedback:", feedbackData);
+    
+    // Save feedback to backend for Google Sheets export
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(feedbackData)
+      });
+      console.log("Feedback saved successfully:", feedbackData);
+    } catch (error) {
+      console.error("Failed to save feedback:", error);
+      // Continue anyway - don't block user from seeing results
+    }
     
     setDashboardStage("full");
   };
@@ -936,30 +955,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       All fields required to unlock full dashboard
                     </p>
                   )}
-                  
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 text-center mb-2">
-                      Or provide detailed feedback via our form
-                    </p>
-                    <div className="rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-700/50">
-                      <iframe
-                        src="https://docs.google.com/forms/d/e/1FAIpQLSfKnowRoleFeedback/viewform?embedded=true"
-                        width="100%"
-                        height="400"
-                        frameBorder="0"
-                        marginHeight={0}
-                        marginWidth={0}
-                        title="Feedback Form"
-                        className="w-full"
-                        data-testid="iframe-google-form"
-                      >
-                        Loading feedback form...
-                      </iframe>
-                    </div>
-                    <p className="text-xs text-warm-gray/40 dark:text-soft-cream/30 text-center mt-2">
-                      Anon/email opt-in available
-                    </p>
-                  </div>
                 </div>
               </CardContent>
             </Card>
