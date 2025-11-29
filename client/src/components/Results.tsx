@@ -455,6 +455,15 @@ function getWeakestTrait(bigFive: { O: number; C: number; E: number; A: number; 
   return adjusted.reduce((a, b) => a[1] < b[1] ? a : b)[0];
 }
 
+// Adventure Archetype type for Mini Explorer
+interface AdventureArchetype {
+  name: string;
+  superpower: string;
+  description: string;
+  mission: string;
+  badgeColor: string;
+}
+
 export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, onRestart, onShare }: ResultsProps) {
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
@@ -466,6 +475,11 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
   const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium);
+  
+  // Mini Explorer (ages 12 and under) - Adventure Archetype instead of job roles
+  const isMiniExplorer = tier === "7-12";
+  const [adventureArchetype, setAdventureArchetype] = useState<AdventureArchetype | null>(null);
+  
   const [showJustKidding, setShowJustKidding] = useState(false);
   
   const [resultsAccurate, setResultsAccurate] = useState<string>("");
@@ -496,6 +510,44 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       console.log('[DEV MODE] Premium features unlocked for testing via ?test_premium=true');
     }
   }, [scores, apiScales, isTestPremium]);
+
+  // Fetch Adventure Archetype for Mini Explorer tier
+  useEffect(() => {
+    if (!isMiniExplorer || !result) return;
+    
+    const fetchArchetype = async () => {
+      try {
+        const response = await fetch('/api/adventure-archetype', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            openness: result.bigFiveProfile.openness,
+            conscientiousness: result.bigFiveProfile.conscientiousness,
+            extraversion: result.bigFiveProfile.extraversion,
+            agreeableness: result.bigFiveProfile.agreeableness,
+            neuroticism: result.bigFiveProfile.neuroticism,
+            mbtiType: result.mbtiType,
+            discStyle: result.discStyle,
+          }),
+        });
+        if (!response.ok) throw new Error('Failed to fetch archetype');
+        const archetype = await response.json();
+        setAdventureArchetype(archetype);
+      } catch (error) {
+        console.error('Failed to fetch adventure archetype:', error);
+        // Fallback archetype
+        setAdventureArchetype({
+          name: "The Explorer",
+          superpower: "You discover what others miss!",
+          description: "You're always curious and asking 'why?' You love learning new things.",
+          mission: "Find something new to explore today!",
+          badgeColor: "#10B981",
+        });
+      }
+    };
+    
+    fetchArchetype();
+  }, [isMiniExplorer, result]);
 
   // DEV MODE: Set to true to show Just Kidding page before premium unlock
   const DEV_BYPASS_PAYMENT = true;
@@ -886,7 +938,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   data-testid="button-donate-kidding"
                 >
                   <Heart className="w-4 h-4 mr-2" />
-                  Donate $0.02 (Alpha Feedback)
+                  Donate (Alpha Feedback)
                 </Button>
               </div>
               
@@ -980,47 +1032,93 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card className="overflow-hidden border-2 border-terracotta/30 bg-gradient-to-br from-terracotta/5 to-transparent">
-            <CardContent className="p-6 text-center">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <div className="w-12 h-12 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
-                  <Briefcase className="w-6 h-6 text-white" />
+          {/* Mini Explorer: Adventure Archetype Display */}
+          {isMiniExplorer && adventureArchetype ? (
+            <Card className="overflow-hidden border-2 border-purple-300 dark:border-purple-600 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <motion.div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: adventureArchetype.badgeColor }}
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Star className="w-8 h-8 text-white" />
+                  </motion.div>
                 </div>
-              </div>
-              <p className="text-xs text-terracotta font-medium mb-1 tracking-wide uppercase">Your Primary Role Match</p>
-              <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2" data-testid="text-primary-role">
-                {result.primaryRole.title}
-              </h3>
-              {(() => {
-                const regionalInfo = getRegionalSalary(result.primaryRole.title, cityName || undefined, stateName || undefined);
-                const displaySalary = regionalInfo.hasRegionalData ? regionalInfo.salary : result.primaryRole.salary;
-                return (
-                  <div className="space-y-1 mb-3">
-                    <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green">
-                      {regionalInfo.hasRegionalData ? <DollarSign className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
-                      <span className="text-sm font-semibold">{displaySalary}</span>
-                      {regionalInfo.hasRegionalData && cityName && (
-                        <span className="text-xs opacity-70">in {cityName}</span>
-                      )}
-                    </div>
-                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-                      {regionalInfo.growthOutlook}
-                    </p>
+                <p className="text-xs text-purple-600 dark:text-purple-300 font-medium mb-1 tracking-wide uppercase">Your Adventure Type</p>
+                <h3 className="text-2xl font-bold text-purple-700 dark:text-purple-200 mb-2" data-testid="text-adventure-archetype">
+                  {adventureArchetype.name}
+                </h3>
+                <div className="mb-4 px-4 py-2 rounded-xl bg-white/50 dark:bg-gray-800/50 border border-purple-200 dark:border-purple-700">
+                  <p className="text-lg font-semibold text-purple-600 dark:text-purple-300">
+                    {adventureArchetype.superpower}
+                  </p>
+                </div>
+                <p className="text-sm text-purple-700/80 dark:text-purple-200/80 leading-relaxed max-w-sm mx-auto mb-4">
+                  {adventureArchetype.description}
+                </p>
+                <div className="p-3 rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 border border-amber-200 dark:border-amber-700">
+                  <p className="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1">Your Mission</p>
+                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                    {adventureArchetype.mission}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            /* Regular Role Display for Teen/Adult tiers */
+            <Card className="overflow-hidden border-2 border-terracotta/30 bg-gradient-to-br from-terracotta/5 to-transparent">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
+                    <Briefcase className="w-6 h-6 text-white" />
                   </div>
-                );
-              })()}
-              <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-sm mx-auto">
-                {result.primaryRole.desc} {result.mbtiType.includes('E') 
-                  ? "Your natural energy and communication style make you well-suited for collaborative environments." 
-                  : "Your thoughtful, focused approach brings unique depth and precision to this field."} 
-                {result.discStyle === 'D' ? " As a natural leader, you thrive when given autonomy and clear goals." 
-                  : result.discStyle === 'I' ? " Your enthusiasm and persuasive abilities help you connect with diverse people." 
-                  : result.discStyle === 'S' ? " Your steady reliability makes you a trusted anchor in team settings." 
-                  : " Your attention to detail ensures high-quality outcomes in everything you do."} 
-                {topTrait[1] > 60 
-                  ? ` With ${TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]} as your strongest trait, you bring a distinctive edge to your work.`
-                  : ` You have a balanced personality profile that adapts well across different situations.`}
-              </p>
+                </div>
+                <p className="text-xs text-terracotta font-medium mb-1 tracking-wide uppercase">Your Primary Role Match</p>
+                <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2" data-testid="text-primary-role">
+                  {result.primaryRole.title}
+                </h3>
+                {/* Salary - Only show for premium users */}
+                {isPremiumUnlocked && (() => {
+                  const regionalInfo = getRegionalSalary(result.primaryRole.title, cityName || undefined, stateName || undefined);
+                  const displaySalary = regionalInfo.hasRegionalData ? regionalInfo.salary : result.primaryRole.salary;
+                  return (
+                    <div className="space-y-1 mb-3">
+                      <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green">
+                        {regionalInfo.hasRegionalData ? <DollarSign className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
+                        <span className="text-sm font-semibold">{displaySalary}</span>
+                        {regionalInfo.hasRegionalData && cityName && (
+                          <span className="text-xs opacity-70">in {cityName}</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                        {regionalInfo.growthOutlook}
+                      </p>
+                    </div>
+                  );
+                })()}
+                {/* Show "Unlock for salary" hint for free tier */}
+                {!isPremiumUnlocked && (
+                  <div className="mb-3">
+                    <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                      <Lock className="w-3 h-3" />
+                      <span className="text-xs">Salary info in Premium</span>
+                    </div>
+                  </div>
+                )}
+                <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-sm mx-auto">
+                  {result.primaryRole.desc} {result.mbtiType.includes('E') 
+                    ? "Your natural energy and communication style make you well-suited for collaborative environments." 
+                    : "Your thoughtful, focused approach brings unique depth and precision to this field."} 
+                  {result.discStyle === 'D' ? " As a natural leader, you thrive when given autonomy and clear goals." 
+                    : result.discStyle === 'I' ? " Your enthusiasm and persuasive abilities help you connect with diverse people." 
+                    : result.discStyle === 'S' ? " Your steady reliability makes you a trusted anchor in team settings." 
+                    : " Your attention to detail ensures high-quality outcomes in everything you do."} 
+                  {topTrait[1] > 60 
+                    ? ` With ${TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]} as your strongest trait, you bring a distinctive edge to your work.`
+                    : ` You have a balanced personality profile that adapts well across different situations.`}
+                </p>
               
               <div className="grid grid-cols-3 gap-2 mt-6">
                 <motion.div 
@@ -1083,6 +1181,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               </div>
             </CardContent>
           </Card>
+          )}
         </motion.div>
 
         {/* TIER 2: POST-FEEDBACK (FULL) - MBTI/DISC/Big Five stacked vertically with plain-language explanations */}
