@@ -37,6 +37,12 @@ interface ResultsProps {
   onShare: () => void;
 }
 
+interface ScaleData {
+  value: number;
+  traits: string;
+  quest: string;
+}
+
 interface PersonalityResult {
   mbtiType: string;
   mbtiLabel: string;
@@ -56,6 +62,10 @@ interface PersonalityResult {
   primaryRole: { title: string; salary: string; desc: string };
   secondaryRole: { title: string; salary: string; desc: string };
   spark: string;
+  scales?: {
+    critical: ScaleData;
+    firstPrinciples: ScaleData;
+  };
 }
 
 function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: { O: number; C: number; E: number; A: number; N: number }): { primary: { title: string; salary: string; desc: string }; secondary: { title: string; salary: string; desc: string } } {
