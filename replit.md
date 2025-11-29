@@ -91,11 +91,25 @@ Preferred communication style: Simple, everyday language.
 - **wouter**: Lightweight client-side routing
 
 ### Theme System
-- **Three-mode theme**: Light (clinical cream), Dark (mysterious amber), Random (7 vibrant themes)
-- **Random themes**: Sunburst Trail, Neon Urban, Forest Whisper, Ocean Drift, Desert Bloom, City Pulse, Meadow Dream
-- **Theme storage**: Persisted in localStorage with automatic application on page load
-- **CSS architecture**: Theme classes applied to container div with PathCanvas background override via CSS selectors
+- **Two-mode theme**: Light (clinical cream), Dark (mysterious amber) - toggle via theme button
+- **Locality-based accent colors**: Sports team colors from top 100 US cities applied as accents
+- **Theme storage**: Mode (light/dark) persisted in localStorage, locality theme in sessionStorage
+- **CSS architecture**: 
+  - Theme mode classes applied to document.documentElement
+  - Locality colors scoped to `.locality-*` utility classes (not global palette overrides)
+  - Preserves contrast by not overriding `--terracotta`/`--sage-green` globally
 - **Haptic feedback**: navigator.vibrate() on tier selection, mood input, fun-mode toggle, and CTA interactions
+
+### Locality Theme System
+- **City themes data**: `client/src/data/cityThemes.ts` - 100+ cities with NFL/sports team colors
+- **City matching**: Exact match + curated alias map (e.g., "Beverly Hills" → "Los Angeles" → "Rams")
+- **Regional fallback**: Generic regional themes (Northeast, Southeast, Midwest, etc.) for non-major cities
+- **API integration**: zippopotam.us API for postal code → city lookup
+- **CSS variables**: 
+  - `--locality-primary`, `--locality-secondary`, `--locality-accent`
+  - `--locality-text-on-primary`, `--locality-text-on-secondary` for contrast safety
+- **Scoped classes**: `.locality-gradient`, `.locality-primary-bg`, `.locality-secondary-bg`
+- **Context provider**: `LocalityThemeContext` manages locality state and applies CSS variables
 
 ### Accessibility
 - **StepIndicator**: ARIA roles/labels for VoiceOver compatibility
