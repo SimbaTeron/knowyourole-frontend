@@ -10,7 +10,6 @@ import FunModeToggle from "@/components/FunModeToggle";
 import PostalInput from "@/components/PostalInput";
 import LandmarkBadge from "@/components/LandmarkBadge";
 import StartButton from "@/components/StartButton";
-import FeedbackModal from "@/components/FeedbackModal";
 import Quiz, { QuizScores } from "@/components/Quiz";
 import Results from "@/components/Results";
 import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
@@ -26,7 +25,7 @@ interface LandmarkInfo {
   country?: string;
 }
 
-type Step = "tier" | "mood" | "postal" | "ready" | "quiz" | "feedback" | "results";
+type Step = "tier" | "mood" | "postal" | "ready" | "quiz" | "results";
 
 export default function Home() {
   const [ageTier, setAgeTier] = useState<string | null>(null);
@@ -127,10 +126,6 @@ export default function Home() {
       console.error("Failed to save quiz results:", error);
     }
 
-    setStep("feedback");
-  };
-
-  const handleFeedbackComplete = () => {
     setStep("results");
   };
 
@@ -208,23 +203,6 @@ export default function Home() {
           theme={theme}
           onComplete={handleQuizComplete}
           onExit={handleQuizExit}
-        />
-      </div>
-    );
-  }
-
-  if (step === "feedback" && quizScores) {
-    return (
-      <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
-        <PathCanvas />
-        <KnowRoleHeader 
-          theme={theme} 
-          randomTheme={randomTheme} 
-          onThemeChange={handleThemeChange} 
-        />
-        <FeedbackModal
-          isOpen={true}
-          onComplete={handleFeedbackComplete}
         />
       </div>
     );

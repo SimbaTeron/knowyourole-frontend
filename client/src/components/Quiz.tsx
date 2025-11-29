@@ -299,7 +299,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   
   if (questions.length === 0 || !currentQuestion) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -318,8 +318,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     : "text-sage-green";
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-soft-cream/80 dark:bg-warm-charcoal/80 backdrop-blur-md">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <Button
             variant="ghost"
@@ -402,7 +402,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   role="article"
                   aria-label={`Swipe left for ${currentQuestion.options[0]}, right for ${currentQuestion.options[1]}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-soft-cream via-white to-pale-sage dark:from-warm-charcoal dark:via-gray-800 dark:to-gray-900" />
+                  <div className="absolute inset-0 bg-white dark:bg-gray-800" />
                   
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-sage-green/30 to-transparent rounded-3xl"
@@ -491,7 +491,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 className="absolute inset-0 z-30 flex items-center justify-center"
                 data-testid="quip-overlay"
               >
-                <div className="bg-gradient-to-br from-warm-gray/95 to-warm-charcoal/95 dark:from-soft-cream/95 dark:to-gray-200/95 rounded-3xl px-8 py-6 shadow-2xl max-w-xs text-center">
+                <div className="bg-warm-gray dark:bg-soft-cream rounded-3xl px-8 py-6 shadow-2xl max-w-xs text-center">
                   <motion.div
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ duration: 0.5, delay: 0.2 }}
@@ -520,7 +520,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         </div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-warm-charcoal dark:via-warm-charcoal/95">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-gray-900">
         <div className="max-w-sm mx-auto flex justify-center gap-4">
           <Button
             variant="outline"

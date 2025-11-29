@@ -1,23 +1,24 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Star, MessageCircle, ThumbsUp, X } from "lucide-react";
+import { Clock, MessageCircle, X, Frown, Meh, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
 
 interface FeedbackModalProps {
   isOpen: boolean;
   onComplete: () => void;
 }
 
-const UNLOCK_TIME = 20;
+const UNLOCK_TIME = 15;
 
 export default function FeedbackModal({ isOpen, onComplete }: FeedbackModalProps) {
   const [timeRemaining, setTimeRemaining] = useState(UNLOCK_TIME);
   const [canUnlock, setCanUnlock] = useState(false);
-  const [question1, setQuestion1] = useState<string>("");
-  const [question2, setQuestion2] = useState<string>("");
-  const [question3, setQuestion3] = useState<string>("");
+  const [resultsAccurate, setResultsAccurate] = useState<string>("");
+  const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
+  const [wouldShare, setWouldShare] = useState<string>("");
+  const [suggestions, setSuggestions] = useState<string>("");
   const modalRef = useRef<HTMLDivElement>(null);
   const firstFocusableRef = useRef<HTMLButtonElement>(null);
   const unlockStartTime = useRef<number>(0);
@@ -92,7 +93,7 @@ export default function FeedbackModal({ isOpen, onComplete }: FeedbackModalProps
 
       if (e.key === "Tab" && modalRef.current) {
         const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
         );
         
         if (focusableElements.length === 0) return;
@@ -129,9 +130,10 @@ export default function FeedbackModal({ isOpen, onComplete }: FeedbackModalProps
     if (navigator.vibrate) navigator.vibrate(50);
     
     const feedbackData = {
-      engagementRating: question1,
-      wouldShare: question2,
-      accuracyRating: question3,
+      q1_accurate: resultsAccurate,
+      q2_engaging: questionsEngaging,
+      q3_share: wouldShare,
+      openText: suggestions,
       timestamp: new Date().toISOString()
     };
     console.log("Quick Path Feedback:", feedbackData);
@@ -144,12 +146,61 @@ export default function FeedbackModal({ isOpen, onComplete }: FeedbackModalProps
     onComplete();
   };
 
-  const allAnswered = question1 !== "" && question2 !== "" && question3 !== "";
+  const allAnswered = resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "";
   const canProceed = canUnlock || allAnswered;
 
   const animationProps = prefersReducedMotion 
     ? {} 
     : { initial: { scale: 0.9, opacity: 0, y: 20 }, animate: { scale: 1, opacity: 1, y: 0 }, exit: { scale: 0.9, opacity: 0, y: 20 } };
+
+  const ToggleButton = ({ 
+    value, 
+    currentValue, 
+    onChange, 
+    variant = "default",
+    children,
+    testId 
+  }: { 
+    value: string; 
+    currentValue: string; 
+    onChange: (v: string) => void;
+    variant?: "no" | "middle" | "yes" | "default";
+    children: React.ReactNode;
+    testId: string;
+  }) => {
+    const isSelected = currentValue === value;
+    const baseClasses = "flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2";
+    
+    const variantClasses = {
+      no: isSelected 
+        ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 ring-2 ring-red-400" 
+        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20",
+      middle: isSelected 
+        ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 ring-2 ring-amber-400" 
+        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-900/20",
+      yes: isSelected 
+        ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-2 ring-green-400" 
+        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20",
+      default: isSelected 
+        ? "bg-terracotta/20 text-terracotta ring-2 ring-terracotta" 
+        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-terracotta/10",
+    };
+
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          onChange(value);
+          if (navigator.vibrate) navigator.vibrate(20);
+        }}
+        className={`${baseClasses} ${variantClasses[variant]}`}
+        aria-pressed={isSelected}
+        data-testid={testId}
+      >
+        {children}
+      </button>
+    );
+  };
 
   return (
     <AnimatePresence>
@@ -194,11 +245,11 @@ export default function FeedbackModal({ isOpen, onComplete }: FeedbackModalProps
                 id="feedback-title"
                 className="text-xl font-display font-bold text-warm-gray dark:text-soft-cream"
               >
-                Quick Path Check
+                Quick Path Check?
               </h2>
               
               <p id="feedback-description" className="text-sm text-warm-gray/70 dark:text-soft-cream/60 mt-1">
-                {UNLOCK_TIME}s to unlock your results
+                {UNLOCK_TIME}s to unlock more free insights!
               </p>
               
               {!canUnlock && (
@@ -226,121 +277,167 @@ export default function FeedbackModal({ isOpen, onComplete }: FeedbackModalProps
               )}
             </div>
 
-            <div className="space-y-6">
-              <fieldset className="space-y-3">
+            <div className="space-y-5">
+              <fieldset className="space-y-2">
                 <Label asChild>
-                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream flex items-center gap-2">
-                    <Star className="w-4 h-4 text-amber-500" aria-hidden="true" />
-                    How engaging were the questions?
+                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
+                    Results feel accurate?
                   </legend>
                 </Label>
-                <RadioGroup 
-                  value={question1} 
-                  onValueChange={setQuestion1}
-                  className="flex justify-between"
-                  aria-label="Question engagement rating from 1 to 5"
+                <div 
+                  className="flex justify-between w-full gap-2" 
+                  role="radiogroup"
+                  aria-label="Rate results accuracy: No, So-so, or Yes"
                 >
-                  {[1, 2, 3, 4, 5].map((value) => (
-                    <div key={value} className="flex flex-col items-center gap-1">
-                      <RadioGroupItem 
-                        value={value.toString()} 
-                        id={`q1-${value}`}
-                        className="border-2 data-[state=checked]:border-terracotta data-[state=checked]:text-terracotta"
-                        data-testid={`radio-engagement-${value}`}
-                      />
-                      <Label 
-                        htmlFor={`q1-${value}`}
-                        className="text-xs text-warm-gray/60 dark:text-soft-cream/50 cursor-pointer"
-                      >
-                        {value}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-                <div className="flex justify-between text-xs text-warm-gray/50 dark:text-soft-cream/40 px-1" aria-hidden="true">
-                  <span>Meh</span>
-                  <span>Loved it!</span>
+                  <ToggleButton 
+                    value="no" 
+                    currentValue={resultsAccurate} 
+                    onChange={setResultsAccurate}
+                    variant="no"
+                    testId="toggle-accurate-no"
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Frown className="w-4 h-4" />
+                      No
+                    </span>
+                  </ToggleButton>
+                  <ToggleButton 
+                    value="so-so" 
+                    currentValue={resultsAccurate} 
+                    onChange={setResultsAccurate}
+                    variant="middle"
+                    testId="toggle-accurate-soso"
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Meh className="w-4 h-4" />
+                      So-so
+                    </span>
+                  </ToggleButton>
+                  <ToggleButton 
+                    value="yes" 
+                    currentValue={resultsAccurate} 
+                    onChange={setResultsAccurate}
+                    variant="yes"
+                    testId="toggle-accurate-yes"
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Smile className="w-4 h-4" />
+                      Yes!
+                    </span>
+                  </ToggleButton>
                 </div>
               </fieldset>
 
-              <fieldset className="space-y-3">
+              <fieldset className="space-y-2">
                 <Label asChild>
-                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream flex items-center gap-2">
-                    <ThumbsUp className="w-4 h-4 text-sage-green" aria-hidden="true" />
+                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
+                    Engaging questions?
+                  </legend>
+                </Label>
+                <div 
+                  className="flex justify-between w-full gap-2" 
+                  role="radiogroup"
+                  aria-label="Rate question engagement: No, So-so, or Yes"
+                >
+                  <ToggleButton 
+                    value="no" 
+                    currentValue={questionsEngaging} 
+                    onChange={setQuestionsEngaging}
+                    variant="no"
+                    testId="toggle-engaging-no"
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Frown className="w-4 h-4" />
+                      No
+                    </span>
+                  </ToggleButton>
+                  <ToggleButton 
+                    value="so-so" 
+                    currentValue={questionsEngaging} 
+                    onChange={setQuestionsEngaging}
+                    variant="middle"
+                    testId="toggle-engaging-soso"
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Meh className="w-4 h-4" />
+                      So-so
+                    </span>
+                  </ToggleButton>
+                  <ToggleButton 
+                    value="yes" 
+                    currentValue={questionsEngaging} 
+                    onChange={setQuestionsEngaging}
+                    variant="yes"
+                    testId="toggle-engaging-yes"
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Smile className="w-4 h-4" />
+                      Yes!
+                    </span>
+                  </ToggleButton>
+                </div>
+              </fieldset>
+
+              <fieldset className="space-y-2">
+                <Label asChild>
+                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
                     Would you share KnowRole with a friend?
                   </legend>
                 </Label>
-                <RadioGroup 
-                  value={question2} 
-                  onValueChange={setQuestion2}
-                  className="flex gap-4"
-                  aria-label="Would you share with a friend"
+                <div 
+                  className="flex justify-between w-full gap-4" 
+                  role="radiogroup"
+                  aria-label="Would you share: No or Yes"
                 >
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem 
-                      value="yes" 
-                      id="q2-yes" 
-                      className="border-2 data-[state=checked]:border-sage-green data-[state=checked]:text-sage-green" 
-                      data-testid="radio-share-yes"
-                    />
-                    <Label htmlFor="q2-yes" className="text-sm cursor-pointer">Yes, totally!</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem 
-                      value="maybe" 
-                      id="q2-maybe" 
-                      className="border-2 data-[state=checked]:border-dusty-blue data-[state=checked]:text-dusty-blue" 
-                      data-testid="radio-share-maybe"
-                    />
-                    <Label htmlFor="q2-maybe" className="text-sm cursor-pointer">Maybe later</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem 
-                      value="no" 
-                      id="q2-no" 
-                      className="border-2 data-[state=checked]:border-warm-gray data-[state=checked]:text-warm-gray" 
-                      data-testid="radio-share-no"
-                    />
-                    <Label htmlFor="q2-no" className="text-sm cursor-pointer">Not yet</Label>
-                  </div>
-                </RadioGroup>
-              </fieldset>
-
-              <fieldset className="space-y-3">
-                <Label asChild>
-                  <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream flex items-center gap-2">
-                    <Star className="w-4 h-4 text-dusty-blue" aria-hidden="true" />
-                    How accurate does your result feel?
-                  </legend>
-                </Label>
-                <RadioGroup 
-                  value={question3} 
-                  onValueChange={setQuestion3}
-                  className="flex justify-between"
-                  aria-label="Result accuracy rating from 1 to 5"
-                >
-                  {[1, 2, 3, 4, 5].map((value) => (
-                    <div key={value} className="flex flex-col items-center gap-1">
-                      <RadioGroupItem 
-                        value={value.toString()} 
-                        id={`q3-${value}`}
-                        className="border-2 data-[state=checked]:border-dusty-blue data-[state=checked]:text-dusty-blue"
-                        data-testid={`radio-accuracy-${value}`}
-                      />
-                      <Label 
-                        htmlFor={`q3-${value}`}
-                        className="text-xs text-warm-gray/60 dark:text-soft-cream/50 cursor-pointer"
-                      >
-                        {value}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-                <div className="flex justify-between text-xs text-warm-gray/50 dark:text-soft-cream/40 px-1" aria-hidden="true">
-                  <span>Way off</span>
-                  <span>Spot on!</span>
+                  <ToggleButton 
+                    value="no" 
+                    currentValue={wouldShare} 
+                    onChange={setWouldShare}
+                    variant="no"
+                    testId="toggle-share-no"
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Frown className="w-4 h-4" />
+                      No
+                    </span>
+                  </ToggleButton>
+                  <div className="flex-1" />
+                  <ToggleButton 
+                    value="yes" 
+                    currentValue={wouldShare} 
+                    onChange={setWouldShare}
+                    variant="yes"
+                    testId="toggle-share-yes"
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Smile className="w-4 h-4" />
+                      Yes
+                    </span>
+                  </ToggleButton>
                 </div>
               </fieldset>
+
+              <div className="space-y-2">
+                <Label 
+                  htmlFor="suggestions" 
+                  className="text-sm font-medium text-warm-gray dark:text-soft-cream"
+                >
+                  Suggestions for improvement?
+                </Label>
+                <Textarea
+                  id="suggestions"
+                  placeholder="Timing, design, questions..."
+                  value={suggestions}
+                  onChange={(e) => setSuggestions(e.target.value)}
+                  maxLength={1000}
+                  rows={3}
+                  className="resize-none text-sm"
+                  data-testid="textarea-suggestions"
+                />
+                <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 text-right">
+                  {suggestions.length}/1000
+                </p>
+              </div>
             </div>
 
             <div className="mt-6 space-y-3">

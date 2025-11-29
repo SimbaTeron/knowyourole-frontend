@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, Trophy, Target, Brain, Heart, Users, RefreshCw, Share2, 
-  Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin
+  Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame, Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import {
 import { Radar } from "react-chartjs-2";
 import type { QuizScores } from "./Quiz";
 import rolesData from "@/data/roles.json";
+import FeedbackModal from "./FeedbackModal";
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -93,7 +94,6 @@ function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: { O: nu
     }
   }
 
-  const mbtiCategory = mbtiType.charAt(0) === "I" ? "introvert" : "extrovert";
   const fallbackKeys = [
     `${mbtiType.toLowerCase()}-c-o-high`,
     `${mbtiType.toLowerCase()}-d-o-high`,
@@ -184,10 +184,54 @@ const TRAIT_LABELS = {
   N: "Neuroticism",
 };
 
+const FUN_MODE_ROASTS: Record<string, string> = {
+  "INTJ": "The mastermind who plans world domination before breakfast.",
+  "INTP": "Puzzle overlord! You debug life like it's source code.",
+  "ENTJ": "You run meetings like a general commands an army.",
+  "ENTP": "Devil's advocate with a PhD in 'Actually, what if...'",
+  "INFJ": "The mystic who knows what you're feeling before you do.",
+  "INFP": "Dreaming in color while the world insists on black and white.",
+  "ENFJ": "The emotional cheerleader everyone needs but didn't ask for.",
+  "ENFP": "A golden retriever in human form with 47 unfinished projects.",
+  "ISTJ": "The reliable rock that schedules their spontaneity.",
+  "ISFJ": "Guardian angel in disguise, passive-aggressively helpful.",
+  "ESTJ": "CEO energy even when ordering coffee at Starbucks.",
+  "ESFJ": "The host who remembers everyone's allergies and birthdays.",
+  "ISTP": "Quietly fixing things while judging your technique.",
+  "ISFP": "The artist who feels everything, especially deadlines.",
+  "ESTP": "Living on the edge while texting and driving metaphorically.",
+  "ESFP": "The party doesn't start until you arrive and overshare.",
+};
+
+const TRAIT_QUESTS: Record<string, { high: string; low: string }> = {
+  "O": { 
+    high: "Try a 5-minute creative break: doodle, write, or explore something new today.", 
+    low: "Challenge yourself: pick one new thing to try this week, even something small." 
+  },
+  "C": { 
+    high: "Reward yourself! Your planning is solid—take a guilt-free 10-min break.", 
+    low: "Tiny win: write down 3 things to do tomorrow before bed tonight." 
+  },
+  "E": { 
+    high: "Social energy high? Reach out to someone you haven't talked to in a while.", 
+    low: "Recharge solo: 15 minutes of quiet time with no screens or obligations." 
+  },
+  "A": { 
+    high: "You give so much—practice saying 'no' to one thing this week.", 
+    low: "Empathy boost: genuinely ask someone how they're doing and listen." 
+  },
+  "N": { 
+    high: "Feeling stressed? Try 2-minute box breathing: inhale 4s, hold 4s, exhale 4s.", 
+    low: "Your calm is a superpower—help someone who seems overwhelmed today." 
+  },
+};
+
 export default function Results({ scores, tier, mood, funMode, landmark, theme, onRestart, onShare }: ResultsProps) {
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
+  const [dashboardStage, setDashboardStage] = useState<"teaser" | "feedback" | "full">("teaser");
+  const [showFeedback, setShowFeedback] = useState(false);
   const chartRef = useRef<ChartJS<"radar">>(null);
   const traitButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotion();
@@ -197,7 +241,19 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     setResult(calculated);
     
     if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
+    
+    const feedbackTimer = setTimeout(() => {
+      setShowFeedback(true);
+    }, 2000);
+    
+    return () => clearTimeout(feedbackTimer);
   }, [scores]);
+
+  const handleFeedbackComplete = () => {
+    setShowFeedback(false);
+    setDashboardStage("full");
+    if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+  };
 
   const isDark = theme === "dark";
   const isRandom = theme === "random";
@@ -259,7 +315,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   if (!result) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
         <motion.div
           animate={shouldReduceMotion ? {} : { rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -270,6 +326,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       </div>
     );
   }
+
+  const sortedBigFive = Object.entries(result.bigFiveProfile)
+    .sort((a, b) => b[1] - a[1]);
+  const topTwoTraits = sortedBigFive.slice(0, 2);
 
   const radarData = {
     labels: Object.keys(result.bigFiveProfile).map(k => TRAIT_LABELS[k as keyof typeof TRAIT_LABELS]),
@@ -329,9 +389,27 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   };
 
   const traitKeys = Object.keys(result.bigFiveProfile);
+  const isTeaser = dashboardStage === "teaser";
+  const isFull = dashboardStage === "full";
+
+  const getQuests = () => {
+    const quests: string[] = [];
+    sortedBigFive.slice(0, 3).forEach(([trait, value]) => {
+      const questData = TRAIT_QUESTS[trait];
+      if (questData) {
+        quests.push(value > 50 ? questData.high : questData.low);
+      }
+    });
+    return quests;
+  };
 
   return (
-    <div className="min-h-screen pb-36">
+    <div className="min-h-screen pb-36 bg-white dark:bg-gray-900">
+      <FeedbackModal 
+        isOpen={showFeedback} 
+        onComplete={handleFeedbackComplete} 
+      />
+      
       <header className="pt-10 pb-6 px-4 text-center">
         <motion.div
           initial={shouldReduceMotion ? {} : { scale: 0 }}
@@ -349,7 +427,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           className="text-2xl font-display font-bold text-warm-gray dark:text-soft-cream mb-2"
           data-testid="text-result-title"
         >
-          Your Personality Map
+          {isTeaser ? "Your Quick Glimpse" : "Your Personality Map"}
         </motion.h1>
         
         <motion.p
@@ -368,93 +446,30 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card className="overflow-hidden">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Zap className="w-4 h-4 text-terracotta" aria-hidden="true" />
-                Big Five Profile
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pb-4">
-              <div 
-                className="w-full aspect-square max-w-[280px] mx-auto"
-                role="img"
-                aria-label={`Big Five personality radar chart: ${traitKeys.map(k => `${TRAIT_LABELS[k as keyof typeof TRAIT_LABELS]} ${result.bigFiveProfile[k as keyof typeof result.bigFiveProfile]}%`).join(", ")}`}
-              >
-                <Radar ref={chartRef} data={radarData} options={radarOptions} />
-              </div>
-              
-              <div 
-                className="flex flex-wrap justify-center gap-2 mt-4"
-                role="group"
-                aria-label="Select a trait to learn more"
-              >
-                {traitKeys.map((trait, index) => {
-                  const Icon = TRAIT_ICONS[trait as keyof typeof TRAIT_ICONS];
-                  const colors = TRAIT_COLORS[trait as keyof typeof TRAIT_COLORS];
-                  const isSelected = selectedTrait === trait;
-                  const value = result.bigFiveProfile[trait as keyof typeof result.bigFiveProfile];
-                  
-                  return (
-                    <button
-                      key={trait}
-                      ref={el => traitButtonsRef.current[index] = el}
-                      onClick={() => handleTraitSelect(trait, index)}
-                      onKeyDown={(e) => handleTraitKeyDown(e, trait, index)}
-                      tabIndex={focusedTraitIndex === -1 ? (index === 0 ? 0 : -1) : (focusedTraitIndex === index ? 0 : -1)}
-                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                        isSelected 
-                          ? `${colors.bg} text-white ring-2 ring-offset-2 ring-${colors.bg}` 
-                          : `bg-gray-100 dark:bg-gray-700 ${colors.text} hover:scale-105`
-                      }`}
-                      aria-pressed={isSelected}
-                      aria-label={`${TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]} petal ${value}%. ${isSelected ? "Selected" : "Click to learn more"}`}
-                      data-testid={`button-trait-${trait.toLowerCase()}`}
-                    >
-                      <Icon className="w-3 h-3" aria-hidden="true" />
-                      <span>{TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]}</span>
-                      <span className="opacity-70">{value}%</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {selectedTrait && (
-                <motion.div
-                  initial={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
-                  className="mt-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
-                  role="region"
-                  aria-live="polite"
-                  aria-label={`${TRAIT_LABELS[selectedTrait as keyof typeof TRAIT_LABELS]} details`}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    {(() => {
-                      const Icon = TRAIT_ICONS[selectedTrait as keyof typeof TRAIT_ICONS];
-                      const colors = TRAIT_COLORS[selectedTrait as keyof typeof TRAIT_COLORS];
-                      return (
-                        <>
-                          <div className={`w-6 h-6 rounded-full ${colors.bg} flex items-center justify-center`}>
-                            <Icon className="w-3 h-3 text-white" aria-hidden="true" />
-                          </div>
-                          <span className={`font-semibold ${colors.text}`}>
-                            {TRAIT_LABELS[selectedTrait as keyof typeof TRAIT_LABELS]}
-                          </span>
-                          <span className="text-sm text-warm-gray/60 dark:text-soft-cream/60 ml-auto">
-                            {result.bigFiveProfile[selectedTrait as keyof typeof result.bigFiveProfile]}%
-                          </span>
-                        </>
-                      );
-                    })()}
+          <Card className="overflow-hidden border-2 border-terracotta/30 bg-gradient-to-br from-terracotta/5 to-transparent">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
+                  <Briefcase className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-terracotta font-medium mb-0.5">Your Primary Role Match</p>
+                  <h3 className="text-lg font-bold text-warm-gray dark:text-soft-cream" data-testid="text-primary-role">
+                    {result.primaryRole.title}
+                  </h3>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-1 text-sage-green">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">{result.primaryRole.salary}</span>
                   </div>
-                  <p className="text-sm text-warm-gray/80 dark:text-soft-cream/80">
-                    {result.bigFiveProfile[selectedTrait as keyof typeof result.bigFiveProfile] > 50
-                      ? result.bigFiveLabels[selectedTrait]?.high
-                      : result.bigFiveLabels[selectedTrait]?.low}
-                  </p>
-                </motion.div>
-              )}
+                </div>
+              </div>
+              <p className="text-sm text-warm-gray/80 dark:text-soft-cream/80">
+                Your <span className="font-semibold text-terracotta">{result.mbtiType}-{result.discStyle}</span> analytical drive 
+                {result.bigFiveProfile.O > 60 ? " and creative openness" : ""} 
+                {result.bigFiveProfile.C > 60 ? " plus steady focus" : ""} make you ideal for this path—{result.primaryRole.desc.toLowerCase()}
+              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -465,7 +480,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           transition={{ delay: 0.6 }}
           className="grid grid-cols-2 gap-3"
         >
-          <Card className="bg-terracotta/5 border-terracotta/20">
+          <Card className="bg-white dark:bg-gray-800 border-terracotta/20">
             <CardContent className="p-4 text-center">
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-terracotta/10 mb-2">
                 <Brain className="w-5 h-5 text-terracotta" aria-hidden="true" />
@@ -477,26 +492,20 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               <p className="text-sm font-medium text-warm-gray dark:text-soft-cream">
                 {result.mbtiLabel}
               </p>
-              <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mt-1">
-                {result.mbtiDesc}
-              </p>
             </CardContent>
           </Card>
 
-          <Card className={`${discColorMap[result.discColor] || "bg-sage-green/5 border-sage-green/20"} border`}>
+          <Card className={`${discColorMap[result.discColor] || "bg-sage-green text-white"} border-0`}>
             <CardContent className="p-4 text-center">
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mb-2">
                 <Award className="w-5 h-5" aria-hidden="true" />
               </div>
               <p className="text-xs opacity-70 mb-1">DISC Style</p>
               <p className="text-lg font-bold" data-testid="text-disc">
-                {result.discStyle}
-              </p>
-              <p className="text-sm font-medium">
                 {result.discLabel}
               </p>
-              <p className="text-xs opacity-70 mt-1">
-                {result.discDesc}
+              <p className="text-sm font-medium opacity-90">
+                {result.discStyle}-type
               </p>
             </CardContent>
           </Card>
@@ -507,73 +516,261 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-sage-green" aria-hidden="true" />
-                Career Matches
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-3 rounded-lg bg-sage-green/10 border border-sage-green/20">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-sage-green text-white">
-                        Primary
-                      </span>
+          <Card className="bg-white dark:bg-gray-800">
+            <CardContent className="p-4">
+              <p className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-2">Top Big Five Traits</p>
+              <div className="flex flex-wrap gap-2">
+                {topTwoTraits.map(([trait, value]) => {
+                  const Icon = TRAIT_ICONS[trait as keyof typeof TRAIT_ICONS];
+                  const colors = TRAIT_COLORS[trait as keyof typeof TRAIT_COLORS];
+                  return (
+                    <div 
+                      key={trait}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${colors.bg} text-white text-sm`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]}</span>
+                      <span className="opacity-80">{value}%</span>
                     </div>
-                    <p className="font-semibold text-warm-gray dark:text-soft-cream" data-testid="text-primary-role">
-                      {result.primaryRole.title}
-                    </p>
-                    <p className="text-sm text-warm-gray/70 dark:text-soft-cream/70 mt-0.5">
-                      {result.primaryRole.desc}
-                    </p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className="flex items-center gap-1 text-sage-green">
-                      <TrendingUp className="w-3 h-3" aria-hidden="true" />
-                      <span className="text-xs font-medium">{result.primaryRole.salary}</span>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
-
-              <div className="p-3 rounded-lg bg-dusty-blue/10 border border-dusty-blue/20">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-dusty-blue text-white">
-                        Secondary
-                      </span>
-                    </div>
-                    <p className="font-semibold text-warm-gray dark:text-soft-cream" data-testid="text-secondary-role">
-                      {result.secondaryRole.title}
-                    </p>
-                    <p className="text-sm text-warm-gray/70 dark:text-soft-cream/70 mt-0.5">
-                      {result.secondaryRole.desc}
-                    </p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className="flex items-center gap-1 text-dusty-blue">
-                      <TrendingUp className="w-3 h-3" aria-hidden="true" />
-                      <span className="text-xs font-medium">{result.secondaryRole.salary}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <button 
-                className="w-full flex items-center justify-center gap-2 py-2 text-sm text-terracotta hover:text-terracotta/80 transition-colors"
-                data-testid="button-more-careers"
-                aria-label="Explore more career paths based on your profile"
-              >
-                <span>Explore more career paths</span>
-                <ChevronRight className="w-4 h-4" aria-hidden="true" />
-              </button>
+              {isTeaser && (
+                <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-3 flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  Full percentages unlock after feedback
+                </p>
+              )}
             </CardContent>
           </Card>
         </motion.div>
+
+        <AnimatePresence>
+          {isFull && (
+            <>
+              <motion.div
+                initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Card className="overflow-hidden bg-white dark:bg-gray-800">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-terracotta" aria-hidden="true" />
+                      Full Big Five Profile
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <div 
+                      className="w-full aspect-square max-w-[280px] mx-auto"
+                      role="img"
+                      aria-label={`Big Five personality radar chart: ${traitKeys.map(k => `${TRAIT_LABELS[k as keyof typeof TRAIT_LABELS]} ${result.bigFiveProfile[k as keyof typeof result.bigFiveProfile]}%`).join(", ")}`}
+                    >
+                      <Radar ref={chartRef} data={radarData} options={radarOptions} />
+                    </div>
+                    
+                    <div 
+                      className="flex flex-wrap justify-center gap-2 mt-4"
+                      role="group"
+                      aria-label="Select a trait to learn more"
+                    >
+                      {traitKeys.map((trait, index) => {
+                        const Icon = TRAIT_ICONS[trait as keyof typeof TRAIT_ICONS];
+                        const colors = TRAIT_COLORS[trait as keyof typeof TRAIT_COLORS];
+                        const isSelected = selectedTrait === trait;
+                        const value = result.bigFiveProfile[trait as keyof typeof result.bigFiveProfile];
+                        
+                        return (
+                          <button
+                            key={trait}
+                            ref={el => traitButtonsRef.current[index] = el}
+                            onClick={() => handleTraitSelect(trait, index)}
+                            onKeyDown={(e) => handleTraitKeyDown(e, trait, index)}
+                            tabIndex={focusedTraitIndex === -1 ? (index === 0 ? 0 : -1) : (focusedTraitIndex === index ? 0 : -1)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                              isSelected 
+                                ? `${colors.bg} text-white ring-2 ring-offset-2 ring-${colors.bg}` 
+                                : `bg-gray-100 dark:bg-gray-700 ${colors.text} hover:scale-105`
+                            }`}
+                            aria-pressed={isSelected}
+                            aria-label={`${TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]} petal ${value}%. ${isSelected ? "Selected" : "Click to learn more"}`}
+                            data-testid={`button-trait-${trait.toLowerCase()}`}
+                          >
+                            <Icon className="w-3 h-3" aria-hidden="true" />
+                            <span>{TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]}</span>
+                            <span className="opacity-70">{value}%</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {selectedTrait && (
+                      <motion.div
+                        initial={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
+                        className="mt-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50"
+                        role="region"
+                        aria-live="polite"
+                        aria-label={`${TRAIT_LABELS[selectedTrait as keyof typeof TRAIT_LABELS]} details`}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          {(() => {
+                            const Icon = TRAIT_ICONS[selectedTrait as keyof typeof TRAIT_ICONS];
+                            const colors = TRAIT_COLORS[selectedTrait as keyof typeof TRAIT_COLORS];
+                            return (
+                              <>
+                                <div className={`w-6 h-6 rounded-full ${colors.bg} flex items-center justify-center`}>
+                                  <Icon className="w-3 h-3 text-white" aria-hidden="true" />
+                                </div>
+                                <span className={`font-semibold ${colors.text}`}>
+                                  {TRAIT_LABELS[selectedTrait as keyof typeof TRAIT_LABELS]}
+                                </span>
+                                <span className="text-sm text-warm-gray/60 dark:text-soft-cream/60 ml-auto">
+                                  {result.bigFiveProfile[selectedTrait as keyof typeof result.bigFiveProfile]}%
+                                </span>
+                              </>
+                            );
+                          })()}
+                        </div>
+                        <p className="text-sm text-warm-gray/80 dark:text-soft-cream/80">
+                          {result.bigFiveProfile[selectedTrait as keyof typeof result.bigFiveProfile] > 50
+                            ? result.bigFiveLabels[selectedTrait]?.high
+                            : result.bigFiveLabels[selectedTrait]?.low}
+                        </p>
+                      </motion.div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Card className="bg-white dark:bg-gray-800">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Lightbulb className="w-4 h-4 text-amber-500" aria-hidden="true" />
+                      Your Growth Quests
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {getQuests().map((quest, index) => (
+                      <div 
+                        key={index}
+                        className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
+                      >
+                        <div className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <p className="text-sm text-warm-gray dark:text-soft-cream">{quest}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {funMode && (
+                <motion.div
+                  initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <Card className="bg-gradient-to-br from-rose-500/10 to-orange-500/10 border-rose-300 dark:border-rose-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                          <Flame className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-rose-600 dark:text-rose-400 font-medium mb-1">Fun Mode Roast</p>
+                          <p className="text-sm font-medium text-warm-gray dark:text-soft-cream">
+                            {FUN_MODE_ROASTS[result.mbtiType] || "You're a unique snowflake that defies categorization!"}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
+              <motion.div
+                initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <Card className="bg-white dark:bg-gray-800">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 text-sage-green" aria-hidden="true" />
+                      More Career Matches
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="p-3 rounded-lg bg-sage-green/10 border border-sage-green/20">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-sage-green text-white">
+                              Primary
+                            </span>
+                          </div>
+                          <p className="font-semibold text-warm-gray dark:text-soft-cream">
+                            {result.primaryRole.title}
+                          </p>
+                          <p className="text-sm text-warm-gray/70 dark:text-soft-cream/70 mt-0.5">
+                            {result.primaryRole.desc}
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className="flex items-center gap-1 text-sage-green">
+                            <TrendingUp className="w-3 h-3" aria-hidden="true" />
+                            <span className="text-xs font-medium">{result.primaryRole.salary}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-lg bg-dusty-blue/10 border border-dusty-blue/20">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-dusty-blue text-white">
+                              Secondary
+                            </span>
+                          </div>
+                          <p className="font-semibold text-warm-gray dark:text-soft-cream" data-testid="text-secondary-role">
+                            {result.secondaryRole.title}
+                          </p>
+                          <p className="text-sm text-warm-gray/70 dark:text-soft-cream/70 mt-0.5">
+                            {result.secondaryRole.desc}
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className="flex items-center gap-1 text-dusty-blue">
+                            <TrendingUp className="w-3 h-3" aria-hidden="true" />
+                            <span className="text-xs font-medium">{result.secondaryRole.salary}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button 
+                      className="w-full flex items-center justify-center gap-2 py-2 text-sm text-terracotta hover:text-terracotta/80 transition-colors"
+                      data-testid="button-more-careers"
+                      aria-label="Explore more career paths based on your profile"
+                    >
+                      <span>Explore more career paths</span>
+                      <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {landmark && (
           <motion.div
@@ -603,7 +800,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
         </motion.div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-5 bg-gradient-to-t from-soft-cream via-soft-cream/98 to-transparent dark:from-warm-charcoal dark:via-warm-charcoal/98">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-5 bg-gradient-to-t from-white via-white/98 to-transparent dark:from-gray-900 dark:via-gray-900/98">
         <div className="max-w-md mx-auto flex gap-3">
           <Button
             variant="outline"
