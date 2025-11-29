@@ -51,6 +51,8 @@ export interface QuizScores {
   }>;
   engagement: number;
   wildcardBoost: boolean;
+  criticalWildcard: number;
+  firstPrinciplesWildcard: number;
 }
 
 const SWIPE_THRESHOLD = 100;
@@ -89,7 +91,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     bigFive: { O: 0, C: 0, E: 0, A: 0, N: 0 },
     responses: [],
     engagement: 0,
-    wildcardBoost: false
+    wildcardBoost: false,
+    criticalWildcard: 0,
+    firstPrinciplesWildcard: 0
   });
   
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -120,11 +124,16 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     if (selected.length < tierConfig.baseCount) {
       const otherQuestions = questionsData.questions
-        .filter(q => q.tier !== tier && !q.paid)
+        .filter(q => q.tier !== tier && q.tier !== "all" && !q.paid)
         .sort(() => Math.random() - 0.5)
         .slice(0, tierConfig.baseCount - selected.length);
       selected.push(...otherQuestions);
     }
+    
+    const scaleWildcards = questionsData.questions.filter(
+      q => q.tier === "all" && (q.psych === "Critical" || q.psych === "FirstPrinciples")
+    );
+    selected.push(...scaleWildcards);
     
     setQuestions(selected.sort(() => Math.random() - 0.5) as Question[]);
   }, [tier, tierConfig.baseCount]);
@@ -204,6 +213,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         if (trait in newScores.bigFive) {
           const modifier = meta.includes("+") ? 1 : -1;
           newScores.bigFive = { ...newScores.bigFive, [trait]: newScores.bigFive[trait] + (weight * modifier) };
+        }
+      } else if (question.psych === "Critical") {
+        if (meta === "CT1") {
+          newScores.criticalWildcard = 1;
+        }
+      } else if (question.psych === "FirstPrinciples") {
+        if (meta === "FP1") {
+          newScores.firstPrinciplesWildcard = 1;
         }
       }
       

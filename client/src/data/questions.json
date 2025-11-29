@@ -559,6 +559,34 @@
       "version": "v1",
       "paid": true,
       "wildcard": true
+    },
+    {
+      "id": 41,
+      "prompt": "Everyone agrees on a solution—your response?",
+      "leftDesc": "Go with consensus since the group wisdom usually wins.",
+      "rightDesc": "Question the hidden assumption nobody else is seeing.",
+      "options": ["Follow consensus", "Question assumption"],
+      "optionMeta": ["CT0", "CT1"],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "all",
+      "version": "v1",
+      "paid": false,
+      "wildcard": true
+    },
+    {
+      "id": 42,
+      "prompt": "Facing a complex problem—how do you attack it?",
+      "leftDesc": "Accept the surface answer and move forward quickly.",
+      "rightDesc": "Break it down to the fundamental basics first.",
+      "options": ["Accept surface", "Break to basics"],
+      "optionMeta": ["FP0", "FP1"],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "all",
+      "version": "v1",
+      "paid": false,
+      "wildcard": true
     }
   ],
   "tierConfig": {
