@@ -562,10 +562,10 @@
     }
   ],
   "tierConfig": {
-    "7-12": { "baseCount": 10, "maxTime": 6, "swipeStyle": "playful" },
-    "13-18": { "baseCount": 10, "maxTime": 7, "swipeStyle": "teen" },
-    "19-25": { "baseCount": 10, "maxTime": 8, "swipeStyle": "adult" },
-    "25+": { "baseCount": 10, "maxTime": 9, "swipeStyle": "mature" }
+    "7-12": { "baseCount": 15, "maxTime": 9, "swipeStyle": "playful" },
+    "13-18": { "baseCount": 25, "maxTime": 9, "swipeStyle": "teen" },
+    "19-25": { "baseCount": 25, "maxTime": 9, "swipeStyle": "adult" },
+    "25+": { "baseCount": 40, "maxTime": 9, "swipeStyle": "mature" }
   },
   "psychDistribution": {
     "MBTI": 0.3,

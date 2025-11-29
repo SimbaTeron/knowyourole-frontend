@@ -2,10 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, Trophy, Target, Brain, Heart, Users, RefreshCw, Share2, 
-  Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame, Lock
+  Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame,
+  MessageCircle, Frown, Meh, Smile
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -18,7 +21,6 @@ import {
 import { Radar } from "react-chartjs-2";
 import type { QuizScores } from "./Quiz";
 import rolesData from "@/data/roles.json";
-import FeedbackModal from "./FeedbackModal";
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -230,8 +232,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
-  const [dashboardStage, setDashboardStage] = useState<"teaser" | "feedback" | "full">("teaser");
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">("teaser");
+  
+  const [resultsAccurate, setResultsAccurate] = useState<string>("");
+  const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
+  const [wouldShare, setWouldShare] = useState<string>("");
+  const [suggestions, setSuggestions] = useState<string>("");
+  
   const chartRef = useRef<ChartJS<"radar">>(null);
   const traitButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotion();
@@ -241,18 +248,25 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     setResult(calculated);
     
     if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
-    
-    const feedbackTimer = setTimeout(() => {
-      setShowFeedback(true);
-    }, 2000);
-    
-    return () => clearTimeout(feedbackTimer);
   }, [scores]);
 
-  const handleFeedbackComplete = () => {
-    setShowFeedback(false);
-    setDashboardStage("full");
+  const allFeedbackAnswered = resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "" && suggestions.trim().length > 0;
+
+  const handleShowFullResults = () => {
+    if (!allFeedbackAnswered) return;
+    
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+    
+    const feedbackData = {
+      q1_accurate: resultsAccurate,
+      q2_engaging: questionsEngaging,
+      q3_share: wouldShare,
+      openText: suggestions,
+      timestamp: new Date().toISOString()
+    };
+    console.log("Quick Path Feedback:", feedbackData);
+    
+    setDashboardStage("full");
   };
 
   const isDark = theme === "dark";
@@ -330,6 +344,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const sortedBigFive = Object.entries(result.bigFiveProfile)
     .sort((a, b) => b[1] - a[1]);
   const topTwoTraits = sortedBigFive.slice(0, 2);
+  const topTrait = sortedBigFive[0];
 
   const radarData = {
     labels: Object.keys(result.bigFiveProfile).map(k => TRAIT_LABELS[k as keyof typeof TRAIT_LABELS]),
@@ -389,7 +404,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   };
 
   const traitKeys = Object.keys(result.bigFiveProfile);
-  const isTeaser = dashboardStage === "teaser";
   const isFull = dashboardStage === "full";
 
   const getQuests = () => {
@@ -403,13 +417,57 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     return quests;
   };
 
+  const ToggleButton = ({ 
+    value, 
+    currentValue, 
+    onChange, 
+    variant = "default",
+    children,
+    testId 
+  }: { 
+    value: string; 
+    currentValue: string; 
+    onChange: (v: string) => void;
+    variant?: "no" | "middle" | "yes" | "default";
+    children: React.ReactNode;
+    testId: string;
+  }) => {
+    const isSelected = currentValue === value;
+    const baseClasses = "flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2";
+    
+    const variantClasses = {
+      no: isSelected 
+        ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 ring-2 ring-red-400" 
+        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20",
+      middle: isSelected 
+        ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 ring-2 ring-amber-400" 
+        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-900/20",
+      yes: isSelected 
+        ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-2 ring-green-400" 
+        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20",
+      default: isSelected 
+        ? "bg-terracotta/20 text-terracotta ring-2 ring-terracotta" 
+        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-terracotta/10",
+    };
+
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          onChange(value);
+          if (navigator.vibrate) navigator.vibrate(20);
+        }}
+        className={`${baseClasses} ${variantClasses[variant]}`}
+        aria-pressed={isSelected}
+        data-testid={testId}
+      >
+        {children}
+      </button>
+    );
+  };
+
   return (
     <div className="min-h-screen pb-36 bg-white dark:bg-gray-900">
-      <FeedbackModal 
-        isOpen={showFeedback} 
-        onComplete={handleFeedbackComplete} 
-      />
-      
       <header className="pt-10 pb-6 px-4 text-center">
         <motion.div
           initial={shouldReduceMotion ? {} : { scale: 0 }}
@@ -427,7 +485,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           className="text-2xl font-display font-bold text-warm-gray dark:text-soft-cream mb-2"
           data-testid="text-result-title"
         >
-          {isTeaser ? "Your Quick Glimpse" : "Your Personality Map"}
+          {isFull ? "Your Personality Map" : "Your Quick Glimpse"}
         </motion.h1>
         
         <motion.p
@@ -518,32 +576,228 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
         >
           <Card className="bg-white dark:bg-gray-800">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-2">Top Big Five Traits</p>
-              <div className="flex flex-wrap gap-2">
-                {topTwoTraits.map(([trait, value]) => {
-                  const Icon = TRAIT_ICONS[trait as keyof typeof TRAIT_ICONS];
-                  const colors = TRAIT_COLORS[trait as keyof typeof TRAIT_COLORS];
+              <p className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-2">Top Big Five Trait</p>
+              <div className="flex items-center gap-3">
+                {(() => {
+                  const Icon = TRAIT_ICONS[topTrait[0] as keyof typeof TRAIT_ICONS];
+                  const colors = TRAIT_COLORS[topTrait[0] as keyof typeof TRAIT_COLORS];
                   return (
                     <div 
-                      key={trait}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${colors.bg} text-white text-sm`}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-full ${colors.bg} text-white text-base`}
                     >
-                      <Icon className="w-3.5 h-3.5" />
-                      <span>{TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]}</span>
-                      <span className="opacity-80">{value}%</span>
+                      <Icon className="w-4 h-4" />
+                      <span className="font-semibold">{TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]}</span>
+                      <span className="opacity-80 font-bold">{topTrait[1]}%</span>
                     </div>
                   );
-                })}
+                })()}
               </div>
-              {isTeaser && (
-                <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-3 flex items-center gap-1">
-                  <Lock className="w-3 h-3" />
-                  Full percentages unlock after feedback
-                </p>
-              )}
             </CardContent>
           </Card>
         </motion.div>
+
+        {!isFull && (
+          <motion.div
+            initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
+            <Card className="bg-soft-cream/50 dark:bg-gray-800 border-2 border-terracotta/20">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center">
+                    <MessageCircle className="w-5 h-5 text-terracotta" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-warm-gray dark:text-soft-cream">
+                      Quick Feedback
+                    </h3>
+                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                      Help us improve to unlock your full results
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-5">
+                  <fieldset className="space-y-2">
+                    <Label asChild>
+                      <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
+                        Results feel accurate? <span className="text-red-500">*</span>
+                      </legend>
+                    </Label>
+                    <div 
+                      className="flex justify-between w-full gap-2" 
+                      role="radiogroup"
+                      aria-label="Rate results accuracy"
+                    >
+                      <ToggleButton 
+                        value="no" 
+                        currentValue={resultsAccurate} 
+                        onChange={setResultsAccurate}
+                        variant="no"
+                        testId="toggle-accurate-no"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Frown className="w-4 h-4" />
+                          No
+                        </span>
+                      </ToggleButton>
+                      <ToggleButton 
+                        value="so-so" 
+                        currentValue={resultsAccurate} 
+                        onChange={setResultsAccurate}
+                        variant="middle"
+                        testId="toggle-accurate-soso"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Meh className="w-4 h-4" />
+                          So-so
+                        </span>
+                      </ToggleButton>
+                      <ToggleButton 
+                        value="yes" 
+                        currentValue={resultsAccurate} 
+                        onChange={setResultsAccurate}
+                        variant="yes"
+                        testId="toggle-accurate-yes"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Smile className="w-4 h-4" />
+                          Yes!
+                        </span>
+                      </ToggleButton>
+                    </div>
+                  </fieldset>
+
+                  <fieldset className="space-y-2">
+                    <Label asChild>
+                      <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
+                        Questions engaging? <span className="text-red-500">*</span>
+                      </legend>
+                    </Label>
+                    <div 
+                      className="flex justify-between w-full gap-2" 
+                      role="radiogroup"
+                      aria-label="Rate question engagement"
+                    >
+                      <ToggleButton 
+                        value="no" 
+                        currentValue={questionsEngaging} 
+                        onChange={setQuestionsEngaging}
+                        variant="no"
+                        testId="toggle-engaging-no"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Frown className="w-4 h-4" />
+                          No
+                        </span>
+                      </ToggleButton>
+                      <ToggleButton 
+                        value="so-so" 
+                        currentValue={questionsEngaging} 
+                        onChange={setQuestionsEngaging}
+                        variant="middle"
+                        testId="toggle-engaging-soso"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Meh className="w-4 h-4" />
+                          So-so
+                        </span>
+                      </ToggleButton>
+                      <ToggleButton 
+                        value="yes" 
+                        currentValue={questionsEngaging} 
+                        onChange={setQuestionsEngaging}
+                        variant="yes"
+                        testId="toggle-engaging-yes"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Smile className="w-4 h-4" />
+                          Yes!
+                        </span>
+                      </ToggleButton>
+                    </div>
+                  </fieldset>
+
+                  <fieldset className="space-y-2">
+                    <Label asChild>
+                      <legend className="text-sm font-medium text-warm-gray dark:text-soft-cream mb-3">
+                        Would share with a friend? <span className="text-red-500">*</span>
+                      </legend>
+                    </Label>
+                    <div 
+                      className="flex justify-between w-full gap-2" 
+                      role="radiogroup"
+                      aria-label="Would you share"
+                    >
+                      <ToggleButton 
+                        value="no" 
+                        currentValue={wouldShare} 
+                        onChange={setWouldShare}
+                        variant="no"
+                        testId="toggle-share-no"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Frown className="w-4 h-4" />
+                          No
+                        </span>
+                      </ToggleButton>
+                      <ToggleButton 
+                        value="yes" 
+                        currentValue={wouldShare} 
+                        onChange={setWouldShare}
+                        variant="yes"
+                        testId="toggle-share-yes"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Smile className="w-4 h-4" />
+                          Yes!
+                        </span>
+                      </ToggleButton>
+                    </div>
+                  </fieldset>
+
+                  <div className="space-y-2">
+                    <Label 
+                      htmlFor="suggestions" 
+                      className="text-sm font-medium text-warm-gray dark:text-soft-cream"
+                    >
+                      Any suggestions? <span className="text-red-500">*</span>
+                    </Label>
+                    <Textarea
+                      id="suggestions"
+                      placeholder="Timing, design, questions..."
+                      value={suggestions}
+                      onChange={(e) => setSuggestions(e.target.value)}
+                      maxLength={1000}
+                      rows={3}
+                      className="resize-none text-sm"
+                      data-testid="textarea-suggestions"
+                    />
+                    <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 text-right">
+                      {suggestions.length}/1000
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={handleShowFullResults}
+                    disabled={!allFeedbackAnswered}
+                    className="w-full bg-terracotta hover:bg-terracotta/90 disabled:opacity-50 disabled:cursor-not-allowed min-h-12 text-base font-semibold"
+                    data-testid="button-show-full-results"
+                  >
+                    {allFeedbackAnswered ? "Show Full Results" : "Complete all fields to continue"}
+                  </Button>
+                  
+                  {!allFeedbackAnswered && (
+                    <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                      All fields required to unlock full dashboard
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         <AnimatePresence>
           {isFull && (
@@ -623,17 +877,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                                 <div className={`w-6 h-6 rounded-full ${colors.bg} flex items-center justify-center`}>
                                   <Icon className="w-3 h-3 text-white" aria-hidden="true" />
                                 </div>
-                                <span className={`font-semibold ${colors.text}`}>
+                                <span className="font-semibold text-warm-gray dark:text-soft-cream">
                                   {TRAIT_LABELS[selectedTrait as keyof typeof TRAIT_LABELS]}
-                                </span>
-                                <span className="text-sm text-warm-gray/60 dark:text-soft-cream/60 ml-auto">
-                                  {result.bigFiveProfile[selectedTrait as keyof typeof result.bigFiveProfile]}%
                                 </span>
                               </>
                             );
                           })()}
                         </div>
-                        <p className="text-sm text-warm-gray/80 dark:text-soft-cream/80">
+                        <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70">
                           {result.bigFiveProfile[selectedTrait as keyof typeof result.bigFiveProfile] > 50
                             ? result.bigFiveLabels[selectedTrait]?.high
                             : result.bigFiveLabels[selectedTrait]?.low}
@@ -653,44 +904,40 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Lightbulb className="w-4 h-4 text-amber-500" aria-hidden="true" />
-                      Your Growth Quests
+                      Growth Quests
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    {getQuests().map((quest, index) => (
+                  <CardContent className="pb-4 space-y-3">
+                    {getQuests().map((quest, idx) => (
                       <div 
-                        key={index}
+                        key={idx}
                         className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
                       >
-                        <div className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                          {index + 1}
+                        <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-amber-600 dark:text-amber-300 text-xs font-bold">{idx + 1}</span>
                         </div>
-                        <p className="text-sm text-warm-gray dark:text-soft-cream">{quest}</p>
+                        <p className="text-sm text-amber-900 dark:text-amber-100">{quest}</p>
                       </div>
                     ))}
                   </CardContent>
                 </Card>
               </motion.div>
 
-              {funMode && (
+              {funMode && FUN_MODE_ROASTS[result.mbtiType] && (
                 <motion.div
-                  initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <Card className="bg-gradient-to-br from-rose-500/10 to-orange-500/10 border-rose-300 dark:border-rose-700">
+                  <Card className="bg-gradient-to-br from-violet-50 to-pink-50 dark:from-violet-900/20 dark:to-pink-900/20 border-violet-200 dark:border-violet-800">
                     <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center flex-shrink-0">
-                          <Flame className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-rose-600 dark:text-rose-400 font-medium mb-1">Fun Mode Roast</p>
-                          <p className="text-sm font-medium text-warm-gray dark:text-soft-cream">
-                            {FUN_MODE_ROASTS[result.mbtiType] || "You're a unique snowflake that defies categorization!"}
-                          </p>
-                        </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Flame className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                        <span className="text-sm font-semibold text-violet-700 dark:text-violet-300">Fun Mode Roast</span>
                       </div>
+                      <p className="text-sm text-violet-900 dark:text-violet-100 italic">
+                        "{FUN_MODE_ROASTS[result.mbtiType]}"
+                      </p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -701,123 +948,64 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <Card className="bg-white dark:bg-gray-800">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-sage-green" aria-hidden="true" />
-                      More Career Matches
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="p-3 rounded-lg bg-sage-green/10 border border-sage-green/20">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-sage-green text-white">
-                              Primary
-                            </span>
-                          </div>
-                          <p className="font-semibold text-warm-gray dark:text-soft-cream">
-                            {result.primaryRole.title}
-                          </p>
-                          <p className="text-sm text-warm-gray/70 dark:text-soft-cream/70 mt-0.5">
-                            {result.primaryRole.desc}
-                          </p>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <div className="flex items-center gap-1 text-sage-green">
-                            <TrendingUp className="w-3 h-3" aria-hidden="true" />
-                            <span className="text-xs font-medium">{result.primaryRole.salary}</span>
-                          </div>
-                        </div>
+                <Card className="bg-white dark:bg-gray-800 border-sage-green/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-sage-green/20 flex items-center justify-center flex-shrink-0">
+                        <Briefcase className="w-4 h-4 text-sage-green" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-sage-green font-medium mb-0.5">Also Consider</p>
+                        <h4 className="text-base font-semibold text-warm-gray dark:text-soft-cream">
+                          {result.secondaryRole.title}
+                        </h4>
+                        <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">
+                          {result.secondaryRole.salary}
+                        </p>
                       </div>
                     </div>
-
-                    <div className="p-3 rounded-lg bg-dusty-blue/10 border border-dusty-blue/20">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-dusty-blue text-white">
-                              Secondary
-                            </span>
-                          </div>
-                          <p className="font-semibold text-warm-gray dark:text-soft-cream" data-testid="text-secondary-role">
-                            {result.secondaryRole.title}
-                          </p>
-                          <p className="text-sm text-warm-gray/70 dark:text-soft-cream/70 mt-0.5">
-                            {result.secondaryRole.desc}
-                          </p>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <div className="flex items-center gap-1 text-dusty-blue">
-                            <TrendingUp className="w-3 h-3" aria-hidden="true" />
-                            <span className="text-xs font-medium">{result.secondaryRole.salary}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button 
-                      className="w-full flex items-center justify-center gap-2 py-2 text-sm text-terracotta hover:text-terracotta/80 transition-colors"
-                      data-testid="button-more-careers"
-                      aria-label="Explore more career paths based on your profile"
-                    >
-                      <span>Explore more career paths</span>
-                      <ChevronRight className="w-4 h-4" aria-hidden="true" />
-                    </button>
                   </CardContent>
                 </Card>
               </motion.div>
+
+              {landmark && (
+                <motion.div
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <Card className="bg-dusty-blue/10 dark:bg-dusty-blue/20 border-dusty-blue/30">
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <MapPin className="w-5 h-5 text-dusty-blue" />
+                      <p className="text-sm text-dusty-blue">
+                        Your journey started near <span className="font-semibold">{landmark}</span>
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
             </>
           )}
         </AnimatePresence>
-
-        {landmark && (
-          <motion.div
-            initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8 }}
-            className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-dusty-blue/10"
-          >
-            <MapPin className="w-4 h-4 text-dusty-blue" aria-hidden="true" />
-            <p className="text-sm text-warm-gray/70 dark:text-soft-cream/70">
-              Inspired by <span className="font-medium text-dusty-blue">{landmark}</span>
-            </p>
-          </motion.div>
-        )}
-
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="text-center py-4"
-        >
-          <p className="text-xs text-warm-gray/40 dark:text-soft-cream/30">
-            Engagement score: {Math.round(scores.engagement)} | 
-            {scores.wildcardBoost && " Wildcard bonus applied |"} 
-            {" "}{tier} tier
-          </p>
-        </motion.div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-5 bg-gradient-to-t from-white via-white/98 to-transparent dark:from-gray-900 dark:via-gray-900/98">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
         <div className="max-w-md mx-auto flex gap-3">
           <Button
             variant="outline"
-            className="flex-1 min-h-11"
+            className="flex-1"
             onClick={onRestart}
-            data-testid="button-retake"
+            data-testid="button-restart"
           >
-            <RefreshCw className="w-4 h-4 mr-2" aria-hidden="true" />
-            Retake
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Start Over
           </Button>
-          
           <Button
-            className="flex-1 bg-terracotta hover:bg-terracotta/90 min-h-11"
+            className="flex-1 bg-terracotta hover:bg-terracotta/90"
             onClick={onShare}
             data-testid="button-share"
           >
-            <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
+            <Share2 className="w-4 h-4 mr-2" />
             Share
           </Button>
         </div>

@@ -131,13 +131,13 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   useEffect(() => {
     if (questions.length > 0 && currentIndex < questions.length) {
-      setTimeRemaining(questions[currentIndex].time);
+      setTimeRemaining(tierConfig.maxTime);
       setQuestionStartTime(Date.now());
       setVibrantColorIndex(Math.floor(Math.random() * READABLE_RANDOM_COLORS.length));
       setIsTimingOut(false);
       setShowQuip(false);
     }
-  }, [currentIndex, questions]);
+  }, [currentIndex, questions, tierConfig.maxTime]);
 
   useEffect(() => {
     if (isPaused || timeRemaining <= 0 || questions.length === 0 || isTimingOut) return;
@@ -224,7 +224,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     if (!isTimeout && navigator.vibrate) navigator.vibrate(50);
     
-    if (timeSpent < question.time * 0.5) {
+    if (timeSpent < tierConfig.maxTime * 0.5) {
       setFastResponses(prev => prev + 1);
     }
     
@@ -310,7 +310,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
-  const timerProgress = (timeRemaining / currentQuestion.time) * 100;
+  const timerProgress = (timeRemaining / tierConfig.maxTime) * 100;
   
   const randomColor = READABLE_RANDOM_COLORS[vibrantColorIndex];
   const promptColor = isRandomTheme 
@@ -433,40 +433,40 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       </h2>
                     </div>
                     
-                    <div className="flex-1 flex flex-col justify-center gap-4">
+                    <div className="flex-1 flex flex-col justify-center gap-3">
                       <motion.button
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={{ scale: 1.03, x: -8 }}
+                        whileTap={{ scale: 0.98, x: -20 }}
                         onClick={() => !isTimingOut && handleSwipe("left")}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all p-4 disabled:opacity-50"
+                        className="min-h-20 flex items-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all p-4 disabled:opacity-50 -ml-2 mr-4"
                         data-testid="card-option-left"
                       >
-                        <div className="flex items-start gap-3">
-                          <ChevronLeft className="w-5 h-5 text-sage-green flex-shrink-0 mt-0.5" />
-                          <p className="text-base font-bold text-sage-green dark:text-sage-green leading-relaxed text-left">
+                        <div className="flex items-center gap-3 w-full">
+                          <ChevronLeft className="w-6 h-6 text-sage-green flex-shrink-0" />
+                          <p className="text-sm font-bold text-sage-green dark:text-sage-green leading-snug text-left flex-1">
                             {currentQuestion.leftDesc}
                           </p>
                         </div>
                       </motion.button>
                       
                       <div className="flex items-center justify-center">
-                        <span className="text-warm-gray/40 dark:text-soft-cream/30 text-sm font-medium">— or —</span>
+                        <span className="text-warm-gray/40 dark:text-soft-cream/30 text-xs font-medium tracking-wider">SWIPE or TAP</span>
                       </div>
                       
                       <motion.button
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={{ scale: 1.03, x: 8 }}
+                        whileTap={{ scale: 0.98, x: 20 }}
                         onClick={() => !isTimingOut && handleSwipe("right")}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all p-4 disabled:opacity-50"
+                        className="min-h-20 flex items-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all p-4 disabled:opacity-50 ml-4 -mr-2"
                         data-testid="card-option-right"
                       >
-                        <div className="flex items-start gap-3">
-                          <p className="text-base font-bold text-terracotta dark:text-terracotta leading-relaxed text-left flex-1">
+                        <div className="flex items-center gap-3 w-full">
+                          <p className="text-sm font-bold text-terracotta dark:text-terracotta leading-snug text-left flex-1">
                             {currentQuestion.rightDesc}
                           </p>
-                          <ChevronRight className="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" />
+                          <ChevronRight className="w-6 h-6 text-terracotta flex-shrink-0" />
                         </div>
                       </motion.button>
                     </div>
