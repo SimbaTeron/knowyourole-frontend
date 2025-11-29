@@ -5,9 +5,8 @@ import PathCanvas from "@/components/PathCanvas";
 import KnowRoleHeader from "@/components/KnowRoleHeader";
 import StepIndicator from "@/components/StepIndicator";
 import AgeTierSelector from "@/components/AgeTierSelector";
-import MoodSelector from "@/components/MoodSelector";
+import MoodSelector, { LandmarkInfo } from "@/components/MoodSelector";
 import FunModeToggle from "@/components/FunModeToggle";
-import PostalInput from "@/components/PostalInput";
 import LandmarkBadge from "@/components/LandmarkBadge";
 import StartButton from "@/components/StartButton";
 import Quiz, { QuizScores } from "@/components/Quiz";
@@ -16,16 +15,7 @@ import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-interface LandmarkInfo {
-  landmark: string;
-  class: string;
-  lucideIcon: string;
-  type: string;
-  city?: string;
-  country?: string;
-}
-
-type Step = "tier" | "mood" | "postal" | "ready" | "quiz" | "results";
+type Step = "tier" | "mood" | "ready" | "quiz" | "results";
 
 export default function Home() {
   const [ageTier, setAgeTier] = useState<string | null>(null);
@@ -77,25 +67,18 @@ export default function Home() {
 
   const handleMoodComplete = () => {
     if (mood) {
-      setStep("postal");
+      setStep("ready");
     }
   };
 
-  const handleLandmarkFound = (info: LandmarkInfo | null) => {
+  const handleLandmarkChange = (info: LandmarkInfo | null) => {
     setLandmark(info);
-    setStep("ready");
-  };
-
-  const handleSkipPostal = () => {
-    setLandmark(null);
-    setStep("ready");
   };
 
   const handleBack = () => {
     if (navigator.vibrate) navigator.vibrate(30);
     if (step === "mood") setStep("tier");
-    else if (step === "postal") setStep("mood");
-    else if (step === "ready") setStep("postal");
+    else if (step === "ready") setStep("mood");
   };
 
   const handleStart = () => {
@@ -177,8 +160,7 @@ export default function Home() {
     switch (step) {
       case "tier": return 1;
       case "mood": return 2;
-      case "postal": return 3;
-      case "ready": return 4;
+      case "ready": return 3;
       default: return 1;
     }
   };
@@ -256,7 +238,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <StepIndicator currentStep={getStepNumber()} totalSteps={4} />
+          <StepIndicator currentStep={getStepNumber()} totalSteps={3} />
 
           <div className="floating-card">
             <div className="premium-card rounded-2xl p-7 md:p-8">
@@ -280,7 +262,7 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="space-y-6"
+                    className="space-y-5"
                   >
                     <button
                       onClick={handleBack}
@@ -291,7 +273,12 @@ export default function Home() {
                       <span>Back</span>
                     </button>
 
-                    <MoodSelector mood={mood} onMoodChange={setMood} />
+                    <MoodSelector 
+                      mood={mood} 
+                      onMoodChange={setMood}
+                      onLandmarkChange={handleLandmarkChange}
+                      landmark={landmark}
+                    />
                     
                     <FunModeToggle enabled={funMode} onToggle={setFunMode} />
 
@@ -299,31 +286,6 @@ export default function Home() {
                       disabled={!mood}
                       onClick={handleMoodComplete}
                       label="Continue"
-                    />
-                  </motion.div>
-                )}
-
-                {step === "postal" && (
-                  <motion.div
-                    key="postal"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4"
-                  >
-                    <button
-                      onClick={handleBack}
-                      className="flex items-center gap-1.5 text-sm font-medium text-terracotta/80 transition-colors hover:text-terracotta"
-                      data-testid="button-back-postal"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      <span>Back</span>
-                    </button>
-
-                    <PostalInput
-                      onLandmarkFound={handleLandmarkFound}
-                      onSkip={handleSkipPostal}
                     />
                   </motion.div>
                 )}
