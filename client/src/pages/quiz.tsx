@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import PathCanvas from "@/components/PathCanvas";
-import CompactHeader from "@/components/CompactHeader";
 import Quiz, { QuizScores } from "@/components/Quiz";
 import Results from "@/components/Results";
 import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
@@ -172,17 +171,7 @@ export default function QuizPage() {
     <div className={`min-h-screen relative overflow-hidden ${getThemeClass()}`}>
       <PathCanvas />
       
-      {!showResults && (
-        <CompactHeader
-          onBack={handleBack}
-          showBack={true}
-          currentTheme={theme}
-          currentRandomTheme={randomTheme}
-          onThemeChange={handleThemeChange}
-        />
-      )}
-
-      <main className="relative z-10 pt-16">
+      <main className="relative z-10">
         <Quiz
           tier={ageTier}
           mood={mood}

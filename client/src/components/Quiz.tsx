@@ -67,6 +67,14 @@ const TIMEOUT_QUIPS = [
   { quip: "Let fate decide this fork in the road" },
   { quip: "Even quick-thinkers need a breather" },
   { quip: "The timer won, but you're still winning" },
+  { quip: "Destiny took the wheel on this one" },
+  { quip: "Your gut instinct just answered silently" },
+  { quip: "The stars aligned while you were thinking" },
+  { quip: "A moment of zen led to this choice" },
+  { quip: "The path chose you this time around" },
+  { quip: "Deep thoughts deserve cosmic help" },
+  { quip: "Your subconscious knew the answer all along" },
+  { quip: "Let the wind carry this decision forward" },
 ];
 
 const READABLE_RANDOM_COLORS = [
@@ -175,8 +183,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const handleTimeout = useCallback(() => {
     if (navigator.vibrate) navigator.vibrate(100);
     
-    const quipIndex = missCount % TIMEOUT_QUIPS.length;
-    setCurrentQuip(TIMEOUT_QUIPS[quipIndex]);
+    const randomQuipIndex = Math.floor(Math.random() * TIMEOUT_QUIPS.length);
+    setCurrentQuip(TIMEOUT_QUIPS[randomQuipIndex]);
     setMissCount(prev => prev + 1);
     setIsTimingOut(true);
     setShowQuip(true);
