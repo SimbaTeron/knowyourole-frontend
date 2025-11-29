@@ -584,6 +584,38 @@
       "primary": { "title": "Fashion Buyer", "salary": "$60K-110K", "desc": "Select trending inventory" },
       "secondary": { "title": "Retail Director", "salary": "$80K-140K", "desc": "Lead fashion retail operations" }
     },
+    "enfp-i-e-high": {
+      "primary": { "title": "Actor / Performer", "salary": "$30K-500K+", "desc": "Captivate audiences with expressive talent and creative energy" },
+      "secondary": { "title": "Singer / Musician", "salary": "$35K-300K+", "desc": "Move hearts through musical expression" }
+    },
+    "esfp-d-o-high": {
+      "primary": { "title": "Dancer / Choreographer", "salary": "$35K-150K", "desc": "Express stories through movement and rhythm" },
+      "secondary": { "title": "Stage Performer", "salary": "$30K-200K+", "desc": "Entertain live audiences with dynamic presence" }
+    },
+    "enfj-i-e-high": {
+      "primary": { "title": "TV / Radio Host", "salary": "$50K-500K+", "desc": "Engage audiences with charismatic presence" },
+      "secondary": { "title": "Motivational Speaker", "salary": "$40K-250K+", "desc": "Inspire crowds with compelling stories" }
+    },
+    "estp-i-o-high": {
+      "primary": { "title": "Stunt Performer", "salary": "$50K-200K", "desc": "Thrill audiences with daring physical feats" },
+      "secondary": { "title": "Sports Broadcaster", "salary": "$60K-250K", "desc": "Energize fans with dynamic commentary" }
+    },
+    "enfp-d-e-high": {
+      "primary": { "title": "Stand-up Comedian", "salary": "$35K-300K+", "desc": "Make audiences laugh with creative wit" },
+      "secondary": { "title": "Improv Artist", "salary": "$30K-100K", "desc": "Create spontaneous comedy magic" }
+    },
+    "esfp-i-o-high": {
+      "primary": { "title": "Singer / Vocalist", "salary": "$35K-500K+", "desc": "Touch hearts through the power of voice" },
+      "secondary": { "title": "YouTube Creator", "salary": "$30K-500K+", "desc": "Build audiences with engaging content" }
+    },
+    "infp-i-e-high": {
+      "primary": { "title": "Singer-Songwriter", "salary": "$30K-200K+", "desc": "Create deeply personal musical art" },
+      "secondary": { "title": "Indie Musician", "salary": "$25K-150K", "desc": "Express authentic emotion through music" }
+    },
+    "isfp-i-e-high": {
+      "primary": { "title": "Session Musician", "salary": "$40K-120K", "desc": "Bring songs to life with instrumental talent" },
+      "secondary": { "title": "Music Producer", "salary": "$45K-200K+", "desc": "Shape sounds with artistic vision" }
+    },
     "default": {
       "primary": { "title": "Career Explorer", "salary": "Varies", "desc": "Discover your unique path through self-reflection" },
       "secondary": { "title": "Skill Builder", "salary": "Varies", "desc": "Develop versatile abilities for any direction" }

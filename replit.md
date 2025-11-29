@@ -128,8 +128,18 @@ Preferred communication style: Simple, everyday language.
 - **Big Five Radar**: Chart.js radar visualization with interactive petals
 - **MBTI Card**: Type name, label (e.g., "Architect"), and description
 - **DISC Card**: Dominant style with color-coded indicator
-- **Role Recommendations**: 147 role clusters covering MBTI-DISC-Big5 combinations, trades, artistic, AI, tech, healthcare, education, finance, legal, marketing, science, creative, service, outdoor, and sports categories
+- **Role Recommendations**: 155+ role clusters covering MBTI-DISC-Big5 combinations including performer roles (Actor, Singer, Musician, Dancer, Comedian), trades, artistic, AI, tech, healthcare, education, finance, legal, marketing, science, creative, service, outdoor, and sports categories
 - **Role Matching Algorithm**: Uses MBTI type + DISC style + dominant Big Five traits
+- **Performer Roles Added**: 
+  - `enfp-i-e-high`: Actor/Performer, Singer/Musician
+  - `esfp-d-o-high`: Dancer/Choreographer, Stage Performer
+  - `enfj-i-e-high`: TV/Radio Host, Motivational Speaker
+  - `estp-i-o-high`: Stunt Performer, Sports Broadcaster
+  - `enfp-d-e-high`: Stand-up Comedian, Improv Artist
+  - `esfp-i-o-high`: Singer/Vocalist, YouTube Creator
+  - `infp-i-e-high`: Singer-Songwriter, Indie Musician
+  - `isfp-i-e-high`: Session Musician, Music Producer
+- **Test Mode**: Add `?test_premium=true` to URL to bypass payment and view premium features
 
 ### Data and State Management
 - **TanStack Query**: Server state management, caching, and data fetching

@@ -250,7 +250,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
-  const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">("teaser");
+  
+  const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
+  const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
+  const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium);
   
   const [resultsAccurate, setResultsAccurate] = useState<string>("");
   const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
@@ -271,7 +274,11 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     setResult(calculated);
     
     if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
-  }, [scores, apiScales]);
+    
+    if (isTestPremium) {
+      console.log('[DEV MODE] Premium features unlocked for testing via ?test_premium=true');
+    }
+  }, [scores, apiScales, isTestPremium]);
 
   const handleUpgrade = async () => {
     setIsCheckingOut(true);
