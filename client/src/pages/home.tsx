@@ -11,8 +11,11 @@ import PostalInput from "@/components/PostalInput";
 import LandmarkBadge from "@/components/LandmarkBadge";
 import StartButton from "@/components/StartButton";
 import FeedbackModal from "@/components/FeedbackModal";
+import Quiz, { QuizScores } from "@/components/Quiz";
+import Results from "@/components/Results";
 import { ThemeMode, RandomTheme } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 interface LandmarkInfo {
   landmark: string;
@@ -23,7 +26,7 @@ interface LandmarkInfo {
   country?: string;
 }
 
-type Step = "tier" | "mood" | "postal" | "ready";
+type Step = "tier" | "mood" | "postal" | "ready" | "quiz" | "results";
 
 export default function Home() {
   const [ageTier, setAgeTier] = useState<string | null>(null);
@@ -34,6 +37,7 @@ export default function Home() {
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
   const feedbackTriggeredRef = useRef(false);
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
@@ -158,7 +162,71 @@ export default function Home() {
         : "Mapping your personalized discovery path...",
     });
 
+    setStep("quiz");
+  };
+
+  const handleQuizComplete = async (scores: QuizScores) => {
+    setQuizScores(scores);
+    
+    try {
+      await apiRequest("POST", "/api/score", {
+        tier: ageTier,
+        mood,
+        funMode,
+        landmark: landmark?.landmark,
+        theme,
+        scores,
+      });
+    } catch (error) {
+      console.error("Failed to save quiz results:", error);
+    }
+
+    setStep("results");
     triggerFeedback(2000);
+  };
+
+  const handleQuizExit = () => {
+    setStep("ready");
+  };
+
+  const handleRestart = () => {
+    setQuizScores(null);
+    setStep("tier");
+    setAgeTier(null);
+    setMood("");
+    setFunMode(false);
+    setLandmark(null);
+  };
+
+  const handleShare = async () => {
+    if (!quizScores) return;
+
+    const mbtiType = [
+      quizScores.mbti.E > quizScores.mbti.I ? "E" : "I",
+      quizScores.mbti.S > quizScores.mbti.N ? "S" : "N",
+      quizScores.mbti.T > quizScores.mbti.F ? "T" : "F",
+      quizScores.mbti.J > quizScores.mbti.P ? "J" : "P",
+    ].join("");
+
+    const shareText = `I discovered my personality path! I'm a ${mbtiType} on KnowRole`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "My KnowRole Result",
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.log("Share cancelled");
+      }
+    } else {
+      await navigator.clipboard.writeText(shareText);
+      toast({
+        title: "Copied to clipboard",
+        description: "Share your result with friends!",
+      });
+    }
   };
 
   const getStepNumber = () => {
@@ -178,6 +246,58 @@ export default function Home() {
     if (theme === "dark") return "dark-mysterious";
     return "light-clinical";
   };
+
+  if (step === "quiz" && ageTier) {
+    return (
+      <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
+        <PathCanvas />
+        <Quiz
+          tier={ageTier}
+          mood={mood}
+          funMode={funMode}
+          landmark={landmark?.landmark}
+          theme={theme}
+          onComplete={handleQuizComplete}
+          onExit={handleQuizExit}
+        />
+        <FeedbackModal
+          isOpen={showFeedback}
+          onClose={() => setShowFeedback(false)}
+          tier={ageTier}
+          selectedTheme={theme}
+        />
+      </div>
+    );
+  }
+
+  if (step === "results" && quizScores && ageTier) {
+    return (
+      <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
+        <PathCanvas />
+        <KnowRoleHeader 
+          theme={theme} 
+          randomTheme={randomTheme} 
+          onThemeChange={handleThemeChange} 
+        />
+        <Results
+          scores={quizScores}
+          tier={ageTier}
+          mood={mood}
+          funMode={funMode}
+          landmark={landmark?.landmark}
+          theme={theme}
+          onRestart={handleRestart}
+          onShare={handleShare}
+        />
+        <FeedbackModal
+          isOpen={showFeedback}
+          onClose={() => setShowFeedback(false)}
+          tier={ageTier}
+          selectedTheme={theme}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
