@@ -5,7 +5,7 @@ import {
   Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame,
   MessageCircle, Frown, Meh, Smile, Lock, Crown, Star, Gift, BookOpen,
   Rocket, Timer, CheckCircle2, Calendar, ArrowRight, Shield, Compass, 
-  Mountain, Sunrise, CircleDot, Play, Building2, DollarSign
+  Mountain, Sunrise, CircleDot, Play, Building2, DollarSign, PartyPopper
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -464,8 +464,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const localeInsight = cityName ? getLocaleInsight(cityName, stateName || undefined) : null;
   
   const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
-  const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
-  const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium);
+  const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">("teaser");
+  const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(false);
+  const [showJokeReveal, setShowJokeReveal] = useState(false);
   
   const [resultsAccurate, setResultsAccurate] = useState<string>("");
   const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
@@ -493,6 +494,17 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     
     if (isTestPremium) {
       console.log('[DEV MODE] Premium features unlocked for testing via ?test_premium=true');
+      // Show joke reveal after 2.5 seconds in test mode
+      const jokeTimer = setTimeout(() => {
+        setShowJokeReveal(true);
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+        setTimeout(() => {
+          setIsPremiumUnlocked(true);
+          setDashboardStage("full");
+          setShowJokeReveal(false);
+        }, 2500);
+      }, 2500);
+      return () => clearTimeout(jokeTimer);
     }
   }, [scores, apiScales, isTestPremium]);
 
@@ -793,6 +805,48 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   return (
     <div className="min-h-screen pb-36 bg-white dark:bg-gray-900">
+      {/* Just Kidding! Joke Reveal Overlay for test mode */}
+      <AnimatePresence>
+        {showJokeReveal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.5, rotate: -10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-8 rounded-3xl shadow-2xl text-center max-w-xs mx-4"
+            >
+              <motion.div
+                animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="text-6xl mb-4"
+              >
+                <PartyPopper className="w-16 h-16 mx-auto text-white" />
+              </motion.div>
+              <h2 className="text-2xl font-bold text-white mb-2">Just Kidding!</h2>
+              <p className="text-lg text-white/90 font-medium mb-4">Premium Unlocked</p>
+              <p className="text-sm text-white/70 mb-5">
+                Enjoy the full experience on us.<br />Love it? Consider a tip!
+              </p>
+              <Button
+                variant="outline"
+                className="bg-white/20 border-white/40 text-white hover:bg-white/30"
+                onClick={() => window.open('https://buy.stripe.com/test_00g4iR5Zz3pz5QA145', '_blank')}
+                data-testid="button-donate-tip"
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Donate Here
+              </Button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
       <header className="pt-10 pb-6 px-4 text-center">
         <motion.div
           initial={shouldReduceMotion ? {} : { scale: 0 }}
