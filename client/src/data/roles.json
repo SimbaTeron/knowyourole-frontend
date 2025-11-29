@@ -1,0 +1,481 @@
+{
+  "roles": {
+    "intp-d-o-high": {
+      "primary": { "title": "Data Scientist", "salary": "$95K-145K", "desc": "Analyze complex datasets to uncover insights and drive decisions" },
+      "secondary": { "title": "Research Analyst", "salary": "$65K-95K", "desc": "Deep-dive into problems with systematic investigation" }
+    },
+    "intj-d-c-high": {
+      "primary": { "title": "Systems Architect", "salary": "$120K-180K", "desc": "Design complex systems with strategic long-term vision" },
+      "secondary": { "title": "Strategic Consultant", "salary": "$90K-150K", "desc": "Solve organizational challenges with analytical frameworks" }
+    },
+    "entp-i-o-high": {
+      "primary": { "title": "Innovation Lead", "salary": "$100K-160K", "desc": "Champion new ideas and drive creative problem-solving" },
+      "secondary": { "title": "Product Strategist", "salary": "$85K-130K", "desc": "Shape product vision with user-centered innovation" }
+    },
+    "entj-d-c-high": {
+      "primary": { "title": "CEO / Founder", "salary": "$150K-500K+", "desc": "Lead organizations with decisive vision and execution" },
+      "secondary": { "title": "Operations Director", "salary": "$110K-170K", "desc": "Optimize business systems for maximum efficiency" }
+    },
+    "infj-s-a-high": {
+      "primary": { "title": "Counselor / Therapist", "salary": "$55K-95K", "desc": "Guide others through personal growth with deep empathy" },
+      "secondary": { "title": "UX Researcher", "salary": "$80K-120K", "desc": "Understand user needs through empathetic inquiry" }
+    },
+    "infp-s-o-high": {
+      "primary": { "title": "Creative Writer", "salary": "$45K-90K", "desc": "Craft meaningful stories that touch hearts and minds" },
+      "secondary": { "title": "Brand Strategist", "salary": "$70K-110K", "desc": "Build authentic brand narratives with creative vision" }
+    },
+    "enfj-i-a-high": {
+      "primary": { "title": "Executive Coach", "salary": "$80K-200K", "desc": "Develop leaders through inspiring mentorship" },
+      "secondary": { "title": "HR Director", "salary": "$95K-150K", "desc": "Build thriving organizational cultures" }
+    },
+    "enfp-i-o-high": {
+      "primary": { "title": "Creative Director", "salary": "$90K-160K", "desc": "Lead creative teams with infectious enthusiasm" },
+      "secondary": { "title": "Marketing Innovator", "salary": "$75K-120K", "desc": "Craft campaigns that capture imagination" }
+    },
+    "istj-c-c-high": {
+      "primary": { "title": "Financial Analyst", "salary": "$70K-120K", "desc": "Master numbers with meticulous precision" },
+      "secondary": { "title": "Compliance Officer", "salary": "$75K-130K", "desc": "Ensure regulatory excellence with systematic care" }
+    },
+    "isfj-s-a-high": {
+      "primary": { "title": "Registered Nurse", "salary": "$60K-95K", "desc": "Provide compassionate care with dedicated service" },
+      "secondary": { "title": "Customer Success Manager", "salary": "$65K-100K", "desc": "Build lasting relationships through attentive support" }
+    },
+    "estj-d-c-high": {
+      "primary": { "title": "Project Manager", "salary": "$75K-130K", "desc": "Drive projects to completion with organized leadership" },
+      "secondary": { "title": "Operations Manager", "salary": "$70K-115K", "desc": "Streamline processes for peak performance" }
+    },
+    "esfj-i-a-high": {
+      "primary": { "title": "Event Coordinator", "salary": "$50K-85K", "desc": "Create memorable experiences with social finesse" },
+      "secondary": { "title": "Community Manager", "salary": "$55K-90K", "desc": "Foster vibrant communities with warmth" }
+    },
+    "istp-d-o-high": {
+      "primary": { "title": "Software Engineer", "salary": "$90K-160K", "desc": "Build elegant solutions with hands-on expertise" },
+      "secondary": { "title": "Mechanical Engineer", "salary": "$75K-120K", "desc": "Design practical systems with technical mastery" }
+    },
+    "isfp-s-o-high": {
+      "primary": { "title": "Graphic Designer", "salary": "$50K-90K", "desc": "Express ideas through visual artistry" },
+      "secondary": { "title": "Interior Designer", "salary": "$55K-95K", "desc": "Create harmonious spaces with aesthetic sensitivity" }
+    },
+    "estp-d-e-high": {
+      "primary": { "title": "Sales Director", "salary": "$85K-180K", "desc": "Close deals with charismatic persuasion" },
+      "secondary": { "title": "Entrepreneur", "salary": "$40K-500K+", "desc": "Seize opportunities with bold action" }
+    },
+    "esfp-i-e-high": {
+      "primary": { "title": "Entertainment Producer", "salary": "$60K-150K", "desc": "Create engaging experiences that captivate audiences" },
+      "secondary": { "title": "Brand Ambassador", "salary": "$45K-100K", "desc": "Connect with audiences through authentic presence" }
+    },
+    "intp-c-o-high": {
+      "primary": { "title": "AI Research Scientist", "salary": "$120K-220K", "desc": "Pioneer machine learning breakthroughs" },
+      "secondary": { "title": "Algorithm Developer", "salary": "$100K-170K", "desc": "Design elegant computational solutions" }
+    },
+    "intj-c-o-high": {
+      "primary": { "title": "Blockchain Architect", "salary": "$130K-200K", "desc": "Design decentralized systems with strategic vision" },
+      "secondary": { "title": "Quantitative Analyst", "salary": "$110K-180K", "desc": "Model complex financial systems" }
+    },
+    "entp-d-o-high": {
+      "primary": { "title": "Startup Founder", "salary": "$50K-1M+", "desc": "Disrupt industries with innovative ventures" },
+      "secondary": { "title": "Venture Capitalist", "salary": "$150K-500K+", "desc": "Identify and fund breakthrough ideas" }
+    },
+    "entj-c-c-high": {
+      "primary": { "title": "Management Consultant", "salary": "$100K-250K", "desc": "Transform organizations with strategic excellence" },
+      "secondary": { "title": "Investment Banker", "salary": "$120K-400K", "desc": "Drive major deals with decisive leadership" }
+    },
+    "infj-c-o-high": {
+      "primary": { "title": "Clinical Psychologist", "salary": "$80K-130K", "desc": "Heal minds with insightful understanding" },
+      "secondary": { "title": "Documentary Filmmaker", "salary": "$50K-120K", "desc": "Tell meaningful stories that inspire change" }
+    },
+    "infp-i-o-high": {
+      "primary": { "title": "Game Narrative Designer", "salary": "$60K-110K", "desc": "Craft immersive story worlds with imagination" },
+      "secondary": { "title": "Podcast Producer", "salary": "$45K-85K", "desc": "Create meaningful audio experiences" }
+    },
+    "enfj-d-a-high": {
+      "primary": { "title": "Nonprofit Director", "salary": "$70K-140K", "desc": "Lead mission-driven organizations with passion" },
+      "secondary": { "title": "Political Strategist", "salary": "$75K-150K", "desc": "Shape public discourse with persuasive vision" }
+    },
+    "enfp-d-o-high": {
+      "primary": { "title": "Innovation Consultant", "salary": "$85K-160K", "desc": "Transform organizations with creative disruption" },
+      "secondary": { "title": "Talent Scout", "salary": "$60K-120K", "desc": "Discover potential with intuitive insight" }
+    },
+    "istj-d-c-high": {
+      "primary": { "title": "Auditor", "salary": "$65K-120K", "desc": "Ensure accuracy with unwavering attention to detail" },
+      "secondary": { "title": "Quality Assurance Lead", "salary": "$70K-110K", "desc": "Maintain standards with systematic precision" }
+    },
+    "isfj-c-a-high": {
+      "primary": { "title": "Medical Records Specialist", "salary": "$45K-70K", "desc": "Organize critical data with meticulous care" },
+      "secondary": { "title": "Administrative Manager", "salary": "$55K-85K", "desc": "Keep operations running smoothly" }
+    },
+    "estj-i-c-high": {
+      "primary": { "title": "Sales Manager", "salary": "$70K-140K", "desc": "Lead teams to exceed targets with organized drive" },
+      "secondary": { "title": "Franchise Owner", "salary": "$60K-200K+", "desc": "Build business empires with proven systems" }
+    },
+    "esfj-s-a-high": {
+      "primary": { "title": "Social Worker", "salary": "$45K-75K", "desc": "Support communities with compassionate dedication" },
+      "secondary": { "title": "Patient Advocate", "salary": "$50K-80K", "desc": "Champion healthcare needs with empathy" }
+    },
+    "istp-c-o-high": {
+      "primary": { "title": "Cybersecurity Analyst", "salary": "$85K-150K", "desc": "Protect systems with analytical vigilance" },
+      "secondary": { "title": "Forensic Technician", "salary": "$55K-90K", "desc": "Uncover evidence with methodical investigation" }
+    },
+    "isfp-i-o-high": {
+      "primary": { "title": "Photographer", "salary": "$40K-100K", "desc": "Capture moments with artistic vision" },
+      "secondary": { "title": "Florist", "salary": "$30K-60K", "desc": "Create beauty through natural artistry" }
+    },
+    "estp-i-e-high": {
+      "primary": { "title": "Real Estate Agent", "salary": "$50K-200K+", "desc": "Close deals with persuasive energy" },
+      "secondary": { "title": "Sports Coach", "salary": "$40K-100K", "desc": "Inspire peak performance with dynamic leadership" }
+    },
+    "esfp-s-e-high": {
+      "primary": { "title": "Flight Attendant", "salary": "$45K-80K", "desc": "Create positive experiences with social warmth" },
+      "secondary": { "title": "Tour Guide", "salary": "$35K-65K", "desc": "Share experiences with infectious enthusiasm" }
+    },
+    "intp-s-o-high": {
+      "primary": { "title": "Technical Writer", "salary": "$65K-100K", "desc": "Translate complex ideas with clarity" },
+      "secondary": { "title": "Patent Examiner", "salary": "$70K-110K", "desc": "Analyze innovations with intellectual rigor" }
+    },
+    "intj-s-o-high": {
+      "primary": { "title": "Urban Planner", "salary": "$65K-105K", "desc": "Design city futures with strategic foresight" },
+      "secondary": { "title": "Policy Analyst", "salary": "$60K-100K", "desc": "Shape governance with analytical insight" }
+    },
+    "trades-d-c-high": {
+      "primary": { "title": "Master Electrician", "salary": "$55K-95K", "desc": "Power buildings with skilled expertise" },
+      "secondary": { "title": "HVAC Technician", "salary": "$50K-85K", "desc": "Control climates with technical mastery" }
+    },
+    "trades-s-c-high": {
+      "primary": { "title": "Plumber", "salary": "$50K-90K", "desc": "Solve essential problems with hands-on skill" },
+      "secondary": { "title": "Welder", "salary": "$45K-80K", "desc": "Join metals with precision craftsmanship" }
+    },
+    "trades-d-o-high": {
+      "primary": { "title": "General Contractor", "salary": "$60K-150K+", "desc": "Lead construction projects with decisive action" },
+      "secondary": { "title": "Heavy Equipment Operator", "salary": "$50K-85K", "desc": "Move earth with powerful precision" }
+    },
+    "trades-i-c-high": {
+      "primary": { "title": "Auto Mechanic", "salary": "$40K-75K", "desc": "Diagnose and fix vehicles with technical skill" },
+      "secondary": { "title": "Appliance Repair Tech", "salary": "$35K-65K", "desc": "Restore function with practical expertise" }
+    },
+    "artistic-o-high": {
+      "primary": { "title": "Fine Artist", "salary": "$35K-100K+", "desc": "Express vision through creative mastery" },
+      "secondary": { "title": "Art Director", "salary": "$75K-140K", "desc": "Lead visual storytelling with artistic authority" }
+    },
+    "artistic-e-high": {
+      "primary": { "title": "Actor / Performer", "salary": "$30K-500K+", "desc": "Captivate audiences with expressive talent" },
+      "secondary": { "title": "Voice Artist", "salary": "$40K-150K", "desc": "Bring characters to life through voice" }
+    },
+    "artistic-a-high": {
+      "primary": { "title": "Music Therapist", "salary": "$50K-80K", "desc": "Heal through the power of music" },
+      "secondary": { "title": "Art Therapist", "salary": "$50K-75K", "desc": "Facilitate healing through creative expression" }
+    },
+    "artistic-c-high": {
+      "primary": { "title": "Classical Musician", "salary": "$40K-120K", "desc": "Master instruments with disciplined artistry" },
+      "secondary": { "title": "Animator", "salary": "$55K-100K", "desc": "Bring stories to life frame by frame" }
+    },
+    "ai-d-o-high": {
+      "primary": { "title": "AI Product Manager", "salary": "$130K-200K", "desc": "Shape AI products with visionary leadership" },
+      "secondary": { "title": "ML Engineering Lead", "salary": "$150K-250K", "desc": "Build AI systems that scale" }
+    },
+    "ai-c-o-high": {
+      "primary": { "title": "Deep Learning Researcher", "salary": "$140K-280K", "desc": "Push the frontiers of artificial intelligence" },
+      "secondary": { "title": "Computer Vision Engineer", "salary": "$120K-200K", "desc": "Teach machines to see and understand" }
+    },
+    "ai-i-o-high": {
+      "primary": { "title": "AI Ethics Consultant", "salary": "$90K-160K", "desc": "Guide responsible AI development" },
+      "secondary": { "title": "NLP Specialist", "salary": "$110K-180K", "desc": "Build systems that understand language" }
+    },
+    "ai-s-c-high": {
+      "primary": { "title": "MLOps Engineer", "salary": "$100K-170K", "desc": "Deploy and maintain AI at scale" },
+      "secondary": { "title": "Data Engineer", "salary": "$95K-155K", "desc": "Build pipelines that power AI" }
+    },
+    "tech-d-o-high": {
+      "primary": { "title": "CTO", "salary": "$150K-350K+", "desc": "Lead technical vision with strategic authority" },
+      "secondary": { "title": "Engineering Manager", "salary": "$140K-220K", "desc": "Build and lead high-performing teams" }
+    },
+    "tech-c-o-high": {
+      "primary": { "title": "Principal Engineer", "salary": "$180K-350K", "desc": "Solve the hardest technical challenges" },
+      "secondary": { "title": "Staff Architect", "salary": "$160K-280K", "desc": "Design systems that scale globally" }
+    },
+    "tech-i-o-high": {
+      "primary": { "title": "Developer Advocate", "salary": "$100K-180K", "desc": "Bridge engineering and community" },
+      "secondary": { "title": "Tech Educator", "salary": "$70K-130K", "desc": "Inspire the next generation of builders" }
+    },
+    "tech-s-c-high": {
+      "primary": { "title": "Site Reliability Engineer", "salary": "$120K-200K", "desc": "Keep systems running with disciplined care" },
+      "secondary": { "title": "DevOps Engineer", "salary": "$100K-170K", "desc": "Automate everything with systematic precision" }
+    },
+    "healthcare-s-a-high": {
+      "primary": { "title": "Physician", "salary": "$200K-400K+", "desc": "Heal patients with expertise and compassion" },
+      "secondary": { "title": "Pharmacist", "salary": "$120K-160K", "desc": "Ensure medication safety with meticulous care" }
+    },
+    "healthcare-i-a-high": {
+      "primary": { "title": "Physical Therapist", "salary": "$75K-100K", "desc": "Restore movement through patient partnership" },
+      "secondary": { "title": "Occupational Therapist", "salary": "$75K-100K", "desc": "Enable daily living through adaptive solutions" }
+    },
+    "healthcare-d-c-high": {
+      "primary": { "title": "Surgeon", "salary": "$300K-600K+", "desc": "Transform lives with precise intervention" },
+      "secondary": { "title": "Radiologist", "salary": "$350K-500K", "desc": "Diagnose through imaging expertise" }
+    },
+    "healthcare-c-a-high": {
+      "primary": { "title": "Lab Technician", "salary": "$45K-70K", "desc": "Analyze samples with scientific precision" },
+      "secondary": { "title": "Medical Coder", "salary": "$45K-65K", "desc": "Translate care into accurate documentation" }
+    },
+    "education-i-a-high": {
+      "primary": { "title": "High School Teacher", "salary": "$50K-80K", "desc": "Shape young minds with inspiring guidance" },
+      "secondary": { "title": "School Counselor", "salary": "$55K-85K", "desc": "Support student wellbeing and growth" }
+    },
+    "education-d-o-high": {
+      "primary": { "title": "University Professor", "salary": "$70K-150K", "desc": "Advance knowledge through research and teaching" },
+      "secondary": { "title": "Department Chair", "salary": "$90K-170K", "desc": "Lead academic excellence with vision" }
+    },
+    "education-s-a-high": {
+      "primary": { "title": "Special Education Teacher", "salary": "$50K-75K", "desc": "Adapt learning for every unique mind" },
+      "secondary": { "title": "Early Childhood Educator", "salary": "$35K-55K", "desc": "Nurture foundations of lifelong learning" }
+    },
+    "education-c-o-high": {
+      "primary": { "title": "Curriculum Developer", "salary": "$60K-100K", "desc": "Design learning experiences with precision" },
+      "secondary": { "title": "Educational Technologist", "salary": "$65K-110K", "desc": "Transform learning through innovation" }
+    },
+    "finance-d-c-high": {
+      "primary": { "title": "Portfolio Manager", "salary": "$120K-300K+", "desc": "Grow wealth with strategic precision" },
+      "secondary": { "title": "Risk Analyst", "salary": "$80K-140K", "desc": "Protect assets through careful analysis" }
+    },
+    "finance-c-c-high": {
+      "primary": { "title": "Actuary", "salary": "$100K-180K", "desc": "Quantify uncertainty with mathematical rigor" },
+      "secondary": { "title": "Tax Specialist", "salary": "$65K-130K", "desc": "Navigate regulations with expert precision" }
+    },
+    "finance-i-c-high": {
+      "primary": { "title": "Financial Advisor", "salary": "$60K-200K+", "desc": "Guide financial journeys with trusted counsel" },
+      "secondary": { "title": "Insurance Agent", "salary": "$45K-120K+", "desc": "Protect futures through thoughtful planning" }
+    },
+    "finance-s-c-high": {
+      "primary": { "title": "Bookkeeper", "salary": "$40K-60K", "desc": "Maintain records with reliable precision" },
+      "secondary": { "title": "Payroll Specialist", "salary": "$45K-65K", "desc": "Ensure accurate compensation with care" }
+    },
+    "legal-d-c-high": {
+      "primary": { "title": "Trial Attorney", "salary": "$80K-300K+", "desc": "Advocate with commanding courtroom presence" },
+      "secondary": { "title": "Corporate Counsel", "salary": "$120K-250K", "desc": "Protect business interests with legal acumen" }
+    },
+    "legal-c-c-high": {
+      "primary": { "title": "Patent Attorney", "salary": "$150K-300K", "desc": "Secure innovations with technical legal expertise" },
+      "secondary": { "title": "Contract Specialist", "salary": "$70K-120K", "desc": "Draft agreements with meticulous precision" }
+    },
+    "legal-i-a-high": {
+      "primary": { "title": "Mediator", "salary": "$60K-150K", "desc": "Resolve conflicts with diplomatic skill" },
+      "secondary": { "title": "Family Law Attorney", "salary": "$70K-150K", "desc": "Navigate personal matters with compassion" }
+    },
+    "legal-s-c-high": {
+      "primary": { "title": "Paralegal", "salary": "$45K-75K", "desc": "Support legal work with organized expertise" },
+      "secondary": { "title": "Court Reporter", "salary": "$45K-80K", "desc": "Capture proceedings with precise accuracy" }
+    },
+    "marketing-i-o-high": {
+      "primary": { "title": "Brand Manager", "salary": "$75K-140K", "desc": "Shape perceptions with creative strategy" },
+      "secondary": { "title": "Social Media Director", "salary": "$65K-120K", "desc": "Build communities with engaging content" }
+    },
+    "marketing-d-o-high": {
+      "primary": { "title": "CMO", "salary": "$150K-350K+", "desc": "Drive growth with visionary marketing" },
+      "secondary": { "title": "Growth Hacker", "salary": "$80K-160K", "desc": "Scale rapidly with data-driven tactics" }
+    },
+    "marketing-c-o-high": {
+      "primary": { "title": "Market Researcher", "salary": "$60K-100K", "desc": "Uncover insights with analytical depth" },
+      "secondary": { "title": "SEO Specialist", "salary": "$55K-95K", "desc": "Optimize visibility with technical precision" }
+    },
+    "marketing-s-a-high": {
+      "primary": { "title": "Public Relations Specialist", "salary": "$55K-100K", "desc": "Shape narratives with diplomatic finesse" },
+      "secondary": { "title": "Customer Insights Analyst", "salary": "$60K-95K", "desc": "Understand audiences with empathetic research" }
+    },
+    "science-c-o-high": {
+      "primary": { "title": "Research Scientist", "salary": "$70K-140K", "desc": "Discover truths through rigorous inquiry" },
+      "secondary": { "title": "Biotech Researcher", "salary": "$80K-150K", "desc": "Advance medicine through innovation" }
+    },
+    "science-d-o-high": {
+      "primary": { "title": "Lab Director", "salary": "$100K-180K", "desc": "Lead research with strategic vision" },
+      "secondary": { "title": "Principal Investigator", "salary": "$90K-160K", "desc": "Drive discovery with ambitious inquiry" }
+    },
+    "science-s-c-high": {
+      "primary": { "title": "Quality Control Scientist", "salary": "$55K-90K", "desc": "Ensure standards with methodical precision" },
+      "secondary": { "title": "Clinical Trial Coordinator", "salary": "$55K-85K", "desc": "Manage trials with organized care" }
+    },
+    "science-i-o-high": {
+      "primary": { "title": "Science Communicator", "salary": "$50K-90K", "desc": "Translate discoveries for public understanding" },
+      "secondary": { "title": "Museum Curator", "salary": "$50K-85K", "desc": "Share knowledge through engaging exhibits" }
+    },
+    "creative-o-high": {
+      "primary": { "title": "UX Designer", "salary": "$80K-140K", "desc": "Craft intuitive experiences with human insight" },
+      "secondary": { "title": "Product Designer", "salary": "$90K-160K", "desc": "Shape products with user-centered vision" }
+    },
+    "creative-e-high": {
+      "primary": { "title": "Video Producer", "salary": "$55K-110K", "desc": "Tell stories through compelling visuals" },
+      "secondary": { "title": "Content Creator", "salary": "$40K-200K+", "desc": "Build audiences with authentic expression" }
+    },
+    "creative-c-high": {
+      "primary": { "title": "Motion Designer", "salary": "$65K-120K", "desc": "Bring graphics to life with precision" },
+      "secondary": { "title": "3D Artist", "salary": "$55K-110K", "desc": "Build worlds with digital craftsmanship" }
+    },
+    "creative-a-high": {
+      "primary": { "title": "Copywriter", "salary": "$55K-100K", "desc": "Craft words that connect and convert" },
+      "secondary": { "title": "Content Strategist", "salary": "$70K-120K", "desc": "Plan narratives with purposeful vision" }
+    },
+    "service-s-a-high": {
+      "primary": { "title": "Hospitality Manager", "salary": "$50K-90K", "desc": "Create welcoming experiences with warmth" },
+      "secondary": { "title": "Concierge", "salary": "$35K-60K", "desc": "Anticipate needs with attentive service" }
+    },
+    "service-i-e-high": {
+      "primary": { "title": "Restaurant Manager", "salary": "$45K-80K", "desc": "Lead dining experiences with social flair" },
+      "secondary": { "title": "Bartender", "salary": "$30K-70K+", "desc": "Mix drinks and conversations with charm" }
+    },
+    "service-d-s-high": {
+      "primary": { "title": "Retail Manager", "salary": "$45K-75K", "desc": "Drive sales with organized leadership" },
+      "secondary": { "title": "Personal Shopper", "salary": "$35K-80K+", "desc": "Curate style with attentive expertise" }
+    },
+    "service-c-a-high": {
+      "primary": { "title": "Customer Service Lead", "salary": "$40K-65K", "desc": "Resolve issues with patient precision" },
+      "secondary": { "title": "Help Desk Specialist", "salary": "$40K-60K", "desc": "Support users with systematic care" }
+    },
+    "outdoor-d-o-high": {
+      "primary": { "title": "Park Ranger", "salary": "$40K-70K", "desc": "Protect nature with dedicated stewardship" },
+      "secondary": { "title": "Wilderness Guide", "salary": "$35K-65K", "desc": "Lead adventures with outdoor expertise" }
+    },
+    "outdoor-s-c-high": {
+      "primary": { "title": "Arborist", "salary": "$40K-75K", "desc": "Care for trees with skilled precision" },
+      "secondary": { "title": "Landscaper", "salary": "$35K-60K", "desc": "Shape outdoor spaces with practical artistry" }
+    },
+    "outdoor-i-a-high": {
+      "primary": { "title": "Environmental Educator", "salary": "$40K-65K", "desc": "Inspire environmental awareness" },
+      "secondary": { "title": "Wildlife Rehabilitator", "salary": "$30K-50K", "desc": "Heal animals with patient compassion" }
+    },
+    "outdoor-c-o-high": {
+      "primary": { "title": "Marine Biologist", "salary": "$50K-90K", "desc": "Study ocean life with scientific curiosity" },
+      "secondary": { "title": "Environmental Scientist", "salary": "$55K-95K", "desc": "Protect ecosystems through research" }
+    },
+    "sports-d-e-high": {
+      "primary": { "title": "Athletic Director", "salary": "$70K-150K", "desc": "Lead sports programs with dynamic vision" },
+      "secondary": { "title": "Team Manager", "salary": "$50K-100K", "desc": "Coordinate athletic operations with energy" }
+    },
+    "sports-i-e-high": {
+      "primary": { "title": "Personal Trainer", "salary": "$40K-90K", "desc": "Transform fitness with motivating energy" },
+      "secondary": { "title": "Sports Agent", "salary": "$60K-500K+", "desc": "Represent athletes with persuasive advocacy" }
+    },
+    "sports-s-a-high": {
+      "primary": { "title": "Athletic Trainer", "salary": "$45K-75K", "desc": "Prevent and heal sports injuries with care" },
+      "secondary": { "title": "Yoga Instructor", "salary": "$35K-75K", "desc": "Guide wellness with mindful presence" }
+    },
+    "sports-c-c-high": {
+      "primary": { "title": "Sports Analyst", "salary": "$50K-100K", "desc": "Decode performance through data" },
+      "secondary": { "title": "Referee", "salary": "$30K-75K", "desc": "Ensure fair play with impartial precision" }
+    },
+    "government-d-c-high": {
+      "primary": { "title": "City Manager", "salary": "$90K-180K", "desc": "Lead municipalities with organized authority" },
+      "secondary": { "title": "Policy Director", "salary": "$80K-140K", "desc": "Shape public policy with strategic vision" }
+    },
+    "government-s-a-high": {
+      "primary": { "title": "Social Services Director", "salary": "$60K-100K", "desc": "Coordinate community support with compassion" },
+      "secondary": { "title": "Veterans Affairs Specialist", "salary": "$50K-80K", "desc": "Support those who served with dedication" }
+    },
+    "government-c-c-high": {
+      "primary": { "title": "Budget Analyst", "salary": "$60K-100K", "desc": "Allocate resources with analytical precision" },
+      "secondary": { "title": "Grants Manager", "salary": "$55K-90K", "desc": "Manage funding with meticulous oversight" }
+    },
+    "government-i-a-high": {
+      "primary": { "title": "Diplomat", "salary": "$70K-150K+", "desc": "Bridge nations with cultural intelligence" },
+      "secondary": { "title": "Legislative Aide", "salary": "$40K-75K", "desc": "Support lawmakers with research and advocacy" }
+    },
+    "security-d-c-high": {
+      "primary": { "title": "Security Director", "salary": "$90K-160K", "desc": "Protect organizations with strategic vigilance" },
+      "secondary": { "title": "Intelligence Analyst", "salary": "$70K-120K", "desc": "Assess threats with analytical precision" }
+    },
+    "security-s-c-high": {
+      "primary": { "title": "Police Officer", "salary": "$50K-85K", "desc": "Protect and serve with steady dedication" },
+      "secondary": { "title": "Firefighter", "salary": "$45K-80K", "desc": "Respond to emergencies with brave action" }
+    },
+    "security-c-c-high": {
+      "primary": { "title": "Fraud Investigator", "salary": "$60K-100K", "desc": "Uncover deception with methodical analysis" },
+      "secondary": { "title": "Compliance Analyst", "salary": "$60K-95K", "desc": "Ensure adherence with systematic review" }
+    },
+    "security-i-a-high": {
+      "primary": { "title": "Crisis Negotiator", "salary": "$65K-110K", "desc": "Resolve standoffs with psychological insight" },
+      "secondary": { "title": "Victim Advocate", "salary": "$40K-65K", "desc": "Support survivors with compassionate care" }
+    },
+    "food-o-high": {
+      "primary": { "title": "Executive Chef", "salary": "$60K-120K", "desc": "Create culinary masterpieces with creative vision" },
+      "secondary": { "title": "Food Stylist", "salary": "$45K-90K", "desc": "Make food visually stunning" }
+    },
+    "food-c-high": {
+      "primary": { "title": "Pastry Chef", "salary": "$45K-80K", "desc": "Craft desserts with precise artistry" },
+      "secondary": { "title": "Sommelier", "salary": "$50K-100K", "desc": "Guide wine selections with refined expertise" }
+    },
+    "food-d-high": {
+      "primary": { "title": "Restaurant Owner", "salary": "$50K-200K+", "desc": "Build dining empires with entrepreneurial drive" },
+      "secondary": { "title": "Catering Director", "salary": "$50K-90K", "desc": "Coordinate events with organized leadership" }
+    },
+    "food-s-high": {
+      "primary": { "title": "Nutritionist", "salary": "$50K-80K", "desc": "Guide healthy eating with supportive expertise" },
+      "secondary": { "title": "Food Safety Inspector", "salary": "$45K-75K", "desc": "Protect public health with careful vigilance" }
+    },
+    "media-i-o-high": {
+      "primary": { "title": "Journalist", "salary": "$45K-90K", "desc": "Uncover stories with investigative curiosity" },
+      "secondary": { "title": "Podcast Host", "salary": "$40K-200K+", "desc": "Engage audiences with compelling conversation" }
+    },
+    "media-d-o-high": {
+      "primary": { "title": "News Director", "salary": "$80K-150K", "desc": "Lead newsrooms with editorial vision" },
+      "secondary": { "title": "Media Executive", "salary": "$120K-300K+", "desc": "Shape media strategy with commanding authority" }
+    },
+    "media-c-o-high": {
+      "primary": { "title": "Film Editor", "salary": "$55K-120K", "desc": "Craft narratives through precise cutting" },
+      "secondary": { "title": "Sound Designer", "salary": "$50K-100K", "desc": "Create immersive audio experiences" }
+    },
+    "media-s-a-high": {
+      "primary": { "title": "Casting Director", "salary": "$60K-150K", "desc": "Match talent with roles through intuitive insight" },
+      "secondary": { "title": "Publicist", "salary": "$50K-120K", "desc": "Shape public image with diplomatic skill" }
+    },
+    "transport-d-c-high": {
+      "primary": { "title": "Airline Pilot", "salary": "$100K-250K+", "desc": "Command aircraft with precise authority" },
+      "secondary": { "title": "Ship Captain", "salary": "$80K-150K", "desc": "Navigate vessels with commanding expertise" }
+    },
+    "transport-s-c-high": {
+      "primary": { "title": "Truck Driver", "salary": "$45K-75K", "desc": "Keep goods moving with reliable dedication" },
+      "secondary": { "title": "Delivery Driver", "salary": "$35K-55K", "desc": "Connect customers with systematic service" }
+    },
+    "transport-c-c-high": {
+      "primary": { "title": "Air Traffic Controller", "salary": "$90K-180K", "desc": "Coordinate flights with unwavering precision" },
+      "secondary": { "title": "Logistics Coordinator", "salary": "$45K-75K", "desc": "Optimize supply chains with analytical care" }
+    },
+    "transport-i-s-high": {
+      "primary": { "title": "Bus Driver", "salary": "$35K-55K", "desc": "Transport communities with steady reliability" },
+      "secondary": { "title": "Rideshare Driver", "salary": "$30K-60K", "desc": "Connect people with flexible service" }
+    },
+    "default": {
+      "primary": { "title": "Career Explorer", "salary": "Varies", "desc": "Discover your unique path through self-reflection" },
+      "secondary": { "title": "Skill Builder", "salary": "Varies", "desc": "Develop versatile abilities for any direction" }
+    }
+  },
+  "traitDescriptions": {
+    "mbti": {
+      "INTJ": { "label": "Architect", "desc": "Strategic visionary with independent drive" },
+      "INTP": { "label": "Logician", "desc": "Curious solver who loves complex puzzles" },
+      "ENTJ": { "label": "Commander", "desc": "Bold leader who drives results" },
+      "ENTP": { "label": "Debater", "desc": "Innovative thinker who challenges norms" },
+      "INFJ": { "label": "Advocate", "desc": "Insightful idealist with quiet determination" },
+      "INFP": { "label": "Mediator", "desc": "Empathetic dreamer seeking authentic meaning" },
+      "ENFJ": { "label": "Protagonist", "desc": "Inspiring leader who uplifts others" },
+      "ENFP": { "label": "Campaigner", "desc": "Enthusiastic creative with infectious energy" },
+      "ISTJ": { "label": "Logistician", "desc": "Reliable organizer who values tradition" },
+      "ISFJ": { "label": "Defender", "desc": "Dedicated protector with warm heart" },
+      "ESTJ": { "label": "Executive", "desc": "Efficient administrator who gets things done" },
+      "ESFJ": { "label": "Consul", "desc": "Caring connector who builds community" },
+      "ISTP": { "label": "Virtuoso", "desc": "Practical experimenter with cool precision" },
+      "ISFP": { "label": "Adventurer", "desc": "Flexible artist with quiet sensitivity" },
+      "ESTP": { "label": "Entrepreneur", "desc": "Energetic doer who seizes opportunities" },
+      "ESFP": { "label": "Entertainer", "desc": "Spontaneous performer who loves life" }
+    },
+    "disc": {
+      "D": { "label": "Dominance", "color": "terracotta", "desc": "Direct, decisive, and driven by results" },
+      "I": { "label": "Influence", "color": "amber", "desc": "Enthusiastic, optimistic, and people-oriented" },
+      "S": { "label": "Steadiness", "color": "sage-green", "desc": "Patient, reliable, and team-focused" },
+      "C": { "label": "Conscientiousness", "color": "dusty-blue", "desc": "Analytical, precise, and quality-driven" }
+    },
+    "bigFive": {
+      "O": { "label": "Openness", "desc": "Curiosity and creativity", "low": "Practical & consistent", "high": "Imaginative & curious" },
+      "C": { "label": "Conscientiousness", "desc": "Organization and reliability", "low": "Flexible & spontaneous", "high": "Organized & disciplined" },
+      "E": { "label": "Extraversion", "desc": "Social energy and assertiveness", "low": "Reserved & reflective", "high": "Outgoing & energetic" },
+      "A": { "label": "Agreeableness", "desc": "Cooperation and empathy", "low": "Competitive & direct", "high": "Cooperative & trusting" },
+      "N": { "label": "Neuroticism", "desc": "Emotional sensitivity", "low": "Calm & resilient", "high": "Sensitive & aware" }
+    }
+  }
+}
