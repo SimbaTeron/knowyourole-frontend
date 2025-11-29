@@ -8,6 +8,8 @@ import questionsData from "@/data/questions.json";
 interface Question {
   id: number;
   prompt: string;
+  leftDesc: string;
+  rightDesc: string;
   options: [string, string];
   optionMeta: [string, string];
   psych: string;
@@ -55,44 +57,26 @@ const SWIPE_THRESHOLD = 100;
 const ROTATION_RANGE = 15;
 
 const TIMEOUT_QUIPS = [
-  { quip: "Time flies when you're pondering!", emoji: "clock" },
-  { quip: "The universe chose for you this time", emoji: "sparkle" },
-  { quip: "Sometimes the best choice is a surprise", emoji: "gift" },
-  { quip: "Going with the cosmic flow on this one", emoji: "star" },
-  { quip: "Your future self just picked for you", emoji: "crystal" },
-  { quip: "Let fate decide this fork in the road", emoji: "path" },
-  { quip: "Even quick-thinkers need a breather", emoji: "leaf" },
-  { quip: "The timer won, but you're still winning", emoji: "trophy" },
+  { quip: "Time flies when you're pondering!" },
+  { quip: "The universe chose for you this time" },
+  { quip: "Sometimes the best choice is a surprise" },
+  { quip: "Going with the cosmic flow on this one" },
+  { quip: "Your future self just picked for you" },
+  { quip: "Let fate decide this fork in the road" },
+  { quip: "Even quick-thinkers need a breather" },
+  { quip: "The timer won, but you're still winning" },
 ];
 
 const READABLE_RANDOM_COLORS = [
-  { text: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500/10" },
-  { text: "text-cyan-700 dark:text-cyan-300", bg: "bg-cyan-500/10" },
-  { text: "text-emerald-700 dark:text-emerald-400", bg: "bg-emerald-500/10" },
-  { text: "text-pink-600 dark:text-pink-400", bg: "bg-pink-500/10" },
-  { text: "text-amber-700 dark:text-amber-400", bg: "bg-amber-500/10" },
-  { text: "text-violet-600 dark:text-violet-400", bg: "bg-violet-500/10" },
-  { text: "text-rose-600 dark:text-rose-400", bg: "bg-rose-500/10" },
-  { text: "text-teal-700 dark:text-teal-400", bg: "bg-teal-500/10" },
+  { accent: "bg-orange-500", text: "text-white" },
+  { accent: "bg-cyan-600", text: "text-white" },
+  { accent: "bg-emerald-600", text: "text-white" },
+  { accent: "bg-pink-500", text: "text-white" },
+  { accent: "bg-amber-500", text: "text-black" },
+  { accent: "bg-violet-600", text: "text-white" },
+  { accent: "bg-rose-500", text: "text-white" },
+  { accent: "bg-teal-600", text: "text-white" },
 ];
-
-function parsePrompt(prompt: string): { topic: string; question: string } {
-  const colonIndex = prompt.indexOf(":");
-  if (colonIndex > 0 && colonIndex < 30) {
-    return {
-      topic: prompt.slice(0, colonIndex + 1),
-      question: prompt.slice(colonIndex + 1).trim()
-    };
-  }
-  const words = prompt.split(" ");
-  if (words.length > 3) {
-    return {
-      topic: words.slice(0, 2).join(" ") + ":",
-      question: words.slice(2).join(" ")
-    };
-  }
-  return { topic: "", question: prompt };
-}
 
 export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
   const tierConfig = questionsData.tierConfig[tier as keyof typeof questionsData.tierConfig] || questionsData.tierConfig["19-25"];
@@ -318,10 +302,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const timerProgress = (timeRemaining / currentQuestion.time) * 100;
-  const { topic, question: questionText } = parsePrompt(currentQuestion.prompt);
   
-  const topicColor = isRandomTheme 
-    ? READABLE_RANDOM_COLORS[vibrantColorIndex].text 
+  const randomColor = READABLE_RANDOM_COLORS[vibrantColorIndex];
+  const promptColor = isRandomTheme 
+    ? `${randomColor.accent} ${randomColor.text} px-3 py-1 rounded-lg inline-block` 
     : "text-sage-green";
 
   return (
@@ -375,8 +359,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-32">
-        <div className="relative w-full max-w-sm h-[420px]">
+      <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-24">
+        <div className="relative w-full max-w-sm h-[480px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentQuestion.id}
@@ -420,67 +404,67 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                     style={{ opacity: rightOpacity }}
                   />
                   
-                  <div className="relative z-10 flex flex-col items-center justify-between h-full p-6 pt-8 pb-6">
-                    <div className="text-center flex-1 flex flex-col justify-center">
+                  <div className="relative z-10 flex flex-col h-full p-5">
+                    <div className="text-center mb-4">
                       {currentQuestion.wildcard && (
                         <motion.div
                           initial={{ y: -10, opacity: 0 }}
                           animate={{ y: 0, opacity: 1 }}
-                          className="mb-3 px-3 py-1 rounded-full bg-dusty-blue/10 text-dusty-blue text-xs font-medium inline-block mx-auto"
+                          className="mb-2 px-3 py-1 rounded-full bg-dusty-blue/10 text-dusty-blue text-xs font-medium inline-block"
                         >
                           Wildcard
                         </motion.div>
                       )}
                       
-                      {topic && (
-                        <h2 
-                          className={`text-base font-semibold mb-3 ${topicColor}`}
-                          data-testid="text-topic"
-                        >
-                          {topic}
-                        </h2>
-                      )}
-                      
-                      <p 
-                        className="text-xl md:text-2xl font-display text-warm-gray dark:text-soft-cream leading-relaxed opacity-90"
-                        data-testid="text-question"
+                      <h2 
+                        className={`text-base font-semibold ${promptColor}`}
+                        data-testid="text-prompt"
                       >
-                        {questionText}
-                      </p>
+                        {currentQuestion.prompt}
+                      </h2>
                     </div>
                     
-                    <div className="w-full flex items-stretch justify-between gap-4 mt-6">
+                    <div className="flex-1 flex flex-col justify-center gap-4">
                       <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => !isTimingOut && handleSwipe("left")}
                         disabled={isTimingOut}
-                        className="flex-1 min-h-16 flex flex-col items-center justify-center gap-2 rounded-2xl bg-sage-green/10 border-2 border-sage-green/20 hover:border-sage-green/50 transition-colors p-3 disabled:opacity-50"
+                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all p-4 disabled:opacity-50"
                         data-testid="card-option-left"
                       >
-                        <ChevronLeft className="w-6 h-6 text-sage-green" />
-                        <span className="text-xl font-bold text-sage-green text-center leading-tight">
-                          {currentQuestion.options[0]}
-                        </span>
+                        <div className="flex items-start gap-3">
+                          <ChevronLeft className="w-5 h-5 text-sage-green flex-shrink-0 mt-0.5" />
+                          <p className="text-base font-bold text-sage-green dark:text-sage-green leading-relaxed text-left">
+                            {currentQuestion.leftDesc}
+                          </p>
+                        </div>
                       </motion.button>
                       
-                      <div className="flex items-center text-warm-gray/30 dark:text-soft-cream/30 text-sm font-medium">
-                        or
+                      <div className="flex items-center justify-center">
+                        <span className="text-warm-gray/40 dark:text-soft-cream/30 text-sm font-medium">— or —</span>
                       </div>
                       
                       <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => !isTimingOut && handleSwipe("right")}
                         disabled={isTimingOut}
-                        className="flex-1 min-h-16 flex flex-col items-center justify-center gap-2 rounded-2xl bg-terracotta/10 border-2 border-terracotta/20 hover:border-terracotta/50 transition-colors p-3 disabled:opacity-50"
+                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all p-4 disabled:opacity-50"
                         data-testid="card-option-right"
                       >
-                        <ChevronRight className="w-6 h-6 text-terracotta" />
-                        <span className="text-xl font-bold text-terracotta text-center leading-tight">
-                          {currentQuestion.options[1]}
-                        </span>
+                        <div className="flex items-start gap-3">
+                          <p className="text-base font-bold text-terracotta dark:text-terracotta leading-relaxed text-left flex-1">
+                            {currentQuestion.rightDesc}
+                          </p>
+                          <ChevronRight className="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" />
+                        </div>
                       </motion.button>
+                    </div>
+                    
+                    <div className="flex justify-between items-center pt-3 text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                      <span>Swipe left</span>
+                      <span>Swipe right</span>
                     </div>
                   </div>
                 </div>
@@ -527,14 +511,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         </div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-6 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-warm-charcoal dark:via-warm-charcoal/95">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-warm-charcoal dark:via-warm-charcoal/95">
         <div className="max-w-sm mx-auto flex justify-center gap-4">
           <Button
             variant="outline"
             size="lg"
             onClick={() => handleSwipe("left")}
             disabled={isTimingOut}
-            className="flex-1 max-w-[160px] min-h-14 text-lg font-bold border-2 border-sage-green text-sage-green hover:bg-sage-green/10 hover:scale-105 transition-all disabled:opacity-50"
+            className="flex-1 max-w-[140px] min-h-12 text-base font-bold border-2 border-sage-green text-sage-green hover:bg-sage-green/10 hover:scale-105 transition-all disabled:opacity-50"
             data-testid="button-swipe-left"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
@@ -546,7 +530,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             size="lg"
             onClick={() => handleSwipe("right")}
             disabled={isTimingOut}
-            className="flex-1 max-w-[160px] min-h-14 text-lg font-bold border-2 border-terracotta text-terracotta hover:bg-terracotta/10 hover:scale-105 transition-all disabled:opacity-50"
+            className="flex-1 max-w-[140px] min-h-12 text-base font-bold border-2 border-terracotta text-terracotta hover:bg-terracotta/10 hover:scale-105 transition-all disabled:opacity-50"
             data-testid="button-swipe-right"
           >
             {currentQuestion.options[1]}
@@ -554,8 +538,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </Button>
         </div>
         
-        <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-3">
-          Swipe card or tap to choose
+        <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-2">
+          Tap card or buttons to choose
         </p>
       </footer>
 
