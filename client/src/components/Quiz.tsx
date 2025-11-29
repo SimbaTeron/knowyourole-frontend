@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap, RotateCcw, ArrowRight, AlertCircle } from "lucide-react";
+import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import questionsData from "@/data/questions.json";
@@ -54,14 +54,26 @@ export interface QuizScores {
 const SWIPE_THRESHOLD = 100;
 const ROTATION_RANGE = 15;
 
-const RANDOM_VIBRANT_COLORS = [
-  "text-orange-500",
-  "text-cyan-400", 
-  "text-emerald-400",
-  "text-pink-400",
-  "text-amber-400",
-  "text-violet-400",
-  "text-rose-400",
+const TIMEOUT_QUIPS = [
+  { quip: "Time flies when you're pondering!", emoji: "clock" },
+  { quip: "The universe chose for you this time", emoji: "sparkle" },
+  { quip: "Sometimes the best choice is a surprise", emoji: "gift" },
+  { quip: "Going with the cosmic flow on this one", emoji: "star" },
+  { quip: "Your future self just picked for you", emoji: "crystal" },
+  { quip: "Let fate decide this fork in the road", emoji: "path" },
+  { quip: "Even quick-thinkers need a breather", emoji: "leaf" },
+  { quip: "The timer won, but you're still winning", emoji: "trophy" },
+];
+
+const READABLE_RANDOM_COLORS = [
+  { text: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500/10" },
+  { text: "text-cyan-700 dark:text-cyan-300", bg: "bg-cyan-500/10" },
+  { text: "text-emerald-700 dark:text-emerald-400", bg: "bg-emerald-500/10" },
+  { text: "text-pink-600 dark:text-pink-400", bg: "bg-pink-500/10" },
+  { text: "text-amber-700 dark:text-amber-400", bg: "bg-amber-500/10" },
+  { text: "text-violet-600 dark:text-violet-400", bg: "bg-violet-500/10" },
+  { text: "text-rose-600 dark:text-rose-400", bg: "bg-rose-500/10" },
+  { text: "text-teal-700 dark:text-teal-400", bg: "bg-teal-500/10" },
 ];
 
 function parsePrompt(prompt: string): { topic: string; question: string } {
@@ -101,8 +113,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [showPauseMenu, setShowPauseMenu] = useState(false);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [fastResponses, setFastResponses] = useState(0);
-  const [showTimeoutFade, setShowTimeoutFade] = useState(false);
-  const [showMissedModal, setShowMissedModal] = useState(false);
+  const [isTimingOut, setIsTimingOut] = useState(false);
+  const [showQuip, setShowQuip] = useState(false);
+  const [currentQuip, setCurrentQuip] = useState(TIMEOUT_QUIPS[0]);
   const [missCount, setMissCount] = useState(0);
   const [vibrantColorIndex, setVibrantColorIndex] = useState(0);
   
@@ -112,6 +125,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const rightOpacity = useTransform(x, [0, 50, 300], [0, 0.5, 1]);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isRandomTheme = theme === "random";
 
@@ -135,12 +149,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     if (questions.length > 0 && currentIndex < questions.length) {
       setTimeRemaining(questions[currentIndex].time);
       setQuestionStartTime(Date.now());
-      setVibrantColorIndex(Math.floor(Math.random() * RANDOM_VIBRANT_COLORS.length));
+      setVibrantColorIndex(Math.floor(Math.random() * READABLE_RANDOM_COLORS.length));
+      setIsTimingOut(false);
+      setShowQuip(false);
     }
   }, [currentIndex, questions]);
 
   useEffect(() => {
-    if (isPaused || timeRemaining <= 0 || questions.length === 0 || showTimeoutFade || showMissedModal) return;
+    if (isPaused || timeRemaining <= 0 || questions.length === 0 || isTimingOut) return;
     
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
@@ -155,31 +171,32 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, currentIndex, questions.length, showTimeoutFade, showMissedModal]);
+  }, [isPaused, currentIndex, questions.length, isTimingOut]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   const handleTimeout = useCallback(() => {
     if (navigator.vibrate) navigator.vibrate(100);
-    setShowTimeoutFade(true);
-    setMissCount(prev => prev + 1);
     
-    setTimeout(() => {
-      setShowTimeoutFade(false);
-      setShowMissedModal(true);
-    }, 1000);
-  }, []);
-
-  const handleRetryQuestion = () => {
-    setShowMissedModal(false);
-    if (questions.length > 0 && currentIndex < questions.length) {
-      setTimeRemaining(questions[currentIndex].time);
-      setQuestionStartTime(Date.now());
-    }
-  };
-
-  const handleSkipQuestion = () => {
-    setShowMissedModal(false);
-    handleSwipe(Math.random() > 0.5 ? "right" : "left", true);
-  };
+    const quipIndex = missCount % TIMEOUT_QUIPS.length;
+    setCurrentQuip(TIMEOUT_QUIPS[quipIndex]);
+    setMissCount(prev => prev + 1);
+    setIsTimingOut(true);
+    setShowQuip(true);
+    
+    timeoutRef.current = setTimeout(() => {
+      setShowQuip(false);
+      
+      setTimeout(() => {
+        handleSwipe(Math.random() > 0.5 ? "right" : "left", true);
+        setIsTimingOut(false);
+      }, 300);
+    }, 2000);
+  }, [missCount]);
 
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1) => {
     const meta = question.optionMeta[choiceIndex];
@@ -250,15 +267,16 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }, [currentIndex, questions, questionStartTime, processScore, scores, onComplete, x]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (isTimingOut) return;
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
       handleSwipe(info.offset.x > 0 ? "right" : "left");
     } else {
       x.set(0);
     }
-  }, [handleSwipe, x]);
+  }, [handleSwipe, x, isTimingOut]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (showPauseMenu || showMissedModal) return;
+    if (showPauseMenu || isTimingOut) return;
     
     if (e.key === "ArrowLeft" || e.key === "a") {
       handleSwipe("left");
@@ -268,7 +286,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       setIsPaused(true);
       setShowPauseMenu(true);
     }
-  }, [handleSwipe, showPauseMenu, showMissedModal]);
+  }, [handleSwipe, showPauseMenu, isTimingOut]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -301,7 +319,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const timerProgress = (timeRemaining / currentQuestion.time) * 100;
   const { topic, question: questionText } = parsePrompt(currentQuestion.prompt);
-  const vibrantColor = isRandomTheme ? RANDOM_VIBRANT_COLORS[vibrantColorIndex] : "text-sage-green";
+  
+  const topicColor = isRandomTheme 
+    ? READABLE_RANDOM_COLORS[vibrantColorIndex].text 
+    : "text-sage-green";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -333,7 +354,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </div>
           
           <div className="flex items-center gap-1.5">
-            <Timer className="w-4 h-4 text-terracotta" />
+            <Timer className={`w-4 h-4 ${timerProgress < 30 ? "text-red-500" : "text-terracotta"}`} />
             <span className={`text-sm font-mono font-medium ${timerProgress < 30 ? "text-red-500" : "text-warm-gray dark:text-soft-cream"}`}>
               {timeRemaining.toFixed(1)}s
             </span>
@@ -357,33 +378,28 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-32">
         <div className="relative w-full max-w-sm h-[420px]">
           <AnimatePresence mode="wait">
-            {showTimeoutFade && (
-              <motion.div
-                key="timeout-fade"
-                initial={{ opacity: 1, scale: 1 }}
-                animate={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className="absolute inset-0 z-20"
-              >
-                <div className="absolute inset-0 bg-red-500/10 rounded-3xl animate-pulse" />
-              </motion.div>
-            )}
-            
             <motion.div
               key={currentQuestion.id}
               className="absolute inset-0"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ 
-                scale: showTimeoutFade ? 0.9 : 1, 
-                opacity: showTimeoutFade ? 0 : 1 
+                scale: isTimingOut ? 0.85 : 1, 
+                opacity: isTimingOut ? 0 : 1,
+                filter: isTimingOut ? "blur(4px)" : "blur(0px)"
               }}
               exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              transition={{ 
+                type: isTimingOut ? "tween" : "spring",
+                duration: isTimingOut ? 2 : undefined,
+                ease: isTimingOut ? "easeOut" : undefined,
+                stiffness: isTimingOut ? undefined : 300, 
+                damping: isTimingOut ? undefined : 25 
+              }}
             >
               <motion.div
                 className="w-full h-full cursor-grab active:cursor-grabbing"
                 style={{ x, rotate }}
-                drag="x"
+                drag={isTimingOut ? false : "x"}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.7}
                 onDragEnd={handleDragEnd}
@@ -418,7 +434,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       
                       {topic && (
                         <h2 
-                          className={`text-base font-semibold mb-3 ${vibrantColor}`}
+                          className={`text-base font-semibold mb-3 ${topicColor}`}
                           data-testid="text-topic"
                         >
                           {topic}
@@ -437,8 +453,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => handleSwipe("left")}
-                        className="flex-1 min-h-16 flex flex-col items-center justify-center gap-2 rounded-2xl bg-sage-green/10 border-2 border-sage-green/20 hover:border-sage-green/50 transition-colors p-3"
+                        onClick={() => !isTimingOut && handleSwipe("left")}
+                        disabled={isTimingOut}
+                        className="flex-1 min-h-16 flex flex-col items-center justify-center gap-2 rounded-2xl bg-sage-green/10 border-2 border-sage-green/20 hover:border-sage-green/50 transition-colors p-3 disabled:opacity-50"
                         data-testid="card-option-left"
                       >
                         <ChevronLeft className="w-6 h-6 text-sage-green" />
@@ -454,8 +471,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => handleSwipe("right")}
-                        className="flex-1 min-h-16 flex flex-col items-center justify-center gap-2 rounded-2xl bg-terracotta/10 border-2 border-terracotta/20 hover:border-terracotta/50 transition-colors p-3"
+                        onClick={() => !isTimingOut && handleSwipe("right")}
+                        disabled={isTimingOut}
+                        className="flex-1 min-h-16 flex flex-col items-center justify-center gap-2 rounded-2xl bg-terracotta/10 border-2 border-terracotta/20 hover:border-terracotta/50 transition-colors p-3 disabled:opacity-50"
                         data-testid="card-option-right"
                       >
                         <ChevronRight className="w-6 h-6 text-terracotta" />
@@ -469,6 +487,43 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               </motion.div>
             </motion.div>
           </AnimatePresence>
+
+          <AnimatePresence>
+            {showQuip && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="absolute inset-0 z-30 flex items-center justify-center"
+                data-testid="quip-overlay"
+              >
+                <div className="bg-gradient-to-br from-warm-gray/95 to-warm-charcoal/95 dark:from-soft-cream/95 dark:to-gray-200/95 rounded-3xl px-8 py-6 shadow-2xl max-w-xs text-center">
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-terracotta/20 mb-4"
+                  >
+                    <RotateCcw className="w-6 h-6 text-terracotta" />
+                  </motion.div>
+                  
+                  <p className="text-lg font-display font-semibold text-soft-cream dark:text-warm-gray mb-2">
+                    {currentQuip.quip}
+                  </p>
+                  
+                  <p className="text-sm text-soft-cream/60 dark:text-warm-gray/60">
+                    Moving to the next path...
+                  </p>
+                  
+                  {missCount > 1 && (
+                    <p className="text-xs text-terracotta/70 mt-3">
+                      {missCount} cosmic assists so far
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
 
@@ -478,7 +533,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             variant="outline"
             size="lg"
             onClick={() => handleSwipe("left")}
-            className="flex-1 max-w-[160px] min-h-14 text-lg font-bold border-2 border-sage-green text-sage-green hover:bg-sage-green/10 hover:scale-105 transition-all"
+            disabled={isTimingOut}
+            className="flex-1 max-w-[160px] min-h-14 text-lg font-bold border-2 border-sage-green text-sage-green hover:bg-sage-green/10 hover:scale-105 transition-all disabled:opacity-50"
             data-testid="button-swipe-left"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
@@ -489,7 +545,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             variant="outline"
             size="lg"
             onClick={() => handleSwipe("right")}
-            className="flex-1 max-w-[160px] min-h-14 text-lg font-bold border-2 border-terracotta text-terracotta hover:bg-terracotta/10 hover:scale-105 transition-all"
+            disabled={isTimingOut}
+            className="flex-1 max-w-[160px] min-h-14 text-lg font-bold border-2 border-terracotta text-terracotta hover:bg-terracotta/10 hover:scale-105 transition-all disabled:opacity-50"
             data-testid="button-swipe-right"
           >
             {currentQuestion.options[1]}
@@ -545,72 +602,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-4">
                 Progress: {currentIndex + 1}/{questions.length} questions
               </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showMissedModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0, y: 20 }}
-              className="bg-gradient-to-br from-soft-cream to-white dark:from-warm-charcoal dark:to-gray-800 rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl border border-red-200 dark:border-red-900/30"
-              data-testid="modal-missed"
-            >
-              <div className="text-center mb-6">
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.1, 1],
-                    rotate: [0, -5, 5, 0]
-                  }}
-                  transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/10 mb-4"
-                >
-                  <AlertCircle className="w-8 h-8 text-red-500" />
-                </motion.div>
-                
-                <h3 className="text-2xl font-display font-bold text-warm-gray dark:text-soft-cream mb-2">
-                  Missed fork!
-                </h3>
-                <p className="text-warm-gray/70 dark:text-soft-cream/70">
-                  Time ran out on this path. What would you like to do?
-                </p>
-              </div>
-              
-              <div className="space-y-3">
-                <Button
-                  className="w-full bg-sage-green hover:bg-sage-green/90 min-h-12 text-lg font-semibold"
-                  onClick={handleRetryQuestion}
-                  data-testid="button-retry"
-                >
-                  <RotateCcw className="w-5 h-5 mr-2" />
-                  Retry this fork
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  className="w-full min-h-12 text-lg font-semibold border-2"
-                  onClick={handleSkipQuestion}
-                  data-testid="button-skip"
-                >
-                  Skip ahead
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </div>
-              
-              {missCount > 1 && (
-                <p className="text-center text-xs text-red-500/70 mt-4">
-                  {missCount} forks missed this session
-                </p>
-              )}
             </motion.div>
           </motion.div>
         )}
