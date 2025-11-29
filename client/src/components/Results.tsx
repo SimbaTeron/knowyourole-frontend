@@ -2038,8 +2038,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         )}
                       </Button>
                       
+                      {/* Why this role link */}
+                      <p className="text-center text-xs text-amber-700/80 dark:text-amber-300/80 mt-3">
+                        <Lightbulb className="w-3 h-3 inline mr-1" />
+                        Discover <span className="font-semibold">why {result.primaryRole.title}</span> fits your unique profile
+                      </p>
+                      
                       {/* Trust badges */}
-                      <div className="flex items-center justify-center gap-4 mt-4 text-xs text-amber-600/70 dark:text-amber-400/70">
+                      <div className="flex items-center justify-center gap-4 mt-3 text-xs text-amber-600/70 dark:text-amber-400/70">
                         <span className="flex items-center gap-1">
                           <Shield className="w-3 h-3" />
                           Secure checkout
