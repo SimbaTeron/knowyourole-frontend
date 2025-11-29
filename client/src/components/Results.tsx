@@ -3,7 +3,7 @@ import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, Trophy, Target, Brain, Heart, Users, RefreshCw, Share2, 
   Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame,
-  MessageCircle, Frown, Meh, Smile, Lock, Crown
+  MessageCircle, Frown, Meh, Smile, Lock, Crown, Star, Gift, BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import {
 import { Radar } from "react-chartjs-2";
 import type { QuizScores } from "./Quiz";
 import rolesData from "@/data/roles.json";
+import { useToast } from "@/hooks/use-toast";
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -31,6 +32,7 @@ interface ResultsProps {
   funMode: boolean;
   landmark?: string;
   theme: string;
+  sessionId?: string | null;
   onRestart: () => void;
   onShare: () => void;
 }
@@ -228,7 +230,7 @@ const TRAIT_QUESTS: Record<string, { high: string; low: string }> = {
   },
 };
 
-export default function Results({ scores, tier, mood, funMode, landmark, theme, onRestart, onShare }: ResultsProps) {
+export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, onRestart, onShare }: ResultsProps) {
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
@@ -238,10 +240,12 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
   const [wouldShare, setWouldShare] = useState<string>("");
   const [suggestions, setSuggestions] = useState<string>("");
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   
   const chartRef = useRef<ChartJS<"radar">>(null);
   const traitButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotion();
+  const { toast } = useToast();
 
   useEffect(() => {
     const calculated = calculateResult(scores);
@@ -249,6 +253,51 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     
     if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
   }, [scores]);
+
+  const handleUpgrade = async () => {
+    setIsCheckingOut(true);
+    if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+    
+    try {
+      const productsRes = await fetch('/api/stripe/products');
+      const productsData = await productsRes.json();
+      
+      const proProduct = productsData.products?.find((p: any) => 
+        p.metadata?.tier === 'pro' || p.name === 'KnowRole Pro'
+      );
+      
+      if (!proProduct || !proProduct.prices?.length) {
+        throw new Error('Pro product not found');
+      }
+      
+      const priceId = proProduct.prices[0].id;
+      
+      const checkoutRes = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          priceId,
+          sessionId: sessionId || undefined,
+        }),
+      });
+      
+      const checkoutData = await checkoutRes.json();
+      
+      if (checkoutData.url) {
+        window.location.href = checkoutData.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Checkout Error",
+        description: "Unable to start checkout. Please try again.",
+        variant: "destructive",
+      });
+      setIsCheckingOut(false);
+    }
+  };
 
   const allFeedbackAnswered = resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "" && suggestions.trim().length > 0;
 
@@ -1064,31 +1113,64 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       Unlock Deep Insights
                     </h4>
                     <p className="text-sm text-amber-700 dark:text-amber-300 mb-4 max-w-xs mx-auto">
-                      Get arc tracking, retest versions, and unlimited access to personality evolution over time.
+                      Get comprehensive role analysis, personality evolution tracking, and expanded career matches.
                     </p>
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                      <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
-                        <Lock className="w-3 h-3" />
-                        <span>Arc Tracker</span>
+                    
+                    <div className="grid grid-cols-2 gap-2 mb-4 text-left">
+                      <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
+                        <Gift className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">+2 Extra Role Matches</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">Expanded career options</p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
-                        <Lock className="w-3 h-3" />
-                        <span>Retest Versions</span>
+                      <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
+                        <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Deep Dive Analysis</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">Why you fit each role</p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
-                        <Lock className="w-3 h-3" />
-                        <span>Full History</span>
+                      <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
+                        <TrendingUp className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Arc Tracker</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">Personality over time</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
+                        <Star className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Retest Versions</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">Compare your growth</p>
+                        </div>
                       </div>
                     </div>
+                    
                     <Button
                       className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8"
+                      onClick={handleUpgrade}
+                      disabled={isCheckingOut}
                       data-testid="button-upgrade"
                     >
-                      <Crown className="w-4 h-4 mr-2" />
-                      Unlock for $9 One-Time
+                      {isCheckingOut ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                          />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <Crown className="w-4 h-4 mr-2" />
+                          Unlock for $9 One-Time
+                        </>
+                      )}
                     </Button>
                     <p className="text-xs text-amber-600/60 dark:text-amber-400/60 mt-3">
-                      No subscription. Access forever.
+                      No subscription. Access forever. Support indie development.
                     </p>
                   </CardContent>
                 </Card>

@@ -148,6 +148,25 @@ Preferred communication style: Simple, everyday language.
 - JSON-based landmark database mapping cities to cultural icons across 10 countries
 - Supports 60+ cities with themed landmark classes (skyline-glow, ivory-dome, neon-tokyo, etc.)
 
+### Stripe Payment Integration
+- **stripe-replit-sync**: Automatic Stripe data sync and webhook handling
+- **Product**: KnowRole Pro ($9 one-time) - unlocks premium features
+  - Product ID: prod_TVgnaGp9KXU17T
+  - Price ID: price_1SYfPZD1d1zeSo4rnlUrvlLa
+- **Premium Features**:
+  - +2 Extra Role Matches
+  - Deep Dive Analysis (explains why you fit each role)
+  - Arc Tracker (personality evolution over time)
+  - Retest Versions (compare your growth)
+- **Endpoints**:
+  - `GET /api/stripe/products` - List available products with prices
+  - `POST /api/stripe/checkout` - Create checkout session
+  - `GET /api/stripe/checkout/:sessionId` - Get checkout session status
+  - `POST /api/stripe/webhook/:uuid` - Webhook handler (auto-managed)
+- **Pages**:
+  - `/checkout/success` - Payment success confirmation
+  - `/checkout/cancel` - Payment cancelled flow
+
 ### Future Integration Points
 - Session management infrastructure present (express-session, connect-pg-simple)
 - Authentication scaffolding with user schema

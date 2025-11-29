@@ -26,6 +26,7 @@ export default function Home() {
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [randomTheme, setRandomTheme] = useState<RandomTheme | null>(null);
   const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
+  const [quizSessionId, setQuizSessionId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -97,7 +98,7 @@ export default function Home() {
     setQuizScores(scores);
     
     try {
-      await apiRequest("POST", "/api/score", {
+      const response = await apiRequest("POST", "/api/score", {
         tier: ageTier,
         mood,
         funMode,
@@ -105,6 +106,10 @@ export default function Home() {
         theme,
         scores,
       });
+      const data = await response.json();
+      if (data.sessionId) {
+        setQuizSessionId(data.sessionId);
+      }
     } catch (error) {
       console.error("Failed to save quiz results:", error);
     }
@@ -118,6 +123,7 @@ export default function Home() {
 
   const handleRestart = () => {
     setQuizScores(null);
+    setQuizSessionId(null);
     setStep("tier");
     setAgeTier(null);
     setMood("");
@@ -206,6 +212,7 @@ export default function Home() {
           funMode={funMode}
           landmark={landmark?.landmark}
           theme={theme}
+          sessionId={quizSessionId}
           onRestart={handleRestart}
           onShare={handleShare}
         />
