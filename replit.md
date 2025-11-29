@@ -112,17 +112,23 @@ Preferred communication style: Simple, everyday language.
 - **A11y**: Focus management, keyboard navigation, aria-modal=true, reduced-motion support
 
 ### Quiz Flow
-- **10 Questions**: Descriptive binary scenarios with vivid 10-15 word options
-- **Timer**: Per-question countdown with visual progress indicator
+- **Question Pool**: 129 total questions with tier-based distribution:
+  - 7-12: 30 questions (15 base count per quiz)
+  - 13-18: 25 questions (25 base count per quiz)
+  - 19-25: 25 questions (25 base count per quiz)
+  - 25+: 45 questions (40 base count per quiz)
+  - 4 universal wildcard questions (Critical Thinking + First Principles)
+- **Randomization**: Double shuffle for question variety each session
+- **Timer**: Per-question countdown (9 seconds max) with visual progress indicator
 - **Swipe/Click Input**: Both swipe gestures and click/tap supported
 - **Guard Conditions**: Robust handling of edge cases (empty questions, quiz completion)
-- **Score Tracking**: MBTI, DISC, and Big Five trait accumulation per question
+- **Score Tracking**: MBTI, DISC, Big Five, Critical Thinking, and First Principles traits
 
 ### Results Dashboard
 - **Big Five Radar**: Chart.js radar visualization with interactive petals
 - **MBTI Card**: Type name, label (e.g., "Architect"), and description
 - **DISC Card**: Dominant style with color-coded indicator
-- **Role Recommendations**: 150+ role clusters with salary ranges and descriptions
+- **Role Recommendations**: 147 role clusters covering MBTI-DISC-Big5 combinations, trades, artistic, AI, tech, healthcare, education, finance, legal, marketing, science, creative, service, outdoor, and sports categories
 - **Role Matching Algorithm**: Uses MBTI type + DISC style + dominant Big Five traits
 
 ### Data and State Management
