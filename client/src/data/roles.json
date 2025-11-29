@@ -616,6 +616,218 @@
       "primary": { "title": "Session Musician", "salary": "$40K-120K", "desc": "Bring songs to life with instrumental talent" },
       "secondary": { "title": "Music Producer", "salary": "$45K-200K+", "desc": "Shape sounds with artistic vision" }
     },
+    "trades-carpenter-d-high": {
+      "primary": { "title": "Master Carpenter", "salary": "$50K-90K", "desc": "Craft beautiful structures with precision woodworking" },
+      "secondary": { "title": "Cabinet Maker", "salary": "$45K-75K", "desc": "Create custom cabinetry with skilled craftsmanship" }
+    },
+    "trades-carpenter-s-high": {
+      "primary": { "title": "Finish Carpenter", "salary": "$45K-80K", "desc": "Perfect the fine details that make spaces shine" },
+      "secondary": { "title": "Trim Carpenter", "salary": "$40K-70K", "desc": "Add elegant finishing touches to interiors" }
+    },
+    "trades-roofer-d-high": {
+      "primary": { "title": "Roofing Contractor", "salary": "$55K-120K+", "desc": "Lead crews to protect homes from the elements" },
+      "secondary": { "title": "Commercial Roofer", "salary": "$45K-85K", "desc": "Install and maintain large-scale roofing systems" }
+    },
+    "trades-roofer-s-high": {
+      "primary": { "title": "Residential Roofer", "salary": "$40K-70K", "desc": "Keep families safe under reliable roofs" },
+      "secondary": { "title": "Roof Inspector", "salary": "$45K-75K", "desc": "Assess roofing conditions with trained expertise" }
+    },
+    "trades-machinist-c-high": {
+      "primary": { "title": "CNC Machinist", "salary": "$45K-80K", "desc": "Operate precision computer-controlled machines" },
+      "secondary": { "title": "Tool and Die Maker", "salary": "$50K-85K", "desc": "Create precise tools for manufacturing" }
+    },
+    "trades-machinist-d-high": {
+      "primary": { "title": "Machine Shop Supervisor", "salary": "$55K-95K", "desc": "Lead machining operations with technical expertise" },
+      "secondary": { "title": "Manufacturing Engineer", "salary": "$65K-100K", "desc": "Optimize production processes" }
+    },
+    "trades-lineman-d-high": {
+      "primary": { "title": "Power Lineman", "salary": "$60K-100K", "desc": "Keep communities powered with skilled electrical work" },
+      "secondary": { "title": "Line Crew Supervisor", "salary": "$70K-110K", "desc": "Lead teams maintaining electrical infrastructure" }
+    },
+    "trades-lineman-s-high": {
+      "primary": { "title": "Telecommunications Lineman", "salary": "$45K-80K", "desc": "Connect communities through communication networks" },
+      "secondary": { "title": "Cable Technician", "salary": "$40K-65K", "desc": "Install and maintain cable systems" }
+    },
+    "trades-ironworker-d-high": {
+      "primary": { "title": "Structural Ironworker", "salary": "$55K-95K", "desc": "Build the steel skeletons of skyscrapers" },
+      "secondary": { "title": "Reinforcing Ironworker", "salary": "$50K-85K", "desc": "Strengthen concrete with steel reinforcement" }
+    },
+    "trades-ironworker-s-high": {
+      "primary": { "title": "Ornamental Ironworker", "salary": "$45K-80K", "desc": "Create decorative metalwork with artistic skill" },
+      "secondary": { "title": "Metal Fabricator", "salary": "$40K-70K", "desc": "Shape metal into functional forms" }
+    },
+    "trades-crane-d-high": {
+      "primary": { "title": "Tower Crane Operator", "salary": "$60K-100K", "desc": "Lift massive loads with precision control" },
+      "secondary": { "title": "Mobile Crane Operator", "salary": "$55K-90K", "desc": "Move heavy materials across job sites" }
+    },
+    "trades-crane-s-high": {
+      "primary": { "title": "Overhead Crane Operator", "salary": "$45K-75K", "desc": "Move materials in industrial facilities" },
+      "secondary": { "title": "Rigging Specialist", "salary": "$50K-80K", "desc": "Secure loads for safe crane operations" }
+    },
+    "trades-mason-d-high": {
+      "primary": { "title": "Master Mason", "salary": "$50K-90K", "desc": "Build lasting structures with brick and stone" },
+      "secondary": { "title": "Stone Mason", "salary": "$45K-85K", "desc": "Craft beautiful stonework with ancient techniques" }
+    },
+    "trades-mason-s-high": {
+      "primary": { "title": "Brick Mason", "salary": "$45K-80K", "desc": "Lay brick with precision and artistry" },
+      "secondary": { "title": "Concrete Finisher", "salary": "$40K-70K", "desc": "Create smooth, durable concrete surfaces" }
+    },
+    "firstresponder-emt-d-high": {
+      "primary": { "title": "Paramedic", "salary": "$45K-75K", "desc": "Save lives with advanced emergency medical care" },
+      "secondary": { "title": "Flight Paramedic", "salary": "$55K-90K", "desc": "Provide critical care during air transport" }
+    },
+    "firstresponder-emt-s-high": {
+      "primary": { "title": "EMT", "salary": "$35K-55K", "desc": "Respond first when every second counts" },
+      "secondary": { "title": "Emergency Room Technician", "salary": "$38K-58K", "desc": "Support emergency medical teams" }
+    },
+    "firstresponder-dispatch-c-high": {
+      "primary": { "title": "911 Dispatcher", "salary": "$40K-65K", "desc": "Coordinate emergency response with calm precision" },
+      "secondary": { "title": "Police Dispatcher", "salary": "$42K-68K", "desc": "Direct law enforcement to where they're needed" }
+    },
+    "firstresponder-dispatch-s-high": {
+      "primary": { "title": "Fire Dispatcher", "salary": "$40K-62K", "desc": "Send help when emergencies strike" },
+      "secondary": { "title": "Medical Dispatcher", "salary": "$38K-60K", "desc": "Coordinate ambulance response" }
+    },
+    "firstresponder-corrections-d-high": {
+      "primary": { "title": "Corrections Officer", "salary": "$40K-70K", "desc": "Maintain safety and order in correctional facilities" },
+      "secondary": { "title": "Probation Officer", "salary": "$45K-75K", "desc": "Guide offenders toward rehabilitation" }
+    },
+    "firstresponder-corrections-s-high": {
+      "primary": { "title": "Juvenile Corrections Officer", "salary": "$38K-62K", "desc": "Help young people find better paths" },
+      "secondary": { "title": "Detention Officer", "salary": "$35K-58K", "desc": "Ensure safety in detention facilities" }
+    },
+    "firstresponder-ranger-d-high": {
+      "primary": { "title": "Park Ranger", "salary": "$40K-70K", "desc": "Protect natural treasures and visitor safety" },
+      "secondary": { "title": "Wildlife Officer", "salary": "$45K-75K", "desc": "Enforce wildlife protection laws" }
+    },
+    "firstresponder-ranger-s-high": {
+      "primary": { "title": "Forest Ranger", "salary": "$38K-65K", "desc": "Guard forests and educate visitors" },
+      "secondary": { "title": "Conservation Officer", "salary": "$42K-70K", "desc": "Protect natural resources for future generations" }
+    },
+    "personalcare-barber-d-high": {
+      "primary": { "title": "Master Barber", "salary": "$35K-80K+", "desc": "Transform looks with expert cutting skills" },
+      "secondary": { "title": "Barbershop Owner", "salary": "$50K-150K+", "desc": "Build a community grooming destination" }
+    },
+    "personalcare-barber-s-high": {
+      "primary": { "title": "Barber", "salary": "$30K-60K", "desc": "Create confident looks for loyal clients" },
+      "secondary": { "title": "Men's Grooming Specialist", "salary": "$35K-65K", "desc": "Specialize in men's styling and care" }
+    },
+    "personalcare-cosmo-d-high": {
+      "primary": { "title": "Salon Owner", "salary": "$50K-150K+", "desc": "Build a thriving beauty business" },
+      "secondary": { "title": "Master Stylist", "salary": "$45K-100K+", "desc": "Create stunning transformations" }
+    },
+    "personalcare-cosmo-s-high": {
+      "primary": { "title": "Cosmetologist", "salary": "$30K-65K", "desc": "Help clients look and feel their best" },
+      "secondary": { "title": "Hair Stylist", "salary": "$28K-60K", "desc": "Create beautiful hair designs" }
+    },
+    "personalcare-esthetician-c-high": {
+      "primary": { "title": "Medical Esthetician", "salary": "$45K-85K", "desc": "Combine skincare with medical expertise" },
+      "secondary": { "title": "Clinical Skincare Specialist", "salary": "$40K-75K", "desc": "Provide advanced skin treatments" }
+    },
+    "personalcare-esthetician-s-high": {
+      "primary": { "title": "Esthetician", "salary": "$32K-60K", "desc": "Enhance natural beauty through skincare" },
+      "secondary": { "title": "Spa Therapist", "salary": "$30K-55K", "desc": "Create relaxing wellness experiences" }
+    },
+    "personalcare-massage-s-high": {
+      "primary": { "title": "Licensed Massage Therapist", "salary": "$40K-80K", "desc": "Heal bodies through therapeutic touch" },
+      "secondary": { "title": "Sports Massage Therapist", "salary": "$45K-90K", "desc": "Help athletes recover and perform" }
+    },
+    "personalcare-massage-i-high": {
+      "primary": { "title": "Spa Manager", "salary": "$45K-85K", "desc": "Lead wellness teams to deliver relaxation" },
+      "secondary": { "title": "Wellness Center Director", "salary": "$55K-100K", "desc": "Create holistic healing environments" }
+    },
+    "manufacturing-supervisor-d-high": {
+      "primary": { "title": "Factory Supervisor", "salary": "$50K-85K", "desc": "Lead production teams to meet goals" },
+      "secondary": { "title": "Shift Manager", "salary": "$45K-75K", "desc": "Oversee manufacturing operations" }
+    },
+    "manufacturing-supervisor-s-high": {
+      "primary": { "title": "Production Lead", "salary": "$42K-70K", "desc": "Guide assembly teams with steady leadership" },
+      "secondary": { "title": "Line Supervisor", "salary": "$40K-65K", "desc": "Keep production lines running smoothly" }
+    },
+    "manufacturing-quality-c-high": {
+      "primary": { "title": "Quality Control Inspector", "salary": "$40K-70K", "desc": "Ensure products meet exacting standards" },
+      "secondary": { "title": "Quality Assurance Analyst", "salary": "$50K-85K", "desc": "Analyze and improve quality systems" }
+    },
+    "manufacturing-quality-d-high": {
+      "primary": { "title": "Quality Manager", "salary": "$65K-110K", "desc": "Lead quality initiatives across operations" },
+      "secondary": { "title": "Six Sigma Black Belt", "salary": "$80K-130K", "desc": "Drive process excellence" }
+    },
+    "manufacturing-cnc-c-high": {
+      "primary": { "title": "CNC Programmer", "salary": "$50K-85K", "desc": "Program precision manufacturing equipment" },
+      "secondary": { "title": "CNC Setup Technician", "salary": "$42K-70K", "desc": "Configure machines for optimal production" }
+    },
+    "manufacturing-plant-d-high": {
+      "primary": { "title": "Plant Manager", "salary": "$80K-150K", "desc": "Lead entire manufacturing facilities" },
+      "secondary": { "title": "Operations Director", "salary": "$90K-160K", "desc": "Optimize plant-wide performance" }
+    },
+    "manufacturing-assembly-s-high": {
+      "primary": { "title": "Assembly Technician", "salary": "$35K-55K", "desc": "Build products with careful precision" },
+      "secondary": { "title": "Electronics Assembler", "salary": "$32K-52K", "desc": "Assemble electronic components" }
+    },
+    "military-officer-d-high": {
+      "primary": { "title": "Military Officer", "salary": "$50K-150K+", "desc": "Lead with courage and strategic vision" },
+      "secondary": { "title": "Combat Arms Officer", "salary": "$55K-120K", "desc": "Command tactical operations" }
+    },
+    "military-officer-c-high": {
+      "primary": { "title": "Intelligence Officer", "salary": "$60K-140K", "desc": "Analyze critical information for national security" },
+      "secondary": { "title": "Cyber Operations Officer", "salary": "$70K-150K", "desc": "Defend digital infrastructure" }
+    },
+    "military-enlisted-d-high": {
+      "primary": { "title": "Infantry Sergeant", "salary": "$40K-80K", "desc": "Lead soldiers in ground operations" },
+      "secondary": { "title": "Special Operations", "salary": "$55K-100K", "desc": "Execute elite tactical missions" }
+    },
+    "military-enlisted-s-high": {
+      "primary": { "title": "Combat Medic", "salary": "$35K-65K", "desc": "Save lives on the battlefield" },
+      "secondary": { "title": "Military Logistics Specialist", "salary": "$38K-70K", "desc": "Keep forces supplied and ready" }
+    },
+    "military-technical-c-high": {
+      "primary": { "title": "Military Intelligence Analyst", "salary": "$50K-100K", "desc": "Gather and analyze strategic intelligence" },
+      "secondary": { "title": "Signals Intelligence Specialist", "salary": "$55K-110K", "desc": "Intercept and analyze communications" }
+    },
+    "military-defense-d-high": {
+      "primary": { "title": "Defense Contractor", "salary": "$80K-180K", "desc": "Support military with specialized expertise" },
+      "secondary": { "title": "Military Consultant", "salary": "$90K-200K+", "desc": "Advise on defense strategy" }
+    },
+    "agriculture-farmer-d-high": {
+      "primary": { "title": "Farm Owner", "salary": "$40K-200K+", "desc": "Build a thriving agricultural operation" },
+      "secondary": { "title": "Farm Manager", "salary": "$50K-100K", "desc": "Oversee all farm operations" }
+    },
+    "agriculture-farmer-s-high": {
+      "primary": { "title": "Family Farmer", "salary": "$35K-120K", "desc": "Grow food with generations of wisdom" },
+      "secondary": { "title": "Organic Farmer", "salary": "$40K-100K", "desc": "Produce healthy food sustainably" }
+    },
+    "agriculture-rancher-d-high": {
+      "primary": { "title": "Cattle Rancher", "salary": "$45K-200K+", "desc": "Raise livestock on open ranges" },
+      "secondary": { "title": "Ranch Manager", "salary": "$50K-100K", "desc": "Lead ranch operations" }
+    },
+    "agriculture-rancher-s-high": {
+      "primary": { "title": "Horse Rancher", "salary": "$40K-150K", "desc": "Breed and train horses" },
+      "secondary": { "title": "Livestock Manager", "salary": "$45K-85K", "desc": "Care for farm animals" }
+    },
+    "agriculture-tech-c-high": {
+      "primary": { "title": "Agricultural Technician", "salary": "$40K-70K", "desc": "Apply science to improve farming" },
+      "secondary": { "title": "Precision Agriculture Specialist", "salary": "$50K-90K", "desc": "Use technology to optimize yields" }
+    },
+    "agriculture-tech-s-high": {
+      "primary": { "title": "Agronomist", "salary": "$55K-95K", "desc": "Study crops to improve production" },
+      "secondary": { "title": "Soil Scientist", "salary": "$50K-85K", "desc": "Analyze soil for better farming" }
+    },
+    "agriculture-equipment-d-high": {
+      "primary": { "title": "Agricultural Equipment Operator", "salary": "$35K-65K", "desc": "Operate heavy farm machinery" },
+      "secondary": { "title": "Farm Equipment Technician", "salary": "$40K-70K", "desc": "Maintain and repair farm equipment" }
+    },
+    "retail-manager-d-high": {
+      "primary": { "title": "Store Manager", "salary": "$45K-90K", "desc": "Lead retail operations to success" },
+      "secondary": { "title": "District Manager", "salary": "$65K-120K", "desc": "Oversee multiple store locations" }
+    },
+    "retail-manager-s-high": {
+      "primary": { "title": "Assistant Store Manager", "salary": "$35K-60K", "desc": "Support store leadership" },
+      "secondary": { "title": "Department Manager", "salary": "$38K-65K", "desc": "Lead retail department teams" }
+    },
+    "retail-supervisor-i-high": {
+      "primary": { "title": "Shift Supervisor", "salary": "$32K-50K", "desc": "Lead teams during store hours" },
+      "secondary": { "title": "Customer Service Lead", "salary": "$30K-48K", "desc": "Ensure great customer experiences" }
+    },
     "default": {
       "primary": { "title": "Career Explorer", "salary": "Varies", "desc": "Discover your unique path through self-reflection" },
       "secondary": { "title": "Skill Builder", "salary": "Varies", "desc": "Develop versatile abilities for any direction" }
