@@ -865,24 +865,21 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   : "Your thoughtful, focused approach brings unique value to this field."}
               </p>
               
-              <div className="grid grid-cols-1 gap-4 mt-6">
+              <div className="grid grid-cols-3 gap-2 mt-6">
                 <motion.div 
                   initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.6 }}
-                  className="text-center px-4 py-5 rounded-2xl bg-terracotta/8 dark:bg-terracotta/15 border border-terracotta/20"
+                  className="text-center px-2 py-4 rounded-xl bg-terracotta/8 dark:bg-terracotta/15 border border-terracotta/20"
                 >
-                  <Brain className="w-6 h-6 text-terracotta mx-auto mb-2" />
-                  <p className="text-xs text-terracotta font-semibold tracking-wide uppercase mb-1">
-                    {funMode ? result.mbtiType : `MBTI ${result.mbtiType}`}
+                  <Brain className="w-5 h-5 text-terracotta mx-auto mb-1.5" />
+                  <p className="text-lg font-bold text-terracotta font-mono mb-0.5" data-testid="text-mbti-teaser">
+                    {result.mbtiType}
                   </p>
-                  <p className="text-sm font-medium text-terracotta mb-1">
+                  <p className="text-[10px] text-terracotta/80 font-medium leading-tight line-clamp-2">
                     {funMode && FUN_MODE_TITLES[result.mbtiType] 
                       ? FUN_MODE_TITLES[result.mbtiType]
                       : result.mbtiLabel}
-                  </p>
-                  <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
-                    {result.mbtiDesc}
                   </p>
                 </motion.div>
                 
@@ -890,21 +887,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.7 }}
-                  className="text-center px-4 py-5 rounded-2xl bg-sage-green/8 dark:bg-sage-green/15 border border-sage-green/20"
+                  className="text-center px-2 py-4 rounded-xl bg-sage-green/8 dark:bg-sage-green/15 border border-sage-green/20"
                 >
-                  <Award className="w-6 h-6 text-sage-green mx-auto mb-2" />
-                  <p className="text-xs text-sage-green font-semibold tracking-wide uppercase mb-1">
-                    {funMode ? result.discStyle : `DISC ${result.discStyle}`}
+                  <Award className="w-5 h-5 text-sage-green mx-auto mb-1.5" />
+                  <p className="text-lg font-bold text-sage-green mb-0.5" data-testid="text-disc-teaser">
+                    {result.discStyle}
                   </p>
-                  <p className="text-sm font-medium text-sage-green mb-1">
+                  <p className="text-[10px] text-sage-green/80 font-medium leading-tight line-clamp-2">
                     {funMode && FUN_MODE_DISC[result.discStyle] 
                       ? FUN_MODE_DISC[result.discStyle].nickname
                       : result.discLabel}
-                  </p>
-                  <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
-                    {funMode && FUN_MODE_DISC[result.discStyle]
-                      ? FUN_MODE_DISC[result.discStyle].vibe
-                      : result.discDesc}
                   </p>
                 </motion.div>
                 
@@ -912,7 +904,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8 }}
-                  className="text-center px-4 py-5 rounded-2xl bg-dusty-blue/8 dark:bg-dusty-blue/15 border border-dusty-blue/20"
+                  className="text-center px-2 py-4 rounded-xl bg-dusty-blue/8 dark:bg-dusty-blue/15 border border-dusty-blue/20"
                 >
                   {(() => {
                     const topTraitKey = topTrait[0] as keyof typeof TRAIT_ICONS;
@@ -920,12 +912,12 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     const topValue = topTrait[1];
                     return (
                       <>
-                        <TopIcon className="w-6 h-6 text-dusty-blue mx-auto mb-2" />
-                        <p className="text-xs text-dusty-blue font-semibold tracking-wide uppercase mb-1">
-                          Big Five {TRAIT_LABELS[topTraitKey]} {topValue}%
+                        <TopIcon className="w-5 h-5 text-dusty-blue mx-auto mb-1.5" />
+                        <p className="text-lg font-bold text-dusty-blue mb-0.5" data-testid="text-bigfive-teaser">
+                          {TRAIT_LABELS[topTraitKey].slice(0, 4)}
                         </p>
-                        <p className="text-sm text-warm-gray dark:text-soft-cream leading-relaxed">
-                          {topValue > 50 ? result.bigFiveLabels[topTrait[0]]?.high : result.bigFiveLabels[topTrait[0]]?.low}
+                        <p className="text-[10px] text-dusty-blue/80 font-medium leading-tight">
+                          {topValue}%
                         </p>
                       </>
                     );
