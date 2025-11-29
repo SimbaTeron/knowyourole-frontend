@@ -1,26 +1,6 @@
 import { useState } from "react";
 import { MapPin, Loader2, Check, X } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import landmarksData from "@/data/landmarks.json";
-
-const countries = [
-  { code: "us", name: "United States", placeholder: "10001" },
-  { code: "in", name: "India", placeholder: "110001" },
-  { code: "gb", name: "United Kingdom", placeholder: "SW1A 1AA" },
-  { code: "fr", name: "France", placeholder: "75001" },
-  { code: "jp", name: "Japan", placeholder: "100-0001" },
-  { code: "au", name: "Australia", placeholder: "2000" },
-  { code: "cn", name: "China", placeholder: "100000" },
-  { code: "br", name: "Brazil", placeholder: "01310-100" },
-  { code: "ae", name: "UAE", placeholder: "00000" },
-  { code: "it", name: "Italy", placeholder: "00100" },
-];
 
 interface LandmarkInfo {
   landmark: string;
@@ -37,13 +17,10 @@ interface PostalInputProps {
 }
 
 export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProps) {
-  const [countryCode, setCountryCode] = useState("us");
   const [postal, setPostal] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [foundCity, setFoundCity] = useState<string | null>(null);
-
-  const selectedCountry = countries.find(c => c.code === countryCode);
 
   const handleSubmit = async () => {
     if (!postal.trim()) {
@@ -56,10 +33,35 @@ export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProp
     setFoundCity(null);
 
     try {
-      const cleanPostal = postal.trim().replace(/\s+/g, "%20");
-      const response = await fetch(
-        `https://api.zippopotam.us/${countryCode}/${cleanPostal}`
-      );
+      const rawPostal = postal.trim();
+      const isCanadianFormat = /^[A-Za-z]\d[A-Za-z][\s-]?\d[A-Za-z]\d$/i.test(rawPostal);
+      const isUSFormat = /^\d{5}(-\d{4})?$/.test(rawPostal);
+      
+      let response: Response;
+      let countryCode: string;
+      
+      if (isCanadianFormat) {
+        const cleanCanadian = rawPostal.toUpperCase().replace(/[\s-]/g, '');
+        const formattedCanadian = cleanCanadian.slice(0, 3) + ' ' + cleanCanadian.slice(3);
+        response = await fetch(`https://api.zippopotam.us/ca/${encodeURIComponent(formattedCanadian)}`);
+        countryCode = "ca";
+      } else if (isUSFormat) {
+        const cleanUS = rawPostal.slice(0, 5);
+        response = await fetch(`https://api.zippopotam.us/us/${cleanUS}`);
+        countryCode = "us";
+      } else {
+        response = await fetch(`https://api.zippopotam.us/us/${encodeURIComponent(rawPostal)}`);
+        countryCode = "us";
+        
+        if (!response.ok) {
+          const cleanCanadian = rawPostal.toUpperCase().replace(/[\s-]/g, '');
+          if (cleanCanadian.length === 6) {
+            const formattedCanadian = cleanCanadian.slice(0, 3) + ' ' + cleanCanadian.slice(3);
+            response = await fetch(`https://api.zippopotam.us/ca/${encodeURIComponent(formattedCanadian)}`);
+            countryCode = "ca";
+          }
+        }
+      }
 
       if (!response.ok) {
         throw new Error("Location not found");
@@ -99,7 +101,7 @@ export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProp
       }, 400);
 
     } catch (err) {
-      setError("Couldn't find that location");
+      setError("Couldn't find that zip code");
       const fallbacks = (landmarksData as Record<string, Record<string, LandmarkInfo>>).fallback;
       setTimeout(() => {
         onLandmarkFound({ ...fallbacks.urban, city: "Your City", country: "Unknown" });
@@ -125,32 +127,12 @@ export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProp
       </div>
 
       <div className="space-y-3">
-        <Select value={countryCode} onValueChange={setCountryCode}>
-          <SelectTrigger 
-            className="w-full h-12 bg-soft-cream/60 dark:bg-deep-cream/40 border-terracotta/8 rounded-xl"
-            data-testid="select-country"
-          >
-            <SelectValue placeholder="Select country" />
-          </SelectTrigger>
-          <SelectContent className="bg-warm-white dark:bg-deep-cream border-terracotta/10 rounded-xl">
-            {countries.map((country) => (
-              <SelectItem 
-                key={country.code} 
-                value={country.code}
-                className="text-warm-gray dark:text-soft-cream rounded-lg"
-              >
-                {country.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
         <div className="relative">
           <input
             type="text"
             value={postal}
             onChange={(e) => setPostal(e.target.value)}
-            placeholder={selectedCountry?.placeholder || "Enter postal code"}
+            placeholder="Enter zip code (e.g., 10001)"
             className="w-full h-12 px-4 rounded-xl bg-soft-cream/60 dark:bg-deep-cream/40 border border-terracotta/8 text-warm-gray dark:text-soft-cream placeholder:text-warm-gray/35 dark:placeholder:text-soft-cream/25 focus:outline-none focus:border-terracotta/25 focus:ring-2 focus:ring-terracotta/10 transition-all"
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             data-testid="input-postal"
@@ -169,6 +151,10 @@ export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProp
             {error}
           </p>
         )}
+        
+        <p className="text-xs text-warm-gray/40 dark:text-soft-cream/30 text-center">
+          US and Canada zip codes supported
+        </p>
       </div>
 
       <div className="flex gap-3 pt-1">

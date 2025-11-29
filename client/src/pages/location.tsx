@@ -60,15 +60,40 @@ export default function LocationPage() {
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
   const [detectedState, setDetectedState] = useState<string | null>(null);
 
-  const lookupPostalCode = async (code: string, countryCode: string) => {
+  const lookupPostalCode = async (code: string) => {
     if (code.length < 3) return;
     
     setIsLoading(true);
     try {
-      const cleanPostal = code.trim().replace(/\s+/g, "%20");
-      const response = await fetch(
-        `https://api.zippopotam.us/${countryCode}/${cleanPostal}`
-      );
+      const rawPostal = code.trim();
+      const isCanadianFormat = /^[A-Za-z]\d[A-Za-z][\s-]?\d[A-Za-z]\d$/i.test(rawPostal);
+      const isUSFormat = /^\d{5}(-\d{4})?$/.test(rawPostal);
+      
+      let response: Response;
+      let countryCode: string;
+      
+      if (isCanadianFormat) {
+        const cleanCanadian = rawPostal.toUpperCase().replace(/[\s-]/g, '');
+        const formattedCanadian = cleanCanadian.slice(0, 3) + ' ' + cleanCanadian.slice(3);
+        response = await fetch(`https://api.zippopotam.us/ca/${encodeURIComponent(formattedCanadian)}`);
+        countryCode = "ca";
+      } else if (isUSFormat) {
+        const cleanUS = rawPostal.slice(0, 5);
+        response = await fetch(`https://api.zippopotam.us/us/${cleanUS}`);
+        countryCode = "us";
+      } else {
+        response = await fetch(`https://api.zippopotam.us/us/${encodeURIComponent(rawPostal)}`);
+        countryCode = "us";
+        
+        if (!response.ok) {
+          const cleanCanadian = rawPostal.toUpperCase().replace(/[\s-]/g, '');
+          if (cleanCanadian.length === 6) {
+            const formattedCanadian = cleanCanadian.slice(0, 3) + ' ' + cleanCanadian.slice(3);
+            response = await fetch(`https://api.zippopotam.us/ca/${encodeURIComponent(formattedCanadian)}`);
+            countryCode = "ca";
+          }
+        }
+      }
 
       if (!response.ok) {
         throw new Error("Location not found");
@@ -81,6 +106,7 @@ export default function LocationPage() {
       if (city) {
         setDetectedCity(city);
         setDetectedState(state);
+        setCountry(countryCode.toUpperCase());
         
         setLocality(city, state, countryCode);
         
@@ -102,7 +128,8 @@ export default function LocationPage() {
         }
       }
     } catch (err) {
-      console.log("Could not look up postal code:", err);
+      setDetectedCity(null);
+      setDetectedState(null);
     } finally {
       setIsLoading(false);
     }
@@ -110,10 +137,10 @@ export default function LocationPage() {
 
   const handlePostalChange = (value: string) => {
     setPostalCode(value);
-    if (value.length >= 5 && country === "US") {
-      lookupPostalCode(value, country);
-    } else if (value.length >= 3) {
-      lookupPostalCode(value, country);
+    if (value.length >= 5) {
+      lookupPostalCode(value);
+    } else if (value.length >= 3 && /^[A-Za-z]\d[A-Za-z]/i.test(value)) {
+      lookupPostalCode(value);
     }
   };
 
@@ -178,36 +205,20 @@ export default function LocationPage() {
             <div className="space-y-3">
               <label className="text-sm font-medium text-warm-gray dark:text-soft-cream flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-terracotta dark:text-sunset-amber" />
-                Your Area (Postal Code)
+                Your Area (Zip Code)
               </label>
-              <div className="flex gap-3">
-                <select
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  className="w-24 px-3 py-3 rounded-xl bg-soft-cream/50 dark:bg-deep-cream/30 border border-terracotta/10 dark:border-sunset-amber/20 text-warm-gray dark:text-soft-cream focus:outline-none focus:ring-2 focus:ring-terracotta/30"
-                  data-testid="select-country"
-                >
-                  <option value="US">US</option>
-                  <option value="CA">CA</option>
-                  <option value="UK">UK</option>
-                  <option value="AU">AU</option>
-                  <option value="DE">DE</option>
-                  <option value="FR">FR</option>
-                  <option value="JP">JP</option>
-                  <option value="BR">BR</option>
-                  <option value="IN">IN</option>
-                  <option value="MX">MX</option>
-                </select>
-                <input
-                  type="text"
-                  value={postalCode}
-                  onChange={(e) => handlePostalChange(e.target.value.toUpperCase())}
-                  placeholder="e.g., 10001"
-                  maxLength={10}
-                  className="flex-1 px-4 py-3 rounded-xl bg-soft-cream/50 dark:bg-deep-cream/30 border border-terracotta/10 dark:border-sunset-amber/20 text-warm-gray dark:text-soft-cream placeholder:text-warm-gray/40 dark:placeholder:text-soft-cream/30 focus:outline-none focus:ring-2 focus:ring-terracotta/30"
-                  data-testid="input-postal"
-                />
-              </div>
+              <input
+                type="text"
+                value={postalCode}
+                onChange={(e) => handlePostalChange(e.target.value.toUpperCase())}
+                placeholder="Enter zip code (e.g., 10001)"
+                maxLength={10}
+                className="w-full px-4 py-3 rounded-xl bg-soft-cream/50 dark:bg-deep-cream/30 border border-terracotta/10 dark:border-sunset-amber/20 text-warm-gray dark:text-soft-cream placeholder:text-warm-gray/40 dark:placeholder:text-soft-cream/30 focus:outline-none focus:ring-2 focus:ring-terracotta/30"
+                data-testid="input-postal"
+              />
+              <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 text-center">
+                US and Canada zip codes supported
+              </p>
               
               {isLoading && (
                 <motion.div

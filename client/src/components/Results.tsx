@@ -809,29 +809,42 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 25 }}
-          className="sticky top-0 z-50 bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-600 px-4 py-3 shadow-lg"
+          className="sticky top-0 z-50 shadow-lg"
           data-testid="banner-test-premium"
         >
-          <div className="max-w-md mx-auto flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                <Crown className="w-5 h-5 text-yellow-300" />
+          <div className="bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 px-4 pt-4 pb-5">
+            <div className="max-w-md mx-auto text-center">
+              <p className="text-2xl font-bold text-white italic mb-3" style={{ fontFamily: "'Georgia', serif", textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}>
+                Just Kidding!
+              </p>
+              <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center mx-auto mb-2 shadow-md">
+                <Crown className="w-7 h-7 text-teal-500" />
               </div>
-              <div className="text-left">
-                <p className="text-sm font-bold text-white leading-tight">Just Kidding! Premium Unlocked</p>
-                <p className="text-xs text-white/80">Enjoy the full experience on us</p>
-              </div>
+              <p className="text-lg font-bold text-teal-700 mb-1">Premium Unlocked</p>
+              <p className="text-sm text-gray-600">Welcome to your full personality journey</p>
             </div>
-            <Button
-              size="sm"
-              className="bg-white text-teal-600 hover:bg-white/90 font-bold shadow-md flex-shrink-0"
-              onClick={() => window.open('https://buy.stripe.com/test_00g4iR5Zz3pz5QA145', '_blank')}
-              data-testid="button-donate-tip"
-            >
-              <Heart className="w-4 h-4 mr-1.5 fill-current" />
-              Donate Here
-            </Button>
           </div>
+          <Button
+            className="w-full rounded-none bg-teal-500 hover:bg-teal-600 text-white text-lg font-bold py-6 h-auto shadow-md"
+            onClick={async () => {
+              try {
+                const checkoutRes = await fetch('/api/stripe/checkout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ priceId: 'price_1QSLNwLbanWmBvNo4RScLlvO', mode: 'payment' }),
+                });
+                const checkoutData = await checkoutRes.json();
+                if (checkoutData.url) {
+                  window.location.href = checkoutData.url;
+                }
+              } catch (error) {
+                window.open('https://buy.stripe.com/test_00g4iR5Zz3pz5QA145', '_blank');
+              }
+            }}
+            data-testid="button-donate-here"
+          >
+            DONATE HERE
+          </Button>
         </motion.div>
       )}
       

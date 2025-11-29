@@ -283,7 +283,97 @@ ws6['!cols'] = [
 XLSX.utils.book_append_sheet(wb, ws6, 'Premium Questions');
 
 // ============================================
-// SHEET 7: User Notes (blank for user input)
+// SHEET 7: City Color Themes (Locality System)
+// ============================================
+// Load city themes data (compiled from TypeScript)
+const cityThemesRaw = fs.readFileSync('./client/src/data/cityThemes.ts', 'utf8');
+
+// Parse each city entry individually with a more robust multi-line pattern
+let cityThemeEntries = [];
+
+// Match city blocks that span multiple lines
+const cityBlockPattern = /"([^"]+)":\s*\{[\s\S]*?city:\s*"([^"]+)"[\s\S]*?state[?]?:\s*"([^"]*)"[\s\S]*?team:\s*"([^"]+)"[\s\S]*?colors:\s*\{\s*primary:\s*"([^"]+)",\s*secondary:\s*"([^"]+)",\s*accent:\s*"([^"]+)"\s*\}/g;
+
+let match;
+const seen = new Set();
+while ((match = cityBlockPattern.exec(cityThemesRaw)) !== null) {
+  const key = match[1];
+  if (!seen.has(key)) {
+    seen.add(key);
+    cityThemeEntries.push({
+      key: key,
+      city: match[2],
+      state: match[3] || '',
+      team: match[4],
+      primary: match[5],
+      secondary: match[6],
+      accent: match[7]
+    });
+  }
+}
+
+// Create state to major city mapping (largest city per state)
+const stateMajorCities = {
+  'AL': 'Birmingham', 'AK': 'Anchorage', 'AZ': 'Phoenix', 'AR': 'Little Rock', 'CA': 'Los Angeles',
+  'CO': 'Denver', 'CT': 'Bridgeport', 'DE': 'Wilmington', 'FL': 'Jacksonville', 'GA': 'Atlanta',
+  'HI': 'Honolulu', 'ID': 'Boise', 'IL': 'Chicago', 'IN': 'Indianapolis', 'IA': 'Des Moines',
+  'KS': 'Wichita', 'KY': 'Louisville', 'LA': 'New Orleans', 'ME': 'Portland', 'MD': 'Baltimore',
+  'MA': 'Boston', 'MI': 'Detroit', 'MN': 'Minneapolis', 'MS': 'Jackson', 'MO': 'Kansas City',
+  'MT': 'Billings', 'NE': 'Omaha', 'NV': 'Las Vegas', 'NH': 'Manchester', 'NJ': 'Newark',
+  'NM': 'Albuquerque', 'NY': 'New York', 'NC': 'Charlotte', 'ND': 'Fargo', 'OH': 'Columbus',
+  'OK': 'Oklahoma City', 'OR': 'Portland', 'PA': 'Philadelphia', 'RI': 'Providence', 'SC': 'Charleston',
+  'SD': 'Sioux Falls', 'TN': 'Nashville', 'TX': 'Houston', 'UT': 'Salt Lake City', 'VT': 'Burlington',
+  'VA': 'Virginia Beach', 'WA': 'Seattle', 'WV': 'Charleston', 'WI': 'Milwaukee', 'WY': 'Cheyenne',
+  'DC': 'Washington'
+};
+
+const colorRows = [
+  ['CITY COLOR THEMES - LOCALITY SYSTEM'],
+  [''],
+  ['HOW THIS WORKS:'],
+  ['1. User enters a US or Canada zip code'],
+  ['2. App looks up the city name from zip code via zippopotam.us API'],
+  ['3. City name is matched to a team theme below'],
+  ['4. Colors are applied to accent the app design'],
+  [''],
+  ['EDITING NOTES:'],
+  ['- To change colors for a city, modify the Primary Color and Secondary Color columns'],
+  ['- Colors should be in hex format (e.g., #FF0000 for red)'],
+  ['- After editing, share this file back for reimport'],
+  [''],
+  ['City Key', 'City Name', 'State', 'Major City in State', 'Team Name', 'Primary Color', 'Secondary Color', 'Accent Color']
+];
+
+// Sort entries by state then city
+cityThemeEntries.sort((a, b) => {
+  if (a.state < b.state) return -1;
+  if (a.state > b.state) return 1;
+  return a.city.localeCompare(b.city);
+});
+
+// Add each city entry
+cityThemeEntries.forEach(entry => {
+  const majorCity = stateMajorCities[entry.state] || entry.city;
+  colorRows.push([
+    entry.key,
+    entry.city,
+    entry.state,
+    majorCity,
+    entry.team,
+    entry.primary,
+    entry.secondary,
+    entry.accent
+  ]);
+});
+
+const ws7 = XLSX.utils.aoa_to_sheet(colorRows);
+ws7['!cols'] = [
+  { wch: 18 }, { wch: 18 }, { wch: 8 }, { wch: 18 }, { wch: 20 }, { wch: 12 }, { wch: 12 }, { wch: 12 }
+];
+XLSX.utils.book_append_sheet(wb, ws7, 'City Color Themes');
+
+// ============================================
+// SHEET 8: User Notes (blank for user input)
 // ============================================
 const notesRows = [
   ['YOUR NOTES & CHANGE REQUESTS'],
@@ -305,9 +395,9 @@ const notesRows = [
   ['- '],
   [''],
 ];
-const ws7 = XLSX.utils.aoa_to_sheet(notesRows.map(row => [row]));
-ws7['!cols'] = [{ wch: 100 }];
-XLSX.utils.book_append_sheet(wb, ws7, 'User Notes');
+const ws8 = XLSX.utils.aoa_to_sheet(notesRows.map(row => [row]));
+ws8['!cols'] = [{ wch: 100 }];
+XLSX.utils.book_append_sheet(wb, ws8, 'User Notes');
 
 // Write file
 const outputPath = path.join(__dirname, '..', 'KnowRole_Data_Export.xlsx');
@@ -320,4 +410,5 @@ console.log(`  3. Roles - ${Object.keys(rolesData.roles).length * 2} role entrie
 console.log(`  4. Timeout Messages - 16 timeout quips`);
 console.log(`  5. Feedback - Template (data stored in memory)`);
 console.log(`  6. Premium Questions - 14 premium flow questions`);
-console.log(`  7. User Notes - Blank sheet for your notes`);
+console.log(`  7. City Color Themes - ${cityThemeEntries.length} city-to-color mappings`);
+console.log(`  8. User Notes - Blank sheet for your notes`);
