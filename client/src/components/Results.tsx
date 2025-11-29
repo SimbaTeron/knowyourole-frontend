@@ -280,9 +280,24 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     }
   }, [scores, apiScales, isTestPremium]);
 
+  // DEV MODE: Set to true to bypass Stripe and preview premium features
+  const DEV_BYPASS_PAYMENT = true;
+  
   const handleUpgrade = async () => {
     setIsCheckingOut(true);
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+    
+    // DEV MODE: Skip payment and unlock premium immediately
+    if (DEV_BYPASS_PAYMENT) {
+      console.log('[DEV MODE] Payment bypassed - unlocking premium features for preview');
+      toast({
+        title: "Premium Unlocked (Dev Mode)",
+        description: "Payment bypassed for testing. You can now see premium features!",
+      });
+      setIsPremiumUnlocked(true);
+      setIsCheckingOut(false);
+      return;
+    }
     
     try {
       const productsRes = await fetch('/api/stripe/products');
@@ -1205,82 +1220,169 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </motion.div>
               )}
 
-              <motion.div
-                initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-              >
-                <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-300 dark:border-amber-700">
-                  <CardContent className="p-5 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-800/50 mb-3">
-                      <Crown className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                    </div>
-                    <h4 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2">
-                      Unlock Deep Insights
-                    </h4>
-                    <p className="text-sm text-amber-700 dark:text-amber-300 mb-4 max-w-xs mx-auto">
-                      Get comprehensive role analysis, personality evolution tracking, and expanded career matches.
-                    </p>
-                    
-                    <div className="grid grid-cols-2 gap-2 mb-4 text-left">
-                      <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
-                        <Gift className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">+2 Extra Role Matches</p>
-                          <p className="text-xs text-amber-600 dark:text-amber-400">Expanded career options</p>
+              {isPremiumUnlocked ? (
+                <motion.div
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                  className="space-y-4"
+                >
+                  <Card className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-2 border-emerald-400 dark:border-emerald-600">
+                    <CardContent className="p-5 text-center">
+                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-800/50 mb-3">
+                        <Crown className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <h4 className="text-lg font-bold text-emerald-800 dark:text-emerald-200 mb-2">
+                        Premium Unlocked!
+                      </h4>
+                      <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-1">
+                        You now have access to all premium features.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white dark:bg-gray-800 border-amber-300 dark:border-amber-700">
+                    <CardContent className="p-4">
+                      <h5 className="text-sm font-bold text-amber-700 dark:text-amber-300 mb-3 flex items-center gap-2">
+                        <Gift className="w-4 h-4" />
+                        +2 Extra Role Matches
+                      </h5>
+                      <div className="space-y-3">
+                        <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
+                          <p className="text-sm font-semibold text-warm-gray dark:text-soft-cream">Creative Consultant</p>
+                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">$60K-120K · Bridge ideas with strategic vision</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
+                          <p className="text-sm font-semibold text-warm-gray dark:text-soft-cream">Workshop Facilitator</p>
+                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">$50K-95K · Guide teams through collaborative discovery</p>
                         </div>
                       </div>
-                      <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
-                        <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Deep Dive Analysis</p>
-                          <p className="text-xs text-amber-600 dark:text-amber-400">Why you fit each role</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white dark:bg-gray-800 border-violet-300 dark:border-violet-700">
+                    <CardContent className="p-4">
+                      <h5 className="text-sm font-bold text-violet-700 dark:text-violet-300 mb-3 flex items-center gap-2">
+                        <BookOpen className="w-4 h-4" />
+                        Deep Dive Analysis
+                      </h5>
+                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70 space-y-2">
+                        <p><strong>Why {result?.primaryRole.title}?</strong></p>
+                        <p>Your unique combination of {result?.mbtiType} personality with {result?.discStyle} drive aligns perfectly with this role. Your high scores in key traits suggest you'd thrive in environments that value {result?.mbtiType.includes('E') ? 'collaboration and energy' : 'focus and depth'}.</p>
+                        <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-2 italic">Based on analysis of your quiz responses and personality profile.</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-700">
+                    <CardContent className="p-4">
+                      <h5 className="text-sm font-bold text-blue-700 dark:text-blue-300 mb-3 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" />
+                        Arc Tracker
+                      </h5>
+                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70">
+                        <p className="mb-2">Track how your personality evolves over time. Take the quiz again in 3-6 months to see your growth.</p>
+                        <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+                          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          <span>First assessment: {new Date().toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
-                        <TrendingUp className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Arc Tracker</p>
-                          <p className="text-xs text-amber-600 dark:text-amber-400">Personality over time</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white dark:bg-gray-800 border-pink-300 dark:border-pink-700">
+                    <CardContent className="p-4">
+                      <h5 className="text-sm font-bold text-pink-700 dark:text-pink-300 mb-3 flex items-center gap-2">
+                        <Star className="w-4 h-4" />
+                        Retest Versions
+                      </h5>
+                      <div className="text-sm text-warm-gray/80 dark:text-soft-cream/70">
+                        <p>Compare your results across multiple assessments to see how your strengths develop and new interests emerge.</p>
+                        <Button variant="outline" size="sm" className="mt-3 border-pink-300 text-pink-700 hover:bg-pink-50 dark:border-pink-600 dark:text-pink-300 dark:hover:bg-pink-900/20" onClick={onRestart}>
+                          Take Quiz Again
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-300 dark:border-amber-700">
+                    <CardContent className="p-5 text-center">
+                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-800/50 mb-3">
+                        <Crown className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <h4 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2">
+                        Unlock Deep Insights
+                      </h4>
+                      <p className="text-sm text-amber-700 dark:text-amber-300 mb-4 max-w-xs mx-auto">
+                        Get comprehensive role analysis, personality evolution tracking, and expanded career matches.
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-2 mb-4 text-left">
+                        <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
+                          <Gift className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">+2 Extra Role Matches</p>
+                            <p className="text-xs text-amber-600 dark:text-amber-400">Expanded career options</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
+                          <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Deep Dive Analysis</p>
+                            <p className="text-xs text-amber-600 dark:text-amber-400">Why you fit each role</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
+                          <TrendingUp className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Arc Tracker</p>
+                            <p className="text-xs text-amber-600 dark:text-amber-400">Personality over time</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
+                          <Star className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Retest Versions</p>
+                            <p className="text-xs text-amber-600 dark:text-amber-400">Compare your growth</p>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-start gap-2 p-2 rounded-lg bg-amber-100/50 dark:bg-amber-800/30">
-                        <Star className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Retest Versions</p>
-                          <p className="text-xs text-amber-600 dark:text-amber-400">Compare your growth</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <Button
-                      className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8"
-                      onClick={handleUpgrade}
-                      disabled={isCheckingOut}
-                      data-testid="button-upgrade"
-                    >
-                      {isCheckingOut ? (
-                        <>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
-                          />
-                          Loading...
-                        </>
-                      ) : (
-                        <>
-                          <Crown className="w-4 h-4 mr-2" />
-                          Unlock for $9 One-Time
-                        </>
-                      )}
-                    </Button>
-                    <p className="text-xs text-amber-600/60 dark:text-amber-400/60 mt-3">
-                      No subscription. Access forever. Support indie development.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                      
+                      <Button
+                        className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8"
+                        onClick={handleUpgrade}
+                        disabled={isCheckingOut}
+                        data-testid="button-upgrade"
+                      >
+                        {isCheckingOut ? (
+                          <>
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                            />
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            <Crown className="w-4 h-4 mr-2" />
+                            Unlock for $9 One-Time
+                          </>
+                        )}
+                      </Button>
+                      <p className="text-xs text-amber-600/60 dark:text-amber-400/60 mt-3">
+                        No subscription. Access forever. Support indie development.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
             </>
           )}
         </AnimatePresence>
