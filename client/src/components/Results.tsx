@@ -859,10 +859,17 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </div>
                 );
               })()}
-              <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-xs mx-auto">
+              <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-sm mx-auto">
                 {result.primaryRole.desc} {result.mbtiType.includes('E') 
-                  ? "Your natural energy and communication style make you well-suited for this role." 
-                  : "Your thoughtful, focused approach brings unique value to this field."}
+                  ? "Your natural energy and communication style make you well-suited for collaborative environments." 
+                  : "Your thoughtful, focused approach brings unique depth and precision to this field."} 
+                {result.discStyle === 'D' ? " As a natural leader, you thrive when given autonomy and clear goals." 
+                  : result.discStyle === 'I' ? " Your enthusiasm and persuasive abilities help you connect with diverse people." 
+                  : result.discStyle === 'S' ? " Your steady reliability makes you a trusted anchor in team settings." 
+                  : " Your attention to detail ensures high-quality outcomes in everything you do."} 
+                {topTrait[1] > 60 
+                  ? ` With ${TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]} as your strongest trait, you bring a distinctive edge to your work.`
+                  : ` You have a balanced personality profile that adapts well across different situations.`}
               </p>
               
               <div className="grid grid-cols-3 gap-2 mt-6">
