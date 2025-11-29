@@ -39,6 +39,10 @@ export class StripeService {
     const stripe = await getUncachableStripeClient();
     return await stripe.checkout.sessions.retrieve(sessionId);
   }
+  
+  async getStripe() {
+    return await getUncachableStripeClient();
+  }
 }
 
 export const stripeService = new StripeService();

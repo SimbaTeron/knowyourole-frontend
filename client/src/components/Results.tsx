@@ -481,6 +481,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [adventureArchetype, setAdventureArchetype] = useState<AdventureArchetype | null>(null);
   
   const [showJustKidding, setShowJustKidding] = useState(false);
+  const [showDonationTiers, setShowDonationTiers] = useState(false);
   
   const [usefulApp, setUsefulApp] = useState<string>("");
   const [resultsAccurate, setResultsAccurate] = useState<string>("");
@@ -862,19 +863,28 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     });
   };
 
-  const handleDonateClick = async () => {
+  const handleDonateClick = () => {
+    setShowDonationTiers(true);
+  };
+  
+  const handleDonationTierSelect = async (amount: number) => {
     try {
-      const checkoutRes = await fetch('/api/stripe/checkout', {
+      const checkoutRes = await fetch('/api/stripe/donate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: 'price_1QSLNwLbanWmBvNo4RScLlvO', mode: 'payment' }),
+        body: JSON.stringify({ amount, sessionId: sessionId || undefined }),
       });
       const checkoutData = await checkoutRes.json();
       if (checkoutData.url) {
         window.location.href = checkoutData.url;
       }
     } catch (error) {
-      window.open('https://buy.stripe.com/test_00g4iR5Zz3pz5QA145', '_blank');
+      console.error('Donation error:', error);
+      toast({
+        title: "Donation Error",
+        description: "Unable to process donation. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -939,14 +949,79 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   onClick={handleDonateClick}
                   data-testid="button-donate-kidding"
                 >
-                  <Heart className="w-4 h-4 mr-2" />
-                  Donate (Alpha Feedback)
+                  <Heart className="w-4 h-4 mr-2 fill-current" />
+                  Donate (Help us build)
                 </Button>
               </div>
               
               <p className="text-xs text-teal-500/60 dark:text-teal-400/50 mt-4">
                 All features unlocked free during testing
               </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Donation Tiers Overlay */}
+      <AnimatePresence>
+        {showDonationTiers && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            data-testid="overlay-donation-tiers"
+          >
+            <motion.div
+              initial={{ scale: 0.8, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 50 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 dark:from-amber-900/90 dark:via-orange-900/80 dark:to-amber-800/90 rounded-3xl p-8 mx-4 max-w-sm w-full text-center shadow-2xl border-2 border-amber-200 dark:border-amber-700"
+            >
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 400 }}
+                className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-4 shadow-lg"
+              >
+                <Heart className="w-10 h-10 text-white fill-current" />
+              </motion.div>
+              
+              <p className="text-xl font-bold text-amber-700 dark:text-amber-200 mb-2">
+                Support KnowRole
+              </p>
+              <p className="text-sm text-amber-600/80 dark:text-amber-300/70 mb-6">
+                Your donation helps us keep building and improving!
+              </p>
+              
+              <div className="space-y-3">
+                <Button
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-4 text-lg shadow-lg"
+                  onClick={() => handleDonationTierSelect(333)}
+                  data-testid="button-donate-333"
+                >
+                  $3.33
+                </Button>
+                
+                <Button
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 text-lg shadow-lg"
+                  onClick={() => handleDonationTierSelect(3333)}
+                  data-testid="button-donate-3333"
+                >
+                  $33.33
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full border-2 border-amber-400 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 font-semibold py-4"
+                  onClick={() => setShowDonationTiers(false)}
+                  data-testid="button-back-kidding"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Go Back
+                </Button>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -975,23 +1050,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </div>
           <Button
             className="w-full rounded-none bg-teal-500 hover:bg-teal-600 text-white text-lg font-bold py-6 h-auto shadow-md"
-            onClick={async () => {
-              try {
-                const checkoutRes = await fetch('/api/stripe/checkout', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ priceId: 'price_1QSLNwLbanWmBvNo4RScLlvO', mode: 'payment' }),
-                });
-                const checkoutData = await checkoutRes.json();
-                if (checkoutData.url) {
-                  window.location.href = checkoutData.url;
-                }
-              } catch (error) {
-                window.open('https://buy.stripe.com/test_00g4iR5Zz3pz5QA145', '_blank');
-              }
-            }}
+            onClick={handleDonateClick}
             data-testid="button-donate-here"
           >
+            <Heart className="w-5 h-5 mr-2 fill-current" />
             DONATE HERE
           </Button>
         </motion.div>

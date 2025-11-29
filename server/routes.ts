@@ -331,6 +331,48 @@ export async function registerRoutes(
     }
   });
 
+  // Donation endpoint with dynamic pricing
+  app.post("/api/stripe/donate", async (req: Request, res: Response) => {
+    try {
+      const { amount, sessionId } = req.body;
+
+      if (!amount || (amount !== 333 && amount !== 3333)) {
+        return res.status(400).json({ error: "Invalid donation amount. Use 333 ($3.33) or 3333 ($33.33)" });
+      }
+
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+      const host = req.headers['x-forwarded-host'] || req.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
+      const successUrl = `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&quiz_session=${sessionId || ''}&donation=true`;
+      const cancelUrl = `${baseUrl}/checkout/cancel`;
+
+      const stripe = await stripeService.getStripe();
+      
+      const checkoutSession = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: amount === 333 ? 'KnowRole Donation - $3.33' : 'KnowRole Donation - $33.33',
+              description: 'Thank you for supporting KnowRole development!',
+            },
+            unit_amount: amount,
+          },
+          quantity: 1,
+        }],
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+
+      res.json({ url: checkoutSession.url });
+    } catch (error) {
+      console.error("Donation checkout error:", error);
+      res.status(500).json({ error: "Failed to create donation checkout" });
+    }
+  });
+
   // Feedback submission endpoint
   app.post("/api/feedback", async (req: Request, res: Response) => {
     try {
