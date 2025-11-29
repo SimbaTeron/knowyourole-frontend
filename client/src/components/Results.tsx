@@ -24,6 +24,7 @@ import { Radar } from "react-chartjs-2";
 import type { QuizScores } from "./Quiz";
 import rolesData from "@/data/roles.json";
 import { useToast } from "@/hooks/use-toast";
+import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -223,6 +224,32 @@ const FUN_MODE_ROASTS: Record<string, string> = {
   "ISFP": "The artist who feels everything, especially deadlines.",
   "ESTP": "Living on the edge while texting and driving metaphorically.",
   "ESFP": "The party doesn't start until you arrive and overshare.",
+};
+
+const FUN_MODE_DISC: Record<string, { nickname: string; vibe: string }> = {
+  "D": { nickname: "The Boss Baby", vibe: "Main character energy. You walk into rooms like you own them (you probably do)." },
+  "I": { nickname: "The Hype Machine", vibe: "Your enthusiasm is contagious—and slightly exhausting. In the best way!" },
+  "S": { nickname: "The Rock", vibe: "Everyone's emotional support human. You've heard 'thanks for listening' 10,000 times." },
+  "C": { nickname: "The Perfectionist", vibe: "If it's not done right, it's not done. Your spreadsheets have spreadsheets." },
+};
+
+const FUN_MODE_TITLES: Record<string, string> = {
+  "INTJ": "Supreme Overthinker",
+  "INTP": "Theoretical Wizard",
+  "ENTJ": "Chief Everything Officer",
+  "ENTP": "Professional Debater",
+  "INFJ": "Soul Reader",
+  "INFP": "Daydream Believer",
+  "ENFJ": "Cheerleader-in-Chief",
+  "ENFP": "Chaos Coordinator",
+  "ISTJ": "Rule Keeper",
+  "ISFJ": "Guardian Angel",
+  "ESTJ": "Order Commander",
+  "ESFJ": "Party Planner Supreme",
+  "ISTP": "Silent Fixer",
+  "ISFP": "Aesthetic Curator",
+  "ESTP": "Action Hero",
+  "ESFP": "Entertainment Director",
 };
 
 const TRAIT_QUESTS: Record<string, { high: string; low: string }> = {
@@ -430,6 +457,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
+  const { teamName, isLocalitySet } = useLocalityTheme();
   
   const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
@@ -827,8 +855,15 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   className="text-center px-4 py-5 rounded-2xl bg-terracotta/8 dark:bg-terracotta/15 border border-terracotta/20"
                 >
                   <Brain className="w-6 h-6 text-terracotta mx-auto mb-2" />
-                  <p className="text-xs text-terracotta font-semibold tracking-wide uppercase mb-1">MBTI {result.mbtiType}</p>
-                  <p className="text-sm text-warm-gray dark:text-soft-cream leading-relaxed">
+                  <p className="text-xs text-terracotta font-semibold tracking-wide uppercase mb-1">
+                    {funMode ? result.mbtiType : `MBTI ${result.mbtiType}`}
+                  </p>
+                  <p className="text-sm font-medium text-terracotta mb-1">
+                    {funMode && FUN_MODE_TITLES[result.mbtiType] 
+                      ? FUN_MODE_TITLES[result.mbtiType]
+                      : result.mbtiLabel}
+                  </p>
+                  <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
                     {result.mbtiDesc}
                   </p>
                 </motion.div>
@@ -840,9 +875,18 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   className="text-center px-4 py-5 rounded-2xl bg-sage-green/8 dark:bg-sage-green/15 border border-sage-green/20"
                 >
                   <Award className="w-6 h-6 text-sage-green mx-auto mb-2" />
-                  <p className="text-xs text-sage-green font-semibold tracking-wide uppercase mb-1">DISC {result.discStyle}</p>
-                  <p className="text-sm text-warm-gray dark:text-soft-cream leading-relaxed">
-                    {result.discDesc}
+                  <p className="text-xs text-sage-green font-semibold tracking-wide uppercase mb-1">
+                    {funMode ? result.discStyle : `DISC ${result.discStyle}`}
+                  </p>
+                  <p className="text-sm font-medium text-sage-green mb-1">
+                    {funMode && FUN_MODE_DISC[result.discStyle] 
+                      ? FUN_MODE_DISC[result.discStyle].nickname
+                      : result.discLabel}
+                  </p>
+                  <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 leading-relaxed">
+                    {funMode && FUN_MODE_DISC[result.discStyle]
+                      ? FUN_MODE_DISC[result.discStyle].vibe
+                      : result.discDesc}
                   </p>
                 </motion.div>
                 
@@ -887,12 +931,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-terracotta/10 mb-2">
                   <Brain className="w-5 h-5 text-terracotta" aria-hidden="true" />
                 </div>
-                <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-1">MBTI Type</p>
+                <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-1">
+                  {funMode ? "Your Title" : "MBTI Type"}
+                </p>
                 <p className="text-lg font-bold font-mono text-terracotta" data-testid="text-mbti">
                   {result.mbtiType}
                 </p>
                 <p className="text-sm font-medium text-warm-gray dark:text-soft-cream">
-                  {result.mbtiLabel}
+                  {funMode && FUN_MODE_TITLES[result.mbtiType] 
+                    ? FUN_MODE_TITLES[result.mbtiType]
+                    : result.mbtiLabel}
                 </p>
               </CardContent>
             </Card>
@@ -902,12 +950,18 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mb-2">
                   <Award className="w-5 h-5" aria-hidden="true" />
                 </div>
-                <p className="text-xs opacity-70 mb-1">DISC Style</p>
+                <p className="text-xs opacity-70 mb-1">
+                  {funMode ? "Your Vibe" : "DISC Style"}
+                </p>
                 <p className="text-lg font-bold" data-testid="text-disc">
-                  {result.discLabel}
+                  {funMode && FUN_MODE_DISC[result.discStyle] 
+                    ? FUN_MODE_DISC[result.discStyle].nickname 
+                    : result.discLabel}
                 </p>
                 <p className="text-sm font-medium opacity-90">
-                  {result.discStyle}-type
+                  {funMode && FUN_MODE_DISC[result.discStyle]
+                    ? result.discStyle + "-type energy"
+                    : result.discStyle + "-type"}
                 </p>
               </CardContent>
             </Card>
@@ -1274,6 +1328,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
+                  className="space-y-3"
                 >
                   <Card className="bg-gradient-to-br from-violet-50 to-pink-50 dark:from-violet-900/20 dark:to-pink-900/20 border-violet-200 dark:border-violet-800">
                     <CardContent className="p-4">
@@ -1286,6 +1341,20 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       </p>
                     </CardContent>
                   </Card>
+                  
+                  {FUN_MODE_DISC[result.discStyle] && (
+                    <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Zap className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                          <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">Your Vibe Check</span>
+                        </div>
+                        <p className="text-sm text-amber-900 dark:text-amber-100">
+                          {FUN_MODE_DISC[result.discStyle].vibe}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
                 </motion.div>
               )}
 

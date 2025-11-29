@@ -118,12 +118,14 @@ export default function FunModeToggle({ enabled, onToggle }: FunModeToggleProps)
           <span className={`font-bold text-base block leading-tight ${
             enabled ? "text-terracotta" : "text-black dark:text-white"
           }`}>
-            Add Personality Twists
+            {enabled ? "Fun Mode Active!" : "Add Personality Twists"}
           </span>
           <span className={`text-sm block ${
             enabled ? "text-terracotta/70" : "text-gray-600 dark:text-gray-300"
           }`}>
-            Get playful insights with your results
+            {enabled 
+              ? "Your results will include playful roasts & vibe checks"
+              : "Unlock funny nicknames, roasts & casual vibes"}
           </span>
         </div>
         

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap, RotateCcw } from "lucide-react";
+import { Timer, Pause, Play, ChevronLeft, ChevronRight, Zap, RotateCcw, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import questionsData from "@/data/questions.json";
+import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 
 interface Question {
   id: number;
@@ -90,6 +91,7 @@ const READABLE_RANDOM_COLORS = [
 
 export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
   const tierConfig = questionsData.tierConfig[tier as keyof typeof questionsData.tierConfig] || questionsData.tierConfig["19-25"];
+  const { teamName, isLocalitySet } = useLocalityTheme();
   
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -123,7 +125,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const isRandomTheme = theme === "random";
+  const useLocalityColors = isLocalitySet;
 
   useEffect(() => {
     const tierQuestions = questionsData.questions.filter(q => q.tier === tier);
@@ -338,8 +340,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const timerProgress = (timeRemaining / tierConfig.maxTime) * 100;
   
   const randomColor = READABLE_RANDOM_COLORS[vibrantColorIndex];
-  const promptColor = isRandomTheme 
-    ? `${randomColor.accent} ${randomColor.text} px-3 py-1 rounded-lg inline-block` 
+  const promptColor = useLocalityColors 
+    ? "locality-gradient px-3 py-1 rounded-lg inline-block" 
     : "text-sage-green";
 
   return (
@@ -359,6 +361,16 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             <span className="text-sm font-medium text-warm-gray dark:text-soft-cream">
               {currentIndex + 1}/{questions.length}
             </span>
+            {useLocalityColors && teamName && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full locality-gradient"
+              >
+                <MapPin className="w-3 h-3" />
+                <span className="text-xs font-medium">{teamName}</span>
+              </motion.div>
+            )}
             {fastResponses >= 3 && (
               <motion.div
                 initial={{ scale: 0 }}

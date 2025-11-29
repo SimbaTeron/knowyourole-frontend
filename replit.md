@@ -31,7 +31,7 @@ Preferred communication style: Simple, everyday language.
 - `AgeTierSelector`: Four age tier cards (7-12, 13-18, 19-25, 25+) with clip-path blob shapes
 - `MoodSelector`: Three mood options (energized, reflective, stuck) with icon indicators
 - `PostalInput`: Country/postal code input with landmark discovery integration
-- `FunModeToggle`: Toggle for playful personality insights
+- `FunModeToggle`: Toggle for playful personality insights with dynamic text (shows "Fun Mode Active!" when enabled)
 - `StepIndicator`: Progress visualization across multi-step flow
 
 ### Backend Architecture
@@ -154,6 +154,13 @@ Preferred communication style: Simple, everyday language.
   - `infp-i-e-high`: Singer-Songwriter, Indie Musician
   - `isfp-i-e-high`: Session Musician, Music Producer
 - **Test Mode**: Add `?test_premium=true` to URL to bypass payment and view premium features
+- **Fun Mode Enhancement**: When enabled on location page, results display:
+  - Fun MBTI titles (e.g., "Supreme Overthinker", "Chief Everything Officer", "Chaos Coordinator")
+  - Fun DISC nicknames (e.g., "The Boss Baby", "The Hype Machine", "The Steady Hero")
+  - Fun DISC vibes (e.g., "Bold moves, zero regrets", "Never met a stranger")
+  - "Fun Mode Roast" card (violet gradient) with personality roasts
+  - "Your Vibe Check" card (amber gradient) with DISC vibe description
+  - Works in both teaser (quick glimpse) and full dashboard stages
 
 ### Data and State Management
 - **TanStack Query**: Server state management, caching, and data fetching

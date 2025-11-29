@@ -6,6 +6,7 @@ import Results from "@/components/Results";
 import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -20,6 +21,7 @@ export default function QuizPage() {
   const [apiScales, setApiScales] = useState<APIScales | null>(null);
   const [showResults, setShowResults] = useState(false);
   const { toast } = useToast();
+  const { teamName, isLocalitySet } = useLocalityTheme();
 
   const ageTier = sessionStorage.getItem("knowrole-tier") || "25plus";
   const mood = sessionStorage.getItem("knowrole-mood") || "";

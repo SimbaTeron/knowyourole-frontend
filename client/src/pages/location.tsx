@@ -276,7 +276,11 @@ export default function LocationPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             onClick={handleBeginJourney}
-            className="w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 trail-button text-white"
+            className={`w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 ${
+              isLocalitySet 
+                ? "locality-button" 
+                : "trail-button text-white"
+            }`}
             data-testid="button-begin-journey"
           >
             <Compass className="w-5 h-5" />

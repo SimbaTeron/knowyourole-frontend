@@ -177,35 +177,35 @@
   --locality-text-on-secondary: 0 0% 10%;
 }
 
-/* Locality themed elements use scoped classes, not global palette overrides */
+/* Locality themed elements - work independently when locality CSS vars are set */
 
-.locality-themed .locality-primary-bg {
+.locality-primary-bg {
   background-color: hsl(var(--locality-primary));
   color: hsl(var(--locality-text-on-primary));
 }
 
-.locality-themed .locality-secondary-bg {
+.locality-secondary-bg {
   background-color: hsl(var(--locality-secondary));
   color: hsl(var(--locality-text-on-secondary));
 }
 
-.locality-themed .locality-primary-text {
+.locality-primary-text {
   color: hsl(var(--locality-primary));
 }
 
-.locality-themed .locality-secondary-text {
+.locality-secondary-text {
   color: hsl(var(--locality-secondary));
 }
 
-.locality-themed .locality-accent-text {
+.locality-accent-text {
   color: hsl(var(--locality-accent));
 }
 
-.locality-themed .locality-primary-border {
+.locality-primary-border {
   border-color: hsl(var(--locality-primary));
 }
 
-.locality-themed .locality-secondary-border {
+.locality-secondary-border {
   border-color: hsl(var(--locality-secondary));
 }
 
@@ -215,6 +215,7 @@
     hsl(var(--locality-primary)) 0%,
     hsl(var(--locality-secondary)) 100%
   );
+  color: hsl(var(--locality-text-on-primary));
 }
 
 .locality-gradient-text {
@@ -226,6 +227,33 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Locality-themed button variant */
+.locality-button {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--locality-primary)) 0%,
+    hsl(var(--locality-secondary)) 100%
+  );
+  color: hsl(var(--locality-text-on-primary));
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px hsl(var(--locality-primary) / 0.3);
+}
+
+.locality-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px hsl(var(--locality-primary) / 0.4);
+}
+
+/* Locality card accent border */
+.locality-card-accent {
+  border-left: 4px solid hsl(var(--locality-primary));
+  background: linear-gradient(
+    90deg,
+    hsl(var(--locality-primary) / 0.05) 0%,
+    transparent 50%
+  );
 }
 
 @layer base {
