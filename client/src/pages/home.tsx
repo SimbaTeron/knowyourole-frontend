@@ -52,7 +52,6 @@ export default function Home() {
         theme={theme} 
         onThemeChange={handleThemeChange} 
       />
-      
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-5 pt-32 pb-24">
         <div className="w-full max-w-md">
           <motion.div 
@@ -64,9 +63,7 @@ export default function Home() {
             <p
               className="text-lg md:text-xl text-warm-gray dark:text-soft-cream max-w-sm mx-auto leading-relaxed"
               data-testid="text-subtitle"
-            >
-              Chart your everyday path to discover traits, sparks, and growth
-            </p>
+            >Chart your path to discover                 traits, sparks, and growth</p>
           </motion.div>
 
           <div className="floating-card">
@@ -86,7 +83,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-
       <footer className="fixed bottom-0 left-0 right-0 z-10 py-5 text-center">
         <p className="text-sm italic font-handwritten text-warm-gray/50 dark:text-soft-cream/40 cursor-pointer hover:text-terracotta transition-colors">
           Unfold your trait trail
