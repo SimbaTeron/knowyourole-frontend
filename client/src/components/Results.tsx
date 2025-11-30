@@ -4,7 +4,7 @@ import {
   Sparkles, Trophy, Target, Brain, Heart, Users, RefreshCw, Share2, 
   Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame,
   MessageCircle, Frown, Meh, Smile, Lock, Crown, Star, Gift, BookOpen,
-  Rocket, Timer, CheckCircle2, Calendar, ArrowRight, Shield, Compass, 
+  Rocket, Timer, CheckCircle2, Calendar, ArrowRight, ArrowLeft, Shield, Compass, 
   Mountain, Sunrise, CircleDot, Play, Building2, DollarSign, PartyPopper
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
