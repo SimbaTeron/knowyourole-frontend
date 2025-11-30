@@ -77,7 +77,6 @@ export default function MoodPage() {
         currentTheme={theme}
         onThemeChange={handleThemeChange}
       />
-
       <main className="relative z-10 pt-24 pb-32 px-4 min-h-screen flex flex-col">
         <div className="max-w-md mx-auto w-full flex-1 flex flex-col">
           <motion.div
@@ -176,7 +175,7 @@ export default function MoodPage() {
                   <h3 className="text-xl font-semibold text-warm-gray dark:text-soft-cream">
                     {MOODS.find(m => m.id === mood)?.label}
                   </h3>
-                  <p className="text-sm text-warm-gray/60 dark:text-soft-cream/50 mt-1">
+                  <p className="text-warm-gray/60 dark:text-soft-cream/50 mt-1 text-[18px]">
                     {MOODS.find(m => m.id === mood)?.desc}
                   </p>
                 </motion.div>
@@ -197,7 +196,6 @@ export default function MoodPage() {
           </motion.div>
         </div>
       </main>
-
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-deep-cream dark:via-deep-cream/95 pb-8">
         <div className="max-w-md mx-auto space-y-3">
           <motion.button
