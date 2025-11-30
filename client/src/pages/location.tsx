@@ -152,16 +152,16 @@ export default function LocationPage() {
 
   const handleBeginJourney = () => {
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    setLocation("/quiz");
+    setLocation("/pre-quiz");
   };
 
   const handleSkip = () => {
     if (navigator.vibrate) navigator.vibrate(20);
-    setLocation("/quiz");
+    setLocation("/pre-quiz");
   };
 
   const handleBack = () => {
-    setLocation("/mood");
+    setLocation("/mood-mixer");
   };
 
   const getThemeClass = () => {

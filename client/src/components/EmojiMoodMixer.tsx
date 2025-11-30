@@ -34,7 +34,11 @@ function getHybridKey(id1: string, id2: string): string {
   return [id1, id2].sort().join("+");
 }
 
-export default function EmojiMoodMixer() {
+interface EmojiMoodMixerProps {
+  onMoodBrewed?: () => void;
+}
+
+export default function EmojiMoodMixer({ onMoodBrewed }: EmojiMoodMixerProps) {
   const [cauldronMoods, setCauldronMoods] = useState<string[]>([]);
   const [hybridResult, setHybridResult] = useState<{ title: string; desc: string } | null>(null);
   const [isBrewing, setIsBrewing] = useState(false);
@@ -54,6 +58,7 @@ export default function EmojiMoodMixer() {
         const key = getHybridKey(newMoods[0], newMoods[1]);
         setHybridResult(HYBRID_HINTS[key] || { title: "Unique Blend", desc: "A one-of-a-kind personality mix!" });
         setIsBrewing(false);
+        if (onMoodBrewed) onMoodBrewed();
       }, 1500);
     }
   };

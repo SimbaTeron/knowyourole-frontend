@@ -24,10 +24,10 @@ interface MultiChoiceQuestion {
   options: MultiChoiceOption[];
 }
 
-const OPENING_QUESTION: MultiChoiceQuestion = {
-  id: "opening",
+const MID1_QUESTION: MultiChoiceQuestion = {
+  id: "mid1",
   prompt: "What energizes you most right now?",
-  subtitle: "Pick the one that feels most like you",
+  subtitle: "Quick break! Pick the one that feels most like you",
   options: [
     {
       id: "creative",
@@ -56,8 +56,8 @@ const OPENING_QUESTION: MultiChoiceQuestion = {
   ]
 };
 
-const FINAL_QUESTION: MultiChoiceQuestion = {
-  id: "final",
+const MID2_QUESTION: MultiChoiceQuestion = {
+  id: "mid2",
   prompt: "When tackling a challenge, you naturally...",
   subtitle: "Almost there! One more insight",
   options: [
@@ -87,6 +87,9 @@ const FINAL_QUESTION: MultiChoiceQuestion = {
     }
   ]
 };
+
+const MID1_BREAK_AFTER = 7;
+const MID2_BREAK_AFTER = 15;
 
 const MULTI_CHOICE_ICONS: Record<MultiChoiceOption["icon"], typeof Sparkles> = {
   creative: Sparkles,
@@ -187,15 +190,17 @@ const READABLE_RANDOM_COLORS = [
   { accent: "bg-teal-600", text: "text-white" },
 ];
 
-type QuizPhase = "opening" | "quiz" | "final";
+type QuizPhase = "quiz" | "mid1" | "mid2";
 
 export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
   const tierConfig = questionsData.tierConfig[tier as keyof typeof questionsData.tierConfig] || questionsData.tierConfig["19-25"];
   const { teamName, isLocalitySet } = useLocalityTheme();
   
-  const [quizPhase, setQuizPhase] = useState<QuizPhase>("opening");
-  const [openingChoice, setOpeningChoice] = useState<string | null>(null);
-  const [finalChoice, setFinalChoice] = useState<string | null>(null);
+  const [quizPhase, setQuizPhase] = useState<QuizPhase>("quiz");
+  const [mid1Choice, setMid1Choice] = useState<string | null>(null);
+  const [mid2Choice, setMid2Choice] = useState<string | null>(null);
+  const [completedMid1, setCompletedMid1] = useState(false);
+  const [completedMid2, setCompletedMid2] = useState(false);
   
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -388,31 +393,33 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     });
   }, []);
 
-  const handleOpeningChoice = useCallback((optionId: string) => {
-    const option = OPENING_QUESTION.options.find(o => o.id === optionId);
+  const handleMid1Choice = useCallback((optionId: string) => {
+    const option = MID1_QUESTION.options.find(o => o.id === optionId);
     if (!option) return;
     
     if (navigator.vibrate) navigator.vibrate(50);
-    setOpeningChoice(optionId);
+    setMid1Choice(optionId);
     applyMultiChoiceWeights(option);
+    setCompletedMid1(true);
     
     setTimeout(() => {
       setQuizPhase("quiz");
     }, 400);
   }, [applyMultiChoiceWeights]);
 
-  const handleFinalChoice = useCallback((optionId: string) => {
-    const option = FINAL_QUESTION.options.find(o => o.id === optionId);
+  const handleMid2Choice = useCallback((optionId: string) => {
+    const option = MID2_QUESTION.options.find(o => o.id === optionId);
     if (!option) return;
     
     if (navigator.vibrate) navigator.vibrate(50);
-    setFinalChoice(optionId);
+    setMid2Choice(optionId);
     applyMultiChoiceWeights(option);
+    setCompletedMid2(true);
     
     setTimeout(() => {
-      onComplete(scores);
+      setQuizPhase("quiz");
     }, 400);
-  }, [applyMultiChoiceWeights, onComplete, scores]);
+  }, [applyMultiChoiceWeights]);
 
   const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false) => {
     if (questions.length === 0 || currentIndex >= questions.length) return;
@@ -438,6 +445,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       swipeDirection: direction
     };
     
+    const nextQuestionNumber = currentIndex + 2;
+    
     setScores(prev => {
       const updatedScores = {
         ...prev,
@@ -446,7 +455,11 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       };
       
       if (currentIndex >= questions.length - 1) {
-        setTimeout(() => setQuizPhase("final"), 300);
+        setTimeout(() => onComplete(updatedScores), 300);
+      } else if (nextQuestionNumber === MID1_BREAK_AFTER + 1 && !completedMid1) {
+        setTimeout(() => setQuizPhase("mid1"), 300);
+      } else if (nextQuestionNumber === MID2_BREAK_AFTER + 1 && !completedMid2) {
+        setTimeout(() => setQuizPhase("mid2"), 300);
       }
       
       return updatedScores;
@@ -457,7 +470,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, x]);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedMid1, completedMid2, onComplete]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut) return;
@@ -612,12 +625,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     </div>
   );
 
-  if (quizPhase === "opening") {
-    return renderMultiChoiceQuestion(OPENING_QUESTION, openingChoice, handleOpeningChoice, true);
+  if (quizPhase === "mid1") {
+    return renderMultiChoiceQuestion(MID1_QUESTION, mid1Choice, handleMid1Choice, true);
   }
 
-  if (quizPhase === "final") {
-    return renderMultiChoiceQuestion(FINAL_QUESTION, finalChoice, handleFinalChoice, false);
+  if (quizPhase === "mid2") {
+    return renderMultiChoiceQuestion(MID2_QUESTION, mid2Choice, handleMid2Choice, false);
   }
   
   if (questions.length === 0 || !currentQuestion) {

@@ -28,16 +28,19 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
 
 ### Feature Specifications
 
-- **Quiz Flow**: A multi-phase quiz includes multi-choice and binary questions, tailored by age tier, with randomization and a per-question timer. Timer morphs to circular progress ring when <3s remaining. Cards tilt on selection for tactile feedback. Auto-hiding "Tap or swipe" hint after first interaction. It tracks MBTI, DISC, Big Five, Critical Thinking, and First Principles traits.
-- **Results Dashboard**: Displays a Big Five Radar chart (340px, single-letter axis labels O/C/E/A/N with color-coded matching trait colors), MBTI/DISC/Big Five stacked vertically with plain-language explanations ("How you think and make decisions", "How you act and work with others", "Your core personality strength"), and personalized role recommendations (200+ clusters including trades, first responders, manufacturing, agriculture) based on personality traits. Free tier gets 4-5 sentence personalized summary incorporating MBTI, DISC, and Big Five insights. "Also Consider" section moved to premium tier. Includes "Fun Mode" enhancements with playful titles and roasts, and a "Test Mode" for premium feature preview (persistent sticky header with Crown icon and "DONATE HERE" teal button).
-- **Just Kidding Interstitial**: After clicking the $0.02 Unlock Premium button, users see a playful "Just Kidding!" overlay with "Premium is Free (For Now)" message, "Proceed to Results" button to unlock premium features for free during testing, and "Donate $0.02 (Alpha Feedback)" button for those who want to support development.
-- **EmojiMoodMixer**: Interactive mood mixing component on the mood page where users tap two mood ingredients (Happy, Calm, Curious, Determined, Creative, Social) to "brew" a hybrid personality hint in a cauldron animation.
-- **Feedback System**: Redesigned feedback section with 5 questions: Useful App?, Results feel accurate?, Questions engaging?, Would share with a friend? (No/Yes), and Suggestions (2000 char limit). Header displays "Complete for More Free Insights!" in 2x larger font, questions use larger labels, and no emojis on buttons.
-- **Location and Geocoding**: Simplified zip code input (US and Canada only, no country selector) with auto-detection. Utilizes zippopotam.us API for postal code to city lookup, then maps to sports team colors via cityThemes.ts. Influences locality themes, locale insights, and regional salary adjustments.
-- **Locale Insights System**: Provides metro-specific career insights based on personality traits, with regional fallbacks.
-- **Regional Salary System**: Offers metro-adjusted salary ranges for common roles, with industry bonuses and growth outlook text.
-- **Premium Follow-Up Flow** (Data in `client/src/data/premiumQuestions.ts`): Career path branching (trades/professional/creative/service) with refinement questions for personalized matches. Service branch includes "hands-on help", "guide through chats", and "care routines" options.
-- **Premium Unlock Card**: Simplified design with tagline at top, 3 features (Deep Dive, Role Matches, 30-Day Quest), and ONE large orange button showing $0.02 price with "Unlock Premium Now" and "Lifetime access. No Subscription. Ever."
+- **User Journey Flow**: Home (age tier selection) → Mood Selection (/mood) → Mood Mixer (/mood-mixer) → Location (/location) → Pre-Quiz Demo (/pre-quiz) → Quiz (/quiz) → Results
+- **Mood Pages (Split)**: 
+  - **/mood**: Mood selection page with three options (Energized, Stuck, Reflective). Clear instructions explain that mood helps personalize the journey.
+  - **/mood-mixer**: Interactive cauldron where users tap two mood ingredients (Happy, Calm, Curious, Determined, Creative, Social) to "brew" a hybrid personality hint. Optional step.
+- **Pre-Quiz Demo Page** (/pre-quiz): Animated walkthrough showing what to expect in the quiz - swipe mechanics, timer, and multi-choice breaks. Helps users understand the format before starting.
+- **Quiz Flow**: Binary swipe questions with multi-choice breaks inserted after Q7 and Q15 (not at beginning/end). Per-question timer with circular progress ring when <3s remaining. Cards tilt on selection for tactile feedback. Auto-hiding "Tap or swipe" hint after first interaction. Tracks MBTI, DISC, Big Five, Critical Thinking, and First Principles traits.
+- **Results Dashboard**: Displays Big Five Radar chart (340px, single-letter axis labels O/C/E/A/N with color-coded trait colors), MBTI/DISC/Big Five stacked vertically with plain-language explanations. Personalized role recommendations (200+ clusters including trades, first responders, manufacturing, agriculture). Premium tier shows salary data without "premium" labeling. Free tier gets 4-5 sentence personalized summary.
+- **Just Kidding Interstitial**: After clicking Unlock Premium button, users see a playful "Just Kidding!" overlay with "Premium is Free (For Now)" message, "Proceed to Results" button to unlock premium features for free during testing, and two donation tier options ($3.33 and $33.33).
+- **Donation System**: Two-tier donation modal with $3.33 and $33.33 options plus back button. Stripe integration for payment processing.
+- **Feedback System**: 5 questions (Useful App?, Results accurate?, Questions engaging?, Would share?, Suggestions). Auto-exports quiz results to Google Sheets when feedback is submitted.
+- **Location and Geocoding**: Simplified zip code input (US and Canada only) with auto-detection via zippopotam.us API. Maps to sports team colors via cityThemes.ts.
+- **Locale Insights System**: Metro-specific career insights based on personality traits with regional fallbacks.
+- **Regional Salary System**: Metro-adjusted salary ranges for common roles with industry bonuses and growth outlook text. Displayed in premium tier only.
 
 ## External Dependencies
 

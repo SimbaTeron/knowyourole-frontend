@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, BookOpen, HelpCircle, ArrowRight, SkipForward } from "lucide-react";
+import { Zap, BookOpen, HelpCircle, ArrowRight, SkipForward, Heart } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
-import EmojiMoodMixer from "@/components/EmojiMoodMixer";
 
 const MOODS = [
   { id: "energized", label: "Energized", desc: "Ready to take on anything", icon: Zap },
@@ -53,12 +52,12 @@ export default function MoodPage() {
 
   const handleContinue = () => {
     if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-    setLocation("/location");
+    setLocation("/mood-mixer");
   };
 
   const handleSkip = () => {
     if (navigator.vibrate) navigator.vibrate(20);
-    setLocation("/location");
+    setLocation("/mood-mixer");
   };
 
   const handleBack = () => {
@@ -83,25 +82,25 @@ export default function MoodPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-center mb-6"
+            className="text-center mb-8"
           >
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-terracotta to-sunset-amber mb-3">
+              <Heart className="w-6 h-6 text-white" />
+            </div>
             <h1 className="text-3xl md:text-4xl font-display font-semibold compass-gradient-text mb-3">
-              How are you feeling today?
+              How are you feeling right now?
             </h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60 text-base">
-              Your current state helps personalize your journey
+            <p className="text-warm-gray/70 dark:text-soft-cream/60 text-base max-w-sm mx-auto">
+              Your current mood helps us personalize your journey. Pick the one that best describes where you're at today.
             </p>
           </motion.div>
-
-          {/* Mood Mixer - Now at top */}
-          <EmojiMoodMixer />
 
           {/* 3 Mood Icon Buttons - Side by side */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mt-8"
+            transition={{ delay: 0.3 }}
+            className="flex-1 flex flex-col justify-center"
           >
             <div className="flex justify-center gap-4">
               {MOODS.map((moodOption, index) => {
@@ -116,9 +115,9 @@ export default function MoodPage() {
                       opacity: 1, 
                       scale: 1,
                     }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
+                    transition={{ delay: 0.4 + index * 0.1 }}
                     onClick={() => handleMoodSelect(moodOption.id)}
-                    className={`relative w-20 h-20 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                    className={`relative w-24 h-24 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 ${
                       isSelected
                         ? "bg-gradient-to-br from-terracotta to-sunset-amber shadow-lg shadow-terracotta/30 scale-110"
                         : "bg-warm-gray/10 dark:bg-soft-cream/10 hover:bg-warm-gray/20 dark:hover:bg-soft-cream/20"
@@ -151,17 +150,24 @@ export default function MoodPage() {
                       />
                     )}
                     
-                    <Icon className={`w-8 h-8 ${
+                    <Icon className={`w-8 h-8 mb-1 ${
                       isSelected 
                         ? "text-white" 
                         : "text-terracotta dark:text-sunset-amber"
                     }`} />
+                    <span className={`text-xs font-medium ${
+                      isSelected 
+                        ? "text-white/90" 
+                        : "text-warm-gray/70 dark:text-soft-cream/60"
+                    }`}>
+                      {moodOption.label}
+                    </span>
                   </motion.button>
                 );
               })}
             </div>
 
-            {/* Selected mood label - appears below icons */}
+            {/* Selected mood description - appears below icons */}
             <AnimatePresence mode="wait">
               {mood && (
                 <motion.div
@@ -170,12 +176,9 @@ export default function MoodPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.2 }}
-                  className="mt-6 text-center"
+                  className="mt-8 text-center"
                 >
-                  <h3 className="text-xl font-semibold text-warm-gray dark:text-soft-cream">
-                    {MOODS.find(m => m.id === mood)?.label}
-                  </h3>
-                  <p className="text-warm-gray/60 dark:text-soft-cream/50 mt-1 text-[18px]">
+                  <p className="text-lg text-warm-gray/80 dark:text-soft-cream/70">
                     {MOODS.find(m => m.id === mood)?.desc}
                   </p>
                 </motion.div>
@@ -188,7 +191,7 @@ export default function MoodPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="mt-6 text-center text-sm text-warm-gray/40 dark:text-soft-cream/30"
+                className="mt-8 text-center text-sm text-warm-gray/40 dark:text-soft-cream/30"
               >
                 Tap an icon to select your mood
               </motion.p>

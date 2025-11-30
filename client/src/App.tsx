@@ -7,7 +7,9 @@ import { LocalityThemeProvider } from "@/contexts/LocalityThemeContext";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import MoodPage from "@/pages/mood";
+import MoodMixerPage from "@/pages/mood-mixer";
 import LocationPage from "@/pages/location";
+import PreQuizPage from "@/pages/pre-quiz";
 import QuizPage from "@/pages/quiz";
 import CheckoutSuccess from "@/pages/checkout-success";
 import CheckoutCancel from "@/pages/checkout-cancel";
@@ -17,7 +19,9 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/mood" component={MoodPage} />
+      <Route path="/mood-mixer" component={MoodMixerPage} />
       <Route path="/location" component={LocationPage} />
+      <Route path="/pre-quiz" component={PreQuizPage} />
       <Route path="/quiz" component={QuizPage} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />

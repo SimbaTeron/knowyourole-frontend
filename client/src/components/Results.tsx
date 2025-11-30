@@ -523,11 +523,11 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            openness: result.bigFiveProfile.openness,
-            conscientiousness: result.bigFiveProfile.conscientiousness,
-            extraversion: result.bigFiveProfile.extraversion,
-            agreeableness: result.bigFiveProfile.agreeableness,
-            neuroticism: result.bigFiveProfile.neuroticism,
+            openness: result.bigFiveProfile.O,
+            conscientiousness: result.bigFiveProfile.C,
+            extraversion: result.bigFiveProfile.E,
+            agreeableness: result.bigFiveProfile.A,
+            neuroticism: result.bigFiveProfile.N,
             mbtiType: result.mbtiType,
             discStyle: result.discStyle,
           }),
@@ -1162,15 +1162,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     </div>
                   );
                 })()}
-                {/* Show "Unlock for salary" hint for free tier */}
-                {!isPremiumUnlocked && (
-                  <div className="mb-3">
-                    <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                      <Lock className="w-3 h-3" />
-                      <span className="text-xs">Salary info in Premium</span>
-                    </div>
-                  </div>
-                )}
                 <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-sm mx-auto">
                   {result.primaryRole.desc} {result.mbtiType.includes('E') 
                     ? "Your natural energy and communication style make you well-suited for collaborative environments." 
