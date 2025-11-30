@@ -1,85 +1,123 @@
 # KnowRole Design Guidelines
 
 ## Design Approach
-**Everyday Compass Aesthetic** - A warm, grounded journey of self-discovery with hand-drawn path visuals and journal-like aesthetics. Focus on breathing room with **70% whitespace** for a contemplative, relatable experience. No cosmic/space imagery - instead use soft curved lines as "life trails" that symbolize trait branches.
+**Reference-Based:** Drawing inspiration from modern career platforms like LinkedIn Learning and Headspace's calm interface aesthetics. The "Everyday Compass" maintains its warm, grounded journey of self-discovery with hand-drawn path visuals and journal-like feel, now with a refreshed contemporary palette suitable for professional career guidance.
+
+**Key Principles:**
+- 70% whitespace for contemplative breathing room
+- Warm professionalism balanced with approachability
+- Hand-drawn path visuals as journey metaphors (no cosmic imagery)
+- Soft curved lines symbolizing life trails and trait branches
 
 ## Color Palette
-- **terracotta**: #C67B5C (primary accent, warmth)
-- **terracotta-dark**: #A85D3F (hover states, depth)
-- **sage-green**: #8B9A6D (secondary accent, growth)
-- **sage-dark**: #6B7A4D (hover states)
-- **warm-gray**: #6B6B6B (text, secondary information)
-- **soft-cream**: #FDF8F3 (backgrounds, cards)
-- **deep-cream**: #1F1B16 (dark mode background)
-- **dusty-blue**: #7BA3B5 (accent, contrast)
-- **warm-white**: #FFFBF7 (card backgrounds)
+
+**Light Mode:**
+- **coral-warm**: #E57A6F (primary accent - inviting, energetic)
+- **coral-deep**: #C85F54 (hover states, emphasis)
+- **amber-soft**: #D4A574 (secondary accent - guidance, clarity)
+- **amber-dark**: #B8895E (hover states)
+- **slate-cool**: #5D6F7F (text, professional anchor)
+- **slate-muted**: #8A99A8 (secondary text)
+- **cream-soft**: #FAF7F4 (page background)
+- **cream-warm**: #FFFDFB (card backgrounds)
+- **lavender-mist**: #9FA8C7 (accent, calm contrast)
+- **stone-light**: #E8E4DF (borders, subtle divisions)
+
+**Dark Mode:**
+- **Background**: #1A1715 (deep warm charcoal)
+- **Card Surface**: #2A2522 (elevated warm gray)
+- **Text Primary**: #F5F1ED (warm white)
+- **Text Secondary**: #B8AFA6 (muted warm gray)
+- **coral-warm**: #F08B7F (brighter for visibility)
+- **amber-soft**: #E3B886 (enhanced warmth)
+- **Borders**: #3D3632 (subtle warm divisions)
 
 ## Typography
-- **Font Family**: Inter (sans-serif)
-- **Title**: text-3xl to 4xl, bold, compass-gradient-text (terracotta → sage-green)
-- **Headers**: text-xl to 2xl, font-semibold
-- **Body**: text-sm to text-base
-- **Labels**: text-xs, uppercase tracking-[0.15em]
+- **Font**: Inter via Google Fonts CDN
+- **Titles**: text-3xl to 4xl, font-bold, gradient from coral-warm to amber-soft
+- **Section Headers**: text-xl to 2xl, font-semibold, slate-cool
+- **Body Text**: text-sm to base, slate-cool/slate-muted
+- **Labels**: text-xs, uppercase, tracking-[0.15em], slate-muted
+- **Hierarchy**: Clear size jumps (3xl → xl → base → xs)
 
 ## Layout System
-- **Spacing**: Tailwind default scale (p-4, p-5, p-6, gap-3)
-- **Container**: max-w-sm centered, min-h-screen
-- **Whitespace**: 70% breathing room
-- **Z-Index**: Path canvas at z-0, content at z-10, header at z-50
+**Spacing Units:** Consistent use of Tailwind's 4, 6, 8, 12 spacing scale
+- **Component Padding**: p-6, p-8
+- **Section Gaps**: gap-6, gap-8
+- **Vertical Rhythm**: mt-12, mb-16 for sections
+- **Container**: max-w-md centered with mx-auto
+- **Mobile Touch**: Minimum 44px tap targets
 
 ## Component Library
 
-### Path Canvas
-- Fixed background with animated SVG paths
-- Curved bezier paths in terracotta, sage-green, and dusty-blue
-- Draw animation on mount (stroke-dashoffset transition)
-- Small dot markers at path intersections
+### Path Canvas Background
+Animated SVG paths as fixed background (z-0) creating the journey visual:
+- Smooth bezier curves in coral-warm, amber-soft, and lavender-mist
+- Stroke-dashoffset draw animation on mount
+- Small circular markers at intersections (4px diameter)
+- Semi-transparent strokes (opacity-30 in light, opacity-20 in dark)
+- Positioned absolutely behind all content
 
-### Tier Selection Blobs
-- Clip-path polygon shape (beveled corners)
-- Gradient background (soft-cream to slightly darker)
-- Selected state: terracotta gradient with white text
-- Hover: scale(1.02) with enhanced shadow
+### Tier Selection Cards
+Beveled corner cards using clip-path polygon:
+- Default: cream-warm background with stone-light border
+- Selected: coral-warm gradient with shadow-lg, white text
+- Hover: scale-[1.02], enhanced shadow
+- Padding: p-6
+- Border radius simulation via clip-path
 
-### Mood Selector Cards
-- Rounded corners, bordered cards
-- Selected: terracotta background with shadow
-- Everyday emojis: ☕ (energized), 📖 (reflective), 🛤️ (finding way)
+### Mood Selector Grid
+Horizontal scrollable grid of emoji-led mood cards:
+- Bordered rounded cards (rounded-xl)
+- Everyday emojis: ☕ (energized), 📖 (reflective), 🛤️ (navigating)
+- Selected: coral-warm background with shadow-md
+- Unselected: cream-warm with stone-light border
+- Size: min-w-[120px] for touch comfort
 
 ### Fun Mode Toggle
-- Checkbox style toggle with sage-green checkmark
+Checkbox-style toggle with personality:
+- Sage-style checkmark when enabled
 - "Add trail twists?" label with 😏 emoji
-- Background changes to sage-green tint when enabled
+- Background tint shifts to amber-soft/10 when active
+- Animated emoji float when enabled
 
-### Trail Button (CTA)
-- Full-width, terracotta gradient
-- Subtle shadow and lift on hover
-- Arrow icon animates on hover
+### Primary CTA Button
+Full-width journey activation:
+- Gradient background: coral-warm to coral-deep
+- White text, font-semibold
+- Shadow-md with shadow-lg on hover
+- Arrow icon (→) that slides right 4px on hover
+- Padding: py-4 px-8
+
+### Progress Indicators
+Stepped progress bar for quiz flow:
+- Completed steps: coral-warm circles
+- Current step: coral-warm ring with pulse animation
+- Future steps: stone-light circles
+- Connecting lines in stone-light
 
 ## Interactions & Animations
-- **Path Draw**: Paths animate in with stroke-dashoffset
-- **Slide Up**: Cards and content slide up on mount
-- **Gentle Float**: Enabled emoji floats when fun mode active
-- **Hover Lift**: Buttons lift 2px on hover
-- **Scale**: Tier cards scale 1.02 on hover
-
-## Responsive Behavior
-- Mobile-first design (max-w-sm)
-- Stack all components vertically
-- Maintain whitespace ratios
-- Touch-friendly tap targets (min 44px)
+- **Path Draw**: 2s ease-out stroke-dashoffset on mount
+- **Content Entrance**: Slide up 20px with fade-in, stagger delay
+- **Hover Lift**: translateY(-2px) with shadow enhancement
+- **Selection**: Quick scale-[1.02] with color transition
+- **Fun Mode Float**: Gentle 0-8px translateY bounce (3s infinite)
 
 ## Accessibility
+- WCAG AA contrast ratios maintained across all color pairs
+- Focus rings using coral-warm at ring-2 ring-offset-2
 - ARIA labels on all interactive elements
-- WCAG AA color contrast compliance
-- Focus states with ring
-- Semantic HTML with proper heading hierarchy
+- Semantic heading hierarchy (h1 → h2 → h3)
+- Screen reader text for icon-only buttons
+- Keyboard navigation support for all interactions
 
-## Dark Mode
-- Background: deep-cream (#1F1B16)
-- Cards: rgba(31,27,22,0.9)
-- Text: soft-cream with reduced opacity for secondary
-- Borders: terracotta with increased opacity
+## Responsive Behavior
+Mobile-first, single-column design:
+- Base: max-w-md (448px)
+- Padding: px-4 on mobile, px-6 on sm+
+- Vertical stacking of all components
+- Maintain 70% whitespace ratio at all breakpoints
+- Touch-optimized spacing and targets
 
 ## Images
-**No hero images needed** - The animated path canvas serves as the visual anchor, creating a journal-like background. Design relies on path drawings and warm color gradients for visual impact.
+**No hero images** - The animated path canvas serves as the primary visual anchor. The journal-like, hand-drawn path background creates sufficient visual interest without traditional hero imagery. Focus remains on the interactive journey elements and warm color palette.

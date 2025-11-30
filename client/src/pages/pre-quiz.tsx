@@ -321,7 +321,7 @@ export default function PreQuizPage() {
             data-testid="button-start-quiz"
           >
             <Zap className="w-5 h-5" />
-            I'm Ready - Start the Quiz!
+            I'm Ready
           </motion.button>
         </div>
       </div>

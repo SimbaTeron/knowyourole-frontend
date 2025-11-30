@@ -13,6 +13,7 @@ import PreQuizPage from "@/pages/pre-quiz";
 import QuizPage from "@/pages/quiz";
 import CheckoutSuccess from "@/pages/checkout-success";
 import CheckoutCancel from "@/pages/checkout-cancel";
+import CrossroadsPage from "@/pages/crossroads";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/location" component={LocationPage} />
       <Route path="/pre-quiz" component={PreQuizPage} />
       <Route path="/quiz" component={QuizPage} />
+      <Route path="/crossroads" component={CrossroadsPage} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />
       <Route component={NotFound} />

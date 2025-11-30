@@ -455,6 +455,196 @@ function getWeakestTrait(bigFive: { O: number; C: number; E: number; A: number; 
   return adjusted.reduce((a, b) => a[1] < b[1] ? a : b)[0];
 }
 
+// WEAKNESS BLINDSPOTS DATA - Based on MBTI and Big Five
+const WEAKNESS_BLINDSPOTS: Record<string, { title: string; blindspot: string; workaround: string; realWorld: string }[]> = {
+  "INTJ": [
+    { title: "Dismissing Others' Ideas", blindspot: "You might shut down suggestions before fully hearing them out.", workaround: "Ask 'What if this worked?' before critiquing.", realWorld: "Try letting a team member lead a small project their way." },
+    { title: "Over-Planning", blindspot: "Waiting for the perfect plan can mean missing opportunities.", workaround: "Set a 'good enough' threshold and act.", realWorld: "Launch that project at 80% instead of waiting for 100%." },
+  ],
+  "INTP": [
+    { title: "Analysis Paralysis", blindspot: "You can get lost researching when action is needed.", workaround: "Time-box your research with a hard deadline.", realWorld: "Give yourself 2 hours max to research, then decide." },
+    { title: "Avoiding Emotions", blindspot: "Skipping emotional conversations damages relationships.", workaround: "Schedule regular check-ins with people who matter.", realWorld: "Ask 'How are we doing?' to one person weekly." },
+  ],
+  "ENTJ": [
+    { title: "Steamrolling Others", blindspot: "Your drive can make others feel unheard.", workaround: "Ask for input before sharing your conclusion.", realWorld: "In your next meeting, speak last instead of first." },
+    { title: "Impatience with Process", blindspot: "Rushing can create mistakes and resentment.", workaround: "Build in buffer time for others to catch up.", realWorld: "Add 20% more time to project estimates." },
+  ],
+  "ENTP": [
+    { title: "Starting Without Finishing", blindspot: "New ideas distract you from completing current ones.", workaround: "Keep a 'parking lot' list for future ideas.", realWorld: "Finish one project before allowing yourself to start another." },
+    { title: "Arguing for Sport", blindspot: "Debating can feel like attacking to others.", workaround: "State 'I'm just exploring ideas' before debating.", realWorld: "Notice when someone gets defensive and shift gears." },
+  ],
+  "INFJ": [
+    { title: "Absorbing Others' Stress", blindspot: "You take on problems that aren't yours to solve.", workaround: "Ask 'Is this my problem to fix?' before diving in.", realWorld: "Practice saying 'That sounds hard' instead of 'I'll fix it'." },
+    { title: "Perfectionist Standards", blindspot: "Your high bar can paralyze you and frustrate others.", workaround: "Define 'done' before starting.", realWorld: "Ship something imperfect and iterate." },
+  ],
+  "INFP": [
+    { title: "Conflict Avoidance", blindspot: "Unaddressed issues build into bigger problems.", workaround: "Address small issues before they grow.", realWorld: "Practice: 'Can I share something that's been on my mind?'" },
+    { title: "Dreaming Without Acting", blindspot: "Beautiful visions need ugly first steps.", workaround: "Identify the smallest possible action today.", realWorld: "Spend 10 minutes on that dream project right now." },
+  ],
+  "ENFJ": [
+    { title: "People-Pleasing Burnout", blindspot: "Saying yes to everyone means neglecting yourself.", workaround: "Check your energy before agreeing to help.", realWorld: "Practice: 'Let me check my schedule and get back to you.'" },
+    { title: "Taking Rejection Personally", blindspot: "Others' choices aren't about your worth.", workaround: "Separate their decision from your value.", realWorld: "When rejected, list 3 things you're proud of." },
+  ],
+  "ENFP": [
+    { title: "Overcommitting", blindspot: "Enthusiasm leads to impossible schedules.", workaround: "Halve the commitments, double the impact.", realWorld: "Before saying yes, check if you can realistically deliver." },
+    { title: "Avoiding Boring Tasks", blindspot: "Necessary routines get neglected.", workaround: "Pair boring tasks with something enjoyable.", realWorld: "Listen to your favorite podcast only while doing admin work." },
+  ],
+  "ISTJ": [
+    { title: "Rigidity", blindspot: "Sticking to 'how it's always done' misses better ways.", workaround: "Try one new approach monthly.", realWorld: "Ask a younger colleague how they'd approach your task." },
+    { title: "Difficulty Delegating", blindspot: "Doing everything yourself limits growth.", workaround: "Delegate the how, keep the what.", realWorld: "Let someone else handle a task their way this week." },
+  ],
+  "ISFJ": [
+    { title: "Difficulty Saying No", blindspot: "You exhaust yourself serving others.", workaround: "Your needs are needs too, not wants.", realWorld: "Decline one request this week without explaining why." },
+    { title: "Change Resistance", blindspot: "Comfort zones can become prisons.", workaround: "Make small changes to build adaptability.", realWorld: "Take a different route or try a new restaurant." },
+  ],
+  "ESTJ": [
+    { title: "Dismissing Feelings", blindspot: "Efficiency without empathy creates resentment.", workaround: "Acknowledge feelings before problem-solving.", realWorld: "Say 'That sounds frustrating' before offering solutions." },
+    { title: "Control Issues", blindspot: "Micromanaging destroys trust and motivation.", workaround: "Define outcomes, not methods.", realWorld: "Assign a task with a deadline but no process instructions." },
+  ],
+  "ESFJ": [
+    { title: "Seeking Approval", blindspot: "Others' opinions shouldn't define your worth.", workaround: "Build internal validation sources.", realWorld: "Do one thing purely because YOU want to this week." },
+    { title: "Avoiding Conflict", blindspot: "Keeping peace now creates war later.", workaround: "Address issues while they're small.", realWorld: "Have that conversation you've been putting off." },
+  ],
+  "ISTP": [
+    { title: "Emotional Distance", blindspot: "People need words, not just actions.", workaround: "Express care verbally, not just through doing.", realWorld: "Tell someone 'I appreciate you' out loud this week." },
+    { title: "Impulsive Decisions", blindspot: "Acting fast sometimes means acting wrong.", workaround: "Count to 10 before major decisions.", realWorld: "Sleep on any decision over $100 or affecting others." },
+  ],
+  "ISFP": [
+    { title: "Avoiding Structure", blindspot: "Some structure enables more creativity.", workaround: "Create minimal frameworks that free you.", realWorld: "Schedule your creative time like an appointment." },
+    { title: "Taking Criticism Hard", blindspot: "Feedback is data, not an attack.", workaround: "Ask 'What can I learn?' before reacting.", realWorld: "Request feedback proactively to reduce surprise." },
+  ],
+  "ESTP": [
+    { title: "Risk Blindness", blindspot: "Excitement can overshadow danger.", workaround: "Ask one cautious person before leaping.", realWorld: "Run your next big idea by the most skeptical person you know." },
+    { title: "Impatience with Details", blindspot: "Skipping steps causes revisiting them later.", workaround: "Build in quick check moments.", realWorld: "Re-read that important email before sending." },
+  ],
+  "ESFP": [
+    { title: "Present-Focus Blindness", blindspot: "Today's fun can be tomorrow's regret.", workaround: "Ask 'How will I feel about this in a week?'", realWorld: "Before a big purchase, wait 48 hours." },
+    { title: "Conflict Avoidance", blindspot: "Keeping things light means leaving issues unresolved.", workaround: "Schedule serious conversations like appointments.", realWorld: "Block 15 minutes to address something you've avoided." },
+  ],
+};
+
+const DEFAULT_BLINDSPOTS = [
+  { title: "Blind to Blind Spots", blindspot: "We all have areas we can't see clearly about ourselves.", workaround: "Ask a trusted friend for honest feedback.", realWorld: "Have a 'what should I work on?' conversation with someone you trust." },
+  { title: "Comfort Zone Trap", blindspot: "Staying comfortable can mean missing growth opportunities.", workaround: "Regularly try something that makes you slightly uncomfortable.", realWorld: "Sign up for one new experience this month." },
+];
+
+function getWeaknessBlindspots(mbtiType: string) {
+  return WEAKNESS_BLINDSPOTS[mbtiType] || DEFAULT_BLINDSPOTS;
+}
+
+// CAREER PATH SIMULATOR - Day-in-the-life scenarios
+const CAREER_SIMULATOR: Record<string, { title: string; morningRoutine: string; afternoonTasks: string; eveningReflection: string; satisfaction: string; growth: string }> = {
+  "Software Developer": { 
+    title: "Software Developer", 
+    morningRoutine: "Coffee in hand, you review yesterday's code and check your team's Slack messages.",
+    afternoonTasks: "Deep work time: you're building a feature that will help thousands of users.",
+    eveningReflection: "That bug you fixed? It's live now, and users are thanking you.",
+    satisfaction: "Creating something from nothing, seeing your work used worldwide.",
+    growth: "In 5 years, you could be leading a team or architecting major systems."
+  },
+  "Nurse Practitioner": {
+    title: "Nurse Practitioner",
+    morningRoutine: "You check your patient list, prioritizing those who need immediate attention.",
+    afternoonTasks: "Helping a worried parent understand their child's diagnosis and treatment plan.",
+    eveningReflection: "A patient texted: 'Thank you for listening. I finally feel heard.'",
+    satisfaction: "Direct impact on people's health and peace of mind every single day.",
+    growth: "In 5 years, you might run your own clinic or specialize in a field you love."
+  },
+  "Electrician": {
+    title: "Electrician",
+    morningRoutine: "You load your truck and head to a job site, reviewing blueprints on the way.",
+    afternoonTasks: "Wiring a new home that a family will move into next month.",
+    eveningReflection: "Lights turn on. Everything works perfectly. That's all you.",
+    satisfaction: "Tangible results you can see and touch. No two days are the same.",
+    growth: "In 5 years, you might run your own crew or start your own business."
+  },
+  "Marketing Manager": {
+    title: "Marketing Manager",
+    morningRoutine: "You review campaign analytics over coffee, spotting trends others miss.",
+    afternoonTasks: "Brainstorming session with your team on the next big product launch.",
+    eveningReflection: "That tagline you wrote? It's everywhere now. People are talking about it.",
+    satisfaction: "Creativity meets strategy. Your ideas reach millions.",
+    growth: "In 5 years, you could be CMO or running your own agency."
+  },
+  "Social Worker": {
+    title: "Social Worker",
+    morningRoutine: "You prepare for today's home visits, reviewing case notes and resources.",
+    afternoonTasks: "Helping a family navigate the system and find the support they need.",
+    eveningReflection: "That teenager you helped? They're back in school and thriving.",
+    satisfaction: "Being the bridge between people and the help they desperately need.",
+    growth: "In 5 years, you might be a program director or policy advocate."
+  },
+  "Data Analyst": {
+    title: "Data Analyst",
+    morningRoutine: "You pull reports and start cleaning yesterday's data imports.",
+    afternoonTasks: "Creating a dashboard that will help executives make better decisions.",
+    eveningReflection: "Your insight saved the company from a costly mistake. They noticed.",
+    satisfaction: "Finding stories in numbers that nobody else can see.",
+    growth: "In 5 years, you could be a data science lead or analytics director."
+  },
+};
+
+// SIDE HUSTLE FINDER - Based on personality traits
+const SIDE_HUSTLES: Record<string, { name: string; fit: string; income: string; startupCost: string; timeCommit: string }[]> = {
+  "creative-high": [
+    { name: "Freelance Graphic Design", fit: "Your creativity shines in visual work.", income: "$25-75/hour", startupCost: "Low ($50-200)", timeCommit: "5-20 hours/week" },
+    { name: "Content Creation", fit: "Your unique perspective attracts audiences.", income: "$100-2,000/month", startupCost: "Minimal", timeCommit: "10-15 hours/week" },
+    { name: "Etsy Shop", fit: "Turn your crafts into cash.", income: "$200-2,000/month", startupCost: "Low ($100-500)", timeCommit: "10-20 hours/week" },
+  ],
+  "analytical-high": [
+    { name: "Freelance Data Analysis", fit: "Companies need your number-crunching skills.", income: "$40-100/hour", startupCost: "Minimal", timeCommit: "10-20 hours/week" },
+    { name: "Online Tutoring", fit: "Share your expertise with students.", income: "$30-80/hour", startupCost: "None", timeCommit: "5-15 hours/week" },
+    { name: "Tax Prep Services", fit: "Your detail orientation is invaluable.", income: "$50-150/return", startupCost: "Low ($100-300)", timeCommit: "Seasonal" },
+  ],
+  "people-high": [
+    { name: "Life Coaching", fit: "Your people skills help others thrive.", income: "$50-200/session", startupCost: "Low ($200-500)", timeCommit: "10-20 hours/week" },
+    { name: "Event Planning", fit: "You make every gathering memorable.", income: "$500-3,000/event", startupCost: "Low", timeCommit: "Variable" },
+    { name: "Airbnb Host", fit: "Your hospitality creates great experiences.", income: "$500-2,000/month", startupCost: "Medium", timeCommit: "5-10 hours/week" },
+  ],
+  "hands-on-high": [
+    { name: "Handyman Services", fit: "Your fix-it skills are in demand.", income: "$35-75/hour", startupCost: "Medium ($200-1,000)", timeCommit: "10-25 hours/week" },
+    { name: "Pet Sitting/Dog Walking", fit: "Turn your love of animals into income.", income: "$15-40/hour", startupCost: "Minimal", timeCommit: "Flexible" },
+    { name: "Furniture Flipping", fit: "Your restoration skills add value.", income: "$100-500/piece", startupCost: "Low ($50-200)", timeCommit: "10-15 hours/week" },
+  ],
+  "default": [
+    { name: "Freelance Writing", fit: "Everyone has valuable knowledge to share.", income: "$25-100/hour", startupCost: "None", timeCommit: "5-20 hours/week" },
+    { name: "Virtual Assistant", fit: "Help busy professionals stay organized.", income: "$20-50/hour", startupCost: "Minimal", timeCommit: "10-30 hours/week" },
+    { name: "Online Reselling", fit: "Turn finds into profit.", income: "$200-1,500/month", startupCost: "Low ($100-300)", timeCommit: "10-15 hours/week" },
+  ],
+};
+
+// LEARNING STYLE DECODER - Based on personality
+const LEARNING_STYLES: Record<string, { style: string; description: string; bestFor: string[]; tips: string[]; resources: string[] }> = {
+  "visual-kinesthetic": {
+    style: "Hands-On Visual Learner",
+    description: "You learn best by doing and seeing. Abstract concepts click when you can visualize or physically work with them.",
+    bestFor: ["Trade skills", "Lab sciences", "Design fields", "Sports/athletics"],
+    tips: ["Draw diagrams while learning", "Use color-coding systems", "Build physical models or prototypes", "Watch video tutorials before reading"],
+    resources: ["YouTube tutorials", "Interactive online labs", "Skillshare courses", "Maker spaces"],
+  },
+  "auditory-social": {
+    style: "Discussion-Based Learner",
+    description: "You absorb information through conversation and explanation. Teaching others helps you master material.",
+    bestFor: ["Sales", "Counseling", "Teaching", "Leadership"],
+    tips: ["Join study groups or mastermind groups", "Record yourself explaining concepts", "Use podcasts and audiobooks", "Discuss ideas with colleagues"],
+    resources: ["Podcasts", "Clubhouse/audio apps", "Debate clubs", "Toastmasters"],
+  },
+  "reading-writing": {
+    style: "Text-Based Learner",
+    description: "You thrive with written material. Taking notes and reading deeply helps concepts stick.",
+    bestFor: ["Research", "Writing", "Law", "Academia"],
+    tips: ["Take detailed handwritten notes", "Rewrite key concepts in your own words", "Create summaries after each chapter", "Use flashcards for memorization"],
+    resources: ["Books and articles", "Online courses with transcripts", "Research journals", "Note-taking apps"],
+  },
+  "logical-sequential": {
+    style: "Step-by-Step Learner",
+    description: "You learn best when information is presented logically with clear progression from simple to complex.",
+    bestFor: ["Programming", "Engineering", "Finance", "Science"],
+    tips: ["Create outlines before diving in", "Follow structured curricula", "Build on fundamentals before advancing", "Use flowcharts and decision trees"],
+    resources: ["Structured online courses", "Textbooks with exercises", "Khan Academy", "Codecademy"],
+  },
+};
+
 // Adventure Archetype type for Mini Explorer
 interface AdventureArchetype {
   name: string;
@@ -1914,43 +2104,216 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     </CardContent>
                   </Card>
 
-                  {/* Team Compatibility Cards - NEW FEATURE */}
-                  <Card className="bg-white dark:bg-gray-800 border-pink-200 dark:border-pink-800 overflow-hidden">
-                    <div className="h-1 bg-gradient-to-r from-pink-400 via-rose-500 to-red-400" />
+                  {/* Weakness Blindspots Report - NEW FEATURE */}
+                  <Card className="bg-white dark:bg-gray-800 border-rose-200 dark:border-rose-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-rose-400 via-pink-500 to-fuchsia-500" />
                     <CardContent className="p-5">
-                      <h5 className="text-base font-bold text-pink-700 dark:text-pink-300 mb-4 flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-pink-100 dark:bg-pink-900/50">
-                          <Users className="w-4 h-4" />
+                      <h5 className="text-base font-bold text-rose-700 dark:text-rose-300 mb-2 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-rose-100 dark:bg-rose-900/50">
+                          <Shield className="w-4 h-4" />
                         </div>
-                        Team Compatibility
+                        Your Blindspots
                       </h5>
                       <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-4">
-                        Best personality matches for collaboration
+                        Potential weaknesses and how to work around them
                       </p>
                       
-                      <div className="space-y-3">
-                        {(COMPATIBILITY_MATRIX[result?.mbtiType || "INTJ"] || COMPATIBILITY_MATRIX["INTJ"]).map((match, idx) => (
-                          <div key={idx} className="p-3 rounded-xl bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border border-pink-100 dark:border-pink-800">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-bold text-pink-700 dark:text-pink-300">{result?.mbtiType} + {match.match}</span>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-lg font-bold text-pink-600 dark:text-pink-400">{match.score}%</span>
-                                <div className="flex">
-                                  {[1, 2, 3].map((n) => (
-                                    <Heart
-                                      key={n}
-                                      className={`w-3 h-3 ${n <= Math.ceil(match.score / 35) ? 'text-pink-500 fill-pink-500' : 'text-pink-200 dark:text-pink-800'}`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
+                      <div className="space-y-4">
+                        {getWeaknessBlindspots(result?.mbtiType || "INTJ").map((item, idx) => (
+                          <div key={idx} className="p-4 rounded-xl bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 border border-rose-100 dark:border-rose-800">
+                            <h6 className="text-sm font-bold text-rose-800 dark:text-rose-200 mb-2">{item.title}</h6>
+                            <p className="text-xs text-rose-700 dark:text-rose-300 mb-3 leading-relaxed">
+                              <span className="font-semibold">The blindspot:</span> {item.blindspot}
+                            </p>
+                            <div className="flex items-start gap-2 p-2.5 rounded-lg bg-white/60 dark:bg-gray-800/60 mb-2">
+                              <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                              <p className="text-xs text-warm-gray dark:text-soft-cream font-medium">{item.workaround}</p>
                             </div>
-                            <p className="text-xs text-warm-gray/70 dark:text-soft-cream/60 italic">"{match.tip}"</p>
+                            <p className="text-xs text-rose-600 dark:text-rose-400 italic">
+                              Try this: {item.realWorld}
+                            </p>
                           </div>
                         ))}
                       </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Career Path Simulator - NEW FEATURE */}
+                  <Card className="bg-white dark:bg-gray-800 border-sky-200 dark:border-sky-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-sky-700 dark:text-sky-300 mb-2 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-sky-100 dark:bg-sky-900/50">
+                          <Briefcase className="w-4 h-4" />
+                        </div>
+                        Career Path Simulator
+                      </h5>
+                      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-4">
+                        A day in the life as a {result?.primaryRole?.title || "your matched career"}
+                      </p>
+                      
+                      {(() => {
+                        const careerKey = Object.keys(CAREER_SIMULATOR).find(k => 
+                          result?.primaryRole?.title?.toLowerCase().includes(k.toLowerCase().split(' ')[0])
+                        ) || Object.keys(CAREER_SIMULATOR)[0];
+                        const career = CAREER_SIMULATOR[careerKey];
+                        
+                        return (
+                          <div className="space-y-3">
+                            <div className="flex items-start gap-3 p-3 rounded-xl bg-sky-50 dark:bg-sky-900/20">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                                <Sunrise className="w-4 h-4 text-white" />
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold text-sky-800 dark:text-sky-200 uppercase">Morning</p>
+                                <p className="text-sm text-warm-gray dark:text-soft-cream">{career?.morningRoutine}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3 p-3 rounded-xl bg-sky-50 dark:bg-sky-900/20">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center flex-shrink-0">
+                                <Zap className="w-4 h-4 text-white" />
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold text-sky-800 dark:text-sky-200 uppercase">Afternoon</p>
+                                <p className="text-sm text-warm-gray dark:text-soft-cream">{career?.afternoonTasks}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3 p-3 rounded-xl bg-sky-50 dark:bg-sky-900/20">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center flex-shrink-0">
+                                <Star className="w-4 h-4 text-white" />
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold text-sky-800 dark:text-sky-200 uppercase">The Reward</p>
+                                <p className="text-sm text-warm-gray dark:text-soft-cream">{career?.eveningReflection}</p>
+                              </div>
+                            </div>
+                            <div className="p-3 rounded-xl bg-gradient-to-r from-sky-100 to-blue-100 dark:from-sky-900/40 dark:to-blue-900/40 border border-sky-200 dark:border-sky-800">
+                              <p className="text-xs text-sky-700 dark:text-sky-300">
+                                <span className="font-bold">5-Year Vision:</span> {career?.growth}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </CardContent>
+                  </Card>
+
+                  {/* Side Hustle Finder - NEW FEATURE */}
+                  <Card className="bg-white dark:bg-gray-800 border-amber-200 dark:border-amber-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/50">
+                          <DollarSign className="w-4 h-4" />
+                        </div>
+                        Side Hustle Finder
+                      </h5>
+                      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-4">
+                        Extra income ideas that match your personality
+                      </p>
+                      
+                      {(() => {
+                        const bigFive = result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 };
+                        let hustleKey = "default";
+                        if (bigFive.O > 65) hustleKey = "creative-high";
+                        else if (bigFive.C > 65) hustleKey = "analytical-high";
+                        else if (bigFive.E > 65) hustleKey = "people-high";
+                        else if (bigFive.E < 40 && bigFive.C > 50) hustleKey = "hands-on-high";
+                        
+                        const hustles = SIDE_HUSTLES[hustleKey] || SIDE_HUSTLES["default"];
+                        
+                        return (
+                          <div className="space-y-3">
+                            {hustles.map((hustle, idx) => (
+                              <div key={idx} className="p-3 rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-100 dark:border-amber-800">
+                                <div className="flex items-center justify-between mb-2">
+                                  <h6 className="text-sm font-bold text-amber-800 dark:text-amber-200">{hustle.name}</h6>
+                                  <span className="text-xs font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded-full">
+                                    {hustle.income}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-amber-700 dark:text-amber-300 mb-2">{hustle.fit}</p>
+                                <div className="flex items-center gap-3 text-xs text-warm-gray/70 dark:text-soft-cream/60">
+                                  <span>Startup: {hustle.startupCost}</span>
+                                  <span className="w-1 h-1 rounded-full bg-warm-gray/30" />
+                                  <span>{hustle.timeCommit}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </CardContent>
+                  </Card>
+
+                  {/* Learning Style Decoder - NEW FEATURE */}
+                  <Card className="bg-white dark:bg-gray-800 border-teal-200 dark:border-teal-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-teal-400 via-cyan-500 to-emerald-500" />
+                    <CardContent className="p-5">
+                      <h5 className="text-base font-bold text-teal-700 dark:text-teal-300 mb-2 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-teal-100 dark:bg-teal-900/50">
+                          <BookOpen className="w-4 h-4" />
+                        </div>
+                        How You Learn Best
+                      </h5>
+                      
+                      {(() => {
+                        const mbti = result?.mbtiType || "INTJ";
+                        const bigFive = result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 };
+                        
+                        let styleKey = "logical-sequential";
+                        if (mbti.includes("S") && mbti.includes("P")) styleKey = "visual-kinesthetic";
+                        else if (mbti.includes("E") && mbti.includes("F")) styleKey = "auditory-social";
+                        else if (mbti.includes("I") && bigFive.O > 60) styleKey = "reading-writing";
+                        
+                        const style = LEARNING_STYLES[styleKey];
+                        
+                        return (
+                          <div className="space-y-4">
+                            <div className="p-4 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border border-teal-100 dark:border-teal-800">
+                              <h6 className="text-lg font-bold text-teal-800 dark:text-teal-200 mb-2">{style?.style}</h6>
+                              <p className="text-sm text-teal-700 dark:text-teal-300 leading-relaxed">{style?.description}</p>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-900/30">
+                                <h6 className="text-xs font-bold text-teal-800 dark:text-teal-200 uppercase mb-2">Best For</h6>
+                                <ul className="space-y-1">
+                                  {style?.bestFor.slice(0, 3).map((item, idx) => (
+                                    <li key={idx} className="text-xs text-teal-700 dark:text-teal-300 flex items-center gap-1.5">
+                                      <CheckCircle2 className="w-3 h-3 text-teal-500" />
+                                      {item}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div className="p-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/30">
+                                <h6 className="text-xs font-bold text-cyan-800 dark:text-cyan-200 uppercase mb-2">Resources</h6>
+                                <ul className="space-y-1">
+                                  {style?.resources.slice(0, 3).map((item, idx) => (
+                                    <li key={idx} className="text-xs text-cyan-700 dark:text-cyan-300 flex items-center gap-1.5">
+                                      <ArrowRight className="w-3 h-3 text-cyan-500" />
+                                      {item}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                            
+                            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/60">
+                              <h6 className="text-xs font-bold text-teal-800 dark:text-teal-200 uppercase mb-2">Quick Tips</h6>
+                              <div className="space-y-2">
+                                {style?.tips.slice(0, 2).map((tip, idx) => (
+                                  <div key={idx} className="flex items-start gap-2">
+                                    <Lightbulb className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                    <p className="text-xs text-warm-gray dark:text-soft-cream">{tip}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </CardContent>
                   </Card>
 
@@ -2104,76 +2467,130 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         </p>
                       </div>
                       
-                      {/* Critical Thinking Tips Section */}
-                      <div className="mt-4 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
-                        <h6 className="text-xs font-bold text-indigo-800 dark:text-indigo-200 uppercase tracking-wide mb-3 flex items-center gap-2">
-                          <Lightbulb className="w-3.5 h-3.5" />
-                          Sharpen Your Thinking
-                        </h6>
-                        <div className="space-y-2.5">
-                          {(() => {
-                            const critScore = result?.scales?.critical?.value || 0;
-                            const fpScore = result?.scales?.firstPrinciples?.value || 0;
-                            
-                            const tips = [];
-                            
-                            if (critScore < 3) {
+                      {/* Critical Thinking Tips Section - Enhanced */}
+                      <div className="mt-4 space-y-4">
+                        {/* Main Tips */}
+                        <div className="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                          <h6 className="text-xs font-bold text-indigo-800 dark:text-indigo-200 uppercase tracking-wide mb-3 flex items-center gap-2">
+                            <Lightbulb className="w-3.5 h-3.5" />
+                            Sharpen Your Thinking
+                          </h6>
+                          <div className="space-y-2.5">
+                            {(() => {
+                              const critScore = result?.scales?.critical?.value || 0;
+                              const fpScore = result?.scales?.firstPrinciples?.value || 0;
+                              
+                              const tips = [];
+                              
+                              if (critScore < 3) {
+                                tips.push({
+                                  tip: "Practice the '5 Whys' technique when facing problems",
+                                  desc: "Ask 'why' five times to get to the root cause",
+                                  example: "Problem: 'I'm always late.' Why? Because I leave late. Why? Because I underestimate prep time..."
+                                });
+                                tips.push({
+                                  tip: "Challenge your first conclusion",
+                                  desc: "Consider 2-3 alternative explanations before deciding",
+                                  example: "If a coworker seems distant, instead of assuming they're upset with you, consider: Are they stressed? Tired? Focused on something?"
+                                });
+                              }
+                              
+                              if (fpScore < 3) {
+                                tips.push({
+                                  tip: "Break complex problems into smaller parts",
+                                  desc: "Identify the fundamental components before solving",
+                                  example: "'I need to get healthier' becomes: sleep better + move more + eat better. Pick one to start."
+                                });
+                                tips.push({
+                                  tip: "Question 'best practices' and conventional wisdom",
+                                  desc: "Ask if assumptions still apply to your situation",
+                                  example: "'Everyone says you need 8 hours of sleep' - but what does YOUR body actually need?"
+                                });
+                              }
+                              
+                              if (critScore >= 3 && fpScore >= 3) {
+                                tips.push({
+                                  tip: "Teach analytical thinking to others",
+                                  desc: "Explaining deepens your own understanding",
+                                  example: "Next time someone asks for advice, help them think through it instead of giving the answer."
+                                });
+                                tips.push({
+                                  tip: "Tackle harder problems in new domains",
+                                  desc: "Apply your skills to unfamiliar territory",
+                                  example: "If you're great at work problems, try applying the same logic to a personal or creative challenge."
+                                });
+                              }
+                              
                               tips.push({
-                                tip: "Practice the '5 Whys' technique when facing problems",
-                                desc: "Ask 'why' five times to get to the root cause"
+                                tip: "Read arguments you disagree with",
+                                desc: "Understanding opposing views sharpens reasoning",
+                                example: "Pick a topic you feel strongly about. Find the best argument from the other side. Can you understand why someone might believe it?"
                               });
-                              tips.push({
-                                tip: "Challenge your first conclusion",
-                                desc: "Consider 2-3 alternative explanations before deciding"
-                              });
-                            }
-                            
-                            if (fpScore < 3) {
-                              tips.push({
-                                tip: "Break complex problems into smaller parts",
-                                desc: "Identify the fundamental components before solving"
-                              });
-                              tips.push({
-                                tip: "Question 'best practices' and conventional wisdom",
-                                desc: "Ask if assumptions still apply to your situation"
-                              });
-                            }
-                            
-                            if (critScore >= 3 && fpScore >= 3) {
-                              tips.push({
-                                tip: "Teach analytical thinking to others",
-                                desc: "Explaining deepens your own understanding"
-                              });
-                              tips.push({
-                                tip: "Tackle harder problems in new domains",
-                                desc: "Apply your skills to unfamiliar territory"
-                              });
-                            }
-                            
-                            tips.push({
-                              tip: "Read arguments you disagree with",
-                              desc: "Understanding opposing views sharpens reasoning"
-                            });
-                            
-                            return tips.slice(0, 3).map((item, idx) => (
-                              <div 
-                                key={idx}
-                                className="flex items-start gap-2 p-2.5 rounded-lg bg-white/50 dark:bg-gray-800/50"
-                              >
-                                <div className="w-5 h-5 rounded-full bg-indigo-200 dark:bg-indigo-700 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                  <span className="text-xs font-bold text-indigo-700 dark:text-indigo-200">{idx + 1}</span>
+                              
+                              return tips.slice(0, 3).map((item, idx) => (
+                                <div 
+                                  key={idx}
+                                  className="flex items-start gap-2 p-2.5 rounded-lg bg-white/50 dark:bg-gray-800/50"
+                                >
+                                  <div className="w-5 h-5 rounded-full bg-indigo-200 dark:bg-indigo-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-xs font-bold text-indigo-700 dark:text-indigo-200">{idx + 1}</span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
+                                      {item.tip}
+                                    </p>
+                                    <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
+                                      {item.desc}
+                                    </p>
+                                    <p className="text-xs text-indigo-500 dark:text-indigo-500 mt-1.5 italic bg-indigo-100/50 dark:bg-indigo-800/30 p-2 rounded">
+                                      {item.example}
+                                    </p>
+                                  </div>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
-                                    {item.tip}
-                                  </p>
-                                  <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
-                                    {item.desc}
-                                  </p>
-                                </div>
-                              </div>
-                            ));
-                          })()}
+                              ));
+                            })()}
+                          </div>
+                        </div>
+                        
+                        {/* Daily Brain Exercise */}
+                        <div className="p-4 rounded-xl bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 border border-violet-100 dark:border-violet-800">
+                          <h6 className="text-xs font-bold text-violet-800 dark:text-violet-200 uppercase tracking-wide mb-3 flex items-center gap-2">
+                            <Brain className="w-3.5 h-3.5" />
+                            Today's Brain Exercise
+                          </h6>
+                          <div className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60">
+                            <p className="text-sm font-medium text-violet-900 dark:text-violet-100 mb-2">
+                              The "Opposite Day" Challenge
+                            </p>
+                            <p className="text-xs text-violet-700 dark:text-violet-300 mb-3">
+                              Pick one belief you hold strongly. Spend 5 minutes arguing the opposite position as convincingly as you can.
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-violet-600 dark:text-violet-400">
+                              <Timer className="w-3.5 h-3.5" />
+                              <span>5 minutes</span>
+                              <span className="w-1 h-1 rounded-full bg-violet-400" />
+                              <span>No wrong answers</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Logical Fallacy Spotlight */}
+                        <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-100 dark:border-amber-800">
+                          <h6 className="text-xs font-bold text-amber-800 dark:text-amber-200 uppercase tracking-wide mb-3 flex items-center gap-2">
+                            <Shield className="w-3.5 h-3.5" />
+                            Logical Fallacy to Watch For
+                          </h6>
+                          <div className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60">
+                            <p className="text-sm font-bold text-amber-900 dark:text-amber-100 mb-1">
+                              Confirmation Bias
+                            </p>
+                            <p className="text-xs text-amber-700 dark:text-amber-300 mb-2">
+                              We tend to seek out information that confirms what we already believe, and ignore evidence that contradicts us.
+                            </p>
+                            <p className="text-xs text-amber-600 dark:text-amber-400 italic">
+                              Spot it: "I knew it all along!" often means you filtered for supporting evidence.
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -2199,6 +2616,28 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">Retake in 3-6 months to track growth</p>
                         </div>
                       </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Crossroads Adventure CTA */}
+                  <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-red-400" />
+                    <CardContent className="p-5 text-center">
+                      <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+                        <Compass className="w-7 h-7 text-white" />
+                      </div>
+                      <h5 className="text-base font-bold text-amber-800 dark:text-amber-200 mb-2">Try Crossroads Adventure</h5>
+                      <p className="text-sm text-amber-700/70 dark:text-amber-300/60 mb-4">
+                        Face 7 life scenarios and discover hidden personality traits
+                      </p>
+                      <Button 
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
+                        onClick={() => window.location.href = "/crossroads"}
+                        data-testid="button-crossroads-cta"
+                      >
+                        <Compass className="w-4 h-4 mr-2" />
+                        Start Adventure
+                      </Button>
                     </CardContent>
                   </Card>
 

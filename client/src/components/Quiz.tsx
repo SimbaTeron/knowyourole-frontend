@@ -834,10 +834,18 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97, rotate: -3 }}
                         onClick={() => !isTimingOut && handleSwipe("left")}
+                        onKeyDown={(e) => {
+                          if ((e.key === "Enter" || e.key === " ") && !isTimingOut) {
+                            e.preventDefault();
+                            handleSwipe("left");
+                          }
+                        }}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all p-4 disabled:opacity-50"
+                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all p-4 disabled:opacity-50 -translate-x-3"
                         data-testid="card-option-left"
                         aria-label={`Choose: ${currentQuestion.leftDesc}`}
+                        tabIndex={0}
+                        role="button"
                       >
                         <p className="text-lg md:text-xl font-bold text-sage-green dark:text-sage-green leading-snug text-center">
                           {currentQuestion.leftDesc}
@@ -848,10 +856,18 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97, rotate: 3 }}
                         onClick={() => !isTimingOut && handleSwipe("right")}
+                        onKeyDown={(e) => {
+                          if ((e.key === "Enter" || e.key === " ") && !isTimingOut) {
+                            e.preventDefault();
+                            handleSwipe("right");
+                          }
+                        }}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all p-4 disabled:opacity-50"
+                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all p-4 disabled:opacity-50 translate-x-3"
                         data-testid="card-option-right"
                         aria-label={`Choose: ${currentQuestion.rightDesc}`}
+                        tabIndex={0}
+                        role="button"
                       >
                         <p className="text-lg md:text-xl font-bold text-terracotta dark:text-terracotta leading-snug text-center">
                           {currentQuestion.rightDesc}
@@ -913,35 +929,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         </div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-gray-900">
-        <div className="max-w-sm mx-auto flex justify-center gap-4">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => handleSwipe("left")}
-            disabled={isTimingOut}
-            className="flex-1 max-w-[140px] min-h-12 text-base font-bold border-2 border-sage-green text-sage-green hover:bg-sage-green/10 hover:scale-105 transition-all disabled:opacity-50"
-            data-testid="button-swipe-left"
-          >
-            <ChevronLeft className="w-5 h-5 mr-1" />
-            {currentQuestion.options[0]}
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => handleSwipe("right")}
-            disabled={isTimingOut}
-            className="flex-1 max-w-[140px] min-h-12 text-base font-bold border-2 border-terracotta text-terracotta hover:bg-terracotta/10 hover:scale-105 transition-all disabled:opacity-50"
-            data-testid="button-swipe-right"
-          >
-            {currentQuestion.options[1]}
-            <ChevronRight className="w-5 h-5 ml-1" />
-          </Button>
-        </div>
-        
-        <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-2">
-          Tap card or buttons to choose
+      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+        <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
+          Tap, swipe, or use keyboard (Tab + Enter) to choose
         </p>
       </footer>
 
