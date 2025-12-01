@@ -1197,14 +1197,13 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       
                       <motion.h2 
                         key={`question-${currentIndex}`}
-                        initial={{ scale: 0.9, opacity: 0 }}
+                        initial={{ scale: 1 }}
                         animate={{ 
-                          scale: [0.95, 1.02, 1],
-                          opacity: 1
+                          scale: [1, 1.25, 1]
                         }}
                         transition={{ 
-                          duration: 0.6,
-                          times: [0, 0.5, 1],
+                          duration: 0.5,
+                          times: [0, 0.3, 1],
                           ease: "easeOut"
                         }}
                         className={`text-3xl md:text-4xl font-bold quiz-question-text leading-tight ${promptColor}`}
