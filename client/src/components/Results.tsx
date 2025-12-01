@@ -2420,7 +2420,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           <Crown className="w-8 h-8 text-white" />
                         </motion.div>
                         
-                        <h4 className="text-xl font-bold text-amber-900 dark:text-amber-100 mb-1">
+                        <h4 className="font-bold text-amber-900 dark:text-amber-100 mb-1 text-[26px]">
                           Unlock Your Full Potential
                         </h4>
                         <p className="text-sm text-amber-700 dark:text-amber-300">
