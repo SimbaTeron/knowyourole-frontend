@@ -335,6 +335,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [missCount, setMissCount] = useState(0);
   const [vibrantColorIndex, setVibrantColorIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [timerResetKey, setTimerResetKey] = useState(0); // Forces timer reset when incremented
   
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-ROTATION_RANGE, 0, ROTATION_RANGE]);
@@ -442,7 +443,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       setShowQuip(false);
       setSliderValue(0); // Reset slider for new question
     }
-  }, [currentIndex, questions, tierConfig.maxTime, dismissBadgeOverlay]);
+  }, [currentIndex, questions, tierConfig.maxTime, dismissBadgeOverlay, timerResetKey]);
 
   useEffect(() => {
     return () => {
@@ -461,11 +462,11 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     timeoutRef.current = setTimeout(() => {
       setShowQuip(false);
-      setTimeRemaining(tierConfig.maxTime);
-      setQuestionStartTime(Date.now());
       setIsTimingOut(false);
+      // Force timer reset by incrementing reset key - this triggers the useEffect
+      setTimerResetKey(prev => prev + 1);
     }, 2000);
-  }, [missCount, tierConfig.maxTime]);
+  }, [missCount]);
 
   useEffect(() => {
     // Pause timer during badge overlay display
@@ -651,8 +652,13 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }, [applyMultiChoiceWeights]);
 
   const handleCountdownComplete = useCallback(() => {
+    // Reset timer to full when returning to quiz from countdown
+    const currentQ = questions[currentIndex];
+    const extraTime = currentQ?.responseType === "slider" ? 5 : 0;
+    setTimeRemaining(tierConfig.maxTime + extraTime);
+    setQuestionStartTime(Date.now());
     setQuizPhase("quiz");
-  }, []);
+  }, [questions, currentIndex, tierConfig.maxTime]);
 
   // Phase 2.1: Dynamic difficulty calculation based on swipe speed
   const calculateDifficulty = (swipeTimes: number[], avgTime: number): "easy" | "medium" | "hard" => {
