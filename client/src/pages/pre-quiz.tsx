@@ -6,6 +6,8 @@ import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
 
+const SKIP_BUTTON_DELAY = 2000; // Show skip button after 2 seconds
+
 const DEMO_STEPS = [
   {
     id: 1,
@@ -52,9 +54,18 @@ export default function PreQuizPage() {
   const [timerProgress, setTimerProgress] = useState(100);
   const [dragDirection, setDragDirection] = useState<number>(0);
   const [viewedSteps, setViewedSteps] = useState<Set<number>>(new Set([0]));
+  const [showSkipButton, setShowSkipButton] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const allStepsViewed = viewedSteps.size === DEMO_STEPS.length;
+
+  // Show skip button after delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSkipButton(true);
+    }, SKIP_BUTTON_DELAY);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
@@ -401,6 +412,24 @@ export default function PreQuizPage() {
               Swipe through all {DEMO_STEPS.length} steps to unlock ({viewedSteps.size}/{DEMO_STEPS.length})
             </p>
           )}
+          
+          {/* Subtle Skip Instructions button - appears after 2 seconds */}
+          <AnimatePresence>
+            {showSkipButton && !allStepsViewed && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                onClick={handleStartQuiz}
+                className="w-full py-2 mb-2 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors"
+                data-testid="button-skip-instructions"
+              >
+                Skip Instructions
+              </motion.button>
+            )}
+          </AnimatePresence>
+          
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
