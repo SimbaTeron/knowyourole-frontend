@@ -393,10 +393,6 @@ export default function PreQuizPage() {
                       )}
                     </div>
 
-                    {/* Swipe hint */}
-                    <p className="text-center text-xs text-warm-gray/40 dark:text-soft-cream/30 mt-4">
-                      Swipe left or right to navigate
-                    </p>
                   </div>
                 </motion.div>
               </AnimatePresence>
