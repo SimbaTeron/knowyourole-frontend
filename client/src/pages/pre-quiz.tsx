@@ -9,7 +9,7 @@ import { ThemeMode } from "@/components/ThemeToggle";
 const DEMO_STEPS = [
   {
     id: 1,
-    title: "Quick Choices",
+    title: "Quick Choice: Swipe or Tap",
     description: "You'll see a question with two options. Swipe left or right to choose - go with your gut!",
     icon: Hand,
     demo: "swipe",
