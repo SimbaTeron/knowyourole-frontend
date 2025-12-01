@@ -1898,7 +1898,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   <h3 className="font-bold text-warm-gray dark:text-soft-cream text-[22px]">
                     Complete for More Free Insights!
                   </h3>
-                  <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">
+                  <p className="text-warm-gray/60 dark:text-soft-cream/50 mt-1 text-[16px]">
                     Answer questions to unlock dashboard
                   </p>
                 </div>
