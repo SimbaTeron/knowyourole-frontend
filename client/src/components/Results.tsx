@@ -2475,7 +2475,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                               Unlock Premium Now
                               <ArrowRight className="w-5 h-5" />
                             </span>
-                            <span className="font-normal opacity-90 text-[20px]">Lifetime access. No Subscription. Ever.</span>
+                            <span className="font-normal opacity-90 text-[17px]">Lifetime access. No Subscription. Ever.</span>
                           </>
                         )}
                       </Button>
