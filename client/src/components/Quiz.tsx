@@ -304,6 +304,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   
   // Badge/2x question display state
   const [showBadgeOverlay, setShowBadgeOverlay] = useState(false);
+  const [badgeCanDismiss, setBadgeCanDismiss] = useState(false); // After 3 seconds, allow manual dismiss
   const [badgeExtraTime, setBadgeExtraTime] = useState(0); // Extra time after badge display
   
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -397,6 +398,15 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     setQuestions(quotaSelection.sort(() => Math.random() - 0.5));
   }, [tier, tierConfig.baseCount]);
 
+  // Function to dismiss badge overlay (called by button or auto-timeout)
+  const dismissBadgeOverlay = useCallback(() => {
+    setShowBadgeOverlay(false);
+    setBadgeCanDismiss(false);
+    setBadgeExtraTime(3); // 3 extra seconds after badge display
+    setTimeRemaining(tierConfig.maxTime + 3);
+    setQuestionStartTime(Date.now());
+  }, [tierConfig.maxTime]);
+
   useEffect(() => {
     if (questions.length > 0 && currentIndex < questions.length) {
       const currentQ = questions[currentIndex];
@@ -404,16 +414,26 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       // Check if this is a badge or 2x question - show overlay first
       if (currentQ?.isBadge || currentQ?.is2x) {
         setShowBadgeOverlay(true);
-        // Hide badge after 2.5 seconds and give 3 extra seconds
-        const timer = setTimeout(() => {
-          setShowBadgeOverlay(false);
-          setBadgeExtraTime(3); // 3 extra seconds after badge display
-          setTimeRemaining(tierConfig.maxTime + 3);
-          setQuestionStartTime(Date.now());
-        }, 2500);
-        return () => clearTimeout(timer);
+        setBadgeCanDismiss(false);
+        
+        // After 3 seconds, allow manual dismiss with Continue button
+        const canDismissTimer = setTimeout(() => {
+          setBadgeCanDismiss(true);
+        }, 3000);
+        
+        // Auto-dismiss after 5 seconds if not manually dismissed
+        const autoDismissTimer = setTimeout(() => {
+          dismissBadgeOverlay();
+        }, 5000);
+        
+        return () => {
+          clearTimeout(canDismissTimer);
+          clearTimeout(autoDismissTimer);
+        };
       } else {
-        setTimeRemaining(tierConfig.maxTime);
+        // Give slider questions 5 extra seconds since they're more complex
+        const extraTime = currentQ?.responseType === "slider" ? 5 : 0;
+        setTimeRemaining(tierConfig.maxTime + extraTime);
         setQuestionStartTime(Date.now());
       }
       
@@ -422,7 +442,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       setShowQuip(false);
       setSliderValue(0); // Reset slider for new question
     }
-  }, [currentIndex, questions, tierConfig.maxTime]);
+  }, [currentIndex, questions, tierConfig.maxTime, dismissBadgeOverlay]);
 
   useEffect(() => {
     return () => {
@@ -1067,9 +1087,18 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       }}
                     />
                   </svg>
-                  <span className="absolute text-[10px] font-bold text-red-500">
-                    {Math.ceil(timeRemaining)}
-                  </span>
+                  <AnimatePresence mode="wait">
+                    <motion.span 
+                      key={Math.ceil(timeRemaining)}
+                      initial={{ scale: 1.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.5, opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute text-xs font-bold text-red-500"
+                    >
+                      {Math.ceil(timeRemaining)}
+                    </motion.span>
+                  </AnimatePresence>
                 </motion.div>
               ) : (
                 <motion.div
@@ -1160,12 +1189,23 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         </motion.div>
                       )}
                       
-                      <h2 
+                      <motion.h2 
+                        key={`question-${currentIndex}`}
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ 
+                          scale: [0.95, 1.02, 1],
+                          opacity: 1
+                        }}
+                        transition={{ 
+                          duration: 0.6,
+                          times: [0, 0.5, 1],
+                          ease: "easeOut"
+                        }}
                         className={`text-3xl md:text-4xl font-bold quiz-question-text leading-tight ${promptColor}`}
                         data-testid="text-prompt"
                       >
                         {currentQuestion.prompt}
-                      </h2>
+                      </motion.h2>
                     </div>
                     
                     <div className="flex-1 flex flex-col justify-center gap-4">
@@ -1436,19 +1476,41 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   </div>
                 </motion.div>
                 
-                {/* Extra time notice */}
+                {/* Extra time notice and Continue button */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="absolute bottom-20 text-center"
+                  className="absolute bottom-16 text-center flex flex-col items-center gap-3"
                 >
                   <p className="text-white font-medium text-lg">
                     +3 seconds bonus time!
                   </p>
-                  <p className="text-white/70 text-sm mt-1">
-                    Timer paused until badge fades...
-                  </p>
+                  
+                  <AnimatePresence>
+                    {badgeCanDismiss ? (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={dismissBadgeOverlay}
+                        className="px-8 py-3 rounded-2xl bg-white text-warm-gray font-bold text-lg shadow-lg"
+                        data-testid="button-badge-continue"
+                      >
+                        Continue
+                      </motion.button>
+                    ) : (
+                      <motion.p 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-white/60 text-sm"
+                      >
+                        Get ready...
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               </motion.div>
             )}
