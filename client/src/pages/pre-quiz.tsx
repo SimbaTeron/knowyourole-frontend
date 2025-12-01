@@ -167,7 +167,7 @@ export default function PreQuizPage() {
             transition={{ delay: 0.1 }}
             className="text-center mb-4"
           >
-            <h1 className="text-2xl md:text-3xl font-display font-semibold compass-gradient-text mb-2">
+            <h1 className="md:text-3xl font-display font-semibold compass-gradient-text mb-2 text-[36px]">
               Here's How It Works
             </h1>
             <p className="text-warm-gray/70 dark:text-soft-cream/60 text-sm">
