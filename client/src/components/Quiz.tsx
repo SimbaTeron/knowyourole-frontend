@@ -1379,14 +1379,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   </p>
                   
                   <p className="text-sm text-soft-cream/60 dark:text-warm-gray/60">
-                    Moving to the next path...
+                    Take a breath, then try again
                   </p>
-                  
-                  {missCount > 1 && (
-                    <p className="text-xs text-terracotta/70 mt-3">
-                      {missCount} cosmic assists so far
-                    </p>
-                  )}
                 </div>
               </motion.div>
             )}
