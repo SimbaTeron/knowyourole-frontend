@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, SkipForward } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
@@ -38,12 +38,7 @@ export default function MoodMixerPage() {
 
   const handleContinue = () => {
     if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-    setLocation("/location");
-  };
-
-  const handleSkip = () => {
-    if (navigator.vibrate) navigator.vibrate(20);
-    setLocation("/location");
+    setLocation("/pre-quiz");
   };
 
   const handleBack = () => {
@@ -75,7 +70,7 @@ export default function MoodMixerPage() {
             className="text-center mb-6"
           >
             <h1 className="md:text-4xl font-display font-semibold compass-gradient-text mb-3 text-[38px]">How are you feeling?</h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60 max-w-sm mx-auto text-[18px]">Tap two to create your mood blend. This helps us personalize your journey. You can also skip this step below.</p>
+            <p className="text-warm-gray/70 dark:text-soft-cream/60 max-w-sm mx-auto text-[18px]">Tap two to create your mood blend. This helps us personalize your journey.</p>
           </motion.div>
 
           <MagneticOrbitMixer onMoodBrewed={handleMoodBrewed} />
@@ -94,18 +89,6 @@ export default function MoodMixerPage() {
           >
             Continue
             <ArrowRight className="w-5 h-5" />
-          </motion.button>
-
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            onClick={handleSkip}
-            className="w-full py-3 text-warm-gray/50 dark:text-soft-cream/40 flex items-center justify-center gap-1 hover:text-warm-gray/70 dark:hover:text-soft-cream/60 transition-colors text-[22px]"
-            data-testid="button-skip-mixer"
-          >
-            <SkipForward className="w-4 h-4" />
-            Skip this step
           </motion.button>
         </div>
       </div>
