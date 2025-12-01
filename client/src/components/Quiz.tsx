@@ -898,16 +898,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   `}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <span className={`
-                    text-sm font-medium leading-tight
-                    ${isSelected 
-                      ? "text-terracotta" 
-                      : "text-warm-gray dark:text-soft-cream"
-                    }
-                  `}>
+                  <span className="font-medium text-warm-gray dark:text-soft-cream text-[18px]">
                     {option.label}
                   </span>
-                  
                   {isSelected && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -1136,7 +1129,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           />
         </div>
       </header>
-
       <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-24">
         <div className="relative w-full max-w-sm h-[480px]">
           <AnimatePresence mode="wait">
@@ -1215,13 +1207,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                     <div className="flex-1 flex flex-col justify-center gap-4">
                       {currentQuestion.responseType === "slider" ? (
                         /* Slider UI for nuanced responses */
-                        <div className="flex flex-col gap-6 px-2">
+                        (<div className="flex flex-col gap-6 px-2">
                           {/* Slider labels */}
                           <div className="flex justify-between text-sm font-medium">
                             <span className="text-sage-green dark:text-sage-green/80">{currentQuestion.leftDesc}</span>
                             <span className="text-terracotta dark:text-terracotta/80">{currentQuestion.rightDesc}</span>
                           </div>
-                          
                           {/* Slider track */}
                           <div className="relative">
                             <input
@@ -1251,7 +1242,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                               <span>Strongly</span>
                             </div>
                           </div>
-                          
                           {/* Current value display */}
                           <motion.div 
                             className={`text-center py-3 px-6 rounded-2xl font-bold text-lg ${
@@ -1271,7 +1261,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                             {sliderValue === 1 && `Slightly: ${currentQuestion.options[1]}`}
                             {sliderValue === 2 && `Strongly: ${currentQuestion.options[1]}`}
                           </motion.div>
-                          
                           {/* Confirm button for slider */}
                           <Button
                             onClick={() => {
@@ -1287,10 +1276,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           >
                             {sliderValue === 0 ? "Slide to choose" : "Confirm Choice"}
                           </Button>
-                        </div>
+                        </div>)
                       ) : (
                         /* Binary option buttons */
-                        <>
+                        (<>
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.97, rotate: -3 }}
@@ -1313,7 +1302,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                               {currentQuestion.leftDesc}
                             </p>
                           </motion.button>
-                          
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.97, rotate: 3 }}
@@ -1336,7 +1324,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                             </p>
                             <ChevronRight className="w-6 h-6 text-terracotta/60 flex-shrink-0" />
                           </motion.button>
-                        </>
+                        </>)
                       )}
                     </div>
                     
@@ -1548,7 +1536,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </AnimatePresence>
         </div>
       </main>
-
       <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
         <div className="flex items-center justify-center gap-4">
           <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
@@ -1571,7 +1558,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           )}
         </div>
       </footer>
-
       <AnimatePresence>
         {showPauseMenu && (
           <motion.div
