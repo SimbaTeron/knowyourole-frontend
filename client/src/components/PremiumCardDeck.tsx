@@ -39,6 +39,7 @@ interface GrowthTipInsight extends PremiumInsight {
   actionSteps: string;
   timeframe: string;
   difficulty: string;
+  targetTrait: string;
 }
 
 interface StrengthInsight extends PremiumInsight {
@@ -596,6 +597,17 @@ function DeepDiveCard({
   );
 }
 
+// Role display type
+interface DisplayRole {
+  title: string | undefined;
+  salary: string | undefined;
+  desc: string | undefined;
+  icon: typeof Star;
+  fit: number;
+  industry?: string;
+  growthOutlook?: string;
+}
+
 // Role Matches Card - Expandable chips
 function RoleMatchesCard({ 
   result,
@@ -613,7 +625,7 @@ function RoleMatchesCard({
   const hasApiData = apiCareerPaths.length > 0;
   
   // Static fallback roles
-  const staticRoles = [
+  const staticRoles: DisplayRole[] = [
     {
       title: result?.mbtiType.includes('N') ? 'Innovation Strategist' : 'Operations Specialist',
       salary: result?.mbtiType.includes('N') ? '$70K-130K' : '$55K-95K',
@@ -642,7 +654,7 @@ function RoleMatchesCard({
   ];
   
   // Map API career paths to roles format
-  const apiRoles = hasApiData 
+  const apiRoles: DisplayRole[] = hasApiData 
     ? apiCareerPaths.slice(0, 3).map((path, idx) => ({
         title: path.title,
         salary: path.salaryRange,
@@ -654,7 +666,7 @@ function RoleMatchesCard({
       }))
     : [];
   
-  const roles = hasApiData ? apiRoles : staticRoles;
+  const roles: DisplayRole[] = hasApiData ? apiRoles : staticRoles;
 
   return (
     <div className="space-y-3">
@@ -694,18 +706,18 @@ function RoleMatchesCard({
                 <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed mb-2">
                   {role.desc}
                 </p>
-                {'industry' in role && role.industry && (
+                {role.industry && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     <span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
-                      {role.industry as string}
+                      {role.industry}
                     </span>
-                    {'growthOutlook' in role && (
+                    {role.growthOutlook && (
                       <span className={`text-xs px-2 py-1 rounded-full ${
-                        (role.growthOutlook as string) === 'high' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' :
-                        (role.growthOutlook as string) === 'medium' ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300' :
+                        role.growthOutlook === 'high' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' :
+                        role.growthOutlook === 'medium' ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300' :
                         'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                       }`}>
-                        {(role.growthOutlook as string)} growth
+                        {role.growthOutlook} growth
                       </span>
                     )}
                   </div>
@@ -747,8 +759,8 @@ function BlindSpotsCard({
     ? apiBlindspots.map(b => ({
         title: b.title,
         blindspot: b.description,
-        workaround: b.strategies,
-        realWorld: b.affectedAreas,
+        workaround: b.actionTip,
+        realWorld: `Focus on improving your ${b.targetTrait === 'O' ? 'openness' : b.targetTrait === 'C' ? 'consistency' : b.targetTrait === 'E' ? 'social energy' : b.targetTrait === 'A' ? 'empathy' : 'emotional balance'}`,
         severity: b.severity,
       }))
     : blindspots;
@@ -1121,21 +1133,29 @@ function GrowthQuestCard({
   const weekKey = `week${selectedWeek}` as keyof typeof quests;
   const staticChallenges = quests[weekKey] || [];
   
-  // Map API data to challenges format (group by week based on difficulty/priority)
+  // Map API data to challenges format - group by week based on timeframe and difficulty
   const apiChallenges = hasApiData 
     ? apiGrowthTips
         .filter(tip => {
-          // Assign tips to weeks based on timeframe
-          if (selectedWeek === 1) return tip.timeframe === "daily" || tip.priority <= 2;
-          if (selectedWeek === 2) return tip.timeframe === "weekly" && tip.priority <= 4;
-          if (selectedWeek === 3) return tip.timeframe === "weekly" && tip.priority > 4;
-          return tip.timeframe === "monthly" || tip.priority > 6;
+          // Assign tips to weeks based on timeframe and difficulty
+          if (selectedWeek === 1) return tip.timeframe.toLowerCase() === "daily" || tip.difficulty === "easy";
+          if (selectedWeek === 2) return tip.timeframe.toLowerCase() === "weekly" && tip.difficulty !== "advanced";
+          if (selectedWeek === 3) return tip.timeframe.toLowerCase() === "weekly" && tip.difficulty !== "easy";
+          return tip.timeframe.toLowerCase().includes("30") || tip.difficulty === "advanced";
         })
-        .slice(0, 4)
-        .map(tip => tip.actionSteps)
+        .slice(0, 5)
+        .map(tip => {
+          // Parse actionSteps if it's a JSON string
+          try {
+            const steps = JSON.parse(tip.actionSteps);
+            return Array.isArray(steps) ? steps[0] : tip.actionSteps;
+          } catch {
+            return tip.actionSteps;
+          }
+        })
     : [];
   
-  const challenges = hasApiData ? apiChallenges : staticChallenges;
+  const challenges = hasApiData && apiChallenges.length > 0 ? apiChallenges : staticChallenges;
 
   return (
     <div className="space-y-4">
