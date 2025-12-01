@@ -4,10 +4,14 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { stripeService } from "./stripeService";
 import { getStripePublishableKey } from "./stripeClient";
-import { sql, eq, and, gte, lte } from "drizzle-orm";
+import { sql, eq, and, gte, lte, or, desc } from "drizzle-orm";
 import { db } from "./db";
-import { seedAll } from "./seedData";
-import { traitVibes, traitCombinations, adventureArchetypes } from "@shared/schema";
+import { seedAll, seedPremiumInsights } from "./seedData";
+import { 
+  traitVibes, traitCombinations, adventureArchetypes,
+  sideHustles, blindspots, careerPaths, growthTips,
+  strengths, communicationStyles, workEnvironments, relationshipInsights
+} from "@shared/schema";
 
 const quizScoresSchema = z.object({
   mbti: z.object({
@@ -432,9 +436,10 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Session not found" });
       }
 
+      const result = session.result as any;
       return res.json({
-        badges: session.result.earnedBadges || [],
-        hybridTypes: session.result.hybridTypes || [],
+        badges: result.earnedBadges || [],
+        hybridTypes: result.hybridTypes || [],
       });
     } catch (error) {
       console.error("Badges fetch error:", error);
@@ -1492,6 +1497,237 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Full data export error:", error);
       res.status(500).json({ error: "Failed to export complete blueprint to Google Sheets" });
+    }
+  });
+
+  // ========================================
+  // PREMIUM INSIGHTS API ENDPOINTS
+  // ========================================
+
+  // Admin route to seed premium insights data
+  app.post("/api/admin/seed-premium", async (req: Request, res: Response) => {
+    try {
+      await seedPremiumInsights();
+      res.json({ success: true, message: "Premium insights seeded successfully" });
+    } catch (error) {
+      console.error("Premium insights seeding error:", error);
+      res.status(500).json({ error: "Failed to seed premium insights" });
+    }
+  });
+
+  // Get personalized premium insights based on personality traits
+  const premiumInsightsSchema = z.object({
+    bigFive: z.object({
+      O: z.number(),
+      C: z.number(),
+      E: z.number(),
+      A: z.number(),
+      N: z.number(),
+    }),
+    mbtiType: z.string().optional(),
+    discStyle: z.string().optional(),
+    ageTier: z.string().optional(),
+  });
+
+  app.post("/api/premium-insights", async (req: Request, res: Response) => {
+    try {
+      const data = premiumInsightsSchema.parse(req.body);
+      const { bigFive, mbtiType, discStyle, ageTier } = data;
+      
+      // Map age tier to database format
+      const ageTierMap: Record<string, string> = {
+        "mini": "mini",
+        "teen": "teen",
+        "young_adult": "young_adult",
+        "adult": "adult",
+        "Ages 12 and under": "mini",
+        "Ages 13-18": "teen",
+        "Ages 19-25": "young_adult",
+        "Ages 25+": "adult",
+      };
+      const dbAgeTier = ageTierMap[ageTier || "adult"] || "adult";
+
+      // Helper function to check if age tier matches
+      const matchesAgeTier = (ageTiers: string | null) => {
+        if (!ageTiers) return true;
+        return ageTiers.includes(dbAgeTier) || ageTiers.includes("all");
+      };
+
+      // 1. SIDE HUSTLES - Match by primary trait and age tier
+      const topTrait = Object.entries(bigFive).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+      const allSideHustles = await db.select().from(sideHustles);
+      const matchedSideHustles = allSideHustles
+        .filter(h => {
+          const traitScore = bigFive[h.primaryTrait as keyof typeof bigFive];
+          if (traitScore === undefined || traitScore < h.primaryTraitMin) return false;
+          if (h.secondaryTrait && h.secondaryTraitMin) {
+            const secScore = bigFive[h.secondaryTrait as keyof typeof bigFive];
+            if (secScore === undefined || secScore < h.secondaryTraitMin) return false;
+          }
+          if (h.mbtiPreference && mbtiType && !mbtiType.includes(h.mbtiPreference)) return false;
+          if (h.discPreference && discStyle && h.discPreference !== discStyle) return false;
+          return matchesAgeTier(h.ageTiers);
+        })
+        .sort((a, b) => {
+          // Prioritize primary trait matches
+          const aScore = bigFive[a.primaryTrait as keyof typeof bigFive] || 0;
+          const bScore = bigFive[b.primaryTrait as keyof typeof bigFive] || 0;
+          return bScore - aScore;
+        })
+        .slice(0, 5);
+
+      // 2. BLINDSPOTS - Match by low traits
+      const allBlindspots = await db.select().from(blindspots);
+      const matchedBlindspots = allBlindspots
+        .filter(b => {
+          const traitScore = bigFive[b.targetTrait as keyof typeof bigFive];
+          if (traitScore === undefined) return false;
+          // Check if trait is below threshold
+          if (traitScore > b.traitMax) return false;
+          // Check secondary conditions if present
+          if (b.secondaryCondition) {
+            try {
+              const cond = JSON.parse(b.secondaryCondition);
+              for (const [key, val] of Object.entries(cond)) {
+                const traitKey = key.replace("min", "").replace("max", "").toUpperCase() as keyof typeof bigFive;
+                const score = bigFive[traitKey];
+                if (key.startsWith("min") && score < (val as number)) return false;
+                if (key.startsWith("max") && score > (val as number)) return false;
+              }
+            } catch (e) {}
+          }
+          return matchesAgeTier(b.ageTiers);
+        })
+        .sort((a, b) => {
+          // Prioritize more severe blindspots for lower scores
+          const aScore = bigFive[a.targetTrait as keyof typeof bigFive] || 100;
+          const bScore = bigFive[b.targetTrait as keyof typeof bigFive] || 100;
+          return aScore - bScore;
+        })
+        .slice(0, 3);
+
+      // 3. CAREER PATHS - Match by traits and MBTI/DISC
+      const allCareerPaths = await db.select().from(careerPaths);
+      const matchedCareerPaths = allCareerPaths
+        .filter(c => {
+          const traitScore = bigFive[c.primaryTrait as keyof typeof bigFive];
+          if (traitScore === undefined || traitScore < c.primaryTraitMin) return false;
+          if (c.secondaryTrait && c.secondaryTraitMin) {
+            const secScore = bigFive[c.secondaryTrait as keyof typeof bigFive];
+            if (secScore === undefined || secScore < c.secondaryTraitMin) return false;
+          }
+          if (c.mbtiTypes && mbtiType && !c.mbtiTypes.split(",").includes(mbtiType)) return false;
+          if (c.discStyles && discStyle && !c.discStyles.split(",").includes(discStyle)) return false;
+          return matchesAgeTier(c.ageTiers);
+        })
+        .sort((a, b) => {
+          const aScore = bigFive[a.primaryTrait as keyof typeof bigFive] || 0;
+          const bScore = bigFive[b.primaryTrait as keyof typeof bigFive] || 0;
+          return bScore - aScore;
+        })
+        .slice(0, 5);
+
+      // 4. GROWTH TIPS - Match by trait direction
+      const allGrowthTips = await db.select().from(growthTips);
+      const matchedGrowthTips = allGrowthTips
+        .filter(g => {
+          const traitScore = bigFive[g.targetTrait as keyof typeof bigFive];
+          if (traitScore === undefined) return false;
+          if (g.traitMin !== null && traitScore < g.traitMin) return false;
+          if (g.traitMax !== null && traitScore > g.traitMax) return false;
+          return matchesAgeTier(g.ageTiers);
+        })
+        .slice(0, 3);
+
+      // 5. STRENGTHS - Match by high traits
+      const allStrengths = await db.select().from(strengths);
+      const matchedStrengths = allStrengths
+        .filter(s => {
+          const traitScore = bigFive[s.primaryTrait as keyof typeof bigFive];
+          if (traitScore === undefined || traitScore < s.primaryTraitMin) return false;
+          if (s.secondaryTrait && s.secondaryTraitMin) {
+            const secScore = bigFive[s.secondaryTrait as keyof typeof bigFive];
+            if (secScore === undefined || secScore < s.secondaryTraitMin) return false;
+          }
+          return matchesAgeTier(s.ageTiers);
+        })
+        .sort((a, b) => {
+          const aScore = bigFive[a.primaryTrait as keyof typeof bigFive] || 0;
+          const bScore = bigFive[b.primaryTrait as keyof typeof bigFive] || 0;
+          return bScore - aScore;
+        })
+        .slice(0, 3);
+
+      // 6. COMMUNICATION STYLES - Match by DISC and traits
+      const allCommStyles = await db.select().from(communicationStyles);
+      const matchedCommStyles = allCommStyles
+        .filter(c => {
+          if (c.discStyle && discStyle && c.discStyle !== discStyle) return false;
+          if (c.extraversionMin !== null && bigFive.E < c.extraversionMin) return false;
+          if (c.extraversionMax !== null && bigFive.E > c.extraversionMax) return false;
+          if (c.agreeablenessMin !== null && bigFive.A < c.agreeablenessMin) return false;
+          if (c.agreeablenessMax !== null && bigFive.A > c.agreeablenessMax) return false;
+          return matchesAgeTier(c.ageTiers);
+        })
+        .slice(0, 2);
+
+      // 7. WORK ENVIRONMENTS - Match by trait ranges
+      const allWorkEnvs = await db.select().from(workEnvironments);
+      const matchedWorkEnvs = allWorkEnvs
+        .filter(w => {
+          if (w.opennessMin !== null && bigFive.O < w.opennessMin) return false;
+          if (w.opennessMax !== null && bigFive.O > w.opennessMax) return false;
+          if (w.conscientiousnessMin !== null && bigFive.C < w.conscientiousnessMin) return false;
+          if (w.conscientiousnessMax !== null && bigFive.C > w.conscientiousnessMax) return false;
+          if (w.extraversionMin !== null && bigFive.E < w.extraversionMin) return false;
+          if (w.extraversionMax !== null && bigFive.E > w.extraversionMax) return false;
+          if (w.discStyles && discStyle && !w.discStyles.split(",").includes(discStyle)) return false;
+          return matchesAgeTier(w.ageTiers);
+        })
+        .slice(0, 3);
+
+      // 8. RELATIONSHIP INSIGHTS - Match by trait ranges
+      const allRelInsights = await db.select().from(relationshipInsights);
+      const matchedRelInsights = allRelInsights
+        .filter(r => {
+          const traitScore = bigFive[r.primaryTrait as keyof typeof bigFive];
+          if (traitScore === undefined) return false;
+          if (r.primaryTraitMin !== null && traitScore < r.primaryTraitMin) return false;
+          if (r.primaryTraitMax !== null && traitScore > r.primaryTraitMax) return false;
+          if (r.agreeablenessMin !== null && bigFive.A < r.agreeablenessMin) return false;
+          if (r.agreeablenessMax !== null && bigFive.A > r.agreeablenessMax) return false;
+          if (r.neuroticismMin !== null && bigFive.N < r.neuroticismMin) return false;
+          if (r.neuroticismMax !== null && bigFive.N > r.neuroticismMax) return false;
+          return matchesAgeTier(r.ageTiers);
+        })
+        .slice(0, 2);
+
+      res.json({
+        success: true,
+        insights: {
+          sideHustles: matchedSideHustles,
+          blindspots: matchedBlindspots,
+          careerPaths: matchedCareerPaths,
+          growthTips: matchedGrowthTips,
+          strengths: matchedStrengths,
+          communicationStyles: matchedCommStyles,
+          workEnvironments: matchedWorkEnvs,
+          relationshipInsights: matchedRelInsights,
+        },
+        counts: {
+          sideHustles: matchedSideHustles.length,
+          blindspots: matchedBlindspots.length,
+          careerPaths: matchedCareerPaths.length,
+          growthTips: matchedGrowthTips.length,
+          strengths: matchedStrengths.length,
+          communicationStyles: matchedCommStyles.length,
+          workEnvironments: matchedWorkEnvs.length,
+          relationshipInsights: matchedRelInsights.length,
+        },
+      });
+    } catch (error) {
+      console.error("Premium insights fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch premium insights" });
     }
   });
 

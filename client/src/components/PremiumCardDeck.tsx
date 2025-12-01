@@ -3,10 +3,77 @@ import { motion, AnimatePresence, useReducedMotion, PanInfo } from "framer-motio
 import { 
   BookOpen, Shield, Briefcase, DollarSign, Target, Brain, Gift, Crown,
   Lightbulb, CheckCircle2, ArrowRight, Star, Sunrise, Zap, Flame, ChevronLeft, ChevronRight,
-  RotateCw, Play, Pause, Clock, Sparkles, TrendingUp, Eye, EyeOff, GripHorizontal
+  RotateCw, Play, Pause, Clock, Sparkles, TrendingUp, Eye, EyeOff, GripHorizontal,
+  MessageSquare, Heart, Users, Compass
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+
+interface PremiumInsight {
+  id: string;
+  title: string;
+  description: string;
+}
+
+interface SideHustleInsight extends PremiumInsight {
+  incomeRange: string;
+  timeCommitment: string;
+  difficulty: string;
+  tags: string;
+}
+
+interface BlindspotInsight extends PremiumInsight {
+  actionTip: string;
+  severity: string;
+  targetTrait: string;
+}
+
+interface CareerPathInsight extends PremiumInsight {
+  salaryRange: string;
+  growthOutlook: string;
+  industry: string;
+}
+
+interface GrowthTipInsight extends PremiumInsight {
+  actionSteps: string;
+  timeframe: string;
+  difficulty: string;
+}
+
+interface StrengthInsight extends PremiumInsight {
+  howToLeverage: string;
+}
+
+interface CommunicationStyleInsight extends PremiumInsight {
+  tipsForOthers: string;
+  tipsForSelf: string;
+}
+
+interface WorkEnvironmentInsight extends PremiumInsight {
+  idealFor: string;
+  challenges: string;
+}
+
+interface RelationshipInsight extends PremiumInsight {
+  strengthsInRelationships: string;
+  growthAreas: string;
+  compatibilityNotes: string;
+}
+
+interface PremiumInsightsResponse {
+  success: boolean;
+  insights: {
+    sideHustles: SideHustleInsight[];
+    blindspots: BlindspotInsight[];
+    careerPaths: CareerPathInsight[];
+    growthTips: GrowthTipInsight[];
+    strengths: StrengthInsight[];
+    communicationStyles: CommunicationStyleInsight[];
+    workEnvironments: WorkEnvironmentInsight[];
+    relationshipInsights: RelationshipInsight[];
+  };
+}
 
 interface PremiumCardDeckProps {
   result: {
@@ -160,6 +227,26 @@ export function PremiumCardDeck({
   const [thinkingChallengeRevealed, setThinkingChallengeRevealed] = useState(false);
   const [thinkingAnswer, setThinkingAnswer] = useState<string | null>(null);
 
+  // Fetch personalized premium insights from API
+  const { data: premiumInsights } = useQuery<PremiumInsightsResponse>({
+    queryKey: ['/api/premium-insights', result?.mbtiType, result?.discStyle],
+    queryFn: async () => {
+      const response = await fetch('/api/premium-insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bigFive: result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 },
+          mbtiType: result?.mbtiType,
+          discStyle: result?.discStyle,
+          ageTier: sessionStorage.getItem('knowrole-age-tier') || 'adult',
+        }),
+      });
+      return response.json();
+    },
+    enabled: !!result?.bigFiveProfile,
+    staleTime: 1000 * 60 * 5,
+  });
+
   const goToCard = (index: number) => {
     setDirection(index > currentCard ? 1 : -1);
     setCurrentCard(index);
@@ -291,6 +378,7 @@ export function PremiumCardDeck({
       case "side-hustle":
         return <SideHustleCard 
           hustles={getSideHustles()}
+          apiHustles={premiumInsights?.insights?.sideHustles || []}
           selectedIndex={selectedHustle}
           setSelectedIndex={setSelectedHustle}
           reduceMotion={shouldReduceMotion ?? false}
@@ -757,32 +845,56 @@ function CareerSimCard({
   );
 }
 
-// Side Hustle Card - Mini carousel
+// Unified hustle display type
+interface DisplayHustle {
+  name: string;
+  fit: string;
+  income: string;
+  startupCost: string;
+  timeCommit: string;
+  tags?: string;
+}
+
+// Side Hustle Card - Mini carousel with API data
 function SideHustleCard({ 
-  hustles, 
+  hustles,
+  apiHustles = [],
   selectedIndex,
   setSelectedIndex,
   reduceMotion
 }: { 
   hustles: Array<{ name: string; fit: string; income: string; startupCost: string; timeCommit: string }>;
+  apiHustles?: SideHustleInsight[];
   selectedIndex: number;
   setSelectedIndex: (idx: number) => void;
   reduceMotion: boolean;
 }) {
+  // Combine API hustles with static data fallback
+  const displayHustles: DisplayHustle[] = apiHustles.length > 0 
+    ? apiHustles.map(h => ({
+        name: h.title,
+        fit: h.description,
+        income: h.incomeRange,
+        startupCost: h.difficulty === "beginner" ? "$0-100" : h.difficulty === "intermediate" ? "$100-500" : "$500+",
+        timeCommit: h.timeCommitment,
+        tags: h.tags,
+      }))
+    : hustles.map(h => ({ ...h, tags: undefined }));
+
   const nextHustle = () => {
-    setSelectedIndex((selectedIndex + 1) % hustles.length);
+    setSelectedIndex((selectedIndex + 1) % displayHustles.length);
   };
 
   const prevHustle = () => {
-    setSelectedIndex((selectedIndex - 1 + hustles.length) % hustles.length);
+    setSelectedIndex((selectedIndex - 1 + displayHustles.length) % displayHustles.length);
   };
 
-  const currentHustle = hustles[selectedIndex];
+  const currentHustle = displayHustles[selectedIndex] || displayHustles[0];
 
   return (
     <div className="space-y-4">
       <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-        Extra income ideas that match your personality
+        {apiHustles.length > 0 ? "Personalized" : "Extra"} income ideas matched to your traits
       </p>
 
       {/* Carousel controls */}
@@ -791,7 +903,7 @@ function SideHustleCard({
           <ChevronLeft className="w-4 h-4" />
         </Button>
         <div className="flex gap-1.5">
-          {hustles.map((_, idx) => (
+          {displayHustles.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setSelectedIndex(idx)}
@@ -829,6 +941,16 @@ function SideHustleCard({
             <span>{currentHustle.timeCommit}</span>
           </div>
         </div>
+        {/* Tags from API */}
+        {currentHustle.tags && (
+          <div className="flex flex-wrap gap-1 mt-3">
+            {currentHustle.tags.split(',').slice(0, 3).map((tag, i) => (
+              <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-800/50 text-amber-700 dark:text-amber-300">
+                {tag.trim()}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

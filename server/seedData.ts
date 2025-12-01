@@ -154,3 +154,6 @@ export async function seedAll() {
   await seedAdventureArchetypes();
   console.log("All seed data inserted successfully!");
 }
+
+// Re-export premium insights seeder
+export { seedPremiumInsights } from './seeds/premiumInsights';
