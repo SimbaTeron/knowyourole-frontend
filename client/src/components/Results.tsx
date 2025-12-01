@@ -1584,83 +1584,100 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           )}
         </motion.div>
 
-        {/* TIER 2: POST-FEEDBACK (FULL) - MBTI/DISC/Big Five stacked vertically with plain-language explanations */}
+        {/* TIER 2: POST-FEEDBACK (FULL) - Unified Personality Profile Card */}
         {isFull && (
           <motion.div
             initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="space-y-3"
           >
-            {/* MBTI Card */}
-            <Card className="bg-white dark:bg-gray-800 border-terracotta/20">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-terracotta/10 flex items-center justify-center">
-                    <Brain className="w-6 h-6 text-terracotta" aria-hidden="true" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-0.5">
-                      How you think and make decisions
-                    </p>
-                    <p className="text-lg font-bold text-terracotta leading-tight" data-testid="text-mbti">
-                      {funMode && FUN_MODE_TITLES[result.mbtiType] 
-                        ? FUN_MODE_TITLES[result.mbtiType]
-                        : result.mbtiLabel}
-                      <span className="text-sm font-mono text-terracotta/60 ml-2">({result.mbtiType})</span>
-                    </p>
-                  </div>
+            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <CardContent className="p-0">
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                  <h3 className="text-sm font-bold text-warm-gray dark:text-soft-cream flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-terracotta" />
+                    Your Personality Profile
+                  </h3>
+                  <p className="text-xs text-warm-gray/50 dark:text-soft-cream/50 mt-0.5">Tap each to learn more</p>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* DISC Card */}
-            <Card className={`${discColorMap[result.discColor] || "bg-sage-green text-white"} border-0`}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                    <Award className="w-6 h-6" aria-hidden="true" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs opacity-70 mb-0.5">
-                      How you act and work with others
+                
+                {/* MBTI Row */}
+                <details className="group border-b border-gray-100 dark:border-gray-700">
+                  <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors list-none">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center">
+                      <Brain className="w-5 h-5 text-terracotta" aria-hidden="true" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] text-warm-gray/50 dark:text-soft-cream/50 uppercase tracking-wide">Thinking Style</p>
+                      <p className="text-sm font-bold text-warm-gray dark:text-soft-cream leading-tight" data-testid="text-mbti">
+                        {funMode && FUN_MODE_TITLES[result.mbtiType] 
+                          ? FUN_MODE_TITLES[result.mbtiType]
+                          : result.mbtiLabel}
+                        <span className="text-xs font-mono text-terracotta ml-1.5">({result.mbtiType})</span>
+                      </p>
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="px-4 pb-4 pt-1">
+                    <p className="text-xs text-warm-gray/70 dark:text-soft-cream/70 leading-relaxed pl-[52px]">
+                      {result.mbtiDesc}
                     </p>
-                    <p className="text-lg font-bold leading-tight" data-testid="text-disc">
-                      {funMode && FUN_MODE_DISC[result.discStyle] 
-                        ? FUN_MODE_DISC[result.discStyle].nickname 
-                        : result.discLabel}
-                      <span className="text-sm font-mono opacity-60 ml-2">({result.discStyle}-type)</span>
+                  </div>
+                </details>
+
+                {/* DISC Row */}
+                <details className="group border-b border-gray-100 dark:border-gray-700">
+                  <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors list-none">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-sage-green/10 flex items-center justify-center">
+                      <Award className="w-5 h-5 text-sage-green" aria-hidden="true" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] text-warm-gray/50 dark:text-soft-cream/50 uppercase tracking-wide">Work Style</p>
+                      <p className="text-sm font-bold text-warm-gray dark:text-soft-cream leading-tight" data-testid="text-disc">
+                        {funMode && FUN_MODE_DISC[result.discStyle] 
+                          ? FUN_MODE_DISC[result.discStyle].nickname 
+                          : result.discLabel}
+                        <span className="text-xs font-mono text-sage-green ml-1.5">({result.discStyle}-type)</span>
+                      </p>
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="px-4 pb-4 pt-1">
+                    <p className="text-xs text-warm-gray/70 dark:text-soft-cream/70 leading-relaxed pl-[52px]">
+                      {result.discDesc}
                     </p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </details>
 
-            {/* Big Five Card */}
-            <Card className="bg-white dark:bg-gray-800 border-dusty-blue/20">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  {(() => {
-                    const Icon = TRAIT_ICONS[topTrait[0] as keyof typeof TRAIT_ICONS];
-                    const colors = TRAIT_COLORS[topTrait[0] as keyof typeof TRAIT_COLORS];
-                    return (
-                      <>
-                        <div className={`flex-shrink-0 w-12 h-12 rounded-full ${colors.bg} flex items-center justify-center`}>
-                          <Icon className="w-6 h-6 text-white" />
+                {/* Big Five Row */}
+                {(() => {
+                  const Icon = TRAIT_ICONS[topTrait[0] as keyof typeof TRAIT_ICONS];
+                  const colors = TRAIT_COLORS[topTrait[0] as keyof typeof TRAIT_COLORS];
+                  const quartileKey = getQuartileKey(topTrait[1]);
+                  const quartileData = TRAIT_QUARTILE_DESCRIPTIONS[topTrait[0]]?.[quartileKey];
+                  return (
+                    <details className="group">
+                      <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors list-none">
+                        <div className={`flex-shrink-0 w-10 h-10 rounded-full ${colors.bg}/10 flex items-center justify-center`}>
+                          <Icon className={`w-5 h-5 ${colors.text}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/60 mb-0.5">
-                            Your core personality strength
-                          </p>
-                          <p className={`text-lg font-bold leading-tight ${colors.text}`} data-testid="text-bigfive">
+                          <p className="text-[10px] text-warm-gray/50 dark:text-soft-cream/50 uppercase tracking-wide">Core Strength</p>
+                          <p className="text-sm font-bold text-warm-gray dark:text-soft-cream leading-tight" data-testid="text-bigfive">
                             {TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]}
-                            <span className="text-sm font-mono opacity-60 ml-2">({topTrait[1]}%)</span>
+                            <span className={`text-xs font-mono ml-1.5 ${colors.text}`}>({topTrait[1]}%)</span>
                           </p>
                         </div>
-                      </>
-                    );
-                  })()}
-                </div>
+                        <ChevronDown className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" />
+                      </summary>
+                      <div className="px-4 pb-4 pt-1">
+                        <p className="text-xs text-warm-gray/70 dark:text-soft-cream/70 leading-relaxed pl-[52px]">
+                          <span className="font-semibold">{quartileData?.vibe}:</span> {quartileData?.description}
+                        </p>
+                      </div>
+                    </details>
+                  );
+                })()}
               </CardContent>
             </Card>
           </motion.div>
