@@ -1030,8 +1030,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
           </Button>
           
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-warm-gray dark:text-soft-cream">
+          <div className="flex items-center gap-3">
+            <span className="text-xl font-bold text-warm-gray dark:text-soft-cream">
               {currentIndex + 1}/{questions.length}
             </span>
             {useLocalityColors && isLocalitySet && (
@@ -1055,39 +1055,39 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             )}
           </div>
           
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <AnimatePresence mode="wait">
               {timeRemaining <= 3 ? (
                 <motion.div
                   key="ring"
                   initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+                  animate={{ scale: 1.1, opacity: 1 }}
                   exit={{ scale: 0.5, opacity: 0 }}
-                  className="relative w-8 h-8 flex items-center justify-center"
+                  className="relative w-14 h-14 flex items-center justify-center"
                 >
-                  <svg className="w-8 h-8 -rotate-90" viewBox="0 0 32 32">
+                  <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
                     <circle
-                      cx="16"
-                      cy="16"
-                      r="14"
+                      cx="28"
+                      cy="28"
+                      r="24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="3"
+                      strokeWidth="5"
                       className="text-gray-200 dark:text-gray-700"
                     />
                     <motion.circle
-                      cx="16"
-                      cy="16"
-                      r="14"
+                      cx="28"
+                      cy="28"
+                      r="24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="3"
+                      strokeWidth="5"
                       strokeLinecap="round"
                       className="text-red-500"
                       initial={{ pathLength: 1 }}
                       animate={{ pathLength: timeRemaining / 3 }}
                       style={{
-                        strokeDasharray: "88",
+                        strokeDasharray: "151",
                         strokeDashoffset: 0,
                       }}
                     />
@@ -1095,11 +1095,11 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   <AnimatePresence mode="wait">
                     <motion.span 
                       key={Math.ceil(timeRemaining)}
-                      initial={{ scale: 1.5, opacity: 0 }}
+                      initial={{ scale: 2, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0.5, opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute text-xs font-bold text-red-500"
+                      transition={{ duration: 0.15, type: "spring", stiffness: 300 }}
+                      className="absolute text-2xl font-black text-red-500 drop-shadow-lg"
                     >
                       {Math.ceil(timeRemaining)}
                     </motion.span>
@@ -1111,10 +1111,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.5, opacity: 0 }}
-                  className="flex items-center gap-1.5"
+                  className="flex items-center gap-2"
                 >
-                  <Timer className={`w-4 h-4 ${timerProgress < 30 ? "text-red-500" : "text-terracotta"}`} />
-                  <span className={`text-sm font-mono font-medium ${timerProgress < 30 ? "text-red-500" : "text-warm-gray dark:text-soft-cream"}`}>
+                  <Timer className={`w-6 h-6 ${timerProgress < 30 ? "text-red-500" : "text-terracotta"}`} />
+                  <span className={`text-xl font-mono font-bold ${timerProgress < 30 ? "text-red-500" : "text-warm-gray dark:text-soft-cream"}`}>
                     {timeRemaining.toFixed(1)}s
                   </span>
                 </motion.div>
@@ -1123,11 +1123,11 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </div>
         </div>
         
-        <div className="max-w-md mx-auto mt-2">
-          <Progress value={progress} className="h-1.5" data-testid="progress-quiz" />
+        <div className="max-w-md mx-auto mt-3">
+          <Progress value={progress} className="h-3" data-testid="progress-quiz" />
         </div>
         
-        <div className="max-w-md mx-auto mt-2 h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+        <div className="max-w-md mx-auto mt-2 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
           <motion.div
             className={`h-full ${timerProgress < 30 ? "bg-red-500" : "bg-gradient-to-r from-terracotta to-dusty-blue"}`}
             initial={{ width: "100%" }}
