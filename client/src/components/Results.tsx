@@ -1054,7 +1054,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     testId: string;
   }) => {
     const isSelected = currentValue === value;
-    const baseClasses = "flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2";
+    const baseClasses = "flex-1 py-1.5 px-1.5 rounded-md text-[10px] font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-1";
     
     const variantClasses = {
       no: isSelected 
@@ -1434,12 +1434,12 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   className="text-center px-2 py-4 rounded-xl bg-sage-green/8 dark:bg-sage-green/15 border border-sage-green/20"
                 >
                   <Award className="w-5 h-5 text-sage-green mx-auto mb-1.5" />
-                  <p className="text-sm font-bold text-sage-green mb-0.5 leading-tight line-clamp-2" data-testid="text-disc-teaser">
+                  <p className="text-[10px] font-bold text-sage-green mb-0.5 leading-tight" data-testid="text-disc-teaser">
                     {funMode && FUN_MODE_DISC[result.discStyle] 
                       ? FUN_MODE_DISC[result.discStyle].nickname
                       : result.discLabel}
                   </p>
-                  <p className="text-[10px] text-sage-green/60 font-mono">
+                  <p className="text-[9px] text-sage-green/60 font-mono">
                     ({result.discStyle}-type)
                   </p>
                 </motion.div>
@@ -1719,13 +1719,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
-            <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-800 dark:border-gray-200">
+            <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-4 border-gray-900 dark:border-gray-100">
               <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream whitespace-nowrap">
+                <div className="flex flex-col items-center justify-center text-center mb-6">
+                  <h3 className="text-xl font-bold text-warm-gray dark:text-soft-cream">
                     Complete for More Free Insights!
                   </h3>
-                  <p className="text-sm text-warm-gray/60 dark:text-soft-cream/50 mt-1">
+                  <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">
                     Answer questions to unlock dashboard
                   </p>
                 </div>

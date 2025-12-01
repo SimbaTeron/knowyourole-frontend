@@ -1463,7 +1463,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         >
                           2X
                         </motion.span>
-                        <span className="text-lg font-bold text-white/90 mt-1">POINTS!</span>
+                        <span className="text-sm font-bold text-white/90 mt-1">POINTS!</span>
+                        <span className="text-xs text-white/70 mt-2 text-center px-4">This question counts double... Ready?</span>
                       </>
                     ) : (
                       <>
