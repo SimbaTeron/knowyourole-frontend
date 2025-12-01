@@ -81,7 +81,7 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
 
 - **zippopotam.us**: Postal code to city lookup.
 - **Stripe**: Payment processing for KnowRole Pro, integrated via `stripe-replit-sync` for managing subscriptions and webhooks.
-- **Google Sheets API**: Data export integration for quiz sessions, feedback, and questions database. **Auto-export enabled**: New quiz results are automatically appended to the Quiz Sessions spreadsheet (ID: 1VT6hlq-AM1DKjB4l9SrFx_WqqPwFjI3cCZpZnjoRvRI) when feedback is submitted. Preserves existing formatting. Manual export endpoints: POST `/api/export/sheets/sessions` (full re-export), POST `/api/export/sheets/questions` (exports questions database), POST `/api/export/sheets/colors` (exports city color schemes and tier configuration).
+- **Google Sheets API**: Data export integration for quiz sessions, feedback, and questions database. **Auto-export enabled**: New quiz results are automatically appended to the Quiz Sessions spreadsheet (ID: 1VT6hlq-AM1DKjB4l9SrFx_WqqPwFjI3cCZpZnjoRvRI) when feedback is submitted. Preserves existing formatting. Manual export endpoints: POST `/api/export/sheets/sessions` (full re-export), POST `/api/export/sheets/questions` (exports questions database), POST `/api/export/sheets/colors` (exports city color schemes and tier configuration), POST `/api/export/sheets/full` (**Complete Blueprint Export** - 11-sheet comprehensive workbook with everything needed to understand and rebuild the app: App Overview, Technical Stack, Database Schema, Quiz Algorithm, API Endpoints, Component Map, Questions Database, City Themes, Tier Configuration, Quiz Sessions, Feedback Data).
 
 ### Databases
 

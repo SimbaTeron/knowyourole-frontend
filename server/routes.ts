@@ -815,5 +815,473 @@ export async function registerRoutes(
     }
   });
 
+  // Comprehensive Full Data Export - Everything needed to understand and rebuild the app
+  app.post("/api/export/sheets/full", async (_req: Request, res: Response) => {
+    try {
+      const { createOrGetSpreadsheet, clearAndWriteSheet, formatTimezone } = await import("./googleSheets");
+      const fs = await import("fs");
+      const path = await import("path");
+      
+      // Create the comprehensive spreadsheet
+      const spreadsheetId = await createOrGetSpreadsheet("KnowRole Complete Blueprint");
+      
+      // ========== SHEET 1: App Overview ==========
+      const overviewRows = [
+        ["KnowRole - Complete Application Blueprint"],
+        ["Generated:", new Date().toISOString()],
+        [""],
+        ["=== PURPOSE ==="],
+        ["KnowRole is a personality discovery application designed with an 'Everyday Compass' aesthetic."],
+        ["It guides users through self-discovery using quizzes, mood assessment, and location-based personalization."],
+        ["The app helps users discover their personality traits through age-tiered quizzes and provides career recommendations."],
+        [""],
+        ["=== CORE FEATURES ==="],
+        ["1. Age-Tiered Quiz System - Mini (16Q), Teen (22Q), Young Adult (28Q), Adult (34Q)"],
+        ["2. Mood Selection & Mood Mixer - Personalized journey based on emotional state"],
+        ["3. Location-Based Themes - Sports team colors from user's city"],
+        ["4. Interactive Game Breaks - Superpower orbs, Mystery Box, Multiple Choice breaks"],
+        ["5. Comprehensive Results - MBTI, DISC, Big Five personality profiles"],
+        ["6. Premium Features - Career simulator, side hustles, growth quests, learning styles"],
+        ["7. Google Sheets Integration - Auto-export quiz sessions and feedback"],
+        ["8. Stripe Integration - Donation system with $3.33 and $33.33 tiers"],
+        [""],
+        ["=== USER JOURNEY FLOW ==="],
+        ["Home (/) → Age Tier Selection"],
+        ["Mood (/mood) → Select from Energized, Stuck, Reflective"],
+        ["Mood Mixer (/mood-mixer) → Tap 2 of 6 mood orbs to create blend"],
+        ["Location (/location) → Enter zip code for city theme colors"],
+        ["Pre-Quiz (/pre-quiz) → Animated walkthrough of quiz mechanics"],
+        ["Quiz (/quiz) → Binary swipe questions with game breaks"],
+        ["Results (/results) → Personality profile and career recommendations"],
+        [""],
+        ["=== BUSINESS MODEL ==="],
+        ["Free tier: Basic personality results with 4-5 sentence summary"],
+        ["Premium tier: Currently free ('Just Kidding' interstitial reveals premium is free for testing)"],
+        ["Donation options: $3.33 or $33.33 via Stripe"],
+        ["Future: AI-driven personality analysis, personalized growth features"],
+      ];
+      await clearAndWriteSheet(spreadsheetId, "1. App Overview", overviewRows);
+      
+      // ========== SHEET 2: Technical Architecture ==========
+      const techRows = [
+        ["KnowRole Technical Architecture"],
+        [""],
+        ["=== TECH STACK ==="],
+        ["Category", "Technology", "Purpose"],
+        ["Frontend Framework", "React 18+", "UI library for building components"],
+        ["Language", "TypeScript", "Type-safe JavaScript for frontend and backend"],
+        ["Build Tool", "Vite", "Fast development server and build tool"],
+        ["Routing", "wouter", "Lightweight client-side routing"],
+        ["UI Components", "shadcn/ui", "Component library built on Radix UI"],
+        ["State Management", "TanStack Query", "Server state management and caching"],
+        ["Styling", "Tailwind CSS", "Utility-first CSS framework"],
+        ["Animations", "Framer Motion", "Animation library for React"],
+        ["Forms", "React Hook Form + Zod", "Form management with validation"],
+        ["Icons", "Lucide React", "Icon library"],
+        ["Backend", "Express.js", "Node.js web server framework"],
+        ["Runtime", "Node.js", "JavaScript runtime"],
+        ["Database ORM", "Drizzle ORM", "Type-safe database ORM"],
+        ["Database", "PostgreSQL (Neon)", "Cloud-hosted PostgreSQL database"],
+        ["Payments", "Stripe", "Payment processing"],
+        ["Data Export", "Google Sheets API", "Spreadsheet integration"],
+        [""],
+        ["=== FILE STRUCTURE ==="],
+        ["Path", "Purpose"],
+        ["client/src/pages/", "Page components (Home, Mood, Quiz, Results, etc.)"],
+        ["client/src/components/", "Reusable UI components"],
+        ["client/src/data/", "Static data files (questions.json, cityThemes.ts)"],
+        ["client/src/lib/", "Utility functions and helpers"],
+        ["client/src/hooks/", "Custom React hooks"],
+        ["server/", "Backend Express server"],
+        ["server/routes.ts", "API endpoint definitions"],
+        ["server/storage.ts", "Data storage interface"],
+        ["server/googleSheets.ts", "Google Sheets integration"],
+        ["shared/schema.ts", "Database schema and types"],
+        [""],
+        ["=== ENVIRONMENT VARIABLES ==="],
+        ["Variable", "Purpose"],
+        ["DATABASE_URL", "PostgreSQL connection string"],
+        ["SESSION_SECRET", "Express session encryption"],
+        ["STRIPE_SECRET_KEY", "Stripe API key (via Replit integration)"],
+        ["Google Sheets", "OAuth via Replit connector (no env var needed)"],
+      ];
+      await clearAndWriteSheet(spreadsheetId, "2. Technical Stack", techRows);
+      
+      // ========== SHEET 3: Database Schema ==========
+      const schemaRows = [
+        ["Database Schema"],
+        [""],
+        ["=== TABLE: users ==="],
+        ["Column", "Type", "Constraints", "Description"],
+        ["id", "varchar", "PRIMARY KEY, UUID", "Unique user identifier"],
+        ["username", "text", "NOT NULL, UNIQUE", "User's username"],
+        ["password", "text", "NOT NULL", "Hashed password"],
+        [""],
+        ["=== TABLE: feedback ==="],
+        ["Column", "Type", "Constraints", "Description"],
+        ["id", "varchar", "PRIMARY KEY, UUID", "Unique feedback identifier"],
+        ["sessionId", "text", "", "Links to quiz session"],
+        ["usefulApp", "text", "", "Was app useful? (yes/no/somewhat)"],
+        ["resultsAccurate", "text", "", "Were results accurate?"],
+        ["questionsEngaging", "text", "", "Were questions engaging?"],
+        ["wouldShare", "text", "", "Would share with others?"],
+        ["suggestions", "text", "", "User suggestions/comments"],
+        ["mbtiType", "text", "", "User's MBTI result"],
+        ["discStyle", "text", "", "User's DISC result"],
+        ["primaryRole", "text", "", "Recommended career role"],
+        ["tier", "text", "", "Age tier selected"],
+        ["mood", "text", "", "Mood selected"],
+        ["funMode", "boolean", "", "Was fun mode enabled?"],
+        ["createdAt", "timestamp", "DEFAULT NOW()", "Record creation time"],
+        [""],
+        ["=== TABLE: trait_vibes ==="],
+        ["Column", "Type", "Constraints", "Description"],
+        ["id", "varchar", "PRIMARY KEY, UUID", "Unique identifier"],
+        ["trait", "text", "NOT NULL", "Big Five trait name"],
+        ["quartile", "text", "NOT NULL", "Score range (low, low_mid, mid_high, high)"],
+        ["scoreMin", "integer", "NOT NULL", "Minimum score for quartile"],
+        ["scoreMax", "integer", "NOT NULL", "Maximum score for quartile"],
+        ["vibeTitle", "text", "NOT NULL", "Friendly title for this level"],
+        ["vibeDescription", "text", "NOT NULL", "Full description"],
+        [""],
+        ["=== TABLE: trait_combinations ==="],
+        ["Column", "Type", "Constraints", "Description"],
+        ["id", "varchar", "PRIMARY KEY, UUID", "Unique identifier"],
+        ["trait1", "text", "NOT NULL", "First trait in combination"],
+        ["trait1Level", "text", "NOT NULL", "First trait level (high/low)"],
+        ["trait2", "text", "NOT NULL", "Second trait in combination"],
+        ["trait2Level", "text", "NOT NULL", "Second trait level (high/low)"],
+        ["comboTitle", "text", "NOT NULL", "Combination title"],
+        ["comboDescription", "text", "NOT NULL", "Combination description"],
+        [""],
+        ["=== TABLE: adventure_archetypes ==="],
+        ["Column", "Type", "Constraints", "Description"],
+        ["id", "varchar", "PRIMARY KEY, UUID", "Unique identifier"],
+        ["name", "text", "NOT NULL", "Archetype name (e.g., The Inventor)"],
+        ["superpower", "text", "NOT NULL", "Kid-friendly superpower description"],
+        ["description", "text", "NOT NULL", "Full archetype description"],
+        ["mission", "text", "NOT NULL", "Daily mission suggestion"],
+        ["badgeColor", "text", "NOT NULL", "Badge display color"],
+        ["traits", "text", "NOT NULL", "JSON of matching trait patterns"],
+      ];
+      await clearAndWriteSheet(spreadsheetId, "3. Database Schema", schemaRows);
+      
+      // ========== SHEET 4: Quiz Algorithm ==========
+      const algorithmRows = [
+        ["Quiz Scoring Algorithm"],
+        [""],
+        ["=== PERSONALITY FRAMEWORKS ==="],
+        ["Framework", "Dimensions", "Description"],
+        ["MBTI", "E/I, S/N, T/F, J/P", "Myers-Briggs Type Indicator - 16 personality types"],
+        ["DISC", "D, I, S, C", "Dominance, Influence, Steadiness, Conscientiousness"],
+        ["Big Five", "O, C, E, A, N", "Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism"],
+        ["Critical Thinking", "1-5 scale", "Proxy from MBTI-T, Big5-O, DISC-C"],
+        ["First Principles", "1-5 scale", "Proxy from MBTI-N, Big5-O, DISC-I"],
+        [""],
+        ["=== SCORING LOGIC ==="],
+        ["Step", "Description"],
+        ["1. Response Collection", "Each question maps to specific trait dimensions via optionMeta"],
+        ["2. Trait Accumulation", "Left/right choices add to respective trait scores"],
+        ["3. MBTI Calculation", "Compare E vs I, S vs N, T vs F, J vs P - higher wins"],
+        ["4. DISC Primary", "Highest of D, I, S, C becomes primary style"],
+        ["5. Big Five Normalize", "Raw scores normalized to 0-100 scale: 50 + (score * 10)"],
+        ["6. Wildcard Boosts", "Game break choices add +20% to Critical/FirstPrinciples"],
+        ["7. Proxy Calculations", "Critical = (MBTI-T% + Big5-O + DISC-C%) / 3"],
+        ["", "FirstPrinciples = (MBTI-N% + Big5-O + DISC-I%) / 3"],
+        ["8. Scale Conversion", "Percentage to 1-5 scale: Math.round(pct / 20)"],
+        [""],
+        ["=== QUESTION STRUCTURE ==="],
+        ["Field", "Description"],
+        ["id", "Unique question identifier"],
+        ["prompt", "Question text shown to user"],
+        ["options", "[leftOption, rightOption] - the two choices"],
+        ["optionMeta", "[leftMeta, rightMeta] - trait codes (e.g., 'E', 'I', 'O+', 'C-')"],
+        ["psych", "Psychology framework: mbti, disc, bigfive, critical, first_principles"],
+        ["tier", "Age tier: 7-12, 13-18, 19-25, 25+"],
+        ["time", "Timer duration in seconds"],
+        ["wildcard", "true if this is a wildcard/break question"],
+        [""],
+        ["=== BREAK SEQUENCE PER TIER ==="],
+        ["Tier", "Total Q", "Timer", "Flow"],
+        ["Mini (12 & under)", "16", "10s", "5 binary → MC1 → 4 → Superpower → 4 → Mystery → 3 → MC2"],
+        ["Teen (13-18)", "22", "10s", "7 binary → MC1 → 6 → Superpower → 5 → Mystery → 4 → MC2"],
+        ["Young Adult (19-25)", "28", "9s", "8 binary → MC1 → 7 → Superpower → 7 → Mystery → 6 → MC2"],
+        ["Adult (25+)", "34", "9s", "9 binary → MC1 → 9 → Superpower → 9 → Mystery → 7 → MC2"],
+        [""],
+        ["=== UNIQUE PATH COMBINATIONS ==="],
+        ["Tier", "Binary Questions", "Paths (2^n × 15 break combinations)"],
+        ["Mini", "16", "983,040 unique personality paths"],
+        ["Teen", "22", "62.9 million unique paths"],
+        ["Young Adult", "28", "4 billion unique paths"],
+        ["Adult", "34", "257 billion unique paths"],
+      ];
+      await clearAndWriteSheet(spreadsheetId, "4. Quiz Algorithm", algorithmRows);
+      
+      // ========== SHEET 5: API Endpoints ==========
+      const apiRows = [
+        ["API Endpoints"],
+        [""],
+        ["=== QUIZ & RESULTS ==="],
+        ["Method", "Endpoint", "Description"],
+        ["GET", "/api/questions/:tier", "Get questions for specific age tier"],
+        ["POST", "/api/quiz/submit", "Submit quiz answers and calculate results"],
+        ["GET", "/api/quiz/session/:id", "Get specific quiz session data"],
+        ["GET", "/api/quiz/sessions", "Get all quiz sessions (admin)"],
+        [""],
+        ["=== PERSONALITY DATA ==="],
+        ["Method", "Endpoint", "Description"],
+        ["GET", "/api/trait-vibes", "Get all Big Five trait descriptions"],
+        ["GET", "/api/trait-vibes/:trait/:score", "Get specific trait vibe for score"],
+        ["GET", "/api/trait-combinations", "Get all trait combinations"],
+        ["GET", "/api/adventure-archetypes", "Get all kid archetypes"],
+        ["GET", "/api/adventure-archetype", "Get matching archetype for traits"],
+        [""],
+        ["=== FEEDBACK ==="],
+        ["Method", "Endpoint", "Description"],
+        ["POST", "/api/feedback", "Submit user feedback (triggers auto-export)"],
+        ["GET", "/api/feedback", "Get all feedback (admin)"],
+        [""],
+        ["=== PAYMENTS (Stripe) ==="],
+        ["Method", "Endpoint", "Description"],
+        ["GET", "/api/stripe/publishable-key", "Get Stripe publishable key"],
+        ["POST", "/api/stripe/create-checkout", "Create Stripe checkout session"],
+        ["POST", "/api/stripe/webhook", "Handle Stripe webhooks"],
+        [""],
+        ["=== DATA EXPORT ==="],
+        ["Method", "Endpoint", "Description"],
+        ["POST", "/api/export/sheets/sessions", "Export all sessions to Google Sheets"],
+        ["POST", "/api/export/sheets/questions", "Export questions database to Sheets"],
+        ["POST", "/api/export/sheets/colors", "Export city themes to Sheets"],
+        ["POST", "/api/export/sheets/full", "Export complete app blueprint (this file)"],
+        [""],
+        ["=== ADMIN ==="],
+        ["Method", "Endpoint", "Description"],
+        ["POST", "/api/seed", "Seed database with initial data"],
+      ];
+      await clearAndWriteSheet(spreadsheetId, "5. API Endpoints", apiRows);
+      
+      // ========== SHEET 6: Component Map ==========
+      const componentRows = [
+        ["Frontend Component Structure"],
+        [""],
+        ["=== PAGES (client/src/pages/) ==="],
+        ["Component", "Route", "Description"],
+        ["Home.tsx", "/", "Landing page with age tier selection buttons"],
+        ["MoodSelection.tsx", "/mood", "Select mood: Energized, Stuck, Reflective"],
+        ["MoodMixer.tsx", "/mood-mixer", "Interactive orb selection to blend moods"],
+        ["LocationInput.tsx", "/location", "Zip code input for city theme colors"],
+        ["PreQuizDemo.tsx", "/pre-quiz", "Animated walkthrough of quiz mechanics"],
+        ["Quiz.tsx", "/quiz", "Main quiz experience with swipe cards"],
+        ["Results.tsx", "/results", "Personality results and recommendations"],
+        ["Feedback.tsx", "/feedback", "5-question feedback form"],
+        [""],
+        ["=== KEY COMPONENTS ==="],
+        ["Component", "File", "Description"],
+        ["AgeTierSelector", "AgeTierSelector.tsx", "Large buttons for age selection"],
+        ["MoodSelector", "MoodSelector.tsx", "Mood option cards"],
+        ["QuizCard", "Quiz.tsx", "Swipeable question card with answers"],
+        ["QuizGames", "QuizGames.tsx", "Game break components (Superpower, Mystery, MC)"],
+        ["PathCanvas", "PathCanvas.tsx", "Animated SVG paths for decoration"],
+        ["StepIndicator", "StepIndicator.tsx", "Progress dots showing journey steps"],
+        ["PremiumCardDeck", "PremiumCardDeck.tsx", "8 swipeable premium insight cards"],
+        ["BigFiveCards", "BigFiveCards.tsx", "Clickable trait cards with quartile descriptions"],
+        ["DonationModal", "DonationModal.tsx", "Stripe payment modal ($3.33 / $33.33)"],
+        ["ThemeToggle", "ThemeToggle.tsx", "Light/dark mode toggle"],
+        [""],
+        ["=== UI PATTERNS ==="],
+        ["Pattern", "Description"],
+        ["Swipe Cards", "Framer Motion drag gestures for quiz and premium cards"],
+        ["Diagonal Offset", "Answer boxes positioned diagonally with directional arrows"],
+        ["Orb Selection", "Floating animated orbs for mood mixer and superpower games"],
+        ["Flip Cards", "Card flip animation for blindspots reveal"],
+        ["Progress Ring", "Circular timer countdown when <3s remaining"],
+        ["Auto-hide Hint", "Tap or swipe hint disappears after first interaction"],
+      ];
+      await clearAndWriteSheet(spreadsheetId, "6. Component Map", componentRows);
+      
+      // ========== SHEET 7: Questions Database ==========
+      const questionsPath = path.join(process.cwd(), "client/src/data/questions.json");
+      const questionsData = JSON.parse(fs.readFileSync(questionsPath, "utf-8"));
+      
+      const questionsHeader = [
+        "ID", "Prompt", "Left Option", "Right Option", "Left Meta", "Right Meta",
+        "Psychology Type", "Timer (s)", "Age Tier", "Version", "Paid", "Wildcard"
+      ];
+      
+      const questionsRows = [questionsHeader];
+      for (const q of questionsData.questions) {
+        questionsRows.push([
+          q.id,
+          q.prompt,
+          q.options[0],
+          q.options[1],
+          q.optionMeta[0],
+          q.optionMeta[1],
+          q.psych,
+          q.time,
+          q.tier,
+          q.version,
+          q.paid ? "Yes" : "No",
+          q.wildcard ? "Yes" : "No"
+        ]);
+      }
+      await clearAndWriteSheet(spreadsheetId, "7. Questions Database", questionsRows);
+      
+      // ========== SHEET 8: City Themes ==========
+      const themesPath = path.join(process.cwd(), "client/src/data/cityThemes.ts");
+      const themesContent = fs.readFileSync(themesPath, "utf-8");
+      
+      const cityThemePattern = /"([^"]+)":\s*\{\s*city:\s*"([^"]+)",\s*(?:state:\s*"([^"]*)",\s*)?country:\s*"([^"]+)",\s*team:\s*"([^"]+)",\s*sport:\s*"([^"]+)",\s*colors:\s*\{\s*primary:\s*"([^"]+)",\s*secondary:\s*"([^"]+)",\s*accent:\s*"([^"]+)"\s*\},\s*textOnPrimary:\s*"([^"]+)",\s*textOnSecondary:\s*"([^"]+)"/g;
+      
+      const colorHeader = [
+        "City Key", "City Name", "State", "Country", "Team", "Sport", 
+        "Primary (HEX)", "Secondary (HEX)", "Accent (HEX)", "Text on Primary", "Text on Secondary"
+      ];
+      
+      const colorRows = [colorHeader];
+      let match;
+      while ((match = cityThemePattern.exec(themesContent)) !== null) {
+        colorRows.push([match[1], match[2], match[3] || "", match[4], match[5], match[6],
+          match[7], match[8], match[9], match[10], match[11]]);
+      }
+      await clearAndWriteSheet(spreadsheetId, "8. City Themes", colorRows);
+      
+      // ========== SHEET 9: Tier Configuration ==========
+      const tierHeader = ["Age Tier", "Display Name", "Questions", "Timer (s)", "Swipe Style", "Break Flow"];
+      const tierRows = [tierHeader];
+      
+      const tierDisplayNames: Record<string, string> = {
+        "7-12": "Mini Explorer (Ages 12 & under)",
+        "13-18": "Teen (Ages 13-18)",
+        "19-25": "Young Adult (Ages 19-25)",
+        "25+": "Adult (Ages 25+)"
+      };
+      
+      const breakFlows: Record<string, string> = {
+        "7-12": "5 → MC1 → 4 → Superpower → 4 → Mystery → 3 → MC2",
+        "13-18": "7 → MC1 → 6 → Superpower → 5 → Mystery → 4 → MC2",
+        "19-25": "8 → MC1 → 7 → Superpower → 7 → Mystery → 6 → MC2",
+        "25+": "9 → MC1 → 9 → Superpower → 9 → Mystery → 7 → MC2"
+      };
+      
+      for (const [tier, config] of Object.entries(questionsData.tierConfig)) {
+        const cfg = config as { baseCount: number; maxTime: number; swipeStyle: string };
+        tierRows.push([
+          tier,
+          tierDisplayNames[tier] || tier,
+          cfg.baseCount.toString(),
+          cfg.maxTime.toString(),
+          cfg.swipeStyle,
+          breakFlows[tier] || ""
+        ]);
+      }
+      await clearAndWriteSheet(spreadsheetId, "9. Tier Configuration", tierRows);
+      
+      // ========== SHEET 10: Quiz Sessions ==========
+      const allSessions = await storage.getAllQuizSessions();
+      const allFeedback = await storage.getAllFeedback();
+      
+      const feedbackMap = new Map<string, any>();
+      allFeedback.forEach(f => {
+        if (f.sessionId) feedbackMap.set(f.sessionId, f);
+      });
+      
+      const questionsMap = new Map<number, any>();
+      questionsData.questions.forEach((q: any) => questionsMap.set(q.id, q));
+      
+      const sessionsHeader = [
+        "Timestamp", "Session ID", "Age Tier", "Mood", "Fun Mode", "Theme",
+        "MBTI Type", "DISC Style", "Primary Role", "Openness", "Conscientiousness", 
+        "Extraversion", "Agreeableness", "Neuroticism", "Engagement Score",
+        "Useful?", "Accurate?", "Engaging?", "Would Share?", "Suggestions"
+      ];
+      
+      const sessionsRows = [sessionsHeader];
+      for (const session of allSessions) {
+        const feedback = feedbackMap.get(session.id);
+        const result = (session.result || {}) as any;
+        const bigFive = result.bigFiveProfile || {};
+        
+        sessionsRows.push([
+          formatTimezone(session.createdAt),
+          session.id || "",
+          session.tier || "",
+          session.mood || "",
+          session.funMode ? "Yes" : "No",
+          session.theme || "",
+          result.mbtiType || "",
+          result.discStyle || "",
+          result.primaryRole?.title || "",
+          bigFive.openness ?? "",
+          bigFive.conscientiousness ?? "",
+          bigFive.extraversion ?? "",
+          bigFive.agreeableness ?? "",
+          bigFive.neuroticism ?? "",
+          result.engagement ?? "",
+          feedback?.usefulApp || "",
+          feedback?.resultsAccurate || "",
+          feedback?.questionsEngaging || "",
+          feedback?.wouldShare || "",
+          feedback?.suggestions || ""
+        ]);
+      }
+      await clearAndWriteSheet(spreadsheetId, "10. Quiz Sessions", sessionsRows);
+      
+      // ========== SHEET 11: Feedback Data ==========
+      const feedbackHeader = [
+        "Timestamp", "Session ID", "MBTI Type", "DISC Style", "Primary Role",
+        "Age Tier", "Mood", "Fun Mode", "Useful App?", "Results Accurate?",
+        "Questions Engaging?", "Would Share?", "Suggestions"
+      ];
+      
+      const feedbackRows = [feedbackHeader];
+      for (const f of allFeedback) {
+        feedbackRows.push([
+          f.createdAt ? formatTimezone(f.createdAt.toISOString()) : "",
+          f.sessionId || "",
+          f.mbtiType || "",
+          f.discStyle || "",
+          f.primaryRole || "",
+          f.tier || "",
+          f.mood || "",
+          f.funMode ? "Yes" : "No",
+          f.usefulApp || "",
+          f.resultsAccurate || "",
+          f.questionsEngaging || "",
+          f.wouldShare || "",
+          f.suggestions || ""
+        ]);
+      }
+      await clearAndWriteSheet(spreadsheetId, "11. Feedback Data", feedbackRows);
+      
+      res.json({
+        success: true,
+        spreadsheetId,
+        url: `https://docs.google.com/spreadsheets/d/${spreadsheetId}`,
+        sheetsCreated: 11,
+        sheets: [
+          "1. App Overview",
+          "2. Technical Stack", 
+          "3. Database Schema",
+          "4. Quiz Algorithm",
+          "5. API Endpoints",
+          "6. Component Map",
+          "7. Questions Database",
+          "8. City Themes",
+          "9. Tier Configuration",
+          "10. Quiz Sessions",
+          "11. Feedback Data"
+        ],
+        questionsExported: questionsData.questions.length,
+        sessionsExported: allSessions.length,
+        feedbackExported: allFeedback.length,
+        cityThemesExported: colorRows.length - 1
+      });
+    } catch (error) {
+      console.error("Full data export error:", error);
+      res.status(500).json({ error: "Failed to export complete blueprint to Google Sheets" });
+    }
+  });
+
   return httpServer;
 }

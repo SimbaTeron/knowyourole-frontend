@@ -348,14 +348,14 @@ export function PremiumCardDeck({
     <div className="relative" ref={containerRef}>
       {/* Header with card navigation dots */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className={`p-1.5 rounded-lg ${COLOR_CLASSES[currentConfig.color].bg100}`}>
-            <currentConfig.icon className="w-4 h-4" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className={`p-2 rounded-lg ${COLOR_CLASSES[currentConfig.color].bg100}`}>
+            <currentConfig.icon className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <h4 className="text-sm font-bold text-warm-gray dark:text-soft-cream">
+          <h4 className="text-lg sm:text-xl font-bold text-warm-gray dark:text-soft-cream">
             {currentConfig.title}
           </h4>
-          <span className="text-xs text-warm-gray/50 dark:text-soft-cream/40">
+          <span className="text-sm sm:text-base text-warm-gray/50 dark:text-soft-cream/40">
             {currentCard + 1}/{CARD_CONFIGS.length}
           </span>
         </div>
