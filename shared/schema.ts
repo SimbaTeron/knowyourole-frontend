@@ -101,3 +101,127 @@ export const insertAdventureArchetypeSchema = createInsertSchema(adventureArchet
 
 export type InsertAdventureArchetype = z.infer<typeof insertAdventureArchetypeSchema>;
 export type AdventureArchetype = typeof adventureArchetypes.$inferSelect;
+
+// Research Norms - for z-score normalization (Section 1.3)
+export const researchNorms = pgTable("research_norms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  trait: text("trait").notNull(), // e.g., "openness", "E", "D"
+  framework: text("framework").notNull(), // "bigFive", "mbti", "disc"
+  populationMean: integer("population_mean").notNull(), // e.g., 50
+  standardDeviation: integer("standard_deviation").notNull(), // e.g., 15
+  source: text("source"), // Research source citation
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertResearchNormsSchema = createInsertSchema(researchNorms).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertResearchNorms = z.infer<typeof insertResearchNormsSchema>;
+export type ResearchNorms = typeof researchNorms.$inferSelect;
+
+// Achievement Badges (Section 2.2)
+export const badges = pgTable("badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id").notNull(),
+  badgeName: text("badge_name").notNull(), // "Trailblazer", "Deep Thinker"
+  badgeType: text("badge_type").notNull(), // "trait", "speed", "streak", "explorer"
+  badgeIcon: text("badge_icon").notNull(), // Icon identifier
+  badgeColor: text("badge_color").notNull(), // Color class
+  threshold: text("threshold"), // JSON of threshold criteria
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+});
+
+export const insertBadgeSchema = createInsertSchema(badges).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+export type InsertBadge = z.infer<typeof insertBadgeSchema>;
+export type Badge = typeof badges.$inferSelect;
+
+// Quiz Events for Random Pop-ups (Section 2.3)
+export const quizEvents = pgTable("quiz_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  eventType: text("event_type").notNull(), // "wheel_spin", "bonus_question", "trait_reveal"
+  eventName: text("event_name").notNull(),
+  effect: text("effect").notNull(), // JSON: { reverseTrait: "E", boost: 10 }
+  probability: integer("probability").notNull(), // 5-10% chance
+  locationTheme: text("location_theme"), // Optional: tied to city themes
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertQuizEventSchema = createInsertSchema(quizEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertQuizEvent = z.infer<typeof insertQuizEventSchema>;
+export type QuizEvent = typeof quizEvents.$inferSelect;
+
+// Story Nodes for Branching Narratives (Section 2.4)
+export const storyNodes = pgTable("story_nodes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  mbtiType: text("mbti_type").notNull(), // Which MBTI type this story is for
+  nodeIndex: integer("node_index").notNull(), // Position in story
+  storyText: text("story_text").notNull(), // The narrative text
+  choiceA: text("choice_a"), // First choice
+  choiceB: text("choice_b"), // Second choice
+  choiceAEffect: text("choice_a_effect"), // JSON: trait adjustments
+  choiceBEffect: text("choice_b_effect"), // JSON: trait adjustments
+  nextNodeA: integer("next_node_a"), // Next node if choice A
+  nextNodeB: integer("next_node_b"), // Next node if choice B
+  isEnding: boolean("is_ending").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertStoryNodeSchema = createInsertSchema(storyNodes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertStoryNode = z.infer<typeof insertStoryNodeSchema>;
+export type StoryNode = typeof storyNodes.$inferSelect;
+
+// Mini Games for Feedback Loop (Section 2.5)
+export const miniGames = pgTable("mini_games", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  gameType: text("game_type").notNull(), // "match", "sort", "puzzle"
+  gameName: text("game_name").notNull(),
+  traitTarget: text("trait_target").notNull(), // Which trait it measures
+  instructions: text("instructions").notNull(),
+  gameData: text("game_data").notNull(), // JSON with game-specific data
+  pointsReward: integer("points_reward").notNull().default(10),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertMiniGameSchema = createInsertSchema(miniGames).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertMiniGame = z.infer<typeof insertMiniGameSchema>;
+export type MiniGame = typeof miniGames.$inferSelect;
+
+// Badge Definitions - templates for achievable badges
+export const badgeDefinitions = pgTable("badge_definitions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(),
+  color: text("color").notNull(),
+  category: text("category").notNull(), // "trait", "speed", "streak", "explorer", "special"
+  thresholdType: text("threshold_type").notNull(), // "score_above", "score_below", "speed_fast", "combo"
+  thresholdValue: text("threshold_value").notNull(), // JSON criteria
+  rarity: text("rarity").notNull().default("common"), // "common", "rare", "epic", "legendary"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertBadgeDefinitionSchema = createInsertSchema(badgeDefinitions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertBadgeDefinition = z.infer<typeof insertBadgeDefinitionSchema>;
+export type BadgeDefinition = typeof badgeDefinitions.$inferSelect;

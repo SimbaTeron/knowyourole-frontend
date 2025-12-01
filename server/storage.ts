@@ -92,7 +92,18 @@ export class MemStorage implements IStorage {
   async saveFeedback(insertFeedback: InsertFeedback): Promise<Feedback> {
     const id = randomUUID();
     const feedback: Feedback = {
-      ...insertFeedback,
+      sessionId: insertFeedback.sessionId ?? null,
+      usefulApp: insertFeedback.usefulApp ?? null,
+      resultsAccurate: insertFeedback.resultsAccurate ?? null,
+      questionsEngaging: insertFeedback.questionsEngaging ?? null,
+      wouldShare: insertFeedback.wouldShare ?? null,
+      suggestions: insertFeedback.suggestions ?? null,
+      mbtiType: insertFeedback.mbtiType ?? null,
+      discStyle: insertFeedback.discStyle ?? null,
+      primaryRole: insertFeedback.primaryRole ?? null,
+      tier: insertFeedback.tier ?? null,
+      mood: insertFeedback.mood ?? null,
+      funMode: insertFeedback.funMode ?? null,
       id,
       createdAt: new Date(),
     };

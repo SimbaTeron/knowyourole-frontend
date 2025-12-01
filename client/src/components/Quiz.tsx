@@ -125,6 +125,9 @@ interface Question {
   version: string;
   paid: boolean;
   wildcard: boolean;
+  responseType?: "binary" | "slider"; // Phase 1.1: slider support
+  difficulty?: "easy" | "medium" | "hard"; // Phase 2.1: dynamic difficulty
+  boostRange?: [number, number]; // Phase 1.4: variable boost range
 }
 
 type TierValue = "7-12" | "13-18" | "19-25" | "25plus";
@@ -157,11 +160,17 @@ export interface QuizScores {
     choice: 0 | 1;
     timeSpent: number;
     swipeDirection: "left" | "right";
+    sliderValue?: number; // Phase 1.1: -2 to +2 for slider questions
+    responseType?: "binary" | "slider";
   }>;
+  swipeTimes: number[]; // Phase 2.1: Track all swipe times for dynamic difficulty
+  averageSwipeTime: number; // Phase 2.1: Running average for difficulty scaling
+  currentDifficulty: "easy" | "medium" | "hard"; // Phase 2.1: Current difficulty level
   engagement: number;
   wildcardBoost: boolean;
   criticalWildcard: number;
   firstPrinciplesWildcard: number;
+  hybridTypes: string[]; // Phase 1.4: Detected hybrid types like "Ambivert"
 }
 
 const SWIPE_THRESHOLD = 100;
@@ -269,10 +278,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     disc: { D: 0, I: 0, S: 0, C: 0 },
     bigFive: { O: 0, C: 0, E: 0, A: 0, N: 0 },
     responses: [],
+    swipeTimes: [], // Phase 2.1: Track swipe times
+    averageSwipeTime: 0,
+    currentDifficulty: "medium",
     engagement: 0,
     wildcardBoost: false,
     criticalWildcard: 0,
-    firstPrinciplesWildcard: 0
+    firstPrinciplesWildcard: 0,
+    hybridTypes: [] // Phase 1.4: Hybrid type detection
   });
   
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -297,25 +310,56 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   const useLocalityColors = isLocalitySet;
 
+  // Phase 1.2: Framework quotas for balanced trait coverage
+  const FRAMEWORK_QUOTAS = {
+    MBTI: 0.3,
+    DISC: 0.25,
+    Big5: 0.35,
+    Critical: 0.05,
+    FirstPrinciples: 0.05
+  };
+
   useEffect(() => {
     const tierQuestions = questionsData.questions.filter(q => q.tier === tier);
-    const shuffled = [...tierQuestions].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, Math.min(tierConfig.baseCount, shuffled.length));
+    const targetCount = tierConfig.baseCount;
     
-    if (selected.length < tierConfig.baseCount) {
-      const otherQuestions = questionsData.questions
-        .filter(q => q.tier !== tier && q.tier !== "all" && !q.paid)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, tierConfig.baseCount - selected.length);
-      selected.push(...otherQuestions);
+    // Phase 1.2: Quota-based selection
+    const quotaSelection: Question[] = [];
+    const frameworkCounts: Record<string, number> = {};
+    
+    // Shuffle first
+    const shuffled = [...tierQuestions].sort(() => Math.random() - 0.5);
+    
+    // Select questions while respecting quotas
+    for (const q of shuffled) {
+      const framework = q.psych.split("-")[0]; // Extract MBTI, DISC, Big5
+      const currentQuota = (frameworkCounts[framework] || 0) / targetCount;
+      const targetQuota = FRAMEWORK_QUOTAS[framework as keyof typeof FRAMEWORK_QUOTAS] || 0.2;
+      
+      if (currentQuota < targetQuota || quotaSelection.length < targetCount * 0.7) {
+        quotaSelection.push(q as Question);
+        frameworkCounts[framework] = (frameworkCounts[framework] || 0) + 1;
+      }
+      
+      if (quotaSelection.length >= targetCount) break;
     }
     
+    // Fill remaining with any available questions
+    if (quotaSelection.length < targetCount) {
+      const remaining = shuffled
+        .filter(q => !quotaSelection.includes(q as Question))
+        .slice(0, targetCount - quotaSelection.length);
+      quotaSelection.push(...(remaining as Question[]));
+    }
+    
+    // Add scale wildcards
     const scaleWildcards = questionsData.questions.filter(
       q => q.tier === "all" && (q.psych === "Critical" || q.psych === "FirstPrinciples")
     );
-    selected.push(...scaleWildcards);
+    quotaSelection.push(...(scaleWildcards as Question[]));
     
-    setQuestions(selected.sort(() => Math.random() - 0.5) as Question[]);
+    // Final shuffle
+    setQuestions(quotaSelection.sort(() => Math.random() - 0.5));
   }, [tier, tierConfig.baseCount]);
 
   useEffect(() => {
@@ -369,9 +413,18 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     };
   }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout]);
 
-  const processScore = useCallback((question: Question, choiceIndex: 0 | 1) => {
+  // Phase 1.1 & 1.4: Enhanced scoring with slider support and variable boosts
+  const processScore = useCallback((question: Question, choiceIndex: 0 | 1, sliderValue?: number) => {
     const meta = question.optionMeta[choiceIndex];
-    const weight = question.wildcard ? 0.8 : 1;
+    
+    // Phase 1.4: Variable boost range (10-30%) instead of fixed 80%
+    const boostRange = question.boostRange || [0.7, 0.9];
+    const variableBoost = boostRange[0] + Math.random() * (boostRange[1] - boostRange[0]);
+    const baseWeight = question.wildcard ? variableBoost : 1;
+    
+    // Phase 1.1: Apply slider multiplier (-2 to +2) if slider response
+    const sliderMultiplier = sliderValue !== undefined ? sliderValue / 2 : 1; // Normalize to -1 to +1
+    const weight = baseWeight * (sliderValue !== undefined ? Math.abs(sliderMultiplier) + 0.5 : 1);
     
     setScores(prev => {
       const newScores = { ...prev };
@@ -379,7 +432,22 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       if (question.psych.startsWith("MBTI")) {
         const trait = meta.replace("+", "").replace("-", "") as keyof typeof newScores.mbti;
         if (trait in newScores.mbti) {
-          newScores.mbti = { ...newScores.mbti, [trait]: newScores.mbti[trait] + weight };
+          // Phase 1.1: For sliders, apply weighted value; for binary, apply full weight
+          const traitValue = sliderValue !== undefined 
+            ? weight * (sliderValue > 0 ? 1 : -1) * Math.abs(sliderMultiplier)
+            : weight;
+          newScores.mbti = { ...newScores.mbti, [trait]: newScores.mbti[trait] + Math.abs(traitValue) };
+          
+          // Also boost the opposite trait slightly for slider neutral responses
+          if (sliderValue !== undefined && Math.abs(sliderValue) < 1) {
+            const oppositeTrait = getOppositeMBTI(trait);
+            if (oppositeTrait) {
+              newScores.mbti = { 
+                ...newScores.mbti, 
+                [oppositeTrait]: newScores.mbti[oppositeTrait as keyof typeof newScores.mbti] + (0.5 - Math.abs(sliderMultiplier)) 
+              };
+            }
+          }
         }
       } else if (question.psych.startsWith("DISC")) {
         const trait = meta as keyof typeof newScores.disc;
@@ -390,7 +458,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         const trait = meta.replace("+", "").replace("-", "") as keyof typeof newScores.bigFive;
         if (trait in newScores.bigFive) {
           const modifier = meta.includes("+") ? 1 : -1;
-          newScores.bigFive = { ...newScores.bigFive, [trait]: newScores.bigFive[trait] + (weight * modifier) };
+          // Phase 1.1: Slider provides nuanced Big Five scoring
+          const adjustedWeight = sliderValue !== undefined ? weight * sliderMultiplier : weight * modifier;
+          newScores.bigFive = { ...newScores.bigFive, [trait]: newScores.bigFive[trait] + adjustedWeight };
         }
       } else if (question.psych === "Critical") {
         if (meta === "CT1") {
@@ -409,6 +479,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       return newScores;
     });
   }, []);
+
+  // Helper function to get opposite MBTI trait for hybrid detection
+  const getOppositeMBTI = (trait: string): string | null => {
+    const pairs: Record<string, string> = { E: "I", I: "E", S: "N", N: "S", T: "F", F: "T", J: "P", P: "J" };
+    return pairs[trait] || null;
+  };
 
   const applyMultiChoiceWeights = useCallback((option: LocalMultiChoiceOption | { weights: LocalMultiChoiceOption['weights'] }) => {
     setScores(prev => {
@@ -503,7 +579,15 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     setQuizPhase("quiz");
   }, []);
 
-  const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false) => {
+  // Phase 2.1: Dynamic difficulty calculation based on swipe speed
+  const calculateDifficulty = (swipeTimes: number[], avgTime: number): "easy" | "medium" | "hard" => {
+    if (swipeTimes.length < 3) return "medium";
+    if (avgTime < 2) return "hard"; // Very fast responses -> harder questions
+    if (avgTime < 4) return "medium";
+    return "easy"; // Slower responses -> easier questions
+  };
+
+  const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false, sliderValue?: number) => {
     if (questions.length === 0 || currentIndex >= questions.length) return;
     
     if (!hasInteracted) setHasInteracted(true);
@@ -518,37 +602,45 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       setFastResponses(prev => prev + 1);
     }
     
-    processScore(question, choiceIndex);
+    // Phase 1.1: Pass slider value to score processing
+    processScore(question, choiceIndex, sliderValue);
     
+    // Phase 2.1: Enhanced response with slider support
     const newResponse = {
       questionId: question.id,
       choice: choiceIndex,
       timeSpent,
-      swipeDirection: direction
+      swipeDirection: direction,
+      sliderValue: sliderValue, // Phase 1.1
+      responseType: question.responseType || "binary" as const
     };
     
     const nextQuestionNumber = currentIndex + 2;
     
     setScores(prev => {
+      // Phase 2.1: Track swipe times for dynamic difficulty
+      const updatedSwipeTimes = [...prev.swipeTimes, timeSpent];
+      const newAvgTime = updatedSwipeTimes.reduce((a, b) => a + b, 0) / updatedSwipeTimes.length;
+      const newDifficulty = calculateDifficulty(updatedSwipeTimes, newAvgTime);
+      
       const updatedScores = {
         ...prev,
         responses: [...prev.responses, newResponse],
+        swipeTimes: updatedSwipeTimes,
+        averageSwipeTime: newAvgTime,
+        currentDifficulty: newDifficulty,
         engagement: prev.engagement + (isTimeout ? -0.5 : 1)
       };
       
       if (currentIndex >= questions.length - 1) {
         setTimeout(() => onComplete(updatedScores), 300);
       } else if (nextQuestionNumber === quizConfig.mid1After + 1 && !completedMid1) {
-        // First break: Multiple Choice 1
         setTimeout(() => setQuizPhase("mid1"), 300);
       } else if (quizConfig.superpowerAfter && nextQuestionNumber === quizConfig.superpowerAfter + 1 && !completedSuperpower) {
-        // Second break: Superpower
         setTimeout(() => setQuizPhase("superpower"), 300);
       } else if (quizConfig.hasMystery && quizConfig.mysteryAfter && nextQuestionNumber === quizConfig.mysteryAfter + 1 && !completedMystery) {
-        // Third break: Mystery Box
         setTimeout(() => setQuizPhase("mystery"), 300);
       } else if (quizConfig.hasMid2 && quizConfig.mid2After && nextQuestionNumber === quizConfig.mid2After + 1 && !completedMid2) {
-        // Fourth break: Multiple Choice 2
         setTimeout(() => setQuizPhase("mid2"), 300);
       }
       
@@ -560,7 +652,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, x, completedMid1, completedMid2, completedSuperpower, completedMystery, quizConfig, onComplete]);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedMid1, completedMid2, completedSuperpower, completedMystery, quizConfig, onComplete, hasInteracted, tierConfig.maxTime]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut) return;

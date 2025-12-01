@@ -27,12 +27,57 @@ const quizScoresSchema = z.object({
     choice: z.union([z.literal(0), z.literal(1)]),
     timeSpent: z.number(),
     swipeDirection: z.enum(["left", "right"]),
+    sliderValue: z.number().optional(), // Phase 1.1
+    responseType: z.enum(["binary", "slider"]).optional(), // Phase 1.1
   })),
+  swipeTimes: z.array(z.number()).optional().default([]), // Phase 2.1
+  averageSwipeTime: z.number().optional().default(0), // Phase 2.1
+  currentDifficulty: z.enum(["easy", "medium", "hard"]).optional().default("medium"), // Phase 2.1
   engagement: z.number(),
   wildcardBoost: z.boolean(),
   criticalWildcard: z.number().optional().default(0),
   firstPrinciplesWildcard: z.number().optional().default(0),
+  hybridTypes: z.array(z.string()).optional().default([]), // Phase 1.4
 });
+
+// Phase 1.3: Research-based population norms for z-score normalization
+const RESEARCH_NORMS = {
+  bigFive: {
+    openness: { mean: 50, std: 15 },
+    conscientiousness: { mean: 50, std: 15 },
+    extraversion: { mean: 50, std: 15 },
+    agreeableness: { mean: 50, std: 15 },
+    neuroticism: { mean: 50, std: 15 },
+  },
+  mbti: {
+    EI: { mean: 0, std: 5 }, // Balanced at 0
+    SN: { mean: 0, std: 5 },
+    TF: { mean: 0, std: 5 },
+    JP: { mean: 0, std: 5 },
+  },
+};
+
+// Phase 1.3: Z-score normalization function
+function zNormalize(rawScore: number, mean: number, std: number): number {
+  const zScore = (rawScore - mean) / std;
+  // Convert to 0-100 scale: 50 is average, each std dev is 15 points
+  return Math.max(0, Math.min(100, 50 + zScore * 15));
+}
+
+// Phase 1.4: Hybrid type detection thresholds
+const HYBRID_THRESHOLD = 1.5; // If difference is less than this, consider hybrid
+
+// Phase 2.2: Badge definitions for achievement system
+const BADGE_DEFINITIONS = [
+  { name: "Trailblazer", type: "trait", condition: (scores: any) => scores.bigFive.O > 80, icon: "compass", color: "terracotta" },
+  { name: "Deep Thinker", type: "trait", condition: (scores: any) => scores.bigFive.C > 80, icon: "brain", color: "sage-green" },
+  { name: "Social Butterfly", type: "trait", condition: (scores: any) => scores.bigFive.E > 80, icon: "users", color: "dusty-blue" },
+  { name: "Peacemaker", type: "trait", condition: (scores: any) => scores.bigFive.A > 80, icon: "heart", color: "soft-cream" },
+  { name: "Speed Demon", type: "speed", condition: (scores: any) => scores.averageSwipeTime && scores.averageSwipeTime < 3, icon: "zap", color: "amber" },
+  { name: "Thoughtful Observer", type: "speed", condition: (scores: any) => scores.averageSwipeTime && scores.averageSwipeTime > 7, icon: "eye", color: "violet" },
+  { name: "Balanced Mind", type: "special", condition: (scores: any) => scores.hybridTypes && scores.hybridTypes.length > 0, icon: "scale", color: "teal" },
+  { name: "Quiz Master", type: "streak", condition: (scores: any) => scores.engagement > 20, icon: "trophy", color: "gold" },
+];
 
 const quizSubmitSchema = z.object({
   tier: z.string(),
@@ -67,12 +112,36 @@ const MBTI_LABELS: Record<string, { title: string; spark: string }> = {
 function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
   const { mbti, disc, bigFive } = scores;
   
+  // Phase 1.4: Detect hybrid types for close scores
+  const hybridTypes: string[] = [];
+  
+  // Check MBTI pairs for hybrids
+  if (Math.abs(mbti.E - mbti.I) < HYBRID_THRESHOLD) hybridTypes.push("Ambivert");
+  if (Math.abs(mbti.S - mbti.N) < HYBRID_THRESHOLD) hybridTypes.push("Ambi-Sensing");
+  if (Math.abs(mbti.T - mbti.F) < HYBRID_THRESHOLD) hybridTypes.push("Ambi-Thinking");
+  if (Math.abs(mbti.J - mbti.P) < HYBRID_THRESHOLD) hybridTypes.push("Ambi-Judging");
+  
+  // Build MBTI type with hybrid notation
+  const mbtiLetter = (a: string, b: string, scoreA: number, scoreB: number) => {
+    if (Math.abs(scoreA - scoreB) < HYBRID_THRESHOLD) return "X"; // Hybrid
+    return scoreA > scoreB ? a : b;
+  };
+  
   const mbtiType = [
-    mbti.E > mbti.I ? "E" : "I",
-    mbti.S > mbti.N ? "S" : "N",
-    mbti.T > mbti.F ? "T" : "F",
-    mbti.J > mbti.P ? "J" : "P",
+    mbtiLetter("E", "I", mbti.E, mbti.I),
+    mbtiLetter("S", "N", mbti.S, mbti.N),
+    mbtiLetter("T", "F", mbti.T, mbti.F),
+    mbtiLetter("J", "P", mbti.J, mbti.P),
   ].join("");
+  
+  // Clean MBTI for lookup (replace X with dominant)
+  const cleanMbti = mbtiType
+    .replace(/X/g, (_, i) => {
+      const pairs = [["E", "I"], ["S", "N"], ["T", "F"], ["J", "P"]];
+      const idx = mbtiType.indexOf("X");
+      const pair = pairs[idx];
+      return mbti[pair[0] as keyof typeof mbti] >= mbti[pair[1] as keyof typeof mbti] ? pair[0] : pair[1];
+    });
 
   const discEntries = Object.entries(disc) as [string, number][];
   const primaryDisc = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
@@ -83,13 +152,21 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
     C: "Careful Analyst",
   };
 
-  const normalize = (val: number) => Math.max(0, Math.min(100, 50 + val * 10));
+  // Phase 1.3: Z-score normalization instead of simple linear
+  const rawBigFive = {
+    openness: bigFive.O,
+    conscientiousness: bigFive.C,
+    extraversion: bigFive.E,
+    agreeableness: bigFive.A,
+    neuroticism: bigFive.N,
+  };
+  
   const bigFiveProfile = {
-    openness: normalize(bigFive.O),
-    conscientiousness: normalize(bigFive.C),
-    extraversion: normalize(bigFive.E),
-    agreeableness: normalize(bigFive.A),
-    neuroticism: normalize(bigFive.N),
+    openness: zNormalize(rawBigFive.openness, RESEARCH_NORMS.bigFive.openness.mean / 10, RESEARCH_NORMS.bigFive.openness.std / 10),
+    conscientiousness: zNormalize(rawBigFive.conscientiousness, RESEARCH_NORMS.bigFive.conscientiousness.mean / 10, RESEARCH_NORMS.bigFive.conscientiousness.std / 10),
+    extraversion: zNormalize(rawBigFive.extraversion, RESEARCH_NORMS.bigFive.extraversion.mean / 10, RESEARCH_NORMS.bigFive.extraversion.std / 10),
+    agreeableness: zNormalize(rawBigFive.agreeableness, RESEARCH_NORMS.bigFive.agreeableness.mean / 10, RESEARCH_NORMS.bigFive.agreeableness.std / 10),
+    neuroticism: zNormalize(rawBigFive.neuroticism, RESEARCH_NORMS.bigFive.neuroticism.mean / 10, RESEARCH_NORMS.bigFive.neuroticism.std / 10),
   };
 
   let proxyNudge = "";
@@ -102,10 +179,16 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
     proxyNudge = proxyNudge ? `${proxyNudge}, Wildcard engaged` : "Wildcard engaged";
   }
 
-  const mbtiInfo = MBTI_LABELS[mbtiType] || MBTI_LABELS.INTP;
+  const mbtiInfo = MBTI_LABELS[cleanMbti] || MBTI_LABELS[mbtiType.replace(/X/g, "I")] || MBTI_LABELS.INTP;
 
   const mbtiTotal = mbti.E + mbti.I + mbti.S + mbti.N + mbti.T + mbti.F + mbti.J + mbti.P;
   const discTotal = disc.D + disc.I + disc.S + disc.C;
+  
+  // Phase 1.3: Weighted proxy calculations based on research correlations
+  const PROXY_WEIGHTS = {
+    critical: { mbtiT: 0.4, big5O: 0.4, discC: 0.2 },
+    firstPrinciples: { mbtiN: 0.4, big5O: 0.4, discI: 0.2 },
+  };
   
   const mbtiT_pct = mbtiTotal > 0 ? (mbti.T / (mbti.T + mbti.F)) * 100 : 50;
   const mbtiN_pct = mbtiTotal > 0 ? (mbti.N / (mbti.S + mbti.N)) * 100 : 50;
@@ -116,8 +199,13 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
   const criticalWildcardBoost = (scores.criticalWildcard || 0) * 20;
   const firstPrinciplesWildcardBoost = (scores.firstPrinciplesWildcard || 0) * 20;
   
-  const criticalProxy = (mbtiT_pct + big5O_pct + discC_pct) / 3;
-  const firstPrinciplesProxy = (mbtiN_pct + big5O_pct + discI_pct) / 3;
+  // Apply weighted proxy formula
+  const criticalProxy = (mbtiT_pct * PROXY_WEIGHTS.critical.mbtiT) + 
+                        (big5O_pct * PROXY_WEIGHTS.critical.big5O) + 
+                        (discC_pct * PROXY_WEIGHTS.critical.discC);
+  const firstPrinciplesProxy = (mbtiN_pct * PROXY_WEIGHTS.firstPrinciples.mbtiN) + 
+                               (big5O_pct * PROXY_WEIGHTS.firstPrinciples.big5O) + 
+                               (discI_pct * PROXY_WEIGHTS.firstPrinciples.discI);
   
   const criticalRaw = (criticalProxy * 0.8) + (criticalWildcardBoost * 0.2);
   const firstPrinciplesRaw = (firstPrinciplesProxy * 0.8) + (firstPrinciplesWildcardBoost * 0.2);
@@ -143,6 +231,22 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
     "Define the core truth beneath",
   ];
 
+  // Phase 2.2: Calculate earned badges
+  const badgeCheckData = {
+    bigFive: bigFiveProfile,
+    averageSwipeTime: scores.averageSwipeTime,
+    hybridTypes,
+    engagement: scores.engagement,
+  };
+  const earnedBadges = BADGE_DEFINITIONS
+    .filter(badge => badge.condition(badgeCheckData))
+    .map(badge => ({
+      name: badge.name,
+      type: badge.type,
+      icon: badge.icon,
+      color: badge.color,
+    }));
+
   return {
     mbtiType,
     mbtiBlend: `${mbtiType}-${primaryDisc}`,
@@ -153,7 +257,7 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
     proxyNudge,
     engagement: scores.engagement,
     totalQuestions: scores.responses.length,
-    avgResponseTime: scores.responses.reduce((a, b) => a + b.timeSpent, 0) / scores.responses.length,
+    avgResponseTime: scores.responses.reduce((a, b) => a + b.timeSpent, 0) / (scores.responses.length || 1),
     criticalScale,
     firstPrinciplesScale,
     criticalQuest: CRITICAL_QUESTS[criticalScale - 1],
@@ -169,6 +273,15 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
         traits: "N/O rebuilds from ground up",
         quest: FIRST_PRINCIPLES_QUESTS[firstPrinciplesScale - 1],
       },
+    },
+    // Phase 1.4 & 2.2: New fields
+    hybridTypes,
+    earnedBadges,
+    swipeAnalytics: {
+      averageTime: scores.averageSwipeTime || 0,
+      difficulty: scores.currentDifficulty || "medium",
+      fastCount: scores.swipeTimes?.filter((t: number) => t < 2).length || 0,
+      slowCount: scores.swipeTimes?.filter((t: number) => t > 6).length || 0,
     },
   };
 }
@@ -227,6 +340,105 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Session fetch error:", error);
       return res.status(500).json({ error: "Failed to fetch session" });
+    }
+  });
+
+  // Phase 1.5: Refine endpoint for recalculating results based on user feedback
+  const refineSchema = z.object({
+    sessionId: z.string(),
+    adjustments: z.object({
+      openness: z.number().min(-20).max(20).optional(),
+      conscientiousness: z.number().min(-20).max(20).optional(),
+      extraversion: z.number().min(-20).max(20).optional(),
+      agreeableness: z.number().min(-20).max(20).optional(),
+      neuroticism: z.number().min(-20).max(20).optional(),
+    }).optional(),
+    traitFeedback: z.array(z.object({
+      trait: z.string(),
+      accuracy: z.number().min(1).max(5), // 1-5 rating
+    })).optional(),
+  });
+
+  app.post("/api/quiz/refine", async (req: Request, res: Response) => {
+    try {
+      const parsed = refineSchema.safeParse(req.body);
+      
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: "Invalid refine data",
+          details: parsed.error.errors,
+        });
+      }
+
+      const { sessionId, adjustments, traitFeedback } = parsed.data;
+      const session = await storage.getQuizSession(sessionId);
+      
+      if (!session) {
+        return res.status(404).json({ error: "Session not found" });
+      }
+
+      // Apply adjustments to Big Five profile
+      const refinedProfile = { ...session.result.bigFiveProfile };
+      
+      if (adjustments) {
+        if (adjustments.openness) refinedProfile.openness = Math.max(0, Math.min(100, refinedProfile.openness + adjustments.openness));
+        if (adjustments.conscientiousness) refinedProfile.conscientiousness = Math.max(0, Math.min(100, refinedProfile.conscientiousness + adjustments.conscientiousness));
+        if (adjustments.extraversion) refinedProfile.extraversion = Math.max(0, Math.min(100, refinedProfile.extraversion + adjustments.extraversion));
+        if (adjustments.agreeableness) refinedProfile.agreeableness = Math.max(0, Math.min(100, refinedProfile.agreeableness + adjustments.agreeableness));
+        if (adjustments.neuroticism) refinedProfile.neuroticism = Math.max(0, Math.min(100, refinedProfile.neuroticism + adjustments.neuroticism));
+      }
+
+      // Calculate confidence scores based on trait feedback
+      const confidenceScores: Record<string, number> = {};
+      if (traitFeedback) {
+        traitFeedback.forEach(fb => {
+          confidenceScores[fb.trait] = fb.accuracy / 5; // Normalize to 0-1
+        });
+      }
+
+      // Update session with refined results
+      const refinedResult = {
+        ...session.result,
+        bigFiveProfile: refinedProfile,
+        refinedAt: new Date().toISOString(),
+        confidenceScores,
+        refinementCount: ((session.result as any).refinementCount || 0) + 1,
+      };
+
+      // Save updated session
+      await storage.saveQuizSession({
+        ...session,
+        result: refinedResult,
+      });
+
+      return res.json({
+        success: true,
+        refinedProfile,
+        confidenceScores,
+        message: "Results refined based on your feedback",
+      });
+    } catch (error) {
+      console.error("Refine error:", error);
+      return res.status(500).json({ error: "Failed to refine results" });
+    }
+  });
+
+  // Phase 2.2: Get badges for a session
+  app.get("/api/badges/:sessionId", async (req: Request, res: Response) => {
+    try {
+      const session = await storage.getQuizSession(req.params.sessionId);
+      
+      if (!session) {
+        return res.status(404).json({ error: "Session not found" });
+      }
+
+      return res.json({
+        badges: session.result.earnedBadges || [],
+        hybridTypes: session.result.hybridTypes || [],
+      });
+    } catch (error) {
+      console.error("Badges fetch error:", error);
+      return res.status(500).json({ error: "Failed to fetch badges" });
     }
   });
 
