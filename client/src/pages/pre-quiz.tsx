@@ -226,7 +226,7 @@ export default function PreQuizPage() {
                         <Icon className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-warm-gray dark:text-soft-cream">
+                        <h3 className="font-semibold text-warm-gray dark:text-soft-cream text-[24px]">
                           {currentDemoStep.title}
                         </h3>
                         <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
@@ -386,7 +386,6 @@ export default function PreQuizPage() {
           </motion.div>
         </div>
       </main>
-
       {/* Start Button */}
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-deep-cream dark:via-deep-cream/95 pb-8">
         <div className="max-w-md mx-auto">
