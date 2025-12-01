@@ -101,7 +101,7 @@ export default function MoodMixerPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
             onClick={handleSkip}
-            className="w-full py-3 text-sm text-warm-gray/50 dark:text-soft-cream/40 flex items-center justify-center gap-1 hover:text-warm-gray/70 dark:hover:text-soft-cream/60 transition-colors"
+            className="w-full py-3 text-warm-gray/50 dark:text-soft-cream/40 flex items-center justify-center gap-1 hover:text-warm-gray/70 dark:hover:text-soft-cream/60 transition-colors text-[22px]"
             data-testid="button-skip-mixer"
           >
             <SkipForward className="w-4 h-4" />
