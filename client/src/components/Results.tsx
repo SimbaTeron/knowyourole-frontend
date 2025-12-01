@@ -1015,7 +1015,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     testId: string;
   }) => {
     const isSelected = currentValue === value;
-    const baseClasses = "flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2";
+    const baseClasses = "flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2";
     
     const variantClasses = {
       no: isSelected 
@@ -1358,7 +1358,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   );
                 })()}
                 <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-sm mx-auto">
-                  {result.primaryRole.desc} {result.mbtiType.includes('E') 
+                  {result.primaryRole.desc}: {result.mbtiType.includes('E') 
                     ? "Your natural energy and communication style make you well-suited for collaborative environments." 
                     : "Your thoughtful, focused approach brings unique depth and precision to this field."} 
                   {result.discStyle === 'D' ? " As a natural leader, you thrive when given autonomy and clear goals." 
@@ -1418,7 +1418,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     return (
                       <>
                         <TopIcon className="w-5 h-5 text-dusty-blue mx-auto mb-1.5" />
-                        <p className="text-sm font-bold text-dusty-blue mb-0.5 leading-tight" data-testid="text-bigfive-teaser">
+                        <p className={`font-bold text-dusty-blue mb-0.5 leading-tight ${
+                          TRAIT_LABELS[topTraitKey].length > 12 ? 'text-[10px]' : 'text-sm'
+                        }`} data-testid="text-bigfive-teaser">
                           {TRAIT_LABELS[topTraitKey]}
                         </p>
                         <p className="text-[10px] text-dusty-blue/60 font-mono">
@@ -1618,12 +1620,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
-            <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-md">
+            <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-800 dark:border-gray-200">
               <CardContent className="p-6">
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-terracotta/10 mb-3">
-                    <MessageCircle className="w-6 h-6 text-terracotta" />
-                  </div>
                   <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream whitespace-nowrap">
                     Complete for More Free Insights!
                   </h3>
