@@ -2470,7 +2470,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         ) : (
                           <>
                             <span className="font-black text-[48px]">$0.02</span>
-                            <span className="text-lg font-bold flex items-center gap-2">
+                            <span className="font-bold flex items-center gap-2 text-[24px]">
                               <Rocket className="w-5 h-5" />
                               Unlock Premium Now
                               <ArrowRight className="w-5 h-5" />
