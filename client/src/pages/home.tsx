@@ -38,7 +38,7 @@ export default function Home() {
     setAgeTier(tierId);
     sessionStorage.setItem("knowrole-tier", tierId);
     if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-    setTimeout(() => setLocation("/mood"), 300);
+    setTimeout(() => setLocation("/mood-mixer"), 300);
   };
 
   const getThemeClass = () => {

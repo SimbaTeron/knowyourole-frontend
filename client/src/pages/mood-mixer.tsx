@@ -21,11 +21,7 @@ export default function MoodMixerPage() {
       }
     }
     
-    const storedMood = sessionStorage.getItem("knowrole-mood");
-    if (!storedMood) {
-      setLocation("/mood");
-    }
-  }, [setLocation]);
+  }, []);
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
@@ -51,7 +47,7 @@ export default function MoodMixerPage() {
   };
 
   const handleBack = () => {
-    setLocation("/mood");
+    setLocation("/");
   };
 
   const getThemeClass = () => {

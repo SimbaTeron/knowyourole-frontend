@@ -20,16 +20,29 @@ const HYBRID_HINTS: Record<string, { title: string; desc: string }> = {
   "happy+determined": { title: "Driven Enthusiast", desc: "You chase goals with a smile" },
   "happy+creative": { title: "Joyful Creator", desc: "You make beautiful things with positive energy" },
   "happy+social": { title: "Life of the Party", desc: "Your energy lights up every room" },
+  "happy+focused": { title: "Productive Optimist", desc: "You tackle tasks with a cheerful mindset" },
+  "happy+adventurous": { title: "Thrill Seeker", desc: "You find joy in new experiences" },
   "calm+curious": { title: "Thoughtful Explorer", desc: "You ponder deeply before diving in" },
   "calm+determined": { title: "Steady Achiever", desc: "You reach goals without breaking a sweat" },
   "calm+creative": { title: "Serene Artist", desc: "You create from a place of peace" },
   "calm+social": { title: "Gentle Connector", desc: "You build lasting bonds through patience" },
+  "calm+focused": { title: "Zen Master", desc: "You maintain clarity in any situation" },
+  "calm+adventurous": { title: "Cool Explorer", desc: "You embrace the unknown with composure" },
   "curious+determined": { title: "Knowledge Hunter", desc: "You won't stop until you understand" },
   "curious+creative": { title: "Inventive Mind", desc: "You see possibilities others miss" },
   "curious+social": { title: "People Watcher", desc: "You love understanding what makes others tick" },
+  "curious+focused": { title: "Deep Diver", desc: "You concentrate intensely on what interests you" },
+  "curious+adventurous": { title: "Pioneer Spirit", desc: "You explore uncharted territory with wonder" },
   "determined+creative": { title: "Ambitious Maker", desc: "You turn visions into reality" },
   "determined+social": { title: "Team Leader", desc: "You inspire others to reach their potential" },
+  "determined+focused": { title: "Unstoppable Force", desc: "Nothing distracts you from your mission" },
+  "determined+adventurous": { title: "Trailblazer", desc: "You push boundaries to achieve great things" },
   "creative+social": { title: "Collaborative Artist", desc: "You bring out creativity in everyone" },
+  "creative+focused": { title: "Master Craftsperson", desc: "You perfect your art with dedication" },
+  "creative+adventurous": { title: "Wild Innovator", desc: "You create bold new things without fear" },
+  "social+focused": { title: "Relationship Builder", desc: "You invest deeply in meaningful connections" },
+  "social+adventurous": { title: "Social Butterfly", desc: "You thrive meeting new people everywhere" },
+  "focused+adventurous": { title: "Goal Crusher", desc: "You pursue ambitious dreams with laser focus" },
 };
 
 function getHybridKey(id1: string, id2: string): string {
@@ -58,15 +71,15 @@ export default function MagneticOrbitMixer({ onMoodBrewed }: MagneticOrbitMixerP
   const [particles, setParticles] = useState<Particle[]>([]);
   const [orbPositions, setOrbPositions] = useState<Record<string, { angle: number; pulled: boolean }>>({});
 
-  const centerX = 140;
-  const centerY = 140;
-  const orbitRadius = 100;
+  const centerX = 180;
+  const centerY = 180;
+  const orbitRadius = 130;
 
   useEffect(() => {
     const initialPositions: Record<string, { angle: number; pulled: boolean }> = {};
     MOOD_ORBS.forEach((orb, idx) => {
       initialPositions[orb.id] = {
-        angle: (idx * 60) * (Math.PI / 180),
+        angle: (idx * 45) * (Math.PI / 180),
         pulled: false
       };
     });
@@ -177,7 +190,7 @@ export default function MagneticOrbitMixer({ onMoodBrewed }: MagneticOrbitMixerP
     const resetPositions: Record<string, { angle: number; pulled: boolean }> = {};
     MOOD_ORBS.forEach((orb, idx) => {
       resetPositions[orb.id] = {
-        angle: (idx * 60) * (Math.PI / 180),
+        angle: (idx * 45) * (Math.PI / 180),
         pulled: false
       };
     });
@@ -199,9 +212,9 @@ export default function MagneticOrbitMixer({ onMoodBrewed }: MagneticOrbitMixerP
   };
 
   return (
-    <div className="relative w-full max-w-[280px] mx-auto">
+    <div className="relative w-full max-w-[360px] mx-auto">
       <svg 
-        viewBox="0 0 280 280" 
+        viewBox="0 0 360 360" 
         className="w-full h-auto"
         style={{ filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.1))' }}
       >
@@ -236,7 +249,7 @@ export default function MagneticOrbitMixer({ onMoodBrewed }: MagneticOrbitMixerP
         <circle 
           cx={centerX} 
           cy={centerY} 
-          r="30" 
+          r="40" 
           fill="currentColor"
           fillOpacity="0.05"
           className="text-warm-gray dark:text-soft-cream"
@@ -284,7 +297,7 @@ export default function MagneticOrbitMixer({ onMoodBrewed }: MagneticOrbitMixerP
               <circle
                 cx={centerX}
                 cy={centerY}
-                r="28"
+                r="40"
                 fill={`url(#grad-${orb.id})`}
                 filter="url(#glow)"
                 style={{
@@ -293,10 +306,10 @@ export default function MagneticOrbitMixer({ onMoodBrewed }: MagneticOrbitMixerP
               />
               <text
                 x={centerX}
-                y={centerY + 4}
+                y={centerY + 5}
                 textAnchor="middle"
                 fill="white"
-                fontSize="10"
+                fontSize="13"
                 fontWeight="600"
                 style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
               >
@@ -316,7 +329,7 @@ export default function MagneticOrbitMixer({ onMoodBrewed }: MagneticOrbitMixerP
               <circle
                 cx={centerX}
                 cy={centerY}
-                r="35"
+                r="50"
                 fill="url(#grad-collision)"
               />
               <defs>
