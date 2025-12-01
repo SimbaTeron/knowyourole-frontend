@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { Clock, Zap, Target, Sparkles, Timer, Hand } from "lucide-react";
+import { Clock, Zap, Target, Sparkles, Timer, Hand, SlidersHorizontal, Award } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
@@ -23,6 +23,20 @@ const DEMO_STEPS = [
   },
   {
     id: 3,
+    title: "Slider Questions",
+    description: "Some questions use a slider. Drag it left or right to show how strongly you feel, then tap confirm.",
+    icon: SlidersHorizontal,
+    demo: "slider",
+  },
+  {
+    id: 4,
+    title: "Bonus Badges",
+    description: "Watch for special badge and 2X questions! They pause the timer and give you extra time to answer.",
+    icon: Award,
+    demo: "badges",
+  },
+  {
+    id: 5,
     title: "Power-Up Questions",
     description: "Some questions are multiple choice. These help us understand you even better.",
     icon: Sparkles,
@@ -281,6 +295,62 @@ export default function PreQuizPage() {
                           <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
                             Trust your instincts!
                           </p>
+                        </div>
+                      )}
+
+                      {currentDemoStep.demo === "slider" && (
+                        <div className="w-full max-w-[220px]">
+                          <div className="flex justify-between text-xs mb-2">
+                            <span className="text-sage-green font-medium">Agree</span>
+                            <span className="text-terracotta font-medium">Disagree</span>
+                          </div>
+                          <div className="relative">
+                            <div className="h-3 rounded-full bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta" />
+                            <motion.div
+                              animate={{ x: [-60, 0, 60, 0, -60] }}
+                              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                              className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white shadow-lg border-2 border-terracotta"
+                              style={{ left: "calc(50% - 12px)" }}
+                            />
+                          </div>
+                          <div className="flex justify-between mt-2 text-[10px] text-warm-gray/50 dark:text-soft-cream/40">
+                            <span>Strongly</span>
+                            <span>Slightly</span>
+                            <span>Neutral</span>
+                            <span>Slightly</span>
+                            <span>Strongly</span>
+                          </div>
+                          <motion.div
+                            animate={{ scale: [1, 1.02, 1] }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                            className="mt-3 px-4 py-2 rounded-lg bg-terracotta text-white text-xs text-center font-medium"
+                          >
+                            Confirm Choice
+                          </motion.div>
+                        </div>
+                      )}
+
+                      {currentDemoStep.demo === "badges" && (
+                        <div className="flex gap-4 items-center">
+                          <motion.div
+                            animate={{ 
+                              scale: [1, 1.1, 1],
+                              rotate: [0, 5, -5, 0]
+                            }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg"
+                          >
+                            <Award className="w-8 h-8 text-white" />
+                          </motion.div>
+                          <motion.div
+                            animate={{ 
+                              scale: [1, 1.15, 1],
+                            }}
+                            transition={{ duration: 0.5, repeat: Infinity }}
+                            className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg"
+                          >
+                            <span className="text-xl font-black text-white">2X</span>
+                          </motion.div>
                         </div>
                       )}
 

@@ -1125,9 +1125,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               }}
             >
               <motion.div
-                className="w-full h-full cursor-grab active:cursor-grabbing"
+                className={`w-full h-full ${currentQuestion.responseType === "slider" ? "cursor-default" : "cursor-grab active:cursor-grabbing"}`}
                 style={{ x, rotate }}
-                drag={isTimingOut ? false : "x"}
+                drag={isTimingOut || currentQuestion.responseType === "slider" ? false : "x"}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.7}
                 onDragEnd={handleDragEnd}
