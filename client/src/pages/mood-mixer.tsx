@@ -78,9 +78,8 @@ export default function MoodMixerPage() {
             transition={{ delay: 0.1 }}
             className="text-center mb-6"
           >
-            <h1 className="text-3xl md:text-4xl font-display font-semibold compass-gradient-text mb-3">
-              Brew Your Mood Mix
-            </h1>
+            <h1 className="text-3xl md:text-4xl font-display font-semibold compass-gradient-text mb-3">How are you feeling?
+            Your mood helps us personalize your journey</h1>
             <p className="text-warm-gray/70 dark:text-soft-cream/60 text-base max-w-sm mx-auto">
               Tap two ingredients below to create your unique mood blend. This helps us understand your mindset right now.
             </p>
