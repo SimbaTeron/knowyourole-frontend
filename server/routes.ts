@@ -735,5 +735,85 @@ export async function registerRoutes(
     }
   });
 
+  // Google Sheets Export - Export color schemes/city themes
+  app.post("/api/export/sheets/colors", async (_req: Request, res: Response) => {
+    try {
+      const { createOrGetSpreadsheet, clearAndWriteSheet } = await import("./googleSheets");
+      const fs = await import("fs");
+      const path = await import("path");
+      
+      // Read city themes
+      const themesPath = path.join(process.cwd(), "client/src/data/cityThemes.ts");
+      const themesContent = fs.readFileSync(themesPath, "utf-8");
+      
+      // Parse the cityThemes object from the TypeScript file
+      const cityThemesMatch = themesContent.match(/export const cityThemes[^=]*=\s*(\{[\s\S]*?\n\};)/);
+      const zipMappingMatch = themesContent.match(/export const zipCodeToCity[^=]*=\s*(\{[\s\S]*?\n\};)/);
+      
+      // Create spreadsheet
+      const spreadsheetId = await createOrGetSpreadsheet("KnowRole Color Schemes");
+      
+      // Extract city theme data using regex
+      const cityThemePattern = /"([^"]+)":\s*\{\s*city:\s*"([^"]+)",\s*(?:state:\s*"([^"]*)",\s*)?country:\s*"([^"]+)",\s*team:\s*"([^"]+)",\s*sport:\s*"([^"]+)",\s*colors:\s*\{\s*primary:\s*"([^"]+)",\s*secondary:\s*"([^"]+)",\s*accent:\s*"([^"]+)"\s*\},\s*textOnPrimary:\s*"([^"]+)",\s*textOnSecondary:\s*"([^"]+)"/g;
+      
+      const colorHeader = [
+        "City Key", "City Name", "State", "Country", "Team", "Sport", 
+        "Primary Color (HEX)", "Secondary Color (HEX)", "Accent Color (HEX)",
+        "Text on Primary", "Text on Secondary"
+      ];
+      
+      const colorRows = [colorHeader];
+      let match;
+      
+      while ((match = cityThemePattern.exec(themesContent)) !== null) {
+        colorRows.push([
+          match[1],  // key
+          match[2],  // city
+          match[3] || "",  // state
+          match[4],  // country
+          match[5],  // team
+          match[6],  // sport
+          match[7],  // primary
+          match[8],  // secondary
+          match[9],  // accent
+          match[10], // textOnPrimary
+          match[11]  // textOnSecondary
+        ]);
+      }
+      
+      await clearAndWriteSheet(spreadsheetId, "City Color Schemes", colorRows);
+      
+      // Also add tier configuration
+      const questionsPath = path.join(process.cwd(), "client/src/data/questions.json");
+      const questionsData = JSON.parse(fs.readFileSync(questionsPath, "utf-8"));
+      
+      const tierHeader = ["Age Tier", "Base Question Count", "Max Time (seconds)", "Swipe Style"];
+      const tierRows = [tierHeader];
+      
+      for (const [tier, config] of Object.entries(questionsData.tierConfig)) {
+        const cfg = config as { baseCount: number; maxTime: number; swipeStyle: string };
+        tierRows.push([
+          tier,
+          cfg.baseCount.toString(),
+          cfg.maxTime.toString(),
+          cfg.swipeStyle
+        ]);
+      }
+      
+      await clearAndWriteSheet(spreadsheetId, "Tier Configuration", tierRows);
+      
+      res.json({ 
+        success: true, 
+        spreadsheetId,
+        url: `https://docs.google.com/spreadsheets/d/${spreadsheetId}`,
+        colorSchemesExported: colorRows.length - 1,
+        tierConfigsExported: tierRows.length - 1
+      });
+    } catch (error) {
+      console.error("Google Sheets color schemes export error:", error);
+      res.status(500).json({ error: "Failed to export color schemes to Google Sheets" });
+    }
+  });
+
   return httpServer;
 }
