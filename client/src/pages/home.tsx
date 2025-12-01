@@ -61,7 +61,7 @@ export default function Home() {
             className="text-center mb-8"
           >
             <p
-              className="text-lg md:text-xl text-warm-gray dark:text-soft-cream max-w-sm mx-auto leading-relaxed"
+              className="md:text-xl text-warm-gray dark:text-soft-cream max-w-sm mx-auto text-[24px]"
               data-testid="text-subtitle"
             >Chart your path to discover                 traits, sparks, and growth</p>
           </motion.div>
