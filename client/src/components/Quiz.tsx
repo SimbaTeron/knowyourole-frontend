@@ -221,7 +221,6 @@ interface RandomEvent {
 const RANDOM_EVENTS: RandomEvent[] = [
   { id: "time_warp", title: "Time Warp!", description: "+3 seconds on next question", effect: "bonus_time", duration: 3000, icon: "clock" },
   { id: "insight_flash", title: "Insight Flash!", description: "Your next answer counts double", effect: "double_points", duration: 2500, icon: "sparkles" },
-  { id: "compass_spin", title: "Compass Spin!", description: "Skip one question if needed", effect: "skip_allowed", duration: 3000, icon: "compass" },
   { id: "inner_voice", title: "Inner Voice!", description: "Trust your first instinct", effect: "hint_reveal", duration: 2500, icon: "brain" },
   { id: "energy_surge", title: "Energy Surge!", description: "Feeling extra decisive!", effect: "mood_boost", duration: 2000, icon: "zap" },
 ];
@@ -1474,8 +1473,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         >
                           <Sparkles className="w-16 h-16 text-white drop-shadow-lg" />
                         </motion.div>
-                        <span className="text-lg font-bold text-white mt-2">BADGE</span>
-                        <span className="text-sm text-white/80">{currentQuestion.badgeHint || 'Special Question!'}</span>
+                        <span className="text-base font-bold text-white mt-2 text-center px-3">You are a</span>
+                        <span className="text-lg font-bold text-white/90 text-center px-3">{currentQuestion.badgeName || currentQuestion.badgeHint || 'Special Explorer!'}</span>
                       </>
                     )}
                   </div>

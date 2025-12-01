@@ -148,7 +148,7 @@ function calculateResult(scores: QuizScores): PersonalityResult {
   const primaryDisc = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
 
   const b5 = scores.bigFive;
-  const normalize = (val: number) => Math.max(5, Math.min(95, 50 + val * 12));
+  const normalize = (val: number) => Math.round(Math.max(5, Math.min(95, 50 + val * 12)));
   const bigFiveProfile = {
     O: normalize(b5.O),
     C: normalize(b5.C),
@@ -351,6 +351,45 @@ const FUN_MODE_TITLES: Record<string, string> = {
   "ISFP": "Aesthetic Curator",
   "ESTP": "Action Hero",
   "ESFP": "Entertainment Director",
+};
+
+const HYBRID_TYPE_DESCRIPTIONS: Record<string, { short: string; description: string }> = {
+  "Ambivert": { 
+    short: "Best of Both Worlds", 
+    description: "You're equally comfortable in social settings and alone time. You can adapt your energy to match any situation—turning up the charm when needed, then recharging in solitude." 
+  },
+  "Ambi-Sensing": { 
+    short: "Practical Dreamer", 
+    description: "You blend real-world awareness with imaginative thinking. You notice details others miss while also seeing the bigger picture and future possibilities." 
+  },
+  "Ambi-Judging": { 
+    short: "Flexible Planner", 
+    description: "You appreciate structure but aren't rigid about it. You can make plans and stick to them, or pivot gracefully when life throws curveballs." 
+  },
+  "Thinking-Feeling Balance": { 
+    short: "Heart & Head Harmony", 
+    description: "You make decisions using both logic and empathy. You consider the facts while also understanding how choices affect people's feelings." 
+  },
+  "Balanced Mind": { 
+    short: "Steady Navigator", 
+    description: "Your emotional landscape is remarkably even. You experience the full range of feelings without getting stuck in extremes, maintaining calm under pressure." 
+  },
+  "Balanced Openness": { 
+    short: "Curious Yet Grounded", 
+    description: "You're open to new ideas while respecting tradition. You explore innovation without losing sight of what's tried and true." 
+  },
+  "Balanced Conscientiousness": { 
+    short: "Organized Free Spirit", 
+    description: "You can focus when it counts but also know when to relax. Your productivity comes in waves, and you're at peace with that rhythm." 
+  },
+  "Balanced Agreeableness": { 
+    short: "Diplomatic Straight-Shooter", 
+    description: "You stand your ground while remaining kind. You can disagree without being disagreeable, and cooperate without being a pushover." 
+  },
+  "Balanced Extraversion": { 
+    short: "Social Chameleon", 
+    description: "You flow easily between group energy and solo time. You're neither the life of the party nor a wallflower—you're wherever you need to be." 
+  },
 };
 
 const TRAIT_QUESTS: Record<string, { high: string; low: string }> = {
@@ -801,9 +840,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     }
   }, [scores, apiScales, isTestPremium]);
 
-  // Fetch Adventure Archetype for Mini Explorer tier
+  // Fetch Adventure Archetype for all tiers
   useEffect(() => {
-    if (!isMiniExplorer || !result) return;
+    if (!result) return;
     
     const fetchArchetype = async () => {
       try {
@@ -837,7 +876,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     };
     
     fetchArchetype();
-  }, [isMiniExplorer, result]);
+  }, [result]);
 
   // DEV MODE: Set to true to show Just Kidding page before premium unlock
   const DEV_BYPASS_PAYMENT = true;
@@ -1431,6 +1470,38 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   })()}
                 </motion.div>
               </div>
+              
+              {/* Adventure Type for Teen/Adult - Compact Display */}
+              {!isMiniExplorer && adventureArchetype && (
+                <motion.div
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9 }}
+                  className="mt-6 pt-5 border-t border-terracotta/20"
+                >
+                  <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-purple-100/60 to-pink-100/60 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200/50 dark:border-purple-700/50">
+                    <motion.div 
+                      className="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center shadow-lg"
+                      style={{ backgroundColor: adventureArchetype.badgeColor }}
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2.5, repeat: Infinity }}
+                    >
+                      <Star className="w-6 h-6 text-white" />
+                    </motion.div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] text-purple-600 dark:text-purple-300 font-medium uppercase tracking-wider mb-0.5">
+                        Your Inner Hero
+                      </p>
+                      <p className="text-lg font-bold text-purple-700 dark:text-purple-200 leading-tight" data-testid="text-adventure-type-compact">
+                        {adventureArchetype.name}
+                      </p>
+                      <p className="text-xs text-purple-600/80 dark:text-purple-300/80 mt-0.5">
+                        {adventureArchetype.superpower}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </CardContent>
           </Card>
           )}
@@ -1443,22 +1514,50 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               transition={{ delay: 0.9 }}
               className="mt-4"
             >
-              {/* Hybrid Types */}
+              {/* Hybrid Types - Tappable with explanations */}
               {hybridTypes.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-2 mb-3">
-                  {hybridTypes.map((type, i) => (
-                    <motion.span
-                      key={type}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.9 + i * 0.1 }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-dusty-blue/20 to-sage-green/20 border border-dusty-blue/30 text-sm font-medium text-dusty-blue dark:text-dusty-blue"
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      {type}
-                    </motion.span>
-                  ))}
-                </div>
+                <Card className="bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200/50 dark:border-indigo-700/50 mb-3">
+                  <CardContent className="p-4">
+                    <p className="text-xs text-center text-indigo-600 dark:text-indigo-300 font-medium mb-3 uppercase tracking-wide">
+                      Your Unique Blend
+                    </p>
+                    <div className="space-y-2">
+                      {hybridTypes.map((type, i) => {
+                        const hybridInfo = HYBRID_TYPE_DESCRIPTIONS[type] || { 
+                          short: type, 
+                          description: "You have a balanced approach in this area." 
+                        };
+                        return (
+                          <motion.details
+                            key={type}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.9 + i * 0.1 }}
+                            className="group"
+                          >
+                            <summary className="flex items-center justify-between cursor-pointer list-none px-3 py-2.5 rounded-xl bg-white/60 dark:bg-gray-800/60 border border-indigo-200/50 dark:border-indigo-700/30 hover:bg-white/80 dark:hover:bg-gray-700/60 transition-colors">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                                  <Sparkles className="w-4 h-4 text-white" />
+                                </div>
+                                <span className="font-semibold text-indigo-700 dark:text-indigo-300">{type}</span>
+                              </div>
+                              <ChevronDown className="w-4 h-4 text-indigo-400 group-open:rotate-180 transition-transform" />
+                            </summary>
+                            <div className="mt-2 px-3 py-3 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/20 border-l-3 border-indigo-400">
+                              <p className="text-sm font-medium text-indigo-600 dark:text-indigo-300 mb-1">
+                                {hybridInfo.short}
+                              </p>
+                              <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed">
+                                {hybridInfo.description}
+                              </p>
+                            </div>
+                          </motion.details>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Earned Badges */}
