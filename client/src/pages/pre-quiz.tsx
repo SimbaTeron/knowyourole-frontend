@@ -233,7 +233,7 @@ export default function PreQuizPage() {
                       </div>
                     </div>
 
-                    <p className="text-warm-gray/80 dark:text-soft-cream/70 mb-6 text-[16px]">
+                    <p className="text-warm-gray/80 dark:text-soft-cream/70 mb-6 text-[18px]">
                       {currentDemoStep.description}
                     </p>
 
