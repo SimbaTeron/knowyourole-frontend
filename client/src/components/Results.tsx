@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, Trophy, Target, Brain, Heart, Users, RefreshCw, Share2, 
-  Briefcase, TrendingUp, ChevronRight, Zap, Award, MapPin, Lightbulb, Flame,
+  Briefcase, TrendingUp, ChevronRight, ChevronDown, Zap, Award, MapPin, Lightbulb, Flame,
   MessageCircle, Frown, Meh, Smile, Lock, Crown, Star, Gift, BookOpen,
   Rocket, Timer, CheckCircle2, Calendar, ArrowRight, ArrowLeft, Shield, Compass, 
   Mountain, Sunrise, CircleDot, Play, Building2, DollarSign, PartyPopper
@@ -11,16 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Radar } from "react-chartjs-2";
 import type { QuizScores } from "./Quiz";
 import rolesData from "@/data/roles.json";
 import { useToast } from "@/hooks/use-toast";
@@ -28,8 +18,6 @@ import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { getLocaleInsight, getPersonalizedInsight, type LocaleInsight } from "@/data/localeInsights";
 import { getRegionalSalary, shouldShowSalary } from "@/data/regionalSalaries";
 import { PremiumCardDeck } from "./PremiumCardDeck";
-
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -209,6 +197,106 @@ const TRAIT_LABELS = {
   A: "Agreeableness",
   N: "Neuroticism",
 };
+
+const TRAIT_QUARTILE_DESCRIPTIONS: Record<string, Record<string, { vibe: string; description: string }>> = {
+  O: {
+    low: { 
+      vibe: "Steady Traditionalist", 
+      description: "You love familiar routines and practical details—like a cozy librarian curating timeless classics, thriving in structured worlds where reliability trumps reinvention." 
+    },
+    lowMid: { 
+      vibe: "Balanced Appreciator", 
+      description: "You enjoy a dash of novelty but stick to proven paths—like a weekend hobbyist tinkering with grandma's recipes, blending comfort with occasional tweaks." 
+    },
+    midHigh: { 
+      vibe: "Curious Explorer", 
+      description: "You dip into ideas with enthusiasm—like a book club enthusiast debating plot twists over coffee, weaving fresh perspectives into everyday chats." 
+    },
+    high: { 
+      vibe: "Boundless Visionary", 
+      description: "You chase wild 'what ifs' and abstract dreams—like a street artist turning urban walls into surreal stories, fueled by endless curiosity." 
+    }
+  },
+  C: {
+    low: { 
+      vibe: "Free-Spirited Improviser", 
+      description: "You flow with the moment over checklists—like a spontaneous road-tripper packing light and letting detours dictate the adventure." 
+    },
+    lowMid: { 
+      vibe: "Flexible Doer", 
+      description: "You start strong but adapt on the fly—like a casual gardener planting intuitively, weeding when inspired rather than on schedule." 
+    },
+    midHigh: { 
+      vibe: "Dependable Achiever", 
+      description: "You plan just enough to deliver—like a project coordinator juggling tasks with a trusty notebook, hitting milestones reliably." 
+    },
+    high: { 
+      vibe: "Meticulous Mastermind", 
+      description: "You have laser-focused discipline—like an elite chef prepping every ingredient hours ahead, orchestrating flawless meals through unwavering routines." 
+    }
+  },
+  E: {
+    low: { 
+      vibe: "Serene Solo Navigator", 
+      description: "You recharge in quiet depths—like a midnight reader lost in novels by lamplight, savoring intimate connections over crowds." 
+    },
+    lowMid: { 
+      vibe: "Selective Socializer", 
+      description: "You shine in small circles—like a coffee shop conversationalist trading stories with a few friends, drawing energy from meaningful exchanges." 
+    },
+    midHigh: { 
+      vibe: "Engaging Connector", 
+      description: "You thrive in moderate mingles—like a team brainstormer rallying ideas at lunch meetups, energizing groups with charm." 
+    },
+    high: { 
+      vibe: "Magnetic Energizer", 
+      description: "You light up every room—like a festival host weaving through crowds with infectious laughs, turning strangers into instant allies." 
+    }
+  },
+  A: {
+    low: { 
+      vibe: "Bold Challenger", 
+      description: "You prioritize truth over harmony—like a witty debater at dinner parties, cutting through fluff with sharp insights." 
+    },
+    lowMid: { 
+      vibe: "Pragmatic Peacemaker", 
+      description: "You compromise strategically—like a negotiation-savvy colleague advocating firmly but fairly, blending empathy with a no-nonsense edge." 
+    },
+    midHigh: { 
+      vibe: "Warm Collaborator", 
+      description: "You foster easy alliances—like a community organizer smoothing group tensions with genuine smiles, building bridges through kindness." 
+    },
+    high: { 
+      vibe: "Heartfelt Harmonizer", 
+      description: "You put others first—like a devoted mentor cheering on dreams with unwavering support, creating ripple effects of positivity." 
+    }
+  },
+  N: {
+    low: { 
+      vibe: "Unflappable Zen Master", 
+      description: "You roll with life's punches—like a surfer riding waves without a flinch, channeling calm focus into steady progress." 
+    },
+    lowMid: { 
+      vibe: "Even-Keeled Responder", 
+      description: "You feel dips but bounce quick—like a hiker pausing at tough trails for a breath, then pushing on with quiet resilience." 
+    },
+    midHigh: { 
+      vibe: "Attuned Empath", 
+      description: "You navigate emotions with depth—like a journal-keeping friend processing worries into wisdom, turning inner turbulence into empathetic connections." 
+    },
+    high: { 
+      vibe: "Passionate Feeler", 
+      description: "Your intensity fuels profound change—like an activist pouring heart into causes, transforming raw sensitivity into powerful advocacy." 
+    }
+  }
+};
+
+function getQuartileKey(value: number): string {
+  if (value <= 25) return "low";
+  if (value <= 50) return "lowMid";
+  if (value <= 75) return "midHigh";
+  return "high";
+}
 
 const FUN_MODE_ROASTS: Record<string, string> = {
   "INTJ": "The mastermind who plans world domination before breakfast.",
@@ -685,7 +773,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [selectedQuestWeek, setSelectedQuestWeek] = useState<1 | 2 | 3 | 4>(1);
   const [completedChallenges, setCompletedChallenges] = useState<Set<string>>(new Set());
   
-  const chartRef = useRef<ChartJS<"radar">>(null);
   const traitButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotion();
   const { toast } = useToast();
@@ -837,39 +924,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     setDashboardStage("full");
   };
 
-  const isDark = theme === "dark";
-  const isRandom = theme === "random";
-
-  const getChartColors = () => {
-    if (isRandom) {
-      return {
-        fill: "rgba(245, 158, 11, 0.25)",
-        border: "rgb(245, 158, 11)",
-        point: "rgb(220, 38, 38)",
-        gridColor: "rgba(139, 92, 246, 0.3)",
-        tickColor: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
-      };
-    }
-    if (isDark) {
-      return {
-        fill: "rgba(180, 83, 9, 0.3)",
-        border: "rgb(180, 83, 9)",
-        point: "rgb(245, 158, 11)",
-        gridColor: "rgba(255,255,255,0.15)",
-        tickColor: "rgba(255,255,255,0.7)",
-      };
-    }
-    return {
-      fill: "rgba(180, 83, 9, 0.2)",
-      border: "rgb(180, 83, 9)",
-      point: "rgb(139, 69, 19)",
-      gridColor: "rgba(0,0,0,0.1)",
-      tickColor: "rgba(0,0,0,0.7)",
-    };
-  };
-
-  const chartColors = getChartColors();
-
   const handleTraitSelect = (trait: string, index: number) => {
     setSelectedTrait(selectedTrait === trait ? null : trait);
     setFocusedTraitIndex(index);
@@ -913,66 +967,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     .sort((a, b) => b[1] - a[1]);
   const topTwoTraits = sortedBigFive.slice(0, 2);
   const topTrait = sortedBigFive[0];
-
-  const radarData = {
-    labels: Object.keys(result.bigFiveProfile), // Single letters: O, C, E, A, N
-    datasets: [{
-      label: "Your Profile",
-      data: Object.values(result.bigFiveProfile),
-      backgroundColor: chartColors.fill,
-      borderColor: chartColors.border,
-      borderWidth: 2,
-      pointBackgroundColor: chartColors.point,
-      pointBorderColor: chartColors.border,
-      pointHoverBackgroundColor: chartColors.border,
-      pointHoverBorderColor: "#fff",
-      pointRadius: 5,
-      pointHoverRadius: 8,
-    }],
-  };
-
-  const traitLabelColors = [
-    TRAIT_COLORS.O.border,
-    TRAIT_COLORS.C.border,
-    TRAIT_COLORS.E.border,
-    TRAIT_COLORS.A.border,
-    TRAIT_COLORS.N.border,
-  ];
-
-  const radarOptions = {
-    responsive: true,
-    maintainAspectRatio: true,
-    animation: shouldReduceMotion ? false as const : undefined,
-    scales: {
-      r: {
-        min: 0,
-        max: 100,
-        ticks: {
-          stepSize: 25,
-          color: chartColors.tickColor,
-          backdropColor: "transparent",
-          font: { size: 11 },
-        },
-        grid: { color: chartColors.gridColor },
-        angleLines: { color: chartColors.gridColor },
-        pointLabels: {
-          color: (context: { index?: number }) => {
-            const idx = context.index ?? 0;
-            return traitLabelColors[idx] ?? chartColors.tickColor;
-          },
-          font: { size: 14, weight: 700 as const },
-        },
-      },
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (ctx: { raw: unknown }) => `${ctx.raw}%`,
-        },
-      },
-    },
-  };
 
   const discColorMap: Record<string, string> = {
     terracotta: "bg-terracotta text-white",
@@ -1789,86 +1783,96 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Zap className="w-4 h-4 text-terracotta" aria-hidden="true" />
-                      Full Big Five Profile
+                      Your Big Five Profile
                     </CardTitle>
+                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">
+                      Tap any trait to learn more about what it means for you
+                    </p>
                   </CardHeader>
-                  <CardContent className="pb-4">
-                    <div 
-                      className="w-full aspect-square max-w-[340px] mx-auto"
-                      role="img"
-                      aria-label={`Big Five personality radar chart: ${traitKeys.map(k => `${TRAIT_LABELS[k as keyof typeof TRAIT_LABELS]} ${result.bigFiveProfile[k as keyof typeof result.bigFiveProfile]}%`).join(", ")}`}
-                    >
-                      <Radar ref={chartRef} data={radarData} options={radarOptions} />
-                    </div>
-                    
-                    <div 
-                      className="flex flex-wrap justify-center gap-2.5 mt-5"
-                      role="group"
-                      aria-label="Select a trait to learn more"
-                    >
-                      {traitKeys.map((trait, index) => {
-                        const Icon = TRAIT_ICONS[trait as keyof typeof TRAIT_ICONS];
-                        const colors = TRAIT_COLORS[trait as keyof typeof TRAIT_COLORS];
-                        const isSelected = selectedTrait === trait;
-                        const value = result.bigFiveProfile[trait as keyof typeof result.bigFiveProfile];
-                        
-                        return (
+                  <CardContent className="pb-4 space-y-3">
+                    {traitKeys.map((trait, index) => {
+                      const Icon = TRAIT_ICONS[trait as keyof typeof TRAIT_ICONS];
+                      const colors = TRAIT_COLORS[trait as keyof typeof TRAIT_COLORS];
+                      const isSelected = selectedTrait === trait;
+                      const value = result.bigFiveProfile[trait as keyof typeof result.bigFiveProfile];
+                      const quartileKey = getQuartileKey(value);
+                      const quartileData = TRAIT_QUARTILE_DESCRIPTIONS[trait]?.[quartileKey];
+                      
+                      return (
+                        <div key={trait} className="space-y-2">
                           <button
-                            key={trait}
                             ref={el => traitButtonsRef.current[index] = el}
                             onClick={() => handleTraitSelect(trait, index)}
                             onKeyDown={(e) => handleTraitKeyDown(e, trait, index)}
                             tabIndex={focusedTraitIndex === -1 ? (index === 0 ? 0 : -1) : (focusedTraitIndex === index ? 0 : -1)}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-semibold transition-all ${
+                            className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-left transition-all ${
                               isSelected 
-                                ? `${colors.bg} text-white ring-2 ring-offset-2 ${colors.ring}` 
-                                : `bg-gray-100 dark:bg-gray-700 ${colors.text} hover:scale-105`
+                                ? `${colors.bg} text-white shadow-lg` 
+                                : `bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700`
                             }`}
                             aria-pressed={isSelected}
-                            aria-label={`${TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]} petal ${value}%. ${isSelected ? "Selected" : "Click to learn more"}`}
+                            aria-expanded={isSelected}
+                            aria-label={`${TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]} ${value}%. ${isSelected ? "Selected, tap to collapse" : "Tap to learn more"}`}
                             data-testid={`button-trait-${trait.toLowerCase()}`}
                           >
-                            <Icon className="w-4 h-4" aria-hidden="true" />
-                            <span>{TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]}</span>
-                            <span className="opacity-70 font-bold">{value}%</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {selectedTrait && (
-                      <motion.div
-                        initial={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
-                        className="mt-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50"
-                        role="region"
-                        aria-live="polite"
-                        aria-label={`${TRAIT_LABELS[selectedTrait as keyof typeof TRAIT_LABELS]} details`}
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          {(() => {
-                            const Icon = TRAIT_ICONS[selectedTrait as keyof typeof TRAIT_ICONS];
-                            const colors = TRAIT_COLORS[selectedTrait as keyof typeof TRAIT_COLORS];
-                            return (
-                              <>
-                                <div className={`w-6 h-6 rounded-full ${colors.bg} flex items-center justify-center`}>
-                                  <Icon className="w-3 h-3 text-white" aria-hidden="true" />
-                                </div>
-                                <span className="font-semibold text-warm-gray dark:text-soft-cream">
-                                  {TRAIT_LABELS[selectedTrait as keyof typeof TRAIT_LABELS]}
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                isSelected ? 'bg-white/20' : colors.bg
+                              }`}>
+                                <Icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-white'}`} aria-hidden="true" />
+                              </div>
+                              <div>
+                                <span className={`font-semibold ${isSelected ? 'text-white' : 'text-warm-gray dark:text-soft-cream'}`}>
+                                  {TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]}
                                 </span>
-                              </>
-                            );
-                          })()}
+                                {!isSelected && quartileData && (
+                                  <p className={`text-xs ${colors.text} opacity-80`}>
+                                    {quartileData.vibe}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`text-lg font-bold ${isSelected ? 'text-white' : colors.text}`}>
+                                {value}%
+                              </span>
+                              <ChevronDown className={`w-4 h-4 transition-transform ${isSelected ? 'rotate-180 text-white' : 'text-warm-gray/40 dark:text-soft-cream/40'}`} />
+                            </div>
+                          </button>
+                          
+                          <AnimatePresence>
+                            {isSelected && quartileData && (
+                              <motion.div
+                                initial={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
+                                className="overflow-hidden"
+                              >
+                                <div 
+                                  className="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border-l-4"
+                                  style={{ borderColor: colors.border }}
+                                  role="region"
+                                  aria-live="polite"
+                                  aria-label={`${TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]} details`}
+                                >
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className={`text-sm font-bold ${colors.text}`}>
+                                      {quartileData.vibe}
+                                    </span>
+                                    <span className="text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                                      ({value <= 25 ? '0-25%' : value <= 50 ? '26-50%' : value <= 75 ? '51-75%' : '76-100%'})
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed">
+                                    {quartileData.description}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
-                        <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70">
-                          {result.bigFiveProfile[selectedTrait as keyof typeof result.bigFiveProfile] > 50
-                            ? result.bigFiveLabels[selectedTrait]?.high
-                            : result.bigFiveLabels[selectedTrait]?.low}
-                        </p>
-                      </motion.div>
-                    )}
+                      );
+                    })}
                   </CardContent>
                 </Card>
               </motion.div>

@@ -345,7 +345,6 @@ interface RevealItemProps {
 
 function RevealItem({ choice, index, isSelected, isOtherSelected, onSelect, isRevealed }: RevealItemProps) {
   const Icon = choice.icon;
-  const positions = [-100, 0, 100];
   
   return (
     <motion.button
@@ -353,10 +352,9 @@ function RevealItem({ choice, index, isSelected, isOtherSelected, onSelect, isRe
       animate={{ 
         y: isRevealed ? 0 : 50,
         opacity: isRevealed ? (isOtherSelected ? 0.3 : 1) : 0,
-        scale: isSelected ? 1.2 : (isOtherSelected ? 0.8 : 1),
-        x: positions[index]
+        scale: isSelected ? 1.1 : (isOtherSelected ? 0.8 : 1)
       }}
-      whileHover={!isSelected && !isOtherSelected && isRevealed ? { scale: 1.1, y: -10 } : {}}
+      whileHover={!isSelected && !isOtherSelected && isRevealed ? { scale: 1.05, y: -5 } : {}}
       whileTap={!isSelected && !isOtherSelected ? { scale: 0.95 } : {}}
       transition={{ 
         type: "spring", 
@@ -366,24 +364,23 @@ function RevealItem({ choice, index, isSelected, isOtherSelected, onSelect, isRe
       }}
       onClick={onSelect}
       disabled={isOtherSelected || !isRevealed}
-      className={`absolute flex flex-col items-center justify-center p-4
+      className={`flex flex-col items-center justify-center
         ${isSelected ? 'z-20' : 'cursor-pointer'}
         ${isOtherSelected || !isRevealed ? 'pointer-events-none' : ''}`}
-      style={{ left: '50%', marginLeft: '-40px' }}
       data-testid={`item-${choice.id}`}
     >
       <motion.div 
-        className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${choice.color} shadow-xl
-          flex items-center justify-center mb-2`}
+        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${choice.color} shadow-xl
+          flex items-center justify-center`}
         animate={isRevealed && !isSelected ? { 
           y: [0, -3, 0],
           rotate: [0, 2, -2, 0]
         } : {}}
         transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
       >
-        <Icon className="w-10 h-10 text-white" />
+        <Icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
       </motion.div>
-      <span className="text-sm font-bold text-warm-gray dark:text-soft-cream text-center">
+      <span className="text-xs sm:text-sm font-medium text-warm-gray dark:text-soft-cream text-center mt-2 max-w-[80px] leading-tight">
         {choice.label}
       </span>
     </motion.button>
@@ -517,27 +514,27 @@ export function MysteryBoxGame({ tier, onSelect }: MysteryBoxGameProps) {
         </p>
       </motion.div>
       
-      <div className="relative w-full max-w-md h-64 flex items-center justify-center">
+      <div className="w-full max-w-md px-4">
         <motion.div
           initial={{ scale: 0.8, rotateX: 0 }}
           animate={{ 
             scale: isOpen ? 1 : 0.8,
             rotateX: isOpen ? -30 : 0,
-            y: isOpen ? 40 : 0
+            opacity: isRevealed ? 0.3 : 1
           }}
           transition={{ type: "spring", stiffness: 150 }}
-          className="relative"
+          className="relative mx-auto w-fit mb-8"
         >
-          <div className="w-40 h-32 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl shadow-2xl relative overflow-hidden">
+          <div className="w-32 h-24 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-t from-amber-700/30 to-transparent" />
             <motion.div
-              className="absolute inset-x-0 top-0 h-8 bg-gradient-to-br from-amber-300 to-amber-500 rounded-t-xl origin-bottom"
+              className="absolute inset-x-0 top-0 h-6 bg-gradient-to-br from-amber-300 to-amber-500 rounded-t-xl origin-bottom"
               animate={{ rotateX: isOpen ? -120 : 0 }}
               transition={{ type: "spring", stiffness: 100, delay: 0.3 }}
               style={{ transformOrigin: 'top center' }}
             >
-              <div className="absolute inset-x-0 top-1/2 h-4 flex justify-center">
-                <div className="w-8 h-4 bg-amber-600 rounded-full" />
+              <div className="absolute inset-x-0 top-1/2 h-3 flex justify-center">
+                <div className="w-6 h-3 bg-amber-600 rounded-full" />
               </div>
             </motion.div>
             
@@ -548,13 +545,13 @@ export function MysteryBoxGame({ tier, onSelect }: MysteryBoxGameProps) {
                 transition={{ delay: 0.5 }}
                 className="absolute inset-0 flex items-center justify-center"
               >
-                <Sparkles className="w-12 h-12 text-white/80" />
+                <Sparkles className="w-10 h-10 text-white/80" />
               </motion.div>
             )}
           </div>
         </motion.div>
         
-        <div className="absolute top-0 left-0 right-0 flex justify-center">
+        <div className="grid grid-cols-4 gap-3 sm:gap-4 justify-items-center">
           {choices.map((choice, idx) => (
             <RevealItem
               key={choice.id}
