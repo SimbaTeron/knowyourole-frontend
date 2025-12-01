@@ -402,7 +402,7 @@
     },
     {
       "id": 21,
-      "prompt": "Science fair project—what excites you?",
+      "prompt": "Science fair project:",
       "leftDesc": "Presenting your work to everyone who walks by.",
       "rightDesc": "The experiment itself and discovering the results.",
       "options": [
@@ -502,7 +502,7 @@
     },
     {
       "id": 26,
-      "prompt": "Sleepover plans—what sounds better?",
+      "prompt": "Sleepover plans:",
       "leftDesc": "Big group with lots of kids and crazy games.",
       "rightDesc": "Your best friend with favorite snacks.",
       "options": [
@@ -602,7 +602,7 @@
     },
     {
       "id": 31,
-      "prompt": "Big assignment due—when do you start?",
+      "prompt": "Big assignment due:",
       "leftDesc": "Pull an all-nighter powered by last-minute panic.",
       "rightDesc": "Start weeks early stress-free.",
       "options": [
@@ -682,7 +682,7 @@
     },
     {
       "id": 35,
-      "prompt": "Thinking about your future—what matters?",
+      "prompt": "Thinking about your future:",
       "leftDesc": "Steady paycheck and clear career path ahead.",
       "rightDesc": "Chase what excites you even with bigger risks.",
       "options": [
@@ -722,7 +722,7 @@
     },
     {
       "id": 37,
-      "prompt": "Finals week approach—your study method?",
+      "prompt": "Finals week approach:",
       "leftDesc": "Create a color-coded calendar mapped out.",
       "rightDesc": "Wing it based on vibes the night before each.",
       "options": [
@@ -922,7 +922,7 @@
     },
     {
       "id": 47,
-      "prompt": "Driver's license test coming—your prep style?",
+      "prompt": "Driver's license test coming:",
       "leftDesc": "Practice with the manual and follow rules.",
       "rightDesc": "Learn by doing, wing it with street smarts.",
       "options": [
@@ -1182,7 +1182,7 @@
     },
     {
       "id": 60,
-      "prompt": "Trip abroad booked—planning style?",
+      "prompt": "Trip abroad booked:",
       "leftDesc": "Create detailed itinerary with all details.",
       "rightDesc": "Book the flight only, solve the rest there.",
       "options": [
@@ -1242,7 +1242,7 @@
     },
     {
       "id": 63,
-      "prompt": "Friday night arrives—what's the vibe?",
+      "prompt": "Friday night arrives:",
       "leftDesc": "Hit the group chat, FOMO-fueled and ready to rally.",
       "rightDesc": "Decline everything for couch time.",
       "options": [
@@ -1262,7 +1262,7 @@
     },
     {
       "id": 64,
-      "prompt": "Your email inbox right now?",
+      "prompt": "Your email inbox:",
       "leftDesc": "Inbox zero—every email sorted within 24 hours.",
       "rightDesc": "10,000 unread but somehow still fully functioning.",
       "options": [
@@ -2042,7 +2042,7 @@
     },
     {
       "id": 103,
-      "prompt": "Investment opportunity arises—your process?",
+      "prompt": "Investment opportunity arises:",
       "leftDesc": "Due diligence, research, consult advisors first.",
       "rightDesc": "Trust your instinct, opportunities don't wait.",
       "options": [
@@ -2062,7 +2062,7 @@
     },
     {
       "id": 104,
-      "prompt": "Hobby time carved out—what do you choose?",
+      "prompt": "Hobby time carved out:",
       "leftDesc": "Something social with a group or club.",
       "rightDesc": "Solo activity for personal enjoyment and peace.",
       "options": [
@@ -2082,7 +2082,7 @@
     },
     {
       "id": 105,
-      "prompt": "Legacy thinking—what matters most?",
+      "prompt": "Legacy thinking:",
       "leftDesc": "Impact and achievements remembered by many.",
       "rightDesc": "Deep connections with loved ones close to you.",
       "options": [
@@ -2102,7 +2102,7 @@
     },
     {
       "id": 110,
-      "prompt": "Sunday evening arrives—your typical feeling?",
+      "prompt": "Sunday evening arrives:",
       "leftDesc": "Recharged and ready for the week ahead.",
       "rightDesc": "Dread creeps in thinking about Monday tasks.",
       "options": [
@@ -2162,7 +2162,7 @@
     },
     {
       "id": 113,
-      "prompt": "Reading preference—what draws you in?",
+      "prompt": "Reading preference:",
       "leftDesc": "Practical how-to books with actionable advice.",
       "rightDesc": "Philosophical works exploring big ideas and meaning.",
       "options": [
@@ -2282,7 +2282,7 @@
     },
     {
       "id": 119,
-      "prompt": "Work anniversary arrives—what matters most?",
+      "prompt": "Work anniversary arrives:",
       "leftDesc": "Public recognition from leadership and team.",
       "rightDesc": "Private satisfaction in your accomplishments.",
       "options": [
@@ -2342,7 +2342,7 @@
     },
     {
       "id": 122,
-      "prompt": "Major presentation tomorrow—your evening?",
+      "prompt": "Major presentation tomorrow:",
       "leftDesc": "Practice once more then relax and sleep well.",
       "rightDesc": "Can't stop rehearsing, mind racing through scenarios.",
       "options": [
@@ -2382,7 +2382,7 @@
     },
     {
       "id": 124,
-      "prompt": "Work-life integration—your philosophy?",
+      "prompt": "Work-life integration:",
       "leftDesc": "Clear boundaries between work and personal time.",
       "rightDesc": "Flexible blend where both flow together naturally.",
       "options": [
@@ -2402,7 +2402,7 @@
     },
     {
       "id": 125,
-      "prompt": "Receiving criticism—your internal process?",
+      "prompt": "Receiving criticism:",
       "leftDesc": "Separate facts from emotions, analyze objectively.",
       "rightDesc": "Process feelings first, then consider the points.",
       "options": [
@@ -2482,7 +2482,7 @@
     },
     {
       "id": 129,
-      "prompt": "Financial planning horizon—your focus?",
+      "prompt": "Financial planning horizon:",
       "leftDesc": "Long-term wealth building over decades.",
       "rightDesc": "Enjoying life now while you can.",
       "options": [
@@ -2542,7 +2542,7 @@
     },
     {
       "id": 132,
-      "prompt": "New recipe to try—how do you cook?",
+      "prompt": "New recipe to try:",
       "leftDesc": "Follow each step precisely for perfect results.",
       "rightDesc": "Eyeball ingredients and trust your instincts.",
       "options": [
@@ -2582,7 +2582,7 @@
     },
     {
       "id": 134,
-      "prompt": "Vacation planning style—what fits you?",
+      "prompt": "Vacation planning style:",
       "leftDesc": "Detailed itinerary with reservations locked in.",
       "rightDesc": "Book the flight and solve the rest later.",
       "options": [
@@ -2682,7 +2682,7 @@
     },
     {
       "id": 139,
-      "prompt": "Deadline approaching—your state?",
+      "prompt": "Deadline approaching:",
       "leftDesc": "Already done a week ago, feeling calm.",
       "rightDesc": "Thriving on last-minute adrenaline rush.",
       "options": [
@@ -2762,7 +2762,7 @@
     },
     {
       "id": 107,
-      "prompt": "Facing a complex problem—how do you attack it?",
+      "prompt": "Facing a complex problem:",
       "leftDesc": "Accept the surface answer and move forward quickly.",
       "rightDesc": "Break it down to the fundamental basics first.",
       "options": [
@@ -2782,7 +2782,7 @@
     },
     {
       "id": 108,
-      "prompt": "Popular opinion contradicts data—which wins?",
+      "prompt": "Popular opinion contradicts data:",
       "leftDesc": "Trust the data even when everyone disagrees.",
       "rightDesc": "Consider the crowd might know something data doesn't.",
       "options": [
