@@ -47,6 +47,20 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
 - **Locale Insights System**: Metro-specific career insights based on personality traits with regional fallbacks.
 - **Regional Salary System**: Metro-adjusted salary ranges for common roles with industry bonuses and growth outlook text. Displayed in premium tier only.
 
+### Market Research Algorithm Improvements (December 2025)
+
+- **Weighted Scoring (-2 to +2)**: Enhanced scoring model replaces binary true/false with 5-point scale supporting slider questions. Values map as: Strongly Disagree (-2), Disagree (-1), Neutral (0), Agree (+1), Strongly Agree (+2). Binary questions continue using 0/1 mapping.
+- **Z-Score Normalization**: Big Five traits now normalized using population research norms stored in `research_norms` table. Enables percentile-based comparisons: raw scores converted to z-scores ((raw - mean) / stdDev), then to normalized 0-100 scale.
+- **Framework Quota Balancing**: Questions shuffled to maintain target distribution: 30% MBTI, 30% DISC, 40% Big Five. Ensures balanced trait measurement regardless of total question count.
+- **Hybrid Type Detection**: Automatically identifies personality nuances when dimension differences fall within threshold (20%): Ambivert (E/I balanced), Intuitive-Sensing Blend (S/N balanced), Thinking-Feeling Balance (T/F balanced), Flexer (J/P balanced), plus Big Five balanced traits.
+- **Variable Boosts (10-30%)**: Randomized boost percentages replace fixed modifiers, adding natural variance to scoring while preventing exploitation patterns.
+- **Dynamic Difficulty Scaling**: Swipe time tracking adjusts question difficulty based on response speed (<2s average = hard questions, 2-4s = medium, >4s = easy). Implemented in Quiz.tsx with `swipeTimes` array and difficulty state.
+- **Achievement Badges**: 8 badge types awarded based on quiz behavior: Speed Demon (<2s avg), Thoughtful Analyst (>6s avg), Balanced Explorer (well-rounded Big5), Pattern Seeker (high consistency), Risk Taker (quick decisions), Consistent Completer (finished quiz), Early Bird (morning completion), Night Owl (evening completion). Stored in `badges` table with awarding logic in routes.ts.
+- **Random Event Pop-ups**: 5-10% chance per question of special events: Surprise Insight (personality hint), Lightning Round (bonus time), Wild Card (skip option), Reflection Pause (breathing moment), Streak Bonus (double points), Mystery Modifier (hidden boost), Time Warp (extra seconds), Power-Up (confidence boost). 3-second display with themed styling.
+- **Slider UI Component**: Interactive slider in Quiz.tsx for nuanced responses, color-coded feedback (green = agree, red = disagree, amber = neutral), immediate value display with descriptive labels.
+- **Feedback Refinement Endpoint**: POST `/api/quiz/refine` accepts sessionId and adjustments object, recalculates normalized scores using latest research norms, supports iterative result refinement.
+- **New Database Tables**: `research_norms` (population statistics by age group), `badges` (achievement definitions), `quiz_events` (triggered events log), `story_nodes` (branching narrative content), `mini_games` (interactive game definitions), `slider_responses` (detailed slider tracking).
+
 ## External Dependencies
 
 ### Frontend Libraries
