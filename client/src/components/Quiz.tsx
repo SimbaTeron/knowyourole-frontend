@@ -293,8 +293,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [completedSuperpower, setCompletedSuperpower] = useState(false);
   const [completedMystery, setCompletedMystery] = useState(false);
   
-  // Phase 2.3: Random event state
+  // Phase 2.3: Random event state with queue for sequential display
   const [currentRandomEvent, setCurrentRandomEvent] = useState<RandomEvent | null>(null);
+  const [pendingRandomEvent, setPendingRandomEvent] = useState<RandomEvent | null>(null);
   const [activeEffects, setActiveEffects] = useState<Set<string>>(new Set());
   const [canSkip, setCanSkip] = useState(false);
   
@@ -467,9 +468,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     }, 2000);
   }, [missCount]);
 
+  // Check if any popup is active (badge overlay or random event) - timer should pause
+  const isAnyPopupActive = showBadgeOverlay || currentRandomEvent !== null;
+
   useEffect(() => {
-    // Pause timer during badge overlay display
-    if (isPaused || questions.length === 0 || isTimingOut || showBadgeOverlay) return;
+    // Pause timer during any popup display (badge overlay or random event)
+    if (isPaused || questions.length === 0 || isTimingOut || isAnyPopupActive) return;
     
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
@@ -484,7 +488,31 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout, showBadgeOverlay]);
+  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout, isAnyPopupActive]);
+
+  // Show pending random event after badge overlay closes
+  useEffect(() => {
+    if (!showBadgeOverlay && pendingRandomEvent && !currentRandomEvent) {
+      // Small delay to ensure smooth transition between popups
+      const showPendingTimer = setTimeout(() => {
+        setCurrentRandomEvent(pendingRandomEvent);
+        setPendingRandomEvent(null);
+        
+        // Apply effect
+        if (pendingRandomEvent.effect === "skip_allowed") {
+          setCanSkip(true);
+        }
+        setActiveEffects(prev => new Set([...prev, pendingRandomEvent.effect]));
+        
+        // Auto-dismiss after duration
+        setTimeout(() => {
+          setCurrentRandomEvent(null);
+        }, pendingRandomEvent.duration);
+      }, 300);
+      
+      return () => clearTimeout(showPendingTimer);
+    }
+  }, [showBadgeOverlay, pendingRandomEvent, currentRandomEvent]);
 
   // Phase 1.1 & 1.4: Enhanced scoring with slider support and variable boosts
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1, sliderValue?: number) => {
@@ -667,10 +695,17 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return "easy"; // Slower responses -> easier questions
   };
 
-  // Phase 2.3: Trigger random event with 7% chance
+  // Phase 2.3: Trigger random event with 7% chance - queue if another popup is active
   const triggerRandomEvent = useCallback(() => {
     if (Math.random() < RANDOM_EVENT_CHANCE) {
       const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+      
+      // If badge overlay is showing or another random event is active, queue this one
+      if (showBadgeOverlay || currentRandomEvent) {
+        setPendingRandomEvent(event);
+        return;
+      }
+      
       setCurrentRandomEvent(event);
       
       // Apply effect
@@ -684,7 +719,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         setCurrentRandomEvent(null);
       }, event.duration);
     }
-  }, []);
+  }, [showBadgeOverlay, currentRandomEvent]);
 
   // Phase 2.3: Handle skip (from random event)
   const handleSkip = useCallback(() => {
@@ -1222,7 +1257,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                               step="1"
                               value={sliderValue}
                               onChange={(e) => setSliderValue(parseInt(e.target.value))}
-                              disabled={isTimingOut || showBadgeOverlay}
+                              disabled={isTimingOut || isAnyPopupActive}
                               className="w-full h-3 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta
                                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-8 [&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing
                                 [&::-moz-range-thumb]:w-8 [&::-moz-range-thumb]:h-8 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing
@@ -1264,12 +1299,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           {/* Confirm button for slider */}
                           <Button
                             onClick={() => {
-                              if (!isTimingOut && !showBadgeOverlay && sliderValue !== 0) {
+                              if (!isTimingOut && !isAnyPopupActive && sliderValue !== 0) {
                                 const direction = sliderValue < 0 ? "left" : "right";
                                 handleSwipe(direction, false, sliderValue);
                               }
                             }}
-                            disabled={isTimingOut || showBadgeOverlay || sliderValue === 0}
+                            disabled={isTimingOut || isAnyPopupActive || sliderValue === 0}
                             className="w-full py-4 text-lg font-bold rounded-2xl disabled:opacity-40"
                             variant={sliderValue !== 0 ? "default" : "outline"}
                             data-testid="button-slider-confirm"
@@ -1283,14 +1318,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.97, rotate: -3 }}
-                            onClick={() => !isTimingOut && !showBadgeOverlay && handleSwipe("left")}
+                            onClick={() => !isTimingOut && !isAnyPopupActive && handleSwipe("left")}
                             onKeyDown={(e) => {
-                              if ((e.key === "Enter" || e.key === " ") && !isTimingOut && !showBadgeOverlay) {
+                              if ((e.key === "Enter" || e.key === " ") && !isTimingOut && !isAnyPopupActive) {
                                 e.preventDefault();
                                 handleSwipe("left");
                               }
                             }}
-                            disabled={isTimingOut || showBadgeOverlay}
+                            disabled={isTimingOut || isAnyPopupActive}
                             className="min-h-28 flex items-center gap-3 rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all px-5 py-5 disabled:opacity-50 -translate-x-4 -rotate-1"
                             data-testid="card-option-left"
                             aria-label={`Choose: ${currentQuestion.leftDesc}`}
@@ -1305,14 +1340,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.97, rotate: 3 }}
-                            onClick={() => !isTimingOut && !showBadgeOverlay && handleSwipe("right")}
+                            onClick={() => !isTimingOut && !isAnyPopupActive && handleSwipe("right")}
                             onKeyDown={(e) => {
-                              if ((e.key === "Enter" || e.key === " ") && !isTimingOut && !showBadgeOverlay) {
+                              if ((e.key === "Enter" || e.key === " ") && !isTimingOut && !isAnyPopupActive) {
                                 e.preventDefault();
                                 handleSwipe("right");
                               }
                             }}
-                            disabled={isTimingOut || showBadgeOverlay}
+                            disabled={isTimingOut || isAnyPopupActive}
                             className="min-h-28 flex items-center gap-3 rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all px-5 py-5 disabled:opacity-50 translate-x-4 rotate-1"
                             data-testid="card-option-right"
                             aria-label={`Choose: ${currentQuestion.rightDesc}`}

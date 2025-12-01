@@ -2029,7 +2029,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-warm-gray dark:text-soft-cream mb-3 text-[18px] font-medium">Would share this app with a friend?</legend>
+                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-warm-gray dark:text-soft-cream mb-3 font-medium text-[18px]">Would share this app with a friend?</legend>
                     </Label>
                     <div 
                       className="flex justify-between w-full gap-2" 
