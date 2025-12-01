@@ -51,7 +51,10 @@ export default function PreQuizPage() {
   const [demoCardX, setDemoCardX] = useState(0);
   const [timerProgress, setTimerProgress] = useState(100);
   const [dragDirection, setDragDirection] = useState<number>(0);
+  const [viewedSteps, setViewedSteps] = useState<Set<number>>(new Set([0]));
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const allStepsViewed = viewedSteps.size === DEMO_STEPS.length;
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
@@ -62,6 +65,10 @@ export default function PreQuizPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    setViewedSteps(prev => new Set(Array.from(prev).concat([currentStep])));
+  }, [currentStep]);
 
   useEffect(() => {
     if (DEMO_STEPS[currentStep]?.demo === "swipe") {
@@ -182,6 +189,8 @@ export default function PreQuizPage() {
                 className={`w-3 h-3 rounded-full transition-all ${
                   idx === currentStep 
                     ? "bg-terracotta scale-125" 
+                    : viewedSteps.has(idx)
+                    ? "bg-sage-green"
                     : "bg-warm-gray/20 dark:bg-soft-cream/20"
                 }`}
                 data-testid={`button-demo-step-${idx}`}
@@ -387,16 +396,26 @@ export default function PreQuizPage() {
       {/* Start Button */}
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-deep-cream dark:via-deep-cream/95 pb-8">
         <div className="max-w-md mx-auto">
+          {!allStepsViewed && (
+            <p className="text-center text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-2">
+              Swipe through all {DEMO_STEPS.length} steps to unlock ({viewedSteps.size}/{DEMO_STEPS.length})
+            </p>
+          )}
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
             onClick={handleStartQuiz}
-            className="w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 trail-button text-white"
+            disabled={!allStepsViewed}
+            className={`w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all ${
+              allStepsViewed 
+                ? "trail-button text-white" 
+                : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+            }`}
             data-testid="button-start-quiz"
           >
             <Zap className="w-5 h-5" />
-            I'm Ready
+            {allStepsViewed ? "I'm Ready" : `View All Steps (${viewedSteps.size}/${DEMO_STEPS.length})`}
           </motion.button>
         </div>
       </div>
