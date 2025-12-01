@@ -128,6 +128,9 @@ interface Question {
   responseType?: "binary" | "slider"; // Phase 1.1: slider support
   difficulty?: "easy" | "medium" | "hard"; // Phase 2.1: dynamic difficulty
   boostRange?: [number, number]; // Phase 1.4: variable boost range
+  isBadge?: boolean; // Special badge question
+  badgeHint?: string; // Badge hint text
+  is2x?: boolean; // 2x scoring multiplier question
 }
 
 type TierValue = "7-12" | "13-18" | "19-25" | "25plus";
@@ -299,6 +302,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   // Phase 1.1: Slider state for slider-type questions
   const [sliderValue, setSliderValue] = useState(0);
   
+  // Badge/2x question display state
+  const [showBadgeOverlay, setShowBadgeOverlay] = useState(false);
+  const [badgeExtraTime, setBadgeExtraTime] = useState(0); // Extra time after badge display
+  
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<QuizScores>({
@@ -392,11 +399,28 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   useEffect(() => {
     if (questions.length > 0 && currentIndex < questions.length) {
-      setTimeRemaining(tierConfig.maxTime);
-      setQuestionStartTime(Date.now());
+      const currentQ = questions[currentIndex];
+      
+      // Check if this is a badge or 2x question - show overlay first
+      if (currentQ?.isBadge || currentQ?.is2x) {
+        setShowBadgeOverlay(true);
+        // Hide badge after 2.5 seconds and give 3 extra seconds
+        const timer = setTimeout(() => {
+          setShowBadgeOverlay(false);
+          setBadgeExtraTime(3); // 3 extra seconds after badge display
+          setTimeRemaining(tierConfig.maxTime + 3);
+          setQuestionStartTime(Date.now());
+        }, 2500);
+        return () => clearTimeout(timer);
+      } else {
+        setTimeRemaining(tierConfig.maxTime);
+        setQuestionStartTime(Date.now());
+      }
+      
       setVibrantColorIndex(Math.floor(Math.random() * READABLE_RANDOM_COLORS.length));
       setIsTimingOut(false);
       setShowQuip(false);
+      setSliderValue(0); // Reset slider for new question
     }
   }, [currentIndex, questions, tierConfig.maxTime]);
 
@@ -424,7 +448,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }, [missCount, tierConfig.maxTime]);
 
   useEffect(() => {
-    if (isPaused || questions.length === 0 || isTimingOut) return;
+    // Pause timer during badge overlay display
+    if (isPaused || questions.length === 0 || isTimingOut || showBadgeOverlay) return;
     
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
@@ -439,7 +464,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout]);
+  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout, showBadgeOverlay]);
 
   // Phase 1.1 & 1.4: Enhanced scoring with slider support and variable boosts
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1, sliderValue?: number) => {
@@ -448,7 +473,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     // Phase 1.4: Variable boost range (10-30%) instead of fixed 80%
     const boostRange = question.boostRange || [0.7, 0.9];
     const variableBoost = boostRange[0] + Math.random() * (boostRange[1] - boostRange[0]);
-    const baseWeight = question.wildcard ? variableBoost : 1;
+    // Apply 2x multiplier for special 2x questions
+    const multiplier = question.is2x ? 2 : 1;
+    const baseWeight = (question.wildcard ? variableBoost : 1) * multiplier;
     
     // Phase 1.1: Apply slider multiplier (-2 to +2) if slider response
     const sliderMultiplier = sliderValue !== undefined ? sliderValue / 2 : 1; // Normalize to -1 to +1
@@ -1142,51 +1169,131 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                     </div>
                     
                     <div className="flex-1 flex flex-col justify-center gap-4">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.97, rotate: -3 }}
-                        onClick={() => !isTimingOut && handleSwipe("left")}
-                        onKeyDown={(e) => {
-                          if ((e.key === "Enter" || e.key === " ") && !isTimingOut) {
-                            e.preventDefault();
-                            handleSwipe("left");
-                          }
-                        }}
-                        disabled={isTimingOut}
-                        className="min-h-28 flex items-center gap-3 rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all px-5 py-5 disabled:opacity-50 -translate-x-4 -rotate-1"
-                        data-testid="card-option-left"
-                        aria-label={`Choose: ${currentQuestion.leftDesc}`}
-                        tabIndex={0}
-                        role="button"
-                      >
-                        <ChevronLeft className="w-6 h-6 text-sage-green/60 flex-shrink-0" />
-                        <p className="text-xl md:text-2xl font-bold text-sage-green dark:text-sage-green leading-snug text-center flex-1">
-                          {currentQuestion.leftDesc}
-                        </p>
-                      </motion.button>
-                      
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.97, rotate: 3 }}
-                        onClick={() => !isTimingOut && handleSwipe("right")}
-                        onKeyDown={(e) => {
-                          if ((e.key === "Enter" || e.key === " ") && !isTimingOut) {
-                            e.preventDefault();
-                            handleSwipe("right");
-                          }
-                        }}
-                        disabled={isTimingOut}
-                        className="min-h-28 flex items-center gap-3 rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all px-5 py-5 disabled:opacity-50 translate-x-4 rotate-1"
-                        data-testid="card-option-right"
-                        aria-label={`Choose: ${currentQuestion.rightDesc}`}
-                        tabIndex={0}
-                        role="button"
-                      >
-                        <p className="text-xl md:text-2xl font-bold text-terracotta dark:text-terracotta leading-snug text-center flex-1">
-                          {currentQuestion.rightDesc}
-                        </p>
-                        <ChevronRight className="w-6 h-6 text-terracotta/60 flex-shrink-0" />
-                      </motion.button>
+                      {currentQuestion.responseType === "slider" ? (
+                        /* Slider UI for nuanced responses */
+                        <div className="flex flex-col gap-6 px-2">
+                          {/* Slider labels */}
+                          <div className="flex justify-between text-sm font-medium">
+                            <span className="text-sage-green dark:text-sage-green/80">{currentQuestion.leftDesc}</span>
+                            <span className="text-terracotta dark:text-terracotta/80">{currentQuestion.rightDesc}</span>
+                          </div>
+                          
+                          {/* Slider track */}
+                          <div className="relative">
+                            <input
+                              type="range"
+                              min="-2"
+                              max="2"
+                              step="1"
+                              value={sliderValue}
+                              onChange={(e) => setSliderValue(parseInt(e.target.value))}
+                              disabled={isTimingOut || showBadgeOverlay}
+                              className="w-full h-3 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta
+                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-8 [&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing
+                                [&::-moz-range-thumb]:w-8 [&::-moz-range-thumb]:h-8 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing
+                                disabled:opacity-50"
+                              style={{
+                                '--thumb-border-color': sliderValue < 0 ? '#7c9885' : sliderValue > 0 ? '#c97c5d' : '#9ca3af'
+                              } as React.CSSProperties}
+                              data-testid="slider-response"
+                            />
+                            
+                            {/* Value indicator labels */}
+                            <div className="flex justify-between mt-2 text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                              <span>Strongly</span>
+                              <span>Slightly</span>
+                              <span>Neutral</span>
+                              <span>Slightly</span>
+                              <span>Strongly</span>
+                            </div>
+                          </div>
+                          
+                          {/* Current value display */}
+                          <motion.div 
+                            className={`text-center py-3 px-6 rounded-2xl font-bold text-lg ${
+                              sliderValue < -1 ? 'bg-sage-green/20 text-sage-green' :
+                              sliderValue < 0 ? 'bg-sage-green/10 text-sage-green/80' :
+                              sliderValue > 1 ? 'bg-terracotta/20 text-terracotta' :
+                              sliderValue > 0 ? 'bg-terracotta/10 text-terracotta/80' :
+                              'bg-warm-gray/10 text-warm-gray dark:text-soft-cream/70'
+                            }`}
+                            animate={{ scale: [1, 1.02, 1] }}
+                            transition={{ duration: 0.2 }}
+                            key={sliderValue}
+                          >
+                            {sliderValue === -2 && `Strongly: ${currentQuestion.options[0]}`}
+                            {sliderValue === -1 && `Slightly: ${currentQuestion.options[0]}`}
+                            {sliderValue === 0 && "Neutral - Move to choose"}
+                            {sliderValue === 1 && `Slightly: ${currentQuestion.options[1]}`}
+                            {sliderValue === 2 && `Strongly: ${currentQuestion.options[1]}`}
+                          </motion.div>
+                          
+                          {/* Confirm button for slider */}
+                          <Button
+                            onClick={() => {
+                              if (!isTimingOut && !showBadgeOverlay && sliderValue !== 0) {
+                                const direction = sliderValue < 0 ? "left" : "right";
+                                handleSwipe(direction, false, sliderValue);
+                              }
+                            }}
+                            disabled={isTimingOut || showBadgeOverlay || sliderValue === 0}
+                            className="w-full py-4 text-lg font-bold rounded-2xl disabled:opacity-40"
+                            variant={sliderValue !== 0 ? "default" : "outline"}
+                            data-testid="button-slider-confirm"
+                          >
+                            {sliderValue === 0 ? "Slide to choose" : "Confirm Choice"}
+                          </Button>
+                        </div>
+                      ) : (
+                        /* Binary option buttons */
+                        <>
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.97, rotate: -3 }}
+                            onClick={() => !isTimingOut && !showBadgeOverlay && handleSwipe("left")}
+                            onKeyDown={(e) => {
+                              if ((e.key === "Enter" || e.key === " ") && !isTimingOut && !showBadgeOverlay) {
+                                e.preventDefault();
+                                handleSwipe("left");
+                              }
+                            }}
+                            disabled={isTimingOut || showBadgeOverlay}
+                            className="min-h-28 flex items-center gap-3 rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all px-5 py-5 disabled:opacity-50 -translate-x-4 -rotate-1"
+                            data-testid="card-option-left"
+                            aria-label={`Choose: ${currentQuestion.leftDesc}`}
+                            tabIndex={0}
+                            role="button"
+                          >
+                            <ChevronLeft className="w-6 h-6 text-sage-green/60 flex-shrink-0" />
+                            <p className="text-xl md:text-2xl font-bold text-sage-green dark:text-sage-green leading-snug text-center flex-1">
+                              {currentQuestion.leftDesc}
+                            </p>
+                          </motion.button>
+                          
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.97, rotate: 3 }}
+                            onClick={() => !isTimingOut && !showBadgeOverlay && handleSwipe("right")}
+                            onKeyDown={(e) => {
+                              if ((e.key === "Enter" || e.key === " ") && !isTimingOut && !showBadgeOverlay) {
+                                e.preventDefault();
+                                handleSwipe("right");
+                              }
+                            }}
+                            disabled={isTimingOut || showBadgeOverlay}
+                            className="min-h-28 flex items-center gap-3 rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all px-5 py-5 disabled:opacity-50 translate-x-4 rotate-1"
+                            data-testid="card-option-right"
+                            aria-label={`Choose: ${currentQuestion.rightDesc}`}
+                            tabIndex={0}
+                            role="button"
+                          >
+                            <p className="text-xl md:text-2xl font-bold text-terracotta dark:text-terracotta leading-snug text-center flex-1">
+                              {currentQuestion.rightDesc}
+                            </p>
+                            <ChevronRight className="w-6 h-6 text-terracotta/60 flex-shrink-0" />
+                          </motion.button>
+                        </>
+                      )}
                     </div>
                     
                     {currentIndex === 0 && (
@@ -1237,6 +1344,112 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                     </p>
                   )}
                 </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Badge/2x Question Overlay - Shows before special questions */}
+          <AnimatePresence>
+            {showBadgeOverlay && currentQuestion && (currentQuestion.isBadge || currentQuestion.is2x) && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.3 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.3, y: -100 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 200, 
+                  damping: 15,
+                  duration: 0.6
+                }}
+                className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+                data-testid="badge-overlay"
+              >
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.15, 1, 1.1, 1],
+                    rotate: [0, 5, -5, 3, 0]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="relative"
+                >
+                  {/* Pulsing glow rings */}
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.5, 1],
+                      opacity: [0.6, 0, 0.6]
+                    }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className={`absolute inset-0 rounded-full ${
+                      currentQuestion.is2x 
+                        ? 'bg-gradient-to-r from-yellow-400 to-orange-500' 
+                        : 'bg-gradient-to-r from-purple-500 to-pink-500'
+                    } blur-xl`}
+                    style={{ transform: 'scale(2)' }}
+                  />
+                  <motion.div
+                    animate={{ 
+                      scale: [1.2, 1.8, 1.2],
+                      opacity: [0.4, 0, 0.4]
+                    }}
+                    transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                    className={`absolute inset-0 rounded-full ${
+                      currentQuestion.is2x 
+                        ? 'bg-gradient-to-r from-yellow-400 to-orange-500' 
+                        : 'bg-gradient-to-r from-purple-500 to-pink-500'
+                    } blur-2xl`}
+                    style={{ transform: 'scale(2.5)' }}
+                  />
+                  
+                  {/* Main badge content */}
+                  <div className={`relative z-10 w-48 h-48 rounded-full flex flex-col items-center justify-center shadow-2xl ${
+                    currentQuestion.is2x 
+                      ? 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500' 
+                      : 'bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500'
+                  }`}>
+                    {currentQuestion.is2x ? (
+                      <>
+                        <motion.span 
+                          className="text-6xl font-black text-white drop-shadow-lg"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 0.5, repeat: Infinity }}
+                        >
+                          2X
+                        </motion.span>
+                        <span className="text-lg font-bold text-white/90 mt-1">POINTS!</span>
+                      </>
+                    ) : (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                        >
+                          <Sparkles className="w-16 h-16 text-white drop-shadow-lg" />
+                        </motion.div>
+                        <span className="text-lg font-bold text-white mt-2">BADGE</span>
+                        <span className="text-sm text-white/80">{currentQuestion.badgeHint || 'Special Question!'}</span>
+                      </>
+                    )}
+                  </div>
+                </motion.div>
+                
+                {/* Extra time notice */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="absolute bottom-20 text-center"
+                >
+                  <p className="text-white font-medium text-lg">
+                    +3 seconds bonus time!
+                  </p>
+                  <p className="text-white/70 text-sm mt-1">
+                    Timer paused until badge fades...
+                  </p>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
