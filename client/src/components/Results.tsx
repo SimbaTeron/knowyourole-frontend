@@ -1895,7 +1895,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-4 border-gray-900 dark:border-gray-100">
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center text-center mb-6">
-                  <h3 className="text-xl font-bold text-warm-gray dark:text-soft-cream">
+                  <h3 className="font-bold text-warm-gray dark:text-soft-cream text-[22px]">
                     Complete for More Free Insights!
                   </h3>
                   <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">
