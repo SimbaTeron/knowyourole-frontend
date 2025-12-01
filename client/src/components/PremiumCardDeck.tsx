@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useReducedMotion, PanInfo } from "framer-motion";
 import { 
   BookOpen, Shield, Briefcase, DollarSign, Target, Brain, Gift, Crown,
@@ -200,6 +200,69 @@ const CARD_CONFIGS = [
   { id: "thinking", title: "Sharpen Thinking", icon: Brain, color: "indigo" as ColorKey, gradient: "from-indigo-400 via-blue-500 to-cyan-500" },
 ];
 
+// LocalStorage key constants
+const STORAGE_KEYS = {
+  COMPLETED_CHALLENGES: 'knowrole-completed-challenges',
+  SELECTED_WEEK: 'knowrole-selected-week',
+  CURRENT_CARD: 'knowrole-current-card',
+};
+
+// Custom hook for localStorage-persisted Set
+function usePersistedSet(key: string, defaultValue: Set<string> = new Set()): [Set<string>, (updater: (prev: Set<string>) => Set<string>) => void] {
+  const [value, setValue] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return new Set(Array.isArray(parsed) ? parsed : []);
+      }
+    } catch (e) {
+      console.warn(`Failed to load ${key} from localStorage`, e);
+    }
+    return defaultValue;
+  });
+
+  const setPersistedValue = useCallback((updater: (prev: Set<string>) => Set<string>) => {
+    setValue(prev => {
+      const next = updater(prev);
+      try {
+        localStorage.setItem(key, JSON.stringify(Array.from(next)));
+      } catch (e) {
+        console.warn(`Failed to save ${key} to localStorage`, e);
+      }
+      return next;
+    });
+  }, [key]);
+
+  return [value, setPersistedValue];
+}
+
+// Custom hook for localStorage-persisted value
+function usePersistedState<T>(key: string, defaultValue: T): [T, (value: T) => void] {
+  const [value, setValue] = useState<T>(() => {
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        return JSON.parse(stored) as T;
+      }
+    } catch (e) {
+      console.warn(`Failed to load ${key} from localStorage`, e);
+    }
+    return defaultValue;
+  });
+
+  const setPersistedValue = useCallback((newValue: T) => {
+    setValue(newValue);
+    try {
+      localStorage.setItem(key, JSON.stringify(newValue));
+    } catch (e) {
+      console.warn(`Failed to save ${key} to localStorage`, e);
+    }
+  }, [key]);
+
+  return [value, setPersistedValue];
+}
+
 export function PremiumCardDeck({
   result,
   topTrait,
@@ -212,7 +275,7 @@ export function PremiumCardDeck({
   TRAIT_LABELS,
 }: PremiumCardDeckProps) {
   const shouldReduceMotion = useReducedMotion();
-  const [currentCard, setCurrentCard] = useState(0);
+  const [currentCard, setCurrentCard] = usePersistedState(STORAGE_KEYS.CURRENT_CARD, 0);
   const [direction, setDirection] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -221,8 +284,8 @@ export function PremiumCardDeck({
   const [careerTimeOfDay, setCareerTimeOfDay] = useState<"morning" | "afternoon" | "evening">("morning");
   const [selectedHustle, setSelectedHustle] = useState(0);
   const [expandedTips, setExpandedTips] = useState<Set<number>>(new Set());
-  const [selectedQuestWeek, setSelectedQuestWeek] = useState<1 | 2 | 3 | 4>(1);
-  const [completedChallenges, setCompletedChallenges] = useState<Set<string>>(new Set());
+  const [selectedQuestWeek, setSelectedQuestWeek] = usePersistedState<1 | 2 | 3 | 4>(STORAGE_KEYS.SELECTED_WEEK, 1);
+  const [completedChallenges, setCompletedChallenges] = usePersistedSet(STORAGE_KEYS.COMPLETED_CHALLENGES);
   const [expandedRoles, setExpandedRoles] = useState<Set<number>>(new Set());
   const [expandedDeepDive, setExpandedDeepDive] = useState<Set<string>>(new Set());
   const [thinkingChallengeRevealed, setThinkingChallengeRevealed] = useState(false);
@@ -410,11 +473,14 @@ export function PremiumCardDeck({
           setSelectedWeek={setSelectedQuestWeek}
           completedChallenges={completedChallenges}
           toggleChallenge={(id) => {
-            const newSet = new Set(completedChallenges);
-            if (newSet.has(id)) newSet.delete(id);
-            else newSet.add(id);
-            setCompletedChallenges(newSet);
-            if (!completedChallenges.has(id) && navigator.vibrate) navigator.vibrate(30);
+            const wasCompleted = completedChallenges.has(id);
+            setCompletedChallenges((prev) => {
+              const newSet = new Set(prev);
+              if (newSet.has(id)) newSet.delete(id);
+              else newSet.add(id);
+              return newSet;
+            });
+            if (!wasCompleted && navigator.vibrate) navigator.vibrate(30);
           }}
           reduceMotion={shouldReduceMotion ?? false}
         />;
