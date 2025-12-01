@@ -343,6 +343,7 @@ export function PremiumCardDeck({
       case "role-matches":
         return <RoleMatchesCard 
           result={result}
+          apiCareerPaths={premiumInsights?.insights?.careerPaths || []}
           expandedRoles={expandedRoles}
           toggleRole={(idx) => {
             const newSet = new Set(expandedRoles);
@@ -356,6 +357,7 @@ export function PremiumCardDeck({
       case "blindspots":
         return <BlindSpotsCard 
           blindspots={getWeaknessBlindspots(result?.mbtiType || "INTJ")}
+          apiBlindspots={premiumInsights?.insights?.blindspots || []}
           flippedCards={flippedBlindspots}
           toggleFlip={(idx) => {
             const newSet = new Set(flippedBlindspots);
@@ -402,6 +404,7 @@ export function PremiumCardDeck({
           weakestTrait={weakestTrait}
           GROWTH_QUESTS={GROWTH_QUESTS}
           TRAIT_LABELS={TRAIT_LABELS}
+          apiGrowthTips={premiumInsights?.insights?.growthTips || []}
           selectedWeek={selectedQuestWeek}
           setSelectedWeek={setSelectedQuestWeek}
           completedChallenges={completedChallenges}
@@ -595,17 +598,22 @@ function DeepDiveCard({
 
 // Role Matches Card - Expandable chips
 function RoleMatchesCard({ 
-  result, 
+  result,
+  apiCareerPaths = [],
   expandedRoles,
   toggleRole,
   reduceMotion
 }: { 
-  result: PremiumCardDeckProps['result']; 
+  result: PremiumCardDeckProps['result'];
+  apiCareerPaths?: CareerPathInsight[];
   expandedRoles: Set<number>;
   toggleRole: (idx: number) => void;
   reduceMotion: boolean;
 }) {
-  const roles = [
+  const hasApiData = apiCareerPaths.length > 0;
+  
+  // Static fallback roles
+  const staticRoles = [
     {
       title: result?.mbtiType.includes('N') ? 'Innovation Strategist' : 'Operations Specialist',
       salary: result?.mbtiType.includes('N') ? '$70K-130K' : '$55K-95K',
@@ -632,11 +640,26 @@ function RoleMatchesCard({
       fit: 98
     }
   ];
+  
+  // Map API career paths to roles format
+  const apiRoles = hasApiData 
+    ? apiCareerPaths.slice(0, 3).map((path, idx) => ({
+        title: path.title,
+        salary: path.salaryRange,
+        desc: path.description,
+        icon: idx === 0 ? Star : idx === 1 ? TrendingUp : Sparkles,
+        fit: 95 - (idx * 3), // Best match first
+        industry: path.industry,
+        growthOutlook: path.growthOutlook,
+      }))
+    : [];
+  
+  const roles = hasApiData ? apiRoles : staticRoles;
 
   return (
     <div className="space-y-3">
       <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-2">
-        Tap a role to see why it matches your personality
+        {hasApiData ? "Personalized career matches for your profile" : "Tap a role to see why it matches your personality"}
       </p>
       {roles.map((role, idx) => (
         <div
@@ -668,9 +691,25 @@ function RoleMatchesCard({
           {expandedRoles.has(idx) && (
             <div className="overflow-hidden">
               <div className="px-4 pb-4 pt-2 border-t border-amber-100 dark:border-amber-800">
-                <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed">
+                <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed mb-2">
                   {role.desc}
                 </p>
+                {'industry' in role && role.industry && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+                      {role.industry as string}
+                    </span>
+                    {'growthOutlook' in role && (
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        (role.growthOutlook as string) === 'high' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' :
+                        (role.growthOutlook as string) === 'medium' ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300' :
+                        'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                      }`}>
+                        {(role.growthOutlook as string)} growth
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -680,25 +719,47 @@ function RoleMatchesCard({
   );
 }
 
-// Blindspots Card - Flip cards
+// Unified blindspot display type
+interface DisplayBlindspot {
+  title: string;
+  blindspot: string;
+  workaround: string;
+  realWorld: string;
+  severity?: string;
+}
+
+// Blindspots Card - Flip cards with API data
 function BlindSpotsCard({ 
-  blindspots, 
+  blindspots,
+  apiBlindspots = [],
   flippedCards,
   toggleFlip,
   reduceMotion
 }: { 
   blindspots: Array<{ title: string; blindspot: string; workaround: string; realWorld: string }>;
+  apiBlindspots?: BlindspotInsight[];
   flippedCards: Set<number>;
   toggleFlip: (idx: number) => void;
   reduceMotion: boolean;
 }) {
+  // Combine API blindspots with static data fallback
+  const displayBlindspots: DisplayBlindspot[] = apiBlindspots.length > 0
+    ? apiBlindspots.map(b => ({
+        title: b.title,
+        blindspot: b.description,
+        workaround: b.strategies,
+        realWorld: b.affectedAreas,
+        severity: b.severity,
+      }))
+    : blindspots;
+
   return (
     <div className="space-y-3">
       <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-2 flex items-center gap-2">
         <RotateCw className="w-3 h-3" />
-        Tap each card to reveal the solution
+        {apiBlindspots.length > 0 ? "Your personalized blindspots - tap to reveal solutions" : "Tap each card to reveal the solution"}
       </p>
-      {blindspots.map((item, idx) => (
+      {displayBlindspots.map((item, idx) => (
         <div
           key={idx}
           onClick={() => toggleFlip(idx)}
@@ -721,8 +782,19 @@ function BlindSpotsCard({
                 <div className="w-8 h-8 rounded-full bg-rose-200 dark:bg-rose-800 flex items-center justify-center flex-shrink-0">
                   <Eye className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                 </div>
-                <div>
-                  <h6 className="text-sm font-bold text-rose-800 dark:text-rose-200 mb-1">{item.title}</h6>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h6 className="text-sm font-bold text-rose-800 dark:text-rose-200">{item.title}</h6>
+                    {item.severity && (
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                        item.severity === 'high' ? 'bg-red-200 text-red-700 dark:bg-red-900/50 dark:text-red-300' :
+                        item.severity === 'medium' ? 'bg-amber-200 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300' :
+                        'bg-green-200 text-green-700 dark:bg-green-900/50 dark:text-green-300'
+                      }`}>
+                        {item.severity}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-rose-700 dark:text-rose-300 leading-relaxed">{item.blindspot}</p>
                 </div>
               </div>
@@ -1025,6 +1097,7 @@ function GrowthQuestCard({
   weakestTrait,
   GROWTH_QUESTS,
   TRAIT_LABELS,
+  apiGrowthTips = [],
   selectedWeek,
   setSelectedWeek,
   completedChallenges,
@@ -1034,20 +1107,40 @@ function GrowthQuestCard({
   weakestTrait: string;
   GROWTH_QUESTS: Record<string, { week1: string[]; week2: string[]; week3: string[]; week4: string[] }>;
   TRAIT_LABELS: Record<string, string>;
+  apiGrowthTips?: GrowthTipInsight[];
   selectedWeek: 1 | 2 | 3 | 4;
   setSelectedWeek: (week: 1 | 2 | 3 | 4) => void;
   completedChallenges: Set<string>;
   toggleChallenge: (id: string) => void;
   reduceMotion: boolean;
 }) {
+  // Use API growth tips if available, otherwise use static data
+  const hasApiData = apiGrowthTips.length > 0;
+  
   const quests = GROWTH_QUESTS[weakestTrait] || GROWTH_QUESTS["O"];
   const weekKey = `week${selectedWeek}` as keyof typeof quests;
-  const challenges = quests[weekKey] || [];
+  const staticChallenges = quests[weekKey] || [];
+  
+  // Map API data to challenges format (group by week based on difficulty/priority)
+  const apiChallenges = hasApiData 
+    ? apiGrowthTips
+        .filter(tip => {
+          // Assign tips to weeks based on timeframe
+          if (selectedWeek === 1) return tip.timeframe === "daily" || tip.priority <= 2;
+          if (selectedWeek === 2) return tip.timeframe === "weekly" && tip.priority <= 4;
+          if (selectedWeek === 3) return tip.timeframe === "weekly" && tip.priority > 4;
+          return tip.timeframe === "monthly" || tip.priority > 6;
+        })
+        .slice(0, 4)
+        .map(tip => tip.actionSteps)
+    : [];
+  
+  const challenges = hasApiData ? apiChallenges : staticChallenges;
 
   return (
     <div className="space-y-4">
       <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-        Personalized challenges to strengthen your {TRAIT_LABELS[weakestTrait]?.toLowerCase() || "growth area"}
+        {hasApiData ? "Personalized growth challenges matched to your profile" : `Challenges to strengthen your ${TRAIT_LABELS[weakestTrait]?.toLowerCase() || "growth area"}`}
       </p>
 
       {/* Week selector - Calendar style */}
