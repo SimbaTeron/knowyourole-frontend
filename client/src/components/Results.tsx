@@ -24,6 +24,14 @@ interface APIScales {
   firstPrinciples: { value: number; traits: string; quest: string };
 }
 
+// Phase 2.2: Badge interface for earned achievements
+interface EarnedBadge {
+  name: string;
+  type: string;
+  icon: string;
+  color: string;
+}
+
 interface ResultsProps {
   scores: QuizScores;
   tier: string;
@@ -33,6 +41,8 @@ interface ResultsProps {
   theme: string;
   sessionId?: string | null;
   apiScales?: APIScales | null;
+  earnedBadges?: EarnedBadge[];
+  hybridTypes?: string[];
   onRestart: () => void;
   onShare: () => void;
 }
@@ -743,7 +753,7 @@ interface AdventureArchetype {
   badgeColor: string;
 }
 
-export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, onRestart, onShare }: ResultsProps) {
+export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, earnedBadges = [], hybridTypes = [], onRestart, onShare }: ResultsProps) {
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
@@ -1421,6 +1431,55 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               </div>
             </CardContent>
           </Card>
+          )}
+
+          {/* Phase 2.2: Badges & Hybrid Types Section */}
+          {(earnedBadges.length > 0 || hybridTypes.length > 0) && (
+            <motion.div
+              initial={shouldReduceMotion ? {} : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="mt-4"
+            >
+              {/* Hybrid Types */}
+              {hybridTypes.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2 mb-3">
+                  {hybridTypes.map((type, i) => (
+                    <motion.span
+                      key={type}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.9 + i * 0.1 }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-dusty-blue/20 to-sage-green/20 border border-dusty-blue/30 text-sm font-medium text-dusty-blue dark:text-dusty-blue"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      {type}
+                    </motion.span>
+                  ))}
+                </div>
+              )}
+
+              {/* Earned Badges */}
+              {earnedBadges.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {earnedBadges.map((badge, i) => (
+                    <motion.div
+                      key={badge.name}
+                      initial={{ scale: 0, rotate: -10 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ delay: 1.0 + i * 0.15, type: "spring" }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 border border-amber-200 dark:border-amber-700"
+                      data-testid={`badge-${badge.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      <Trophy className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                      <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">
+                        {badge.name}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
           )}
         </motion.div>
 

@@ -13,12 +13,22 @@ interface APIScales {
   firstPrinciples: { value: number; traits: string; quest: string };
 }
 
+// Phase 2.2: Badge interface for earned achievements
+interface EarnedBadge {
+  name: string;
+  type: string;
+  icon: string;
+  color: string;
+}
+
 export default function QuizPage() {
   const [, setLocation] = useLocation();
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
   const [quizSessionId, setQuizSessionId] = useState<string | null>(null);
   const [apiScales, setApiScales] = useState<APIScales | null>(null);
+  const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>([]);
+  const [hybridTypes, setHybridTypes] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const { toast } = useToast();
   const { teamName, isLocalitySet } = useLocalityTheme();
@@ -72,6 +82,13 @@ export default function QuizPage() {
       }
       if (data.result?.scales) {
         setApiScales(data.result.scales);
+      }
+      // Phase 2.2: Extract badges and hybrid types from API response
+      if (data.result?.earnedBadges) {
+        setEarnedBadges(data.result.earnedBadges);
+      }
+      if (data.result?.hybridTypes) {
+        setHybridTypes(data.result.hybridTypes);
       }
     } catch (error) {
       console.error("Failed to save quiz results:", error);
@@ -146,6 +163,8 @@ export default function QuizPage() {
         theme={theme}
         sessionId={quizSessionId}
         apiScales={apiScales}
+        earnedBadges={earnedBadges}
+        hybridTypes={hybridTypes}
         onRestart={handleRestart}
         onShare={handleShare}
       />
