@@ -670,7 +670,7 @@ function getWeaknessBlindspots(mbtiType: string) {
   return WEAKNESS_BLINDSPOTS[mbtiType] || DEFAULT_BLINDSPOTS;
 }
 
-// CAREER PATH SIMULATOR - Day-in-the-life scenarios
+// CAREER PATH SIMULATOR - Day-in-the-life scenarios (25+ diverse roles)
 const CAREER_SIMULATOR: Record<string, { title: string; morningRoutine: string; afternoonTasks: string; eveningReflection: string; satisfaction: string; growth: string }> = {
   "Software Developer": { 
     title: "Software Developer", 
@@ -719,6 +719,166 @@ const CAREER_SIMULATOR: Record<string, { title: string; morningRoutine: string; 
     eveningReflection: "Your insight saved the company from a costly mistake. They noticed.",
     satisfaction: "Finding stories in numbers that nobody else can see.",
     growth: "In 5 years, you could be a data science lead or analytics director."
+  },
+  "Firefighter": {
+    title: "Firefighter",
+    morningRoutine: "You check your gear, run equipment tests, and train with your crew.",
+    afternoonTasks: "Responding to a call—could be a house fire, car accident, or medical emergency.",
+    eveningReflection: "You helped rescue a family today. They're safe because of your team.",
+    satisfaction: "Being there when people need you most. Real hero work.",
+    growth: "In 5 years, you could be a lieutenant, paramedic captain, or fire inspector."
+  },
+  "Police Officer": {
+    title: "Police Officer",
+    morningRoutine: "Roll call briefing, checking your patrol car, reviewing incident reports.",
+    afternoonTasks: "Community patrol, responding to calls, de-escalating a tense situation.",
+    eveningReflection: "A scared kid you helped today felt safe enough to wave goodbye.",
+    satisfaction: "Protecting your community and making real differences daily.",
+    growth: "In 5 years, you might be a detective, SWAT member, or community liaison."
+  },
+  "Paramedic": {
+    title: "Paramedic",
+    morningRoutine: "Stocking the ambulance, checking meds, reviewing protocols with your partner.",
+    afternoonTasks: "Racing to a cardiac arrest—your skills and speed save a life today.",
+    eveningReflection: "That patient's family called dispatch to say thank you. You mattered.",
+    satisfaction: "Being the difference between life and death in critical moments.",
+    growth: "In 5 years, you could be a flight paramedic or EMS supervisor."
+  },
+  "Plumber": {
+    title: "Plumber",
+    morningRoutine: "Loading your van with pipes and fittings, checking today's job orders.",
+    afternoonTasks: "Installing a new bathroom for a young couple's first home.",
+    eveningReflection: "No leaks. Perfect joints. The homeowner shakes your hand warmly.",
+    satisfaction: "Solving problems that people can't fix themselves. Essential work.",
+    growth: "In 5 years, you might run your own plumbing company with a full crew."
+  },
+  "HVAC Technician": {
+    title: "HVAC Technician",
+    morningRoutine: "Checking your service schedule and gathering diagnostic tools.",
+    afternoonTasks: "Fixing AC for a grateful family during a heat wave.",
+    eveningReflection: "That elderly couple can sleep comfortably tonight because of you.",
+    satisfaction: "Being the person who makes homes comfortable year-round.",
+    growth: "In 5 years, you could specialize in commercial systems or own your business."
+  },
+  "Welder": {
+    title: "Welder",
+    morningRoutine: "Setting up your station, checking equipment, reviewing blueprints.",
+    afternoonTasks: "Joining steel beams that will become part of a new bridge.",
+    eveningReflection: "Your welds will hold for decades. That's craftsmanship.",
+    satisfaction: "Building structures that will stand long after you're gone.",
+    growth: "In 5 years, you could be a welding inspector, foreman, or underwater welder."
+  },
+  "Chef": {
+    title: "Chef",
+    morningRoutine: "Inspecting deliveries, prepping ingredients, briefing your kitchen team.",
+    afternoonTasks: "Creating today's special—a dish that tells a story on every plate.",
+    eveningReflection: "A guest asked to meet the chef. They called it the best meal of their life.",
+    satisfaction: "Creating edible art that brings people joy and brings them together.",
+    growth: "In 5 years, you might open your own restaurant or become an executive chef."
+  },
+  "Graphic Designer": {
+    title: "Graphic Designer",
+    morningRoutine: "Reviewing client briefs, sketching initial concepts, gathering inspiration.",
+    afternoonTasks: "Crafting a brand identity that perfectly captures a startup's vision.",
+    eveningReflection: "The client cried happy tears when they saw their new logo.",
+    satisfaction: "Turning abstract ideas into visual stories that connect with people.",
+    growth: "In 5 years, you could be an art director or running your own design studio."
+  },
+  "Physical Therapist": {
+    title: "Physical Therapist",
+    morningRoutine: "Reviewing patient charts, preparing treatment plans, setting up equipment.",
+    afternoonTasks: "Helping a stroke survivor take their first unassisted steps in months.",
+    eveningReflection: "Watching someone regain their independence—that's why you do this.",
+    satisfaction: "Guiding people from pain and limitation back to full lives.",
+    growth: "In 5 years, you might specialize in sports medicine or open your own clinic."
+  },
+  "Teacher": {
+    title: "Teacher",
+    morningRoutine: "Preparing lesson materials, decorating the classroom, greeting early arrivals.",
+    afternoonTasks: "That 'aha moment' when a struggling student finally gets it.",
+    eveningReflection: "A former student emails to say you changed their life. You cry a little.",
+    satisfaction: "Shaping the future, one young mind at a time.",
+    growth: "In 5 years, you might be a department head, curriculum designer, or principal."
+  },
+  "Farmer": {
+    title: "Farmer",
+    morningRoutine: "Up before dawn, feeding animals, checking crops, planning the day's work.",
+    afternoonTasks: "Harvesting vegetables that will be on dinner tables by evening.",
+    eveningReflection: "You grew food that will nourish families. There's pride in that.",
+    satisfaction: "Working with the land, being part of something bigger than yourself.",
+    growth: "In 5 years, you might expand to farmers markets or run a successful CSA."
+  },
+  "Mechanic": {
+    title: "Mechanic",
+    morningRoutine: "Opening the shop, reviewing service tickets, organizing your tools.",
+    afternoonTasks: "Diagnosing a mysterious engine noise that three other shops missed.",
+    eveningReflection: "That single mom's car will run safely for another year. Good day.",
+    satisfaction: "Problem-solving with your hands. Fixing what others can't.",
+    growth: "In 5 years, you might own your own shop or specialize in classic cars."
+  },
+  "Veterinarian": {
+    title: "Veterinarian",
+    morningRoutine: "Checking on overnight patients, reviewing surgery schedules, greeting staff.",
+    afternoonTasks: "Saving a puppy that ate something it shouldn't have—again.",
+    eveningReflection: "A little girl hugged her healthy cat goodbye. You made that possible.",
+    satisfaction: "Healing animals and comforting the people who love them.",
+    growth: "In 5 years, you might specialize in exotic animals or open your own practice."
+  },
+  "Architect": {
+    title: "Architect",
+    morningRoutine: "Reviewing project specifications, sketching concepts, meeting with clients.",
+    afternoonTasks: "Designing a community center that will serve thousands for decades.",
+    eveningReflection: "Your building won't just stand—it will inspire.",
+    satisfaction: "Creating spaces where life happens. Shaping cities themselves.",
+    growth: "In 5 years, you might be a partner or start your own firm."
+  },
+  "Accountant": {
+    title: "Accountant",
+    morningRoutine: "Reviewing financial statements, responding to client emails, checking deadlines.",
+    afternoonTasks: "Finding a tax strategy that saves a small business $50,000.",
+    eveningReflection: "That family business can now afford to hire their first employee.",
+    satisfaction: "Being the trusted advisor who helps people build wealth.",
+    growth: "In 5 years, you might be a CFO or run your own accounting firm."
+  },
+  "Personal Trainer": {
+    title: "Personal Trainer",
+    morningRoutine: "Early session with your most dedicated client, planning workout progressions.",
+    afternoonTasks: "Coaching someone through their first-ever pull-up. Pure joy.",
+    eveningReflection: "A client just hit a goal they thought was impossible. Your belief paid off.",
+    satisfaction: "Transforming bodies and confidence, one workout at a time.",
+    growth: "In 5 years, you might own a gym or build a successful online coaching business."
+  },
+  "Real Estate Agent": {
+    title: "Real Estate Agent",
+    morningRoutine: "Checking new listings, following up with leads, preparing for showings.",
+    afternoonTasks: "Helping first-time buyers find their dream home within budget.",
+    eveningReflection: "That couple just got the keys. They're crying happy tears.",
+    satisfaction: "Being there for life's biggest purchases. Making dreams happen.",
+    growth: "In 5 years, you might be a broker or lead your own real estate team."
+  },
+  "UX Designer": {
+    title: "UX Designer",
+    morningRoutine: "Reviewing user research, sketching wireframes, planning user tests.",
+    afternoonTasks: "Redesigning a checkout flow that will reduce cart abandonment by 40%.",
+    eveningReflection: "Millions of users will have a better experience because of your work.",
+    satisfaction: "Making technology actually work for humans, not against them.",
+    growth: "In 5 years, you could be a design lead or VP of Product Design."
+  },
+  "Construction Manager": {
+    title: "Construction Manager",
+    morningRoutine: "Site walk-through, safety briefing, coordinating with subcontractors.",
+    afternoonTasks: "Solving a supply chain issue that could have delayed the project by weeks.",
+    eveningReflection: "That building is on schedule and under budget. Leadership wins.",
+    satisfaction: "Orchestrating complex projects that create lasting structures.",
+    growth: "In 5 years, you might be overseeing multiple major projects or starting your own firm."
+  },
+  "Photographer": {
+    title: "Photographer",
+    morningRoutine: "Editing last night's shoot, responding to inquiries, scouting new locations.",
+    afternoonTasks: "Capturing a couple's wedding—moments they'll treasure forever.",
+    eveningReflection: "You froze time today. Those photos will be passed down for generations.",
+    satisfaction: "Preserving life's most precious moments in art.",
+    growth: "In 5 years, you might be shooting for major brands or teaching your craft."
   },
 };
 
