@@ -225,3 +225,23 @@ export const insertBadgeDefinitionSchema = createInsertSchema(badgeDefinitions).
 
 export type InsertBadgeDefinition = z.infer<typeof insertBadgeDefinitionSchema>;
 export type BadgeDefinition = typeof badgeDefinitions.$inferSelect;
+
+// Slider Responses - detailed tracking for slider question responses
+export const sliderResponses = pgTable("slider_responses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id").notNull(),
+  questionId: integer("question_id").notNull(),
+  sliderValue: integer("slider_value").notNull(), // -2 to +2
+  responseTimeMs: integer("response_time_ms").notNull(),
+  framework: text("framework").notNull(), // MBTI, DISC, Big5
+  trait: text("trait").notNull(), // Which trait was measured
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertSliderResponseSchema = createInsertSchema(sliderResponses).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertSliderResponse = z.infer<typeof insertSliderResponseSchema>;
+export type SliderResponse = typeof sliderResponses.$inferSelect;
