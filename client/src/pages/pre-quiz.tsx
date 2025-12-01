@@ -229,7 +229,7 @@ export default function PreQuizPage() {
                         <h3 className="font-semibold text-warm-gray dark:text-soft-cream text-[24px]">
                           {currentDemoStep.title}
                         </h3>
-                        <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                        <p className="text-warm-gray/60 dark:text-soft-cream/50 text-[18px]">
                           Step {currentStep + 1} of {DEMO_STEPS.length}
                         </p>
                       </div>
