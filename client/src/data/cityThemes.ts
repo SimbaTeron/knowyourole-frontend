@@ -28,11 +28,11 @@ export const cityThemes: Record<string, CityTheme> = {
     city: "New York",
     state: "NY",
     country: "US",
-    team: "Giants",
-    sport: "nfl",
-    colors: { primary: "#0B2265", secondary: "#A71930", accent: "#A5ACAF" },
+    team: "Yankees",
+    sport: "mlb",
+    colors: { primary: "#0B2265", secondary: "#C0C0C0", accent: "#1C2841" },
     textOnPrimary: "light",
-    textOnSecondary: "light"
+    textOnSecondary: "dark"
   },
   "brooklyn": {
     city: "Brooklyn",

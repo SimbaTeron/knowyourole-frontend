@@ -2823,22 +2823,22 @@
   ],
   "tierConfig": {
     "7-12": {
-      "baseCount": 15,
-      "maxTime": 9,
+      "baseCount": 16,
+      "maxTime": 10,
       "swipeStyle": "playful"
     },
     "13-18": {
-      "baseCount": 25,
-      "maxTime": 9,
+      "baseCount": 22,
+      "maxTime": 10,
       "swipeStyle": "teen"
     },
     "19-25": {
-      "baseCount": 25,
+      "baseCount": 28,
       "maxTime": 9,
       "swipeStyle": "adult"
     },
     "25+": {
-      "baseCount": 40,
+      "baseCount": 34,
       "maxTime": 9,
       "swipeStyle": "mature"
     }

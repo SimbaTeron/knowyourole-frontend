@@ -101,9 +101,6 @@ const MID2_QUESTION: MultiChoiceQuestion = {
   ]
 };
 
-const MID1_BREAK_AFTER = 7;
-const MID2_BREAK_AFTER = 15;
-
 const MULTI_CHOICE_ICONS: Record<IconKey, typeof Sparkles> = {
   creative: Sparkles,
   analytical: Wrench,
@@ -201,18 +198,54 @@ const READABLE_RANDOM_COLORS = [
 
 type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown";
 
-const SUPERPOWER_AFTER = 9;
-
 const getQuizConfig = (tier: string) => {
   switch (tier) {
     case "7-12":
-      return { totalQuestions: 20, mid1After: 15, hasMid2: false, hasMystery: false };
+      // Mini 16: 5 binary → MC1 → 4 binary → Superpower → 4 binary → Mystery → 3 binary → MC2
+      return { 
+        totalQuestions: 16, 
+        mid1After: 5, 
+        superpowerAfter: 9,
+        mysteryAfter: 13,
+        mid2After: 16,
+        hasMid2: true, 
+        hasMystery: true 
+      };
     case "13-18":
+      // Teen 22: 7 binary → MC1 → 6 binary → Superpower → 5 binary → Mystery → 4 binary → MC2
+      return { 
+        totalQuestions: 22, 
+        mid1After: 7, 
+        superpowerAfter: 13,
+        mysteryAfter: 18,
+        mid2After: 22,
+        hasMid2: true, 
+        hasMystery: true 
+      };
     case "19-25":
-      return { totalQuestions: 30, mid1After: 15, mid2After: 20, hasMid2: true, hasMystery: true, mysteryAfter: 25 };
+      // Young Adult 28: 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 6 binary → MC2
+      return { 
+        totalQuestions: 28, 
+        mid1After: 8, 
+        superpowerAfter: 15,
+        mysteryAfter: 22,
+        mid2After: 28,
+        hasMid2: true, 
+        hasMystery: true 
+      };
+    case "25+":
     case "25plus":
     default:
-      return { totalQuestions: 40, mid1After: 17, mid2After: 24, hasMid2: true, hasMystery: true, mysteryAfter: 33 };
+      // Adult 34: 9 binary → MC1 → 9 binary → Superpower → 9 binary → Mystery → 7 binary → MC2
+      return { 
+        totalQuestions: 34, 
+        mid1After: 9, 
+        superpowerAfter: 18,
+        mysteryAfter: 27,
+        mid2After: 34,
+        hasMid2: true, 
+        hasMystery: true 
+      };
   }
 };
 
@@ -505,14 +538,18 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       
       if (currentIndex >= questions.length - 1) {
         setTimeout(() => onComplete(updatedScores), 300);
-      } else if (nextQuestionNumber === SUPERPOWER_AFTER + 1 && !completedSuperpower) {
-        setTimeout(() => setQuizPhase("superpower"), 300);
       } else if (nextQuestionNumber === quizConfig.mid1After + 1 && !completedMid1) {
+        // First break: Multiple Choice 1
         setTimeout(() => setQuizPhase("mid1"), 300);
-      } else if (quizConfig.hasMid2 && quizConfig.mid2After && nextQuestionNumber === quizConfig.mid2After + 1 && !completedMid2) {
-        setTimeout(() => setQuizPhase("mid2"), 300);
+      } else if (quizConfig.superpowerAfter && nextQuestionNumber === quizConfig.superpowerAfter + 1 && !completedSuperpower) {
+        // Second break: Superpower
+        setTimeout(() => setQuizPhase("superpower"), 300);
       } else if (quizConfig.hasMystery && quizConfig.mysteryAfter && nextQuestionNumber === quizConfig.mysteryAfter + 1 && !completedMystery) {
+        // Third break: Mystery Box
         setTimeout(() => setQuizPhase("mystery"), 300);
+      } else if (quizConfig.hasMid2 && quizConfig.mid2After && nextQuestionNumber === quizConfig.mid2After + 1 && !completedMid2) {
+        // Fourth break: Multiple Choice 2
+        setTimeout(() => setQuizPhase("mid2"), 300);
       }
       
       return updatedScores;
@@ -925,14 +962,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       )}
                       
                       <h2 
-                        className={`text-xl md:text-2xl font-semibold quiz-question-text ${promptColor}`}
+                        className={`text-3xl md:text-4xl font-bold quiz-question-text leading-tight ${promptColor}`}
                         data-testid="text-prompt"
                       >
                         {currentQuestion.prompt}
                       </h2>
                     </div>
                     
-                    <div className="flex-1 flex flex-col justify-center gap-3">
+                    <div className="flex-1 flex flex-col justify-center gap-4">
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97, rotate: -3 }}
@@ -944,13 +981,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           }
                         }}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all p-4 disabled:opacity-50 -translate-x-6 -rotate-1"
+                        className="min-h-28 flex items-center gap-3 rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all px-5 py-5 disabled:opacity-50 -translate-x-4 -rotate-1"
                         data-testid="card-option-left"
                         aria-label={`Choose: ${currentQuestion.leftDesc}`}
                         tabIndex={0}
                         role="button"
                       >
-                        <p className="text-lg md:text-xl font-bold text-sage-green dark:text-sage-green leading-snug text-center">
+                        <ChevronLeft className="w-6 h-6 text-sage-green/60 flex-shrink-0" />
+                        <p className="text-xl md:text-2xl font-bold text-sage-green dark:text-sage-green leading-snug text-center flex-1">
                           {currentQuestion.leftDesc}
                         </p>
                       </motion.button>
@@ -966,15 +1004,16 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           }
                         }}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all p-4 disabled:opacity-50 translate-x-6 rotate-1"
+                        className="min-h-28 flex items-center gap-3 rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all px-5 py-5 disabled:opacity-50 translate-x-4 rotate-1"
                         data-testid="card-option-right"
                         aria-label={`Choose: ${currentQuestion.rightDesc}`}
                         tabIndex={0}
                         role="button"
                       >
-                        <p className="text-lg md:text-xl font-bold text-terracotta dark:text-terracotta leading-snug text-center">
+                        <p className="text-xl md:text-2xl font-bold text-terracotta dark:text-terracotta leading-snug text-center flex-1">
                           {currentQuestion.rightDesc}
                         </p>
+                        <ChevronRight className="w-6 h-6 text-terracotta/60 flex-shrink-0" />
                       </motion.button>
                     </div>
                     
