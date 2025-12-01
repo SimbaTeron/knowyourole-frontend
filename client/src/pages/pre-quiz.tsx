@@ -170,9 +170,7 @@ export default function PreQuizPage() {
             <h1 className="md:text-3xl font-display font-semibold compass-gradient-text mb-2 text-[36px]">
               Here's How It Works
             </h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60 text-sm">
-              A quick look at what to expect in your personality quiz
-            </p>
+            <p className="text-warm-gray/70 dark:text-soft-cream/60 text-[18px]">Five minutes of focus REQUIRED ;-)</p>
           </motion.div>
 
           {/* Step Counter */}
