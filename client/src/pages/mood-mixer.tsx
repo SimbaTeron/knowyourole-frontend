@@ -79,7 +79,7 @@ export default function MoodMixerPage() {
             className="text-center mb-6"
           >
             <h1 className="text-3xl md:text-4xl font-display font-semibold compass-gradient-text mb-3">How are you feeling?</h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60 max-w-sm mx-auto text-[18px]">Tap two to create your mood blend. This helps us personalize your journey.</p>
+            <p className="text-warm-gray/70 dark:text-soft-cream/60 max-w-sm mx-auto text-[18px]">Tap two to create your mood blend. This helps us personalize your journey. You can also skip this step below.</p>
           </motion.div>
 
           <MagneticOrbitMixer onMoodBrewed={handleMoodBrewed} />

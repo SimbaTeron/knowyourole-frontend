@@ -10,6 +10,8 @@ const MOOD_ORBS = [
   { id: "determined", label: "Determined", color: "#F87171", glowColor: "rgba(248, 113, 113, 0.5)" },
   { id: "creative", label: "Creative", color: "#F472B6", glowColor: "rgba(244, 114, 182, 0.5)" },
   { id: "social", label: "Social", color: "#34D399", glowColor: "rgba(52, 211, 153, 0.5)" },
+  { id: "focused", label: "Focused", color: "#14B8A6", glowColor: "rgba(20, 184, 166, 0.5)" },
+  { id: "adventurous", label: "Bold", color: "#F97316", glowColor: "rgba(249, 115, 22, 0.5)" },
 ];
 
 const HYBRID_HINTS: Record<string, { title: string; desc: string }> = {
