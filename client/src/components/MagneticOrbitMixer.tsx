@@ -328,14 +328,6 @@ export default function MagneticOrbitMixer({ onMoodBrewed }: MagneticOrbitMixerP
         </AnimatePresence>
       </svg>
 
-      <p className="text-center text-sm text-warm-gray/60 dark:text-soft-cream/50 mt-2">
-        {selectedOrbs.length === 0 
-          ? "Tap two orbs to see what they create together"
-          : selectedOrbs.length === 1 
-            ? "Now tap another orb..."
-            : ""}
-      </p>
-
       <AnimatePresence>
         {hybridResult && (
           <motion.div
