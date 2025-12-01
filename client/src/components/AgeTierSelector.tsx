@@ -35,14 +35,13 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
   return (
     <div className="w-full">
       <div className="text-center mb-6">
-        <h2 className="text-2xl md:text-3xl font-display font-semibold text-warm-gray dark:text-soft-cream mb-2">
+        <h2 className="md:text-3xl font-display font-semibold text-warm-gray dark:text-soft-cream mb-2 text-[36px]">
           Choose your path
         </h2>
         <p className="text-base md:text-lg text-warm-gray/70 dark:text-soft-cream/60">
           Select the journey that fits you best
         </p>
       </div>
-      
       <div className="space-y-3">
         {ageTiers.map((tier, index) => {
           const isSelected = selectedTier === tier.id;
@@ -100,7 +99,6 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
           );
         })}
       </div>
-
       <p className="text-center text-sm text-warm-gray/50 dark:text-soft-cream/40 italic mt-6">
         Tap to select your age tier
       </p>
