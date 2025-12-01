@@ -856,7 +856,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               )}
             </motion.div>
             
-            <p className="text-sm text-warm-gray/60 dark:text-soft-cream/50 mb-2">
+            <p className="text-warm-gray/60 dark:text-soft-cream/50 mb-2 text-[16px]">
               {question.subtitle}
             </p>
             <h2 className="text-2xl font-bold text-warm-gray dark:text-soft-cream">
