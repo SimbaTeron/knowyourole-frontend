@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, BookOpen, HelpCircle, ArrowRight, SkipForward, Heart } from "lucide-react";
+import { Zap, BookOpen, HelpCircle, ArrowRight, SkipForward } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
@@ -76,7 +76,7 @@ export default function MoodPage() {
         currentTheme={theme}
         onThemeChange={handleThemeChange}
       />
-      <main className="relative z-10 pt-24 pb-32 px-4 min-h-screen flex flex-col">
+      <main className="relative z-10 pt-16 pb-32 px-4 min-h-screen flex flex-col">
         <div className="max-w-md mx-auto w-full flex-1 flex flex-col">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -84,9 +84,6 @@ export default function MoodPage() {
             transition={{ delay: 0.1 }}
             className="text-center mb-8"
           >
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-terracotta to-sunset-amber mb-3">
-              <Heart className="w-6 h-6 text-white" />
-            </div>
             <h1 className="text-3xl md:text-4xl font-display font-semibold compass-gradient-text mb-3">
               How are you feeling right now?
             </h1>

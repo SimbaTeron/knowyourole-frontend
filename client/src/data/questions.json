@@ -2,11 +2,17 @@
   "questions": [
     {
       "id": 1,
-      "prompt": "Playground pick—how do you play?",
+      "prompt": "Playground pick:",
       "leftDesc": "Jump in shouting 'You're it!' and lead the chase.",
       "rightDesc": "Sneak off to plan the perfect secret fort.",
-      "options": ["Lead tag", "Plan fort"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Lead tag",
+        "Plan fort"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 6,
       "tier": "7-12",
@@ -16,11 +22,17 @@
     },
     {
       "id": 2,
-      "prompt": "New video game—what's your move?",
+      "prompt": "New video game:",
       "leftDesc": "Mash all buttons to see what explosions happen.",
       "rightDesc": "Watch the full tutorial before your first try.",
-      "options": ["Mash buttons", "Watch tutorial"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Mash buttons",
+        "Watch tutorial"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 6,
       "tier": "7-12",
@@ -30,11 +42,17 @@
     },
     {
       "id": 3,
-      "prompt": "Dream superpower—which would you pick?",
-      "leftDesc": "Soar through clouds racing birds across the sky.",
+      "prompt": "Dream superpower:",
+      "leftDesc": "Soar through clouds racing birds through skies.",
       "rightDesc": "Read your pet's mind to solve their mysteries.",
-      "options": ["Flying", "Pet's thoughts"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "Flying",
+        "Pet's thoughts"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 6,
       "tier": "7-12",
@@ -44,11 +62,17 @@
     },
     {
       "id": 4,
-      "prompt": "Friend is sad—how do you help?",
-      "leftDesc": "Tell them exactly how to fix the problem step-by-step.",
+      "prompt": "Friend is sad:",
+      "leftDesc": "Tell them how to fix the problem methodically.",
       "rightDesc": "Sit close and give a gentle silent hug.",
-      "options": ["Fix it", "Quiet hug"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Fix it",
+        "Quiet hug"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 6,
       "tier": "7-12",
@@ -58,11 +82,17 @@
     },
     {
       "id": 5,
-      "prompt": "Birthday party coming—what's better?",
-      "leftDesc": "Know every game and guest ahead of time.",
+      "prompt": "Birthday party coming:",
+      "leftDesc": "Know every game and guest early.",
       "rightDesc": "Walk in ready for surprising fun discoveries.",
-      "options": ["Know ahead", "Surprises"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Know ahead",
+        "Surprises"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 6,
       "tier": "7-12",
@@ -72,11 +102,17 @@
     },
     {
       "id": 6,
-      "prompt": "Group project time—your role?",
+      "prompt": "Group project time:",
       "leftDesc": "Grab the marker and assign everyone their jobs.",
       "rightDesc": "Let teammates pick while you help anywhere needed.",
-      "options": ["Be captain", "Help out"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Be captain",
+        "Help out"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 6,
       "tier": "7-12",
@@ -86,11 +122,17 @@
     },
     {
       "id": 7,
-      "prompt": "Recess bell rings—where do you go?",
+      "prompt": "Recess bell rings:",
       "leftDesc": "Run to the big game with all the kids.",
       "rightDesc": "Find your bestie for secrets and inside jokes.",
-      "options": ["Whole class", "Just bestie"],
-      "optionMeta": ["I", "S"],
+      "options": [
+        "Whole class",
+        "Just bestie"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
       "psych": "DISC-IS",
       "time": 6,
       "tier": "7-12",
@@ -100,11 +142,17 @@
     },
     {
       "id": 8,
-      "prompt": "New LEGO set—how do you build?",
-      "leftDesc": "Follow each step to match the box perfectly.",
+      "prompt": "New LEGO set:",
+      "leftDesc": "Follow each step to match the box .",
       "rightDesc": "Dump pieces out and create your own invention.",
-      "options": ["Follow pics", "My creation"],
-      "optionMeta": ["C", "D"],
+      "options": [
+        "Follow pics",
+        "My creation"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
       "psych": "DISC-CD",
       "time": 6,
       "tier": "7-12",
@@ -114,11 +162,17 @@
     },
     {
       "id": 9,
-      "prompt": "Ice cream truck arrives—your order?",
+      "prompt": "Ice cream truck arrives:",
       "leftDesc": "Try that weird blue swirl nobody understands.",
       "rightDesc": "Get your trusted favorite that never disappoints.",
-      "options": ["Blue weird", "My fave"],
-      "optionMeta": ["O+", "O-"],
+      "options": [
+        "Blue weird",
+        "My fave"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 6,
       "tier": "7-12",
@@ -128,11 +182,17 @@
     },
     {
       "id": 10,
-      "prompt": "School talent show—where are you?",
-      "leftDesc": "Center stage with spotlight performing for the crowd.",
+      "prompt": "School talent show:",
+      "leftDesc": "Center stage with spotlight for the crowd.",
       "rightDesc": "Backstage running the tech booth and cueing lights.",
-      "options": ["On stage", "Backstage"],
-      "optionMeta": ["E+", "E-"],
+      "options": [
+        "On stage",
+        "Backstage"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
       "psych": "Big5-E",
       "time": 6,
       "tier": "7-12",
@@ -142,11 +202,17 @@
     },
     {
       "id": 11,
-      "prompt": "Homework time—what happens first?",
+      "prompt": "Homework time:",
       "leftDesc": "Finish everything before any playtime begins.",
-      "rightDesc": "Play first, figure out homework at bedtime.",
-      "options": ["Work first", "Play first"],
-      "optionMeta": ["C+", "C-"],
+      "rightDesc": "Play first, solve homework at bedtime.",
+      "options": [
+        "Work first",
+        "Play first"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 6,
       "tier": "7-12",
@@ -156,11 +222,17 @@
     },
     {
       "id": 12,
-      "prompt": "Someone cuts in line—what do you do?",
+      "prompt": "Someone cuts in line:",
       "leftDesc": "Let it go, no big deal, not worth fighting.",
       "rightDesc": "Speak up politely and tell them that's not fair.",
-      "options": ["Let go", "Speak up"],
-      "optionMeta": ["A+", "A-"],
+      "options": [
+        "Let go",
+        "Speak up"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
       "psych": "Big5-A",
       "time": 6,
       "tier": "7-12",
@@ -170,11 +242,17 @@
     },
     {
       "id": 13,
-      "prompt": "Big test tomorrow—how do you feel?",
-      "leftDesc": "Study a bit, sleep well, it'll be fine.",
+      "prompt": "Big test tomorrow:",
+      "leftDesc": "Study slightly, sleep well, it'll be fine.",
       "rightDesc": "Worry all night even if you studied everything.",
-      "options": ["Sleep fine", "Worry lots"],
-      "optionMeta": ["N-", "N+"],
+      "options": [
+        "Sleep fine",
+        "Worry lots"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
       "psych": "Big5-N",
       "time": 6,
       "tier": "7-12",
@@ -184,11 +262,17 @@
     },
     {
       "id": 14,
-      "prompt": "Class field trip—your favorite part?",
+      "prompt": "Class field trip:",
       "leftDesc": "Making new friends on the bus ride there.",
       "rightDesc": "Exploring every exhibit and learning cool facts.",
-      "options": ["Bus friends", "Explore facts"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Bus friends",
+        "Explore facts"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 6,
       "tier": "7-12",
@@ -198,11 +282,17 @@
     },
     {
       "id": 15,
-      "prompt": "Story writing time—what kind?",
+      "prompt": "Story writing time:",
       "leftDesc": "Dragons and wizards in magical kingdoms far away.",
-      "rightDesc": "A kid just like you solving real-life mysteries.",
-      "options": ["Magic world", "Real life"],
-      "optionMeta": ["N", "S"],
+      "rightDesc": "A kid like you solving real-life mysteries.",
+      "options": [
+        "Magic world",
+        "Real life"
+      ],
+      "optionMeta": [
+        "N",
+        "S"
+      ],
       "psych": "MBTI-SN",
       "time": 6,
       "tier": "7-12",
@@ -212,11 +302,17 @@
     },
     {
       "id": 16,
-      "prompt": "Pet goldfish died—what helps most?",
+      "prompt": "Pet goldfish died:",
       "leftDesc": "Facts about fish lifespans and why it happened.",
       "rightDesc": "A big hug and someone saying they're sorry.",
-      "options": ["Facts", "Hugs"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Facts",
+        "Hugs"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 6,
       "tier": "7-12",
@@ -226,11 +322,17 @@
     },
     {
       "id": 17,
-      "prompt": "Room cleaning time—your style?",
+      "prompt": "Room cleaning time:",
       "leftDesc": "Make piles, organize everything, take your time.",
       "rightDesc": "Stuff things anywhere fast so you can play.",
-      "options": ["Organize piles", "Stuff fast"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Organize piles",
+        "Stuff fast"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 6,
       "tier": "7-12",
@@ -240,11 +342,17 @@
     },
     {
       "id": 18,
-      "prompt": "Classroom debate—how do you participate?",
+      "prompt": "Classroom debate:",
       "leftDesc": "Lead the discussion and state your opinion first.",
       "rightDesc": "Listen to everyone then share thoughtful ideas.",
-      "options": ["Lead it", "Listen first"],
-      "optionMeta": ["D", "C"],
+      "options": [
+        "Lead it",
+        "Listen first"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
       "psych": "DISC-DC",
       "time": 6,
       "tier": "7-12",
@@ -254,11 +362,17 @@
     },
     {
       "id": 19,
-      "prompt": "New kid at school—what do you do?",
+      "prompt": "New kid at school:",
       "leftDesc": "Invite them to sit with you at lunch immediately.",
       "rightDesc": "Wave hello, see if they need help finding class.",
-      "options": ["Lunch invite", "Wave hello"],
-      "optionMeta": ["I", "S"],
+      "options": [
+        "Lunch invite",
+        "Wave hello"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
       "psych": "DISC-IS",
       "time": 6,
       "tier": "7-12",
@@ -268,11 +382,17 @@
     },
     {
       "id": 20,
-      "prompt": "Art class project—your approach?",
-      "leftDesc": "Create something totally wild and unexpected.",
+      "prompt": "Art class project:",
+      "leftDesc": "Create something wild and unexpected.",
       "rightDesc": "Follow the teacher's example to get it right.",
-      "options": ["Wild art", "Follow example"],
-      "optionMeta": ["O+", "O-"],
+      "options": [
+        "Wild art",
+        "Follow example"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 6,
       "tier": "7-12",
@@ -285,8 +405,14 @@
       "prompt": "Science fair project—what excites you?",
       "leftDesc": "Presenting your work to everyone who walks by.",
       "rightDesc": "The experiment itself and discovering the results.",
-      "options": ["Presenting", "Discovering"],
-      "optionMeta": ["E+", "E-"],
+      "options": [
+        "Presenting",
+        "Discovering"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
       "psych": "Big5-E",
       "time": 6,
       "tier": "7-12",
@@ -296,11 +422,17 @@
     },
     {
       "id": 22,
-      "prompt": "Summer reading list—how do you tackle it?",
+      "prompt": "Summer reading list:",
       "leftDesc": "Finish all books in the first two weeks.",
-      "rightDesc": "Read one page a day, maybe, if you remember.",
-      "options": ["Finish early", "Read slowly"],
-      "optionMeta": ["C+", "C-"],
+      "rightDesc": "Read one page a day, , if you remember.",
+      "options": [
+        "Finish early",
+        "Read slowly"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 6,
       "tier": "7-12",
@@ -310,11 +442,17 @@
     },
     {
       "id": 23,
-      "prompt": "Someone is being bullied—what do you do?",
+      "prompt": "Someone is being bullied:",
       "leftDesc": "Tell the teacher right away, rules are rules.",
       "rightDesc": "Step in yourself to help and stand up for them.",
-      "options": ["Tell teacher", "Step in"],
-      "optionMeta": ["A+", "D"],
+      "options": [
+        "Tell teacher",
+        "Step in"
+      ],
+      "optionMeta": [
+        "A+",
+        "D"
+      ],
       "psych": "Big5-AD",
       "time": 6,
       "tier": "7-12",
@@ -324,11 +462,17 @@
     },
     {
       "id": 24,
-      "prompt": "Movie night pick—your choice?",
+      "prompt": "Movie night pick:",
       "leftDesc": "Something funny that makes everyone laugh together.",
       "rightDesc": "An adventure with heroes solving big problems.",
-      "options": ["Funny one", "Adventure"],
-      "optionMeta": ["I", "D"],
+      "options": [
+        "Funny one",
+        "Adventure"
+      ],
+      "optionMeta": [
+        "I",
+        "D"
+      ],
       "psych": "DISC-ID",
       "time": 6,
       "tier": "7-12",
@@ -338,11 +482,17 @@
     },
     {
       "id": 25,
-      "prompt": "Sports day at school—your role?",
+      "prompt": "Sports day at school:",
       "leftDesc": "Team captain leading cheers and calling plays.",
       "rightDesc": "Reliable player who shows up and does their part.",
-      "options": ["Captain", "Reliable player"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Captain",
+        "Reliable player"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 6,
       "tier": "7-12",
@@ -354,9 +504,15 @@
       "id": 26,
       "prompt": "Sleepover plans—what sounds better?",
       "leftDesc": "Big group with lots of kids and crazy games.",
-      "rightDesc": "Just your best friend with favorite snacks.",
-      "options": ["Big group", "Best friend"],
-      "optionMeta": ["E", "I"],
+      "rightDesc": "Your best friend with favorite snacks.",
+      "options": [
+        "Big group",
+        "Best friend"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 6,
       "tier": "7-12",
@@ -366,11 +522,17 @@
     },
     {
       "id": 27,
-      "prompt": "Vacation choice—where would you go?",
+      "prompt": "Vacation choice:",
       "leftDesc": "Amusement park with rollercoasters and cotton candy.",
       "rightDesc": "Museum with dinosaur bones and space exhibits.",
-      "options": ["Theme park", "Museum"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "Theme park",
+        "Museum"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 6,
       "tier": "7-12",
@@ -380,11 +542,17 @@
     },
     {
       "id": 28,
-      "prompt": "Teacher asks a question you know—what now?",
+      "prompt": "Teacher asks a question you know:",
       "leftDesc": "Raise your hand fast to answer before anyone else.",
-      "rightDesc": "Wait to see if others get it, then maybe share.",
-      "options": ["Hand up fast", "Wait a bit"],
-      "optionMeta": ["D", "S"],
+      "rightDesc": "Wait to see if others get it, then share.",
+      "options": [
+        "Hand up fast",
+        "Wait a bit"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 6,
       "tier": "7-12",
@@ -394,11 +562,17 @@
     },
     {
       "id": 29,
-      "prompt": "Building a treehouse—your job?",
+      "prompt": "Building a treehouse:",
       "leftDesc": "Design the plans with doors, windows, and a ladder.",
       "rightDesc": "Hammer nails and saw boards with your hands.",
-      "options": ["Design plans", "Build it"],
-      "optionMeta": ["N", "S"],
+      "options": [
+        "Design plans",
+        "Build it"
+      ],
+      "optionMeta": [
+        "N",
+        "S"
+      ],
       "psych": "MBTI-SN",
       "time": 6,
       "tier": "7-12",
@@ -408,11 +582,17 @@
     },
     {
       "id": 30,
-      "prompt": "You made a mistake—how do you feel?",
+      "prompt": "You made a mistake:",
       "leftDesc": "Learn from it, fix it, and move on quickly.",
-      "rightDesc": "Feel bad about it for a while, replay it.",
-      "options": ["Move on", "Feel bad"],
-      "optionMeta": ["N-", "N+"],
+      "rightDesc": "Feel bad about it briefly, replay it.",
+      "options": [
+        "Move on",
+        "Feel bad"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
       "psych": "Big5-N",
       "time": 6,
       "tier": "7-12",
@@ -424,9 +604,15 @@
       "id": 31,
       "prompt": "Big assignment due—when do you start?",
       "leftDesc": "Pull an all-nighter powered by last-minute panic.",
-      "rightDesc": "Start weeks early with a stress-free color-coded plan.",
-      "options": ["Night before", "Start early"],
-      "optionMeta": ["C-", "C+"],
+      "rightDesc": "Start weeks early stress-free.",
+      "options": [
+        "Night before",
+        "Start early"
+      ],
+      "optionMeta": [
+        "C-",
+        "C+"
+      ],
       "psych": "Big5-C",
       "time": 7,
       "tier": "13-18",
@@ -436,11 +622,17 @@
     },
     {
       "id": 32,
-      "prompt": "Friend group drama erupts—your move?",
+      "prompt": "Friend group drama erupts:",
       "leftDesc": "Step in as peacemaker to fix the misunderstanding.",
-      "rightDesc": "Stay completely out until the storm passes.",
-      "options": ["Peacemaker", "Stay out"],
-      "optionMeta": ["A+", "A-"],
+      "rightDesc": "Stay out until the storm passes.",
+      "options": [
+        "Peacemaker",
+        "Stay out"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
       "psych": "Big5-A",
       "time": 7,
       "tier": "13-18",
@@ -450,11 +642,17 @@
     },
     {
       "id": 33,
-      "prompt": "You bombed a test—how do you cope?",
+      "prompt": "You bombed a test:",
       "leftDesc": "Shake it off—one bad grade won't define you.",
-      "rightDesc": "Replay every wrong answer in your head for days.",
-      "options": ["Shake off", "Overthink"],
-      "optionMeta": ["N-", "N+"],
+      "rightDesc": "Replay every wrong answer mentally for days.",
+      "options": [
+        "Shake off",
+        "Overthink"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
       "psych": "Big5-N",
       "time": 7,
       "tier": "13-18",
@@ -464,11 +662,17 @@
     },
     {
       "id": 34,
-      "prompt": "Class presentation day—your preference?",
+      "prompt": "Class presentation day:",
       "leftDesc": "Volunteer first to get it over with fast.",
       "rightDesc": "Handle slides while your partner does the talking.",
-      "options": ["Speak up", "Slides duty"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Speak up",
+        "Slides duty"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 7,
       "tier": "13-18",
@@ -481,8 +685,14 @@
       "prompt": "Thinking about your future—what matters?",
       "leftDesc": "Steady paycheck and clear career path ahead.",
       "rightDesc": "Chase what excites you even with bigger risks.",
-      "options": ["Steady pay", "Follow passion"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "Steady pay",
+        "Follow passion"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 7,
       "tier": "13-18",
@@ -492,11 +702,17 @@
     },
     {
       "id": 36,
-      "prompt": "Teacher gave unfair grade—what now?",
-      "leftDesc": "Schedule a meeting to argue your case point-by-point.",
+      "prompt": "Teacher gave unfair grade:",
+      "leftDesc": "Schedule a meeting and argue your case.",
       "rightDesc": "Accept it to avoid awkward confrontation or grudges.",
-      "options": ["Argue it", "Accept it"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Argue it",
+        "Accept it"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 7,
       "tier": "13-18",
@@ -507,10 +723,16 @@
     {
       "id": 37,
       "prompt": "Finals week approach—your study method?",
-      "leftDesc": "Create a color-coded calendar with every subject blocked.",
+      "leftDesc": "Create a color-coded calendar mapped out.",
       "rightDesc": "Wing it based on vibes the night before each.",
-      "options": ["Color-coded", "Wing it"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Color-coded",
+        "Wing it"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 7,
       "tier": "13-18",
@@ -520,11 +742,17 @@
     },
     {
       "id": 38,
-      "prompt": "You're team captain—game day energy?",
+      "prompt": "You're team captain:",
       "leftDesc": "Pump everyone up with an epic team huddle speech.",
       "rightDesc": "Draw the winning play on the whiteboard quietly.",
-      "options": ["Pump up", "Draw plays"],
-      "optionMeta": ["I", "D"],
+      "options": [
+        "Pump up",
+        "Draw plays"
+      ],
+      "optionMeta": [
+        "I",
+        "D"
+      ],
       "psych": "DISC-ID",
       "time": 7,
       "tier": "13-18",
@@ -534,11 +762,17 @@
     },
     {
       "id": 39,
-      "prompt": "First day at new school—your approach?",
+      "prompt": "First day at new school:",
       "leftDesc": "Introduce yourself to everyone and make lunch plans.",
       "rightDesc": "Observe the social scene for a week first.",
-      "options": ["Introduce", "Observe"],
-      "optionMeta": ["I", "C"],
+      "options": [
+        "Introduce",
+        "Observe"
+      ],
+      "optionMeta": [
+        "I",
+        "C"
+      ],
       "psych": "DISC-IC",
       "time": 7,
       "tier": "13-18",
@@ -548,11 +782,17 @@
     },
     {
       "id": 40,
-      "prompt": "Gap year dreams—what's the plan?",
-      "leftDesc": "Backpack solo through hostels meeting strangers everywhere.",
+      "prompt": "Gap year dreams:",
+      "leftDesc": "Backpack solo through hostels meeting strangers.",
       "rightDesc": "Road trip with your squad sharing every moment.",
-      "options": ["Hostels solo", "Squad trip"],
-      "optionMeta": ["O+", "O-"],
+      "options": [
+        "Hostels solo",
+        "Squad trip"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 7,
       "tier": "13-18",
@@ -562,11 +802,17 @@
     },
     {
       "id": 41,
-      "prompt": "Party invite arrives—your reaction?",
+      "prompt": "Party invite arrives:",
       "leftDesc": "Excited! Time to meet new people and have fun.",
-      "rightDesc": "Check who's going first, maybe stay home instead.",
-      "options": ["Excited", "Maybe skip"],
-      "optionMeta": ["E", "I"],
+      "rightDesc": "Check who's going first, stay home instead.",
+      "options": [
+        "Excited",
+        "Maybe skip"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 7,
       "tier": "13-18",
@@ -576,11 +822,17 @@
     },
     {
       "id": 42,
-      "prompt": "Prom date ask—how do you do it?",
-      "leftDesc": "Big public promposal with signs and all the attention.",
-      "rightDesc": "Private moment with heartfelt one-on-one conversation.",
-      "options": ["Promposal", "Private ask"],
-      "optionMeta": ["E+", "E-"],
+      "prompt": "Prom date ask:",
+      "leftDesc": "Big public promposal with fanfare.",
+      "rightDesc": "Private moment one-on-one.",
+      "options": [
+        "Promposal",
+        "Private ask"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
       "psych": "Big5-E",
       "time": 7,
       "tier": "13-18",
@@ -590,11 +842,17 @@
     },
     {
       "id": 43,
-      "prompt": "College essay topic—which feels right?",
+      "prompt": "College essay topic:",
       "leftDesc": "A meaningful experience that changed who you are.",
       "rightDesc": "Your big achievements and concrete accomplishments.",
-      "options": ["Meaningful story", "Achievements"],
-      "optionMeta": ["N", "S"],
+      "options": [
+        "Meaningful story",
+        "Achievements"
+      ],
+      "optionMeta": [
+        "N",
+        "S"
+      ],
       "psych": "MBTI-SN",
       "time": 7,
       "tier": "13-18",
@@ -604,11 +862,17 @@
     },
     {
       "id": 44,
-      "prompt": "Friend asks for brutally honest feedback—you give:",
+      "prompt": "Friend asks for brutally honest feedback:",
       "leftDesc": "The truth, even if it stings a little.",
       "rightDesc": "A softer version that protects their feelings.",
-      "options": ["Hard truth", "Softer truth"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Hard truth",
+        "Softer truth"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 7,
       "tier": "13-18",
@@ -618,11 +882,17 @@
     },
     {
       "id": 45,
-      "prompt": "Weekend plan changes last minute—your reaction?",
+      "prompt": "Weekend plan changes last minute:",
       "leftDesc": "Annoyed. You already had things scheduled and ready.",
       "rightDesc": "Excited! Spontaneous adventures are the best kind.",
-      "options": ["Annoyed", "Excited"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Annoyed",
+        "Excited"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 7,
       "tier": "13-18",
@@ -632,11 +902,17 @@
     },
     {
       "id": 46,
-      "prompt": "Group project partner isn't pulling weight—you:",
+      "prompt": "Group project partner isn't pulling weight:",
       "leftDesc": "Confront them directly about doing their share.",
-      "rightDesc": "Just do their work yourself to avoid conflict.",
-      "options": ["Confront", "Do it yourself"],
-      "optionMeta": ["D", "S"],
+      "rightDesc": "Do their work yourself to avoid conflict.",
+      "options": [
+        "Confront",
+        "Do it yourself"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 7,
       "tier": "13-18",
@@ -647,10 +923,16 @@
     {
       "id": 47,
       "prompt": "Driver's license test coming—your prep style?",
-      "leftDesc": "Practice with the manual and follow every rule precisely.",
+      "leftDesc": "Practice with the manual and follow rules.",
       "rightDesc": "Learn by doing, wing it with street smarts.",
-      "options": ["Manual rules", "Street smarts"],
-      "optionMeta": ["C", "D"],
+      "options": [
+        "Manual rules",
+        "Street smarts"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
       "psych": "DISC-CD",
       "time": 7,
       "tier": "13-18",
@@ -660,11 +942,17 @@
     },
     {
       "id": 48,
-      "prompt": "New hobby to try—what calls you?",
+      "prompt": "New hobby to try:",
       "leftDesc": "Something creative and unconventional like pottery.",
       "rightDesc": "Something practical like cooking or budgeting.",
-      "options": ["Creative hobby", "Practical skill"],
-      "optionMeta": ["O+", "O-"],
+      "options": [
+        "Creative hobby",
+        "Practical skill"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 7,
       "tier": "13-18",
@@ -674,11 +962,17 @@
     },
     {
       "id": 49,
-      "prompt": "Your room organization—honest assessment?",
+      "prompt": "Your room organization:",
       "leftDesc": "Everything has a place, labeled and color-coded.",
-      "rightDesc": "Organized chaos—you know where everything is somehow.",
-      "options": ["Color-coded", "Organized chaos"],
-      "optionMeta": ["C+", "C-"],
+      "rightDesc": "Organized chaoswith a hidden system.",
+      "options": [
+        "Color-coded",
+        "Organized chaos"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 7,
       "tier": "13-18",
@@ -688,11 +982,17 @@
     },
     {
       "id": 50,
-      "prompt": "Someone gossips about a friend—you:",
+      "prompt": "Someone gossips about a friend:",
       "leftDesc": "Defend your friend and shut it down immediately.",
-      "rightDesc": "Stay neutral, don't want to get involved.",
-      "options": ["Defend them", "Stay neutral"],
-      "optionMeta": ["A+", "A-"],
+      "rightDesc": "Stay neutral, don't wanna get involved.",
+      "options": [
+        "Defend them",
+        "Stay neutral"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
       "psych": "Big5-A",
       "time": 7,
       "tier": "13-18",
@@ -702,11 +1002,17 @@
     },
     {
       "id": 51,
-      "prompt": "Before a big game or performance—your vibe?",
+      "prompt": "Before a big game or performance:",
       "leftDesc": "Calm and focused, you've prepared, you're ready.",
       "rightDesc": "Nervous butterflies that won't go away.",
-      "options": ["Calm focused", "Nervous"],
-      "optionMeta": ["N-", "N+"],
+      "options": [
+        "Calm focused",
+        "Nervous"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
       "psych": "Big5-N",
       "time": 7,
       "tier": "13-18",
@@ -716,11 +1022,17 @@
     },
     {
       "id": 52,
-      "prompt": "Part-time job interview—your strategy?",
+      "prompt": "Part-time job interview:",
       "leftDesc": "Research the company, prepare answers, dress sharp.",
       "rightDesc": "Show up with confidence and charm your way through.",
-      "options": ["Research prep", "Wing it charm"],
-      "optionMeta": ["C", "I"],
+      "options": [
+        "Research prep",
+        "Wing it charm"
+      ],
+      "optionMeta": [
+        "C",
+        "I"
+      ],
       "psych": "DISC-CI",
       "time": 7,
       "tier": "13-18",
@@ -730,11 +1042,17 @@
     },
     {
       "id": 53,
-      "prompt": "Social media post goes viral—your reaction?",
+      "prompt": "Social media post goes viral:",
       "leftDesc": "Love the attention! Engage with every comment.",
-      "rightDesc": "Feel a bit exposed, maybe delete it later.",
-      "options": ["Love it", "Feel exposed"],
-      "optionMeta": ["E", "I"],
+      "rightDesc": "Feel slightly exposed, delete it later.",
+      "options": [
+        "Love it",
+        "Feel exposed"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 7,
       "tier": "13-18",
@@ -744,11 +1062,17 @@
     },
     {
       "id": 54,
-      "prompt": "Planning senior trip—your role?",
-      "leftDesc": "Take charge of logistics, bookings, and the schedule.",
+      "prompt": "Planning senior trip:",
+      "leftDesc": "Take charge of all logistics.",
       "rightDesc": "Go with the flow, let others handle details.",
-      "options": ["Handle logistics", "Go with flow"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Handle logistics",
+        "Go with flow"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 7,
       "tier": "13-18",
@@ -758,11 +1082,17 @@
     },
     {
       "id": 55,
-      "prompt": "Debate team topic—how do you prepare?",
+      "prompt": "Debate team topic:",
       "leftDesc": "Research every angle, anticipate counterarguments.",
       "rightDesc": "Trust your quick thinking and improvise on stage.",
-      "options": ["Research deep", "Improvise"],
-      "optionMeta": ["C", "I"],
+      "options": [
+        "Research deep",
+        "Improvise"
+      ],
+      "optionMeta": [
+        "C",
+        "I"
+      ],
       "psych": "DISC-CI",
       "time": 7,
       "tier": "13-18",
@@ -772,11 +1102,17 @@
     },
     {
       "id": 56,
-      "prompt": "New work project lands—your first step?",
+      "prompt": "New work project lands:",
       "leftDesc": "Dive in fast, iterating and fixing as you go.",
-      "rightDesc": "Map out every requirement and milestone before action.",
-      "options": ["Dive in", "Map it out"],
-      "optionMeta": ["D", "C"],
+      "rightDesc": "Map out every requirement first.",
+      "options": [
+        "Dive in",
+        "Map it out"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
       "psych": "DISC-DC",
       "time": 8,
       "tier": "19-25",
@@ -786,11 +1122,17 @@
     },
     {
       "id": 57,
-      "prompt": "Networking mixer tonight—your strategy?",
-      "leftDesc": "Work the room collecting cards from everyone possible.",
+      "prompt": "Networking mixer tonight:",
+      "leftDesc": "Work the room making connections.",
       "rightDesc": "Find one interesting person for a real conversation.",
-      "options": ["Work room", "One real talk"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Work room",
+        "One real talk"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 8,
       "tier": "19-25",
@@ -800,11 +1142,17 @@
     },
     {
       "id": 58,
-      "prompt": "Career crossroads—which path calls you?",
+      "prompt": "Career crossroads:",
       "leftDesc": "Corporate ladder with clear promotions and benefits.",
       "rightDesc": "Startup gamble with equity and chance to build.",
-      "options": ["Corporate", "Startup bet"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "Corporate",
+        "Startup bet"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 8,
       "tier": "19-25",
@@ -814,11 +1162,17 @@
     },
     {
       "id": 59,
-      "prompt": "Performance review hits hard—your response?",
-      "leftDesc": "Analyze feedback objectively while keeping emotions separate.",
-      "rightDesc": "Feel the sting first before thinking about next steps.",
-      "options": ["Analyze", "Feel first"],
-      "optionMeta": ["T", "F"],
+      "prompt": "Performance review hits hard:",
+      "leftDesc": "Analyze feedback objectively objectively.",
+      "rightDesc": "Feel the sting first then analyze.",
+      "options": [
+        "Analyze",
+        "Feel first"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 8,
       "tier": "19-25",
@@ -829,10 +1183,16 @@
     {
       "id": 60,
       "prompt": "Trip abroad booked—planning style?",
-      "leftDesc": "Create detailed itinerary with every restaurant and train.",
-      "rightDesc": "Book the flight only, figure out the rest there.",
-      "options": ["Full itinerary", "Figure it out"],
-      "optionMeta": ["J", "P"],
+      "leftDesc": "Create detailed itinerary with all details.",
+      "rightDesc": "Book the flight only, solve the rest there.",
+      "options": [
+        "Full itinerary",
+        "Figure it out"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 8,
       "tier": "19-25",
@@ -842,11 +1202,17 @@
     },
     {
       "id": 61,
-      "prompt": "Roommate tension brewing—how do you handle it?",
-      "leftDesc": "Have the direct awkward conversation to clear the air.",
+      "prompt": "Roommate tension brewing:",
+      "leftDesc": "Have the direct awkward conversation directly.",
       "rightDesc": "Wait it out, hoping things naturally improve.",
-      "options": ["Awkward convo", "Wait it out"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Awkward convo",
+        "Wait it out"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 8,
       "tier": "19-25",
@@ -856,11 +1222,17 @@
     },
     {
       "id": 62,
-      "prompt": "Side hustle idea sparks—your approach?",
+      "prompt": "Side hustle idea sparks:",
       "leftDesc": "Experiment with a wild untested idea for big upside.",
-      "rightDesc": "Stick to proven models that safely minimize the risk.",
-      "options": ["Wild idea", "What works"],
-      "optionMeta": ["O+", "O-"],
+      "rightDesc": "Stick to proven models to minimize risk.",
+      "options": [
+        "Wild idea",
+        "What works"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 8,
       "tier": "19-25",
@@ -872,9 +1244,15 @@
       "id": 63,
       "prompt": "Friday night arrives—what's the vibe?",
       "leftDesc": "Hit the group chat, FOMO-fueled and ready to rally.",
-      "rightDesc": "Decline everything guilt-free, couch and shows calling.",
-      "options": ["FOMO outing", "Couch time"],
-      "optionMeta": ["E+", "E-"],
+      "rightDesc": "Decline everything for couch time.",
+      "options": [
+        "FOMO outing",
+        "Couch time"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
       "psych": "Big5-E",
       "time": 8,
       "tier": "19-25",
@@ -887,8 +1265,14 @@
       "prompt": "Your email inbox right now?",
       "leftDesc": "Inbox zero—every email sorted within 24 hours.",
       "rightDesc": "10,000 unread but somehow still fully functioning.",
-      "options": ["Inbox zero", "10k unread"],
-      "optionMeta": ["C+", "C-"],
+      "options": [
+        "Inbox zero",
+        "10k unread"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 8,
       "tier": "19-25",
@@ -898,11 +1282,17 @@
     },
     {
       "id": 65,
-      "prompt": "Apartment rent negotiation—your style?",
-      "leftDesc": "Haggle hard with comparable listings, willing to walk.",
-      "rightDesc": "Just pay listed price to avoid the hassle.",
-      "options": ["Haggle hard", "Listed price"],
-      "optionMeta": ["D", "S"],
+      "prompt": "Apartment rent negotiation:",
+      "leftDesc": "Haggle hard firmly.",
+      "rightDesc": "Pay listed price to avoid the hassle.",
+      "options": [
+        "Haggle hard",
+        "Listed price"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 8,
       "tier": "19-25",
@@ -912,11 +1302,17 @@
     },
     {
       "id": 66,
-      "prompt": "Group dinner bill comes—what happens?",
+      "prompt": "Group dinner bill comes:",
       "leftDesc": "Split it equally, who cares about exact amounts.",
       "rightDesc": "Calculate each person's items for fair payment.",
-      "options": ["Split equal", "Calculate exact"],
-      "optionMeta": ["A+", "T"],
+      "options": [
+        "Split equal",
+        "Calculate exact"
+      ],
+      "optionMeta": [
+        "A+",
+        "T"
+      ],
       "psych": "Big5-AT",
       "time": 8,
       "tier": "19-25",
@@ -926,11 +1322,17 @@
     },
     {
       "id": 67,
-      "prompt": "First day at new job—your energy?",
+      "prompt": "First day at new job:",
       "leftDesc": "Introduce yourself to everyone in the office.",
       "rightDesc": "Observe the culture quietly before engaging much.",
-      "options": ["Intro everyone", "Observe first"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Intro everyone",
+        "Observe first"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 8,
       "tier": "19-25",
@@ -940,11 +1342,17 @@
     },
     {
       "id": 68,
-      "prompt": "Investment decision—how do you choose?",
+      "prompt": "Investment decision:",
       "leftDesc": "Research data, charts, and fundamentals extensively.",
       "rightDesc": "Trust your intuition about future trends.",
-      "options": ["Data research", "Intuition"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "Data research",
+        "Intuition"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 8,
       "tier": "19-25",
@@ -954,11 +1362,17 @@
     },
     {
       "id": 69,
-      "prompt": "Relationship disagreement—your approach?",
-      "leftDesc": "Debate the issue logically until you reach resolution.",
+      "prompt": "Relationship disagreement:",
+      "leftDesc": "Debate the issue to resolution.",
       "rightDesc": "Focus on feelings first, facts can wait.",
-      "options": ["Debate logic", "Feelings first"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Debate logic",
+        "Feelings first"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 8,
       "tier": "19-25",
@@ -968,11 +1382,17 @@
     },
     {
       "id": 70,
-      "prompt": "Morning routine—what does it look like?",
-      "leftDesc": "Same time, same order, every single day.",
+      "prompt": "Morning routine:",
+      "leftDesc": "Same time, same order, every day.",
       "rightDesc": "Varies based on mood, energy, and what's happening.",
-      "options": ["Same routine", "Varies daily"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Same routine",
+        "Varies daily"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 8,
       "tier": "19-25",
@@ -982,11 +1402,17 @@
     },
     {
       "id": 71,
-      "prompt": "Co-worker asks for feedback—you give:",
+      "prompt": "Co-worker asks for feedback:",
       "leftDesc": "Honest critique that helps them improve directly.",
       "rightDesc": "Encouraging words that keep morale high.",
-      "options": ["Honest critique", "Encouragement"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Honest critique",
+        "Encouragement"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 8,
       "tier": "19-25",
@@ -996,11 +1422,17 @@
     },
     {
       "id": 72,
-      "prompt": "Learning new skill—what motivates you?",
-      "leftDesc": "Exploring something completely outside your wheelhouse.",
+      "prompt": "Learning new skill:",
+      "leftDesc": "Exploring something outside your wheelhouse.",
       "rightDesc": "Getting better at something you're already good at.",
-      "options": ["Something new", "Get better"],
-      "optionMeta": ["O+", "O-"],
+      "options": [
+        "Something new",
+        "Get better"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 8,
       "tier": "19-25",
@@ -1010,11 +1442,17 @@
     },
     {
       "id": 73,
-      "prompt": "Work from home day—your setup?",
+      "prompt": "Work from home day:",
       "leftDesc": "Dedicated desk, proper lighting, workstation vibes.",
       "rightDesc": "Couch, bed, coffee shop, wherever feels right.",
-      "options": ["Dedicated desk", "Wherever works"],
-      "optionMeta": ["C+", "C-"],
+      "options": [
+        "Dedicated desk",
+        "Wherever works"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 8,
       "tier": "19-25",
@@ -1024,11 +1462,17 @@
     },
     {
       "id": 74,
-      "prompt": "Friend needs help moving—your response?",
+      "prompt": "Friend needs help moving:",
       "leftDesc": "Show up ready to work, no questions asked.",
       "rightDesc": "Check your schedule first, offer when convenient.",
-      "options": ["Show up", "Check schedule"],
-      "optionMeta": ["A+", "A-"],
+      "options": [
+        "Show up",
+        "Check schedule"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
       "psych": "Big5-A",
       "time": 8,
       "tier": "19-25",
@@ -1038,11 +1482,17 @@
     },
     {
       "id": 75,
-      "prompt": "Big deadline looming—how do you feel?",
+      "prompt": "Big deadline looming:",
       "leftDesc": "Stressed but thriving under the pressure.",
       "rightDesc": "Anxious, losing sleep, counting down the hours.",
-      "options": ["Thrive stress", "Anxious"],
-      "optionMeta": ["N-", "N+"],
+      "options": [
+        "Thrive stress",
+        "Anxious"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
       "psych": "Big5-N",
       "time": 8,
       "tier": "19-25",
@@ -1052,11 +1502,17 @@
     },
     {
       "id": 76,
-      "prompt": "Team meeting dynamics—your role?",
-      "leftDesc": "Drive the agenda and keep things moving forward.",
-      "rightDesc": "Listen and contribute when you have something valuable.",
-      "options": ["Drive agenda", "Contribute value"],
-      "optionMeta": ["D", "C"],
+      "prompt": "Team meeting dynamics:",
+      "leftDesc": "Drive the agenda and keep things going forward.",
+      "rightDesc": "Listen and contribute when it matters.",
+      "options": [
+        "Drive agenda",
+        "Contribute value"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
       "psych": "DISC-DC",
       "time": 8,
       "tier": "19-25",
@@ -1066,11 +1522,17 @@
     },
     {
       "id": 77,
-      "prompt": "Grocery shopping style—your approach?",
+      "prompt": "Grocery shopping style:",
       "leftDesc": "List made, organized by aisle, in and out fast.",
       "rightDesc": "Wander and grab what looks good in the moment.",
-      "options": ["List organized", "Wander grab"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "List organized",
+        "Wander grab"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 8,
       "tier": "19-25",
@@ -1080,11 +1542,17 @@
     },
     {
       "id": 78,
-      "prompt": "Salary negotiation—your comfort level?",
+      "prompt": "Salary negotiation:",
       "leftDesc": "Confident and direct about what you're worth.",
       "rightDesc": "Nervous but willing to try with some coaching.",
-      "options": ["Confident", "Nervous try"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Confident",
+        "Nervous try"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 8,
       "tier": "19-25",
@@ -1094,11 +1562,17 @@
     },
     {
       "id": 79,
-      "prompt": "Weekend plans fall through—your reaction?",
+      "prompt": "Weekend plans fall through:",
       "leftDesc": "Find something else to do, keep the momentum going.",
       "rightDesc": "Embrace the unexpected free time for yourself.",
-      "options": ["Find activity", "Free time"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Find activity",
+        "Free time"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 8,
       "tier": "19-25",
@@ -1108,11 +1582,17 @@
     },
     {
       "id": 80,
-      "prompt": "Project brainstorm session—your contribution?",
+      "prompt": "Project brainstorm session:",
       "leftDesc": "Throw out wild ideas, see what sticks.",
       "rightDesc": "Analyze feasibility of ideas others suggest.",
-      "options": ["Wild ideas", "Analyze feasibility"],
-      "optionMeta": ["I", "C"],
+      "options": [
+        "Wild ideas",
+        "Analyze feasibility"
+      ],
+      "optionMeta": [
+        "I",
+        "C"
+      ],
       "psych": "DISC-IC",
       "time": 8,
       "tier": "19-25",
@@ -1122,11 +1602,17 @@
     },
     {
       "id": 81,
-      "prompt": "Life philosophy at this stage—what guides you?",
+      "prompt": "Life philosophy at this stage:",
       "leftDesc": "Maximize experiences now while you're still healthy.",
       "rightDesc": "Build lasting legacy and foundations for the future.",
-      "options": ["Experiences", "Legacy"],
-      "optionMeta": ["P", "J"],
+      "options": [
+        "Experiences",
+        "Legacy"
+      ],
+      "optionMeta": [
+        "P",
+        "J"
+      ],
       "psych": "MBTI-JP",
       "time": 9,
       "tier": "25+",
@@ -1136,11 +1622,17 @@
     },
     {
       "id": 82,
-      "prompt": "Workplace tension with leadership—your approach?",
+      "prompt": "Workplace tension with leadership:",
       "leftDesc": "Address it formally in a meeting with documentation.",
       "rightDesc": "Suggest casual coffee chat to build rapport first.",
-      "options": ["Formal meeting", "Coffee chat"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Formal meeting",
+        "Coffee chat"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 9,
       "tier": "25+",
@@ -1150,11 +1642,17 @@
     },
     {
       "id": 83,
-      "prompt": "Mid-career crossroads—which direction?",
+      "prompt": "Mid-career crossroads:",
       "leftDesc": "Keep climbing the ladder you've built for years.",
       "rightDesc": "Pivot to your true calling even starting over.",
-      "options": ["Climb ladder", "Follow calling"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "Climb ladder",
+        "Follow calling"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 9,
       "tier": "25+",
@@ -1164,11 +1662,17 @@
     },
     {
       "id": 84,
-      "prompt": "Unexpected bonus arrives—what happens next?",
+      "prompt": "Unexpected bonus arrives:",
       "leftDesc": "Max out retirement contributions for compound magic.",
       "rightDesc": "Splurge on something you've wanted forever now.",
-      "options": ["Retirement", "Splurge"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Retirement",
+        "Splurge"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 9,
       "tier": "25+",
@@ -1178,11 +1682,17 @@
     },
     {
       "id": 85,
-      "prompt": "Partner disagreement escalates—your first move?",
+      "prompt": "Partner disagreement escalates:",
       "leftDesc": "Approach logically identifying the core issue first.",
       "rightDesc": "Reconnect emotionally so you both feel heard.",
-      "options": ["Logic first", "Emotions first"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Logic first",
+        "Emotions first"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 9,
       "tier": "25+",
@@ -1192,11 +1702,17 @@
     },
     {
       "id": 86,
-      "prompt": "Major life decision ahead—how do you decide?",
+      "prompt": "Major life decision ahead:",
       "leftDesc": "Trust gut instincts built from decades of experience.",
-      "rightDesc": "Deep-dive research with spreadsheets and expert consults.",
-      "options": ["Gut instincts", "Research deep"],
-      "optionMeta": ["N", "S"],
+      "rightDesc": "Deep-dive research with experts.",
+      "options": [
+        "Gut instincts",
+        "Research deep"
+      ],
+      "optionMeta": [
+        "N",
+        "S"
+      ],
       "psych": "MBTI-SN",
       "time": 9,
       "tier": "25+",
@@ -1206,11 +1722,17 @@
     },
     {
       "id": 87,
-      "prompt": "Burnout signals appearing—your response?",
-      "leftDesc": "Power through the quarter—the project can't wait.",
-      "rightDesc": "Take mental health days now for sustainable performance.",
-      "options": ["Power through", "Health days"],
-      "optionMeta": ["D", "S"],
+      "prompt": "Burnout signals appearing:",
+      "leftDesc": "Power through quarter—the project can't wait.",
+      "rightDesc": "Take mental health days now to recharge.",
+      "options": [
+        "Power through",
+        "Health days"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 9,
       "tier": "25+",
@@ -1220,11 +1742,17 @@
     },
     {
       "id": 88,
-      "prompt": "Want to learn something new—your method?",
+      "prompt": "Want to learn something new:",
       "leftDesc": "YouTube university at your own pace when motivated.",
       "rightDesc": "Sign up for a structured course with clear deadlines.",
-      "options": ["YouTube pace", "Proper course"],
-      "optionMeta": ["O+", "C+"],
+      "options": [
+        "YouTube pace",
+        "Proper course"
+      ],
+      "optionMeta": [
+        "O+",
+        "C+"
+      ],
       "psych": "Big5-OC",
       "time": 9,
       "tier": "25+",
@@ -1234,11 +1762,17 @@
     },
     {
       "id": 89,
-      "prompt": "Dinner party happening—your preferred role?",
-      "leftDesc": "Host and curate every detail of the entire evening.",
-      "rightDesc": "Attend as guest enjoying food without any stress.",
-      "options": ["Host it", "Be guest"],
-      "optionMeta": ["E", "I"],
+      "prompt": "Dinner party happening:",
+      "leftDesc": "Host and curate every detail of the whole evening.",
+      "rightDesc": "Attend as guest enjoying food without stress.",
+      "options": [
+        "Host it",
+        "Be guest"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 9,
       "tier": "25+",
@@ -1248,11 +1782,17 @@
     },
     {
       "id": 90,
-      "prompt": "Life throws a major curveball—your instinct?",
-      "leftDesc": "Lean into chaos as opportunity to reinvent everything.",
+      "prompt": "Life throws a major curveball:",
+      "leftDesc": "Lean into chaos as opportunity.",
       "rightDesc": "Anchor down to protect what you've carefully built.",
-      "options": ["Lean in", "Anchor down"],
-      "optionMeta": ["O+", "N-"],
+      "options": [
+        "Lean in",
+        "Anchor down"
+      ],
+      "optionMeta": [
+        "O+",
+        "N-"
+      ],
       "psych": "Big5-ON",
       "time": 9,
       "tier": "25+",
@@ -1262,11 +1802,17 @@
     },
     {
       "id": 91,
-      "prompt": "Retirement planning discussion—your stance?",
+      "prompt": "Retirement planning discussion:",
       "leftDesc": "Max contributions, compound interest is magic.",
       "rightDesc": "Live now, worry about retirement when it comes.",
-      "options": ["Max savings", "Live now"],
-      "optionMeta": ["C+", "C-"],
+      "options": [
+        "Max savings",
+        "Live now"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 9,
       "tier": "25+",
@@ -1276,11 +1822,17 @@
     },
     {
       "id": 92,
-      "prompt": "Family gathering coming—your energy?",
+      "prompt": "Family gathering coming:",
       "leftDesc": "Excited to catch up with everyone at once.",
       "rightDesc": "Prefer smaller one-on-one conversations throughout.",
-      "options": ["Big gathering", "Small talks"],
-      "optionMeta": ["E+", "E-"],
+      "options": [
+        "Big gathering",
+        "Small talks"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
       "psych": "Big5-E",
       "time": 9,
       "tier": "25+",
@@ -1290,11 +1842,17 @@
     },
     {
       "id": 93,
-      "prompt": "Mentoring junior colleague—your style?",
+      "prompt": "Mentoring junior colleague:",
       "leftDesc": "Give direct feedback, they'll learn faster that way.",
       "rightDesc": "Guide gently, let them discover insights themselves.",
-      "options": ["Direct feedback", "Gentle guide"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Direct feedback",
+        "Gentle guide"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 9,
       "tier": "25+",
@@ -1304,11 +1862,17 @@
     },
     {
       "id": 94,
-      "prompt": "Health checkup reminder—your approach?",
+      "prompt": "Health checkup reminder:",
       "leftDesc": "Schedule immediately, prevention is key.",
-      "rightDesc": "Put it off, you feel fine right now.",
-      "options": ["Schedule now", "Put off"],
-      "optionMeta": ["C+", "C-"],
+      "rightDesc": "Put it off, you feel fine now.",
+      "options": [
+        "Schedule now",
+        "Put off"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 9,
       "tier": "25+",
@@ -1318,11 +1882,17 @@
     },
     {
       "id": 95,
-      "prompt": "Old friend reaches out after years—you:",
+      "prompt": "Old friend reaches out after years:",
       "leftDesc": "Excited to reconnect and catch up immediately.",
       "rightDesc": "Cautious, wondering what they might want from you.",
-      "options": ["Excited", "Cautious"],
-      "optionMeta": ["A+", "A-"],
+      "options": [
+        "Excited",
+        "Cautious"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
       "psych": "Big5-A",
       "time": 9,
       "tier": "25+",
@@ -1332,11 +1902,17 @@
     },
     {
       "id": 96,
-      "prompt": "Market downturn hits—your reaction?",
+      "prompt": "Market downturn hits:",
       "leftDesc": "Stay calm, this is normal, don't panic sell.",
       "rightDesc": "Stress about losses, consider changing strategy.",
-      "options": ["Stay calm", "Stress out"],
-      "optionMeta": ["N-", "N+"],
+      "options": [
+        "Stay calm",
+        "Stress out"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
       "psych": "Big5-N",
       "time": 9,
       "tier": "25+",
@@ -1346,11 +1922,17 @@
     },
     {
       "id": 97,
-      "prompt": "New technology emerges—your stance?",
+      "prompt": "New technology emerges:",
       "leftDesc": "Curious to explore and learn how it works.",
       "rightDesc": "Skeptical, prefer what already works well.",
-      "options": ["Curious explore", "Skeptical wait"],
-      "optionMeta": ["O+", "O-"],
+      "options": [
+        "Curious explore",
+        "Skeptical wait"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 9,
       "tier": "25+",
@@ -1360,11 +1942,17 @@
     },
     {
       "id": 98,
-      "prompt": "Career achievement unlocked—what next?",
+      "prompt": "Career achievement unlocked:",
       "leftDesc": "Set the next ambitious goal immediately.",
-      "rightDesc": "Pause to appreciate before moving forward.",
-      "options": ["Next goal", "Pause appreciate"],
-      "optionMeta": ["D", "S"],
+      "rightDesc": "Pause to appreciate before going forward.",
+      "options": [
+        "Next goal",
+        "Pause appreciate"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 9,
       "tier": "25+",
@@ -1374,11 +1962,17 @@
     },
     {
       "id": 99,
-      "prompt": "Work meeting you organized—your preparation?",
-      "leftDesc": "Agenda prepared, materials ready, rehearsed talking points.",
+      "prompt": "Work meeting you organized:",
+      "leftDesc": "Agenda prepared, materials ready, rehearsed.",
       "rightDesc": "Know the topic well, trust yourself to facilitate.",
-      "options": ["Full prep", "Trust yourself"],
-      "optionMeta": ["C", "I"],
+      "options": [
+        "Full prep",
+        "Trust yourself"
+      ],
+      "optionMeta": [
+        "C",
+        "I"
+      ],
       "psych": "DISC-CI",
       "time": 9,
       "tier": "25+",
@@ -1388,11 +1982,17 @@
     },
     {
       "id": 100,
-      "prompt": "Difficult conversation needed—your timing?",
+      "prompt": "Difficult conversation needed:",
       "leftDesc": "Address it directly and soon to clear the air.",
       "rightDesc": "Wait for the right moment when tensions ease.",
-      "options": ["Direct soon", "Wait for moment"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Direct soon",
+        "Wait for moment"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 9,
       "tier": "25+",
@@ -1402,11 +2002,17 @@
     },
     {
       "id": 101,
-      "prompt": "Morning routine on vacation—what happens?",
+      "prompt": "Morning routine on vacation:",
       "leftDesc": "Still wake up early, same habits, new location.",
       "rightDesc": "Sleep in, no schedule, go with the flow.",
-      "options": ["Same habits", "No schedule"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Same habits",
+        "No schedule"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 9,
       "tier": "25+",
@@ -1416,11 +2022,17 @@
     },
     {
       "id": 102,
-      "prompt": "Team conflict arises—your role?",
+      "prompt": "Team conflict arises:",
       "leftDesc": "Mediate and find common ground for everyone.",
       "rightDesc": "Let people work it out themselves.",
-      "options": ["Mediate", "Let work out"],
-      "optionMeta": ["I", "S"],
+      "options": [
+        "Mediate",
+        "Let work out"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
       "psych": "DISC-IS",
       "time": 9,
       "tier": "25+",
@@ -1433,8 +2045,14 @@
       "prompt": "Investment opportunity arises—your process?",
       "leftDesc": "Due diligence, research, consult advisors first.",
       "rightDesc": "Trust your instinct, opportunities don't wait.",
-      "options": ["Due diligence", "Trust instinct"],
-      "optionMeta": ["C", "D"],
+      "options": [
+        "Due diligence",
+        "Trust instinct"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
       "psych": "DISC-CD",
       "time": 9,
       "tier": "25+",
@@ -1447,8 +2065,14 @@
       "prompt": "Hobby time carved out—what do you choose?",
       "leftDesc": "Something social with a group or club.",
       "rightDesc": "Solo activity for personal enjoyment and peace.",
-      "options": ["Social group", "Solo activity"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Social group",
+        "Solo activity"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 9,
       "tier": "25+",
@@ -1461,8 +2085,14 @@
       "prompt": "Legacy thinking—what matters most?",
       "leftDesc": "Impact and achievements remembered by many.",
       "rightDesc": "Deep connections with loved ones close to you.",
-      "options": ["Wide impact", "Deep connections"],
-      "optionMeta": ["E+", "E-"],
+      "options": [
+        "Wide impact",
+        "Deep connections"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
       "psych": "Big5-E",
       "time": 9,
       "tier": "25+",
@@ -1475,8 +2105,14 @@
       "prompt": "Sunday evening arrives—your typical feeling?",
       "leftDesc": "Recharged and ready for the week ahead.",
       "rightDesc": "Dread creeps in thinking about Monday tasks.",
-      "options": ["Ready", "Dread"],
-      "optionMeta": ["N-", "N+"],
+      "options": [
+        "Ready",
+        "Dread"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
       "psych": "Big5-N",
       "time": 9,
       "tier": "25+",
@@ -1486,11 +2122,17 @@
     },
     {
       "id": 111,
-      "prompt": "Colleague takes credit for your work—you:",
+      "prompt": "Colleague takes credit for your work:",
       "leftDesc": "Speak up directly and correct the record.",
       "rightDesc": "Let it slide, not worth the conflict.",
-      "options": ["Speak up", "Let slide"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Speak up",
+        "Let slide"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 9,
       "tier": "25+",
@@ -1500,11 +2142,17 @@
     },
     {
       "id": 112,
-      "prompt": "Conference invitation arrives—your reaction?",
+      "prompt": "Conference invitation arrives:",
       "leftDesc": "Excited to network and meet new industry contacts.",
       "rightDesc": "Prefer to watch the talks virtually from home.",
-      "options": ["Go network", "Watch virtual"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Go network",
+        "Watch virtual"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 9,
       "tier": "25+",
@@ -1517,8 +2165,14 @@
       "prompt": "Reading preference—what draws you in?",
       "leftDesc": "Practical how-to books with actionable advice.",
       "rightDesc": "Philosophical works exploring big ideas and meaning.",
-      "options": ["How-to books", "Philosophy"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "How-to books",
+        "Philosophy"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 9,
       "tier": "25+",
@@ -1531,8 +2185,14 @@
       "prompt": "Friend's business idea sounds risky—you say:",
       "leftDesc": "Share honest analysis of potential pitfalls clearly.",
       "rightDesc": "Support their dream with encouragement first.",
-      "options": ["Honest analysis", "Encouragement"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Honest analysis",
+        "Encouragement"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 9,
       "tier": "25+",
@@ -1542,11 +2202,17 @@
     },
     {
       "id": 115,
-      "prompt": "Vacation booking approach—your style?",
-      "leftDesc": "Research extensively, reviews read, every detail planned.",
+      "prompt": "Vacation booking approach:",
+      "leftDesc": "Research extensively, all details checked.",
       "rightDesc": "Book spontaneously and figure it out when there.",
-      "options": ["Research all", "Spontaneous"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Research all",
+        "Spontaneous"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 9,
       "tier": "25+",
@@ -1556,11 +2222,17 @@
     },
     {
       "id": 116,
-      "prompt": "Leadership style in a crisis—your approach?",
+      "prompt": "Leadership style in a crisis:",
       "leftDesc": "Take charge immediately with decisive action.",
       "rightDesc": "Gather team input before making major moves.",
-      "options": ["Take charge", "Gather input"],
-      "optionMeta": ["D", "C"],
+      "options": [
+        "Take charge",
+        "Gather input"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
       "psych": "DISC-DC",
       "time": 9,
       "tier": "25+",
@@ -1570,11 +2242,17 @@
     },
     {
       "id": 117,
-      "prompt": "Coworker struggling with task—your instinct?",
+      "prompt": "Coworker struggling with task:",
       "leftDesc": "Jump in energetically to help them succeed.",
       "rightDesc": "Offer quiet support without overwhelming them.",
-      "options": ["Jump in", "Quiet support"],
-      "optionMeta": ["I", "S"],
+      "options": [
+        "Jump in",
+        "Quiet support"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
       "psych": "DISC-IS",
       "time": 9,
       "tier": "25+",
@@ -1584,11 +2262,17 @@
     },
     {
       "id": 118,
-      "prompt": "New restaurant opens nearby—your move?",
+      "prompt": "New restaurant opens nearby:",
       "leftDesc": "Try it immediately, love discovering new places.",
       "rightDesc": "Wait for reviews and recommendations first.",
-      "options": ["Try now", "Wait reviews"],
-      "optionMeta": ["O+", "O-"],
+      "options": [
+        "Try now",
+        "Wait reviews"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 9,
       "tier": "25+",
@@ -1601,8 +2285,14 @@
       "prompt": "Work anniversary arrives—what matters most?",
       "leftDesc": "Public recognition from leadership and team.",
       "rightDesc": "Private satisfaction in your accomplishments.",
-      "options": ["Public recognition", "Private satisfaction"],
-      "optionMeta": ["E+", "E-"],
+      "options": [
+        "Public recognition",
+        "Private satisfaction"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
       "psych": "Big5-E",
       "time": 9,
       "tier": "25+",
@@ -1612,11 +2302,17 @@
     },
     {
       "id": 120,
-      "prompt": "Home project approach—your style?",
+      "prompt": "Home project approach:",
       "leftDesc": "Research materials, plan steps, execute methodically.",
-      "rightDesc": "Wing it, figure out problems as they come.",
-      "options": ["Plan methodically", "Wing it"],
-      "optionMeta": ["C+", "C-"],
+      "rightDesc": "Wing it, solve problems as they come.",
+      "options": [
+        "Plan methodically",
+        "Wing it"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 9,
       "tier": "25+",
@@ -1626,11 +2322,17 @@
     },
     {
       "id": 121,
-      "prompt": "Someone needs a favor during busy time—you:",
-      "leftDesc": "Help anyway, relationships matter more than deadlines.",
+      "prompt": "Someone needs a favor during busy time:",
+      "leftDesc": "Help anyway, relationships first.",
       "rightDesc": "Politely decline, your priorities come first.",
-      "options": ["Help anyway", "Politely decline"],
-      "optionMeta": ["A+", "A-"],
+      "options": [
+        "Help anyway",
+        "Politely decline"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
       "psych": "Big5-A",
       "time": 9,
       "tier": "25+",
@@ -1643,8 +2345,14 @@
       "prompt": "Major presentation tomorrow—your evening?",
       "leftDesc": "Practice once more then relax and sleep well.",
       "rightDesc": "Can't stop rehearsing, mind racing through scenarios.",
-      "options": ["Practice sleep", "Can't stop"],
-      "optionMeta": ["N-", "N+"],
+      "options": [
+        "Practice sleep",
+        "Can't stop"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
       "psych": "Big5-N",
       "time": 9,
       "tier": "25+",
@@ -1654,11 +2362,17 @@
     },
     {
       "id": 123,
-      "prompt": "Professional development approach—your preference?",
+      "prompt": "Professional development approach:",
       "leftDesc": "Formal training programs with certifications.",
       "rightDesc": "Self-directed learning through experimentation.",
-      "options": ["Formal training", "Self-directed"],
-      "optionMeta": ["C", "D"],
+      "options": [
+        "Formal training",
+        "Self-directed"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
       "psych": "DISC-CD",
       "time": 9,
       "tier": "25+",
@@ -1671,8 +2385,14 @@
       "prompt": "Work-life integration—your philosophy?",
       "leftDesc": "Clear boundaries between work and personal time.",
       "rightDesc": "Flexible blend where both flow together naturally.",
-      "options": ["Clear boundaries", "Flexible blend"],
-      "optionMeta": ["J", "P"],
+      "options": [
+        "Clear boundaries",
+        "Flexible blend"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 9,
       "tier": "25+",
@@ -1685,8 +2405,14 @@
       "prompt": "Receiving criticism—your internal process?",
       "leftDesc": "Separate facts from emotions, analyze objectively.",
       "rightDesc": "Process feelings first, then consider the points.",
-      "options": ["Analyze first", "Feel first"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Analyze first",
+        "Feel first"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 9,
       "tier": "25+",
@@ -1696,11 +2422,17 @@
     },
     {
       "id": 126,
-      "prompt": "Weekend activity preference—your choice?",
+      "prompt": "Weekend activity preference:",
       "leftDesc": "Busy schedule with social events and activities.",
       "rightDesc": "Quiet time at home with minimal obligations.",
-      "options": ["Busy social", "Quiet home"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Busy social",
+        "Quiet home"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 9,
       "tier": "25+",
@@ -1710,11 +2442,17 @@
     },
     {
       "id": 127,
-      "prompt": "Problem-solving approach—your method?",
-      "leftDesc": "Follow proven frameworks and established best practices.",
+      "prompt": "Problem-solving approach:",
+      "leftDesc": "Follow proven frameworks .",
       "rightDesc": "Invent novel approaches for each unique situation.",
-      "options": ["Proven frameworks", "Novel approaches"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "Proven frameworks",
+        "Novel approaches"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 9,
       "tier": "25+",
@@ -1724,11 +2462,17 @@
     },
     {
       "id": 128,
-      "prompt": "Team celebration happening—your preference?",
+      "prompt": "Team celebration happening:",
       "leftDesc": "Big party with everyone together celebrating wins.",
       "rightDesc": "Individual recognition and quiet appreciation.",
-      "options": ["Big party", "Individual recognition"],
-      "optionMeta": ["I", "S"],
+      "options": [
+        "Big party",
+        "Individual recognition"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
       "psych": "DISC-IS",
       "time": 9,
       "tier": "25+",
@@ -1741,8 +2485,14 @@
       "prompt": "Financial planning horizon—your focus?",
       "leftDesc": "Long-term wealth building over decades.",
       "rightDesc": "Enjoying life now while you can.",
-      "options": ["Long-term", "Enjoy now"],
-      "optionMeta": ["C+", "C-"],
+      "options": [
+        "Long-term",
+        "Enjoy now"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 9,
       "tier": "25+",
@@ -1752,11 +2502,17 @@
     },
     {
       "id": 130,
-      "prompt": "Weekend morning vibes—what's your move?",
+      "prompt": "Weekend morning vibes:",
       "leftDesc": "Up early to catch sunrise and start adventures.",
       "rightDesc": "Cozy blanket cocoon until noon calls.",
-      "options": ["Early bird", "Sleep in"],
-      "optionMeta": ["E", "I"],
+      "options": [
+        "Early bird",
+        "Sleep in"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
       "psych": "MBTI-EI",
       "time": 7,
       "tier": "19-25",
@@ -1766,11 +2522,17 @@
     },
     {
       "id": 131,
-      "prompt": "Friend needs advice—your approach?",
+      "prompt": "Friend needs advice:",
       "leftDesc": "Listen quietly and let them figure it out.",
       "rightDesc": "Jump in with all your best solutions.",
-      "options": ["Listen", "Advise"],
-      "optionMeta": ["I", "E"],
+      "options": [
+        "Listen",
+        "Advise"
+      ],
+      "optionMeta": [
+        "I",
+        "E"
+      ],
       "psych": "MBTI-EI",
       "time": 7,
       "tier": "19-25",
@@ -1783,8 +2545,14 @@
       "prompt": "New recipe to try—how do you cook?",
       "leftDesc": "Follow each step precisely for perfect results.",
       "rightDesc": "Eyeball ingredients and trust your instincts.",
-      "options": ["Follow recipe", "Wing it"],
-      "optionMeta": ["S", "N"],
+      "options": [
+        "Follow recipe",
+        "Wing it"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
       "psych": "MBTI-SN",
       "time": 7,
       "tier": "19-25",
@@ -1794,11 +2562,17 @@
     },
     {
       "id": 133,
-      "prompt": "Roommate conflict brewing—your response?",
+      "prompt": "Roommate conflict brewing:",
       "leftDesc": "Create a fair chore chart with clear rules.",
       "rightDesc": "Have a heart-to-heart about feelings first.",
-      "options": ["Chart rules", "Heart talk"],
-      "optionMeta": ["T", "F"],
+      "options": [
+        "Chart rules",
+        "Heart talk"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
       "psych": "MBTI-TF",
       "time": 7,
       "tier": "19-25",
@@ -1810,9 +2584,15 @@
       "id": 134,
       "prompt": "Vacation planning style—what fits you?",
       "leftDesc": "Detailed itinerary with reservations locked in.",
-      "rightDesc": "Book the flight and figure out the rest later.",
-      "options": ["Planned", "Spontaneous"],
-      "optionMeta": ["J", "P"],
+      "rightDesc": "Book the flight and solve the rest later.",
+      "options": [
+        "Planned",
+        "Spontaneous"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
       "psych": "MBTI-JP",
       "time": 7,
       "tier": "19-25",
@@ -1822,11 +2602,17 @@
     },
     {
       "id": 135,
-      "prompt": "Group dinner bill arrives—your move?",
+      "prompt": "Group dinner bill arrives:",
       "leftDesc": "Take charge and calculate everyone's share.",
       "rightDesc": "Go with the flow and split equally.",
-      "options": ["Take charge", "Go flow"],
-      "optionMeta": ["D", "S"],
+      "options": [
+        "Take charge",
+        "Go flow"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
       "psych": "DISC-DS",
       "time": 7,
       "tier": "19-25",
@@ -1836,11 +2622,17 @@
     },
     {
       "id": 136,
-      "prompt": "Party invite arrives—your energy?",
+      "prompt": "Party invite arrives:",
       "leftDesc": "Already planning your entrance and outfit.",
       "rightDesc": "Hoping your favorite person will be there.",
-      "options": ["Big entrance", "Find friend"],
-      "optionMeta": ["I", "S"],
+      "options": [
+        "Big entrance",
+        "Find friend"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
       "psych": "DISC-IS",
       "time": 7,
       "tier": "19-25",
@@ -1850,11 +2642,17 @@
     },
     {
       "id": 137,
-      "prompt": "IKEA furniture arrives—your method?",
+      "prompt": "IKEA furniture arrives:",
       "leftDesc": "Read every page of instructions twice.",
       "rightDesc": "Dump pieces out and figure it out.",
-      "options": ["Read all", "Figure out"],
-      "optionMeta": ["C", "D"],
+      "options": [
+        "Read all",
+        "Figure out"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
       "psych": "DISC-CD",
       "time": 7,
       "tier": "19-25",
@@ -1864,11 +2662,17 @@
     },
     {
       "id": 138,
-      "prompt": "New music discovery—your vibe?",
+      "prompt": "New music discovery:",
       "leftDesc": "Try weird experimental sounds no one knows.",
       "rightDesc": "Stick with genres you already love.",
-      "options": ["Weird new", "Trusted fave"],
-      "optionMeta": ["O+", "O-"],
+      "options": [
+        "Weird new",
+        "Trusted fave"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
       "psych": "Big5-O",
       "time": 7,
       "tier": "19-25",
@@ -1881,8 +2685,14 @@
       "prompt": "Deadline approaching—your state?",
       "leftDesc": "Already done a week ago, feeling calm.",
       "rightDesc": "Thriving on last-minute adrenaline rush.",
-      "options": ["Done early", "Last minute"],
-      "optionMeta": ["C+", "C-"],
+      "options": [
+        "Done early",
+        "Last minute"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
       "psych": "Big5-C",
       "time": 7,
       "tier": "19-25",
@@ -1892,11 +2702,17 @@
     },
     {
       "id": 140,
-      "prompt": "Meeting new people—your comfort level?",
+      "prompt": "Meeting new people:",
       "leftDesc": "Energized by fresh faces and new stories.",
       "rightDesc": "Prefer deepening bonds with existing friends.",
-      "options": ["New faces", "Old friends"],
-      "optionMeta": ["E+", "E-"],
+      "options": [
+        "New faces",
+        "Old friends"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
       "psych": "Big5-E",
       "time": 7,
       "tier": "19-25",
@@ -1906,11 +2722,17 @@
     },
     {
       "id": 141,
-      "prompt": "Someone cuts in line—your reaction?",
+      "prompt": "Someone cuts in line:",
       "leftDesc": "Speak up politely but firmly about fairness.",
       "rightDesc": "Let it go to avoid any awkward tension.",
-      "options": ["Speak up", "Let go"],
-      "optionMeta": ["A-", "A+"],
+      "options": [
+        "Speak up",
+        "Let go"
+      ],
+      "optionMeta": [
+        "A-",
+        "A+"
+      ],
       "psych": "Big5-A",
       "time": 7,
       "tier": "19-25",
@@ -1920,11 +2742,17 @@
     },
     {
       "id": 106,
-      "prompt": "Everyone agrees on a solution—your response?",
-      "leftDesc": "Go with consensus since the group wisdom usually wins.",
+      "prompt": "Everyone agrees on a solution:",
+      "leftDesc": "Go with consensus trusting group wisdom.",
       "rightDesc": "Question the hidden assumption nobody else is seeing.",
-      "options": ["Follow consensus", "Question assumption"],
-      "optionMeta": ["CT0", "CT1"],
+      "options": [
+        "Follow consensus",
+        "Question assumption"
+      ],
+      "optionMeta": [
+        "CT0",
+        "CT1"
+      ],
       "psych": "Critical",
       "time": 7,
       "tier": "all",
@@ -1937,8 +2765,14 @@
       "prompt": "Facing a complex problem—how do you attack it?",
       "leftDesc": "Accept the surface answer and move forward quickly.",
       "rightDesc": "Break it down to the fundamental basics first.",
-      "options": ["Accept surface", "Break to basics"],
-      "optionMeta": ["FP0", "FP1"],
+      "options": [
+        "Accept surface",
+        "Break to basics"
+      ],
+      "optionMeta": [
+        "FP0",
+        "FP1"
+      ],
       "psych": "FirstPrinciples",
       "time": 7,
       "tier": "all",
@@ -1951,8 +2785,14 @@
       "prompt": "Popular opinion contradicts data—which wins?",
       "leftDesc": "Trust the data even when everyone disagrees.",
       "rightDesc": "Consider the crowd might know something data doesn't.",
-      "options": ["Trust data", "Consider crowd"],
-      "optionMeta": ["CT1", "CT0"],
+      "options": [
+        "Trust data",
+        "Consider crowd"
+      ],
+      "optionMeta": [
+        "CT1",
+        "CT0"
+      ],
       "psych": "Critical",
       "time": 7,
       "tier": "all",
@@ -1962,11 +2802,17 @@
     },
     {
       "id": 109,
-      "prompt": "Solving a stuck problem—your strategy?",
+      "prompt": "Solving a stuck problem:",
       "leftDesc": "Start from zero and rebuild your assumptions.",
       "rightDesc": "Try variations of what already partially works.",
-      "options": ["Rebuild zero", "Vary what works"],
-      "optionMeta": ["FP1", "FP0"],
+      "options": [
+        "Rebuild zero",
+        "Vary what works"
+      ],
+      "optionMeta": [
+        "FP1",
+        "FP0"
+      ],
       "psych": "FirstPrinciples",
       "time": 7,
       "tier": "all",
@@ -1976,10 +2822,26 @@
     }
   ],
   "tierConfig": {
-    "7-12": { "baseCount": 15, "maxTime": 9, "swipeStyle": "playful" },
-    "13-18": { "baseCount": 25, "maxTime": 9, "swipeStyle": "teen" },
-    "19-25": { "baseCount": 25, "maxTime": 9, "swipeStyle": "adult" },
-    "25+": { "baseCount": 40, "maxTime": 9, "swipeStyle": "mature" }
+    "7-12": {
+      "baseCount": 15,
+      "maxTime": 9,
+      "swipeStyle": "playful"
+    },
+    "13-18": {
+      "baseCount": 25,
+      "maxTime": 9,
+      "swipeStyle": "teen"
+    },
+    "19-25": {
+      "baseCount": 25,
+      "maxTime": 9,
+      "swipeStyle": "adult"
+    },
+    "25+": {
+      "baseCount": 40,
+      "maxTime": 9,
+      "swipeStyle": "mature"
+    }
   },
   "psychDistribution": {
     "MBTI": 0.3,

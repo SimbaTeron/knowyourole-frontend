@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
-import { Play, Clock, Zap, Target, ChevronLeft, ChevronRight, Sparkles, Timer, Hand } from "lucide-react";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { Clock, Zap, Target, Sparkles, Timer, Hand } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
 
 const DEMO_STEPS = [
   {
@@ -37,6 +36,8 @@ export default function PreQuizPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [demoCardX, setDemoCardX] = useState(0);
   const [timerProgress, setTimerProgress] = useState(100);
+  const [dragDirection, setDragDirection] = useState<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
@@ -98,16 +99,20 @@ export default function PreQuizPage() {
     setLocation("/location");
   };
 
-  const handleNextStep = () => {
-    if (currentStep < DEMO_STEPS.length - 1) {
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const threshold = 50;
+    if (info.offset.x < -threshold && currentStep < DEMO_STEPS.length - 1) {
       setCurrentStep(prev => prev + 1);
+      if (navigator.vibrate) navigator.vibrate(20);
+    } else if (info.offset.x > threshold && currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+      if (navigator.vibrate) navigator.vibrate(20);
     }
+    setDragDirection(0);
   };
 
-  const handlePrevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
-    }
+  const handleDrag = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    setDragDirection(info.offset.x);
   };
 
   const getThemeClass = () => {
@@ -117,6 +122,21 @@ export default function PreQuizPage() {
   const currentDemoStep = DEMO_STEPS[currentStep];
   const Icon = currentDemoStep.icon;
 
+  const swipeVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? -300 : 300,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+  };
+
   return (
     <div className={`min-h-screen relative overflow-hidden ${getThemeClass()}`}>
       <PathCanvas />
@@ -125,17 +145,14 @@ export default function PreQuizPage() {
         currentTheme={theme}
         onThemeChange={handleThemeChange}
       />
-      <main className="relative z-10 pt-20 pb-32 px-4 min-h-screen flex flex-col">
+      <main className="relative z-10 pt-12 pb-32 px-4 min-h-screen flex flex-col">
         <div className="max-w-md mx-auto w-full flex-1 flex flex-col">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-center mb-6"
+            className="text-center mb-4"
           >
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-dusty-blue to-sage-green mb-3">
-              <Play className="w-6 h-6 text-white" />
-            </div>
             <h1 className="text-2xl md:text-3xl font-display font-semibold compass-gradient-text mb-2">
               Here's How It Works
             </h1>
@@ -144,166 +161,157 @@ export default function PreQuizPage() {
             </p>
           </motion.div>
 
-          {/* Demo Area */}
+          {/* Step Counter */}
+          <div className="flex justify-center gap-2 mb-4">
+            {DEMO_STEPS.map((step, idx) => (
+              <button
+                key={step.id}
+                onClick={() => setCurrentStep(idx)}
+                className={`w-3 h-3 rounded-full transition-all ${
+                  idx === currentStep 
+                    ? "bg-terracotta scale-125" 
+                    : "bg-warm-gray/20 dark:bg-soft-cream/20"
+                }`}
+                data-testid={`button-demo-step-${idx}`}
+              />
+            ))}
+          </div>
+
+          {/* Swipeable Demo Card */}
           <motion.div
+            ref={containerRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex-1 flex flex-col"
+            className="flex-1 flex flex-col relative overflow-hidden"
           >
-            {/* Step Counter */}
-            <div className="flex justify-center gap-2 mb-6">
-              {DEMO_STEPS.map((step, idx) => (
-                <button
-                  key={step.id}
-                  onClick={() => setCurrentStep(idx)}
-                  className={`w-3 h-3 rounded-full transition-all ${
-                    idx === currentStep 
-                      ? "bg-terracotta scale-125" 
-                      : "bg-warm-gray/20 dark:bg-soft-cream/20"
-                  }`}
-                  data-testid={`button-demo-step-${idx}`}
-                />
-              ))}
-            </div>
+            <div className="relative flex-1 min-h-[320px]">
+              <AnimatePresence initial={false} custom={dragDirection} mode="popLayout">
+                <motion.div
+                  key={currentStep}
+                  custom={dragDirection}
+                  variants={swipeVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 30 
+                  }}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onDrag={handleDrag}
+                  onDragEnd={handleDragEnd}
+                  className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                >
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-warm-gray/10 dark:border-soft-cream/10 h-full flex flex-col">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-terracotta to-sunset-amber flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-warm-gray dark:text-soft-cream">
+                          {currentDemoStep.title}
+                        </h3>
+                        <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                          Step {currentStep + 1} of {DEMO_STEPS.length}
+                        </p>
+                      </div>
+                    </div>
 
-            {/* Demo Card */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6 border border-warm-gray/10 dark:border-soft-cream/10"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-terracotta to-sunset-amber flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-warm-gray dark:text-soft-cream">
-                      {currentDemoStep.title}
-                    </h3>
-                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-                      Step {currentStep + 1} of {DEMO_STEPS.length}
+                    <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 mb-6 leading-relaxed">
+                      {currentDemoStep.description}
+                    </p>
+
+                    {/* Visual Demo */}
+                    <div className="bg-soft-cream/50 dark:bg-gray-700/50 rounded-xl p-4 flex-1 flex items-center justify-center">
+                      {currentDemoStep.demo === "swipe" && (
+                        <div className="relative">
+                          <motion.div
+                            animate={{ x: demoCardX, rotate: demoCardX / 3 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                            className="w-40 h-20 bg-white dark:bg-gray-600 rounded-xl shadow-md flex items-center justify-center border-2 border-terracotta/20"
+                          >
+                            <span className="text-xs text-warm-gray/70 dark:text-soft-cream/60">
+                              Swipe me!
+                            </span>
+                          </motion.div>
+                          <div className="flex justify-between mt-3 px-2">
+                            <span className="text-xs text-sage-green font-medium">Option A</span>
+                            <span className="text-xs text-dusty-blue font-medium">Option B</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {currentDemoStep.demo === "timer" && (
+                        <div className="text-center">
+                          <div className="relative w-20 h-20 mx-auto mb-2">
+                            <svg className="w-full h-full transform -rotate-90">
+                              <circle
+                                cx="40"
+                                cy="40"
+                                r="36"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                className="text-warm-gray/10 dark:text-soft-cream/10"
+                              />
+                              <circle
+                                cx="40"
+                                cy="40"
+                                r="36"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                strokeDasharray={`${226 * (timerProgress / 100)} 226`}
+                                strokeLinecap="round"
+                                className={`transition-all duration-100 ${
+                                  timerProgress < 30 ? "text-red-500" : "text-terracotta"
+                                }`}
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-lg font-bold text-warm-gray dark:text-soft-cream">
+                                {Math.ceil(timerProgress / 10)}s
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                            Trust your instincts!
+                          </p>
+                        </div>
+                      )}
+
+                      {currentDemoStep.demo === "multichoice" && (
+                        <div className="w-full max-w-[200px] space-y-2">
+                          {["Creative work", "Helping others", "Solving puzzles", "Leading teams"].map((opt, idx) => (
+                            <motion.div
+                              key={opt}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.1 }}
+                              className={`px-3 py-2 rounded-lg text-xs text-center transition-all ${
+                                idx === 1 
+                                  ? "bg-terracotta text-white" 
+                                  : "bg-white dark:bg-gray-600 text-warm-gray/70 dark:text-soft-cream/60"
+                              }`}
+                            >
+                              {opt}
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Swipe hint */}
+                    <p className="text-center text-xs text-warm-gray/40 dark:text-soft-cream/30 mt-4">
+                      Swipe left or right to navigate
                     </p>
                   </div>
-                </div>
-
-                <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 mb-6 leading-relaxed">
-                  {currentDemoStep.description}
-                </p>
-
-                {/* Visual Demo */}
-                <div className="bg-soft-cream/50 dark:bg-gray-700/50 rounded-xl p-4 min-h-[120px] flex items-center justify-center">
-                  {currentDemoStep.demo === "swipe" && (
-                    <div className="relative">
-                      <motion.div
-                        animate={{ x: demoCardX, rotate: demoCardX / 3 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        className="w-40 h-20 bg-white dark:bg-gray-600 rounded-xl shadow-md flex items-center justify-center border-2 border-terracotta/20"
-                      >
-                        <span className="text-xs text-warm-gray/70 dark:text-soft-cream/60">
-                          Swipe me!
-                        </span>
-                      </motion.div>
-                      <div className="flex justify-between mt-3 px-2">
-                        <span className="text-xs text-sage-green font-medium">Option A</span>
-                        <span className="text-xs text-dusty-blue font-medium">Option B</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {currentDemoStep.demo === "timer" && (
-                    <div className="text-center">
-                      <div className="relative w-20 h-20 mx-auto mb-2">
-                        <svg className="w-full h-full transform -rotate-90">
-                          <circle
-                            cx="40"
-                            cy="40"
-                            r="36"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                            className="text-warm-gray/10 dark:text-soft-cream/10"
-                          />
-                          <circle
-                            cx="40"
-                            cy="40"
-                            r="36"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                            strokeDasharray={`${226 * (timerProgress / 100)} 226`}
-                            strokeLinecap="round"
-                            className={`transition-all duration-100 ${
-                              timerProgress < 30 ? "text-red-500" : "text-terracotta"
-                            }`}
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-lg font-bold text-warm-gray dark:text-soft-cream">
-                            {Math.ceil(timerProgress / 10)}s
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-                        Trust your instincts!
-                      </p>
-                    </div>
-                  )}
-
-                  {currentDemoStep.demo === "multichoice" && (
-                    <div className="w-full max-w-[200px] space-y-2">
-                      {["Creative work", "Helping others", "Solving puzzles", "Leading teams"].map((opt, idx) => (
-                        <motion.div
-                          key={opt}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.1 }}
-                          className={`px-3 py-2 rounded-lg text-xs text-center transition-all ${
-                            idx === 1 
-                              ? "bg-terracotta text-white" 
-                              : "bg-white dark:bg-gray-600 text-warm-gray/70 dark:text-soft-cream/60"
-                          }`}
-                        >
-                          {opt}
-                        </motion.div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Navigation Arrows */}
-            <div className="flex justify-between items-center px-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handlePrevStep}
-                disabled={currentStep === 0}
-                className="opacity-70 hover:opacity-100 disabled:opacity-30"
-                data-testid="button-prev-demo"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </Button>
-              
-              <div className="text-sm text-warm-gray/50 dark:text-soft-cream/40">
-                {currentStep + 1} / {DEMO_STEPS.length}
-              </div>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleNextStep}
-                disabled={currentStep === DEMO_STEPS.length - 1}
-                className="opacity-70 hover:opacity-100 disabled:opacity-30"
-                data-testid="button-next-demo"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </Button>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
         </div>

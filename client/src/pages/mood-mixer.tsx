@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, SkipForward, Sparkles } from "lucide-react";
+import { ArrowRight, SkipForward } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
-import EmojiMoodMixer from "@/components/EmojiMoodMixer";
+import MagneticOrbitMixer from "@/components/MagneticOrbitMixer";
 
 export default function MoodMixerPage() {
   const [, setLocation] = useLocation();
@@ -70,7 +70,7 @@ export default function MoodMixerPage() {
         currentTheme={theme}
         onThemeChange={handleThemeChange}
       />
-      <main className="relative z-10 pt-24 pb-32 px-4 min-h-screen flex flex-col">
+      <main className="relative z-10 pt-16 pb-32 px-4 min-h-screen flex flex-col">
         <div className="max-w-md mx-auto w-full flex-1 flex flex-col">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -78,9 +78,6 @@ export default function MoodMixerPage() {
             transition={{ delay: 0.1 }}
             className="text-center mb-6"
           >
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-3">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
             <h1 className="text-3xl md:text-4xl font-display font-semibold compass-gradient-text mb-3">
               Brew Your Mood Mix
             </h1>
@@ -89,16 +86,8 @@ export default function MoodMixerPage() {
             </p>
           </motion.div>
 
-          <EmojiMoodMixer onMoodBrewed={handleMoodBrewed} />
+          <MagneticOrbitMixer onMoodBrewed={handleMoodBrewed} />
           
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-6 text-center text-sm text-warm-gray/50 dark:text-soft-cream/40"
-          >
-            Pick any two moods to see what they create together
-          </motion.p>
         </div>
       </main>
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-deep-cream dark:via-deep-cream/95 pb-8">

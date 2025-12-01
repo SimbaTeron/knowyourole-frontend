@@ -130,8 +130,10 @@ interface Question {
   wildcard: boolean;
 }
 
+type TierValue = "7-12" | "13-18" | "19-25" | "25plus";
+
 interface QuizProps {
-  tier: string;
+  tier: TierValue;
   mood: string;
   funMode: boolean;
   landmark?: string;
@@ -169,27 +171,21 @@ const SWIPE_THRESHOLD = 100;
 const ROTATION_RANGE = 15;
 
 const TIMEOUT_QUIPS = [
-  { quip: "Time flies when you're pondering!" },
-  { quip: "The universe chose for you this time" },
-  { quip: "Sometimes the best choice is a surprise" },
-  { quip: "Going with the cosmic flow on this one" },
-  { quip: "Your future self just picked for you" },
-  { quip: "Let fate decide this fork in the road" },
-  { quip: "Even quick-thinkers need a breather" },
-  { quip: "The timer won, but you're still winning" },
-  { quip: "Destiny took the wheel on this one" },
-  { quip: "Your gut instinct just answered silently" },
-  { quip: "The stars aligned while you were thinking" },
-  { quip: "A moment of zen led to this choice" },
-  { quip: "The path chose you this time around" },
-  { quip: "Deep thoughts deserve cosmic help" },
-  { quip: "Your subconscious knew the answer all along" },
-  { quip: "Let the wind carry this decision forward" },
-  { quip: "Adventure awaits—fate flipped the card!" },
-  { quip: "The compass spun and landed here" },
-  { quip: "Sometimes the road picks the traveler" },
-  { quip: "Your inner compass knew the way" },
-  { quip: "The trail blazed itself this time" },
+  { quip: "Take a breath! No rush here" },
+  { quip: "Deep thoughts take time" },
+  { quip: "Pause, reset, try again!" },
+  { quip: "Your pace is perfect" },
+  { quip: "Take a moment, then decide" },
+  { quip: "No pressure - you've got this" },
+  { quip: "Let that one simmer" },
+  { quip: "Some questions need extra thought" },
+  { quip: "Thinking is a superpower" },
+  { quip: "Take your time, champ" },
+  { quip: "Good things take time" },
+  { quip: "Breathe and try again" },
+  { quip: "Your brain needed a break" },
+  { quip: "Slow and steady wins" },
+  { quip: "Reset and refocus" },
 ];
 
 const READABLE_RANDOM_COLORS = [
@@ -300,24 +296,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }, [currentIndex, questions, tierConfig.maxTime]);
 
   useEffect(() => {
-    if (isPaused || timeRemaining <= 0 || questions.length === 0 || isTimingOut) return;
-    
-    timerRef.current = setInterval(() => {
-      setTimeRemaining(prev => {
-        if (prev <= 0.1) {
-          handleTimeout();
-          return 0;
-        }
-        return prev - 0.1;
-      });
-    }, 100);
-    
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isPaused, currentIndex, questions.length, isTimingOut]);
-
-  useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
@@ -334,13 +312,29 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     timeoutRef.current = setTimeout(() => {
       setShowQuip(false);
-      
-      setTimeout(() => {
-        handleSwipe(Math.random() > 0.5 ? "right" : "left", true);
-        setIsTimingOut(false);
-      }, 300);
+      setTimeRemaining(tierConfig.maxTime);
+      setQuestionStartTime(Date.now());
+      setIsTimingOut(false);
     }, 2000);
-  }, [missCount]);
+  }, [missCount, tierConfig.maxTime]);
+
+  useEffect(() => {
+    if (isPaused || questions.length === 0 || isTimingOut) return;
+    
+    timerRef.current = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 0.1) {
+          handleTimeout();
+          return 0;
+        }
+        return prev - 0.1;
+      });
+    }, 100);
+    
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout]);
 
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1) => {
     const meta = question.optionMeta[choiceIndex];
@@ -685,10 +679,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   );
 
   if (quizPhase === "superpower") {
-    const ageTier: AgeTier = tier === "7-12" ? "mini" : tier === "13-18" ? "teen" : tier === "19-25" ? "ya" : "adult";
     return (
       <SuperpowerGame
-        ageTier={ageTier}
+        tier={tier}
         onSelect={handleSuperpowerChoice}
       />
     );
@@ -697,8 +690,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   if (quizPhase === "superpower-countdown") {
     return (
       <TimedCountdown
-        title="Great choice!"
-        subtitle="Back to questions..."
         onComplete={handleCountdownComplete}
       />
     );
@@ -711,8 +702,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   if (quizPhase === "mid1-countdown") {
     return (
       <TimedCountdown
-        title="Locked in!"
-        subtitle="Continuing your journey..."
         onComplete={handleCountdownComplete}
       />
     );
@@ -725,18 +714,15 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   if (quizPhase === "mid2-countdown") {
     return (
       <TimedCountdown
-        title="Nice pick!"
-        subtitle="Almost there..."
         onComplete={handleCountdownComplete}
       />
     );
   }
 
   if (quizPhase === "mystery") {
-    const ageTier: AgeTier = tier === "7-12" ? "mini" : tier === "13-18" ? "teen" : tier === "19-25" ? "ya" : "adult";
     return (
       <MysteryBoxGame
-        ageTier={ageTier}
+        tier={tier}
         onSelect={handleMysteryChoice}
       />
     );
@@ -745,8 +731,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   if (quizPhase === "mystery-countdown") {
     return (
       <TimedCountdown
-        title="Mystery revealed!"
-        subtitle="Final stretch..."
         onComplete={handleCountdownComplete}
       />
     );

@@ -1573,7 +1573,35 @@ export function getRegionalTheme(state?: string, country?: string): LocalityThem
   return genericThemes.default;
 }
 
+const stateThemeOverrides: Record<string, LocalityTheme> = {
+  "CA": {
+    name: "California",
+    team: "Golden State",
+    primary: "#C8102E",
+    secondary: "#FFD700",
+    accent: "#FFFFFF",
+    textOnPrimary: "light",
+    textOnSecondary: "dark"
+  },
+  "NY": {
+    name: "New York",
+    team: "Yankees",
+    primary: "#003087",
+    secondary: "#FFFFFF",
+    accent: "#C4CED4",
+    textOnPrimary: "light",
+    textOnSecondary: "dark"
+  }
+};
+
 export function getLocalityTheme(city: string, state?: string, country?: string): LocalityTheme {
+  if (state) {
+    const upperState = state.toUpperCase();
+    if (stateThemeOverrides[upperState]) {
+      return stateThemeOverrides[upperState];
+    }
+  }
+  
   const cityTheme = getCityTheme(city, state, country);
   
   if (cityTheme) {

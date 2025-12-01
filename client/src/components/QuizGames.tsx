@@ -551,7 +551,7 @@ export function MysteryBoxGame({ tier, onSelect }: MysteryBoxGameProps) {
           </div>
         </motion.div>
         
-        <div className="grid grid-cols-4 gap-3 sm:gap-4 justify-items-center">
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 justify-items-center max-w-xs mx-auto">
           {choices.map((choice, idx) => (
             <RevealItem
               key={choice.id}
