@@ -2469,7 +2469,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           </div>
                         ) : (
                           <>
-                            <span className="text-3xl font-black">$0.02</span>
+                            <span className="font-black text-[48px]">$0.02</span>
                             <span className="text-lg font-bold flex items-center gap-2">
                               <Rocket className="w-5 h-5" />
                               Unlock Premium Now
