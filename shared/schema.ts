@@ -245,3 +245,199 @@ export const insertSliderResponseSchema = createInsertSchema(sliderResponses).om
 
 export type InsertSliderResponse = z.infer<typeof insertSliderResponseSchema>;
 export type SliderResponse = typeof sliderResponses.$inferSelect;
+
+// ============================================
+// PREMIUM INSIGHTS DATABASE - 8 Categories
+// ============================================
+
+// 1. Side Hustles - Matched by traits for personalized recommendations
+export const sideHustles = pgTable("side_hustles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  incomeRange: text("income_range").notNull(), // "$500-2K/mo"
+  timeCommitment: text("time_commitment").notNull(), // "5-10 hrs/week"
+  difficulty: text("difficulty").notNull(), // "beginner", "intermediate", "advanced"
+  primaryTrait: text("primary_trait").notNull(), // Big Five trait: O, C, E, A, N
+  primaryTraitMin: integer("primary_trait_min").notNull(), // Minimum score 0-100
+  secondaryTrait: text("secondary_trait"), // Optional second trait
+  secondaryTraitMin: integer("secondary_trait_min"), // Optional minimum
+  mbtiPreference: text("mbti_preference"), // E/I, N/S, T/F, J/P preference
+  discPreference: text("disc_preference"), // D, I, S, C preference
+  ageTiers: text("age_tiers").notNull().default("teen,young_adult,adult"), // Comma-separated
+  tags: text("tags").notNull(), // Comma-separated: "creative,digital,flexible"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertSideHustleSchema = createInsertSchema(sideHustles).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertSideHustle = z.infer<typeof insertSideHustleSchema>;
+export type SideHustle = typeof sideHustles.$inferSelect;
+
+// 2. Blindspots - Areas for personal growth based on low traits
+export const blindspots = pgTable("blindspots", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  actionTip: text("action_tip").notNull(), // Specific action to address it
+  targetTrait: text("target_trait").notNull(), // The low trait this addresses
+  traitMax: integer("trait_max").notNull(), // Maximum score to show (e.g., 40)
+  secondaryCondition: text("secondary_condition"), // JSON for additional conditions
+  severity: text("severity").notNull().default("moderate"), // "mild", "moderate", "significant"
+  ageTiers: text("age_tiers").notNull().default("teen,young_adult,adult"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertBlindspotSchema = createInsertSchema(blindspots).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertBlindspot = z.infer<typeof insertBlindspotSchema>;
+export type Blindspot = typeof blindspots.$inferSelect;
+
+// 3. Career Paths - Extended career recommendations
+export const careerPaths = pgTable("career_paths", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  salaryRange: text("salary_range").notNull(),
+  growthOutlook: text("growth_outlook").notNull(), // "High", "Moderate", "Stable"
+  educationReq: text("education_req").notNull(), // "None", "Certificate", "Degree"
+  primaryTrait: text("primary_trait").notNull(),
+  primaryTraitMin: integer("primary_trait_min").notNull(),
+  secondaryTrait: text("secondary_trait"),
+  secondaryTraitMin: integer("secondary_trait_min"),
+  mbtiTypes: text("mbti_types"), // Comma-separated: "INTJ,INTP,ENTJ"
+  discStyles: text("disc_styles"), // Comma-separated: "D,C"
+  industry: text("industry").notNull(), // "Tech", "Healthcare", "Creative", etc.
+  ageTiers: text("age_tiers").notNull().default("young_adult,adult"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCareerPathSchema = createInsertSchema(careerPaths).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertCareerPath = z.infer<typeof insertCareerPathSchema>;
+export type CareerPath = typeof careerPaths.$inferSelect;
+
+// 4. Growth Tips - Personalized improvement suggestions
+export const growthTips = pgTable("growth_tips", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  actionSteps: text("action_steps").notNull(), // JSON array of steps
+  timeframe: text("timeframe").notNull(), // "Daily", "Weekly", "30-day"
+  targetTrait: text("target_trait").notNull(),
+  traitDirection: text("trait_direction").notNull(), // "strengthen" or "balance"
+  traitMin: integer("trait_min"), // Show if trait above this
+  traitMax: integer("trait_max"), // Show if trait below this
+  difficulty: text("difficulty").notNull().default("easy"),
+  ageTiers: text("age_tiers").notNull().default("all"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertGrowthTipSchema = createInsertSchema(growthTips).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertGrowthTip = z.infer<typeof insertGrowthTipSchema>;
+export type GrowthTip = typeof growthTips.$inferSelect;
+
+// 5. Strengths - Personalized strength descriptions
+export const strengths = pgTable("strengths", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  howToLeverage: text("how_to_leverage").notNull(),
+  primaryTrait: text("primary_trait").notNull(),
+  primaryTraitMin: integer("primary_trait_min").notNull(),
+  secondaryTrait: text("secondary_trait"),
+  secondaryTraitMin: integer("secondary_trait_min"),
+  combinationType: text("combination_type"), // "both_high", "contrast", etc.
+  ageTiers: text("age_tiers").notNull().default("all"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertStrengthSchema = createInsertSchema(strengths).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertStrength = z.infer<typeof insertStrengthSchema>;
+export type Strength = typeof strengths.$inferSelect;
+
+// 6. Communication Styles - How user communicates based on traits
+export const communicationStyles = pgTable("communication_styles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  tipsForOthers: text("tips_for_others").notNull(), // How others should communicate with them
+  tipsForSelf: text("tips_for_self").notNull(), // How to improve communication
+  discStyle: text("disc_style"), // D, I, S, or C
+  extraversionMin: integer("extraversion_min"),
+  extraversionMax: integer("extraversion_max"),
+  agreeablenessMin: integer("agreeableness_min"),
+  agreeablenessMax: integer("agreeableness_max"),
+  ageTiers: text("age_tiers").notNull().default("all"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCommunicationStyleSchema = createInsertSchema(communicationStyles).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertCommunicationStyle = z.infer<typeof insertCommunicationStyleSchema>;
+export type CommunicationStyle = typeof communicationStyles.$inferSelect;
+
+// 7. Work Environments - Ideal work settings
+export const workEnvironments = pgTable("work_environments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  idealFor: text("ideal_for").notNull(), // Who thrives here
+  challenges: text("challenges").notNull(), // Potential challenges
+  opennessMin: integer("openness_min"),
+  opennessMax: integer("openness_max"),
+  conscientiousnessMin: integer("conscientiousness_min"),
+  conscientiousnessMax: integer("conscientiousness_max"),
+  extraversionMin: integer("extraversion_min"),
+  extraversionMax: integer("extraversion_max"),
+  discStyles: text("disc_styles"), // Comma-separated
+  ageTiers: text("age_tiers").notNull().default("young_adult,adult"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertWorkEnvironmentSchema = createInsertSchema(workEnvironments).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertWorkEnvironment = z.infer<typeof insertWorkEnvironmentSchema>;
+export type WorkEnvironment = typeof workEnvironments.$inferSelect;
+
+// 8. Relationship Insights - How traits affect relationships
+export const relationshipInsights = pgTable("relationship_insights", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  strengthsInRelationships: text("strengths_in_relationships").notNull(),
+  growthAreas: text("growth_areas").notNull(),
+  compatibilityNotes: text("compatibility_notes").notNull(),
+  primaryTrait: text("primary_trait").notNull(),
+  primaryTraitMin: integer("primary_trait_min"),
+  primaryTraitMax: integer("primary_trait_max"),
+  agreeablenessMin: integer("agreeableness_min"),
+  agreeablenessMax: integer("agreeableness_max"),
+  neuroticismMin: integer("neuroticism_min"),
+  neuroticismMax: integer("neuroticism_max"),
+  ageTiers: text("age_tiers").notNull().default("teen,young_adult,adult"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertRelationshipInsightSchema = createInsertSchema(relationshipInsights).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertRelationshipInsight = z.infer<typeof insertRelationshipInsightSchema>;
+export type RelationshipInsight = typeof relationshipInsights.$inferSelect;

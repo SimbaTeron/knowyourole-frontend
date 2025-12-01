@@ -2167,7 +2167,40 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     TRAIT_LABELS={TRAIT_LABELS}
                   />
 
-                  {/* Arc Tracker */}
+                  {/* Crossroads Adventure CTA - Featured prominently after Premium cards */}
+                  <Card className="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 dark:from-amber-900/30 dark:via-orange-900/20 dark:to-rose-900/20 border-2 border-amber-300 dark:border-amber-700 overflow-hidden shadow-lg">
+                    <div className="h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-400" />
+                    <CardContent className="p-6 text-center">
+                      <motion.div 
+                        className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-red-400 flex items-center justify-center shadow-xl"
+                        animate={{ rotate: [0, 5, -5, 0] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <Compass className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h5 className="text-xl font-bold text-amber-800 dark:text-amber-200 mb-2">Crossroads Adventure</h5>
+                      <p className="text-base text-amber-700/80 dark:text-amber-300/70 mb-5 max-w-xs mx-auto">
+                        Face 7 life scenarios with branching choices. Discover hidden traits you didn't know you had.
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-2 mb-5">
+                        <span className="px-3 py-1 text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 rounded-full">7 Scenarios</span>
+                        <span className="px-3 py-1 text-xs font-medium bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 rounded-full">Your Choices Matter</span>
+                        <span className="px-3 py-1 text-xs font-medium bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 rounded-full">Trait Reveals</span>
+                      </div>
+                      <Button 
+                        size="lg"
+                        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-8 py-6 text-lg shadow-lg shadow-orange-500/30"
+                        onClick={() => window.location.href = "/crossroads"}
+                        data-testid="button-crossroads-cta"
+                      >
+                        <Compass className="w-5 h-5 mr-2" />
+                        Start Adventure
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Arc Tracker - Moved below Crossroads */}
                   <Card className="bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 overflow-hidden">
                     <div className="h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500" />
                     <CardContent className="p-5">
@@ -2187,28 +2220,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">Retake in 3-6 months to track growth</p>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Crossroads Adventure CTA */}
-                  <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800 overflow-hidden">
-                    <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-red-400" />
-                    <CardContent className="p-5 text-center">
-                      <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
-                        <Compass className="w-7 h-7 text-white" />
-                      </div>
-                      <h5 className="text-base font-bold text-amber-800 dark:text-amber-200 mb-2">Try Crossroads Adventure</h5>
-                      <p className="text-sm text-amber-700/70 dark:text-amber-300/60 mb-4">
-                        Face 7 life scenarios and discover hidden personality traits
-                      </p>
-                      <Button 
-                        className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
-                        onClick={() => window.location.href = "/crossroads"}
-                        data-testid="button-crossroads-cta"
-                      >
-                        <Compass className="w-4 h-4 mr-2" />
-                        Start Adventure
-                      </Button>
                     </CardContent>
                   </Card>
 
