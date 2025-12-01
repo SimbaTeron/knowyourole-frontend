@@ -78,7 +78,8 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 5,
@@ -98,7 +99,8 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 6,
@@ -158,7 +160,10 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Pattern Spotter"
     },
     {
       "id": 9,
@@ -238,7 +243,8 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 13,
@@ -298,7 +304,8 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 16,
@@ -318,7 +325,10 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Deep Diver"
     },
     {
       "id": 17,
@@ -398,7 +408,8 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 21,
@@ -478,7 +489,10 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Bold Explorer"
     },
     {
       "id": 25,
@@ -498,7 +512,8 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 26,
@@ -558,7 +573,8 @@
       "tier": "7-12",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 29,
@@ -678,7 +694,8 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 35,
@@ -698,7 +715,8 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 36,
@@ -758,7 +776,10 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Pattern Spotter"
     },
     {
       "id": 39,
@@ -838,7 +859,8 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 43,
@@ -898,7 +920,8 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 46,
@@ -918,7 +941,10 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Creative Mind"
     },
     {
       "id": 47,
@@ -998,7 +1024,8 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 51,
@@ -1078,7 +1105,10 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Pattern Spotter"
     },
     {
       "id": 55,
@@ -1098,7 +1128,8 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": true
+      "wildcard": true,
+      "is2x": true
     },
     {
       "id": 56,
@@ -1178,7 +1209,8 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 60,
@@ -1198,7 +1230,8 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 61,
@@ -1258,7 +1291,10 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Deep Diver"
     },
     {
       "id": 64,
@@ -1338,7 +1374,8 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 68,
@@ -1398,7 +1435,8 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 71,
@@ -1418,7 +1456,10 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Pattern Spotter"
     },
     {
       "id": 72,
@@ -1498,7 +1539,8 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 76,
@@ -1578,7 +1620,10 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Bold Explorer"
     },
     {
       "id": 80,
@@ -1598,7 +1643,8 @@
       "tier": "19-25",
       "version": "v1",
       "paid": false,
-      "wildcard": true
+      "wildcard": true,
+      "is2x": true
     },
     {
       "id": 81,
@@ -1678,7 +1724,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 85,
@@ -1698,7 +1745,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 86,
@@ -1758,7 +1806,10 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Creative Mind"
     },
     {
       "id": 89,
@@ -1838,7 +1889,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 93,
@@ -1898,7 +1950,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 96,
@@ -1918,7 +1971,10 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Bold Explorer"
     },
     {
       "id": 97,
@@ -1998,7 +2054,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 101,
@@ -2078,7 +2135,10 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Deep Diver"
     },
     {
       "id": 105,
@@ -2098,7 +2158,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 110,
@@ -2158,7 +2219,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 113,
@@ -2238,7 +2300,10 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Creative Mind"
     },
     {
       "id": 117,
@@ -2298,7 +2363,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 120,
@@ -2318,7 +2384,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 121,
@@ -2398,7 +2465,10 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Deep Diver"
     },
     {
       "id": 125,
@@ -2478,7 +2548,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 129,
@@ -2498,7 +2569,8 @@
       "tier": "25+",
       "version": "v1",
       "paid": false,
-      "wildcard": true
+      "wildcard": true,
+      "is2x": true
     },
     {
       "id": 130,
@@ -2558,7 +2630,8 @@
       "tier": "19-25",
       "version": "v2",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 133,
@@ -2638,7 +2711,10 @@
       "tier": "19-25",
       "version": "v2",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider",
+      "isBadge": true,
+      "badgeHint": "Deep Diver"
     },
     {
       "id": 137,
@@ -2698,7 +2774,8 @@
       "tier": "19-25",
       "version": "v2",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "is2x": true
     },
     {
       "id": 140,
@@ -2718,7 +2795,8 @@
       "tier": "19-25",
       "version": "v2",
       "paid": false,
-      "wildcard": false
+      "wildcard": false,
+      "responseType": "slider"
     },
     {
       "id": 141,
@@ -2818,7 +2896,8 @@
       "tier": "all",
       "version": "v1",
       "paid": false,
-      "wildcard": true
+      "wildcard": true,
+      "responseType": "slider"
     }
   ],
   "tierConfig": {
