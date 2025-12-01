@@ -1474,7 +1474,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           <Sparkles className="w-16 h-16 text-white drop-shadow-lg" />
                         </motion.div>
                         <span className="text-base font-bold text-white mt-2 text-center px-3">You are a</span>
-                        <span className="text-lg font-bold text-white/90 text-center px-3">{currentQuestion.badgeName || currentQuestion.badgeHint || 'Special Explorer!'}</span>
+                        <span className="text-lg font-bold text-white/90 text-center px-3">{currentQuestion.badgeHint || 'Special Explorer!'}</span>
                       </>
                     )}
                   </div>
