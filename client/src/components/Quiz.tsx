@@ -5,11 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import questionsData from "@/data/questions.json";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
+import { 
+  SuperpowerGame, 
+  MysteryBoxGame, 
+  TimedCountdown, 
+  SpinningWheel,
+  StackedCards,
+  type SuperpowerChoice, 
+  type MysteryBoxChoice,
+  type AgeTier,
+  type MultiChoiceOption as GameMultiChoiceOption
+} from "./QuizGames";
 
-interface MultiChoiceOption {
+type IconKey = "creative" | "analytical" | "people" | "learning" | "hands" | "mind" | "discuss" | "research";
+
+interface LocalMultiChoiceOption {
   id: string;
   label: string;
-  icon: "creative" | "analytical" | "people" | "learning" | "hands" | "mind" | "discuss" | "research";
+  icon: IconKey;
   weights: {
     mbti?: Partial<Record<"E" | "I" | "S" | "N" | "T" | "F" | "J" | "P", number>>;
     disc?: Partial<Record<"D" | "I" | "S" | "C", number>>;
@@ -21,7 +34,7 @@ interface MultiChoiceQuestion {
   id: string;
   prompt: string;
   subtitle: string;
-  options: MultiChoiceOption[];
+  options: LocalMultiChoiceOption[];
 }
 
 const MID1_QUESTION: MultiChoiceQuestion = {
@@ -91,7 +104,7 @@ const MID2_QUESTION: MultiChoiceQuestion = {
 const MID1_BREAK_AFTER = 7;
 const MID2_BREAK_AFTER = 15;
 
-const MULTI_CHOICE_ICONS: Record<MultiChoiceOption["icon"], typeof Sparkles> = {
+const MULTI_CHOICE_ICONS: Record<IconKey, typeof Sparkles> = {
   creative: Sparkles,
   analytical: Wrench,
   people: Users,
@@ -190,10 +203,26 @@ const READABLE_RANDOM_COLORS = [
   { accent: "bg-teal-600", text: "text-white" },
 ];
 
-type QuizPhase = "quiz" | "mid1" | "mid2";
+type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown";
+
+const SUPERPOWER_AFTER = 9;
+
+const getQuizConfig = (tier: string) => {
+  switch (tier) {
+    case "7-12":
+      return { totalQuestions: 20, mid1After: 15, hasMid2: false, hasMystery: false };
+    case "13-18":
+    case "19-25":
+      return { totalQuestions: 30, mid1After: 15, mid2After: 20, hasMid2: true, hasMystery: true, mysteryAfter: 25 };
+    case "25plus":
+    default:
+      return { totalQuestions: 40, mid1After: 17, mid2After: 24, hasMid2: true, hasMystery: true, mysteryAfter: 33 };
+  }
+};
 
 export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
   const tierConfig = questionsData.tierConfig[tier as keyof typeof questionsData.tierConfig] || questionsData.tierConfig["19-25"];
+  const quizConfig = getQuizConfig(tier);
   const { teamName, isLocalitySet } = useLocalityTheme();
   
   const [quizPhase, setQuizPhase] = useState<QuizPhase>("quiz");
@@ -201,6 +230,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [mid2Choice, setMid2Choice] = useState<string | null>(null);
   const [completedMid1, setCompletedMid1] = useState(false);
   const [completedMid2, setCompletedMid2] = useState(false);
+  const [completedSuperpower, setCompletedSuperpower] = useState(false);
+  const [completedMystery, setCompletedMystery] = useState(false);
   
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -352,13 +383,13 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     });
   }, []);
 
-  const applyMultiChoiceWeights = useCallback((option: MultiChoiceOption) => {
+  const applyMultiChoiceWeights = useCallback((option: LocalMultiChoiceOption | { weights: LocalMultiChoiceOption['weights'] }) => {
     setScores(prev => {
       const newScores = { ...prev };
       
       if (option.weights.mbti) {
         Object.entries(option.weights.mbti).forEach(([trait, weight]) => {
-          if (trait in newScores.mbti && weight) {
+          if (trait in newScores.mbti && typeof weight === 'number') {
             newScores.mbti = { 
               ...newScores.mbti, 
               [trait]: newScores.mbti[trait as keyof typeof newScores.mbti] + weight 
@@ -369,7 +400,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       
       if (option.weights.disc) {
         Object.entries(option.weights.disc).forEach(([trait, weight]) => {
-          if (trait in newScores.disc && weight) {
+          if (trait in newScores.disc && typeof weight === 'number') {
             newScores.disc = { 
               ...newScores.disc, 
               [trait]: newScores.disc[trait as keyof typeof newScores.disc] + weight 
@@ -380,7 +411,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       
       if (option.weights.bigFive) {
         Object.entries(option.weights.bigFive).forEach(([trait, weight]) => {
-          if (trait in newScores.bigFive && weight) {
+          if (trait in newScores.bigFive && typeof weight === 'number') {
             newScores.bigFive = { 
               ...newScores.bigFive, 
               [trait]: newScores.bigFive[trait as keyof typeof newScores.bigFive] + weight 
@@ -393,6 +424,26 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     });
   }, []);
 
+  const handleSuperpowerChoice = useCallback((choice: SuperpowerChoice) => {
+    if (navigator.vibrate) navigator.vibrate(50);
+    applyMultiChoiceWeights({ weights: choice.weights });
+    setCompletedSuperpower(true);
+    
+    setTimeout(() => {
+      setQuizPhase("superpower-countdown");
+    }, 600);
+  }, [applyMultiChoiceWeights]);
+
+  const handleMysteryChoice = useCallback((choice: MysteryBoxChoice) => {
+    if (navigator.vibrate) navigator.vibrate(50);
+    applyMultiChoiceWeights({ weights: choice.weights });
+    setCompletedMystery(true);
+    
+    setTimeout(() => {
+      setQuizPhase("mystery-countdown");
+    }, 600);
+  }, [applyMultiChoiceWeights]);
+
   const handleMid1Choice = useCallback((optionId: string) => {
     const option = MID1_QUESTION.options.find(o => o.id === optionId);
     if (!option) return;
@@ -403,7 +454,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     setCompletedMid1(true);
     
     setTimeout(() => {
-      setQuizPhase("quiz");
+      setQuizPhase("mid1-countdown");
     }, 400);
   }, [applyMultiChoiceWeights]);
 
@@ -417,9 +468,13 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     setCompletedMid2(true);
     
     setTimeout(() => {
-      setQuizPhase("quiz");
+      setQuizPhase("mid2-countdown");
     }, 400);
   }, [applyMultiChoiceWeights]);
+
+  const handleCountdownComplete = useCallback(() => {
+    setQuizPhase("quiz");
+  }, []);
 
   const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false) => {
     if (questions.length === 0 || currentIndex >= questions.length) return;
@@ -456,10 +511,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       
       if (currentIndex >= questions.length - 1) {
         setTimeout(() => onComplete(updatedScores), 300);
-      } else if (nextQuestionNumber === MID1_BREAK_AFTER + 1 && !completedMid1) {
+      } else if (nextQuestionNumber === SUPERPOWER_AFTER + 1 && !completedSuperpower) {
+        setTimeout(() => setQuizPhase("superpower"), 300);
+      } else if (nextQuestionNumber === quizConfig.mid1After + 1 && !completedMid1) {
         setTimeout(() => setQuizPhase("mid1"), 300);
-      } else if (nextQuestionNumber === MID2_BREAK_AFTER + 1 && !completedMid2) {
+      } else if (quizConfig.hasMid2 && quizConfig.mid2After && nextQuestionNumber === quizConfig.mid2After + 1 && !completedMid2) {
         setTimeout(() => setQuizPhase("mid2"), 300);
+      } else if (quizConfig.hasMystery && quizConfig.mysteryAfter && nextQuestionNumber === quizConfig.mysteryAfter + 1 && !completedMystery) {
+        setTimeout(() => setQuizPhase("mystery"), 300);
       }
       
       return updatedScores;
@@ -470,7 +529,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, x, completedMid1, completedMid2, onComplete]);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedMid1, completedMid2, completedSuperpower, completedMystery, quizConfig, onComplete]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut) return;
@@ -625,12 +684,72 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     </div>
   );
 
+  if (quizPhase === "superpower") {
+    const ageTier: AgeTier = tier === "7-12" ? "mini" : tier === "13-18" ? "teen" : tier === "19-25" ? "ya" : "adult";
+    return (
+      <SuperpowerGame
+        ageTier={ageTier}
+        onSelect={handleSuperpowerChoice}
+      />
+    );
+  }
+
+  if (quizPhase === "superpower-countdown") {
+    return (
+      <TimedCountdown
+        title="Great choice!"
+        subtitle="Back to questions..."
+        onComplete={handleCountdownComplete}
+      />
+    );
+  }
+
   if (quizPhase === "mid1") {
     return renderMultiChoiceQuestion(MID1_QUESTION, mid1Choice, handleMid1Choice, true);
   }
 
+  if (quizPhase === "mid1-countdown") {
+    return (
+      <TimedCountdown
+        title="Locked in!"
+        subtitle="Continuing your journey..."
+        onComplete={handleCountdownComplete}
+      />
+    );
+  }
+
   if (quizPhase === "mid2") {
     return renderMultiChoiceQuestion(MID2_QUESTION, mid2Choice, handleMid2Choice, false);
+  }
+
+  if (quizPhase === "mid2-countdown") {
+    return (
+      <TimedCountdown
+        title="Nice pick!"
+        subtitle="Almost there..."
+        onComplete={handleCountdownComplete}
+      />
+    );
+  }
+
+  if (quizPhase === "mystery") {
+    const ageTier: AgeTier = tier === "7-12" ? "mini" : tier === "13-18" ? "teen" : tier === "19-25" ? "ya" : "adult";
+    return (
+      <MysteryBoxGame
+        ageTier={ageTier}
+        onSelect={handleMysteryChoice}
+      />
+    );
+  }
+
+  if (quizPhase === "mystery-countdown") {
+    return (
+      <TimedCountdown
+        title="Mystery revealed!"
+        subtitle="Final stretch..."
+        onComplete={handleCountdownComplete}
+      />
+    );
   }
   
   if (questions.length === 0 || !currentQuestion) {
@@ -754,9 +873,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           <Progress value={progress} className="h-1.5" data-testid="progress-quiz" />
         </div>
         
-        <div className="max-w-md mx-auto mt-1.5 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="max-w-md mx-auto mt-2 h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
           <motion.div
-            className={`h-full ${timerProgress < 30 ? "bg-red-500" : "bg-terracotta"}`}
+            className={`h-full ${timerProgress < 30 ? "bg-red-500" : "bg-gradient-to-r from-terracotta to-dusty-blue"}`}
             initial={{ width: "100%" }}
             animate={{ width: `${timerProgress}%` }}
             transition={{ duration: 0.1 }}
@@ -841,7 +960,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           }
                         }}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all p-4 disabled:opacity-50 -translate-x-3"
+                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all p-4 disabled:opacity-50 -translate-x-6 -rotate-1"
                         data-testid="card-option-left"
                         aria-label={`Choose: ${currentQuestion.leftDesc}`}
                         tabIndex={0}
@@ -863,7 +982,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                           }
                         }}
                         disabled={isTimingOut}
-                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all p-4 disabled:opacity-50 translate-x-3"
+                        className="min-h-20 flex items-center justify-center text-center rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all p-4 disabled:opacity-50 translate-x-6 rotate-1"
                         data-testid="card-option-right"
                         aria-label={`Choose: ${currentQuestion.rightDesc}`}
                         tabIndex={0}
