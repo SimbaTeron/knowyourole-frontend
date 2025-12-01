@@ -2445,7 +2445,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                             </div>
                             <div>
                               <p className="text-sm font-bold text-amber-900 dark:text-amber-100">{feature.title}</p>
-                              <p className="text-xs text-amber-600 dark:text-amber-400">{feature.desc}</p>
+                              <p className="text-amber-600 dark:text-amber-400 text-[15px]">{feature.desc}</p>
                             </div>
                           </div>
                         ))}
