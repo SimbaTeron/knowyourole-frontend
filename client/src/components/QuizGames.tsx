@@ -589,16 +589,22 @@ interface TimedCountdownProps {
 
 export function TimedCountdown({ onComplete }: TimedCountdownProps) {
   const [count, setCount] = useState(3);
+  const [isVisible, setIsVisible] = useState(true);
   
   useEffect(() => {
     if (count === 0) {
-      const timer = setTimeout(onComplete, 300);
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        setTimeout(onComplete, 200);
+      }, 600);
       return () => clearTimeout(timer);
     }
     
-    const timer = setTimeout(() => setCount(c => c - 1), 800);
+    const timer = setTimeout(() => setCount(c => c - 1), 1000);
     return () => clearTimeout(timer);
   }, [count, onComplete]);
+  
+  if (!isVisible) return null;
   
   return (
     <motion.div
@@ -630,11 +636,11 @@ export function TimedCountdown({ onComplete }: TimedCountdownProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={count}
-            initial={{ scale: 0.5, opacity: 0 }}
+            initial={{ scale: 0.3, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 1.5, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            className="text-6xl font-bold bg-gradient-to-r from-terracotta to-dusty-blue bg-clip-text text-transparent"
+            exit={{ scale: 0.3, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-7xl font-black bg-gradient-to-r from-terracotta to-dusty-blue bg-clip-text text-transparent"
           >
             {count === 0 ? "GO!" : count}
           </motion.div>

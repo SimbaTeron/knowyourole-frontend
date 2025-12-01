@@ -1050,7 +1050,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           
           <div className="flex items-center gap-2">
             <AnimatePresence mode="wait">
-              {timeRemaining <= 3 ? (
+              {timeRemaining <= 3 && timeRemaining > 0 ? (
                 <motion.div
                   key="ring"
                   initial={{ scale: 0.5, opacity: 0 }}
@@ -1078,7 +1078,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       strokeLinecap="round"
                       className="text-red-500"
                       initial={{ pathLength: 1 }}
-                      animate={{ pathLength: timeRemaining / 3 }}
+                      animate={{ pathLength: Math.max(0, timeRemaining) / 3 }}
                       style={{
                         strokeDasharray: "151",
                         strokeDashoffset: 0,
@@ -1087,18 +1087,18 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   </svg>
                   <AnimatePresence mode="wait">
                     <motion.span 
-                      key={Math.ceil(timeRemaining)}
-                      initial={{ scale: 2, opacity: 0 }}
+                      key={Math.max(1, Math.ceil(timeRemaining))}
+                      initial={{ scale: 1.5, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0.5, opacity: 0 }}
-                      transition={{ duration: 0.15, type: "spring", stiffness: 300 }}
+                      transition={{ duration: 0.1 }}
                       className="absolute text-2xl font-black text-red-500 drop-shadow-lg"
                     >
-                      {Math.ceil(timeRemaining)}
+                      {Math.max(1, Math.ceil(timeRemaining))}
                     </motion.span>
                   </AnimatePresence>
                 </motion.div>
-              ) : (
+              ) : timeRemaining <= 0 ? null : (
                 <motion.div
                   key="timer"
                   initial={{ scale: 0.5, opacity: 0 }}
