@@ -1355,7 +1355,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </motion.div>
         )}
       </AnimatePresence>
-      
       {/* Donation Tiers Overlay */}
       <AnimatePresence>
         {showDonationTiers && (
@@ -1420,7 +1419,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Persistent Test Mode Premium Banner */}
       {isTestPremium && (
         <motion.div
@@ -1452,7 +1450,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </Button>
         </motion.div>
       )}
-      
       <header className={`${isTestPremium ? 'pt-6' : 'pt-10'} pb-6 px-4 text-center`}>
         <motion.div
           initial={shouldReduceMotion ? {} : { scale: 0 }}
@@ -1482,7 +1479,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           Based on your {scores.responses.length} path choices
         </motion.p>
       </header>
-
       <main className="px-4 max-w-md mx-auto space-y-6">
         {/* TIER 1: PRE-FEEDBACK (TEASER) - Always visible */}
         <motion.div
@@ -1526,7 +1522,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             </Card>
           ) : (
             /* Regular Role Display for Teen/Adult tiers */
-            <Card className="overflow-hidden border-2 border-terracotta/30 bg-gradient-to-br from-terracotta/5 to-transparent">
+            (<Card className="overflow-hidden border-2 border-terracotta/30 bg-gradient-to-br from-terracotta/5 to-transparent">
               <CardContent className="p-6 text-center">
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <div className="w-12 h-12 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
@@ -1663,7 +1659,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </motion.div>
               )}
             </CardContent>
-          </Card>
+            </Card>)
           )}
 
           {/* Phase 2.2: Badges & Hybrid Types Section */}
@@ -2033,9 +2029,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="text-lg font-medium text-warm-gray dark:text-soft-cream mb-3">
-                        Would share with a friend?
-                      </legend>
+                      <legend className="text-lg font-medium text-warm-gray dark:text-soft-cream mb-3">Would share this app with a friend?</legend>
                     </Label>
                     <div 
                       className="flex justify-between w-full gap-2" 
@@ -2405,7 +2399,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </motion.div>
               ) : (
                 /* COMPELLING CTA - Locked State */
-                <motion.div
+                (<motion.div
                   initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 }}
@@ -2499,13 +2493,12 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </motion.div>)
               )}
             </>
           )}
         </AnimatePresence>
       </main>
-
       <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
         <div className="max-w-md mx-auto flex gap-3">
           <Button
