@@ -205,7 +205,27 @@ const READABLE_RANDOM_COLORS = [
   { accent: "bg-teal-600", text: "text-white" },
 ];
 
-type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown";
+// Phase 2.3: Random event definitions with 5-10% trigger chance
+interface RandomEvent {
+  id: string;
+  title: string;
+  description: string;
+  effect: "bonus_time" | "double_points" | "skip_allowed" | "hint_reveal" | "mood_boost";
+  duration: number;
+  icon: string;
+}
+
+const RANDOM_EVENTS: RandomEvent[] = [
+  { id: "time_warp", title: "Time Warp!", description: "+3 seconds on next question", effect: "bonus_time", duration: 3000, icon: "clock" },
+  { id: "insight_flash", title: "Insight Flash!", description: "Your next answer counts double", effect: "double_points", duration: 2500, icon: "sparkles" },
+  { id: "compass_spin", title: "Compass Spin!", description: "Skip one question if needed", effect: "skip_allowed", duration: 3000, icon: "compass" },
+  { id: "inner_voice", title: "Inner Voice!", description: "Trust your first instinct", effect: "hint_reveal", duration: 2500, icon: "brain" },
+  { id: "energy_surge", title: "Energy Surge!", description: "Feeling extra decisive!", effect: "mood_boost", duration: 2000, icon: "zap" },
+];
+
+const RANDOM_EVENT_CHANCE = 0.07; // 7% chance per question
+
+type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown" | "random-event";
 
 const getQuizConfig = (tier: string) => {
   switch (tier) {
@@ -270,6 +290,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [completedMid2, setCompletedMid2] = useState(false);
   const [completedSuperpower, setCompletedSuperpower] = useState(false);
   const [completedMystery, setCompletedMystery] = useState(false);
+  
+  // Phase 2.3: Random event state
+  const [currentRandomEvent, setCurrentRandomEvent] = useState<RandomEvent | null>(null);
+  const [activeEffects, setActiveEffects] = useState<Set<string>>(new Set());
+  const [canSkip, setCanSkip] = useState(false);
+  
+  // Phase 1.1: Slider state for slider-type questions
+  const [sliderValue, setSliderValue] = useState(0);
   
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -587,7 +615,39 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return "easy"; // Slower responses -> easier questions
   };
 
-  const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false, sliderValue?: number) => {
+  // Phase 2.3: Trigger random event with 7% chance
+  const triggerRandomEvent = useCallback(() => {
+    if (Math.random() < RANDOM_EVENT_CHANCE) {
+      const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+      setCurrentRandomEvent(event);
+      
+      // Apply effect
+      if (event.effect === "skip_allowed") {
+        setCanSkip(true);
+      }
+      setActiveEffects(prev => new Set([...prev, event.effect]));
+      
+      // Auto-dismiss after duration
+      setTimeout(() => {
+        setCurrentRandomEvent(null);
+      }, event.duration);
+    }
+  }, []);
+
+  // Phase 2.3: Handle skip (from random event)
+  const handleSkip = useCallback(() => {
+    if (!canSkip || currentIndex >= questions.length - 1) return;
+    setCanSkip(false);
+    setActiveEffects(prev => {
+      const newSet = new Set(prev);
+      newSet.delete("skip_allowed");
+      return newSet;
+    });
+    setCurrentIndex(prev => prev + 1);
+    setSliderValue(0);
+  }, [canSkip, currentIndex, questions.length]);
+
+  const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false, sliderVal?: number) => {
     if (questions.length === 0 || currentIndex >= questions.length) return;
     
     if (!hasInteracted) setHasInteracted(true);
@@ -603,7 +663,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     }
     
     // Phase 1.1: Pass slider value to score processing
-    processScore(question, choiceIndex, sliderValue);
+    processScore(question, choiceIndex, sliderVal);
     
     // Phase 2.1: Enhanced response with slider support
     const newResponse = {
@@ -611,11 +671,19 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       choice: choiceIndex,
       timeSpent,
       swipeDirection: direction,
-      sliderValue: sliderValue, // Phase 1.1
+      sliderValue: sliderVal, // Phase 1.1
       responseType: question.responseType || "binary" as const
     };
     
     const nextQuestionNumber = currentIndex + 2;
+    
+    // Phase 2.3: Check for random event trigger
+    if (currentIndex < questions.length - 1 && !isTimeout) {
+      triggerRandomEvent();
+    }
+    
+    // Reset slider for next question
+    setSliderValue(0);
     
     setScores(prev => {
       // Phase 2.1: Track swipe times for dynamic difficulty
@@ -623,14 +691,26 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       const newAvgTime = updatedSwipeTimes.reduce((a, b) => a + b, 0) / updatedSwipeTimes.length;
       const newDifficulty = calculateDifficulty(updatedSwipeTimes, newAvgTime);
       
+      // Phase 2.3: Apply double points if active
+      const engagementBonus = activeEffects.has("double_points") ? 2 : 1;
+      
       const updatedScores = {
         ...prev,
         responses: [...prev.responses, newResponse],
         swipeTimes: updatedSwipeTimes,
         averageSwipeTime: newAvgTime,
         currentDifficulty: newDifficulty,
-        engagement: prev.engagement + (isTimeout ? -0.5 : 1)
+        engagement: prev.engagement + (isTimeout ? -0.5 : 1 * engagementBonus)
       };
+      
+      // Clear double points after use
+      if (activeEffects.has("double_points")) {
+        setActiveEffects(prevEffects => {
+          const newSet = new Set(prevEffects);
+          newSet.delete("double_points");
+          return newSet;
+        });
+      }
       
       if (currentIndex >= questions.length - 1) {
         setTimeout(() => onComplete(updatedScores), 300);
@@ -1160,13 +1240,62 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Phase 2.3: Random Event Overlay */}
+          <AnimatePresence>
+            {currentRandomEvent && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5, y: -50 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.5, y: -50 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="absolute top-4 left-1/2 -translate-x-1/2 z-40"
+                data-testid="random-event-overlay"
+              >
+                <div className="bg-gradient-to-r from-dusty-blue via-terracotta to-sage-green rounded-2xl px-6 py-4 shadow-2xl text-center">
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 1, ease: "easeInOut" }}
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mb-2"
+                  >
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </motion.div>
+                  
+                  <p className="text-lg font-display font-bold text-white">
+                    {currentRandomEvent.title}
+                  </p>
+                  
+                  <p className="text-sm text-white/80">
+                    {currentRandomEvent.description}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
 
       <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-        <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
-          Tap, swipe, or use keyboard (Tab + Enter) to choose
-        </p>
+        <div className="flex items-center justify-center gap-4">
+          <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
+            Tap, swipe, or use keyboard (Tab + Enter) to choose
+          </p>
+          
+          {/* Phase 2.3: Skip button when available */}
+          {canSkip && (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSkip}
+              className="px-3 py-1 rounded-full bg-dusty-blue text-white text-xs font-medium"
+              data-testid="button-skip"
+            >
+              Skip Question
+            </motion.button>
+          )}
+        </div>
       </footer>
 
       <AnimatePresence>
