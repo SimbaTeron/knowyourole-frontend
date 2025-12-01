@@ -17,7 +17,7 @@ const DEMO_STEPS = [
   {
     id: 2,
     title: "Beat the Clock",
-    description: "Each question has a timer. Don't overthink it - your first instinct is usually right.",
+    description: "Questions are timed but don't overthink it - your first instinct is usually right.",
     icon: Timer,
     demo: "timer",
   },
