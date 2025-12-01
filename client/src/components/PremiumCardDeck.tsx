@@ -9,6 +9,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
+import { getRandomQuestions, ThinkingQuestion } from "@/data/thinkingQuestions";
 
 interface PremiumInsight {
   id: string;
@@ -487,11 +488,6 @@ export function PremiumCardDeck({
       
       case "thinking":
         return <ThinkingCard 
-          result={result}
-          revealed={thinkingChallengeRevealed}
-          setRevealed={setThinkingChallengeRevealed}
-          answer={thinkingAnswer}
-          setAnswer={setThinkingAnswer}
           reduceMotion={shouldReduceMotion ?? false}
         />;
       
@@ -1312,77 +1308,274 @@ function GrowthQuestCard({
   );
 }
 
-// Thinking Card - Mini challenge
+// Thinking Card - 5-Question Challenge with scoring
+const THINKING_STORAGE_KEYS = {
+  BEST_SCORE: 'knowrole-thinking-best-score',
+  COMPLETED_IDS: 'knowrole-thinking-completed-ids',
+  CURRENT_SESSION: 'knowrole-thinking-current-session',
+};
+
+interface ThinkingSessionState {
+  questions: ThinkingQuestion[];
+  currentIndex: number;
+  answers: { questionId: string; selectedId: string; correct: boolean }[];
+  completed: boolean;
+  score: number;
+}
+
 function ThinkingCard({ 
-  result,
-  revealed,
-  setRevealed,
-  answer,
-  setAnswer,
   reduceMotion
 }: { 
-  result: PremiumCardDeckProps['result'];
-  revealed: boolean;
-  setRevealed: (val: boolean) => void;
-  answer: string | null;
-  setAnswer: (val: string | null) => void;
   reduceMotion: boolean;
 }) {
-  const critScore = result?.scales?.critical?.value || 3;
-  const fpScore = result?.scales?.firstPrinciples?.value || 2;
-  const combinedScore = Math.min(3, Math.round((critScore + fpScore) / 3.5));
+  const [session, setSession] = useState<ThinkingSessionState | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [bestScore, setBestScore] = useState<number>(() => {
+    try {
+      const stored = localStorage.getItem(THINKING_STORAGE_KEYS.BEST_SCORE);
+      return stored ? parseInt(stored, 10) : 0;
+    } catch { return 0; }
+  });
+  const [completedIds, setCompletedIds] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem(THINKING_STORAGE_KEYS.COMPLETED_IDS);
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
 
-  const challenge = {
-    question: "A company claims their new diet pill helps 90% of users lose weight. What's the first thing you should question?",
-    options: [
-      { id: "a", text: "How was 'lose weight' defined?", correct: true },
-      { id: "b", text: "What was the sample size?", correct: true },
-      { id: "c", text: "Who funded the study?", correct: true },
-      { id: "d", text: "All of the above", correct: true },
-    ],
-    explanation: "Great critical thinking! All of these are valid questions. The definition of success, sample size, and funding source all affect the reliability of such claims."
+  const initializeSession = useCallback(() => {
+    const questions = getRandomQuestions(5, completedIds.slice(-20));
+    setSession({
+      questions,
+      currentIndex: 0,
+      answers: [],
+      completed: false,
+      score: 0,
+    });
+    setShowExplanation(false);
+  }, [completedIds]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(THINKING_STORAGE_KEYS.CURRENT_SESSION);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && !parsed.completed) {
+          setSession(parsed);
+          return;
+        }
+      }
+    } catch {}
+    initializeSession();
+  }, []);
+
+  useEffect(() => {
+    if (session) {
+      try {
+        localStorage.setItem(THINKING_STORAGE_KEYS.CURRENT_SESSION, JSON.stringify(session));
+      } catch {}
+    }
+  }, [session]);
+
+  const handleAnswer = (optionId: string) => {
+    if (!session || showExplanation) return;
+    
+    const currentQuestion = session.questions[session.currentIndex];
+    const selectedOption = currentQuestion.options.find(o => o.id === optionId);
+    const isCorrect = selectedOption?.correct || false;
+    
+    const newAnswers = [...session.answers, {
+      questionId: currentQuestion.id,
+      selectedId: optionId,
+      correct: isCorrect,
+    }];
+    
+    setSession(prev => prev ? { ...prev, answers: newAnswers } : null);
+    setShowExplanation(true);
+    
+    const newCompletedIds = [...completedIds, currentQuestion.id];
+    setCompletedIds(newCompletedIds);
+    try {
+      localStorage.setItem(THINKING_STORAGE_KEYS.COMPLETED_IDS, JSON.stringify(newCompletedIds.slice(-50)));
+    } catch {}
   };
 
-  return (
-    <div className="space-y-4">
-      {/* Score display */}
-      <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 border border-indigo-100 dark:border-indigo-800">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">Problem-Solving Score</span>
-          <div className="flex gap-0.5">
+  const nextQuestion = () => {
+    if (!session) return;
+    
+    if (session.currentIndex >= 4) {
+      const correctCount = session.answers.filter(a => a.correct).length;
+      const newScore = correctCount;
+      
+      if (newScore > bestScore) {
+        setBestScore(newScore);
+        try {
+          localStorage.setItem(THINKING_STORAGE_KEYS.BEST_SCORE, newScore.toString());
+        } catch {}
+      }
+      
+      setSession(prev => prev ? { ...prev, completed: true, score: newScore } : null);
+    } else {
+      setSession(prev => prev ? { ...prev, currentIndex: prev.currentIndex + 1 } : null);
+    }
+    setShowExplanation(false);
+  };
+
+  const getStars = (score: number) => {
+    if (score >= 4) return 3;
+    if (score >= 2) return 2;
+    return 1;
+  };
+
+  const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
+    logic: { bg: "bg-purple-100 dark:bg-purple-900/30", text: "text-purple-700 dark:text-purple-300", border: "border-purple-200 dark:border-purple-700" },
+    bias: { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-700 dark:text-amber-300", border: "border-amber-200 dark:border-amber-700" },
+    statistics: { bg: "bg-cyan-100 dark:bg-cyan-900/30", text: "text-cyan-700 dark:text-cyan-300", border: "border-cyan-200 dark:border-cyan-700" },
+    arguments: { bg: "bg-rose-100 dark:bg-rose-900/30", text: "text-rose-700 dark:text-rose-300", border: "border-rose-200 dark:border-rose-700" },
+    firstPrinciples: { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-700" },
+  };
+
+  const categoryLabels: Record<string, string> = {
+    logic: "Logic",
+    bias: "Bias Detection",
+    statistics: "Statistics",
+    arguments: "Arguments",
+    firstPrinciples: "First Principles",
+  };
+
+  if (!session) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (session.completed) {
+    const stars = getStars(session.score);
+    return (
+      <div className="space-y-4">
+        <div className="p-6 rounded-xl bg-gradient-to-br from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 border border-indigo-100 dark:border-indigo-800 text-center">
+          <h5 className="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-2">Challenge Complete!</h5>
+          <div className="flex justify-center gap-1 mb-3">
             {[1, 2, 3].map((n) => (
               <Star
                 key={n}
-                className={`w-5 h-5 ${n <= combinedScore ? "text-indigo-500 fill-indigo-500" : "text-indigo-200 dark:text-indigo-700"}`}
+                className={`w-8 h-8 ${n <= stars ? "text-indigo-500 fill-indigo-500" : "text-indigo-200 dark:text-indigo-700"}`}
               />
             ))}
           </div>
+          <p className="text-2xl font-bold text-indigo-700 dark:text-indigo-300 mb-1">
+            {session.score} / 5 Correct
+          </p>
+          <p className="text-sm text-indigo-600 dark:text-indigo-400 mb-4">
+            {stars === 3 ? "Excellent critical thinking!" : stars === 2 ? "Good job! Keep practicing." : "Keep sharpening your skills!"}
+          </p>
+          {bestScore > 0 && (
+            <p className="text-xs text-indigo-500 dark:text-indigo-400 mb-4">
+              Your best score: {bestScore}/5 ({getStars(bestScore)} stars)
+            </p>
+          )}
+          <Button
+            onClick={initializeSession}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            data-testid="try-again"
+          >
+            <RotateCw className="w-4 h-4 mr-2" /> New Challenge
+          </Button>
         </div>
-        <p className="text-xs text-indigo-700 dark:text-indigo-300">
-          {combinedScore >= 3 ? "You demonstrate strong analytical skills!" : "Focus on questioning assumptions to grow this skill."}
-        </p>
+
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-warm-gray/60 dark:text-soft-cream/50">Your Answers:</p>
+          {session.answers.map((ans, idx) => {
+            const q = session.questions[idx];
+            return (
+              <div 
+                key={ans.questionId}
+                className={`p-3 rounded-lg text-xs ${ans.correct ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800'}`}
+              >
+                <div className="flex items-start gap-2">
+                  {ans.correct ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+                  )}
+                  <div>
+                    <p className={`font-medium ${ans.correct ? 'text-emerald-800 dark:text-emerald-200' : 'text-rose-800 dark:text-rose-200'}`}>
+                      Q{idx + 1}: {q?.question.substring(0, 60)}...
+                    </p>
+                    <p className={`text-xs mt-1 ${ans.correct ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                      {ans.correct ? "Correct!" : `Explanation: ${q?.explanation.substring(0, 80)}...`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  const currentQuestion = session.questions[session.currentIndex];
+  const currentAnswer = session.answers.find(a => a.questionId === currentQuestion.id);
+  const colors = categoryColors[currentQuestion.category] || categoryColors.logic;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className={`text-xs px-2 py-1 rounded-full ${colors.bg} ${colors.text}`}>
+            {categoryLabels[currentQuestion.category]}
+          </span>
+          <span className={`text-xs px-2 py-1 rounded-full ${
+            currentQuestion.difficulty === 'easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+            currentQuestion.difficulty === 'medium' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
+            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+          }`}>
+            {currentQuestion.difficulty}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          {[0, 1, 2, 3, 4].map((idx) => (
+            <div
+              key={idx}
+              className={`w-2 h-2 rounded-full ${
+                idx < session.currentIndex ? 'bg-indigo-500' :
+                idx === session.currentIndex ? 'bg-indigo-400 ring-2 ring-indigo-200' :
+                'bg-gray-200 dark:bg-gray-700'
+              }`}
+            />
+          ))}
+          <span className="text-xs text-warm-gray/60 dark:text-soft-cream/50 ml-2">
+            {session.currentIndex + 1}/5
+          </span>
+        </div>
       </div>
 
-      {/* Mini Challenge */}
-      <div className="p-4 rounded-xl bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-700">
+      {bestScore > 0 && (
+        <div className="flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400">
+          <Star className="w-3 h-3 fill-indigo-500 text-indigo-500" />
+          <span>Best: {bestScore}/5</span>
+        </div>
+      )}
+
+      <div className={`p-4 rounded-xl bg-white dark:bg-gray-800 border ${colors.border}`}>
         <div className="flex items-center gap-2 mb-3">
           <Brain className="w-4 h-4 text-indigo-500" />
-          <h6 className="text-sm font-bold text-indigo-800 dark:text-indigo-200">Quick Challenge</h6>
+          <h6 className="text-sm font-bold text-indigo-800 dark:text-indigo-200">Question {session.currentIndex + 1}</h6>
         </div>
         
         <p className="text-sm text-warm-gray dark:text-soft-cream mb-4 leading-relaxed">
-          {challenge.question}
+          {currentQuestion.question}
         </p>
 
-        {!revealed ? (
+        {!showExplanation ? (
           <div className="space-y-2">
-            {challenge.options.map((opt) => (
+            {currentQuestion.options.map((opt) => (
               <button
                 key={opt.id}
-                onClick={() => {
-                  setAnswer(opt.id);
-                  setRevealed(true);
-                }}
+                onClick={() => handleAnswer(opt.id)}
                 className={`w-full p-3 rounded-xl text-left text-sm bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 ${reduceMotion ? '' : 'transition-colors'} border border-indigo-100 dark:border-indigo-800`}
                 data-testid={`answer-${opt.id}`}
               >
@@ -1392,25 +1585,31 @@ function ThinkingCard({
             ))}
           </div>
         ) : (
-          <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700">
+          <div className={`p-4 rounded-xl ${currentAnswer?.correct ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700' : 'bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-700'}`}>
             <div className="flex items-start gap-2 mb-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Great thinking!</p>
+              {currentAnswer?.correct ? (
+                <>
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Correct!</p>
+                </>
+              ) : (
+                <>
+                  <Eye className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                  <p className="text-sm font-semibold text-rose-800 dark:text-rose-200">Not quite right</p>
+                </>
+              )}
             </div>
-            <p className="text-xs text-emerald-700 dark:text-emerald-300 leading-relaxed">
-              {challenge.explanation}
+            <p className={`text-xs leading-relaxed mb-3 ${currentAnswer?.correct ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}`}>
+              {currentQuestion.explanation}
             </p>
             <Button
               variant="ghost"
               size="sm"
-              className="mt-3 text-xs"
-              onClick={() => {
-                setRevealed(false);
-                setAnswer(null);
-              }}
-              data-testid="try-again"
+              className="text-xs"
+              onClick={nextQuestion}
+              data-testid="next-question"
             >
-              <RotateCw className="w-3 h-3 mr-1" /> Try another
+              {session.currentIndex >= 4 ? 'See Results' : 'Next Question'} <ArrowRight className="w-3 h-3 ml-1" />
             </Button>
           </div>
         )}
