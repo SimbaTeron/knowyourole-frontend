@@ -2469,13 +2469,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           </div>
                         ) : (
                           <>
-                            <span className="font-black text-[42px]">$0.02</span>
-                            <span className="font-bold flex items-center gap-2 text-[22px]">
+                            <span className="font-black text-[30px]">$0.02</span>
+                            <span className="font-bold flex items-center gap-2 text-[18px]">
                               <Rocket className="w-5 h-5" />
                               Unlock Premium Now
                               <ArrowRight className="w-5 h-5" />
                             </span>
-                            <span className="font-normal opacity-90 text-[17px]">Lifetime access. No Subscription. Ever.</span>
+                            <span className="font-normal opacity-90 text-[15px]">Lifetime access. No Subscription. Ever.</span>
                           </>
                         )}
                       </Button>
