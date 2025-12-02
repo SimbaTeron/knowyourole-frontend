@@ -2281,7 +2281,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       >
                         <Crown className="w-7 h-7 text-white" />
                       </motion.div>
-                      <h4 className="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-1">
+                      <h4 className="font-bold text-emerald-800 dark:text-emerald-200 mb-1 text-[26px]">
                         Premium Unlocked
                       </h4>
                       <p className="text-sm text-emerald-700 dark:text-emerald-300">
