@@ -1251,10 +1251,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
     setShowJustKidding(false);
     setIsPremiumUnlocked(true);
-    toast({
-      title: "Premium Unlocked",
-      description: "Enjoy your full personality insights!",
-    });
   };
 
   const handleDonateClick = () => {
@@ -1906,7 +1902,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 <div className="space-y-5">
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[16px]">
+                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[18px]">
                         Useful App?
                       </legend>
                     </Label>
@@ -1947,7 +1943,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[16px]">
+                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[18px]">
                         Results feel accurate?
                       </legend>
                     </Label>
@@ -1988,7 +1984,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[16px]">
+                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[18px]">
                         Questions engaging?
                       </legend>
                     </Label>
@@ -2029,7 +2025,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                   <fieldset className="space-y-2">
                     <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[16px]">Would share this app with a friend?</legend>
+                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[18px]">Would share this app with a friend?</legend>
                     </Label>
                     <div 
                       className="flex justify-between w-full gap-2" 

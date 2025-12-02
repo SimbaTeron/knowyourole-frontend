@@ -413,7 +413,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       const currentQ = questions[currentIndex];
       
       // Check if this is a badge or 2x question - show overlay first
-      if (currentQ?.isBadge || currentQ?.is2x) {
+      // BUT never show badge overlay on the very first question (currentIndex === 0)
+      if ((currentQ?.isBadge || currentQ?.is2x) && currentIndex > 0) {
         setShowBadgeOverlay(true);
         setBadgeCanDismiss(false);
         
