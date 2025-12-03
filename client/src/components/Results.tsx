@@ -1297,28 +1297,23 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               className="bg-gradient-to-br from-teal-50 via-cyan-50 to-teal-100 dark:from-teal-900/90 dark:via-cyan-900/80 dark:to-teal-800/90 rounded-3xl p-8 mx-4 max-w-sm w-full text-center shadow-2xl border-2 border-teal-200 dark:border-teal-700"
             >
-              <motion.p 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 400 }}
-                className="text-4xl font-bold text-teal-600 dark:text-teal-300 italic mb-4"
-                style={{ fontFamily: "'Georgia', serif", textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}
-              >
-                Just Kidding!
-              </motion.p>
-              
               <motion.div 
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
                 className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center mx-auto mb-4 shadow-lg"
               >
                 <Crown className="w-10 h-10 text-white" />
               </motion.div>
               
-              <p className="text-lg font-semibold text-teal-700 dark:text-teal-200 mb-2">
+              <motion.p 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 400 }}
+                className="text-[28px] font-bold text-teal-700 dark:text-teal-200 mb-2"
+              >
                 Premium is Free (For Now)
-              </p>
+              </motion.p>
               <p className="text-sm text-teal-600/80 dark:text-teal-300/70 mb-6">
                 We're testing! Your two cents (literally $0.02) helps us build something great.
               </p>
@@ -2465,8 +2460,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           </div>
                         ) : (
                           <>
-                            <span className="font-black text-[30px]">$0.02</span>
-                            <span className="font-bold flex items-center gap-2 text-[18px]">
+                            <span className="font-bold flex items-center gap-2 text-[22px]">
                               <Rocket className="w-5 h-5" />
                               Unlock Premium Now
                               <ArrowRight className="w-5 h-5" />
