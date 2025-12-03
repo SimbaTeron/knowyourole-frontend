@@ -33,11 +33,52 @@ export default function QuizPage() {
   const { toast } = useToast();
   const { teamName, isLocalitySet } = useLocalityTheme();
 
-  const ageTier = sessionStorage.getItem("knowrole-tier") || "25plus";
-  const mood = sessionStorage.getItem("knowrole-mood") || "";
-  const funMode = sessionStorage.getItem("knowrole-funmode") === "true";
+  // Type for age tiers
+  type TierValue = "7-12" | "13-18" | "19-25" | "25plus";
+  
+  // State for tier/mood/etc - can be overridden by stored results
+  const [storedTier, setStoredTier] = useState<TierValue | null>(null);
+  const [storedMood, setStoredMood] = useState<string | null>(null);
+  const [storedFunMode, setStoredFunMode] = useState<boolean | null>(null);
+  const [storedLandmark, setStoredLandmark] = useState<string | null>(null);
+
+  const sessionTier = (sessionStorage.getItem("knowrole-tier") || "25plus") as TierValue;
+  const sessionMood = sessionStorage.getItem("knowrole-mood") || "";
+  const sessionFunMode = sessionStorage.getItem("knowrole-funmode") === "true";
   const landmarkData = sessionStorage.getItem("knowrole-landmark");
-  const landmark = landmarkData ? JSON.parse(landmarkData) : null;
+  const sessionLandmark = landmarkData ? JSON.parse(landmarkData) : null;
+
+  // Use stored values if available, otherwise fall back to session values
+  const ageTier: TierValue = storedTier ?? sessionTier;
+  const mood = storedMood ?? sessionMood;
+  const funMode = storedFunMode ?? sessionFunMode;
+  const landmark = storedLandmark ? { landmark: storedLandmark } : sessionLandmark;
+
+  // Check for stored premium results on mount (for returning from Crossroads, etc.)
+  useEffect(() => {
+    const storedResults = localStorage.getItem("knowrole-premium-results");
+    if (storedResults) {
+      try {
+        const parsed = JSON.parse(storedResults);
+        if (parsed.scores) {
+          setQuizScores(parsed.scores);
+          setQuizSessionId(parsed.sessionId || null);
+          setApiScales(parsed.apiScales || null);
+          setEarnedBadges(parsed.earnedBadges || []);
+          setHybridTypes(parsed.hybridTypes || []);
+          // Restore tier/mood/funMode/landmark from stored results
+          if (parsed.tier) setStoredTier(parsed.tier as TierValue);
+          if (parsed.mood !== undefined) setStoredMood(parsed.mood);
+          if (parsed.funMode !== undefined) setStoredFunMode(parsed.funMode);
+          if (parsed.landmark) setStoredLandmark(parsed.landmark);
+          if (parsed.theme) setTheme(parsed.theme);
+          setShowResults(true);
+        }
+      } catch (e) {
+        console.error("Failed to parse stored results:", e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
@@ -67,6 +108,11 @@ export default function QuizPage() {
   const handleQuizComplete = async (scores: QuizScores) => {
     setQuizScores(scores);
     
+    let sessionId: string | null = null;
+    let scales: APIScales | null = null;
+    let badges: EarnedBadge[] = [];
+    let hybrids: string[] = [];
+    
     try {
       const response = await apiRequest("POST", "/api/score", {
         tier: ageTier,
@@ -78,18 +124,39 @@ export default function QuizPage() {
       });
       const data = await response.json();
       if (data.sessionId) {
+        sessionId = data.sessionId;
         setQuizSessionId(data.sessionId);
       }
       if (data.result?.scales) {
+        scales = data.result.scales;
         setApiScales(data.result.scales);
       }
       // Phase 2.2: Extract badges and hybrid types from API response
       if (data.result?.earnedBadges) {
+        badges = data.result.earnedBadges;
         setEarnedBadges(data.result.earnedBadges);
       }
       if (data.result?.hybridTypes) {
+        hybrids = data.result.hybridTypes;
         setHybridTypes(data.result.hybridTypes);
       }
+      
+      // Store premium results for returning from other pages (Crossroads, etc.)
+      const premiumResults = {
+        scores,
+        sessionId,
+        apiScales: scales,
+        earnedBadges: badges,
+        hybridTypes: hybrids,
+        tier: ageTier,
+        mood,
+        funMode,
+        landmark: landmark?.landmark,
+        theme,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem("knowrole-premium-results", JSON.stringify(premiumResults));
+      
     } catch (error) {
       console.error("Failed to save quiz results:", error);
     }
@@ -103,6 +170,7 @@ export default function QuizPage() {
 
   const handleRestart = () => {
     sessionStorage.clear();
+    localStorage.removeItem("knowrole-premium-results"); // Clear stored results on explicit restart
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
