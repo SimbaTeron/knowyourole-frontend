@@ -971,6 +971,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [showJustKidding, setShowJustKidding] = useState(false);
   const [showDonationTiers, setShowDonationTiers] = useState(false);
   
+  // Feedback modal state - now triggered in Premium section
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackCompleted, setFeedbackCompleted] = useState(() => {
+    return sessionStorage.getItem("knowrole-feedback-completed") === "true";
+  });
+  const [pendingCrossroads, setPendingCrossroads] = useState(false);
+  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
   const [usefulApp, setUsefulApp] = useState<string>("");
   const [resultsAccurate, setResultsAccurate] = useState<string>("");
   const [questionsEngaging, setQuestionsEngaging] = useState<string>("");
@@ -1096,7 +1104,33 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   const allFeedbackAnswered = usefulApp !== "" && resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "" && suggestions.trim().length > 0;
 
-  const handleShowFullResults = async () => {
+  // 30-second timer for feedback in Premium section
+  useEffect(() => {
+    if (isPremiumUnlocked && !feedbackCompleted) {
+      feedbackTimerRef.current = setTimeout(() => {
+        setShowFeedbackModal(true);
+      }, 30000); // 30 seconds
+    }
+    
+    return () => {
+      if (feedbackTimerRef.current) {
+        clearTimeout(feedbackTimerRef.current);
+      }
+    };
+  }, [isPremiumUnlocked, feedbackCompleted]);
+
+  // Handle Crossroads click - show feedback first if not completed
+  const handleCrossroadsClick = () => {
+    if (!feedbackCompleted) {
+      setPendingCrossroads(true);
+      setShowFeedbackModal(true);
+    } else {
+      window.location.href = "/crossroads";
+    }
+  };
+
+  // Submit feedback from modal
+  const handleFeedbackSubmit = async () => {
     if (!allFeedbackAnswered) return;
     
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
@@ -1127,9 +1161,28 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       console.log("Feedback saved successfully:", feedbackData);
     } catch (error) {
       console.error("Failed to save feedback:", error);
-      // Continue anyway - don't block user from seeing results
     }
     
+    // Mark feedback as completed in session
+    setFeedbackCompleted(true);
+    sessionStorage.setItem("knowrole-feedback-completed", "true");
+    setShowFeedbackModal(false);
+    
+    // Clear the timer
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+    }
+    
+    // If user was trying to go to Crossroads, redirect now
+    if (pendingCrossroads) {
+      setPendingCrossroads(false);
+      window.location.href = "/crossroads";
+    }
+  };
+
+  // Go directly to full results without feedback (now the default)
+  const handleShowFullResults = () => {
+    if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
     setDashboardStage("full");
   };
 
@@ -1410,6 +1463,136 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Feedback Modal Overlay - Triggered after 30s in Premium or before Crossroads */}
+      <AnimatePresence>
+        {showFeedbackModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            data-testid="overlay-feedback-modal"
+          >
+            <motion.div
+              initial={{ scale: 0.8, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 50 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-md w-full shadow-2xl border-2 border-terracotta/30 dark:border-terracotta/50 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="text-center mb-5">
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+                  className="w-16 h-16 rounded-full bg-gradient-to-br from-terracotta to-amber-500 flex items-center justify-center mx-auto mb-3"
+                >
+                  <MessageCircle className="w-8 h-8 text-white" />
+                </motion.div>
+                <h3 className="text-xl font-bold text-warm-gray dark:text-soft-cream mb-1">
+                  Quick Feedback
+                </h3>
+                <p className="text-sm text-warm-gray/60 dark:text-soft-cream/50">
+                  Help us improve KnowRole in 30 seconds
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <fieldset className="space-y-2">
+                  <Label asChild>
+                    <legend className="font-medium text-warm-gray dark:text-soft-cream mb-2 text-sm">
+                      Useful App?
+                    </legend>
+                  </Label>
+                  <div className="flex justify-between w-full gap-2" role="radiogroup">
+                    <ToggleButton value="no" currentValue={usefulApp} onChange={setUsefulApp} variant="no" testId="modal-toggle-useful-no">No</ToggleButton>
+                    <ToggleButton value="somewhat" currentValue={usefulApp} onChange={setUsefulApp} variant="middle" testId="modal-toggle-useful-somewhat">Somewhat</ToggleButton>
+                    <ToggleButton value="yes" currentValue={usefulApp} onChange={setUsefulApp} variant="yes" testId="modal-toggle-useful-yes">Yes</ToggleButton>
+                  </div>
+                </fieldset>
+
+                <fieldset className="space-y-2">
+                  <Label asChild>
+                    <legend className="font-medium text-warm-gray dark:text-soft-cream mb-2 text-sm">
+                      Results feel accurate?
+                    </legend>
+                  </Label>
+                  <div className="flex justify-between w-full gap-2" role="radiogroup">
+                    <ToggleButton value="no" currentValue={resultsAccurate} onChange={setResultsAccurate} variant="no" testId="modal-toggle-accurate-no">No</ToggleButton>
+                    <ToggleButton value="somewhat" currentValue={resultsAccurate} onChange={setResultsAccurate} variant="middle" testId="modal-toggle-accurate-somewhat">Somewhat</ToggleButton>
+                    <ToggleButton value="yes" currentValue={resultsAccurate} onChange={setResultsAccurate} variant="yes" testId="modal-toggle-accurate-yes">Yes</ToggleButton>
+                  </div>
+                </fieldset>
+
+                <fieldset className="space-y-2">
+                  <Label asChild>
+                    <legend className="font-medium text-warm-gray dark:text-soft-cream mb-2 text-sm">
+                      Questions engaging?
+                    </legend>
+                  </Label>
+                  <div className="flex justify-between w-full gap-2" role="radiogroup">
+                    <ToggleButton value="no" currentValue={questionsEngaging} onChange={setQuestionsEngaging} variant="no" testId="modal-toggle-engaging-no">No</ToggleButton>
+                    <ToggleButton value="somewhat" currentValue={questionsEngaging} onChange={setQuestionsEngaging} variant="middle" testId="modal-toggle-engaging-somewhat">Somewhat</ToggleButton>
+                    <ToggleButton value="yes" currentValue={questionsEngaging} onChange={setQuestionsEngaging} variant="yes" testId="modal-toggle-engaging-yes">Yes</ToggleButton>
+                  </div>
+                </fieldset>
+
+                <fieldset className="space-y-2">
+                  <Label asChild>
+                    <legend className="font-medium text-warm-gray dark:text-soft-cream mb-2 text-sm">
+                      Would share with a friend?
+                    </legend>
+                  </Label>
+                  <div className="flex justify-between w-full gap-2" role="radiogroup">
+                    <ToggleButton value="no" currentValue={wouldShare} onChange={setWouldShare} variant="no" testId="modal-toggle-share-no">No</ToggleButton>
+                    <ToggleButton value="yes" currentValue={wouldShare} onChange={setWouldShare} variant="yes" testId="modal-toggle-share-yes">Yes</ToggleButton>
+                  </div>
+                </fieldset>
+
+                <div className="space-y-2">
+                  <Label htmlFor="modal-suggestions" className="text-sm font-medium text-warm-gray dark:text-soft-cream">
+                    Suggestions for improvement?
+                  </Label>
+                  <Textarea
+                    id="modal-suggestions"
+                    placeholder="Share your thoughts..."
+                    value={suggestions}
+                    onChange={(e) => setSuggestions(e.target.value)}
+                    maxLength={2000}
+                    rows={2}
+                    className="resize-none text-sm"
+                    data-testid="modal-textarea-suggestions"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleFeedbackSubmit}
+                  disabled={!allFeedbackAnswered}
+                  className="w-full bg-terracotta hover:bg-terracotta/90 disabled:opacity-50 disabled:cursor-not-allowed min-h-12 text-base font-semibold"
+                  data-testid="button-submit-feedback"
+                >
+                  {allFeedbackAnswered ? (
+                    <>
+                      <CheckCircle2 className="w-5 h-5 mr-2" />
+                      {pendingCrossroads ? "Submit & Start Adventure" : "Submit Feedback"}
+                    </>
+                  ) : (
+                    "Complete all fields to continue"
+                  )}
+                </Button>
+                
+                {!allFeedbackAnswered && (
+                  <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                    All fields required
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
       {/* Persistent Test Mode Premium Banner */}
       {isTestPremium && (
         <motion.div
@@ -1883,208 +2066,32 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
-            <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-4 border-gray-900 dark:border-gray-100">
+            <Card className="bg-gradient-to-br from-terracotta/10 via-amber-50 to-orange-50 dark:from-terracotta/20 dark:via-amber-900/20 dark:to-orange-900/20 rounded-xl shadow-lg border-2 border-terracotta/30 dark:border-terracotta/50">
               <CardContent className="p-6">
-                <div className="flex flex-col items-center justify-center text-center mb-6">
+                <div className="flex flex-col items-center justify-center text-center mb-4">
+                  <motion.div 
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-terracotta to-amber-500 flex items-center justify-center mb-4 shadow-lg"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </motion.div>
                   <h3 className="font-bold text-warm-gray dark:text-soft-cream text-[22px]">
-                    Complete for More Free Insights!
+                    View Your Complete Results
                   </h3>
-                  <p className="text-warm-gray/60 dark:text-soft-cream/50 mt-1 text-[18px]">
-                    Answer questions to unlock dashboard
+                  <p className="text-warm-gray/60 dark:text-soft-cream/50 mt-2 text-base max-w-xs">
+                    See your full personality profile, Big Five traits, and personalized insights
                   </p>
                 </div>
 
-                <div className="space-y-5">
-                  <fieldset className="space-y-2">
-                    <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[16px]">
-                        Useful App?
-                      </legend>
-                    </Label>
-                    <div 
-                      className="flex justify-between w-full gap-2" 
-                      role="radiogroup"
-                      aria-label="Rate app usefulness"
-                    >
-                      <ToggleButton 
-                        value="no" 
-                        currentValue={usefulApp} 
-                        onChange={setUsefulApp}
-                        variant="no"
-                        testId="toggle-useful-no"
-                      >
-                        No
-                      </ToggleButton>
-                      <ToggleButton 
-                        value="somewhat" 
-                        currentValue={usefulApp} 
-                        onChange={setUsefulApp}
-                        variant="middle"
-                        testId="toggle-useful-somewhat"
-                      >
-                        Somewhat
-                      </ToggleButton>
-                      <ToggleButton 
-                        value="yes" 
-                        currentValue={usefulApp} 
-                        onChange={setUsefulApp}
-                        variant="yes"
-                        testId="toggle-useful-yes"
-                      >
-                        Yes
-                      </ToggleButton>
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="space-y-2">
-                    <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[16px]">
-                        Results feel accurate?
-                      </legend>
-                    </Label>
-                    <div 
-                      className="flex justify-between w-full gap-2" 
-                      role="radiogroup"
-                      aria-label="Rate results accuracy"
-                    >
-                      <ToggleButton 
-                        value="no" 
-                        currentValue={resultsAccurate} 
-                        onChange={setResultsAccurate}
-                        variant="no"
-                        testId="toggle-accurate-no"
-                      >
-                        No
-                      </ToggleButton>
-                      <ToggleButton 
-                        value="somewhat" 
-                        currentValue={resultsAccurate} 
-                        onChange={setResultsAccurate}
-                        variant="middle"
-                        testId="toggle-accurate-somewhat"
-                      >
-                        Somewhat
-                      </ToggleButton>
-                      <ToggleButton 
-                        value="yes" 
-                        currentValue={resultsAccurate} 
-                        onChange={setResultsAccurate}
-                        variant="yes"
-                        testId="toggle-accurate-yes"
-                      >
-                        Yes
-                      </ToggleButton>
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="space-y-2">
-                    <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[16px]">
-                        Questions engaging?
-                      </legend>
-                    </Label>
-                    <div 
-                      className="flex justify-between w-full gap-2" 
-                      role="radiogroup"
-                      aria-label="Rate question engagement"
-                    >
-                      <ToggleButton 
-                        value="no" 
-                        currentValue={questionsEngaging} 
-                        onChange={setQuestionsEngaging}
-                        variant="no"
-                        testId="toggle-engaging-no"
-                      >
-                        No
-                      </ToggleButton>
-                      <ToggleButton 
-                        value="somewhat" 
-                        currentValue={questionsEngaging} 
-                        onChange={setQuestionsEngaging}
-                        variant="middle"
-                        testId="toggle-engaging-somewhat"
-                      >
-                        Somewhat
-                      </ToggleButton>
-                      <ToggleButton 
-                        value="yes" 
-                        currentValue={questionsEngaging} 
-                        onChange={setQuestionsEngaging}
-                        variant="yes"
-                        testId="toggle-engaging-yes"
-                      >
-                        Yes
-                      </ToggleButton>
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="space-y-2">
-                    <Label asChild>
-                      <legend className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium text-warm-gray dark:text-soft-cream mb-3 text-[16px]">Would share this app with a friend?</legend>
-                    </Label>
-                    <div 
-                      className="flex justify-between w-full gap-2" 
-                      role="radiogroup"
-                      aria-label="Would you share"
-                    >
-                      <ToggleButton 
-                        value="no" 
-                        currentValue={wouldShare} 
-                        onChange={setWouldShare}
-                        variant="no"
-                        testId="toggle-share-no"
-                      >
-                        No
-                      </ToggleButton>
-                      <ToggleButton 
-                        value="yes" 
-                        currentValue={wouldShare} 
-                        onChange={setWouldShare}
-                        variant="yes"
-                        testId="toggle-share-yes"
-                      >
-                        Yes
-                      </ToggleButton>
-                    </div>
-                  </fieldset>
-
-                  <div className="space-y-2">
-                    <Label 
-                      htmlFor="suggestions" 
-                      className="text-lg font-medium text-warm-gray dark:text-soft-cream"
-                    >
-                      Suggestions for improvement?
-                    </Label>
-                    <Textarea
-                      id="suggestions"
-                      placeholder="Share your thoughts (timing, design, features, etc.)"
-                      value={suggestions}
-                      onChange={(e) => setSuggestions(e.target.value)}
-                      maxLength={2000}
-                      rows={3}
-                      className="resize-none text-sm"
-                      data-testid="textarea-suggestions"
-                    />
-                    <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 text-right">
-                      {suggestions.length}/2000
-                    </p>
-                  </div>
-
-                  <Button
-                    onClick={handleShowFullResults}
-                    disabled={!allFeedbackAnswered}
-                    className="w-full bg-terracotta hover:bg-terracotta/90 disabled:opacity-50 disabled:cursor-not-allowed min-h-12 text-base font-semibold"
-                    data-testid="button-show-full-results"
-                  >
-                    {allFeedbackAnswered ? "Show Full Results" : "Complete all fields to continue"}
-                  </Button>
-                  
-                  {!allFeedbackAnswered && (
-                    <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
-                      All fields required to unlock full dashboard
-                    </p>
-                  )}
-                </div>
+                <Button
+                  onClick={handleShowFullResults}
+                  className="w-full bg-terracotta hover:bg-terracotta/90 min-h-14 text-lg font-bold shadow-lg"
+                  data-testid="button-show-full-results"
+                >
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                  See Full Results
+                </Button>
               </CardContent>
             </Card>
           </motion.div>
@@ -2335,7 +2342,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       <Button 
                         size="lg"
                         className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-8 py-6 text-lg shadow-lg shadow-orange-500/30"
-                        onClick={() => window.location.href = "/crossroads"}
+                        onClick={handleCrossroadsClick}
                         data-testid="button-crossroads-cta"
                       >
                         <Compass className="w-5 h-5 mr-2" />
