@@ -33,12 +33,16 @@ interface Scenario {
     emoji: string;
     trait: string;
     insight: string;
+    consequence: string;
+    bigFiveTrait?: string;
   };
   choiceB: {
     text: string;
     emoji: string;
     trait: string;
     insight: string;
+    consequence: string;
+    bigFiveTrait?: string;
   };
 }
 
@@ -59,13 +63,17 @@ const SCENARIOS: Scenario[] = [
       text: "Apply now with what I have - fortune favors the bold!",
       emoji: "rocket",
       trait: "risk-taker",
-      insight: "You leap before you look. This boldness can open doors others never see."
+      insight: "You leap before you look. This boldness can open doors others never see.",
+      consequence: "Reveals your appetite for risk and spontaneous action",
+      bigFiveTrait: "O"
     },
     choiceB: {
       text: "Bookmark it and work toward being ready next time",
       emoji: "target",
       trait: "strategic",
-      insight: "You play the long game. Your patience often leads to better-prepared wins."
+      insight: "You play the long game. Your patience often leads to better-prepared wins.",
+      consequence: "Shows your preference for preparation over impulsiveness",
+      bigFiveTrait: "C"
     }
   },
   {
@@ -76,13 +84,17 @@ const SCENARIOS: Scenario[] = [
       text: "Jump in and help find a middle ground",
       emoji: "handshake",
       trait: "mediator",
-      insight: "You're naturally drawn to harmony. Your ability to see all sides makes you invaluable in conflicts."
+      insight: "You're naturally drawn to harmony. Your ability to see all sides makes you invaluable in conflicts.",
+      consequence: "Demonstrates your drive for social harmony",
+      bigFiveTrait: "A"
     },
     choiceB: {
       text: "Let them work it out - they're both capable adults",
       emoji: "thinking",
       trait: "observer",
-      insight: "You trust others to solve their own problems. This restraint often leads to stronger team dynamics."
+      insight: "You trust others to solve their own problems. This restraint often leads to stronger team dynamics.",
+      consequence: "Reveals your trust in others' autonomy",
+      bigFiveTrait: "C"
     }
   },
   {
@@ -93,13 +105,17 @@ const SCENARIOS: Scenario[] = [
       text: "Fix it immediately - my integrity isn't negotiable",
       emoji: "shield",
       trait: "principled",
-      insight: "Your moral compass is unwavering. People trust you because you never take shortcuts on ethics."
+      insight: "Your moral compass is unwavering. People trust you because you never take shortcuts on ethics.",
+      consequence: "Shows your commitment to doing what's right",
+      bigFiveTrait: "C"
     },
     choiceB: {
       text: "Note it for later - the impact is minimal",
       emoji: "scales",
       trait: "pragmatic",
-      insight: "You weigh costs and benefits realistically. This practical wisdom helps you avoid burnout."
+      insight: "You weigh costs and benefits realistically. This practical wisdom helps you avoid burnout.",
+      consequence: "Reveals your practical approach to prioritization",
+      bigFiveTrait: "N"
     }
   },
   {
@@ -110,13 +126,17 @@ const SCENARIOS: Scenario[] = [
       text: "Force something out - anything is better than nothing",
       emoji: "lightning",
       trait: "action-oriented",
-      insight: "You believe motion creates momentum. Your bias toward action often breaks through paralysis."
+      insight: "You believe motion creates momentum. Your bias toward action often breaks through paralysis.",
+      consequence: "Demonstrates your need for forward movement",
+      bigFiveTrait: "E"
     },
     choiceB: {
       text: "Take a walk, let my subconscious work on it",
       emoji: "nature",
       trait: "intuitive",
-      insight: "You trust your inner wisdom. Stepping back often leads to your best breakthroughs."
+      insight: "You trust your inner wisdom. Stepping back often leads to your best breakthroughs.",
+      consequence: "Shows your trust in creative incubation",
+      bigFiveTrait: "O"
     }
   },
   {
@@ -127,13 +147,17 @@ const SCENARIOS: Scenario[] = [
       text: "I'm in! New connections could change everything",
       emoji: "people",
       trait: "connector",
-      insight: "You energize through connection. Your network often becomes your greatest asset."
+      insight: "You energize through connection. Your network often becomes your greatest asset.",
+      consequence: "Reveals how you recharge through social interaction",
+      bigFiveTrait: "E"
     },
     choiceB: {
       text: "Rain check - I need to recharge first",
       emoji: "battery",
       trait: "self-aware",
-      insight: "You know your limits. This self-awareness prevents burnout and keeps you effective long-term."
+      insight: "You know your limits. This self-awareness prevents burnout and keeps you effective long-term.",
+      consequence: "Shows your awareness of personal boundaries",
+      bigFiveTrait: "N"
     }
   },
   {
@@ -144,13 +168,17 @@ const SCENARIOS: Scenario[] = [
       text: "Thank them and examine the feedback carefully",
       emoji: "growth",
       trait: "growth-minded",
-      insight: "You see feedback as fuel. This openness accelerates your development."
+      insight: "You see feedback as fuel. This openness accelerates your development.",
+      consequence: "Demonstrates your openness to growth",
+      bigFiveTrait: "O"
     },
     choiceB: {
       text: "Consider the source and their motives first",
       emoji: "detective",
       trait: "discerning",
-      insight: "You filter information thoughtfully. Not all feedback deserves equal weight."
+      insight: "You filter information thoughtfully. Not all feedback deserves equal weight.",
+      consequence: "Shows your analytical approach to information",
+      bigFiveTrait: "C"
     }
   },
   {
@@ -161,13 +189,17 @@ const SCENARIOS: Scenario[] = [
       text: "Take the money - I can build new relationships",
       emoji: "money",
       trait: "ambitious",
-      insight: "You prioritize growth and advancement. Your drive often leads to rapid career progress."
+      insight: "You prioritize growth and advancement. Your drive often leads to rapid career progress.",
+      consequence: "Reveals your drive for advancement",
+      bigFiveTrait: "E"
     },
     choiceB: {
       text: "Stay - the culture and people matter more",
       emoji: "heart",
       trait: "values-driven",
-      insight: "You prioritize meaning over money. Your loyalty builds deep, lasting professional bonds."
+      insight: "You prioritize meaning over money. Your loyalty builds deep, lasting professional bonds.",
+      consequence: "Shows your commitment to relationships",
+      bigFiveTrait: "A"
     }
   }
 ];
@@ -189,6 +221,33 @@ const TRAIT_CONFIG: Record<string, { label: string; icon: typeof Heart; color: s
   "values-driven": { label: "Values", icon: Heart, color: "text-indigo-500" },
 };
 
+// Big Five trait labels for personality echo
+const BIG_FIVE_LABELS: Record<string, { name: string; highDesc: string; lowDesc: string }> = {
+  "O": { name: "Openness", highDesc: "your curious, creative nature", lowDesc: "your practical, grounded approach" },
+  "C": { name: "Conscientiousness", highDesc: "your organized, disciplined side", lowDesc: "your flexible, spontaneous style" },
+  "E": { name: "Extraversion", highDesc: "your outgoing, energetic spirit", lowDesc: "your thoughtful, reserved nature" },
+  "A": { name: "Agreeableness", highDesc: "your cooperative, empathetic heart", lowDesc: "your independent, direct approach" },
+  "N": { name: "Emotional Stability", highDesc: "your calm, steady presence", lowDesc: "your depth of feeling and sensitivity" },
+};
+
+// Personality Echo - personalized messages based on Big Five
+const getPersonalityEcho = (bigFive: Record<string, number> | null, choice: Scenario['choiceA'] | Scenario['choiceB']): string | null => {
+  if (!bigFive || !choice.bigFiveTrait) return null;
+  
+  const trait = choice.bigFiveTrait;
+  const score = bigFive[trait] || 50;
+  const traitInfo = BIG_FIVE_LABELS[trait];
+  
+  if (!traitInfo) return null;
+  
+  if (score >= 60) {
+    return `This choice aligns with ${traitInfo.highDesc}`;
+  } else if (score <= 40) {
+    return `This might stretch ${traitInfo.lowDesc}`;
+  }
+  return null;
+};
+
 export default function CrossroadsAdventure() {
   const [, setLocation] = useLocation();
   const shouldReduceMotion = useReducedMotion();
@@ -199,6 +258,21 @@ export default function CrossroadsAdventure() {
   const [currentInsight, setCurrentInsight] = useState("");
   const [isComplete, setIsComplete] = useState(false);
   const [traitSnapshots, setTraitSnapshots] = useState<TraitSnapshot[]>([]);
+  const [showConsequence, setShowConsequence] = useState<"A" | "B" | null>(null);
+  
+  // Get Big Five profile from session storage (from quiz results)
+  const [bigFiveProfile, setBigFiveProfile] = useState<Record<string, number> | null>(null);
+  
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('knowrole-big-five');
+      if (stored) {
+        setBigFiveProfile(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.log("No quiz data found for personality echo");
+    }
+  }, []);
   
   const scenario = SCENARIOS[currentScenario];
   const progress = ((currentScenario + (showInsight ? 1 : 0)) / SCENARIOS.length) * 100;
@@ -247,6 +321,7 @@ export default function CrossroadsAdventure() {
       setCurrentScenario(currentScenario + 1);
       setShowInsight(false);
       setCurrentInsight("");
+      setShowConsequence(null);
     }
   };
   
@@ -257,6 +332,7 @@ export default function CrossroadsAdventure() {
     setCurrentInsight("");
     setIsComplete(false);
     setTraitSnapshots([]);
+    setShowConsequence(null);
   };
   
   const handleShare = async () => {
@@ -457,6 +533,9 @@ export default function CrossroadsAdventure() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleChoice("A")}
+                  onMouseEnter={() => setShowConsequence("A")}
+                  onMouseLeave={() => setShowConsequence(null)}
+                  onTouchStart={() => setShowConsequence("A")}
                   className="w-full p-4 rounded-2xl bg-gradient-to-r from-sage-green/10 to-emerald-50 dark:from-sage-green/20 dark:to-emerald-900/20 border-2 border-sage-green/30 hover:border-sage-green/60 transition-all text-left"
                   data-testid="button-choice-a"
                 >
@@ -464,9 +543,32 @@ export default function CrossroadsAdventure() {
                     <div className="w-10 h-10 rounded-full bg-sage-green/20 flex items-center justify-center flex-shrink-0">
                       <span className="text-lg font-bold text-sage-green">A</span>
                     </div>
-                    <p className="text-base font-medium text-warm-gray dark:text-soft-cream leading-relaxed">
-                      {scenario.choiceA.text}
-                    </p>
+                    <div className="flex-1">
+                      <p className="text-base font-medium text-warm-gray dark:text-soft-cream leading-relaxed">
+                        {scenario.choiceA.text}
+                      </p>
+                      <AnimatePresence>
+                        {showConsequence === "A" && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mt-2 pt-2 border-t border-sage-green/20"
+                          >
+                            <p className="text-xs text-sage-green/80 dark:text-sage-green/70 flex items-center gap-1">
+                              <Sparkles className="w-3 h-3" />
+                              {scenario.choiceA.consequence}
+                            </p>
+                            {bigFiveProfile && getPersonalityEcho(bigFiveProfile, scenario.choiceA) && (
+                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+                                <Star className="w-3 h-3" />
+                                {getPersonalityEcho(bigFiveProfile, scenario.choiceA)}
+                              </p>
+                            )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </motion.button>
                 
@@ -474,6 +576,9 @@ export default function CrossroadsAdventure() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleChoice("B")}
+                  onMouseEnter={() => setShowConsequence("B")}
+                  onMouseLeave={() => setShowConsequence(null)}
+                  onTouchStart={() => setShowConsequence("B")}
                   className="w-full p-4 rounded-2xl bg-gradient-to-r from-terracotta/10 to-orange-50 dark:from-terracotta/20 dark:to-orange-900/20 border-2 border-terracotta/30 hover:border-terracotta/60 transition-all text-left"
                   data-testid="button-choice-b"
                 >
@@ -481,15 +586,38 @@ export default function CrossroadsAdventure() {
                     <div className="w-10 h-10 rounded-full bg-terracotta/20 flex items-center justify-center flex-shrink-0">
                       <span className="text-lg font-bold text-terracotta">B</span>
                     </div>
-                    <p className="text-base font-medium text-warm-gray dark:text-soft-cream leading-relaxed">
-                      {scenario.choiceB.text}
-                    </p>
+                    <div className="flex-1">
+                      <p className="text-base font-medium text-warm-gray dark:text-soft-cream leading-relaxed">
+                        {scenario.choiceB.text}
+                      </p>
+                      <AnimatePresence>
+                        {showConsequence === "B" && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mt-2 pt-2 border-t border-terracotta/20"
+                          >
+                            <p className="text-xs text-terracotta/80 dark:text-terracotta/70 flex items-center gap-1">
+                              <Sparkles className="w-3 h-3" />
+                              {scenario.choiceB.consequence}
+                            </p>
+                            {bigFiveProfile && getPersonalityEcho(bigFiveProfile, scenario.choiceB) && (
+                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+                                <Star className="w-3 h-3" />
+                                {getPersonalityEcho(bigFiveProfile, scenario.choiceB)}
+                              </p>
+                            )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </motion.button>
               </div>
               
               <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
-                There are no wrong answers - just different paths
+                {bigFiveProfile ? "Your quiz results personalize these choices" : "Tap and hold to preview what each choice reveals"}
               </p>
             </motion.div>
           ) : (
