@@ -354,66 +354,191 @@ export default function CrossroadsAdventure() {
     }
   };
   
+  // Generate detailed personality insights based on top traits
+  const getDetailedInsight = (traits: TraitSnapshot[]): { title: string; description: string; strength: string; growth: string; actionTip: string } => {
+    if (traits.length === 0) {
+      return { title: "Explorer", description: "You're on a journey of self-discovery.", strength: "Open-mindedness", growth: "Consistency", actionTip: "Keep exploring different paths." };
+    }
+    
+    const topTrait = traits[0]?.trait;
+    const secondTrait = traits[1]?.trait;
+    
+    const insights: Record<string, { title: string; description: string; strength: string; growth: string; actionTip: string }> = {
+      "risk-taker": {
+        title: "The Trailblazer",
+        description: "You thrive on new challenges and aren't afraid to leap into the unknown. Your willingness to take chances often leads to opportunities others miss entirely.",
+        strength: "Turning uncertainty into opportunity - you see potential where others see risk.",
+        growth: "Sometimes the safest path has hidden rewards. Practice strategic patience.",
+        actionTip: "Before your next big decision, ask: 'What's the best that could happen?' alongside the risks."
+      },
+      "strategic": {
+        title: "The Architect",
+        description: "You build for the long term, carefully laying foundations before making moves. Your patience and planning often result in more sustainable success.",
+        strength: "Seeing the bigger picture and building systematic approaches to achieve goals.",
+        growth: "Spontaneity can unlock creativity. Sometimes 'good enough now' beats 'perfect later'.",
+        actionTip: "Try one small unplanned action this week - notice how it feels and what you learn."
+      },
+      "mediator": {
+        title: "The Bridge Builder",
+        description: "You naturally see multiple perspectives and work to create harmony. People trust you to navigate difficult situations with grace and fairness.",
+        strength: "Reading emotional dynamics and finding solutions that honor everyone's needs.",
+        growth: "Your own needs matter too. Practice stating your position before seeking consensus.",
+        actionTip: "In your next conflict, share your perspective first before asking for others' views."
+      },
+      "observer": {
+        title: "The Wise Watcher",
+        description: "You understand that not every situation requires intervention. Your ability to step back gives you clarity that action-oriented people often miss.",
+        strength: "Deep understanding through careful observation and thoughtful analysis.",
+        growth: "Sometimes teams need your voice even when it feels unnecessary to speak up.",
+        actionTip: "Identify one situation this week where your input could help, even if not asked."
+      },
+      "principled": {
+        title: "The Compass",
+        description: "Your moral clarity guides you through complex decisions. People know where you stand, and that consistency builds deep trust over time.",
+        strength: "Unwavering integrity that creates lasting respect and reliable relationships.",
+        growth: "Context sometimes requires flexibility. Consider when principles serve vs. limit.",
+        actionTip: "Ask yourself: 'Is this a core value, or a preference I'm treating as absolute?'"
+      },
+      "pragmatic": {
+        title: "The Realist",
+        description: "You excel at weighing trade-offs and finding workable solutions. Your practical wisdom prevents burnout and keeps projects moving forward.",
+        strength: "Seeing what's truly essential and allocating energy where it matters most.",
+        growth: "Some 'impractical' pursuits feed the soul. Make room for what can't be measured.",
+        actionTip: "Schedule one 'inefficient' activity this week purely because you enjoy it."
+      },
+      "action-oriented": {
+        title: "The Catalyst",
+        description: "You break through paralysis by moving forward. Your bias toward action often creates momentum that others can then build upon.",
+        strength: "Transforming ideas into reality through decisive, confident movement.",
+        growth: "Pausing can be productive. Sometimes the best action is thoughtful inaction.",
+        actionTip: "Before your next quick decision, take three deep breaths and ask 'What am I missing?'"
+      },
+      "intuitive": {
+        title: "The Seeker",
+        description: "You trust the wisdom that emerges from stepping back. Your best insights come when you create space for subconscious processing.",
+        strength: "Connecting dots others miss by allowing ideas to percolate naturally.",
+        growth: "External deadlines are real. Balance inner wisdom with outer requirements.",
+        actionTip: "When facing a decision, set a timer for reflection, then commit to a choice."
+      },
+      "connector": {
+        title: "The Networker",
+        description: "You understand that relationships are the foundation of opportunity. Your genuine interest in others creates connections that benefit everyone.",
+        strength: "Building authentic relationships that open doors and create possibilities.",
+        growth: "Quality matters more than quantity. Deepen a few key relationships intentionally.",
+        actionTip: "Reach out to one meaningful contact you've been neglecting this week."
+      },
+      "self-aware": {
+        title: "The Guardian",
+        description: "You protect your capacity to show up fully by honoring your limits. This self-knowledge prevents burnout and sustains long-term performance.",
+        strength: "Maintaining energy and effectiveness through intentional boundary-setting.",
+        growth: "Discomfort sometimes signals growth, not danger. Distinguish protection from avoidance.",
+        actionTip: "Choose one small stretch outside your comfort zone this week."
+      },
+      "growth-minded": {
+        title: "The Learner",
+        description: "You see feedback as fuel rather than criticism. This openness accelerates your development and inspires others to grow alongside you.",
+        strength: "Turning every experience into a learning opportunity and growing continuously.",
+        growth: "You're already enough. Balance self-improvement with self-acceptance.",
+        actionTip: "This week, acknowledge three things you're already good at."
+      },
+      "discerning": {
+        title: "The Filter",
+        description: "Not all input deserves equal weight, and you know it. Your ability to evaluate sources and motives protects you from manipulation and distraction.",
+        strength: "Critical thinking that separates signal from noise in information-overload.",
+        growth: "Valid insight can come from unexpected sources. Stay open to being surprised.",
+        actionTip: "Consider feedback you initially dismissed. Is there any kernel of truth?"
+      },
+      "ambitious": {
+        title: "The Climber",
+        description: "You're driven to reach your potential and create impact. Your ambition pushes you to achieve what others might settle for less than.",
+        strength: "The drive to excel and create meaningful accomplishments in your field.",
+        growth: "The journey matters too. Celebrate progress, not just arrival at destinations.",
+        actionTip: "Identify one recent small win and fully celebrate it before moving to the next goal."
+      },
+      "values-driven": {
+        title: "The Loyalist",
+        description: "You prioritize what money can't buy: meaning, relationships, and alignment with your core values. This creates deep satisfaction and lasting bonds.",
+        strength: "Building rich, meaningful experiences and relationships that endure.",
+        growth: "Resources enable impact. Consider how strategic advancement could serve your values.",
+        actionTip: "Identify one career step that would increase both your income AND your impact."
+      }
+    };
+    
+    const primary = insights[topTrait] || insights["risk-taker"];
+    
+    // Create a blended description if there's a strong second trait
+    if (secondTrait && traits[1]?.score > 1) {
+      const secondary = insights[secondTrait];
+      if (secondary) {
+        return {
+          ...primary,
+          description: `${primary.description} When combined with your ${secondary.title.toLowerCase().replace("the ", "")} tendencies, you bring a rare balance of ${primary.title.toLowerCase().replace("the ", "")} energy and ${secondary.title.toLowerCase().replace("the ", "")} wisdom.`
+        };
+      }
+    }
+    
+    return primary;
+  };
+  
   if (isComplete) {
+    const topThreeTraits = traitSnapshots.slice(0, 3);
+    const insight = getDetailedInsight(traitSnapshots);
+    
     return (
       <div className="min-h-screen bg-gradient-to-b from-soft-cream via-white to-soft-cream dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-6">
         <div className="max-w-md mx-auto">
           <motion.div
             initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center mb-8"
+            className="text-center mb-6"
           >
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 flex items-center justify-center shadow-lg">
               <Trophy className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2">
-              Adventure Complete!
+            <h1 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-1">
+              {insight.title}
             </h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60">
-              Here's what your choices revealed about you
+            <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60">
+              Your decision-making personality revealed
             </p>
           </motion.div>
           
-          <Card className="bg-white dark:bg-gray-800 border-amber-200 dark:border-amber-800 overflow-hidden mb-6">
+          {/* Top 3 Traits - Compact Display */}
+          <Card className="bg-white dark:bg-gray-800 border-amber-200 dark:border-amber-800 overflow-hidden mb-4">
             <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500" />
-            <CardContent className="p-5">
-              <h2 className="text-lg font-bold text-warm-gray dark:text-soft-cream mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-500" />
-                Your Personality Snapshot
+            <CardContent className="p-4">
+              <h2 className="text-sm font-bold text-warm-gray dark:text-soft-cream mb-3 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                Your Top 3 Tendencies
               </h2>
               
-              <div className="space-y-3">
-                {traitSnapshots.slice(0, 5).map((trait, idx) => {
+              <div className="flex justify-between gap-2">
+                {topThreeTraits.map((trait, idx) => {
                   const Icon = trait.icon;
+                  const size = idx === 0 ? "w-14 h-14" : "w-12 h-12";
+                  const iconSize = idx === 0 ? "w-7 h-7" : "w-5 h-5";
+                  
                   return (
                     <motion.div
                       key={trait.trait}
-                      initial={shouldReduceMotion ? {} : { opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20"
+                      initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.15 }}
+                      className="flex-1 text-center"
                     >
-                      <div className={`w-10 h-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center shadow-sm`}>
-                        <Icon className={`w-5 h-5 ${trait.color}`} />
+                      <div className={`${size} mx-auto mb-2 rounded-full bg-gradient-to-br ${
+                        idx === 0 ? 'from-amber-100 to-orange-100 dark:from-amber-800/40 dark:to-orange-800/40 ring-2 ring-amber-400' :
+                        'from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20'
+                      } flex items-center justify-center shadow-sm`}>
+                        <Icon className={`${iconSize} ${trait.color}`} />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-bold text-warm-gray dark:text-soft-cream">
-                            {trait.label}
-                          </span>
-                          <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-                            {trait.score > 1 ? `${trait.score}x chosen` : "chosen"}
-                          </span>
-                        </div>
-                        <div className="h-2 rounded-full bg-amber-100 dark:bg-amber-900/40 overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(trait.score / choices.length) * 100}%` }}
-                            transition={{ delay: idx * 0.1 + 0.3, duration: 0.5 }}
-                            className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
-                          />
-                        </div>
-                      </div>
+                      <p className={`text-xs font-bold ${idx === 0 ? 'text-amber-700 dark:text-amber-300' : 'text-warm-gray/80 dark:text-soft-cream/70'}`}>
+                        {idx === 0 && <span className="block text-[10px] text-amber-500 mb-0.5">#1</span>}
+                        {trait.label}
+                      </p>
+                      <p className="text-[10px] text-warm-gray/50 dark:text-soft-cream/40">
+                        {trait.score}x chosen
+                      </p>
                     </motion.div>
                   );
                 })}
@@ -421,24 +546,55 @@ export default function CrossroadsAdventure() {
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800 mb-6">
-            <CardContent className="p-5">
-              <h3 className="text-base font-bold text-indigo-800 dark:text-indigo-200 mb-3 flex items-center gap-2">
+          {/* Detailed Personality Description */}
+          <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800 mb-4">
+            <CardContent className="p-4">
+              <h3 className="text-sm font-bold text-indigo-800 dark:text-indigo-200 mb-2 flex items-center gap-2">
                 <Brain className="w-4 h-4" />
-                What This Means
+                Your Decision Style
               </h3>
               <p className="text-sm text-indigo-700 dark:text-indigo-300 leading-relaxed">
-                {traitSnapshots.length > 0 && (
-                  <>
-                    Your strongest tendency is <span className="font-bold">{traitSnapshots[0]?.label}</span>
-                    {traitSnapshots.length > 1 && (
-                      <>, balanced by <span className="font-bold">{traitSnapshots[1]?.label}</span></>
-                    )}.
-                    This combination suggests you approach life with a unique blend of {
-                      traitSnapshots.slice(0, 2).map(t => t.label.toLowerCase()).join(" and ")
-                    }.
-                  </>
-                )}
+                {insight.description}
+              </p>
+            </CardContent>
+          </Card>
+          
+          {/* Strengths & Growth */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-800">
+              <CardContent className="p-3">
+                <h4 className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1.5 flex items-center gap-1">
+                  <Star className="w-3 h-3" />
+                  Your Strength
+                </h4>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 leading-relaxed">
+                  {insight.strength}
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20 border-violet-200 dark:border-violet-800">
+              <CardContent className="p-3">
+                <h4 className="text-xs font-bold text-violet-700 dark:text-violet-300 mb-1.5 flex items-center gap-1">
+                  <Target className="w-3 h-3" />
+                  Growth Edge
+                </h4>
+                <p className="text-xs text-violet-600 dark:text-violet-400 leading-relaxed">
+                  {insight.growth}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Action Tip */}
+          <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/20 border-amber-300 dark:border-amber-700 mb-6">
+            <CardContent className="p-4">
+              <h4 className="text-sm font-bold text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Try This Week
+              </h4>
+              <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed italic">
+                "{insight.actionTip}"
               </p>
             </CardContent>
           </Card>
@@ -461,7 +617,7 @@ export default function CrossroadsAdventure() {
                 data-testid="button-restart-crossroads"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
-                Try Again
+                Start Over
               </Button>
               <Button
                 variant="outline"

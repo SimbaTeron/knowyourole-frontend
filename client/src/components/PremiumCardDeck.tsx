@@ -1156,10 +1156,11 @@ function GrowthQuestCard({
         </span>
       </div>
 
-      {/* 5 Challenges - always showing exactly 5 items */}
+      {/* 5 Challenges - always showing exactly 5 unique items */}
       <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, idx) => {
-          const challenge = challenges[idx] || `Complete today's personality growth task`;
+          // Combine API and static challenges to ensure 5 unique items
+          const challenge = challenges[idx] || staticChallenges[idx] || staticChallenges[idx % staticChallenges.length];
           const challengeId = `${weakestTrait}-w${selectedWeek}-${idx}`;
           const isCompleted = completedChallenges.has(challengeId);
           

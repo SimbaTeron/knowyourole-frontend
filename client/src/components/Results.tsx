@@ -1312,7 +1312,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 transition={{ delay: 0.3, type: "spring", stiffness: 400 }}
                 className="text-[28px] font-bold text-teal-700 dark:text-teal-200 mb-2"
               >
-                Premium is Free (For Now)
+                Premium is Free!
               </motion.p>
               <p className="text-sm text-teal-600/80 dark:text-teal-300/70 mb-6">
                 We're testing! Your two cents (literally $0.02) helps us build something great.
