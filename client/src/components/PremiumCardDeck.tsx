@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useReducedMotion, PanInfo } from "framer-motion";
 import { 
-  BookOpen, Shield, Briefcase, DollarSign, Target, Brain, Gift, Crown,
-  Lightbulb, CheckCircle2, ArrowRight, Star, Sunrise, Zap, Flame, ChevronLeft, ChevronRight,
+  BookOpen, Shield, DollarSign, Target, Brain, Gift, Crown,
+  Lightbulb, CheckCircle2, ArrowRight, Star, Zap, Flame, ChevronLeft, ChevronRight,
   RotateCw, Play, Pause, Clock, Sparkles, TrendingUp, Eye, EyeOff, GripHorizontal,
   MessageSquare, Heart, Users, Compass
 } from "lucide-react";
@@ -154,39 +154,6 @@ const COLOR_CLASSES = {
   },
 } as const;
 
-// Static time-of-day color classes
-const TIME_COLORS = {
-  morning: {
-    bgSelected: "bg-amber-100 dark:bg-amber-900/40",
-    bgUnselected: "hover:bg-gray-100 dark:hover:bg-gray-700",
-    circleSelected: "bg-gradient-to-br from-amber-400 to-amber-500",
-    circleUnselected: "bg-gray-200 dark:bg-gray-700",
-    textSelected: "text-amber-700 dark:text-amber-300",
-    textUnselected: "text-gray-500",
-    contentBg: "bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800",
-    iconColor: "text-amber-500",
-  },
-  afternoon: {
-    bgSelected: "bg-sky-100 dark:bg-sky-900/40",
-    bgUnselected: "hover:bg-gray-100 dark:hover:bg-gray-700",
-    circleSelected: "bg-gradient-to-br from-sky-400 to-sky-500",
-    circleUnselected: "bg-gray-200 dark:bg-gray-700",
-    textSelected: "text-sky-700 dark:text-sky-300",
-    textUnselected: "text-gray-500",
-    contentBg: "bg-sky-50 dark:bg-sky-900/20 border-sky-100 dark:border-sky-800",
-    iconColor: "text-sky-500",
-  },
-  evening: {
-    bgSelected: "bg-purple-100 dark:bg-purple-900/40",
-    bgUnselected: "hover:bg-gray-100 dark:hover:bg-gray-700",
-    circleSelected: "bg-gradient-to-br from-purple-400 to-purple-500",
-    circleUnselected: "bg-gray-200 dark:bg-gray-700",
-    textSelected: "text-purple-700 dark:text-purple-300",
-    textUnselected: "text-gray-500",
-    contentBg: "bg-purple-50 dark:bg-purple-900/20 border-purple-100 dark:border-purple-800",
-    iconColor: "text-purple-500",
-  },
-} as const;
 
 type ColorKey = keyof typeof COLOR_CLASSES;
 
@@ -194,7 +161,6 @@ const CARD_CONFIGS = [
   { id: "deep-dive", title: "Deep Dive", icon: BookOpen, color: "violet" as ColorKey, gradient: "from-violet-400 via-purple-500 to-fuchsia-500" },
   { id: "role-matches", title: "Role Matches", icon: Gift, color: "amber" as ColorKey, gradient: "from-amber-400 via-orange-500 to-red-400" },
   { id: "blindspots", title: "Your Blindspots", icon: Shield, color: "rose" as ColorKey, gradient: "from-rose-400 via-pink-500 to-fuchsia-500" },
-  { id: "career-sim", title: "Career Simulator", icon: Briefcase, color: "sky" as ColorKey, gradient: "from-sky-400 via-blue-500 to-indigo-500" },
   { id: "side-hustle", title: "Side Hustles", icon: DollarSign, color: "amber" as ColorKey, gradient: "from-amber-400 via-yellow-500 to-orange-500" },
   { id: "learning", title: "How You Learn", icon: BookOpen, color: "teal" as ColorKey, gradient: "from-teal-400 via-cyan-500 to-emerald-500" },
   { id: "growth-quest", title: "30-Day Quest", icon: Target, color: "emerald" as ColorKey, gradient: "from-emerald-400 via-green-500 to-teal-500" },
@@ -282,7 +248,6 @@ export function PremiumCardDeck({
   
   // Interactive states for each card
   const [flippedBlindspots, setFlippedBlindspots] = useState<Set<number>>(new Set());
-  const [careerTimeOfDay, setCareerTimeOfDay] = useState<"morning" | "afternoon" | "evening">("morning");
   const [selectedHustle, setSelectedHustle] = useState(0);
   const [expandedTips, setExpandedTips] = useState<Set<number>>(new Set());
   const [selectedQuestWeek, setSelectedQuestWeek] = usePersistedState<1 | 2 | 3 | 4>(STORAGE_KEYS.SELECTED_WEEK, 1);
@@ -358,14 +323,6 @@ export function PremiumCardDeck({
     }),
   };
 
-  // Get career data
-  const getCareerData = () => {
-    const careerKey = Object.keys(CAREER_SIMULATOR).find(k => 
-      result?.primaryRole?.title?.toLowerCase().includes(k.toLowerCase().split(' ')[0])
-    ) || Object.keys(CAREER_SIMULATOR)[0];
-    return CAREER_SIMULATOR[careerKey];
-  };
-
   // Get side hustles data
   const getSideHustles = () => {
     const bigFive = result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 };
@@ -430,15 +387,6 @@ export function PremiumCardDeck({
             else newSet.add(idx);
             setFlippedBlindspots(newSet);
           }}
-          reduceMotion={shouldReduceMotion ?? false}
-        />;
-      
-      case "career-sim":
-        return <CareerSimCard 
-          career={getCareerData()}
-          roleTitle={result?.primaryRole?.title || "your matched career"}
-          timeOfDay={careerTimeOfDay}
-          setTimeOfDay={setCareerTimeOfDay}
           reduceMotion={shouldReduceMotion ?? false}
         />;
       
@@ -896,97 +844,6 @@ function BlindSpotsCard({
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-// Career Simulator Card - Timeline slider
-function CareerSimCard({ 
-  career, 
-  roleTitle,
-  timeOfDay,
-  setTimeOfDay,
-  reduceMotion
-}: { 
-  career: { morningRoutine: string; afternoonTasks: string; eveningReflection: string; growth: string };
-  roleTitle: string;
-  timeOfDay: "morning" | "afternoon" | "evening";
-  setTimeOfDay: (time: "morning" | "afternoon" | "evening") => void;
-  reduceMotion: boolean;
-}) {
-  const times = [
-    { id: "morning" as const, label: "Morning", icon: Sunrise, content: career?.morningRoutine },
-    { id: "afternoon" as const, label: "Afternoon", icon: Zap, content: career?.afternoonTasks },
-    { id: "evening" as const, label: "Evening", icon: Star, content: career?.eveningReflection },
-  ];
-
-  const timeIndex = times.findIndex(t => t.id === timeOfDay);
-  const currentTimeColors = TIME_COLORS[timeOfDay];
-
-  return (
-    <div className="space-y-4">
-      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-        A day in the life as a <span className="font-semibold">{roleTitle}</span>
-      </p>
-      
-      {/* Timeline slider */}
-      <div className="relative">
-        <div className="flex justify-between items-center mb-4">
-          {times.map((time) => {
-            const isSelected = timeOfDay === time.id;
-            const colors = TIME_COLORS[time.id];
-            return (
-              <button
-                key={time.id}
-                onClick={() => setTimeOfDay(time.id)}
-                className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all ${
-                  isSelected ? colors.bgSelected : colors.bgUnselected
-                }`}
-                data-testid={`time-${time.id}`}
-              >
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  isSelected ? colors.circleSelected : colors.circleUnselected
-                }`}>
-                  <time.icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-500'}`} />
-                </div>
-                <span className={`text-xs font-medium ${
-                  isSelected ? colors.textSelected : colors.textUnselected
-                }`}>
-                  {time.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        
-        {/* Progress bar */}
-        <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mb-4 overflow-hidden">
-          <div 
-            className={`h-full bg-gradient-to-r from-amber-400 via-sky-400 to-purple-400 ${reduceMotion ? '' : 'transition-all duration-300'}`}
-            style={{ width: `${((timeIndex + 1) / 3) * 100}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Content area */}
-      <div
-        key={timeOfDay}
-        className={`p-4 rounded-xl ${currentTimeColors.contentBg}`}
-      >
-        <div className="flex items-start gap-3">
-          <Clock className={`w-5 h-5 ${currentTimeColors.iconColor} flex-shrink-0 mt-0.5`} />
-          <p className="text-sm text-warm-gray dark:text-soft-cream leading-relaxed">
-            {times.find(t => t.id === timeOfDay)?.content}
-          </p>
-        </div>
-      </div>
-
-      {/* 5-Year Vision */}
-      <div className="p-3 rounded-xl bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-900/30 dark:to-indigo-900/30 border border-sky-200 dark:border-sky-700">
-        <p className="text-xs text-sky-700 dark:text-sky-300">
-          <span className="font-bold">5-Year Vision:</span> {career?.growth}
-        </p>
-      </div>
     </div>
   );
 }
