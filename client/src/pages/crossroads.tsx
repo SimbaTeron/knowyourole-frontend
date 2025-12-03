@@ -609,6 +609,15 @@ export default function CrossroadsAdventure() {
               Share Your Results
             </Button>
             
+            <Button
+              className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-5"
+              onClick={() => setLocation("/quiz")}
+              data-testid="button-back-to-premium"
+            >
+              <ChevronLeft className="w-5 h-5 mr-2" />
+              Back to Premium Results
+            </Button>
+            
             <div className="flex gap-3">
               <Button
                 variant="outline"
