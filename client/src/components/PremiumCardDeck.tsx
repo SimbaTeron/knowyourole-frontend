@@ -1023,7 +1023,24 @@ function LearningStyleCard({
   );
 }
 
-// Growth Quest Card - Tappable calendar
+// Week theme descriptions for each week
+const WEEK_THEMES: Record<number, { title: string; focus: string }> = {
+  1: { title: "Foundation", focus: "Start with quick wins" },
+  2: { title: "Build Habits", focus: "Create momentum" },
+  3: { title: "Deep Practice", focus: "Challenge yourself" },
+  4: { title: "Integration", focus: "Make it permanent" },
+};
+
+// Trait improvement descriptions
+const TRAIT_IMPROVEMENTS: Record<string, { icon: string; improvement: string }> = {
+  "O": { icon: "Creativity", improvement: "Expanding your horizons and embracing new experiences" },
+  "C": { icon: "Focus", improvement: "Building discipline and achieving your goals" },
+  "E": { icon: "Connection", improvement: "Growing your social skills and relationships" },
+  "A": { icon: "Kindness", improvement: "Strengthening empathy and cooperation" },
+  "N": { icon: "Calm", improvement: "Building emotional resilience and inner peace" },
+};
+
+// Growth Quest Card - Tappable calendar with personality-based improvements
 function GrowthQuestCard({ 
   weakestTrait,
   GROWTH_QUESTS,
@@ -1075,37 +1092,55 @@ function GrowthQuestCard({
     : [];
   
   const challenges = hasApiData && apiChallenges.length > 0 ? apiChallenges : staticChallenges;
+  const traitInfo = TRAIT_IMPROVEMENTS[weakestTrait] || TRAIT_IMPROVEMENTS["O"];
+  const weekTheme = WEEK_THEMES[selectedWeek];
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-        {hasApiData ? "Personalized growth challenges matched to your profile" : `Challenges to strengthen your ${TRAIT_LABELS[weakestTrait]?.toLowerCase() || "growth area"}`}
-      </p>
+      {/* Trait being improved header */}
+      <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800">
+        <div className="flex items-center gap-2 mb-1">
+          <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase">
+            Improving: {TRAIT_LABELS[weakestTrait] || "Growth Area"}
+          </span>
+        </div>
+        <p className="text-xs text-emerald-600/80 dark:text-emerald-400/70">
+          {hasApiData ? "Personalized challenges based on your unique profile" : traitInfo.improvement}
+        </p>
+      </div>
 
-      {/* Week selector - Calendar style */}
+      {/* Week selector - Calendar style with themes */}
       <div className="grid grid-cols-4 gap-2">
         {([1, 2, 3, 4] as const).map((week) => {
           const weekChallenges = (quests[`week${week}` as keyof typeof quests] || []).length;
           const weekCompleted = Array.from(completedChallenges).filter(id => id.includes(`-w${week}-`)).length;
+          const allWeekDone = weekCompleted >= 5;
           
           return (
             <button
               key={week}
               onClick={() => setSelectedWeek(week)}
-              className={`relative p-3 rounded-xl ${reduceMotion ? '' : 'transition-all'} ${
+              className={`relative p-2 rounded-xl ${reduceMotion ? '' : 'transition-all'} ${
                 selectedWeek === week
                   ? 'bg-emerald-500 text-white shadow-lg'
-                  : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-800/50'
+                  : allWeekDone
+                    ? 'bg-emerald-100 dark:bg-emerald-800/50 text-emerald-700 dark:text-emerald-300 border-2 border-emerald-300 dark:border-emerald-600'
+                    : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-800/50'
               }`}
               data-testid={`week-${week}`}
             >
               <div className="text-center">
-                <div className="text-lg font-bold">{week}</div>
-                <div className="text-xs opacity-80">Week</div>
+                <div className="text-base font-bold">{week}</div>
+                <div className="text-[10px] opacity-80 leading-tight">{WEEK_THEMES[week].title}</div>
               </div>
               {weekCompleted > 0 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-600 dark:bg-emerald-400 rounded-full flex items-center justify-center text-xs text-white dark:text-gray-900 font-bold">
-                  {weekCompleted}
+                <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                  allWeekDone 
+                    ? 'bg-emerald-600 dark:bg-emerald-400 text-white dark:text-gray-900'
+                    : 'bg-amber-500 text-white'
+                }`}>
+                  {allWeekDone ? <CheckCircle2 className="w-3 h-3" /> : weekCompleted}
                 </div>
               )}
             </button>
@@ -1113,9 +1148,18 @@ function GrowthQuestCard({
         })}
       </div>
 
-      {/* Challenges */}
+      {/* Week focus description */}
+      <div className="flex items-center gap-2 px-1">
+        <Sparkles className="w-3 h-3 text-emerald-500" />
+        <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+          Week {selectedWeek} Focus: {weekTheme.focus}
+        </span>
+      </div>
+
+      {/* 5 Challenges - always showing exactly 5 items */}
       <div className="space-y-2">
-        {challenges.slice(0, 5).map((challenge, idx) => {
+        {Array.from({ length: 5 }).map((_, idx) => {
+          const challenge = challenges[idx] || `Complete today's personality growth task`;
           const challengeId = `${weakestTrait}-w${selectedWeek}-${idx}`;
           const isCompleted = completedChallenges.has(challengeId);
           
@@ -1147,16 +1191,19 @@ function GrowthQuestCard({
         })}
       </div>
 
-      {/* Progress */}
+      {/* Progress with personality growth context */}
       <div className="pt-3 border-t border-emerald-100 dark:border-emerald-800">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-            {completedChallenges.size} / 20 completed
-          </span>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-3 h-3 text-emerald-500" />
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+              {completedChallenges.size} / 20 growth tasks done
+            </span>
+          </div>
           <div className="flex items-center gap-1">
             <Flame className={`w-4 h-4 ${completedChallenges.size >= 5 ? 'text-orange-500' : 'text-gray-300'}`} />
             <span className={`text-xs font-bold ${completedChallenges.size >= 5 ? 'text-orange-500' : 'text-gray-400'}`}>
-              {completedChallenges.size >= 5 ? `${Math.floor(completedChallenges.size / 5)} week streak!` : 'Start streak'}
+              {completedChallenges.size >= 5 ? `${Math.floor(completedChallenges.size / 5)} week streak!` : 'Complete 5 to start streak'}
             </span>
           </div>
         </div>
