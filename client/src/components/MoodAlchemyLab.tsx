@@ -112,7 +112,7 @@ const MOOD_ORBS: MoodOrb[] = [
   },
 ];
 
-interface BlendInfo {
+export interface BlendInfo {
   title: string;
   desc: string;
   emoji: string;
@@ -120,7 +120,7 @@ interface BlendInfo {
   sampleQuestion: string;
 }
 
-const HYBRID_HINTS: Record<string, BlendInfo> = {
+export const HYBRID_HINTS: Record<string, BlendInfo> = {
   "calm+happy": { 
     title: "Peaceful Optimist", 
     desc: "You bring steady sunshine to every situation",
@@ -438,7 +438,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
   },
 };
 
-function getHybridKey(id1: string, id2: string): string {
+export function getHybridKey(id1: string, id2: string): string {
   return [id1, id2].sort().join("+");
 }
 

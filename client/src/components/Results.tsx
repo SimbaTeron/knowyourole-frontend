@@ -19,6 +19,8 @@ import { getLocaleInsight, getPersonalizedInsight, type LocaleInsight } from "@/
 import { getRegionalSalary, shouldShowSalary } from "@/data/regionalSalaries";
 import { PremiumCardDeck } from "./PremiumCardDeck";
 import { SharePDFModal } from "./SharePDFModal";
+import { HYBRID_HINTS, getHybridKey, type BlendInfo } from "./MoodAlchemyLab";
+import { MOOD_PROXY_BOOSTS } from "@/lib/proxyCalculations";
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -1047,6 +1049,12 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   // Share PDF Modal state
   const [showSharePDFModal, setShowSharePDFModal] = useState(false);
   
+  // Mood Blend Badge state
+  const [moodBlendInfo, setMoodBlendInfo] = useState<BlendInfo | null>(null);
+  const [moodBlendKey, setMoodBlendKey] = useState<string>("");
+  const [isMasterAlchemist, setIsMasterAlchemist] = useState(false);
+  const [uniqueBlendsCount, setUniqueBlendsCount] = useState(0);
+  
   const traitButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotion();
   const { toast } = useToast();
@@ -1064,6 +1072,45 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       console.log('[DEV MODE] Premium features unlocked for testing via ?test_premium=true');
     }
   }, [scores, apiScales, isTestPremium]);
+
+  // Process Mood Blend for Mood Alchemist badge
+  useEffect(() => {
+    const storedBlend = sessionStorage.getItem("knowrole-mood-blend");
+    if (!storedBlend || storedBlend === "neutral") return;
+    
+    // Parse the mood blend (format: "mood1+mood2" or just "mood1")
+    const moods = storedBlend.toLowerCase().split('+').map(m => m.trim());
+    if (moods.length < 2) return; // Only award for actual blends
+    
+    const blendKey = getHybridKey(moods[0], moods[1]);
+    const blendInfo = HYBRID_HINTS[blendKey];
+    
+    if (blendInfo) {
+      setMoodBlendInfo(blendInfo);
+      setMoodBlendKey(blendKey);
+      
+      // Track unique blends in localStorage for Master Alchemist badge
+      const STORAGE_KEY = "knowrole-unique-blends";
+      try {
+        const existingBlends = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]") as string[];
+        if (!existingBlends.includes(blendKey)) {
+          const updatedBlends = [...existingBlends, blendKey];
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBlends));
+          setUniqueBlendsCount(updatedBlends.length);
+          
+          // Award Master Alchemist after 3 unique blends
+          if (updatedBlends.length >= 3) {
+            setIsMasterAlchemist(true);
+          }
+        } else {
+          setUniqueBlendsCount(existingBlends.length);
+          setIsMasterAlchemist(existingBlends.length >= 3);
+        }
+      } catch (e) {
+        console.error("Error tracking unique blends:", e);
+      }
+    }
+  }, []);
 
   // Fetch Adventure Archetype for all tiers
   useEffect(() => {
@@ -2195,6 +2242,146 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </Card>
               )}
 
+              {/* Mood Alchemist Badge - Highlights mood blend influence */}
+              {moodBlendInfo && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 1.0, type: "spring", stiffness: 200, damping: 15 }}
+                >
+                  <Card className="bg-gradient-to-br from-purple-50/80 to-fuchsia-50/80 dark:from-purple-900/30 dark:to-fuchsia-900/30 border-purple-200/60 dark:border-purple-700/50 mb-3 overflow-hidden">
+                    <CardContent className="p-4 relative">
+                      {/* Animated sparkle background */}
+                      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                        <motion.div
+                          className="absolute top-2 right-4 w-2 h-2 bg-purple-400/60 rounded-full"
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        />
+                        <motion.div
+                          className="absolute bottom-3 left-6 w-1.5 h-1.5 bg-fuchsia-400/60 rounded-full"
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }}
+                          transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
+                        />
+                        <motion.div
+                          className="absolute top-1/2 right-8 w-1 h-1 bg-pink-400/60 rounded-full"
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }}
+                          transition={{ duration: 1.8, repeat: Infinity, delay: 1 }}
+                        />
+                      </div>
+                      
+                      {/* Badge Header */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <motion.div
+                          className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-300/30 dark:shadow-purple-900/30"
+                          initial={{ rotate: -15, scale: 0 }}
+                          animate={{ rotate: 0, scale: 1 }}
+                          transition={{ delay: 1.1, type: "spring", stiffness: 300 }}
+                        >
+                          <Flame className="w-6 h-6 text-white" />
+                        </motion.div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-purple-600 dark:text-purple-300 uppercase tracking-wider">
+                              Mood Alchemist
+                            </span>
+                            {isMasterAlchemist && (
+                              <motion.span
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 1.3, type: "spring" }}
+                                className="text-[10px] px-1.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold"
+                              >
+                                MASTER
+                              </motion.span>
+                            )}
+                          </div>
+                          <p className="text-sm font-semibold text-purple-800 dark:text-purple-200">
+                            {moodBlendInfo.title}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Blend Effects */}
+                      <div className="space-y-2">
+                        <p className="text-xs text-purple-700/80 dark:text-purple-200/80 leading-relaxed">
+                          Your <span className="font-semibold">{moodBlendInfo.title}</span> mix unlocked deeper insights!
+                        </p>
+                        
+                        {/* Trait Boosts Display */}
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {moodBlendInfo.combinedBoosts.slice(0, 3).map((boost, i) => (
+                            <motion.div
+                              key={boost.trait}
+                              initial={{ x: -10, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: 1.2 + i * 0.1 }}
+                              className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
+                              style={{ 
+                                backgroundColor: `${boost.color}20`,
+                                color: boost.color,
+                                border: `1px solid ${boost.color}40`
+                              }}
+                            >
+                              <TrendingUp className="w-3 h-3" />
+                              <span>{boost.trait}</span>
+                              <span className="font-bold">{boost.amount}</span>
+                            </motion.div>
+                          ))}
+                        </div>
+
+                        {/* Proxy Impact Note */}
+                        {(() => {
+                          const moods = moodBlendKey.split('+');
+                          let criticalBoost = 0;
+                          let fpBoost = 0;
+                          moods.forEach(m => {
+                            const boosts = MOOD_PROXY_BOOSTS[m] || { critical: 0, firstPrinciples: 0 };
+                            criticalBoost += boosts.critical;
+                            fpBoost += boosts.firstPrinciples;
+                          });
+                          const hasProxyBoost = criticalBoost > 0 || fpBoost > 0;
+                          
+                          return hasProxyBoost && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 1.4 }}
+                              className="mt-2 pt-2 border-t border-purple-200/50 dark:border-purple-700/50"
+                            >
+                              <p className="text-[11px] text-purple-600/70 dark:text-purple-300/70 flex items-center gap-1">
+                                <Zap className="w-3 h-3" />
+                                <span>
+                                  Proxy boost:{" "}
+                                  {criticalBoost > 0 && <span className="font-semibold">Critical +{criticalBoost}%</span>}
+                                  {criticalBoost > 0 && fpBoost > 0 && ", "}
+                                  {fpBoost > 0 && <span className="font-semibold">First Principles +{fpBoost}%</span>}
+                                </span>
+                              </p>
+                            </motion.div>
+                          );
+                        })()}
+                        
+                        {/* Master Alchemist Progress */}
+                        {!isMasterAlchemist && uniqueBlendsCount > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1.5 }}
+                            className="mt-2 pt-2 border-t border-purple-200/50 dark:border-purple-700/50"
+                          >
+                            <p className="text-[10px] text-purple-500/70 dark:text-purple-400/70 flex items-center gap-1">
+                              <Star className="w-3 h-3" />
+                              <span>{uniqueBlendsCount}/3 unique blends toward Master Alchemist</span>
+                            </p>
+                          </motion.div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
               {/* Earned Badges */}
               {earnedBadges.length > 0 && (
                 <div className="flex flex-wrap justify-center gap-2">
@@ -2869,7 +3056,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             mbtiType: result.mbtiType,
             discStyle: result.discStyle,
             bigFiveProfile: result.bigFiveProfile,
-            title: result.title,
+            title: result.primaryRole.title,
             spark: result.spark,
           }}
           mood={mood}
