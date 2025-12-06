@@ -1453,48 +1453,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={togglePause}
-            data-testid="button-pause"
-            className={`relative px-4 py-2 rounded-xl transition-all ${
-              showFirstTimePauseMessage 
-                ? 'ring-4 ring-terracotta ring-offset-2 bg-terracotta/10 animate-pulse' 
-                : 'hover:bg-sage-green/10'
-            }`}
-          >
-            {isPaused ? <Play className="w-7 h-7" /> : <Pause className="w-7 h-7" />}
-            <span className="ml-2 text-sm font-medium hidden sm:inline">
-              {isPaused ? 'Resume' : 'Pause'}
-            </span>
-          </Button>
-          
-          <div className="flex items-center gap-3">
-            <span className="text-xl font-bold text-warm-gray dark:text-soft-cream">
-              {currentIndex + 1}/{questions.length}
-            </span>
-            {useLocalityColors && isLocalitySet && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="flex items-center gap-1 px-2 py-1 rounded-full locality-gradient"
-              >
-                <MapPin className="w-3 h-3" />
-              </motion.div>
-            )}
-            {fastResponses >= 3 && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-terracotta/10 text-terracotta"
-              >
-                <Zap className="w-3 h-3" />
-                <span className="text-xs font-medium">Fast!</span>
-              </motion.div>
-            )}
-          </div>
-          
           <div className="flex items-center gap-2">
             <AnimatePresence mode="wait">
               {timeRemaining <= 3 && timeRemaining > 0 ? (
@@ -1561,6 +1519,48 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               )}
             </AnimatePresence>
           </div>
+          
+          <div className="flex items-center gap-3">
+            <span className="text-xl font-bold text-warm-gray dark:text-soft-cream">
+              {currentIndex + 1}/{questions.length}
+            </span>
+            {useLocalityColors && isLocalitySet && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="flex items-center gap-1 px-2 py-1 rounded-full locality-gradient"
+              >
+                <MapPin className="w-3 h-3" />
+              </motion.div>
+            )}
+            {fastResponses >= 3 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-terracotta/10 text-terracotta"
+              >
+                <Zap className="w-3 h-3" />
+                <span className="text-xs font-medium">Fast!</span>
+              </motion.div>
+            )}
+          </div>
+          
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={togglePause}
+            data-testid="button-pause"
+            className={`relative px-4 py-2 rounded-xl transition-all ${
+              showFirstTimePauseMessage 
+                ? 'ring-4 ring-terracotta ring-offset-2 bg-terracotta/10 animate-pulse' 
+                : 'hover:bg-sage-green/10'
+            }`}
+          >
+            {isPaused ? <Play className="w-7 h-7" /> : <Pause className="w-7 h-7" />}
+            <span className="ml-2 text-sm font-medium hidden sm:inline">
+              {isPaused ? 'Resume' : 'Pause'}
+            </span>
+          </Button>
         </div>
         
         <div className="max-w-md mx-auto mt-3">
@@ -2028,11 +2028,11 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 >
                   <Pause className="w-8 h-8 text-sage-green" />
                 </motion.div>
-                <h3 className="text-xl font-display font-semibold text-warm-gray dark:text-soft-cream mb-2">
+                <h3 className="text-2xl font-display font-bold text-gray-900 dark:text-white mb-2">
                   No Rush!
                 </h3>
-                <p className="text-warm-gray/80 dark:text-soft-cream/80 text-sm leading-relaxed">
-                  Take your time. If you ever need a moment to think, just tap the <strong>Pause</strong> button up top. 
+                <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed">
+                  Take your time. If you ever need a moment to think, just tap the <strong className="text-sage-green font-semibold">Pause</strong> button up top. 
                   The question will wait for you.
                 </p>
               </div>
