@@ -51,6 +51,26 @@ export default function Home() {
   };
 
   const handleTierSelect = (tierId: string) => {
+    // Clear ALL knowrole data for fresh quiz experience (except theme preference)
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("knowrole-") && key !== "knowrole-theme") {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    // Clear all session storage for fresh start
+    const sessionKeysToRemove: string[] = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key && key.startsWith("knowrole-")) {
+        sessionKeysToRemove.push(key);
+      }
+    }
+    sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
+    
     setAgeTier(tierId);
     sessionStorage.setItem("knowrole-tier", tierId);
     if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
