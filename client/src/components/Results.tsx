@@ -88,6 +88,7 @@ interface ResultsProps {
   hybridTypes?: string[];
   onRestart: () => void;
   onShare: () => void;
+  onDownloadPDF?: () => void;
 }
 
 interface ScaleData {
@@ -995,7 +996,7 @@ interface AdventureArchetype {
   badgeColor: string;
 }
 
-export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, earnedBadges = [], hybridTypes = [], onRestart, onShare }: ResultsProps) {
+export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, earnedBadges = [], hybridTypes = [], onRestart, onShare, onDownloadPDF }: ResultsProps) {
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
@@ -2567,22 +2568,33 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
         </AnimatePresence>
       </main>
       <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-        <div className="max-w-md mx-auto flex gap-3">
+        <div className="max-w-md mx-auto flex gap-2">
           <Button
             variant="outline"
             className="flex-1"
             onClick={onRestart}
             data-testid="button-restart"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Start Over
+            <RefreshCw className="w-4 h-4 mr-1" />
+            Restart
           </Button>
+          {onDownloadPDF && (
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={onDownloadPDF}
+              data-testid="button-download-pdf"
+            >
+              <BookOpen className="w-4 h-4 mr-1" />
+              Save PDF
+            </Button>
+          )}
           <Button
             className="flex-1 bg-terracotta hover:bg-terracotta/90"
             onClick={onShare}
             data-testid="button-share"
           >
-            <Share2 className="w-4 h-4 mr-2" />
+            <Share2 className="w-4 h-4 mr-1" />
             Share
           </Button>
         </div>
