@@ -674,6 +674,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const useLocalityColors = isLocalitySet;
+  
+  // Derived state: check if any popup is active to disable interactions
+  const isAnyPopupActive = showPauseMenu || showFirstTimePauseMessage || showQuip;
 
   // Phase 1.2: Adaptive framework quotas based on tier
   // Adults get more Big Five for nuanced percentiles, younger tiers get more MBTI for clarity
@@ -1026,10 +1029,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     const timeSpent = (Date.now() - questionStartTime) / 1000;
     
     if (!isTimeout && navigator.vibrate) navigator.vibrate(50);
-    
-    if (timeSpent < tierConfig.maxTime * 0.5) {
-      setFastResponses(prev => prev + 1);
-    }
     
     // Phase 1.1: Pass slider value to score processing
     processScore(question, choiceIndex, sliderVal);
