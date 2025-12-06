@@ -3,6 +3,7 @@ import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "
 import { Timer, Pause, Play, Zap, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import CelestialProgressTracker from "./CelestialProgressTracker";
 import questionsData from "@/data/questions.json";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { 
@@ -1565,11 +1566,19 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </Button>
         </div>
         
-        <div className="max-w-md mx-auto mt-3">
-          <Progress value={progress} className="h-3" data-testid="progress-quiz" />
-        </div>
+        <CelestialProgressTracker
+          currentQuestion={currentIndex + 1}
+          totalQuestions={questions.length}
+          tier={tier}
+          completedPhases={{
+            mid1: completedMid1,
+            superpower: completedSuperpower,
+            mystery: completedMystery,
+            mid2: completedMid2
+          }}
+        />
         
-        <div className="max-w-md mx-auto mt-2 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+        <div className="max-w-md mx-auto mt-2 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
           <motion.div
             className={`h-full ${timerProgress < 30 ? "bg-red-500" : "bg-gradient-to-r from-terracotta to-dusty-blue"}`}
             initial={{ width: "100%" }}
