@@ -1015,6 +1015,11 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [showJustKidding, setShowJustKidding] = useState(false);
   const [showDonationTiers, setShowDonationTiers] = useState(false);
   
+  // Post-quiz validation before premium unlock
+  const [showValidation, setShowValidation] = useState(false);
+  const [validationStep, setValidationStep] = useState(0);
+  const [validationAnswers, setValidationAnswers] = useState<string[]>([]);
+  
   // Feedback modal state - now triggered in Premium section
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackCompleted, setFeedbackCompleted] = useState(() => {
@@ -1093,14 +1098,48 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   // DEV MODE: Set to true to show Just Kidding page before premium unlock
   const DEV_BYPASS_PAYMENT = true;
   
+  // Validation questions for post-quiz check
+  const validationQuestions = [
+    {
+      question: "Based on your quiz, which sounds more like you?",
+      options: [
+        { text: "I trust my gut and act quickly", trait: "intuitive" },
+        { text: "I gather info before deciding", trait: "analytical" }
+      ]
+    },
+    {
+      question: "When tackling a challenge, you prefer to:",
+      options: [
+        { text: "Work with others and share ideas", trait: "collaborative" },
+        { text: "Figure it out independently first", trait: "independent" }
+      ]
+    }
+  ];
+  
+  const handleValidationAnswer = (answer: string) => {
+    const newAnswers = [...validationAnswers, answer];
+    setValidationAnswers(newAnswers);
+    
+    if (validationStep < validationQuestions.length - 1) {
+      setValidationStep(validationStep + 1);
+    } else {
+      // Validation complete, show Just Kidding
+      setShowValidation(false);
+      setShowJustKidding(true);
+      console.log('[Validation] Answers:', newAnswers);
+    }
+  };
+  
   const handleUpgrade = async () => {
     setIsCheckingOut(true);
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
     
-    // Show Just Kidding interstitial instead of payment
+    // Show validation questions first, then Just Kidding
     if (DEV_BYPASS_PAYMENT) {
-      console.log('[DEV MODE] Showing Just Kidding interstitial');
-      setShowJustKidding(true);
+      console.log('[DEV MODE] Showing validation questions before premium unlock');
+      setShowValidation(true);
+      setValidationStep(0);
+      setValidationAnswers([]);
       setIsCheckingOut(false);
       return;
     }
@@ -1377,6 +1416,73 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   return (
     <div className="min-h-screen pb-36 bg-white dark:bg-gray-900">
+      {/* Validation Questions Overlay - 2 quick questions before premium unlock */}
+      <AnimatePresence>
+        {showValidation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            data-testid="overlay-validation"
+          >
+            <motion.div
+              initial={{ scale: 0.8, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 50 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-gradient-to-br from-indigo-50 via-purple-50 to-indigo-100 dark:from-indigo-900/90 dark:via-purple-900/80 dark:to-indigo-800/90 rounded-3xl p-8 mx-4 max-w-sm w-full text-center shadow-2xl border-2 border-indigo-200 dark:border-indigo-700"
+            >
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+                className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center mx-auto mb-4 shadow-lg"
+              >
+                <Sparkles className="w-8 h-8 text-white" />
+              </motion.div>
+              
+              <p className="text-xs uppercase tracking-wider text-indigo-500 dark:text-indigo-300 mb-2">
+                Quick Check ({validationStep + 1}/2)
+              </p>
+              
+              <motion.p 
+                key={validationStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-lg font-semibold text-indigo-700 dark:text-indigo-200 mb-6"
+              >
+                {validationQuestions[validationStep]?.question}
+              </motion.p>
+              
+              <div className="space-y-3">
+                {validationQuestions[validationStep]?.options.map((option, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + idx * 0.1 }}
+                  >
+                    <Button
+                      variant="outline"
+                      className="w-full border-2 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-800/50 font-medium py-4 text-left justify-start"
+                      onClick={() => handleValidationAnswer(option.trait)}
+                      data-testid={`button-validation-${idx}`}
+                    >
+                      {option.text}
+                    </Button>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <p className="text-xs text-indigo-400/70 dark:text-indigo-400/50 mt-4">
+                Helps personalize your premium insights
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
       {/* Just Kidding Interstitial Overlay */}
       <AnimatePresence>
         {showJustKidding && (
