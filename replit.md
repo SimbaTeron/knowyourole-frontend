@@ -1,8 +1,8 @@
-# KnowRole - Everyday Compass Personality Discovery
+# KnowYouRole - Everyday Compass Personality Discovery
 
 ## Overview
 
-KnowRole is a personality discovery application with an "Everyday Compass" aesthetic, guiding users through self-discovery. It uses hand-drawn visuals and journal-like designs to offer a warm, grounded journey. The application helps users discover personality traits via age-tier selection, mood assessment, optional location integration, and a comprehensive quiz. The business vision is to provide a contemplative and insightful self-discovery tool, with future potential for advanced AI-driven personality analysis and personalized growth features.
+KnowYouRole is a personality discovery application with an "Everyday Compass" aesthetic, guiding users through self-discovery. It uses hand-drawn visuals and journal-like designs to offer a warm, grounded journey. The application helps users discover personality traits via age-tier selection, mood assessment, optional location integration, and a comprehensive quiz. The business vision is to provide a contemplative and insightful self-discovery tool, with future potential for advanced AI-driven personality analysis and personalized growth features.
 
 ## User Preferences
 
@@ -26,7 +26,13 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
 - **User Journey**: Home (age) → Mood Selection → Mood Mixer → Location → Pre-Quiz Demo → Quiz → Results.
 - **Mood Interaction**: Separate pages for mood selection and an interactive "Mood Mixer" cauldron.
 - **Pre-Quiz Demo**: Animated 3-card walkthrough of question types.
-- **Quiz Flow**: Age-tiered binary swipe questions with strategic breaks. Features include a timer, tactile feedback, dynamic difficulty scaling, mid-quiz recaps, and achievement badges. Supports MBTI, DISC, Big Five, Critical Thinking, and First Principles traits. Includes a `Slider UI Component` for nuanced responses.
+- **Quiz Flow**: Age-tiered binary swipe questions with strategic breaks. Features include a timer, tactile feedback, dynamic difficulty scaling, and strategic checkpoint pauses. Supports MBTI, DISC, Big Five, Critical Thinking, and First Principles traits. Includes a `Slider UI Component` for nuanced responses.
+  - **Tier-Specific Quiz Configurations**:
+    - Youth (7-12): 25 questions - superpower (Q6), energy (Q12), mystery (Q18), no checkpoints
+    - Teen (13-18): 30 questions - superpower (Q6), checkpoint (Q11), energy (Q16), mystery (Q21)
+    - Young Adult (19-25): 35 questions - superpower (Q11), checkpoint1 (Q11), checkpoint2 (Q21), energy (Q27), mystery (Q32)
+    - Adult (25+): 40 questions - checkpoint1 (Q10), checkpoint2 (Q20), superpower (Q25), energy (Q30), mystery (Q35)
+  - **Removed mid-quiz circular badges** (Bold Explorer, 2x, random events, frequency badges) - only square insight badges in top-right corner remain
 - **Results Dashboard**: Displays Big Five Radar chart, MBTI/DISC/Big Five explanations, and personalized role recommendations. Includes percentile comparisons and a "Just Kidding!" interstitial for premium features.
 - **Donation System**: Two-tier donation modal integrated with Stripe.
 - **Feedback System**: 5-question feedback form that auto-exports quiz results to Google Sheets.

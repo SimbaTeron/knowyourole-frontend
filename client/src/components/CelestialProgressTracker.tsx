@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { Star, Zap, Gift, HelpCircle, Trophy } from "lucide-react";
+import { Star, Zap, Gift, Target, Trophy, Sparkles } from "lucide-react";
 
 interface Milestone {
   id: string;
   label: string;
   questionIndex: number;
-  type: "start" | "mid1" | "superpower" | "mystery" | "mid2" | "finish";
+  type: "start" | "superpower" | "checkpoint1" | "checkpoint2" | "energy" | "mystery" | "finish";
   icon: typeof Star;
   color: string;
   glowColor: string;
@@ -16,21 +16,28 @@ interface CelestialProgressTrackerProps {
   totalQuestions: number;
   tier: string;
   completedPhases: {
-    mid1: boolean;
+    energy: boolean;
     superpower: boolean;
     mystery: boolean;
-    mid2: boolean;
+    checkpoint1: boolean;
+    checkpoint2: boolean;
   };
 }
 
 function getQuizMilestones(tier: string, totalQuestions: number): Milestone[] {
-  const tierConfigs: Record<string, { mid1: number; superpower?: number; mystery?: number; mid2?: number }> = {
-    "12-under": { mid1: 6, superpower: 12, mystery: 18, mid2: 25 },
-    "7-12": { mid1: 6, superpower: 12, mystery: 18, mid2: 25 },
-    "13-18": { mid1: 8, superpower: 15, mystery: 22, mid2: 30 },
-    "19-25": { mid1: 9, superpower: 18, mystery: 27, mid2: 35 },
-    "25+": { mid1: 10, superpower: 20, mystery: 30, mid2: 40 },
-    "25plus": { mid1: 10, superpower: 20, mystery: 30, mid2: 40 }
+  const tierConfigs: Record<string, { 
+    superpower: number; 
+    checkpoint1?: number; 
+    checkpoint2?: number; 
+    energy: number; 
+    mystery: number;
+  }> = {
+    "12-under": { superpower: 6, energy: 12, mystery: 18 },
+    "7-12": { superpower: 6, energy: 12, mystery: 18 },
+    "13-18": { superpower: 6, checkpoint1: 11, energy: 16, mystery: 21 },
+    "19-25": { superpower: 11, checkpoint1: 11, checkpoint2: 21, energy: 27, mystery: 32 },
+    "25+": { checkpoint1: 10, checkpoint2: 20, superpower: 25, energy: 30, mystery: 35 },
+    "25plus": { checkpoint1: 10, checkpoint2: 20, superpower: 25, energy: 30, mystery: 35 }
   };
   
   const config = tierConfigs[tier] || tierConfigs["19-25"];
@@ -44,32 +51,70 @@ function getQuizMilestones(tier: string, totalQuestions: number): Milestone[] {
       icon: Star,
       color: "#FBBF24",
       glowColor: "rgba(251, 191, 36, 0.6)"
-    },
-    {
-      id: "mid1",
-      label: "Energy Check",
-      questionIndex: config.mid1,
-      type: "mid1",
-      icon: Zap,
-      color: "#A78BFA",
-      glowColor: "rgba(167, 139, 250, 0.6)"
     }
   ];
   
-  if (config.superpower) {
-    milestones.push({
+  const orderedMilestones: { question: number; milestone: Milestone }[] = [];
+  
+  orderedMilestones.push({
+    question: config.superpower,
+    milestone: {
       id: "superpower",
       label: "Superpower",
       questionIndex: config.superpower,
       type: "superpower",
-      icon: Zap,
+      icon: Sparkles,
       color: "#F472B6",
       glowColor: "rgba(244, 114, 182, 0.6)"
+    }
+  });
+  
+  if (config.checkpoint1) {
+    orderedMilestones.push({
+      question: config.checkpoint1,
+      milestone: {
+        id: "checkpoint1",
+        label: "Checkpoint",
+        questionIndex: config.checkpoint1,
+        type: "checkpoint1",
+        icon: Target,
+        color: "#A78BFA",
+        glowColor: "rgba(167, 139, 250, 0.6)"
+      }
     });
   }
   
-  if (config.mystery) {
-    milestones.push({
+  if (config.checkpoint2) {
+    orderedMilestones.push({
+      question: config.checkpoint2,
+      milestone: {
+        id: "checkpoint2",
+        label: "Checkpoint",
+        questionIndex: config.checkpoint2,
+        type: "checkpoint2",
+        icon: Target,
+        color: "#60A5FA",
+        glowColor: "rgba(96, 165, 250, 0.6)"
+      }
+    });
+  }
+  
+  orderedMilestones.push({
+    question: config.energy,
+    milestone: {
+      id: "energy",
+      label: "Energy Check",
+      questionIndex: config.energy,
+      type: "energy",
+      icon: Zap,
+      color: "#F97316",
+      glowColor: "rgba(249, 115, 22, 0.6)"
+    }
+  });
+  
+  orderedMilestones.push({
+    question: config.mystery,
+    milestone: {
       id: "mystery",
       label: "Mystery",
       questionIndex: config.mystery,
@@ -77,20 +122,12 @@ function getQuizMilestones(tier: string, totalQuestions: number): Milestone[] {
       icon: Gift,
       color: "#14B8A6",
       glowColor: "rgba(20, 184, 166, 0.6)"
-    });
-  }
+    }
+  });
   
-  if (config.mid2) {
-    milestones.push({
-      id: "mid2",
-      label: "Challenge",
-      questionIndex: config.mid2,
-      type: "mid2",
-      icon: HelpCircle,
-      color: "#60A5FA",
-      glowColor: "rgba(96, 165, 250, 0.6)"
-    });
-  }
+  orderedMilestones.sort((a, b) => a.question - b.question);
+  
+  orderedMilestones.forEach(m => milestones.push(m.milestone));
   
   milestones.push({
     id: "finish",
@@ -98,8 +135,8 @@ function getQuizMilestones(tier: string, totalQuestions: number): Milestone[] {
     questionIndex: totalQuestions,
     type: "finish",
     icon: Trophy,
-    color: "#F97316",
-    glowColor: "rgba(249, 115, 22, 0.6)"
+    color: "#10B981",
+    glowColor: "rgba(16, 185, 129, 0.6)"
   });
   
   return milestones;
@@ -116,10 +153,11 @@ export default function CelestialProgressTracker({
   
   const isMilestoneReached = (milestone: Milestone) => {
     if (milestone.type === "start") return true;
-    if (milestone.type === "mid1") return completedPhases.mid1;
     if (milestone.type === "superpower") return completedPhases.superpower;
+    if (milestone.type === "checkpoint1") return completedPhases.checkpoint1;
+    if (milestone.type === "checkpoint2") return completedPhases.checkpoint2;
+    if (milestone.type === "energy") return completedPhases.energy;
     if (milestone.type === "mystery") return completedPhases.mystery;
-    if (milestone.type === "mid2") return completedPhases.mid2;
     if (milestone.type === "finish") return currentQuestion >= totalQuestions;
     return currentQuestion >= milestone.questionIndex;
   };
@@ -175,172 +213,97 @@ export default function CelestialProgressTracker({
             transition={{ duration: 0.5, ease: "easeOut" }}
             filter="url(#celestialGlow)"
           />
-          
-          <motion.circle
-            cx={20 + (360 * progress / 100)}
-            cy={32 + Math.sin((progress / 100) * Math.PI) * -12}
-            r="4"
-            fill="#FBBF24"
-            filter="url(#celestialGlow)"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.8, 1, 0.8]
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
         </svg>
         
-        <div className="relative w-full flex justify-between items-center px-2 z-10">
+        <div className="absolute inset-0 flex items-center justify-between px-4">
           {milestones.map((milestone, index) => {
-            const reached = isMilestoneReached(milestone);
-            const active = isMilestoneActive(milestone);
-            const xPos = (milestone.questionIndex / totalQuestions) * 100;
+            const isReached = isMilestoneReached(milestone);
+            const isActive = isMilestoneActive(milestone);
             const Icon = milestone.icon;
+            const xPosition = milestone.questionIndex === 0 
+              ? 5 
+              : (milestone.questionIndex / totalQuestions) * 90 + 5;
             
             return (
               <motion.div
                 key={milestone.id}
-                className="relative flex flex-col items-center"
-                style={{ 
-                  position: 'absolute',
-                  left: `${Math.min(95, Math.max(5, xPos))}%`,
-                  transform: 'translateX(-50%)'
-                }}
+                className="absolute"
+                style={{ left: `${xPosition}%`, transform: 'translateX(-50%)' }}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ 
-                  scale: reached ? 1 : active ? 1.1 : 0.85,
-                  opacity: 1
+                  scale: isActive ? 1.2 : 1, 
+                  opacity: 1,
+                  y: isActive ? -4 : 0
                 }}
                 transition={{ 
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 200
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 20,
+                  delay: index * 0.1
                 }}
               >
                 <motion.div
-                  className={`relative w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    reached 
-                      ? 'shadow-lg' 
-                      : active 
-                        ? 'shadow-md' 
-                        : 'opacity-50'
-                  }`}
-                  style={{
-                    background: reached 
-                      ? `linear-gradient(135deg, ${milestone.color}, ${milestone.color}dd)` 
-                      : active
-                        ? `linear-gradient(135deg, ${milestone.color}66, ${milestone.color}44)`
-                        : 'rgba(156, 163, 175, 0.3)',
-                    boxShadow: reached 
-                      ? `0 0 20px ${milestone.glowColor}` 
-                      : active
-                        ? `0 0 12px ${milestone.glowColor}`
-                        : 'none'
-                  }}
-                  animate={active ? {
-                    scale: [1, 1.15, 1],
-                    boxShadow: [
-                      `0 0 12px ${milestone.glowColor}`,
-                      `0 0 24px ${milestone.glowColor}`,
-                      `0 0 12px ${milestone.glowColor}`
-                    ]
-                  } : reached ? {
-                    rotate: [0, 5, -5, 0]
+                  className="relative flex flex-col items-center"
+                  animate={isActive ? {
+                    scale: [1, 1.1, 1],
                   } : {}}
-                  transition={{
-                    duration: active ? 2 : 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  data-testid={`milestone-${milestone.id}`}
+                  transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <Icon 
-                    className={`w-4 h-4 ${reached || active ? 'text-white' : 'text-gray-400'}`}
-                  />
-                  
-                  {reached && (
+                  {isActive && (
                     <motion.div
                       className="absolute inset-0 rounded-full"
-                      style={{ border: `2px solid ${milestone.color}` }}
-                      initial={{ scale: 1, opacity: 0.8 }}
-                      animate={{ scale: 1.5, opacity: 0 }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeOut"
-                      }}
+                      style={{ backgroundColor: milestone.glowColor }}
+                      animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
                     />
                   )}
-                </motion.div>
-                
-                {(reached || active) && (
+                  
+                  <motion.div
+                    className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-all duration-300`}
+                    style={{
+                      backgroundColor: isReached ? milestone.color : 'rgba(156, 163, 175, 0.3)',
+                      boxShadow: isReached ? `0 0 12px ${milestone.glowColor}` : 'none'
+                    }}
+                  >
+                    <Icon 
+                      className={`w-4 h-4 transition-colors duration-300 ${
+                        isReached ? 'text-white' : 'text-gray-400'
+                      }`}
+                    />
+                  </motion.div>
+                  
                   <motion.span
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`absolute -bottom-5 text-[10px] font-medium whitespace-nowrap ${
-                      reached 
+                    className={`text-[9px] font-medium mt-1 whitespace-nowrap transition-colors duration-300 ${
+                      isReached 
                         ? 'text-warm-gray dark:text-soft-cream' 
-                        : 'text-warm-gray/60 dark:text-soft-cream/60'
+                        : 'text-gray-400 dark:text-gray-500'
                     }`}
+                    animate={isActive ? { opacity: [0.7, 1, 0.7] } : {}}
+                    transition={{ duration: 1.5, repeat: Infinity }}
                   >
                     {milestone.label}
                   </motion.span>
-                )}
-                
-                {active && (
-                  <>
-                    {[0, 1, 2].map((i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute w-1 h-1 rounded-full"
-                        style={{ backgroundColor: milestone.color }}
-                        initial={{ 
-                          x: 0, 
-                          y: 0,
-                          opacity: 0.8,
-                          scale: 1
-                        }}
-                        animate={{ 
-                          x: [0, (Math.random() - 0.5) * 40],
-                          y: [0, -20 - Math.random() * 20],
-                          opacity: [0.8, 0],
-                          scale: [1, 0.5]
-                        }}
-                        transition={{
-                          duration: 1.5,
-                          repeat: Infinity,
-                          delay: i * 0.4,
-                          ease: "easeOut"
-                        }}
-                      />
-                    ))}
-                  </>
-                )}
+                </motion.div>
               </motion.div>
             );
           })}
         </div>
       </div>
       
-      <div className="flex justify-between items-center mt-6 px-1">
-        <span className="text-xs text-warm-gray/60 dark:text-soft-cream/60">
-          Question {currentQuestion} of {totalQuestions}
-        </span>
-        <div className="flex items-center gap-1">
-          <motion.div
-            className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-400"
-            animate={{ scale: [1, 1.3, 1] }}
-            transition={{ duration: 1, repeat: Infinity }}
-          />
-          <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
-            {Math.round(progress)}% Complete
-          </span>
-        </div>
-      </div>
+      <motion.div
+        className="absolute left-4 -bottom-1"
+        style={{ 
+          left: `${(currentQuestion / totalQuestions) * 90 + 5}%`,
+          transform: 'translateX(-50%)'
+        }}
+        animate={{ 
+          y: [0, -3, 0],
+          opacity: [0.6, 1, 0.6]
+        }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <div className="w-2 h-2 rounded-full bg-gradient-to-r from-terracotta to-dusty-blue shadow-lg" />
+      </motion.div>
     </div>
   );
 }

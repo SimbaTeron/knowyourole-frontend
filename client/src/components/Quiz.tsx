@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { Timer, Pause, Play, Zap, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Timer, Pause, Play, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import CelestialProgressTracker from "./CelestialProgressTracker";
@@ -66,38 +66,6 @@ const MID1_QUESTION: MultiChoiceQuestion = {
       label: "Understanding how things work",
       icon: "learning",
       weights: { mbti: { I: 1, N: 1, T: 1 }, disc: { C: 2 }, bigFive: { O: 2, C: 1 } }
-    }
-  ]
-};
-
-const MID2_QUESTION: MultiChoiceQuestion = {
-  id: "mid2",
-  prompt: "When tackling a challenge, you naturally...",
-  subtitle: "Almost there! One more insight",
-  options: [
-    {
-      id: "hands",
-      label: "Jump in and figure it out hands-on",
-      icon: "hands",
-      weights: { mbti: { E: 1, S: 2, P: 1 }, disc: { D: 2 }, bigFive: { E: 1 } }
-    },
-    {
-      id: "mind",
-      label: "Plan it out mentally first",
-      icon: "mind",
-      weights: { mbti: { I: 1, N: 1, J: 2 }, disc: { C: 2 }, bigFive: { C: 2 } }
-    },
-    {
-      id: "discuss",
-      label: "Talk it through with others",
-      icon: "discuss",
-      weights: { mbti: { E: 2, F: 1 }, disc: { I: 2, S: 1 }, bigFive: { E: 2, A: 1 } }
-    },
-    {
-      id: "research",
-      label: "Research until you feel ready",
-      icon: "research",
-      weights: { mbti: { I: 2, N: 1, J: 1 }, disc: { C: 2, S: 1 }, bigFive: { C: 2, O: 1 } }
     }
   ]
 };
@@ -228,7 +196,7 @@ const RANDOM_EVENTS: RandomEvent[] = [
 const RANDOM_EVENT_BASE_CHANCE = 0.03; // 3% base chance per question (reduced from 8%)
 const RANDOM_EVENT_MAX_CHANCE = 0.06; // 6% max chance cap (reduced from 15%)
 
-type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown" | "random-event" | "recap";
+type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "energy" | "energy-countdown" | "mystery" | "mystery-countdown" | "checkpoint";
 
 // Spin wheel recap component - cycles through insights then settles on accurate ones
 interface RecapSpinWheelProps {
@@ -484,49 +452,49 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
 const getQuizConfig = (tier: string) => {
   switch (tier) {
     case "7-12":
-      // Mini 25: 6 binary → MC1 → 6 binary → Superpower → 6 binary → Mystery → 7 binary → MC2
+      // Youth 25: 5 binary → Superpower → 5 mix → Energy → 5 mix → Mystery → 10 mix → Results (NO checkpoints)
       return { 
         totalQuestions: 25, 
-        mid1After: 6, 
-        superpowerAfter: 12,
-        mysteryAfter: 18,
-        mid2After: 25,
-        hasMid2: true, 
+        superpowerAfter: 5,
+        energyAfter: 10,
+        mysteryAfter: 15,
+        checkpoint1After: null,
+        checkpoint2After: null,
         hasMystery: true 
       };
     case "13-18":
-      // Teen 30: 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 8 binary → MC2
+      // Teen 30: 5 binary → Superpower → 5 mix → Checkpoint → 5 mix → Energy → 5 mix → Mystery → 5 mix → Results
       return { 
         totalQuestions: 30, 
-        mid1After: 8, 
-        superpowerAfter: 15,
-        mysteryAfter: 22,
-        mid2After: 30,
-        hasMid2: true, 
+        superpowerAfter: 5,
+        checkpoint1After: 11,
+        energyAfter: 16,
+        mysteryAfter: 21,
+        checkpoint2After: null,
         hasMystery: true 
       };
     case "19-25":
-      // Young Adult 35: 9 binary → MC1 → 9 binary → Superpower → 9 binary → Mystery → 8 binary → MC2
+      // Young Adult 35: 5 binary → 5 mix → Superpower → Checkpoint → 10 mix → Checkpoint → 5 mix → Energy → 5 mix → Mystery → 5 mix → Results
       return { 
         totalQuestions: 35, 
-        mid1After: 9, 
-        superpowerAfter: 18,
-        mysteryAfter: 27,
-        mid2After: 35,
-        hasMid2: true, 
+        superpowerAfter: 11,
+        checkpoint1After: 11,
+        checkpoint2After: 21,
+        energyAfter: 27,
+        mysteryAfter: 32,
         hasMystery: true 
       };
     case "25+":
     case "25plus":
     default:
-      // Adult 40: 10 binary → MC1 → 10 binary → Superpower → 10 binary → Mystery → 10 binary → MC2
+      // Adult 40: 5 binary → 5 mix → Checkpoint → 10 mix → Checkpoint → 5 mix → Superpower → 5 mix → Energy → 5 mix → Mystery → 5 mix → Results
       return { 
         totalQuestions: 40, 
-        mid1After: 10, 
-        superpowerAfter: 20,
-        mysteryAfter: 30,
-        mid2After: 40,
-        hasMid2: true, 
+        checkpoint1After: 10,
+        checkpoint2After: 20,
+        superpowerAfter: 25,
+        energyAfter: 30,
+        mysteryAfter: 35,
         hasMystery: true 
       };
   }
@@ -652,28 +620,16 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const moodEffects = getMoodEffects(mood);
   
   const [quizPhase, setQuizPhase] = useState<QuizPhase>("quiz");
-  const [mid1Choice, setMid1Choice] = useState<string | null>(null);
-  const [mid2Choice, setMid2Choice] = useState<string | null>(null);
-  const [completedMid1, setCompletedMid1] = useState(false);
-  const [completedMid2, setCompletedMid2] = useState(false);
+  const [energyChoice, setEnergyChoice] = useState<string | null>(null);
+  const [completedEnergy, setCompletedEnergy] = useState(false);
   const [completedSuperpower, setCompletedSuperpower] = useState(false);
   const [completedMystery, setCompletedMystery] = useState(false);
-  const [completedRecaps, setCompletedRecaps] = useState<Set<number>>(new Set()); // Track which recap milestones have been shown
+  const [completedCheckpoint1, setCompletedCheckpoint1] = useState(false);
+  const [completedCheckpoint2, setCompletedCheckpoint2] = useState(false);
   const [shownInsights, setShownInsights] = useState<Set<string>>(new Set()); // Track shown insights to prevent repeats
-  
-  // Phase 2.3: Random event state with queue for sequential display
-  const [currentRandomEvent, setCurrentRandomEvent] = useState<RandomEvent | null>(null);
-  const [pendingRandomEvent, setPendingRandomEvent] = useState<RandomEvent | null>(null);
-  const [activeEffects, setActiveEffects] = useState<Set<string>>(new Set());
-  const [canSkip, setCanSkip] = useState(false);
   
   // Phase 1.1: Slider state for slider-type questions
   const [sliderValue, setSliderValue] = useState(0);
-  
-  // Badge/2x question display state
-  const [showBadgeOverlay, setShowBadgeOverlay] = useState(false);
-  const [badgeCanDismiss, setBadgeCanDismiss] = useState(false); // After 3 seconds, allow manual dismiss
-  const [badgeExtraTime, setBadgeExtraTime] = useState(0); // Extra time after badge display
   
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -701,7 +657,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   });
   const hasShownFirstTimePauseRef = useRef(localStorage.getItem('knowrole-first-pause-shown') === 'true');
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
-  const [fastResponses, setFastResponses] = useState(0);
   const [isTimingOut, setIsTimingOut] = useState(false);
   const [showQuip, setShowQuip] = useState(false);
   const [currentQuip, setCurrentQuip] = useState(TIMEOUT_QUIPS[0]);
@@ -827,52 +782,21 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     setQuestions(quotaSelection.sort(() => Math.random() - 0.5));
   }, [tier, tierConfig.baseCount]);
 
-  // Function to dismiss badge overlay (called by button or auto-timeout)
-  const dismissBadgeOverlay = useCallback(() => {
-    setShowBadgeOverlay(false);
-    setBadgeCanDismiss(false);
-    setBadgeExtraTime(2); // 2 extra seconds after badge display
-    setTimeRemaining(tierConfig.maxTime + 2);
-    setQuestionStartTime(Date.now());
-  }, [tierConfig.maxTime]);
-
   useEffect(() => {
     if (questions.length > 0 && currentIndex < questions.length) {
       const currentQ = questions[currentIndex];
       
-      // Check if this is a badge or 2x question - show overlay first
-      // BUT never show badge overlay in the first 10 questions (currentIndex < 10)
-      if ((currentQ?.isBadge || currentQ?.is2x) && currentIndex >= 10) {
-        setShowBadgeOverlay(true);
-        setBadgeCanDismiss(false);
-        
-        // After 1.5 seconds, allow manual dismiss with Continue button (2x faster)
-        const canDismissTimer = setTimeout(() => {
-          setBadgeCanDismiss(true);
-        }, 1500);
-        
-        // Auto-dismiss after 5 seconds if not manually dismissed
-        const autoDismissTimer = setTimeout(() => {
-          dismissBadgeOverlay();
-        }, 5000);
-        
-        return () => {
-          clearTimeout(canDismissTimer);
-          clearTimeout(autoDismissTimer);
-        };
-      } else {
-        // Give slider questions 3 extra seconds since they're more complex
-        const extraTime = currentQ?.responseType === "slider" ? 3 : 0;
-        setTimeRemaining(tierConfig.maxTime + extraTime);
-        setQuestionStartTime(Date.now());
-      }
+      // Give slider questions 3 extra seconds since they're more complex
+      const extraTime = currentQ?.responseType === "slider" ? 3 : 0;
+      setTimeRemaining(tierConfig.maxTime + extraTime);
+      setQuestionStartTime(Date.now());
       
       setVibrantColorIndex(Math.floor(Math.random() * READABLE_RANDOM_COLORS.length));
       setIsTimingOut(false);
       setShowQuip(false);
       setSliderValue(0); // Reset slider for new question
     }
-  }, [currentIndex, questions, tierConfig.maxTime, dismissBadgeOverlay, timerResetKey]);
+  }, [currentIndex, questions, tierConfig.maxTime, timerResetKey]);
 
   useEffect(() => {
     return () => {
@@ -897,12 +821,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     }, 2000);
   }, [missCount]);
 
-  // Check if any popup is active (badge overlay or random event) - timer should pause
-  const isAnyPopupActive = showBadgeOverlay || currentRandomEvent !== null;
-
   useEffect(() => {
-    // Pause timer during any popup display (badge overlay or random event)
-    if (isPaused || questions.length === 0 || isTimingOut || isAnyPopupActive || showFirstTimePauseMessage) return;
+    // Pause timer during paused state or other conditions
+    if (isPaused || questions.length === 0 || isTimingOut || showFirstTimePauseMessage) return;
     
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
@@ -926,31 +847,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout, isAnyPopupActive, showFirstTimePauseMessage]);
-
-  // Show pending random event after badge overlay closes
-  useEffect(() => {
-    if (!showBadgeOverlay && pendingRandomEvent && !currentRandomEvent) {
-      // Small delay to ensure smooth transition between popups
-      const showPendingTimer = setTimeout(() => {
-        setCurrentRandomEvent(pendingRandomEvent);
-        setPendingRandomEvent(null);
-        
-        // Apply effect
-        if (pendingRandomEvent.effect === "skip_allowed") {
-          setCanSkip(true);
-        }
-        setActiveEffects(prev => new Set(Array.from(prev).concat(pendingRandomEvent.effect)));
-        
-        // Auto-dismiss after duration
-        setTimeout(() => {
-          setCurrentRandomEvent(null);
-        }, pendingRandomEvent.duration);
-      }, 300);
-      
-      return () => clearTimeout(showPendingTimer);
-    }
-  }, [showBadgeOverlay, pendingRandomEvent, currentRandomEvent]);
+  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout, showFirstTimePauseMessage]);
 
   // Phase 1.1 & 1.4: Enhanced scoring with slider support and variable boosts
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1, sliderValue?: number) => {
@@ -1088,31 +985,17 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     }, 600);
   }, [applyMultiChoiceWeights]);
 
-  const handleMid1Choice = useCallback((optionId: string) => {
+  const handleEnergyChoice = useCallback((optionId: string) => {
     const option = MID1_QUESTION.options.find(o => o.id === optionId);
     if (!option) return;
     
     if (navigator.vibrate) navigator.vibrate(50);
-    setMid1Choice(optionId);
+    setEnergyChoice(optionId);
     applyMultiChoiceWeights(option);
-    setCompletedMid1(true);
+    setCompletedEnergy(true);
     
     setTimeout(() => {
-      setQuizPhase("mid1-countdown");
-    }, 400);
-  }, [applyMultiChoiceWeights]);
-
-  const handleMid2Choice = useCallback((optionId: string) => {
-    const option = MID2_QUESTION.options.find(o => o.id === optionId);
-    if (!option) return;
-    
-    if (navigator.vibrate) navigator.vibrate(50);
-    setMid2Choice(optionId);
-    applyMultiChoiceWeights(option);
-    setCompletedMid2(true);
-    
-    setTimeout(() => {
-      setQuizPhase("mid2-countdown");
+      setQuizPhase("energy-countdown");
     }, 400);
   }, [applyMultiChoiceWeights]);
 
@@ -1132,49 +1015,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     if (avgTime < 4) return "medium";
     return "easy"; // Slower responses -> easier questions
   };
-
-  // Phase 2.3: Trigger random event with dynamic chance (8-15%) - queue if another popup is active
-  const triggerRandomEvent = useCallback(() => {
-    // Dynamic chance based on engagement, capped at 15%
-    const engagementBoost = Math.max(0, scores.engagement * 0.01); // +1% per engagement point
-    const dynamicChance = Math.min(RANDOM_EVENT_MAX_CHANCE, RANDOM_EVENT_BASE_CHANCE + engagementBoost);
-    
-    if (Math.random() < dynamicChance) {
-      const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
-      
-      // If badge overlay is showing or another random event is active, queue this one
-      if (showBadgeOverlay || currentRandomEvent) {
-        setPendingRandomEvent(event);
-        return;
-      }
-      
-      setCurrentRandomEvent(event);
-      
-      // Apply effect
-      if (event.effect === "skip_allowed") {
-        setCanSkip(true);
-      }
-      setActiveEffects(prev => new Set(Array.from(prev).concat(event.effect)));
-      
-      // Auto-dismiss after duration
-      setTimeout(() => {
-        setCurrentRandomEvent(null);
-      }, event.duration);
-    }
-  }, [showBadgeOverlay, currentRandomEvent, scores.engagement]);
-
-  // Phase 2.3: Handle skip (from random event)
-  const handleSkip = useCallback(() => {
-    if (!canSkip || currentIndex >= questions.length - 1) return;
-    setCanSkip(false);
-    setActiveEffects(prev => {
-      const newSet = new Set(prev);
-      newSet.delete("skip_allowed");
-      return newSet;
-    });
-    setCurrentIndex(prev => prev + 1);
-    setSliderValue(0);
-  }, [canSkip, currentIndex, questions.length]);
 
   const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false, sliderVal?: number) => {
     if (questions.length === 0 || currentIndex >= questions.length) return;
@@ -1206,22 +1046,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     const nextQuestionNumber = currentIndex + 2;
     
-    // Phase 2.3: Check for random event trigger
-    if (currentIndex < questions.length - 1 && !isTimeout) {
-      triggerRandomEvent();
-    }
-    
     // Reset slider for next question
     setSliderValue(0);
     
     setScores(prev => {
-      // Phase 2.1: Track swipe times for dynamic difficulty
+      // Track swipe times for dynamic difficulty
       const updatedSwipeTimes = [...prev.swipeTimes, timeSpent];
       const newAvgTime = updatedSwipeTimes.reduce((a, b) => a + b, 0) / updatedSwipeTimes.length;
       const newDifficulty = calculateDifficulty(updatedSwipeTimes, newAvgTime);
-      
-      // Phase 2.3: Apply double points if active
-      const engagementBonus = activeEffects.has("double_points") ? 2 : 1;
       
       const updatedScores = {
         ...prev,
@@ -1229,17 +1061,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         swipeTimes: updatedSwipeTimes,
         averageSwipeTime: newAvgTime,
         currentDifficulty: newDifficulty,
-        engagement: prev.engagement + (isTimeout ? -0.5 : 1 * engagementBonus)
+        engagement: prev.engagement + (isTimeout ? -0.5 : 1)
       };
-      
-      // Clear double points after use
-      if (activeEffects.has("double_points")) {
-        setActiveEffects(prevEffects => {
-          const newSet = new Set(prevEffects);
-          newSet.delete("double_points");
-          return newSet;
-        });
-      }
       
       if (currentIndex >= questions.length - 1) {
         // Apply mood-based boosts to Big Five before completing
@@ -1259,23 +1082,16 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           }
         };
         setTimeout(() => onComplete(moodBoostedScores), 300);
-      } else if (nextQuestionNumber === quizConfig.mid1After + 1 && !completedMid1) {
-        setTimeout(() => setQuizPhase("mid1"), 300);
       } else if (quizConfig.superpowerAfter && nextQuestionNumber === quizConfig.superpowerAfter + 1 && !completedSuperpower) {
         setTimeout(() => setQuizPhase("superpower"), 300);
+      } else if (quizConfig.checkpoint1After && nextQuestionNumber === quizConfig.checkpoint1After + 1 && !completedCheckpoint1) {
+        setTimeout(() => setQuizPhase("checkpoint"), 300);
+      } else if (quizConfig.checkpoint2After && nextQuestionNumber === quizConfig.checkpoint2After + 1 && !completedCheckpoint2) {
+        setTimeout(() => setQuizPhase("checkpoint"), 300);
+      } else if (quizConfig.energyAfter && nextQuestionNumber === quizConfig.energyAfter + 1 && !completedEnergy) {
+        setTimeout(() => setQuizPhase("energy"), 300);
       } else if (quizConfig.hasMystery && quizConfig.mysteryAfter && nextQuestionNumber === quizConfig.mysteryAfter + 1 && !completedMystery) {
         setTimeout(() => setQuizPhase("mystery"), 300);
-      } else if (quizConfig.hasMid2 && quizConfig.mid2After && nextQuestionNumber === quizConfig.mid2After + 1 && !completedMid2) {
-        setTimeout(() => setQuizPhase("mid2"), 300);
-      } else {
-        // Check for recap milestone (every 10 questions, but not at existing break points)
-        const recapMilestone = Math.floor(nextQuestionNumber / 10) * 10;
-        const isRecapMilestone = recapMilestone > 0 && 
-                                  nextQuestionNumber === recapMilestone + 1 && 
-                                  !completedRecaps.has(recapMilestone);
-        if (isRecapMilestone && quizConfig.totalQuestions >= 22) { // Only show recaps for longer quizzes
-          setTimeout(() => setQuizPhase("recap"), 300);
-        }
       }
       
       return updatedScores;
@@ -1286,7 +1102,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, x, completedMid1, completedMid2, completedSuperpower, completedMystery, quizConfig, onComplete, hasInteracted, tierConfig.maxTime]);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut) return;
@@ -1332,7 +1148,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [mcBreakVisible, setMcBreakVisible] = useState(false);
   
   useEffect(() => {
-    if (quizPhase === "mid1" || quizPhase === "mid2") {
+    if (quizPhase === "energy") {
       setMcBreakVisible(false);
       setMcBreakTimer(20);
       setMcBreakTimerActive(false);
@@ -1353,8 +1169,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }, [mcBreakTimerActive, mcBreakTimer]);
 
   const getMcBreakQuestionNumber = () => {
-    if (quizPhase === "mid1") return quizConfig.mid1After + 1;
-    if (quizPhase === "mid2") return quizConfig.mid2After;
+    if (quizPhase === "energy") return (quizConfig.energyAfter || 0) + 1;
     return currentIndex + 1;
   };
 
@@ -1524,11 +1339,11 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     );
   }
 
-  if (quizPhase === "mid1") {
-    return renderMultiChoiceQuestion(MID1_QUESTION, mid1Choice, handleMid1Choice, true);
+  if (quizPhase === "energy") {
+    return renderMultiChoiceQuestion(MID1_QUESTION, energyChoice, handleEnergyChoice, true);
   }
 
-  if (quizPhase === "mid1-countdown") {
+  if (quizPhase === "energy-countdown") {
     return (
       <TimedCountdown
         onComplete={handleCountdownComplete}
@@ -1536,14 +1351,26 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     );
   }
 
-  if (quizPhase === "mid2") {
-    return renderMultiChoiceQuestion(MID2_QUESTION, mid2Choice, handleMid2Choice, false);
-  }
-
-  if (quizPhase === "mid2-countdown") {
+  if (quizPhase === "checkpoint") {
     return (
-      <TimedCountdown
-        onComplete={handleCountdownComplete}
+      <RecapSpinWheel
+        currentIndex={currentIndex}
+        scores={scores}
+        questionsRemaining={questions.length - currentIndex - 1}
+        shownInsights={shownInsights}
+        onInsightShown={(insight) => {
+          setShownInsights(prev => new Set(Array.from(prev).concat(insight)));
+        }}
+        onContinue={() => {
+          // Mark appropriate checkpoint as completed
+          if (quizConfig.checkpoint1After && currentIndex + 1 >= quizConfig.checkpoint1After && !completedCheckpoint1) {
+            setCompletedCheckpoint1(true);
+          } else if (quizConfig.checkpoint2After && currentIndex + 1 >= quizConfig.checkpoint2After && !completedCheckpoint2) {
+            setCompletedCheckpoint2(true);
+          }
+          setQuizPhase("quiz");
+          setTimerResetKey(prev => prev + 1);
+        }}
       />
     );
   }
@@ -1565,30 +1392,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     );
   }
 
-  // Mid-quiz recap every 10 questions - shows running trait feedback with spin wheel effect
-  if (quizPhase === "recap") {
-    return (
-      <RecapSpinWheel
-        currentIndex={currentIndex}
-        scores={scores}
-        questionsRemaining={questions.length - currentIndex - 1}
-        shownInsights={shownInsights}
-        onInsightShown={(insight) => {
-          setShownInsights(prev => new Set(Array.from(prev).concat(insight)));
-        }}
-        onContinue={() => {
-          const recapMilestone = Math.floor((currentIndex + 1) / 10) * 10;
-          setCompletedRecaps(prev => {
-            const newSet = new Set(Array.from(prev));
-            newSet.add(recapMilestone);
-            return newSet;
-          });
-          setQuizPhase("quiz");
-          setTimerResetKey(prev => prev + 1);
-        }}
-      />
-    );
-  }
   
   if (questions.length === 0 || !currentQuestion) {
     return (
@@ -1694,16 +1497,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 <MapPin className="w-3 h-3" />
               </motion.div>
             )}
-            {fastResponses >= 3 && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-terracotta/10 text-terracotta"
-              >
-                <Zap className="w-3 h-3" />
-                <span className="text-xs font-medium">Fast!</span>
-              </motion.div>
-            )}
           </div>
         </div>
         
@@ -1712,10 +1505,11 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           totalQuestions={questions.length}
           tier={tier}
           completedPhases={{
-            mid1: completedMid1,
+            energy: completedEnergy,
             superpower: completedSuperpower,
             mystery: completedMystery,
-            mid2: completedMid2
+            checkpoint1: completedCheckpoint1,
+            checkpoint2: completedCheckpoint2
           }}
         />
         
@@ -1983,166 +1777,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             )}
           </AnimatePresence>
 
-          {/* Badge/2x Question Overlay - Shows before special questions */}
-          <AnimatePresence>
-            {showBadgeOverlay && currentQuestion && (currentQuestion.isBadge || currentQuestion.is2x) && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.3 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.3, y: -100 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 200, 
-                  damping: 15,
-                  duration: 0.6
-                }}
-                className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-                data-testid="badge-overlay"
-              >
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.15, 1, 1.1, 1],
-                    rotate: [0, 5, -5, 3, 0]
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="relative"
-                >
-                  {/* Pulsing glow rings */}
-                  <motion.div
-                    animate={{ 
-                      scale: [1, 1.5, 1],
-                      opacity: [0.6, 0, 0.6]
-                    }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    className={`absolute inset-0 rounded-full ${
-                      currentQuestion.is2x 
-                        ? 'bg-gradient-to-r from-yellow-400 to-orange-500' 
-                        : 'bg-gradient-to-r from-purple-500 to-pink-500'
-                    } blur-xl`}
-                    style={{ transform: 'scale(2)' }}
-                  />
-                  <motion.div
-                    animate={{ 
-                      scale: [1.2, 1.8, 1.2],
-                      opacity: [0.4, 0, 0.4]
-                    }}
-                    transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                    className={`absolute inset-0 rounded-full ${
-                      currentQuestion.is2x 
-                        ? 'bg-gradient-to-r from-yellow-400 to-orange-500' 
-                        : 'bg-gradient-to-r from-purple-500 to-pink-500'
-                    } blur-2xl`}
-                    style={{ transform: 'scale(2.5)' }}
-                  />
-                  
-                  {/* Main badge content */}
-                  <div className={`relative z-10 w-48 h-48 rounded-full flex flex-col items-center justify-center shadow-2xl ${
-                    currentQuestion.is2x 
-                      ? 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500' 
-                      : 'bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500'
-                  }`}>
-                    {currentQuestion.is2x ? (
-                      <>
-                        <motion.span 
-                          className="text-6xl font-black text-white drop-shadow-lg"
-                          animate={{ scale: [1, 1.2, 1] }}
-                          transition={{ duration: 0.5, repeat: Infinity }}
-                        >
-                          2X
-                        </motion.span>
-                        <span className="text-sm font-bold text-white/90 mt-1">POINTS!</span>
-                        <span className="text-xs text-white/70 mt-2 text-center px-4">This question counts double... Ready?</span>
-                      </>
-                    ) : (
-                      <>
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                        >
-                          <Sparkles className="w-16 h-16 text-white drop-shadow-lg" />
-                        </motion.div>
-                        <span className="text-base font-bold text-white mt-2 text-center px-3">You are a</span>
-                        <span className="text-lg font-bold text-white/90 text-center px-3">{currentQuestion.badgeHint || 'Special Explorer!'}</span>
-                      </>
-                    )}
-                  </div>
-                </motion.div>
-                
-                {/* Extra time notice and Continue button */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="absolute bottom-16 text-center flex flex-col items-center gap-3"
-                >
-                  <p className="text-white font-medium text-lg">
-                    +3 seconds bonus time!
-                  </p>
-                  
-                  <AnimatePresence>
-                    {badgeCanDismiss ? (
-                      <motion.button
-                        initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={dismissBadgeOverlay}
-                        className="px-8 py-3 rounded-2xl bg-white/95 text-gray-800 font-bold text-lg shadow-lg border border-gray-200"
-                        data-testid="button-badge-continue"
-                      >
-                        Continue
-                      </motion.button>
-                    ) : (
-                      <motion.p 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-white/60 text-sm"
-                      >
-                        Get ready...
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Phase 2.3: Random Event Overlay */}
-          <AnimatePresence>
-            {currentRandomEvent && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.5, y: -50 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.5, y: -50 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className="absolute top-4 left-1/2 -translate-x-1/2 z-40"
-                data-testid="random-event-overlay"
-              >
-                <div className="bg-gradient-to-r from-dusty-blue via-terracotta to-sage-green rounded-2xl px-6 py-4 shadow-2xl text-center">
-                  <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 1, ease: "easeInOut" }}
-                    className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mb-2"
-                  >
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </motion.div>
-                  
-                  <p className="text-lg font-display font-bold text-white">
-                    {currentRandomEvent.title}
-                  </p>
-                  
-                  <p className="text-sm text-white/80">
-                    {currentRandomEvent.description}
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </main>
       <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
@@ -2150,21 +1784,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
             Tap, swipe, or use keyboard (Tab + Enter) to choose
           </p>
-          
-          {/* Phase 2.3: Skip button when available */}
-          {canSkip && (
-            <motion.button
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleSkip}
-              className="px-3 py-1 rounded-full bg-dusty-blue text-white text-xs font-medium"
-              data-testid="button-skip"
-            >
-              Skip Question
-            </motion.button>
-          )}
         </div>
       </footer>
       <AnimatePresence>
