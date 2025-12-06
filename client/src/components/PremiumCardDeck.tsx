@@ -249,7 +249,7 @@ export function PremiumCardDeck({
   TRAIT_LABELS,
 }: PremiumCardDeckProps) {
   const shouldReduceMotion = useReducedMotion();
-  const [currentCard, setCurrentCard] = usePersistedState(STORAGE_KEYS.CURRENT_CARD, 0);
+  const [currentCard, setCurrentCard] = useState(0);
   const [direction, setDirection] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   
