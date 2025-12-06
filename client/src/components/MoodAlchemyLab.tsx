@@ -121,7 +121,7 @@ interface BlendInfo {
 }
 
 const HYBRID_HINTS: Record<string, BlendInfo> = {
-  "happy+calm": { 
+  "calm+happy": { 
     title: "Peaceful Optimist", 
     desc: "You bring steady sunshine to every situation",
     emoji: "🌅",
@@ -132,7 +132,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "When you pause and reflect, what brings you the most joy?"
   },
-  "happy+curious": { 
+  "curious+happy": { 
     title: "Wonder Seeker", 
     desc: "You find joy in learning new things",
     emoji: "✨",
@@ -143,7 +143,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What discovery made you happiest recently?"
   },
-  "happy+determined": { 
+  "determined+happy": { 
     title: "Driven Enthusiast", 
     desc: "You chase goals with a smile",
     emoji: "🚀",
@@ -154,7 +154,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What goal excites you most right now?"
   },
-  "happy+creative": { 
+  "creative+happy": { 
     title: "Joyful Creator", 
     desc: "You make beautiful things with positive energy",
     emoji: "🎨",
@@ -175,7 +175,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "How do you bring joy to the people around you?"
   },
-  "happy+focused": { 
+  "focused+happy": { 
     title: "Productive Optimist", 
     desc: "You tackle tasks with a cheerful mindset",
     emoji: "⚡",
@@ -186,7 +186,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What task brings you satisfaction when completed?"
   },
-  "happy+adventurous": { 
+  "adventurous+happy": { 
     title: "Thrill Seeker", 
     desc: "You find joy in new experiences",
     emoji: "🌟",
@@ -252,7 +252,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What helps you find your center?"
   },
-  "calm+adventurous": { 
+  "adventurous+calm": { 
     title: "Cool Explorer", 
     desc: "You embrace the unknown with composure",
     emoji: "🧭",
@@ -309,7 +309,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What topic deserves your deep focus?"
   },
-  "curious+adventurous": { 
+  "adventurous+curious": { 
     title: "Pioneer Spirit", 
     desc: "You explore uncharted territory with wonder",
     emoji: "🗺️",
@@ -320,7 +320,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What frontier would you love to explore?"
   },
-  "determined+creative": { 
+  "creative+determined": { 
     title: "Ambitious Maker", 
     desc: "You turn visions into reality",
     emoji: "🛠️",
@@ -354,7 +354,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What mission are you fully committed to?"
   },
-  "determined+adventurous": { 
+  "adventurous+determined": { 
     title: "Trailblazer", 
     desc: "You push boundaries to achieve great things",
     emoji: "⛰️",
@@ -390,7 +390,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What skill are you mastering?"
   },
-  "creative+adventurous": { 
+  "adventurous+creative": { 
     title: "Wild Innovator", 
     desc: "You create bold new things without fear",
     emoji: "🌋",
@@ -401,7 +401,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "What wild idea are you ready to try?"
   },
-  "social+focused": { 
+  "focused+social": { 
     title: "Relationship Builder", 
     desc: "You invest deeply in meaningful connections",
     emoji: "💎",
@@ -413,7 +413,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "Who deserves more of your focused attention?"
   },
-  "social+adventurous": { 
+  "adventurous+social": { 
     title: "Social Butterfly", 
     desc: "You thrive meeting new people everywhere",
     emoji: "🦋",
@@ -424,7 +424,7 @@ const HYBRID_HINTS: Record<string, BlendInfo> = {
     ],
     sampleQuestion: "Where would you love to meet new people?"
   },
-  "focused+adventurous": { 
+  "adventurous+focused": { 
     title: "Goal Crusher", 
     desc: "You pursue ambitious dreams with laser focus",
     emoji: "💪",
