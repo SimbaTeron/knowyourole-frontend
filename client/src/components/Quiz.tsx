@@ -1732,15 +1732,23 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                     
                     <div className="flex-1 flex flex-col justify-center gap-4">
                       {currentQuestion.responseType === "slider" ? (
-                        /* Slider UI for nuanced responses */
-                        (<div className="flex flex-col gap-6 px-2">
-                          {/* Slider labels */}
-                          <div className="flex justify-between text-sm font-medium">
-                            <span className="text-sage-green dark:text-sage-green/80">{currentQuestion.leftDesc}</span>
-                            <span className="text-terracotta dark:text-terracotta/80">{currentQuestion.rightDesc}</span>
+                        /* Slider UI for nuanced responses - improved readability */
+                        (<div className="flex flex-col gap-5 px-2">
+                          {/* Slider labels - larger text */}
+                          <div className="flex justify-between gap-4">
+                            <div className="flex-1 text-left">
+                              <span className="text-base sm:text-lg font-semibold text-sage-green dark:text-sage-green/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                                {currentQuestion.leftDesc}
+                              </span>
+                            </div>
+                            <div className="flex-1 text-right">
+                              <span className="text-base sm:text-lg font-semibold text-terracotta dark:text-terracotta/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                                {currentQuestion.rightDesc}
+                              </span>
+                            </div>
                           </div>
-                          {/* Slider track */}
-                          <div className="relative">
+                          {/* Slider track - larger thumb */}
+                          <div className="relative py-2">
                             <input
                               type="range"
                               min="-2"
@@ -1749,9 +1757,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                               value={sliderValue}
                               onChange={(e) => setSliderValue(parseInt(e.target.value))}
                               disabled={isTimingOut || isAnyPopupActive}
-                              className="w-full h-3 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta
-                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-8 [&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing
-                                [&::-moz-range-thumb]:w-8 [&::-moz-range-thumb]:h-8 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing
+                              className="w-full h-4 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta
+                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-10 [&::-webkit-slider-thumb]:h-10 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-xl [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing
+                                [&::-moz-range-thumb]:w-10 [&::-moz-range-thumb]:h-10 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-xl [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing
                                 disabled:opacity-50"
                               style={{
                                 '--thumb-border-color': sliderValue < 0 ? '#7c9885' : sliderValue > 0 ? '#c97c5d' : '#9ca3af'
@@ -1760,34 +1768,35 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                             />
                             
                             {/* Value indicator labels */}
-                            <div className="flex justify-between mt-2 text-xs text-warm-gray/60 dark:text-soft-cream/50">
-                              <span>Strongly</span>
-                              <span>Slightly</span>
+                            <div className="flex justify-between mt-3 text-xs sm:text-sm font-medium text-warm-gray/70 dark:text-soft-cream/60" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                              <span>Strong</span>
+                              <span>Slight</span>
                               <span>Neutral</span>
-                              <span>Slightly</span>
-                              <span>Strongly</span>
+                              <span>Slight</span>
+                              <span>Strong</span>
                             </div>
                           </div>
-                          {/* Current value display */}
+                          {/* Current value display - larger text */}
                           <motion.div 
-                            className={`text-center py-3 px-6 rounded-2xl font-bold text-lg ${
+                            className={`text-center py-4 px-6 rounded-2xl font-bold text-xl sm:text-2xl ${
                               sliderValue < -1 ? 'bg-sage-green/20 text-sage-green' :
                               sliderValue < 0 ? 'bg-sage-green/10 text-sage-green/80' :
                               sliderValue > 1 ? 'bg-terracotta/20 text-terracotta' :
                               sliderValue > 0 ? 'bg-terracotta/10 text-terracotta/80' :
                               'bg-warm-gray/10 text-warm-gray dark:text-soft-cream/70'
                             }`}
+                            style={{ fontFamily: 'Nunito, sans-serif' }}
                             animate={{ scale: [1, 1.02, 1] }}
                             transition={{ duration: 0.2 }}
                             key={sliderValue}
                           >
                             {sliderValue === -2 && `Strongly: ${currentQuestion.options[0]}`}
                             {sliderValue === -1 && `Slightly: ${currentQuestion.options[0]}`}
-                            {sliderValue === 0 && "Neutral - Move to choose"}
+                            {sliderValue === 0 && "Slide to choose"}
                             {sliderValue === 1 && `Slightly: ${currentQuestion.options[1]}`}
                             {sliderValue === 2 && `Strongly: ${currentQuestion.options[1]}`}
                           </motion.div>
-                          {/* Confirm button for slider */}
+                          {/* Confirm button for slider - larger */}
                           <Button
                             onClick={() => {
                               if (!isTimingOut && !isAnyPopupActive && sliderValue !== 0) {
@@ -1796,7 +1805,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                               }
                             }}
                             disabled={isTimingOut || isAnyPopupActive || sliderValue === 0}
-                            className="w-full py-4 text-lg font-bold rounded-2xl disabled:opacity-40"
+                            className="w-full py-5 text-xl font-bold rounded-2xl disabled:opacity-40"
+                            style={{ fontFamily: 'Nunito, sans-serif' }}
                             variant={sliderValue !== 0 ? "default" : "outline"}
                             data-testid="button-slider-confirm"
                           >
