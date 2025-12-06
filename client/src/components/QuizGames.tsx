@@ -425,11 +425,10 @@ export function SuperpowerGame({ tier, onSelect }: SuperpowerGameProps) {
         <h2 className="text-2xl md:text-3xl font-bold text-warm-gray dark:text-soft-cream mb-2">
           You Wake Up With ONE Superpower
         </h2>
-        <p className="text-warm-gray/60 dark:text-soft-cream/50 text-sm">
+        <p className="text-warm-gray/60 dark:text-soft-cream/50 text-[24px]">
           Which would you keep?
         </p>
       </motion.div>
-      
       <div className="relative w-full max-w-sm h-80 flex items-center justify-center">
         {choices.map((choice, idx) => (
           <FloatingOrb
@@ -442,7 +441,6 @@ export function SuperpowerGame({ tier, onSelect }: SuperpowerGameProps) {
           />
         ))}
       </div>
-      
       <AnimatePresence>
         {selectedId && (
           <motion.div
