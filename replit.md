@@ -42,6 +42,11 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
     - **Post-Quiz Validation Gate**: 2-question overlay to refine results based on user perception.
     - **Adaptive Branching (IRT)**: Prioritizes questions for ambiguous traits.
     - **Dynamic Question Wording**: Adjusts question prompts based on mood.
+- **Mood Alchemist Badge**: Highlights mood blend influence on results:
+    - Displays blend title (e.g., "Wonder Seeker", "Inventive Mind") with trait boosts
+    - Shows proxy impact (Critical Thinking, First Principles boosts)
+    - Tracks unique blends in localStorage for "Master Alchemist" meta-badge (3+ unique blends)
+    - Animated Framer Motion pop entrance with sparkle effects
 - **PDF Sharing**: Multi-channel result sharing via SharePDFModal component:
     - **Download**: Generates structured PDF with personality overview, MBTI type, Big Five breakdown, and mood blend using pdf-lib.
     - **Email**: Sends beautifully designed HTML email with embedded results via Nodemailer (requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS secrets).
