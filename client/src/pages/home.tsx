@@ -10,7 +10,7 @@ import { ThemeMode } from "@/components/ThemeToggle";
 const ROTATING_TAGLINES = [
   { text: "What career fits your brain?", icon: "compass" },
   { text: "What makes you... you?", icon: "sparkle" },
-  { text: "Discover traits you didn't know you had", icon: "compass" },
+  { text: "Discover your hidden traits", icon: "compass" },
   { text: "Find your hidden superpowers", icon: "sparkle" },
 ];
 
