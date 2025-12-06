@@ -230,6 +230,176 @@ const RANDOM_EVENT_MAX_CHANCE = 0.15; // 15% max chance cap
 
 type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown" | "random-event" | "recap";
 
+// Spin wheel recap component - cycles through insights then settles on accurate ones
+interface RecapSpinWheelProps {
+  currentIndex: number;
+  scores: {
+    mbti: Record<"E" | "I" | "S" | "N" | "T" | "F" | "J" | "P", number>;
+    disc: Record<"D" | "I" | "S" | "C", number>;
+    bigFive: Record<"O" | "C" | "E" | "A" | "N", number>;
+  };
+  questionsRemaining: number;
+  onContinue: () => void;
+}
+
+function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue }: RecapSpinWheelProps) {
+  const recapMilestone = Math.floor((currentIndex + 1) / 10) * 10;
+  
+  // All possible insights to cycle through
+  const allInsights = [
+    "You're showing social energy",
+    "You're showing thoughtful focus",
+    "You're seeing the big picture",
+    "You're grounded in details",
+    "You're analyzing logically",
+    "You're tuned to feelings",
+    "You prefer structure",
+    "You're staying flexible",
+    "You're naturally curious",
+    "You're practical and grounded",
+    "You connect well with others",
+    "You value independence",
+  ];
+  
+  // Calculate the ACTUAL insights based on scores
+  const mbti = scores.mbti;
+  const finalInsights = [
+    mbti.E >= mbti.I ? "You're showing social energy" : "You're showing thoughtful focus",
+    mbti.N >= mbti.S ? "You're seeing the big picture" : "You're grounded in details",
+  ];
+  
+  const [displayedInsights, setDisplayedInsights] = useState<string[]>(["...", "..."]);
+  const [spinComplete, setSpinComplete] = useState(false);
+  const [buttonActive, setButtonActive] = useState(false);
+  
+  useEffect(() => {
+    let cycleCount = 0;
+    const totalCycles = 20; // Number of cycles before settling
+    const baseInterval = 80; // Starting speed in ms
+    
+    const spinCycle = () => {
+      cycleCount++;
+      
+      // Calculate delay - starts fast, slows down exponentially
+      const progress = cycleCount / totalCycles;
+      const delay = baseInterval + (progress * progress * 400); // Exponential slowdown
+      
+      if (cycleCount < totalCycles) {
+        // Still spinning - show random insights
+        const randomInsight1 = allInsights[Math.floor(Math.random() * allInsights.length)];
+        let randomInsight2 = allInsights[Math.floor(Math.random() * allInsights.length)];
+        while (randomInsight2 === randomInsight1) {
+          randomInsight2 = allInsights[Math.floor(Math.random() * allInsights.length)];
+        }
+        setDisplayedInsights([randomInsight1, randomInsight2]);
+        
+        setTimeout(spinCycle, delay);
+      } else {
+        // Settle on final accurate insights
+        setDisplayedInsights(finalInsights);
+        setSpinComplete(true);
+        
+        // Activate button after a brief pause
+        setTimeout(() => {
+          setButtonActive(true);
+        }, 500);
+      }
+    };
+    
+    // Start spinning after a brief delay
+    const startTimer = setTimeout(() => {
+      spinCycle();
+    }, 300);
+    
+    return () => clearTimeout(startTimer);
+  }, []);
+  
+  return (
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md text-center"
+        >
+          <motion.div
+            initial={{ y: -20 }}
+            animate={{ y: 0 }}
+            className="mb-6"
+          >
+            <div className="w-16 h-16 mx-auto rounded-full bg-sage-green/20 dark:bg-sage-green/30 flex items-center justify-center mb-4">
+              <motion.div
+                animate={spinComplete ? {} : { rotate: 360 }}
+                transition={spinComplete ? {} : { duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="w-8 h-8 text-sage-green" />
+              </motion.div>
+            </div>
+            <h2 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2">
+              Checkpoint: {recapMilestone} Questions
+            </h2>
+            <p className="text-warm-gray/70 dark:text-soft-cream/70">
+              {spinComplete ? "Here's what we're seeing so far..." : "Analyzing your responses..."}
+            </p>
+          </motion.div>
+          
+          <div className="space-y-3 mb-8">
+            {displayedInsights.map((insight, idx) => (
+              <motion.div
+                key={idx}
+                animate={spinComplete ? { scale: [1, 1.02, 1] } : {}}
+                transition={{ duration: 0.3 }}
+                className={`p-4 rounded-xl border transition-all duration-200 ${
+                  spinComplete 
+                    ? "bg-sage-green/10 dark:bg-sage-green/20 border-sage-green/30 dark:border-sage-green/40" 
+                    : "bg-soft-cream/50 dark:bg-gray-800/50 border-warm-gray/10 dark:border-white/10"
+                }`}
+              >
+                <motion.p 
+                  key={insight}
+                  initial={{ opacity: 0.5 }}
+                  animate={{ opacity: 1 }}
+                  className={`font-medium transition-colors duration-200 ${
+                    spinComplete 
+                      ? "text-sage-green dark:text-sage-green" 
+                      : "text-warm-gray/70 dark:text-soft-cream/70"
+                  }`}
+                >
+                  {insight}
+                </motion.p>
+              </motion.div>
+            ))}
+          </div>
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: buttonActive ? 1 : 0.4 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Button
+              size="lg"
+              onClick={onContinue}
+              disabled={!buttonActive}
+              className={`w-full transition-all duration-300 ${
+                buttonActive 
+                  ? "bg-terracotta hover:bg-terracotta/90 text-white" 
+                  : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              }`}
+              data-testid="button-recap-continue"
+            >
+              Keep Going
+              <ChevronRight className="w-5 h-5 ml-2" />
+            </Button>
+            <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-3">
+              {questionsRemaining} questions remaining
+            </p>
+          </motion.div>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
+
 const getQuizConfig = (tier: string) => {
   switch (tier) {
     case "7-12":
@@ -1135,98 +1305,24 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     );
   }
 
-  // Mid-quiz recap every 10 questions - shows running trait feedback
+  // Mid-quiz recap every 10 questions - shows running trait feedback with spin wheel effect
   if (quizPhase === "recap") {
-    const recapMilestone = Math.floor((currentIndex + 1) / 10) * 10;
-    
-    // Calculate running trait indicators
-    const mbti = scores.mbti;
-    const dominantE = mbti.E >= mbti.I;
-    const dominantN = mbti.N >= mbti.S;
-    const dominantT = mbti.T >= mbti.F;
-    const dominantJ = mbti.J >= mbti.P;
-    
-    const traitHints = [
-      dominantE ? "You're showing social energy" : "You're showing thoughtful focus",
-      dominantN ? "You're seeing the big picture" : "You're grounded in details",
-      dominantT ? "You're analyzing logically" : "You're tuned to feelings",
-      dominantJ ? "You prefer structure" : "You're staying flexible",
-    ];
-    
-    // Pick 2 random hints to show
-    const shuffledHints = [...traitHints].sort(() => Math.random() - 0.5).slice(0, 2);
-    
-    const handleRecapContinue = () => {
-      setCompletedRecaps(prev => {
-        const newSet = new Set(Array.from(prev));
-        newSet.add(recapMilestone);
-        return newSet;
-      });
-      setQuizPhase("quiz");
-      setTimerResetKey(prev => prev + 1);
-    };
-    
     return (
-      <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
-        <main className="flex-1 flex items-center justify-center px-4 py-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md text-center"
-          >
-            <motion.div
-              initial={{ y: -20 }}
-              animate={{ y: 0 }}
-              className="mb-6"
-            >
-              <div className="w-16 h-16 mx-auto rounded-full bg-sage-green/20 dark:bg-sage-green/30 flex items-center justify-center mb-4">
-                <Sparkles className="w-8 h-8 text-sage-green" />
-              </div>
-              <h2 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2">
-                Checkpoint: {recapMilestone} Questions
-              </h2>
-              <p className="text-warm-gray/70 dark:text-soft-cream/70">
-                Here's what we're seeing so far...
-              </p>
-            </motion.div>
-            
-            <div className="space-y-3 mb-8">
-              {shuffledHints.map((hint, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + idx * 0.2 }}
-                  className="p-4 rounded-xl bg-soft-cream/50 dark:bg-gray-800/50 border border-warm-gray/10 dark:border-white/10"
-                >
-                  <p className="text-warm-gray dark:text-soft-cream font-medium">
-                    {hint}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-            
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-            >
-              <Button
-                size="lg"
-                onClick={handleRecapContinue}
-                className="w-full bg-terracotta hover:bg-terracotta/90 text-white"
-                data-testid="button-recap-continue"
-              >
-                Keep Going
-                <ChevronRight className="w-5 h-5 ml-2" />
-              </Button>
-              <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-3">
-                {questions.length - currentIndex - 1} questions remaining
-              </p>
-            </motion.div>
-          </motion.div>
-        </main>
-      </div>
+      <RecapSpinWheel
+        currentIndex={currentIndex}
+        scores={scores}
+        questionsRemaining={questions.length - currentIndex - 1}
+        onContinue={() => {
+          const recapMilestone = Math.floor((currentIndex + 1) / 10) * 10;
+          setCompletedRecaps(prev => {
+            const newSet = new Set(Array.from(prev));
+            newSet.add(recapMilestone);
+            return newSet;
+          });
+          setQuizPhase("quiz");
+          setTimerResetKey(prev => prev + 1);
+        }}
+      />
     );
   }
   
