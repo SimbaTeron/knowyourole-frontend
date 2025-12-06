@@ -72,6 +72,72 @@ function zNormalize(rawScore: number, mean: number, std: number): number {
   return Math.max(0, Math.min(100, 50 + zScore * 15));
 }
 
+// Phase 3.1: Cronbach's alpha calculation for internal consistency
+interface ResponseItem {
+  questionId: number;
+  choice: 0 | 1;
+  sliderValue?: number;
+  psych?: string;
+}
+
+function calculateCronbachAlpha(responses: ResponseItem[], traitGroup: string): number {
+  // Filter responses for this trait group
+  const traitResponses = responses.filter(r => r.psych?.includes(traitGroup));
+  
+  if (traitResponses.length < 2) return 1; // Not enough items to calculate
+  
+  const n = traitResponses.length;
+  
+  // Get item scores (use sliderValue if available, otherwise binary choice as 0/1)
+  const items = traitResponses.map(r => r.sliderValue !== undefined ? r.sliderValue : r.choice);
+  
+  // Calculate variance of total score
+  const totalScores = items;
+  const totalMean = totalScores.reduce((a, b) => a + b, 0) / n;
+  const totalVariance = totalScores.reduce((sum, val) => sum + Math.pow(val - totalMean, 2), 0) / (n - 1) || 1;
+  
+  // Calculate sum of item variances (simplified - treating each as independent)
+  const itemVariances = items.map(item => {
+    const mean = (item + (n > 1 ? items.reduce((a, b) => a + b, 0) / n : item)) / 2;
+    return Math.pow(item - mean, 2);
+  });
+  const sumItemVariance = itemVariances.reduce((a, b) => a + b, 0) / (n - 1) || 1;
+  
+  // Cronbach's alpha formula: α = (n / (n-1)) * (1 - Σσi² / σt²)
+  const alpha = (n / (n - 1)) * (1 - sumItemVariance / totalVariance);
+  
+  return Math.max(0, Math.min(1, alpha));
+}
+
+// Phase 3.1: Calculate internal consistency for all trait groups
+function calculateTraitConsistency(responses: ResponseItem[]): { 
+  alphas: Record<string, number>; 
+  lowConsistencyFlags: string[];
+  overallAlpha: number;
+} {
+  const traitGroups = ['MBTI', 'DISC', 'Big5', 'Critical', 'FirstPrinciples'];
+  const alphas: Record<string, number> = {};
+  const lowConsistencyFlags: string[] = [];
+  const ALPHA_THRESHOLD = 0.7;
+  
+  for (const trait of traitGroups) {
+    const alpha = calculateCronbachAlpha(responses, trait);
+    alphas[trait] = Math.round(alpha * 100) / 100;
+    
+    if (alpha < ALPHA_THRESHOLD) {
+      lowConsistencyFlags.push(trait);
+    }
+  }
+  
+  // Calculate overall alpha
+  const validAlphas = Object.values(alphas).filter(a => a > 0 && a <= 1);
+  const overallAlpha = validAlphas.length > 0 
+    ? validAlphas.reduce((a, b) => a + b, 0) / validAlphas.length 
+    : 0.7;
+  
+  return { alphas, lowConsistencyFlags, overallAlpha };
+}
+
 // Phase 1.4: Hybrid type detection thresholds
 const HYBRID_THRESHOLD = 1.5; // If difference is less than this, consider hybrid
 
@@ -259,6 +325,19 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
       color: badge.color,
     }));
 
+  // Phase 3.1: Calculate internal consistency (Cronbach's alpha)
+  const responsesWithPsych: ResponseItem[] = scores.responses.map((r: any) => ({
+    questionId: r.questionId,
+    choice: r.choice,
+    sliderValue: r.sliderValue,
+    psych: r.psych || 'Unknown',
+  }));
+  
+  const consistency = calculateTraitConsistency(responsesWithPsych);
+  const consistencyWarning = consistency.lowConsistencyFlags.length > 0 
+    ? `Balanced View - Retake for clarity on: ${consistency.lowConsistencyFlags.join(', ')}`
+    : null;
+
   return {
     mbtiType,
     mbtiBlend: `${mbtiType}-${primaryDisc}`,
@@ -294,6 +373,30 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
       difficulty: scores.currentDifficulty || "medium",
       fastCount: scores.swipeTimes?.filter((t: number) => t < 2).length || 0,
       slowCount: scores.swipeTimes?.filter((t: number) => t > 6).length || 0,
+    },
+    // Phase 3.1: Internal consistency metrics
+    consistency: {
+      alphas: consistency.alphas,
+      overallAlpha: consistency.overallAlpha,
+      lowConsistencyFlags: consistency.lowConsistencyFlags,
+      warning: consistencyWarning,
+    },
+    // Phase 3.1: Weighted proxy percentages for transparency
+    proxyBreakdown: {
+      critical: {
+        mbtiT: Math.round(mbtiT_pct),
+        big5O: Math.round(big5O_pct),
+        discC: Math.round(discC_pct),
+        weighted: Math.round(criticalProxy),
+        final: Math.round(Math.max(0, Math.min(100, criticalRaw))),
+      },
+      firstPrinciples: {
+        mbtiN: Math.round(mbtiN_pct),
+        big5O: Math.round(big5O_pct),
+        discI: Math.round(discI_pct),
+        weighted: Math.round(firstPrinciplesProxy),
+        final: Math.round(Math.max(0, Math.min(100, firstPrinciplesRaw))),
+      },
     },
   };
 }
