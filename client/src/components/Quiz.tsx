@@ -2031,7 +2031,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 <h3 className="text-2xl font-display font-bold dark:text-white mb-2 text-[#8b9a6d]">
                   No Rush!
                 </h3>
-                <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed">
+                <p className="dark:text-gray-200 text-base leading-relaxed text-[#8b9a6d]">
                   Take your time. If you ever need a moment to think, just tap the <strong className="text-sage-green font-semibold">Pause</strong> button up top. 
                   The question will wait for you.
                 </p>
