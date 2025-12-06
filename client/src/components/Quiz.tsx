@@ -347,14 +347,24 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   const useLocalityColors = isLocalitySet;
 
-  // Phase 1.2: Framework quotas for balanced trait coverage
-  const FRAMEWORK_QUOTAS = {
-    MBTI: 0.3,
-    DISC: 0.25,
-    Big5: 0.35,
-    Critical: 0.05,
-    FirstPrinciples: 0.05
+  // Phase 1.2: Adaptive framework quotas based on tier
+  // Adults get more Big Five for nuanced percentiles, younger tiers get more MBTI for clarity
+  const getAdaptiveQuotas = (tier: string) => {
+    switch (tier) {
+      case "7-12": // Mini Explorer - simpler MBTI focus
+        return { MBTI: 0.40, DISC: 0.25, Big5: 0.25, Critical: 0.05, FirstPrinciples: 0.05 };
+      case "13-18": // Teen Navigator - balanced
+        return { MBTI: 0.35, DISC: 0.25, Big5: 0.30, Critical: 0.05, FirstPrinciples: 0.05 };
+      case "19-25": // Young Trailblazer - more nuance
+        return { MBTI: 0.30, DISC: 0.25, Big5: 0.35, Critical: 0.05, FirstPrinciples: 0.05 };
+      case "25+": // Adult Anchor - maximum Big Five for percentile accuracy
+        return { MBTI: 0.25, DISC: 0.20, Big5: 0.45, Critical: 0.05, FirstPrinciples: 0.05 };
+      default:
+        return { MBTI: 0.30, DISC: 0.25, Big5: 0.35, Critical: 0.05, FirstPrinciples: 0.05 };
+    }
   };
+  
+  const FRAMEWORK_QUOTAS = getAdaptiveQuotas(tier);
 
   useEffect(() => {
     const tierQuestions = questionsData.questions.filter(q => q.tier === tier);
