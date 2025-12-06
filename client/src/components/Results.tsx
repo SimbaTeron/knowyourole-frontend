@@ -24,6 +24,49 @@ interface APIScales {
   firstPrinciples: { value: number; traits: string; quest: string };
 }
 
+// Research norms for Big Five percentile calculations (based on population studies)
+const RESEARCH_NORMS: Record<string, { mean: number; stdDev: number }> = {
+  O: { mean: 50, stdDev: 15 }, // Openness
+  C: { mean: 52, stdDev: 14 }, // Conscientiousness
+  E: { mean: 48, stdDev: 16 }, // Extraversion
+  A: { mean: 55, stdDev: 13 }, // Agreeableness
+  N: { mean: 45, stdDev: 17 }, // Neuroticism
+};
+
+// Calculate z-score and percentile for a trait
+function calculatePercentile(traitValue: number, trait: string): number {
+  const norm = RESEARCH_NORMS[trait];
+  if (!norm) return 50;
+  
+  const zScore = (traitValue - norm.mean) / norm.stdDev;
+  // Standard normal CDF approximation
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+  
+  const sign = zScore < 0 ? -1 : 1;
+  const z = Math.abs(zScore) / Math.sqrt(2);
+  const t = 1 / (1 + p * z);
+  const erf = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-z * z);
+  const percentile = Math.round((0.5 * (1 + sign * erf)) * 100);
+  
+  return Math.max(1, Math.min(99, percentile));
+}
+
+// Get percentile description
+function getPercentileLabel(percentile: number): { label: string; color: string } {
+  if (percentile >= 85) return { label: "Very High", color: "text-emerald-600 dark:text-emerald-400" };
+  if (percentile >= 70) return { label: "High", color: "text-green-600 dark:text-green-400" };
+  if (percentile >= 55) return { label: "Above Average", color: "text-blue-600 dark:text-blue-400" };
+  if (percentile >= 45) return { label: "Average", color: "text-gray-600 dark:text-gray-400" };
+  if (percentile >= 30) return { label: "Below Average", color: "text-amber-600 dark:text-amber-400" };
+  if (percentile >= 15) return { label: "Low", color: "text-orange-600 dark:text-orange-400" };
+  return { label: "Very Low", color: "text-red-600 dark:text-red-400" };
+}
+
 // Phase 2.2: Badge interface for earned achievements
 interface EarnedBadge {
   name: string;
@@ -2159,9 +2202,20 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className={`text-lg font-bold ${isSelected ? 'text-white' : colors.text}`}>
-                                {value}%
-                              </span>
+                              <div className="text-right">
+                                <span className={`text-lg font-bold ${isSelected ? 'text-white' : colors.text}`}>
+                                  {value}%
+                                </span>
+                                {(() => {
+                                  const percentile = calculatePercentile(value, trait);
+                                  const pLabel = getPercentileLabel(percentile);
+                                  return (
+                                    <p className={`text-[10px] ${isSelected ? 'text-white/80' : pLabel.color}`}>
+                                      Top {100 - percentile}%
+                                    </p>
+                                  );
+                                })()}
+                              </div>
                               <ChevronDown className={`w-4 h-4 transition-transform ${isSelected ? 'rotate-180 text-white' : 'text-warm-gray/40 dark:text-soft-cream/40'}`} />
                             </div>
                           </button>
@@ -2189,9 +2243,25 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                                       ({value <= 25 ? '0-25%' : value <= 50 ? '26-50%' : value <= 75 ? '51-75%' : '76-100%'})
                                     </span>
                                   </div>
-                                  <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed">
+                                  <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed mb-3">
                                     {quartileData.description}
                                   </p>
+                                  {/* Percentile comparison */}
+                                  {(() => {
+                                    const percentile = calculatePercentile(value, trait);
+                                    const pLabel = getPercentileLabel(percentile);
+                                    return (
+                                      <div className="flex items-center gap-2 pt-2 border-t border-warm-gray/10 dark:border-white/5">
+                                        <TrendingUp className="w-3 h-3 text-warm-gray/40" />
+                                        <span className={`text-xs font-medium ${pLabel.color}`}>
+                                          {pLabel.label}
+                                        </span>
+                                        <span className="text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                                          — You score higher than {percentile}% of people
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                               </motion.div>
                             )}
