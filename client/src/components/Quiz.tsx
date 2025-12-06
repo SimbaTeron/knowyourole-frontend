@@ -841,8 +841,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       const currentQ = questions[currentIndex];
       
       // Check if this is a badge or 2x question - show overlay first
-      // BUT never show badge overlay on the very first question (currentIndex === 0)
-      if ((currentQ?.isBadge || currentQ?.is2x) && currentIndex > 0) {
+      // BUT never show badge overlay in the first 10 questions (currentIndex < 10)
+      if ((currentQ?.isBadge || currentQ?.is2x) && currentIndex >= 10) {
         setShowBadgeOverlay(true);
         setBadgeCanDismiss(false);
         
@@ -1728,8 +1728,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           />
         </div>
       </header>
-      <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-24">
-        <div className="relative w-full max-w-sm h-[480px]">
+      <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-32 overflow-y-auto">
+        <div className="relative w-full max-w-sm h-[min(480px,calc(100vh-220px))] min-h-[380px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentQuestion.id}
@@ -2193,7 +2193,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 <h3 className="text-2xl font-display font-bold text-sage-green dark:text-sage-green mb-2">
                   No Rush!
                 </h3>
-                <p className="text-warm-gray dark:text-gray-200 text-base leading-relaxed">
+                <p className="text-sage-green/80 dark:text-sage-green/90 text-base leading-relaxed">
                   Take your time. If you ever need a moment to think, just tap the <strong className="text-sage-green font-semibold text-[18px]">Pause</strong> button at the bottom. 
                   The question will wait for you.
                 </p>

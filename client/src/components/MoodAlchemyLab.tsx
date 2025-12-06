@@ -619,7 +619,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
           const result = HYBRID_HINTS[key] || { 
             title: "Unique Blend", 
             desc: "A one-of-a-kind personality mix!",
-            emoji: "🌈",
+            emoji: "✨",
             combinedBoosts: [],
             sampleQuestion: "What makes you uniquely you?"
           };
