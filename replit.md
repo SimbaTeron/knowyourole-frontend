@@ -33,11 +33,12 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
   - **/mood**: Mood selection page with three options (Energized, Stuck, Reflective). Clear instructions explain that mood helps personalize the journey.
   - **/mood-mixer**: Interactive cauldron where users tap two mood ingredients (Happy, Calm, Curious, Determined, Creative, Social) to "brew" a hybrid personality hint. Optional step.
 - **Pre-Quiz Demo Page** (/pre-quiz): Consolidated 3-card animated walkthrough: 1) Binary Questions (shows timer + swipe animation), 2) Slider Questions (interactive slider preview), 3) Your Results (badges and insight preview). Swipe to navigate between cards.
-- **Quiz Flow**: Age-tiered binary swipe questions with strategic break phases. Timer per question (10s for Mini/Teen, 9s for Young Adult/Adult). Cards tilt on selection for tactile feedback. Auto-hiding "Tap or swipe" hint after first interaction. Tracks MBTI, DISC, Big Five, Critical Thinking, and First Principles traits.
-  - **Mini Explorer (12 and under)**: 20 questions - 6 binary → MC1 → 5 binary → Superpower → 5 binary → Mystery → 4 binary → MC2
-  - **Teen (13-18)**: 30 questions - 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 6 binary → MC2
+- **Quiz Flow**: Age-tiered binary swipe questions with strategic break phases. Timer per question (12s base, +3s for sliders, +2s after badges). Cards tilt on selection for tactile feedback. Auto-hiding "Tap or swipe" hint after first interaction. Tracks MBTI, DISC, Big Five, Critical Thinking, and First Principles traits.
+  - **Mini Explorer (12 and under)**: 25 questions - 6 binary → MC1 → 6 binary → Superpower → 6 binary → Mystery → 7 binary → MC2
+  - **Teen (13-18)**: 30 questions - 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 8 binary → MC2
   - **Young Adult (19-25)**: 35 questions - 9 binary → MC1 → 9 binary → Superpower → 9 binary → Mystery → 8 binary → MC2
-  - **Adult (25+)**: 40 questions - 10 binary → MC1 → 10 binary → Superpower → 10 binary → Mystery → 9 binary → MC2
+  - **Adult (25+)**: 40 questions - 10 binary → MC1 → 10 binary → Superpower → 10 binary → Mystery → 10 binary → MC2
+  - **MC Break Questions**: Hybrid treatment with 20-second timer, included in question count, 1-second fade-in animation for smooth visual transition
   - **UI Design**: 2x larger question text (text-3xl), 150% larger answer boxes with directional arrows (← left option, → right option), diagonal offset layout
 - **Results Dashboard**: Displays Big Five Radar chart (340px, single-letter axis labels O/C/E/A/N with color-coded trait colors), MBTI/DISC/Big Five stacked vertically with plain-language explanations. Personalized role recommendations (200+ clusters including trades, first responders, manufacturing, agriculture). Premium tier shows salary data without "premium" labeling. Free tier gets 4-5 sentence personalized summary.
 - **Just Kidding Interstitial**: After clicking Unlock Premium button, users see a playful "Just Kidding!" overlay with "Premium is Free (For Now)" message, "Proceed to Results" button to unlock premium features for free during testing, and two donation tier options ($3.33 and $33.33).
