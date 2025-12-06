@@ -892,23 +892,35 @@ function SideHustleCard({
 
       {/* Carousel controls */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prevHustle} data-testid="prev-hustle">
-          <ChevronLeft className="w-4 h-4" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-800/60 border border-amber-200 dark:border-amber-700" 
+          onClick={prevHustle} 
+          data-testid="prev-hustle"
+        >
+          <ChevronLeft className="w-6 h-6 text-amber-700 dark:text-amber-300" />
         </Button>
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
           {displayHustles.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setSelectedIndex(idx)}
-              className={`w-2 h-2 rounded-full ${reduceMotion ? '' : 'transition-all'} ${
-                idx === selectedIndex ? 'bg-amber-500 w-4' : 'bg-amber-200 dark:bg-amber-700'
+              className={`w-2.5 h-2.5 rounded-full ${reduceMotion ? '' : 'transition-all'} ${
+                idx === selectedIndex ? 'bg-amber-500 w-5' : 'bg-amber-200 dark:bg-amber-700'
               }`}
               data-testid={`hustle-dot-${idx}`}
             />
           ))}
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={nextHustle} data-testid="next-hustle">
-          <ChevronRight className="w-4 h-4" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-800/60 border border-amber-200 dark:border-amber-700" 
+          onClick={nextHustle} 
+          data-testid="next-hustle"
+        >
+          <ChevronRight className="w-6 h-6 text-amber-700 dark:text-amber-300" />
         </Button>
       </div>
 
