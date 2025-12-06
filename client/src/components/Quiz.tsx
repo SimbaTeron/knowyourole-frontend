@@ -403,52 +403,98 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue }
 const getQuizConfig = (tier: string) => {
   switch (tier) {
     case "7-12":
-      // Mini 16: 5 binary → MC1 → 4 binary → Superpower → 4 binary → Mystery → 3 binary → MC2
+      // Mini 20: 6 binary → MC1 → 5 binary → Superpower → 5 binary → Mystery → 4 binary → MC2
       return { 
-        totalQuestions: 16, 
-        mid1After: 5, 
-        superpowerAfter: 9,
-        mysteryAfter: 13,
-        mid2After: 16,
+        totalQuestions: 20, 
+        mid1After: 6, 
+        superpowerAfter: 11,
+        mysteryAfter: 16,
+        mid2After: 20,
         hasMid2: true, 
         hasMystery: true 
       };
     case "13-18":
-      // Teen 22: 7 binary → MC1 → 6 binary → Superpower → 5 binary → Mystery → 4 binary → MC2
+      // Teen 30: 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 6 binary → MC2
       return { 
-        totalQuestions: 22, 
-        mid1After: 7, 
-        superpowerAfter: 13,
-        mysteryAfter: 18,
-        mid2After: 22,
+        totalQuestions: 30, 
+        mid1After: 8, 
+        superpowerAfter: 15,
+        mysteryAfter: 22,
+        mid2After: 30,
         hasMid2: true, 
         hasMystery: true 
       };
     case "19-25":
-      // Young Adult 28: 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 6 binary → MC2
+      // Young Adult 35: 9 binary → MC1 → 9 binary → Superpower → 9 binary → Mystery → 8 binary → MC2
       return { 
-        totalQuestions: 28, 
-        mid1After: 8, 
-        superpowerAfter: 15,
-        mysteryAfter: 22,
-        mid2After: 28,
+        totalQuestions: 35, 
+        mid1After: 9, 
+        superpowerAfter: 18,
+        mysteryAfter: 27,
+        mid2After: 35,
         hasMid2: true, 
         hasMystery: true 
       };
     case "25+":
     case "25plus":
     default:
-      // Adult 34: 9 binary → MC1 → 9 binary → Superpower → 9 binary → Mystery → 7 binary → MC2
+      // Adult 40: 10 binary → MC1 → 10 binary → Superpower → 10 binary → Mystery → 9 binary → MC2
       return { 
-        totalQuestions: 34, 
-        mid1After: 9, 
-        superpowerAfter: 18,
-        mysteryAfter: 27,
-        mid2After: 34,
+        totalQuestions: 40, 
+        mid1After: 10, 
+        superpowerAfter: 20,
+        mysteryAfter: 30,
+        mid2After: 40,
         hasMid2: true, 
         hasMystery: true 
       };
   }
+};
+
+// Dynamically adjust question wording based on mood tone
+const adjustQuestionWording = (prompt: string, tone: "introspective" | "energetic" | "analytical" | "neutral"): string => {
+  if (tone === "neutral") return prompt;
+  
+  // Mapping of common phrases to mood-adjusted versions
+  const toneAdjustments: Record<string, Record<string, string>> = {
+    introspective: {
+      "Do you": "When you pause to reflect, do you",
+      "Would you": "In quiet moments, would you",
+      "Are you": "Deep down, are you",
+      "You prefer": "When you listen to your inner voice, you prefer",
+      "You enjoy": "In contemplative times, you enjoy",
+      "You like": "At your core, you like",
+    },
+    energetic: {
+      "Do you": "Right now, do you",
+      "Would you": "If you had the chance today, would you",
+      "Are you": "At your best, are you",
+      "You prefer": "When you're fired up, you prefer",
+      "You enjoy": "At your peak energy, you enjoy",
+      "You like": "When motivated, you like",
+    },
+    analytical: {
+      "Do you": "Thinking it through, do you",
+      "Would you": "After careful consideration, would you",
+      "Are you": "Logically speaking, are you",
+      "You prefer": "Based on experience, you prefer",
+      "You enjoy": "When solving problems, you enjoy",
+      "You like": "Rationally, you like",
+    }
+  };
+  
+  const adjustments = toneAdjustments[tone] || {};
+  let adjustedPrompt = prompt;
+  
+  // Only adjust the first matching phrase to avoid over-modification
+  for (const [original, replacement] of Object.entries(adjustments)) {
+    if (prompt.startsWith(original)) {
+      adjustedPrompt = prompt.replace(original, replacement);
+      break;
+    }
+  }
+  
+  return adjustedPrompt;
 };
 
 // Mood integration: boost proxies and adjust question tone
@@ -605,6 +651,51 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   };
   
   const FRAMEWORK_QUOTAS = getAdaptiveQuotas(tier);
+  
+  // IRT Adaptive Branching: Detect ambiguous traits and prioritize relevant questions
+  const detectAmbiguousTraits = (scores: typeof initialScores): string[] => {
+    const ambiguousTraits: string[] = [];
+    const AMBIGUITY_THRESHOLD = 0.15; // 15% difference = ambiguous
+    
+    // Check MBTI dimensions
+    const mbtiTotal = scores.mbti.E + scores.mbti.I;
+    const nsTotal = scores.mbti.N + scores.mbti.S;
+    const tfTotal = scores.mbti.T + scores.mbti.F;
+    const jpTotal = scores.mbti.J + scores.mbti.P;
+    
+    if (mbtiTotal > 0) {
+      if (Math.abs(scores.mbti.E - scores.mbti.I) / mbtiTotal < AMBIGUITY_THRESHOLD) {
+        ambiguousTraits.push("MBTI-E", "MBTI-I");
+      }
+    }
+    if (nsTotal > 0) {
+      if (Math.abs(scores.mbti.N - scores.mbti.S) / nsTotal < AMBIGUITY_THRESHOLD) {
+        ambiguousTraits.push("MBTI-N", "MBTI-S");
+      }
+    }
+    if (tfTotal > 0) {
+      if (Math.abs(scores.mbti.T - scores.mbti.F) / tfTotal < AMBIGUITY_THRESHOLD) {
+        ambiguousTraits.push("MBTI-T", "MBTI-F");
+      }
+    }
+    if (jpTotal > 0) {
+      if (Math.abs(scores.mbti.J - scores.mbti.P) / jpTotal < AMBIGUITY_THRESHOLD) {
+        ambiguousTraits.push("MBTI-J", "MBTI-P");
+      }
+    }
+    
+    // Check Big Five dimensions
+    const big5Traits = ["O", "C", "E", "A", "N"] as const;
+    for (const trait of big5Traits) {
+      // Ambiguous if between 40-60 (normalized to 100)
+      const value = scores.bigFive[trait];
+      if (value >= 40 && value <= 60) {
+        ambiguousTraits.push(`Big5-${trait}`);
+      }
+    }
+    
+    return ambiguousTraits;
+  };
 
   useEffect(() => {
     const tierQuestions = questionsData.questions.filter(q => q.tier === tier);
@@ -1536,7 +1627,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         className={`text-3xl md:text-4xl font-bold quiz-question-text leading-tight ${promptColor}`}
                         data-testid="text-prompt"
                       >
-                        {currentQuestion.prompt}
+                        {adjustQuestionWording(currentQuestion.prompt, moodEffects.questionTone)}
                       </motion.h2>
                     </div>
                     
@@ -1819,7 +1910,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={dismissBadgeOverlay}
-                        className="px-8 py-3 rounded-2xl bg-white text-warm-gray font-bold text-lg shadow-lg"
+                        className="px-8 py-3 rounded-2xl bg-white/95 text-gray-800 font-bold text-lg shadow-lg border border-gray-200"
                         data-testid="button-badge-continue"
                       >
                         Continue
