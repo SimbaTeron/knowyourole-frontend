@@ -18,6 +18,7 @@ import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { getLocaleInsight, getPersonalizedInsight, type LocaleInsight } from "@/data/localeInsights";
 import { getRegionalSalary, shouldShowSalary } from "@/data/regionalSalaries";
 import { PremiumCardDeck } from "./PremiumCardDeck";
+import { SharePDFModal } from "./SharePDFModal";
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -1042,6 +1043,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   // Premium feature states
   const [selectedQuestWeek, setSelectedQuestWeek] = useState<1 | 2 | 3 | 4>(1);
   const [completedChallenges, setCompletedChallenges] = useState<Set<string>>(new Set());
+  
+  // Share PDF Modal state
+  const [showSharePDFModal, setShowSharePDFModal] = useState(false);
   
   const traitButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotion();
@@ -2835,17 +2839,15 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             <RefreshCw className="w-4 h-4 mr-1" />
             Restart
           </Button>
-          {onDownloadPDF && (
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={onDownloadPDF}
-              data-testid="button-download-pdf"
-            >
-              <BookOpen className="w-4 h-4 mr-1" />
-              Save PDF
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => setShowSharePDFModal(true)}
+            data-testid="button-download-pdf"
+          >
+            <BookOpen className="w-4 h-4 mr-1" />
+            Share PDF
+          </Button>
           <Button
             className="flex-1 bg-terracotta hover:bg-terracotta/90"
             onClick={onShare}
@@ -2856,6 +2858,24 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </Button>
         </div>
       </footer>
+      
+      {/* Share PDF Modal */}
+      {result && (
+        <SharePDFModal
+          isOpen={showSharePDFModal}
+          onClose={() => setShowSharePDFModal(false)}
+          sessionId={sessionId || ""}
+          result={{
+            mbtiType: result.mbtiType,
+            discStyle: result.discStyle,
+            bigFiveProfile: result.bigFiveProfile,
+            title: result.title,
+            spark: result.spark,
+          }}
+          mood={mood}
+          tier={tier}
+        />
+      )}
     </div>
   );
 }
