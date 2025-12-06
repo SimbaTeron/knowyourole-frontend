@@ -452,27 +452,27 @@ export function PremiumCardDeck({
           </span>
         </div>
         
-        {/* Navigation arrows */}
-        <div className="flex items-center gap-1">
+        {/* Navigation arrows - larger for mobile */}
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-10 w-10 sm:h-11 sm:w-11 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40"
             onClick={prevCard}
             disabled={currentCard === 0}
             data-testid="button-prev-card"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-10 w-10 sm:h-11 sm:w-11 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40"
             onClick={nextCard}
             disabled={currentCard === CARD_CONFIGS.length - 1}
             data-testid="button-next-card"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
         </div>
       </div>

@@ -564,27 +564,25 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
   }, []);
 
   const [lastTapTime, setLastTapTime] = useState<Record<string, number>>({});
+  const [draggedOrb, setDraggedOrb] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   
   const handleOrbClick = (orbId: string, event: React.MouseEvent) => {
     if (selectedOrbs.length >= 2 || selectedOrbs.includes(orbId) || isColliding) return;
     
-    const now = Date.now();
-    const lastTap = lastTapTime[orbId] || 0;
+    if (navigator.vibrate) navigator.vibrate(15);
     
-    if (now - lastTap < 400) {
-      if (navigator.vibrate) navigator.vibrate(30);
+    if (showTooltip === orbId) {
       setShowTooltip(null);
     } else {
-      setLastTapTime(prev => ({ ...prev, [orbId]: now }));
-      
-      if (showTooltip === orbId) {
-        if (navigator.vibrate) navigator.vibrate(30);
-        setShowTooltip(null);
-      } else {
-        setShowTooltip(orbId);
-        return;
-      }
+      setShowTooltip(orbId);
+      const rect = (event.target as Element).getBoundingClientRect();
+      setTooltipPosition({ x: rect.left + rect.width / 2, y: rect.top });
     }
+  };
+  
+  const selectOrb = (orbId: string) => {
+    if (selectedOrbs.length >= 2 || selectedOrbs.includes(orbId) || isColliding) return;
     
     if (navigator.vibrate) navigator.vibrate(30);
     setShowTooltip(null);
@@ -636,6 +634,20 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
         }, 700);
       }, 400);
     }
+  };
+  
+  const handleDragEnd = (orbId: string, offsetX: number, offsetY: number) => {
+    const pos = getOrbPosition(orbId);
+    const finalX = pos.x + offsetX;
+    const finalY = pos.y + offsetY;
+    const distanceToCenter = Math.sqrt((finalX - centerX) ** 2 + (finalY - centerY) ** 2);
+    
+    if (distanceToCenter < 60) {
+      selectOrb(orbId);
+    }
+    
+    setDraggedOrb(null);
+    setDragOffset({ x: 0, y: 0 });
   };
 
   const handleOrbHover = (orbId: string, event: React.MouseEvent) => {
@@ -841,30 +853,59 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
           const pos = getOrbPosition(orb.id);
           const isSelected = selectedOrbs.includes(orb.id);
           const isAvailable = selectedOrbs.length < 2 && !isSelected && !isColliding;
+          const isDragging = draggedOrb === orb.id;
           
           if (isColliding && isSelected) {
             return null;
           }
+          
+          const animateX = isDragging ? pos.x - centerX + dragOffset.x : pos.x - centerX;
+          const animateY = isDragging ? pos.y - centerY + dragOffset.y : pos.y - centerY;
           
           return (
             <motion.g
               key={orb.id}
               initial={false}
               animate={{
-                x: pos.x - centerX,
-                y: pos.y - centerY,
-                scale: isSelected ? 0.7 : 1,
+                x: animateX,
+                y: animateY,
+                scale: isSelected ? 0.7 : isDragging ? 1.1 : 1,
                 opacity: isSelected && !isColliding ? 0 : 1
               }}
-              transition={{
+              transition={isDragging ? { duration: 0 } : {
                 type: "spring",
                 stiffness: 180,
                 damping: 18
               }}
-              style={{ cursor: isAvailable ? 'pointer' : 'default' }}
+              style={{ 
+                cursor: isAvailable ? 'grab' : 'default',
+                touchAction: 'none'
+              }}
               onClick={(e) => isAvailable && handleOrbClick(orb.id, e)}
-              onMouseEnter={(e) => isAvailable && handleOrbHover(orb.id, e)}
-              onMouseLeave={() => setShowTooltip(null)}
+              onPointerDown={(e) => {
+                if (!isAvailable) return;
+                e.preventDefault();
+                (e.target as Element).setPointerCapture(e.pointerId);
+                setDraggedOrb(orb.id);
+                setShowTooltip(null);
+              }}
+              onPointerMove={(e) => {
+                if (draggedOrb !== orb.id) return;
+                setDragOffset(prev => ({
+                  x: prev.x + e.movementX * 1.2,
+                  y: prev.y + e.movementY * 1.2
+                }));
+              }}
+              onPointerUp={(e) => {
+                if (draggedOrb !== orb.id) return;
+                (e.target as Element).releasePointerCapture(e.pointerId);
+                handleDragEnd(orb.id, dragOffset.x, dragOffset.y);
+              }}
+              onPointerCancel={(e) => {
+                if (draggedOrb !== orb.id) return;
+                setDraggedOrb(null);
+                setDragOffset({ x: 0, y: 0 });
+              }}
               data-testid={`orb-${orb.id}`}
             >
               <motion.circle
@@ -872,7 +913,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
                 cy={centerY}
                 r={isAvailable ? 44 : 40}
                 fill="transparent"
-                animate={isAvailable ? { r: [44, 46, 44] } : {}}
+                animate={isAvailable && !isDragging ? { r: [44, 46, 44] } : {}}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               />
               
@@ -890,9 +931,9 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
                 r="40"
                 fill="none"
                 stroke="white"
-                strokeWidth="2"
-                strokeOpacity={isAvailable ? 0.3 : 0}
-                animate={isAvailable ? { strokeOpacity: [0.2, 0.4, 0.2] } : {}}
+                strokeWidth={isDragging ? 3 : 2}
+                strokeOpacity={isDragging ? 0.7 : isAvailable ? 0.3 : 0}
+                animate={isAvailable && !isDragging ? { strokeOpacity: [0.2, 0.4, 0.2] } : {}}
                 transition={{ duration: 1.5, repeat: Infinity }}
               />
               
@@ -903,12 +944,12 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
                 fill="white"
                 fontSize="13"
                 fontWeight="600"
-                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
+                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)', pointerEvents: 'none' }}
               >
                 {orb.label}
               </text>
               
-              {isAvailable && (
+              {isAvailable && !isDragging && (
                 <motion.g
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 0.6 }}
@@ -969,7 +1010,22 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
           )}
         </AnimatePresence>
         
-        {selectedOrbs.length === 0 && (
+        {draggedOrb && (
+          <motion.circle
+            cx={centerX}
+            cy={centerY}
+            r="60"
+            fill="none"
+            stroke="url(#alchemyRing)"
+            strokeWidth="3"
+            strokeDasharray="8 4"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 0.8, scale: 1 }}
+            transition={{ duration: 0.2 }}
+          />
+        )}
+        
+        {selectedOrbs.length === 0 && !draggedOrb && (
           <>
             <motion.text
               x={centerX}
@@ -977,26 +1033,60 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
               textAnchor="middle"
               fill="currentColor"
               fillOpacity="0.5"
-              fontSize="12"
+              fontSize="11"
               fontWeight="500"
               className="text-warm-gray dark:text-soft-cream"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              Tap any orb to learn more
+              Tap orb for details
             </motion.text>
             <motion.text
               x={centerX}
               y={centerY + 12}
               textAnchor="middle"
               fill="currentColor"
-              fillOpacity="0.35"
-              fontSize="10"
+              fillOpacity="0.4"
+              fontSize="11"
+              fontWeight="600"
               className="text-warm-gray dark:text-soft-cream"
             >
-              Tap again to select
+              Drag here to select
             </motion.text>
           </>
+        )}
+        
+        {draggedOrb && (
+          <motion.text
+            x={centerX}
+            y={centerY + 4}
+            textAnchor="middle"
+            fill="url(#alchemyRing)"
+            fontSize="14"
+            fontWeight="700"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: [1, 1.05, 1] }}
+            transition={{ duration: 0.3, scale: { repeat: Infinity, duration: 1 } }}
+          >
+            Drop to Brew!
+          </motion.text>
+        )}
+        
+        {selectedOrbs.length === 1 && !draggedOrb && (
+          <motion.text
+            x={centerX}
+            y={centerY + 4}
+            textAnchor="middle"
+            fill="currentColor"
+            fillOpacity="0.5"
+            fontSize="11"
+            fontWeight="500"
+            className="text-warm-gray dark:text-soft-cream"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            Drag one more orb here
+          </motion.text>
         )}
       </svg>
 
