@@ -2072,7 +2072,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-amber-400 animate-pulse" />
-                  <h3 className="text-lg font-display font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-display font-semibold dark:text-white text-[#c67b5c]">
                     Paused
                   </h3>
                 </div>
