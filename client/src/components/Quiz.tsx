@@ -1547,23 +1547,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               </motion.div>
             )}
           </div>
-          
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={togglePause}
-            data-testid="button-pause"
-            className={`relative px-4 py-2 rounded-xl transition-all ${
-              showFirstTimePauseMessage 
-                ? 'ring-4 ring-terracotta ring-offset-2 bg-terracotta/10 animate-pulse' 
-                : 'hover:bg-sage-green/10'
-            }`}
-          >
-            {isPaused ? <Play className="w-7 h-7" /> : <Pause className="w-7 h-7" />}
-            <span className="ml-2 text-sm font-medium hidden sm:inline">
-              {isPaused ? 'Resume' : 'Pause'}
-            </span>
-          </Button>
         </div>
         
         <CelestialProgressTracker
@@ -2043,7 +2026,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   No Rush!
                 </h3>
                 <p className="dark:text-gray-200 text-base leading-relaxed text-[#8b9a6d]">
-                  Take your time. If you ever need a moment to think, just tap the <strong className="text-sage-green font-semibold text-[18px]">Pause</strong> button up top. 
+                  Take your time. If you ever need a moment to think, just tap the <strong className="text-sage-green font-semibold text-[18px]">Pause</strong> button at the bottom. 
                   The question will wait for you.
                 </p>
               </div>
@@ -2069,47 +2052,89 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {!isPaused && !showFirstTimePauseMessage && quizPhase === "quiz" && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-warm-charcoal dark:via-warm-charcoal/95"
+        >
+          <div className="max-w-sm mx-auto">
+            <button
+              onClick={togglePause}
+              className="w-full py-3 px-6 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 shadow-sm"
+              data-testid="button-pause"
+            >
+              <Pause className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                Tap to Pause
+              </span>
+            </button>
+          </div>
+        </motion.div>
+      )}
+      
       <AnimatePresence>
         {showPauseMenu && !showFirstTimePauseMessage && (
           <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-0 left-0 right-0 z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+            onClick={() => togglePause()}
           >
-            <div className="max-w-sm mx-auto bg-soft-cream dark:bg-warm-charcoal rounded-2xl p-5 shadow-2xl border border-sage-green/30">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-amber-400 animate-pulse" />
-                  <h3 className="text-lg font-display font-semibold dark:text-white text-[#c67b5c]">
-                    Paused
-                  </h3>
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="w-full max-w-md mx-4 mb-4"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                      <Pause className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                        Quiz Paused
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Take your time
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {currentIndex + 1}
+                      <span className="text-gray-400 dark:text-gray-500">/{questions.length}</span>
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {currentIndex + 1}/{questions.length}
-                </p>
-              </div>
-              
-              <div className="flex gap-3">
-                <Button
-                  className="flex-1 bg-terracotta hover:bg-terracotta/90"
-                  onClick={() => togglePause()}
-                  data-testid="button-resume"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  Resume
-                </Button>
                 
-                <Button
-                  variant="outline"
-                  className="flex-1 text-[#111827]"
-                  onClick={onExit}
-                  data-testid="button-exit-quiz"
-                >
-                  Exit Quiz
-                </Button>
+                <div className="flex gap-3">
+                  <Button
+                    className="flex-1 bg-sage-green hover:bg-sage-green/90 text-white font-semibold py-6 text-base"
+                    onClick={() => togglePause()}
+                    data-testid="button-resume"
+                  >
+                    <Play className="w-5 h-5 mr-2" />
+                    Resume
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 font-semibold py-6 text-base"
+                    onClick={onExit}
+                    data-testid="button-exit-quiz"
+                  >
+                    Exit Quiz
+                  </Button>
+                </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
