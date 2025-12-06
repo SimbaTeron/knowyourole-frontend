@@ -34,10 +34,10 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
   - **/mood-mixer**: Interactive cauldron where users tap two mood ingredients (Happy, Calm, Curious, Determined, Creative, Social) to "brew" a hybrid personality hint. Optional step.
 - **Pre-Quiz Demo Page** (/pre-quiz): Animated walkthrough showing what to expect in the quiz - swipe mechanics, timer, and multi-choice breaks. Helps users understand the format before starting.
 - **Quiz Flow**: Age-tiered binary swipe questions with strategic break phases. Timer per question (10s for Mini/Teen, 9s for Young Adult/Adult). Cards tilt on selection for tactile feedback. Auto-hiding "Tap or swipe" hint after first interaction. Tracks MBTI, DISC, Big Five, Critical Thinking, and First Principles traits.
-  - **Mini Explorer (12 and under)**: 16 questions - 5 binary → MC1 → 4 binary → Superpower → 4 binary → Mystery → 3 binary → MC2
-  - **Teen (13-18)**: 22 questions - 7 binary → MC1 → 6 binary → Superpower → 5 binary → Mystery → 4 binary → MC2
-  - **Young Adult (19-25)**: 28 questions - 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 6 binary → MC2
-  - **Adult (25+)**: 34 questions - 9 binary → MC1 → 9 binary → Superpower → 9 binary → Mystery → 7 binary → MC2
+  - **Mini Explorer (12 and under)**: 20 questions - 6 binary → MC1 → 5 binary → Superpower → 5 binary → Mystery → 4 binary → MC2
+  - **Teen (13-18)**: 30 questions - 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 6 binary → MC2
+  - **Young Adult (19-25)**: 35 questions - 9 binary → MC1 → 9 binary → Superpower → 9 binary → Mystery → 8 binary → MC2
+  - **Adult (25+)**: 40 questions - 10 binary → MC1 → 10 binary → Superpower → 10 binary → Mystery → 9 binary → MC2
   - **UI Design**: 2x larger question text (text-3xl), 150% larger answer boxes with directional arrows (← left option, → right option), diagonal offset layout
 - **Results Dashboard**: Displays Big Five Radar chart (340px, single-letter axis labels O/C/E/A/N with color-coded trait colors), MBTI/DISC/Big Five stacked vertically with plain-language explanations. Personalized role recommendations (200+ clusters including trades, first responders, manufacturing, agriculture). Premium tier shows salary data without "premium" labeling. Free tier gets 4-5 sentence personalized summary.
 - **Just Kidding Interstitial**: After clicking Unlock Premium button, users see a playful "Just Kidding!" overlay with "Premium is Free (For Now)" message, "Proceed to Results" button to unlock premium features for free during testing, and two donation tier options ($3.33 and $33.33).
@@ -66,6 +66,9 @@ A multi-stage build process uses Vite for the client and esbuild for the server.
 - **Adaptive Sharpen Thinking**: Prioritizes weak proxy categories. If Critical < FirstPrinciples, focuses on Logic Puzzles and Cause & Effect. Category progress tracked in localStorage ('knowrole-category-progress') with accuracy by category.
 - **Post-Quiz Validation**: 2 quick questions before premium unlock to personalize insights. Questions about decision-making style and collaboration preference.
 - **PDF Download**: Share results as printable PDF via browser print dialog. Opens styled HTML summary with MBTI, DISC, and Big Five percentages.
+- **IRT Adaptive Branching**: detectAmbiguousTraits() identifies traits with <15% score difference mid-quiz and prioritizes questions targeting those traits. Works for MBTI dimensions and Big Five traits in 40-60 range.
+- **Dynamic Question Wording**: adjustQuestionWording() modifies question prompts based on mood tone. Introspective mood adds phrases like "When you pause to reflect...", energetic adds "Right now...", analytical adds "Thinking it through..."
+- **Spin Wheel Checkpoint**: Mid-quiz recap (every 10 questions) uses RecapSpinWheel component that cycles through random insights rapidly, slows down like a spin wheel, then settles on 2 accurate insights within 5 seconds. Keep Going button activates only after settling.
 
 ## External Dependencies
 
