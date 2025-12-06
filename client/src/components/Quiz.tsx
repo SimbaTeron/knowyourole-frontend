@@ -280,10 +280,78 @@ const getQuizConfig = (tier: string) => {
   }
 };
 
+// Mood integration: boost proxies and adjust question tone
+const getMoodEffects = (mood: string) => {
+  const effects = {
+    criticalBoost: 0,
+    firstPrinciplesBoost: 0,
+    extraversionBoost: 0,
+    opennessBoost: 0,
+    conscientiousnessBoost: 0,
+    agreeablenessBoost: 0,
+    neuroticismBoost: 0,
+    questionTone: "neutral" as "introspective" | "energetic" | "analytical" | "neutral"
+  };
+  
+  // Parse mood - could be single or blend (e.g., "Energized|Reflective" from Mixer)
+  const moods = mood.split("|").map(m => m.trim().toLowerCase());
+  
+  for (const m of moods) {
+    switch (m) {
+      case "energized":
+        effects.extraversionBoost += 5;
+        effects.questionTone = "energetic";
+        break;
+      case "stuck":
+        effects.criticalBoost += 10; // Boost analytical thinking for breakthroughs
+        effects.conscientiousnessBoost += 5;
+        effects.questionTone = "analytical";
+        break;
+      case "reflective":
+        effects.firstPrinciplesBoost += 5;
+        effects.opennessBoost += 5;
+        effects.questionTone = "introspective";
+        break;
+      case "happy":
+        effects.extraversionBoost += 3;
+        effects.agreeablenessBoost += 3;
+        break;
+      case "calm":
+        effects.neuroticismBoost -= 5; // Lower neuroticism when calm
+        effects.conscientiousnessBoost += 3;
+        break;
+      case "curious":
+        effects.opennessBoost += 8;
+        effects.firstPrinciplesBoost += 5;
+        break;
+      case "determined":
+        effects.conscientiousnessBoost += 8;
+        effects.criticalBoost += 5;
+        break;
+      case "creative":
+        effects.opennessBoost += 10;
+        effects.firstPrinciplesBoost += 8;
+        break;
+      case "social":
+        effects.extraversionBoost += 10;
+        effects.agreeablenessBoost += 5;
+        break;
+    }
+  }
+  
+  // Blend effects - if multiple moods, average the tone
+  if (moods.length > 1) {
+    effects.questionTone = "neutral"; // Blends use neutral
+  }
+  
+  return effects;
+};
+
 export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
   const tierConfig = questionsData.tierConfig[tier as keyof typeof questionsData.tierConfig] || questionsData.tierConfig["19-25"];
   const quizConfig = getQuizConfig(tier);
   const { teamName, isLocalitySet } = useLocalityTheme();
+  const moodEffects = getMoodEffects(mood);
   
   const [quizPhase, setQuizPhase] = useState<QuizPhase>("quiz");
   const [mid1Choice, setMid1Choice] = useState<string | null>(null);
@@ -811,7 +879,23 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       }
       
       if (currentIndex >= questions.length - 1) {
-        setTimeout(() => onComplete(updatedScores), 300);
+        // Apply mood-based boosts to Big Five before completing
+        const moodBoostedScores = {
+          ...updatedScores,
+          bigFive: {
+            O: updatedScores.bigFive.O + (moodEffects.opennessBoost * 0.1),
+            C: updatedScores.bigFive.C + (moodEffects.conscientiousnessBoost * 0.1),
+            E: updatedScores.bigFive.E + (moodEffects.extraversionBoost * 0.1),
+            A: updatedScores.bigFive.A + (moodEffects.agreeablenessBoost * 0.1),
+            N: updatedScores.bigFive.N + (moodEffects.neuroticismBoost * 0.1),
+          },
+          // Store mood boosts for proxy calculations
+          moodBoosts: {
+            critical: moodEffects.criticalBoost,
+            firstPrinciples: moodEffects.firstPrinciplesBoost,
+          }
+        };
+        setTimeout(() => onComplete(moodBoostedScores), 300);
       } else if (nextQuestionNumber === quizConfig.mid1After + 1 && !completedMid1) {
         setTimeout(() => setQuizPhase("mid1"), 300);
       } else if (quizConfig.superpowerAfter && nextQuestionNumber === quizConfig.superpowerAfter + 1 && !completedSuperpower) {

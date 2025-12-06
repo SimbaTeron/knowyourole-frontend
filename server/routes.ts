@@ -203,6 +203,9 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
   const criticalWildcardBoost = (scores.criticalWildcard || 0) * 20;
   const firstPrinciplesWildcardBoost = (scores.firstPrinciplesWildcard || 0) * 20;
   
+  // Mood-based proxy boosts (passed from quiz)
+  const moodBoosts = scores.moodBoosts || { critical: 0, firstPrinciples: 0 };
+  
   // Apply weighted proxy formula
   const criticalProxy = (mbtiT_pct * PROXY_WEIGHTS.critical.mbtiT) + 
                         (big5O_pct * PROXY_WEIGHTS.critical.big5O) + 
@@ -211,8 +214,9 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
                                (big5O_pct * PROXY_WEIGHTS.firstPrinciples.big5O) + 
                                (discI_pct * PROXY_WEIGHTS.firstPrinciples.discI);
   
-  const criticalRaw = (criticalProxy * 0.8) + (criticalWildcardBoost * 0.2);
-  const firstPrinciplesRaw = (firstPrinciplesProxy * 0.8) + (firstPrinciplesWildcardBoost * 0.2);
+  // Apply mood boosts to raw scores
+  const criticalRaw = (criticalProxy * 0.8) + (criticalWildcardBoost * 0.2) + moodBoosts.critical;
+  const firstPrinciplesRaw = (firstPrinciplesProxy * 0.8) + (firstPrinciplesWildcardBoost * 0.2) + moodBoosts.firstPrinciples;
   
   const toScale = (pct: number) => Math.max(1, Math.min(5, Math.round(pct / 20)));
   
