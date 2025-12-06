@@ -227,7 +227,7 @@ const RANDOM_EVENTS: RandomEvent[] = [
 
 const RANDOM_EVENT_CHANCE = 0.07; // 7% chance per question
 
-type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown" | "random-event";
+type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown" | "random-event" | "recap";
 
 const getQuizConfig = (tier: string) => {
   switch (tier) {
@@ -360,6 +360,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [completedMid2, setCompletedMid2] = useState(false);
   const [completedSuperpower, setCompletedSuperpower] = useState(false);
   const [completedMystery, setCompletedMystery] = useState(false);
+  const [completedRecaps, setCompletedRecaps] = useState<Set<number>>(new Set()); // Track which recap milestones have been shown
   
   // Phase 2.3: Random event state with queue for sequential display
   const [currentRandomEvent, setCurrentRandomEvent] = useState<RandomEvent | null>(null);
@@ -904,6 +905,15 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         setTimeout(() => setQuizPhase("mystery"), 300);
       } else if (quizConfig.hasMid2 && quizConfig.mid2After && nextQuestionNumber === quizConfig.mid2After + 1 && !completedMid2) {
         setTimeout(() => setQuizPhase("mid2"), 300);
+      } else {
+        // Check for recap milestone (every 10 questions, but not at existing break points)
+        const recapMilestone = Math.floor(nextQuestionNumber / 10) * 10;
+        const isRecapMilestone = recapMilestone > 0 && 
+                                  nextQuestionNumber === recapMilestone + 1 && 
+                                  !completedRecaps.has(recapMilestone);
+        if (isRecapMilestone && quizConfig.totalQuestions >= 22) { // Only show recaps for longer quizzes
+          setTimeout(() => setQuizPhase("recap"), 300);
+        }
       }
       
       return updatedScores;
@@ -1117,6 +1127,101 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       <TimedCountdown
         onComplete={handleCountdownComplete}
       />
+    );
+  }
+
+  // Mid-quiz recap every 10 questions - shows running trait feedback
+  if (quizPhase === "recap") {
+    const recapMilestone = Math.floor((currentIndex + 1) / 10) * 10;
+    
+    // Calculate running trait indicators
+    const mbti = scores.mbti;
+    const dominantE = mbti.E >= mbti.I;
+    const dominantN = mbti.N >= mbti.S;
+    const dominantT = mbti.T >= mbti.F;
+    const dominantJ = mbti.J >= mbti.P;
+    
+    const traitHints = [
+      dominantE ? "You're showing social energy" : "You're showing thoughtful focus",
+      dominantN ? "You're seeing the big picture" : "You're grounded in details",
+      dominantT ? "You're analyzing logically" : "You're tuned to feelings",
+      dominantJ ? "You prefer structure" : "You're staying flexible",
+    ];
+    
+    // Pick 2 random hints to show
+    const shuffledHints = [...traitHints].sort(() => Math.random() - 0.5).slice(0, 2);
+    
+    const handleRecapContinue = () => {
+      setCompletedRecaps(prev => {
+        const newSet = new Set(Array.from(prev));
+        newSet.add(recapMilestone);
+        return newSet;
+      });
+      setQuizPhase("quiz");
+      setTimerResetKey(prev => prev + 1);
+    };
+    
+    return (
+      <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+        <main className="flex-1 flex items-center justify-center px-4 py-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md text-center"
+          >
+            <motion.div
+              initial={{ y: -20 }}
+              animate={{ y: 0 }}
+              className="mb-6"
+            >
+              <div className="w-16 h-16 mx-auto rounded-full bg-sage-green/20 dark:bg-sage-green/30 flex items-center justify-center mb-4">
+                <Sparkles className="w-8 h-8 text-sage-green" />
+              </div>
+              <h2 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2">
+                Checkpoint: {recapMilestone} Questions
+              </h2>
+              <p className="text-warm-gray/70 dark:text-soft-cream/70">
+                Here's what we're seeing so far...
+              </p>
+            </motion.div>
+            
+            <div className="space-y-3 mb-8">
+              {shuffledHints.map((hint, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + idx * 0.2 }}
+                  className="p-4 rounded-xl bg-soft-cream/50 dark:bg-gray-800/50 border border-warm-gray/10 dark:border-white/10"
+                >
+                  <p className="text-warm-gray dark:text-soft-cream font-medium">
+                    {hint}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+            
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Button
+                size="lg"
+                onClick={handleRecapContinue}
+                className="w-full bg-terracotta hover:bg-terracotta/90 text-white"
+                data-testid="button-recap-continue"
+              >
+                Keep Going
+                <ChevronRight className="w-5 h-5 ml-2" />
+              </Button>
+              <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-3">
+                {questions.length - currentIndex - 1} questions remaining
+              </p>
+            </motion.div>
+          </motion.div>
+        </main>
+      </div>
     );
   }
   
