@@ -2093,7 +2093,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 text-[#111827]"
                   onClick={onExit}
                   data-testid="button-exit-quiz"
                 >
