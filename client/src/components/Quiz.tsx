@@ -617,6 +617,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [hasShownFirstTimePause, setHasShownFirstTimePause] = useState(() => {
     return localStorage.getItem('knowrole-first-pause-shown') === 'true';
   });
+  const hasShownFirstTimePauseRef = useRef(localStorage.getItem('knowrole-first-pause-shown') === 'true');
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [fastResponses, setFastResponses] = useState(0);
   const [isTimingOut, setIsTimingOut] = useState(false);
@@ -823,8 +824,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
-        // First-time auto-pause at 5 seconds
-        if (prev <= 5.1 && prev > 4.9 && !hasShownFirstTimePause) {
+        // First-time auto-pause at 5 seconds - use ref for reliable check inside interval
+        if (prev <= 5.1 && prev > 4.9 && !hasShownFirstTimePauseRef.current) {
+          hasShownFirstTimePauseRef.current = true;
           setIsPaused(true);
           setShowFirstTimePauseMessage(true);
           setHasShownFirstTimePause(true);
@@ -842,7 +844,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout, isAnyPopupActive, hasShownFirstTimePause, showFirstTimePauseMessage]);
+  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout, isAnyPopupActive, showFirstTimePauseMessage]);
 
   // Show pending random event after badge overlay closes
   useEffect(() => {
@@ -2061,26 +2063,27 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       <AnimatePresence>
         {showPauseMenu && !showFirstTimePauseMessage && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => togglePause()}
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            className="fixed bottom-0 left-0 right-0 z-50 p-4"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-soft-cream dark:bg-warm-charcoal rounded-2xl p-6 max-w-xs w-full mx-4 shadow-2xl"
-              onClick={e => e.stopPropagation()}
-            >
-              <h3 className="text-xl font-display font-semibold text-warm-gray dark:text-soft-cream text-center mb-4">
-                Paused
-              </h3>
+            <div className="max-w-sm mx-auto bg-soft-cream dark:bg-warm-charcoal rounded-2xl p-5 shadow-2xl border border-sage-green/30">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-amber-400 animate-pulse" />
+                  <h3 className="text-lg font-display font-semibold text-gray-900 dark:text-white">
+                    Paused
+                  </h3>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {currentIndex + 1}/{questions.length}
+                </p>
+              </div>
               
-              <div className="space-y-3">
+              <div className="flex gap-3">
                 <Button
-                  className="w-full bg-terracotta hover:bg-terracotta/90"
+                  className="flex-1 bg-terracotta hover:bg-terracotta/90"
                   onClick={() => togglePause()}
                   data-testid="button-resume"
                 >
@@ -2090,18 +2093,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="flex-1"
                   onClick={onExit}
                   data-testid="button-exit-quiz"
                 >
                   Exit Quiz
                 </Button>
               </div>
-              
-              <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-4">
-                Progress: {currentIndex + 1}/{questions.length} questions
-              </p>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
