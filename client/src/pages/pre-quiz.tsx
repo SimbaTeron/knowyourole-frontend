@@ -11,38 +11,24 @@ const SKIP_BUTTON_DELAY = 0; // Show skip button immediately
 const DEMO_STEPS = [
   {
     id: 1,
-    title: "Beat the Clock",
-    description: "Questions are timed but don't overthink it - your first instinct is usually right.",
-    icon: Timer,
-    demo: "timer",
+    title: "Binary Questions",
+    description: "Most questions have two choices. Tap or swipe left/right to answer. Watch the timer - trust your gut!",
+    icon: Hand,
+    demo: "binary",
   },
   {
     id: 2,
-    title: "Quick Choice: Swipe or Tap",
-    description: "You'll see a question with two options. Swipe to choose - go with your gut!",
-    icon: Hand,
-    demo: "swipe",
-  },
-  {
-    id: 3,
     title: "Slider Questions",
-    description: "Some questions use a slider. Drag it left or right to show how strongly you feel, then tap confirm.",
+    description: "Some questions let you show how strongly you feel. Drag the slider, then tap confirm.",
     icon: SlidersHorizontal,
     demo: "slider",
   },
   {
-    id: 4,
-    title: "Bonus Badges",
-    description: "Watch for special badge and 2X questions! They pause the timer and give you extra time to answer.",
-    icon: Award,
-    demo: "badges",
-  },
-  {
-    id: 5,
-    title: "Power-Up Questions",
-    description: "Some questions are multiple choice. These help us understand you even better.",
-    icon: Sparkles,
-    demo: "multichoice",
+    id: 3,
+    title: "Your Results",
+    description: "Earn badges along the way and unlock detailed insights about your personality, strengths, and potential career paths.",
+    icon: Target,
+    demo: "results",
   },
 ];
 
@@ -82,14 +68,14 @@ export default function PreQuizPage() {
   }, [currentStep]);
 
   useEffect(() => {
-    if (DEMO_STEPS[currentStep]?.demo === "swipe") {
+    if (DEMO_STEPS[currentStep]?.demo === "binary") {
       const interval = setInterval(() => {
         setDemoCardX(prev => {
-          if (prev === 0) return 60;
-          if (prev === 60) return -60;
+          if (prev === 0) return 50;
+          if (prev === 50) return -50;
           return 0;
         });
-      }, 1000);
+      }, 1200);
       return () => clearInterval(interval);
     } else {
       setDemoCardX(0);
@@ -97,12 +83,12 @@ export default function PreQuizPage() {
   }, [currentStep]);
 
   useEffect(() => {
-    if (DEMO_STEPS[currentStep]?.demo === "timer") {
+    if (DEMO_STEPS[currentStep]?.demo === "binary") {
       setTimerProgress(100);
       const interval = setInterval(() => {
         setTimerProgress(prev => {
           if (prev <= 0) return 100;
-          return prev - 5;
+          return prev - 4;
         });
       }, 150);
       return () => clearInterval(interval);
@@ -259,180 +245,97 @@ export default function PreQuizPage() {
 
                     {/* Visual Demo */}
                     <div className="bg-soft-cream/50 dark:bg-gray-700/50 rounded-xl p-4 flex-1 flex items-center justify-center">
-                      {currentDemoStep.demo === "swipe" && (
-                        <div className="relative">
-                          <motion.div
-                            animate={{ x: demoCardX, rotate: demoCardX / 3 }}
-                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                            className="w-40 h-20 bg-white dark:bg-gray-600 rounded-xl shadow-md flex items-center justify-center border-2 border-terracotta/20"
-                          >
-                            <span className="text-xs text-warm-gray/70 dark:text-soft-cream/60">
-                              Swipe me!
-                            </span>
-                          </motion.div>
-                          <div className="flex justify-between mt-3 px-2">
-                            <span className="text-xs text-sage-green font-medium">Option A</span>
-                            <span className="text-xs text-dusty-blue font-medium">Option B</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {currentDemoStep.demo === "timer" && (
-                        <div className="w-full max-w-[260px]">
-                          {/* Mini Question Card Illustration */}
-                          <div className="bg-white dark:bg-gray-700 rounded-xl p-3 shadow-md border border-warm-gray/10 dark:border-soft-cream/10 relative">
-                            {/* Top bar with timer and pause */}
-                            <div className="flex items-center justify-between mb-2">
-                              {/* Timer Circle */}
-                              <div className="relative w-10 h-10">
+                      {currentDemoStep.demo === "binary" && (
+                        <div className="w-full max-w-[280px]">
+                          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 shadow-md border border-warm-gray/10 dark:border-soft-cream/10 relative">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="relative w-12 h-12">
                                 <svg className="w-full h-full transform -rotate-90">
-                                  <circle
-                                    cx="20"
-                                    cy="20"
-                                    r="16"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="3"
-                                    className="text-warm-gray/10 dark:text-soft-cream/10"
-                                  />
-                                  <circle
-                                    cx="20"
-                                    cy="20"
-                                    r="16"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="3"
-                                    strokeDasharray={`${100 * (timerProgress / 100)} 100`}
-                                    strokeLinecap="round"
-                                    className={`transition-all duration-100 ${
-                                      timerProgress < 30 ? "text-red-500" : "text-terracotta"
-                                    }`}
-                                  />
+                                  <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" className="text-warm-gray/10 dark:text-soft-cream/10" />
+                                  <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${125 * (timerProgress / 100)} 125`} strokeLinecap="round" className={`transition-all duration-100 ${timerProgress < 30 ? "text-red-500" : "text-terracotta"}`} />
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                  <span className="text-[10px] font-bold text-warm-gray dark:text-soft-cream">
-                                    {Math.ceil(timerProgress / 10)}s
-                                  </span>
+                                  <span className="text-xs font-bold text-warm-gray dark:text-soft-cream">{Math.ceil(timerProgress / 10)}s</span>
                                 </div>
                               </div>
-                              
-                              {/* Pause Button */}
-                              <motion.div 
-                                animate={{ scale: [1, 1.1, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="w-8 h-8 rounded-full bg-warm-gray/10 dark:bg-soft-cream/10 flex items-center justify-center"
-                              >
+                              <div className="w-8 h-8 rounded-full bg-warm-gray/10 dark:bg-soft-cream/10 flex items-center justify-center">
                                 <div className="flex gap-0.5">
-                                  <div className="w-1 h-3 bg-warm-gray/60 dark:bg-soft-cream/60 rounded-sm" />
-                                  <div className="w-1 h-3 bg-warm-gray/60 dark:bg-soft-cream/60 rounded-sm" />
+                                  <div className="w-1 h-3 bg-warm-gray/50 rounded-sm" />
+                                  <div className="w-1 h-3 bg-warm-gray/50 rounded-sm" />
                                 </div>
+                              </div>
+                            </div>
+                            <div className="w-full h-1.5 bg-warm-gray/10 dark:bg-soft-cream/10 rounded-full mb-4 overflow-hidden">
+                              <motion.div className={`h-full rounded-full transition-all ${timerProgress < 30 ? "bg-red-500" : "bg-terracotta"}`} style={{ width: `${timerProgress}%` }} />
+                            </div>
+                            <motion.div animate={{ x: demoCardX, rotate: demoCardX / 5 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="bg-soft-cream/70 dark:bg-gray-600 rounded-lg p-3 mb-3 shadow-sm">
+                              <p className="text-sm text-center text-warm-gray dark:text-soft-cream font-medium">"I enjoy meeting new people"</p>
+                            </motion.div>
+                            <div className="flex gap-2">
+                              <motion.div animate={{ scale: demoCardX < 0 ? 1.05 : 1, opacity: demoCardX < 0 ? 1 : 0.7 }} className="flex-1 py-2 rounded-lg bg-sage-green/20 text-sage-green text-sm text-center font-semibold flex items-center justify-center gap-1">
+                                <span>←</span> Agree
+                              </motion.div>
+                              <motion.div animate={{ scale: demoCardX > 0 ? 1.05 : 1, opacity: demoCardX > 0 ? 1 : 0.7 }} className="flex-1 py-2 rounded-lg bg-terracotta/20 text-terracotta text-sm text-center font-semibold flex items-center justify-center gap-1">
+                                Disagree <span>→</span>
                               </motion.div>
                             </div>
-                            
-                            {/* Progress Bar */}
-                            <div className="w-full h-1.5 bg-warm-gray/10 dark:bg-soft-cream/10 rounded-full mb-3 overflow-hidden">
-                              <motion.div 
-                                className={`h-full rounded-full transition-all duration-100 ${
-                                  timerProgress < 30 ? "bg-red-500" : "bg-terracotta"
-                                }`}
-                                style={{ width: `${timerProgress}%` }}
-                              />
-                            </div>
-                            
-                            {/* Mini Question */}
-                            <p className="text-[11px] text-center text-warm-gray dark:text-soft-cream mb-2 font-medium">
-                              "I enjoy meeting new people"
-                            </p>
-                            
-                            {/* Binary Options */}
-                            <div className="flex gap-2">
-                              <div className="flex-1 py-1.5 rounded-lg bg-sage-green/20 text-sage-green text-[10px] text-center font-medium flex items-center justify-center gap-1">
-                                <span>←</span> Agree
-                              </div>
-                              <div className="flex-1 py-1.5 rounded-lg bg-dusty-blue/20 text-dusty-blue text-[10px] text-center font-medium flex items-center justify-center gap-1">
-                                Disagree <span>→</span>
-                              </div>
-                            </div>
                           </div>
-                          <p className="text-[10px] text-center text-warm-gray/50 dark:text-soft-cream/40 mt-2">
-                            Watch the timer count down - trust your instincts!
-                          </p>
+                          <p className="text-xs text-center text-warm-gray/50 dark:text-soft-cream/40 mt-3">Tap or swipe left/right to choose</p>
                         </div>
                       )}
 
                       {currentDemoStep.demo === "slider" && (
-                        <div className="w-full max-w-[220px]">
-                          <div className="flex justify-between text-xs mb-2">
-                            <span className="text-sage-green font-medium">Agree</span>
-                            <span className="text-terracotta font-medium">Disagree</span>
-                          </div>
-                          <div className="relative">
-                            <div className="h-3 rounded-full bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta" />
-                            <motion.div
-                              animate={{ x: [-60, 0, 60, 0, -60] }}
-                              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                              className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white shadow-lg border-2 border-terracotta"
-                              style={{ left: "calc(50% - 12px)" }}
-                            />
-                          </div>
-                          <div className="flex justify-between mt-2 text-[10px] text-warm-gray/50 dark:text-soft-cream/40">
-                            <span>Strongly</span>
-                            <span>Slightly</span>
-                            <span>Neutral</span>
-                            <span>Slightly</span>
-                            <span>Strongly</span>
-                          </div>
-                          <motion.div
-                            animate={{ scale: [1, 1.02, 1] }}
-                            transition={{ duration: 1, repeat: Infinity }}
-                            className="mt-3 px-4 py-2 rounded-lg bg-terracotta text-white text-xs text-center font-medium"
-                          >
-                            Confirm Choice
-                          </motion.div>
-                        </div>
-                      )}
-
-                      {currentDemoStep.demo === "badges" && (
-                        <div className="flex gap-4 items-center">
-                          <motion.div
-                            animate={{ 
-                              scale: [1, 1.1, 1],
-                              rotate: [0, 5, -5, 0]
-                            }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg"
-                          >
-                            <Award className="w-8 h-8 text-white" />
-                          </motion.div>
-                          <motion.div
-                            animate={{ 
-                              scale: [1, 1.15, 1],
-                            }}
-                            transition={{ duration: 0.5, repeat: Infinity }}
-                            className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg"
-                          >
-                            <span className="text-xl font-black text-white">2X</span>
-                          </motion.div>
-                        </div>
-                      )}
-
-                      {currentDemoStep.demo === "multichoice" && (
-                        <div className="w-full max-w-[200px] space-y-2">
-                          {["Creative work", "Helping others", "Solving puzzles", "Leading teams"].map((opt, idx) => (
-                            <motion.div
-                              key={opt}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: idx * 0.1 }}
-                              className={`px-3 py-2 rounded-lg text-xs text-center transition-all ${
-                                idx === 1 
-                                  ? "bg-terracotta text-white" 
-                                  : "bg-white dark:bg-gray-600 text-warm-gray/70 dark:text-soft-cream/60"
-                              }`}
-                            >
-                              {opt}
+                        <div className="w-full max-w-[260px]">
+                          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 shadow-md">
+                            <p className="text-sm text-center text-warm-gray dark:text-soft-cream font-medium mb-4">"I prefer plans over spontaneity"</p>
+                            <div className="flex justify-between text-sm mb-2">
+                              <span className="text-sage-green font-semibold">Agree</span>
+                              <span className="text-terracotta font-semibold">Disagree</span>
+                            </div>
+                            <div className="relative py-2">
+                              <div className="h-4 rounded-full bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta" />
+                              <motion.div animate={{ x: [-70, 0, 70, 0, -70] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-xl border-4 border-terracotta" style={{ left: "calc(50% - 16px)" }} />
+                            </div>
+                            <div className="flex justify-between mt-2 text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                              <span>Strong</span>
+                              <span>Slight</span>
+                              <span>Neutral</span>
+                              <span>Slight</span>
+                              <span>Strong</span>
+                            </div>
+                            <motion.div animate={{ scale: [1, 1.03, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="mt-4 px-4 py-3 rounded-xl bg-terracotta text-white text-sm text-center font-bold">
+                              Confirm Choice
                             </motion.div>
-                          ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {currentDemoStep.demo === "results" && (
+                        <div className="w-full max-w-[280px]">
+                          <div className="flex justify-center gap-3 mb-4">
+                            <motion.div animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                              <Award className="w-6 h-6 text-white" />
+                            </motion.div>
+                            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.6, repeat: Infinity }} className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
+                              <span className="text-base font-black text-white">2X</span>
+                            </motion.div>
+                            <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.8, repeat: Infinity, delay: 0.3 }} className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg">
+                              <Sparkles className="w-6 h-6 text-white" />
+                            </motion.div>
+                          </div>
+                          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 shadow-md space-y-2">
+                            {[
+                              { label: "Personality Type", value: "ENFP", color: "text-purple-600" },
+                              { label: "Top Strength", value: "Creativity", color: "text-amber-600" },
+                              { label: "Career Match", value: "Designer", color: "text-teal-600" }
+                            ].map((item, idx) => (
+                              <motion.div key={item.label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.15 }} className="flex justify-between items-center py-1.5 border-b border-warm-gray/10 dark:border-soft-cream/10 last:border-0">
+                                <span className="text-xs text-warm-gray/70 dark:text-soft-cream/60">{item.label}</span>
+                                <span className={`text-sm font-bold ${item.color}`}>{item.value}</span>
+                              </motion.div>
+                            ))}
+                          </div>
+                          <p className="text-xs text-center text-warm-gray/50 dark:text-soft-cream/40 mt-3">Unlock insights about your unique traits</p>
                         </div>
                       )}
                     </div>
