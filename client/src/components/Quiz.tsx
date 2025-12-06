@@ -2028,7 +2028,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 >
                   <Pause className="w-8 h-8 text-sage-green" />
                 </motion.div>
-                <h3 className="text-2xl font-display font-bold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-2xl font-display font-bold dark:text-white mb-2 text-[#8b9a6d]">
                   No Rush!
                 </h3>
                 <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed">
@@ -2058,7 +2058,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </motion.div>
         )}
       </AnimatePresence>
-      
       <AnimatePresence>
         {showPauseMenu && !showFirstTimePauseMessage && (
           <motion.div
