@@ -173,8 +173,8 @@ export async function clearAndWriteSheet(
   });
 }
 
-export function formatTimezone(isoDate: string): string {
-  const date = new Date(isoDate);
+export function formatTimezone(isoDate: string | Date): string {
+  const date = typeof isoDate === 'string' ? new Date(isoDate) : isoDate;
   const formatter = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: '2-digit',
@@ -183,9 +183,13 @@ export function formatTimezone(isoDate: string): string {
     minute: '2-digit',
     second: '2-digit',
     hour12: true,
-    timeZoneName: 'short',
+    timeZone: 'America/Los_Angeles',
   });
-  return formatter.format(date);
+  return formatter.format(date) + ' PST';
+}
+
+export function getPSTTimestamp(): string {
+  return formatTimezone(new Date());
 }
 
 export async function autoExportQuizSession(

@@ -1081,7 +1081,7 @@ export async function registerRoutes(
   // Comprehensive Full Data Export - Everything needed to understand and rebuild the app
   app.post("/api/export/sheets/full", async (_req: Request, res: Response) => {
     try {
-      const { createOrGetSpreadsheet, clearAndWriteSheet, formatTimezone } = await import("./googleSheets");
+      const { createOrGetSpreadsheet, clearAndWriteSheet, formatTimezone, getPSTTimestamp } = await import("./googleSheets");
       const fs = await import("fs");
       const path = await import("path");
       
@@ -1091,7 +1091,7 @@ export async function registerRoutes(
       // ========== SHEET 1: App Overview ==========
       const overviewRows = [
         ["KnowRole - Complete Application Blueprint"],
-        ["Generated:", new Date().toISOString()],
+        ["Generated:", getPSTTimestamp()],
         [""],
         ["=== PURPOSE ==="],
         ["KnowRole is a personality discovery application designed with an 'Everyday Compass' aesthetic."],
@@ -1195,7 +1195,7 @@ export async function registerRoutes(
       // ========== SHEET 3: Database Schema (COMPREHENSIVE - ALL 18 TABLES) ==========
       const schemaRows = [
         ["Database Schema - Complete Reference (18 Tables)"],
-        ["Generated:", new Date().toISOString()],
+        ["Generated:", getPSTTimestamp()],
         [""],
         ["╔══════════════════════════════════════════════════════════════════╗"],
         ["║  SECTION 1: CORE TABLES                                          ║"],
@@ -1497,7 +1497,7 @@ export async function registerRoutes(
       // ========== SHEET 4: Quiz Algorithm (COMPREHENSIVE) ==========
       const algorithmRows = [
         ["Quiz Scoring Algorithm - Complete Reference"],
-        ["Generated:", new Date().toISOString()],
+        ["Generated:", getPSTTimestamp()],
         [""],
         ["╔══════════════════════════════════════════════════════════════════╗"],
         ["║  PERSONALITY FRAMEWORKS                                          ║"],
@@ -2072,7 +2072,7 @@ export async function registerRoutes(
       // ========== SHEET 12: Premium Insights System ==========
       const premiumInsightsRows = [
         ["Premium Insights System - Complete Reference"],
-        ["Generated:", new Date().toISOString()],
+        ["Generated:", getPSTTimestamp()],
         [""],
         ["╔══════════════════════════════════════════════════════════════════╗"],
         ["║  OVERVIEW                                                         ║"],
@@ -2282,7 +2282,7 @@ export async function registerRoutes(
       // ========== SHEET 13: Sharpen Thinking Section ==========
       const thinkingRows = [
         ["Sharpen Thinking Section - Complete Reference"],
-        ["Generated:", new Date().toISOString()],
+        ["Generated:", getPSTTimestamp()],
         [""],
         ["╔══════════════════════════════════════════════════════════════════╗"],
         ["║  OVERVIEW                                                         ║"],

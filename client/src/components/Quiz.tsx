@@ -223,7 +223,6 @@ const RANDOM_EVENTS: RandomEvent[] = [
   { id: "time_warp", title: "Time Warp!", description: "+3 seconds on next question", effect: "bonus_time", duration: 3000, icon: "clock" },
   { id: "insight_flash", title: "Insight Flash!", description: "Your next answer counts double", effect: "double_points", duration: 2500, icon: "sparkles" },
   { id: "inner_voice", title: "Inner Voice!", description: "Trust your first instinct", effect: "hint_reveal", duration: 2500, icon: "brain" },
-  { id: "energy_surge", title: "Energy Surge!", description: "Feeling extra decisive!", effect: "mood_boost", duration: 2000, icon: "zap" },
 ];
 
 const RANDOM_EVENT_BASE_CHANCE = 0.03; // 3% base chance per question (reduced from 8%)
@@ -2166,7 +2165,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/20 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/10 backdrop-blur-sm"
             onClick={() => togglePause()}
           >
             <motion.div

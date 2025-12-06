@@ -170,7 +170,6 @@ const CARD_CONFIGS = [
   { id: "blindspots", title: "Your Blindspots", icon: Shield, color: "rose" as ColorKey, gradient: "from-rose-400 via-pink-500 to-fuchsia-500" },
   { id: "side-hustle", title: "Side Hustles", icon: DollarSign, color: "amber" as ColorKey, gradient: "from-amber-400 via-yellow-500 to-orange-500" },
   { id: "learning", title: "How You Learn", icon: BookOpen, color: "teal" as ColorKey, gradient: "from-teal-400 via-cyan-500 to-emerald-500" },
-  { id: "growth-quest", title: "30-Day Quest", icon: Target, color: "emerald" as ColorKey, gradient: "from-emerald-400 via-green-500 to-teal-500" },
   { id: "thinking", title: "Sharpen Thinking", icon: Brain, color: "indigo" as ColorKey, gradient: "from-indigo-400 via-blue-500 to-cyan-500" },
 ];
 
@@ -415,28 +414,6 @@ export function PremiumCardDeck({
             if (newSet.has(idx)) newSet.delete(idx);
             else newSet.add(idx);
             setExpandedTips(newSet);
-          }}
-          reduceMotion={shouldReduceMotion ?? false}
-        />;
-      
-      case "growth-quest":
-        return <GrowthQuestCard 
-          weakestTrait={weakestTrait}
-          GROWTH_QUESTS={GROWTH_QUESTS}
-          TRAIT_LABELS={TRAIT_LABELS}
-          apiGrowthTips={premiumInsights?.insights?.growthTips || []}
-          selectedWeek={selectedQuestWeek}
-          setSelectedWeek={setSelectedQuestWeek}
-          completedChallenges={completedChallenges}
-          toggleChallenge={(id) => {
-            const wasCompleted = completedChallenges.has(id);
-            setCompletedChallenges((prev) => {
-              const newSet = new Set(prev);
-              if (newSet.has(id)) newSet.delete(id);
-              else newSet.add(id);
-              return newSet;
-            });
-            if (!wasCompleted && navigator.vibrate) navigator.vibrate(30);
           }}
           reduceMotion={shouldReduceMotion ?? false}
         />;
