@@ -832,8 +832,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const dismissBadgeOverlay = useCallback(() => {
     setShowBadgeOverlay(false);
     setBadgeCanDismiss(false);
-    setBadgeExtraTime(3); // 3 extra seconds after badge display
-    setTimeRemaining(tierConfig.maxTime + 3);
+    setBadgeExtraTime(2); // 2 extra seconds after badge display
+    setTimeRemaining(tierConfig.maxTime + 2);
     setQuestionStartTime(Date.now());
   }, [tierConfig.maxTime]);
 
@@ -862,8 +862,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           clearTimeout(autoDismissTimer);
         };
       } else {
-        // Give slider questions 5 extra seconds since they're more complex
-        const extraTime = currentQ?.responseType === "slider" ? 5 : 0;
+        // Give slider questions 3 extra seconds since they're more complex
+        const extraTime = currentQ?.responseType === "slider" ? 3 : 0;
         setTimeRemaining(tierConfig.maxTime + extraTime);
         setQuestionStartTime(Date.now());
       }
@@ -1120,7 +1120,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const handleCountdownComplete = useCallback(() => {
     // Reset timer to full when returning to quiz from countdown
     const currentQ = questions[currentIndex];
-    const extraTime = currentQ?.responseType === "slider" ? 5 : 0;
+    const extraTime = currentQ?.responseType === "slider" ? 3 : 0;
     setTimeRemaining(tierConfig.maxTime + extraTime);
     setQuestionStartTime(Date.now());
     setQuizPhase("quiz");
@@ -1818,7 +1818,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                               }
                             }}
                             disabled={isTimingOut || isAnyPopupActive}
-                            className="min-h-28 flex items-center gap-3 rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all px-5 py-5 disabled:opacity-50 -translate-x-4 -rotate-1"
+                            className="min-h-24 w-[90%] flex items-center gap-3 rounded-2xl bg-sage-green/10 dark:bg-sage-green/20 border-2 border-sage-green/30 hover:border-sage-green/60 focus:border-sage-green focus:ring-2 focus:ring-sage-green/50 transition-all px-5 py-4 disabled:opacity-50 -translate-x-3"
                             data-testid="card-option-left"
                             aria-label={`Choose: ${currentQuestion.leftDesc}`}
                             tabIndex={0}
@@ -1840,7 +1840,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                               }
                             }}
                             disabled={isTimingOut || isAnyPopupActive}
-                            className="min-h-28 flex items-center gap-3 rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all px-5 py-5 disabled:opacity-50 translate-x-4 rotate-1"
+                            className="min-h-24 w-[90%] flex items-center gap-3 rounded-2xl bg-terracotta/10 dark:bg-terracotta/20 border-2 border-terracotta/30 hover:border-terracotta/60 focus:border-terracotta focus:ring-2 focus:ring-terracotta/50 transition-all px-5 py-4 disabled:opacity-50 translate-x-3 self-end"
                             data-testid="card-option-right"
                             aria-label={`Choose: ${currentQuestion.rightDesc}`}
                             tabIndex={0}

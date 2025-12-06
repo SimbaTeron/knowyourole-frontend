@@ -25,7 +25,7 @@ export default function ThemeToggle({ currentTheme, onThemeChange }: ThemeToggle
     <motion.button
       onClick={handleToggle}
       whileTap={{ scale: 0.95 }}
-      className="w-9 h-9 rounded-xl bg-soft-cream/80 dark:bg-deep-cream/60 backdrop-blur-sm border border-terracotta/8 dark:border-sunset-amber/20 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-terracotta/20 dark:hover:border-sunset-amber/30"
+      className="w-12 h-12 rounded-xl bg-soft-cream/80 dark:bg-deep-cream/60 backdrop-blur-sm border border-terracotta/8 dark:border-sunset-amber/20 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-terracotta/20 dark:hover:border-sunset-amber/30"
       aria-label={`Switch to ${currentTheme === "light" ? "dark" : "light"} mode`}
       data-testid="button-theme-toggle"
     >
@@ -35,9 +35,9 @@ export default function ThemeToggle({ currentTheme, onThemeChange }: ThemeToggle
         transition={{ type: "spring", stiffness: 200, damping: 15 }}
       >
         {currentTheme === "dark" ? (
-          <Moon className="w-4 h-4 text-sunset-amber" />
+          <Moon className="w-8 h-8 text-sunset-amber" />
         ) : (
-          <Sun className="w-4 h-4 text-terracotta" />
+          <Sun className="w-8 h-8 text-terracotta" />
         )}
       </motion.div>
     </motion.button>

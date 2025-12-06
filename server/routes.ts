@@ -915,32 +915,74 @@ export async function registerRoutes(
       // Create spreadsheet
       const spreadsheetId = await createOrGetSpreadsheet("KnowRole Questions Database");
       
-      // Build questions data
+      // Build questions data with ALL details
       const questionsHeader = [
         "ID", "Prompt", "Left Option", "Right Option", "Left Description", "Right Description",
-        "Left Meta", "Right Meta", "Psychology Type", "Time (s)", "Age Tier", "Version", "Paid", "Wildcard"
+        "Left Meta", "Right Meta", "Psychology Type", "Response Type", "Time (s)", "Age Tier", 
+        "Version", "Paid", "Wildcard", "Is 2x", "Boost Range Min", "Boost Range Max", "Notes"
       ];
       
       const questionsRows = [questionsHeader];
       
       for (const q of questionsData.questions) {
+        const boostRange = q.boostRange || [0.7, 0.9];
         questionsRows.push([
           q.id,
           q.prompt,
-          q.options[0],
-          q.options[1],
-          q.leftDesc,
-          q.rightDesc,
-          q.optionMeta[0],
-          q.optionMeta[1],
-          q.psych,
-          q.time,
-          q.tier,
-          q.version,
+          q.options?.[0] || "",
+          q.options?.[1] || "",
+          q.leftDesc || "",
+          q.rightDesc || "",
+          q.optionMeta?.[0] || "",
+          q.optionMeta?.[1] || "",
+          q.psych || "",
+          q.responseType || "binary",
+          q.time || "",
+          q.tier || "",
+          q.version || "",
           q.paid ? "Yes" : "No",
-          q.wildcard ? "Yes" : "No"
+          q.wildcard ? "Yes" : "No",
+          q.is2x ? "Yes" : "No",
+          boostRange[0],
+          boostRange[1],
+          q.notes || ""
         ]);
       }
+      
+      // Add summary sheet
+      const summaryRows = [
+        ["KnowRole Questions Database Summary"],
+        [""],
+        ["Total Questions", questionsData.questions.length],
+        ["Binary Questions", questionsData.questions.filter((q: any) => !q.responseType || q.responseType === "binary").length],
+        ["Slider Questions", questionsData.questions.filter((q: any) => q.responseType === "slider").length],
+        [""],
+        ["By Psychology Type:"],
+        ["MBTI", questionsData.questions.filter((q: any) => q.psych?.startsWith("MBTI")).length],
+        ["DISC", questionsData.questions.filter((q: any) => q.psych?.startsWith("DISC")).length],
+        ["Big Five", questionsData.questions.filter((q: any) => q.psych?.startsWith("Big5")).length],
+        ["Critical Thinking", questionsData.questions.filter((q: any) => q.psych === "Critical").length],
+        ["First Principles", questionsData.questions.filter((q: any) => q.psych === "FirstPrinciples").length],
+        [""],
+        ["By Age Tier:"],
+        ["All Tiers", questionsData.questions.filter((q: any) => q.tier === "all").length],
+        ["Mini (7-12)", questionsData.questions.filter((q: any) => q.tier === "7-12").length],
+        ["Teen (13-18)", questionsData.questions.filter((q: any) => q.tier === "13-18").length],
+        ["Young Adult (19-25)", questionsData.questions.filter((q: any) => q.tier === "19-25").length],
+        ["Adult (25+)", questionsData.questions.filter((q: any) => q.tier === "25+").length],
+        [""],
+        ["Timer Configuration:"],
+        ["Mini (7-12)", `${questionsData.tierConfig["7-12"]?.maxTime || 12}s base, ${questionsData.tierConfig["7-12"]?.baseCount || 16} questions`],
+        ["Teen (13-18)", `${questionsData.tierConfig["13-18"]?.maxTime || 12}s base, ${questionsData.tierConfig["13-18"]?.baseCount || 22} questions`],
+        ["Young Adult (19-25)", `${questionsData.tierConfig["19-25"]?.maxTime || 12}s base, ${questionsData.tierConfig["19-25"]?.baseCount || 28} questions`],
+        ["Adult (25+)", `${questionsData.tierConfig["25+"]?.maxTime || 12}s base, ${questionsData.tierConfig["25+"]?.baseCount || 34} questions`],
+        ["Slider Bonus", "+3 seconds"],
+        ["Badge Bonus", "+2 seconds"],
+        [""],
+        ["Export Date", new Date().toISOString()]
+      ];
+      
+      await clearAndWriteSheet(spreadsheetId, "Summary", summaryRows);
       
       await clearAndWriteSheet(spreadsheetId, "Questions", questionsRows);
       

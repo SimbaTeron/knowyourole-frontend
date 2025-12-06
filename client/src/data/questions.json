@@ -2903,22 +2903,22 @@
   "tierConfig": {
     "7-12": {
       "baseCount": 16,
-      "maxTime": 10,
+      "maxTime": 12,
       "swipeStyle": "playful"
     },
     "13-18": {
       "baseCount": 22,
-      "maxTime": 10,
+      "maxTime": 12,
       "swipeStyle": "teen"
     },
     "19-25": {
       "baseCount": 28,
-      "maxTime": 9,
+      "maxTime": 12,
       "swipeStyle": "adult"
     },
     "25+": {
       "baseCount": 34,
-      "maxTime": 9,
+      "maxTime": 12,
       "swipeStyle": "mature"
     }
   },
