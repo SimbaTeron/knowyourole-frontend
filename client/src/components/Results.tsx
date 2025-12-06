@@ -1019,6 +1019,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [showValidation, setShowValidation] = useState(false);
   const [validationStep, setValidationStep] = useState(0);
   const [validationAnswers, setValidationAnswers] = useState<string[]>([]);
+  const [mbtiMatchAnswer, setMbtiMatchAnswer] = useState<string>("");
+  const [opennessRating, setOpennessRating] = useState<number>(0);
+  const [showRefinedMessage, setShowRefinedMessage] = useState(false);
+  const [adjustedBigFive, setAdjustedBigFive] = useState<{ O: number; C: number; E: number; A: number; N: number } | null>(null);
   
   // Feedback modal state - now triggered in Premium section
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -1098,29 +1102,80 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   // DEV MODE: Set to true to show Just Kidding page before premium unlock
   const DEV_BYPASS_PAYMENT = true;
   
-  // Validation questions for post-quiz check
-  const validationQuestions = [
-    {
-      question: "Based on your quiz, which sounds more like you?",
-      options: [
-        { text: "I trust my gut and act quickly", trait: "intuitive" },
-        { text: "I gather info before deciding", trait: "analytical" }
-      ]
-    },
-    {
-      question: "When tackling a challenge, you prefer to:",
-      options: [
-        { text: "Work with others and share ideas", trait: "collaborative" },
-        { text: "Figure it out independently first", trait: "independent" }
-      ]
+  // Handle validation submission with proxy adjustments
+  const handleValidationSubmit = () => {
+    if (!mbtiMatchAnswer || opennessRating === 0) return;
+    
+    // Store responses in localStorage
+    const validationResponses = {
+      mbtiMatch: mbtiMatchAnswer,
+      opennessRating: opennessRating,
+      mbtiType: result?.mbtiType || "",
+      originalOpenness: result?.bigFiveProfile.O || 50,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('knowrole-validation-responses', JSON.stringify(validationResponses));
+    
+    // Apply proxy adjustments based on feedback
+    let adjustedProfile = { ...result!.bigFiveProfile };
+    
+    // If MBTI mismatch (No/Somewhat), reduce MBTI quota by 5% and boost Big Five by 5%
+    if (mbtiMatchAnswer === "no" || mbtiMatchAnswer === "somewhat") {
+      // Boost all Big Five scores by 5%
+      adjustedProfile = {
+        O: Math.min(100, Math.round(adjustedProfile.O * 1.05)),
+        C: Math.min(100, Math.round(adjustedProfile.C * 1.05)),
+        E: Math.min(100, Math.round(adjustedProfile.E * 1.05)),
+        A: Math.min(100, Math.round(adjustedProfile.A * 1.05)),
+        N: Math.min(100, Math.round(adjustedProfile.N * 1.05)),
+      };
+      console.log('[Validation] MBTI mismatch detected, Big Five boosted by 5%');
     }
-  ];
+    
+    // If Openness rating < 3, tweak Openness score by -/+5% based on direction
+    if (opennessRating < 3) {
+      // User thinks Openness is inaccurate - adjust down if high, up if low
+      const currentO = adjustedProfile.O;
+      if (currentO > 50) {
+        // Openness was rated high but user disagrees - reduce by 5%
+        adjustedProfile.O = Math.max(5, Math.round(currentO * 0.95));
+        console.log('[Validation] Openness adjusted down from', currentO, 'to', adjustedProfile.O);
+      } else {
+        // Openness was rated low but user disagrees - increase by 5%
+        adjustedProfile.O = Math.min(95, Math.round(currentO * 1.05));
+        console.log('[Validation] Openness adjusted up from', currentO, 'to', adjustedProfile.O);
+      }
+    }
+    
+    setAdjustedBigFive(adjustedProfile);
+    
+    // Store adjusted values
+    const adjustedResponses = {
+      ...validationResponses,
+      adjustedOpenness: adjustedProfile.O,
+      adjustedProfile: adjustedProfile
+    };
+    localStorage.setItem('knowrole-validation-responses', JSON.stringify(adjustedResponses));
+    
+    console.log('[Validation] Responses:', adjustedResponses);
+    
+    // Show refined message briefly, then proceed
+    setShowValidation(false);
+    setShowRefinedMessage(true);
+    
+    // After 2 seconds, show Just Kidding
+    setTimeout(() => {
+      setShowRefinedMessage(false);
+      setShowJustKidding(true);
+    }, 2500);
+  };
   
+  // Legacy validation handler (kept for compatibility)
   const handleValidationAnswer = (answer: string) => {
     const newAnswers = [...validationAnswers, answer];
     setValidationAnswers(newAnswers);
     
-    if (validationStep < validationQuestions.length - 1) {
+    if (validationStep < 1) {
       setValidationStep(validationStep + 1);
     } else {
       // Validation complete, show Just Kidding
@@ -1431,7 +1486,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.8, y: 50 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="bg-gradient-to-br from-indigo-50 via-purple-50 to-indigo-100 dark:from-indigo-900/90 dark:via-purple-900/80 dark:to-indigo-800/90 rounded-3xl p-8 mx-4 max-w-sm w-full text-center shadow-2xl border-2 border-indigo-200 dark:border-indigo-700"
+              className="bg-gradient-to-br from-indigo-50 via-purple-50 to-indigo-100 dark:from-indigo-900/90 dark:via-purple-900/80 dark:to-indigo-800/90 rounded-3xl p-8 mx-4 max-w-md w-full shadow-2xl border-2 border-indigo-200 dark:border-indigo-700"
             >
               <motion.div 
                 initial={{ scale: 0 }}
@@ -1442,42 +1497,138 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 <Sparkles className="w-8 h-8 text-white" />
               </motion.div>
               
-              <p className="text-xs uppercase tracking-wider text-indigo-500 dark:text-indigo-300 mb-2">
-                Quick Check ({validationStep + 1}/2)
+              <p className="text-xs uppercase tracking-wider text-indigo-500 dark:text-indigo-300 mb-2 text-center">
+                Quick Validation
+              </p>
+              <p className="text-lg font-semibold text-indigo-700 dark:text-indigo-200 mb-6 text-center">
+                Help us refine your insights
               </p>
               
-              <motion.p 
-                key={validationStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-lg font-semibold text-indigo-700 dark:text-indigo-200 mb-6"
-              >
-                {validationQuestions[validationStep]?.question}
-              </motion.p>
-              
-              <div className="space-y-3">
-                {validationQuestions[validationStep]?.options.map((option, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + idx * 0.1 }}
-                  >
-                    <Button
-                      variant="outline"
-                      className="w-full border-2 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-800/50 font-medium py-4 text-left justify-start"
-                      onClick={() => handleValidationAnswer(option.trait)}
-                      data-testid={`button-validation-${idx}`}
+              {/* Question 1: MBTI Match */}
+              <div className="mb-6">
+                <p className="text-sm font-medium text-indigo-600 dark:text-indigo-300 mb-3">
+                  1. Does this MBTI type ({result?.mbtiType || "XXXX"}) match you?
+                </p>
+                <div className="flex gap-2 justify-center">
+                  {["yes", "somewhat", "no"].map((option) => (
+                    <motion.button
+                      key={option}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setMbtiMatchAnswer(option)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all ${
+                        mbtiMatchAnswer === option
+                          ? "bg-indigo-500 text-white border-indigo-500"
+                          : "bg-white dark:bg-indigo-800/50 text-indigo-600 dark:text-indigo-200 border-indigo-300 dark:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-700/50"
+                      }`}
+                      data-testid={`radio-mbti-${option}`}
                     >
-                      {option.text}
-                    </Button>
-                  </motion.div>
-                ))}
+                      {option.charAt(0).toUpperCase() + option.slice(1)}
+                    </motion.button>
+                  ))}
+                </div>
               </div>
               
-              <p className="text-xs text-indigo-400/70 dark:text-indigo-400/50 mt-4">
+              {/* Question 2: Openness Star Rating */}
+              <div className="mb-6">
+                <p className="text-sm font-medium text-indigo-600 dark:text-indigo-300 mb-3">
+                  2. Rate the accuracy of your Openness score ({result?.bigFiveProfile.O || 50}%)
+                </p>
+                <div className="flex gap-1 justify-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <motion.button
+                      key={star}
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setOpennessRating(star)}
+                      className="p-1 transition-all"
+                      data-testid={`star-rating-${star}`}
+                    >
+                      <Star
+                        className={`w-8 h-8 transition-all ${
+                          star <= opennessRating
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-indigo-300 dark:text-indigo-600"
+                        }`}
+                      />
+                    </motion.button>
+                  ))}
+                </div>
+                <p className="text-xs text-indigo-400/70 dark:text-indigo-400/50 mt-1 text-center">
+                  {opennessRating === 0 && "Tap to rate"}
+                  {opennessRating === 1 && "Very inaccurate"}
+                  {opennessRating === 2 && "Somewhat inaccurate"}
+                  {opennessRating === 3 && "Neutral"}
+                  {opennessRating === 4 && "Mostly accurate"}
+                  {opennessRating === 5 && "Very accurate"}
+                </p>
+              </div>
+              
+              <Button
+                onClick={handleValidationSubmit}
+                disabled={!mbtiMatchAnswer || opennessRating === 0}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-4 text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="button-validation-submit"
+              >
+                <CheckCircle2 className="w-5 h-5 mr-2" />
+                Submit & Continue
+              </Button>
+              
+              <p className="text-xs text-indigo-400/70 dark:text-indigo-400/50 mt-4 text-center">
                 Helps personalize your premium insights
               </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Refined Message Overlay */}
+      <AnimatePresence>
+        {showRefinedMessage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            data-testid="overlay-refined"
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 dark:from-emerald-900/90 dark:via-teal-900/80 dark:to-emerald-800/90 rounded-3xl p-8 mx-4 max-w-sm w-full text-center shadow-2xl border-2 border-emerald-200 dark:border-emerald-700"
+            >
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+                className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mx-auto mb-4 shadow-lg"
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                >
+                  <CheckCircle2 className="w-10 h-10 text-white" />
+                </motion.div>
+              </motion.div>
+              
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-xl font-bold text-emerald-700 dark:text-emerald-200 mb-2"
+              >
+                Thanks!
+              </motion.p>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-sm text-emerald-600/80 dark:text-emerald-300/70"
+              >
+                We've refined your insights based on your input.
+              </motion.p>
             </motion.div>
           </motion.div>
         )}
