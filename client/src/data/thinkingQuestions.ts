@@ -817,3 +817,97 @@ export function getQuestionsByCategory(category: ThinkingQuestion['category']): 
 export function getQuestionsByDifficulty(difficulty: ThinkingQuestion['difficulty']): ThinkingQuestion[] {
   return THINKING_QUESTIONS.filter(q => q.difficulty === difficulty);
 }
+
+// Category progress tracking interface
+export interface CategoryProgress {
+  correct: number;
+  total: number;
+  accuracy: number;
+}
+
+export type CategoryProgressMap = Record<ThinkingQuestion['category'], CategoryProgress>;
+
+// Initialize empty progress
+export function initCategoryProgress(): CategoryProgressMap {
+  return {
+    logic: { correct: 0, total: 0, accuracy: 0 },
+    bias: { correct: 0, total: 0, accuracy: 0 },
+    statistics: { correct: 0, total: 0, accuracy: 0 },
+    arguments: { correct: 0, total: 0, accuracy: 0 },
+    firstPrinciples: { correct: 0, total: 0, accuracy: 0 },
+  };
+}
+
+// Adaptive question selection - prioritizes weak categories
+export function getAdaptiveQuestions(
+  count: number = 5, 
+  excludeIds: string[] = [],
+  progress: CategoryProgressMap,
+  weakProxy?: 'critical' | 'firstPrinciples' | null
+): ThinkingQuestion[] {
+  const available = THINKING_QUESTIONS.filter(q => !excludeIds.includes(q.id));
+  
+  // Calculate category weights based on accuracy (lower accuracy = higher weight)
+  const weights: Record<string, number> = {};
+  const categories: ThinkingQuestion['category'][] = ['logic', 'bias', 'statistics', 'arguments', 'firstPrinciples'];
+  
+  for (const cat of categories) {
+    const p = progress[cat];
+    const accuracy = p.total > 0 ? p.accuracy : 0.5; // Default to 50% for new categories
+    weights[cat] = 1 - accuracy + 0.2; // Base weight + inverse accuracy
+    
+    // Boost weight for weak proxy categories
+    if (weakProxy === 'critical' && (cat === 'logic' || cat === 'bias' || cat === 'arguments')) {
+      weights[cat] *= 1.5;
+    }
+    if (weakProxy === 'firstPrinciples' && cat === 'firstPrinciples') {
+      weights[cat] *= 2;
+    }
+  }
+  
+  // Weighted shuffle
+  const weightedQuestions = available.map(q => ({
+    question: q,
+    weight: weights[q.category] * Math.random()
+  }));
+  
+  weightedQuestions.sort((a, b) => b.weight - a.weight);
+  
+  // Ensure category diversity - at least one from each category if available
+  const result: ThinkingQuestion[] = [];
+  const usedCategories = new Set<string>();
+  
+  // First pass: one from each weak category
+  for (const wq of weightedQuestions) {
+    if (result.length >= count) break;
+    if (!usedCategories.has(wq.question.category)) {
+      result.push(wq.question);
+      usedCategories.add(wq.question.category);
+    }
+  }
+  
+  // Second pass: fill remaining slots
+  for (const wq of weightedQuestions) {
+    if (result.length >= count) break;
+    if (!result.includes(wq.question)) {
+      result.push(wq.question);
+    }
+  }
+  
+  // Shuffle result for variety
+  return result.sort(() => Math.random() - 0.5);
+}
+
+// Update category progress
+export function updateCategoryProgress(
+  progress: CategoryProgressMap,
+  category: ThinkingQuestion['category'],
+  correct: boolean
+): CategoryProgressMap {
+  const updated = { ...progress };
+  const p = updated[category];
+  p.correct += correct ? 1 : 0;
+  p.total += 1;
+  p.accuracy = p.total > 0 ? p.correct / p.total : 0;
+  return updated;
+}

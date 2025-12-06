@@ -9,7 +9,14 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { getRandomQuestions, ThinkingQuestion } from "@/data/thinkingQuestions";
+import { 
+  getRandomQuestions, 
+  getAdaptiveQuestions, 
+  ThinkingQuestion, 
+  CategoryProgressMap, 
+  initCategoryProgress,
+  updateCategoryProgress
+} from "@/data/thinkingQuestions";
 
 interface PremiumInsight {
   id: string;
@@ -435,8 +442,14 @@ export function PremiumCardDeck({
         />;
       
       case "thinking":
+        // Determine weak proxy to prioritize in Sharpen Thinking
+        const criticalValue = result?.scales?.critical?.value || 3;
+        const firstPrinciplesValue = result?.scales?.firstPrinciples?.value || 3;
+        const weakProxy = criticalValue < firstPrinciplesValue ? 'critical' : 
+                          firstPrinciplesValue < criticalValue ? 'firstPrinciples' : null;
         return <ThinkingCard 
           reduceMotion={shouldReduceMotion ?? false}
+          weakProxy={weakProxy}
         />;
       
       default:
@@ -1218,6 +1231,7 @@ const THINKING_STORAGE_KEYS = {
   BEST_SCORE: 'knowrole-thinking-best-score',
   COMPLETED_IDS: 'knowrole-thinking-completed-ids',
   CURRENT_SESSION: 'knowrole-thinking-current-session',
+  CATEGORY_PROGRESS: 'knowrole-thinking-category-progress',
 };
 
 interface ThinkingSessionState {
@@ -1229,9 +1243,11 @@ interface ThinkingSessionState {
 }
 
 function ThinkingCard({ 
-  reduceMotion
+  reduceMotion,
+  weakProxy
 }: { 
   reduceMotion: boolean;
+  weakProxy?: 'critical' | 'firstPrinciples' | null;
 }) {
   const [session, setSession] = useState<ThinkingSessionState | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -1247,9 +1263,16 @@ function ThinkingCard({
       return stored ? JSON.parse(stored) : [];
     } catch { return []; }
   });
+  const [categoryProgress, setCategoryProgress] = useState<CategoryProgressMap>(() => {
+    try {
+      const stored = localStorage.getItem(THINKING_STORAGE_KEYS.CATEGORY_PROGRESS);
+      return stored ? JSON.parse(stored) : initCategoryProgress();
+    } catch { return initCategoryProgress(); }
+  });
 
   const initializeSession = useCallback(() => {
-    const questions = getRandomQuestions(5, completedIds.slice(-20));
+    // Use adaptive questions that prioritize weak categories
+    const questions = getAdaptiveQuestions(5, completedIds.slice(-20), categoryProgress, weakProxy);
     setSession({
       questions,
       currentIndex: 0,
@@ -1258,7 +1281,7 @@ function ThinkingCard({
       score: 0,
     });
     setShowExplanation(false);
-  }, [completedIds]);
+  }, [completedIds, categoryProgress, weakProxy]);
 
   useEffect(() => {
     try {
@@ -1302,6 +1325,13 @@ function ThinkingCard({
     setCompletedIds(newCompletedIds);
     try {
       localStorage.setItem(THINKING_STORAGE_KEYS.COMPLETED_IDS, JSON.stringify(newCompletedIds.slice(-50)));
+    } catch {}
+    
+    // Update category progress for adaptive learning
+    const updatedProgress = updateCategoryProgress(categoryProgress, currentQuestion.category, isCorrect);
+    setCategoryProgress(updatedProgress);
+    try {
+      localStorage.setItem(THINKING_STORAGE_KEYS.CATEGORY_PROGRESS, JSON.stringify(updatedProgress));
     } catch {}
   };
 
