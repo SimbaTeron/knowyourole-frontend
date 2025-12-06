@@ -41,23 +41,23 @@ export default function KnowRoleHeader({ theme, onThemeChange }: KnowRoleHeaderP
           </PopoverContent>
         </Popover>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <img 
             src={appIcon} 
-            alt="KnowRole compass icon" 
-            className="w-14 h-14 rounded-xl shadow-md object-cover"
+            alt="KnowYouRole compass icon" 
+            className="w-10 h-10 rounded-lg shadow-md object-cover"
             data-testid="img-app-icon-left"
           />
           <h1
             className="text-display compass-gradient-text"
             data-testid="text-title"
           >
-            KnowRole
+            KnowYouRole
           </h1>
           <img 
             src={appIcon} 
-            alt="KnowRole compass icon" 
-            className="w-14 h-14 rounded-xl shadow-md object-cover"
+            alt="KnowYouRole compass icon" 
+            className="w-10 h-10 rounded-lg shadow-md object-cover"
             data-testid="img-app-icon-right"
           />
         </div>
