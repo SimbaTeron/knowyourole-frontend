@@ -6,22 +6,22 @@ import PathCanvas from "@/components/PathCanvas";
 import CompactHeader from "@/components/CompactHeader";
 import { ThemeMode } from "@/components/ThemeToggle";
 
-const SKIP_BUTTON_DELAY = 2000; // Show skip button after 2 seconds
+const SKIP_BUTTON_DELAY = 0; // Show skip button immediately
 
 const DEMO_STEPS = [
   {
     id: 1,
-    title: "Quick Choice: Swipe or Tap",
-    description: "You'll see a question with two options. Swipe to choose - go with your gut!",
-    icon: Hand,
-    demo: "swipe",
-  },
-  {
-    id: 2,
     title: "Beat the Clock",
     description: "Questions are timed but don't overthink it - your first instinct is usually right.",
     icon: Timer,
     demo: "timer",
+  },
+  {
+    id: 2,
+    title: "Quick Choice: Swipe or Tap",
+    description: "You'll see a question with two options. Swipe to choose - go with your gut!",
+    icon: Hand,
+    demo: "swipe",
   },
   {
     id: 3,
@@ -278,40 +278,84 @@ export default function PreQuizPage() {
                       )}
 
                       {currentDemoStep.demo === "timer" && (
-                        <div className="text-center">
-                          <div className="relative w-20 h-20 mx-auto mb-2">
-                            <svg className="w-full h-full transform -rotate-90">
-                              <circle
-                                cx="40"
-                                cy="40"
-                                r="36"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                                className="text-warm-gray/10 dark:text-soft-cream/10"
-                              />
-                              <circle
-                                cx="40"
-                                cy="40"
-                                r="36"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                                strokeDasharray={`${226 * (timerProgress / 100)} 226`}
-                                strokeLinecap="round"
-                                className={`transition-all duration-100 ${
-                                  timerProgress < 30 ? "text-red-500" : "text-terracotta"
+                        <div className="w-full max-w-[260px]">
+                          {/* Mini Question Card Illustration */}
+                          <div className="bg-white dark:bg-gray-700 rounded-xl p-3 shadow-md border border-warm-gray/10 dark:border-soft-cream/10 relative">
+                            {/* Top bar with timer and pause */}
+                            <div className="flex items-center justify-between mb-2">
+                              {/* Timer Circle */}
+                              <div className="relative w-10 h-10">
+                                <svg className="w-full h-full transform -rotate-90">
+                                  <circle
+                                    cx="20"
+                                    cy="20"
+                                    r="16"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    className="text-warm-gray/10 dark:text-soft-cream/10"
+                                  />
+                                  <circle
+                                    cx="20"
+                                    cy="20"
+                                    r="16"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    strokeDasharray={`${100 * (timerProgress / 100)} 100`}
+                                    strokeLinecap="round"
+                                    className={`transition-all duration-100 ${
+                                      timerProgress < 30 ? "text-red-500" : "text-terracotta"
+                                    }`}
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <span className="text-[10px] font-bold text-warm-gray dark:text-soft-cream">
+                                    {Math.ceil(timerProgress / 10)}s
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              {/* Pause Button */}
+                              <motion.div 
+                                animate={{ scale: [1, 1.1, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className="w-8 h-8 rounded-full bg-warm-gray/10 dark:bg-soft-cream/10 flex items-center justify-center"
+                              >
+                                <div className="flex gap-0.5">
+                                  <div className="w-1 h-3 bg-warm-gray/60 dark:bg-soft-cream/60 rounded-sm" />
+                                  <div className="w-1 h-3 bg-warm-gray/60 dark:bg-soft-cream/60 rounded-sm" />
+                                </div>
+                              </motion.div>
+                            </div>
+                            
+                            {/* Progress Bar */}
+                            <div className="w-full h-1.5 bg-warm-gray/10 dark:bg-soft-cream/10 rounded-full mb-3 overflow-hidden">
+                              <motion.div 
+                                className={`h-full rounded-full transition-all duration-100 ${
+                                  timerProgress < 30 ? "bg-red-500" : "bg-terracotta"
                                 }`}
+                                style={{ width: `${timerProgress}%` }}
                               />
-                            </svg>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-lg font-bold text-warm-gray dark:text-soft-cream">
-                                {Math.ceil(timerProgress / 10)}s
-                              </span>
+                            </div>
+                            
+                            {/* Mini Question */}
+                            <p className="text-[11px] text-center text-warm-gray dark:text-soft-cream mb-2 font-medium">
+                              "I enjoy meeting new people"
+                            </p>
+                            
+                            {/* Binary Options */}
+                            <div className="flex gap-2">
+                              <div className="flex-1 py-1.5 rounded-lg bg-sage-green/20 text-sage-green text-[10px] text-center font-medium flex items-center justify-center gap-1">
+                                <span>←</span> Agree
+                              </div>
+                              <div className="flex-1 py-1.5 rounded-lg bg-dusty-blue/20 text-dusty-blue text-[10px] text-center font-medium flex items-center justify-center gap-1">
+                                Disagree <span>→</span>
+                              </div>
                             </div>
                           </div>
-                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
-                            Trust your instincts!
+                          <p className="text-[10px] text-center text-warm-gray/50 dark:text-soft-cream/40 mt-2">
+                            Watch the timer count down - trust your instincts!
                           </p>
                         </div>
                       )}

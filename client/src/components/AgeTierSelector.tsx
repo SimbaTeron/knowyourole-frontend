@@ -9,10 +9,10 @@ interface AgeTier {
 }
 
 const ageTiers: AgeTier[] = [
-  { id: "7-12", label: "Mini Explorer", sublabel: "Ages 12 and under", Icon: Compass },
-  { id: "13-18", label: "Teen Navigator", sublabel: "Ages 13-18", Icon: Rocket },
-  { id: "19-25", label: "Young Trailblazer", sublabel: "Ages 19-25", Icon: Zap },
   { id: "25+", label: "Adult Anchor", sublabel: "Ages 25+", Icon: Anchor },
+  { id: "19-25", label: "Young Trailblazer", sublabel: "Ages 19-25", Icon: Zap },
+  { id: "13-18", label: "Teen Navigator", sublabel: "Ages 13-18", Icon: Rocket },
+  { id: "7-12", label: "Mini Explorer", sublabel: "Ages 12 and under", Icon: Compass },
 ];
 
 const triggerHaptic = (duration = 50) => {
