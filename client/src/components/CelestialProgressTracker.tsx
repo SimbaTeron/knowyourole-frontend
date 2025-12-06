@@ -25,10 +25,12 @@ interface CelestialProgressTrackerProps {
 
 function getQuizMilestones(tier: string, totalQuestions: number): Milestone[] {
   const tierConfigs: Record<string, { mid1: number; superpower?: number; mystery?: number; mid2?: number }> = {
-    "12-under": { mid1: 6, superpower: 11, mystery: 16 },
-    "13-18": { mid1: 8, superpower: 15, mystery: 22, mid2: 28 },
+    "12-under": { mid1: 6, superpower: 12, mystery: 18, mid2: 25 },
+    "7-12": { mid1: 6, superpower: 12, mystery: 18, mid2: 25 },
+    "13-18": { mid1: 8, superpower: 15, mystery: 22, mid2: 30 },
     "19-25": { mid1: 9, superpower: 18, mystery: 27, mid2: 35 },
-    "25+": { mid1: 10, superpower: 20, mystery: 30, mid2: 39 }
+    "25+": { mid1: 10, superpower: 20, mystery: 30, mid2: 40 },
+    "25plus": { mid1: 10, superpower: 20, mystery: 30, mid2: 40 }
   };
   
   const config = tierConfigs[tier] || tierConfigs["19-25"];

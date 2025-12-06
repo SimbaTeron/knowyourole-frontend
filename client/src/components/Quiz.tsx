@@ -484,18 +484,18 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
 const getQuizConfig = (tier: string) => {
   switch (tier) {
     case "7-12":
-      // Mini 20: 6 binary → MC1 → 5 binary → Superpower → 5 binary → Mystery → 4 binary → MC2
+      // Mini 25: 6 binary → MC1 → 6 binary → Superpower → 6 binary → Mystery → 7 binary → MC2
       return { 
-        totalQuestions: 20, 
+        totalQuestions: 25, 
         mid1After: 6, 
-        superpowerAfter: 11,
-        mysteryAfter: 16,
-        mid2After: 20,
+        superpowerAfter: 12,
+        mysteryAfter: 18,
+        mid2After: 25,
         hasMid2: true, 
         hasMystery: true 
       };
     case "13-18":
-      // Teen 30: 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 6 binary → MC2
+      // Teen 30: 8 binary → MC1 → 7 binary → Superpower → 7 binary → Mystery → 8 binary → MC2
       return { 
         totalQuestions: 30, 
         mid1After: 8, 
@@ -519,7 +519,7 @@ const getQuizConfig = (tier: string) => {
     case "25+":
     case "25plus":
     default:
-      // Adult 40: 10 binary → MC1 → 10 binary → Superpower → 10 binary → Mystery → 9 binary → MC2
+      // Adult 40: 10 binary → MC1 → 10 binary → Superpower → 10 binary → Mystery → 10 binary → MC2
       return { 
         totalQuestions: 40, 
         mid1After: 10, 
@@ -1327,24 +1327,82 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   const currentQuestion = questions[currentIndex];
   
+  const [mcBreakTimer, setMcBreakTimer] = useState(20);
+  const [mcBreakTimerActive, setMcBreakTimerActive] = useState(false);
+  const [mcBreakVisible, setMcBreakVisible] = useState(false);
+  
+  useEffect(() => {
+    if (quizPhase === "mid1" || quizPhase === "mid2") {
+      setMcBreakVisible(false);
+      setMcBreakTimer(20);
+      setMcBreakTimerActive(false);
+      const fadeInTimeout = setTimeout(() => {
+        setMcBreakVisible(true);
+        setMcBreakTimerActive(true);
+      }, 100);
+      return () => clearTimeout(fadeInTimeout);
+    }
+  }, [quizPhase]);
+  
+  useEffect(() => {
+    if (!mcBreakTimerActive || mcBreakTimer <= 0) return;
+    const interval = setInterval(() => {
+      setMcBreakTimer(prev => Math.max(0, prev - 0.1));
+    }, 100);
+    return () => clearInterval(interval);
+  }, [mcBreakTimerActive, mcBreakTimer]);
+
+  const getMcBreakQuestionNumber = () => {
+    if (quizPhase === "mid1") return quizConfig.mid1After + 1;
+    if (quizPhase === "mid2") return quizConfig.mid2After;
+    return currentIndex + 1;
+  };
+
   const renderMultiChoiceQuestion = (
     question: MultiChoiceQuestion, 
     selectedChoice: string | null,
     onSelect: (id: string) => void,
     isOpening: boolean
-  ) => (
+  ) => {
+    const mcQuestionNum = getMcBreakQuestionNumber();
+    const mcTimerProgress = (mcBreakTimer / 20) * 100;
+    
+    return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between max-w-md mx-auto">
+          <div className="flex items-center gap-2">
+            <Timer className={`w-5 h-5 ${mcBreakTimer < 5 ? "text-red-500" : "text-terracotta"}`} />
+            <span className={`text-lg font-mono font-bold ${mcBreakTimer < 5 ? "text-red-500" : "text-warm-gray dark:text-soft-cream"}`}>
+              {mcBreakTimer.toFixed(1)}s
+            </span>
+          </div>
+          <span className="text-lg font-bold text-warm-gray dark:text-soft-cream">
+            {mcQuestionNum}/{quizConfig.totalQuestions}
+          </span>
+        </div>
+        <div className="max-w-md mx-auto mt-2 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <motion.div
+            className={`h-full ${mcBreakTimer < 5 ? "bg-red-500" : "bg-gradient-to-r from-terracotta to-dusty-blue"}`}
+            initial={{ width: "100%" }}
+            animate={{ width: `${mcTimerProgress}%` }}
+            transition={{ duration: 0.1 }}
+          />
+        </div>
+      </header>
+      
+      <main className="flex-1 flex items-center justify-center px-4 py-8 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: mcBreakVisible ? 1 : 0, y: mcBreakVisible ? 0 : 20 }}
+          transition={{ duration: 1, ease: "easeOut" }}
           className="w-full max-w-md"
         >
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
+              animate={{ scale: mcBreakVisible ? 1 : 0 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
               className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
                 isOpening 
                   ? "bg-gradient-to-br from-terracotta to-dusty-blue" 
@@ -1358,12 +1416,22 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               )}
             </motion.div>
             
-            <p className="text-warm-gray/60 dark:text-soft-cream/50 mb-2 text-[16px]">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: mcBreakVisible ? 1 : 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="text-warm-gray/60 dark:text-soft-cream/50 mb-2 text-[16px]"
+            >
               {question.subtitle}
-            </p>
-            <h2 className="text-2xl font-bold text-warm-gray dark:text-soft-cream">
+            </motion.p>
+            <motion.h2 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: mcBreakVisible ? 1 : 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="text-2xl font-bold text-warm-gray dark:text-soft-cream"
+            >
               {question.prompt}
-            </h2>
+            </motion.h2>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
@@ -1375,9 +1443,15 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 <motion.button
                   key={option.id}
                   initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: isSelected ? 1.05 : 1 }}
-                  transition={{ delay: idx * 0.1 }}
-                  onClick={() => onSelect(option.id)}
+                  animate={{ 
+                    opacity: mcBreakVisible ? (isSelected || !selectedChoice ? 1 : 0.5) : 0, 
+                    scale: isSelected ? 1.05 : 1 
+                  }}
+                  transition={{ delay: mcBreakVisible ? 0.7 + idx * 0.1 : 0, duration: 0.3 }}
+                  onClick={() => {
+                    onSelect(option.id);
+                    setMcBreakTimerActive(false);
+                  }}
                   disabled={!!selectedChoice}
                   className={`
                     relative p-6 rounded-2xl border-2 transition-all duration-300
@@ -1419,20 +1493,19 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             })}
           </div>
           
-          {!isOpening && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-6"
-            >
-              Your answers shape your personalized results
-            </motion.p>
-          )}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: mcBreakVisible ? 1 : 0 }}
+            transition={{ delay: 1.2 }}
+            className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-6"
+          >
+            Your answers shape your personalized results
+          </motion.p>
         </motion.div>
       </main>
     </div>
   );
+  };
 
   if (quizPhase === "superpower") {
     return (
@@ -2117,10 +2190,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 >
                   <Pause className="w-8 h-8 text-sage-green" />
                 </motion.div>
-                <h3 className="text-2xl font-display font-bold dark:text-white mb-2 text-[#8b9a6d]">
+                <h3 className="text-2xl font-display font-bold text-sage-green dark:text-sage-green mb-2">
                   No Rush!
                 </h3>
-                <p className="dark:text-gray-200 text-base leading-relaxed text-[#8b9a6d]">
+                <p className="text-warm-gray dark:text-gray-200 text-base leading-relaxed">
                   Take your time. If you ever need a moment to think, just tap the <strong className="text-sage-green font-semibold text-[18px]">Pause</strong> button at the bottom. 
                   The question will wait for you.
                 </p>
