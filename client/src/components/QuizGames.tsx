@@ -593,12 +593,12 @@ export function TimedCountdown({ onComplete }: TimedCountdownProps) {
     if (count === 0) {
       const timer = setTimeout(() => {
         setIsVisible(false);
-        setTimeout(onComplete, 200);
-      }, 600);
+        setTimeout(onComplete, 100);
+      }, 300);
       return () => clearTimeout(timer);
     }
     
-    const timer = setTimeout(() => setCount(c => c - 1), 1000);
+    const timer = setTimeout(() => setCount(c => c - 1), 500);
     return () => clearTimeout(timer);
   }, [count, onComplete]);
   
@@ -625,10 +625,10 @@ export function TimedCountdown({ onComplete }: TimedCountdownProps) {
         </motion.div>
         
         <h3 className="text-xl font-bold text-warm-gray dark:text-soft-cream mb-2">
-          Timed Questions Resume!
+          Timed Questions resume!
         </h3>
         <p className="text-warm-gray/60 dark:text-soft-cream/50 text-sm mb-6">
-          Get ready to answer quickly
+          Get ready to answer
         </p>
         
         <AnimatePresence mode="wait">
@@ -637,7 +637,7 @@ export function TimedCountdown({ onComplete }: TimedCountdownProps) {
             initial={{ scale: 0.3, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.3, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.1 }}
             className="text-7xl font-black bg-gradient-to-r from-terracotta to-dusty-blue bg-clip-text text-transparent"
           >
             {count === 0 ? "GO!" : count}

@@ -8,12 +8,10 @@ import AgeTierSelector from "@/components/AgeTierSelector";
 import { ThemeMode } from "@/components/ThemeToggle";
 
 const ROTATING_TAGLINES = [
-  { text: "Night owl or early bird?", icon: "sparkle" },
   { text: "What career fits your brain?", icon: "compass" },
-  { text: "Discover traits you didn't know you had", icon: "sparkle" },
-  { text: "Are you a leader or a listener?", icon: "compass" },
+  { text: "What makes you... you?", icon: "sparkle" },
+  { text: "Discover traits you didn't know you had", icon: "compass" },
   { text: "Find your hidden superpowers", icon: "sparkle" },
-  { text: "What makes you... you?", icon: "compass" },
 ];
 
 export default function Home() {
@@ -35,7 +33,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setTaglineIndex((prev) => (prev + 1) % ROTATING_TAGLINES.length);
-    }, 3500);
+    }, 2625);
     return () => clearInterval(interval);
   }, []);
 

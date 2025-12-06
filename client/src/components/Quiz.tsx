@@ -226,8 +226,8 @@ const RANDOM_EVENTS: RandomEvent[] = [
   { id: "energy_surge", title: "Energy Surge!", description: "Feeling extra decisive!", effect: "mood_boost", duration: 2000, icon: "zap" },
 ];
 
-const RANDOM_EVENT_BASE_CHANCE = 0.08; // 8% base chance per question
-const RANDOM_EVENT_MAX_CHANCE = 0.15; // 15% max chance cap
+const RANDOM_EVENT_BASE_CHANCE = 0.03; // 3% base chance per question (reduced from 8%)
+const RANDOM_EVENT_MAX_CHANCE = 0.06; // 6% max chance cap (reduced from 15%)
 
 type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown" | "random-event" | "recap";
 
@@ -765,10 +765,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         setShowBadgeOverlay(true);
         setBadgeCanDismiss(false);
         
-        // After 3 seconds, allow manual dismiss with Continue button
+        // After 1.5 seconds, allow manual dismiss with Continue button (2x faster)
         const canDismissTimer = setTimeout(() => {
           setBadgeCanDismiss(true);
-        }, 3000);
+        }, 1500);
         
         // Auto-dismiss after 5 seconds if not manually dismissed
         const autoDismissTimer = setTimeout(() => {
@@ -2080,7 +2080,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/20 backdrop-blur-sm"
             onClick={() => togglePause()}
           >
             <motion.div
