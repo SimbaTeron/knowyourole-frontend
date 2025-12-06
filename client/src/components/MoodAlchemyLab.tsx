@@ -492,26 +492,6 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
     setOrbPositions(initialPositions);
   }, []);
 
-  useEffect(() => {
-    if (selectedOrbs.length === 0) return;
-    
-    const interval = setInterval(() => {
-      setOrbPositions(prev => {
-        const updated = { ...prev };
-        MOOD_ORBS.forEach(orb => {
-          if (!selectedOrbs.includes(orb.id) && updated[orb.id]) {
-            updated[orb.id] = {
-              ...updated[orb.id],
-              angle: updated[orb.id].angle + 0.015
-            };
-          }
-        });
-        return updated;
-      });
-    }, 50);
-
-    return () => clearInterval(interval);
-  }, [selectedOrbs]);
 
   useEffect(() => {
     if (particles.length === 0) return;
@@ -583,8 +563,28 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
     setParticles(newParticles);
   }, []);
 
+  const [lastTapTime, setLastTapTime] = useState<Record<string, number>>({});
+  
   const handleOrbClick = (orbId: string, event: React.MouseEvent) => {
     if (selectedOrbs.length >= 2 || selectedOrbs.includes(orbId) || isColliding) return;
+    
+    const now = Date.now();
+    const lastTap = lastTapTime[orbId] || 0;
+    
+    if (now - lastTap < 400) {
+      if (navigator.vibrate) navigator.vibrate(30);
+      setShowTooltip(null);
+    } else {
+      setLastTapTime(prev => ({ ...prev, [orbId]: now }));
+      
+      if (showTooltip === orbId) {
+        if (navigator.vibrate) navigator.vibrate(30);
+        setShowTooltip(null);
+      } else {
+        setShowTooltip(orbId);
+        return;
+      }
+    }
     
     if (navigator.vibrate) navigator.vibrate(30);
     setShowTooltip(null);
@@ -970,20 +970,33 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
         </AnimatePresence>
         
         {selectedOrbs.length === 0 && (
-          <motion.text
-            x={centerX}
-            y={centerY + 4}
-            textAnchor="middle"
-            fill="currentColor"
-            fillOpacity="0.4"
-            fontSize="11"
-            className="text-warm-gray dark:text-soft-cream"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            Tap two moods
-          </motion.text>
+          <>
+            <motion.text
+              x={centerX}
+              y={centerY - 4}
+              textAnchor="middle"
+              fill="currentColor"
+              fillOpacity="0.5"
+              fontSize="12"
+              fontWeight="500"
+              className="text-warm-gray dark:text-soft-cream"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              Tap any orb to learn more
+            </motion.text>
+            <motion.text
+              x={centerX}
+              y={centerY + 12}
+              textAnchor="middle"
+              fill="currentColor"
+              fillOpacity="0.35"
+              fontSize="10"
+              className="text-warm-gray dark:text-soft-cream"
+            >
+              Tap again to select
+            </motion.text>
+          </>
         )}
       </svg>
 

@@ -241,73 +241,157 @@ interface RecapSpinWheelProps {
   };
   questionsRemaining: number;
   onContinue: () => void;
+  shownInsights: Set<string>;
+  onInsightShown: (insight: string) => void;
 }
 
-function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue }: RecapSpinWheelProps) {
+const INSIGHT_POOL: Record<string, string[]> = {
+  extraverted: [
+    "You're showing social energy",
+    "You thrive around others",
+    "You light up in group settings",
+    "Connection energizes you"
+  ],
+  introverted: [
+    "You're showing thoughtful focus",
+    "You recharge with quiet time",
+    "Deep thinking is your strength",
+    "Solo reflection suits you"
+  ],
+  intuitive: [
+    "You're seeing the big picture",
+    "Patterns and possibilities catch your eye",
+    "You think in concepts and ideas",
+    "Future possibilities excite you"
+  ],
+  sensing: [
+    "You're grounded in details",
+    "You notice what's right in front of you",
+    "Practical facts guide you",
+    "You trust hands-on experience"
+  ],
+  thinking: [
+    "You're analyzing logically",
+    "Logic guides your choices",
+    "You weigh pros and cons carefully",
+    "Reason is your compass"
+  ],
+  feeling: [
+    "You're tuned to feelings",
+    "Values guide your decisions",
+    "Harmony matters to you",
+    "You consider how others feel"
+  ],
+  judging: [
+    "You prefer structure",
+    "Planning gives you peace",
+    "You like things decided",
+    "Organization is your friend"
+  ],
+  perceiving: [
+    "You're staying flexible",
+    "You adapt as things change",
+    "Options feel better than plans",
+    "Spontaneity suits you"
+  ],
+  openness: [
+    "You're naturally curious",
+    "New ideas spark your interest",
+    "Creativity flows through you",
+    "You embrace the unusual"
+  ],
+  conscientiousness: [
+    "You're organized and driven",
+    "You follow through on commitments",
+    "Discipline is a strength",
+    "Goals keep you focused"
+  ],
+  agreeableness: [
+    "You connect well with others",
+    "Kindness comes naturally",
+    "You value cooperation",
+    "Empathy is your strength"
+  ],
+  neuroticism_low: [
+    "You stay calm under pressure",
+    "Stress doesn't shake you easily",
+    "Emotional stability is your anchor",
+    "You handle challenges with grace"
+  ]
+};
+
+function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, shownInsights, onInsightShown }: RecapSpinWheelProps) {
   const recapMilestone = Math.floor((currentIndex + 1) / 10) * 10;
   
-  // All possible insights to cycle through
-  const allInsights = [
-    "You're showing social energy",
-    "You're showing thoughtful focus",
-    "You're seeing the big picture",
-    "You're grounded in details",
-    "You're analyzing logically",
-    "You're tuned to feelings",
-    "You prefer structure",
-    "You're staying flexible",
-    "You're naturally curious",
-    "You're practical and grounded",
-    "You connect well with others",
-    "You value independence",
-  ];
+  const allInsights = Object.values(INSIGHT_POOL).flat();
   
-  // Calculate the ACTUAL insights based on scores
-  const mbti = scores.mbti;
-  const finalInsights = [
-    mbti.E >= mbti.I ? "You're showing social energy" : "You're showing thoughtful focus",
-    mbti.N >= mbti.S ? "You're seeing the big picture" : "You're grounded in details",
-  ];
+  const getTraitScores = () => {
+    const mbti = scores.mbti;
+    const bigFive = scores.bigFive;
+    
+    const traitScores = [
+      { trait: mbti.E >= mbti.I ? "extraverted" : "introverted", score: Math.abs(mbti.E - mbti.I) + (mbti.E >= mbti.I ? mbti.E : mbti.I) },
+      { trait: mbti.N >= mbti.S ? "intuitive" : "sensing", score: Math.abs(mbti.N - mbti.S) + (mbti.N >= mbti.S ? mbti.N : mbti.S) },
+      { trait: mbti.T >= mbti.F ? "thinking" : "feeling", score: Math.abs(mbti.T - mbti.F) + (mbti.T >= mbti.F ? mbti.T : mbti.F) },
+      { trait: mbti.J >= mbti.P ? "judging" : "perceiving", score: Math.abs(mbti.J - mbti.P) + (mbti.J >= mbti.P ? mbti.J : mbti.P) },
+      { trait: "openness", score: bigFive.O },
+      { trait: "conscientiousness", score: bigFive.C },
+      { trait: "agreeableness", score: bigFive.A },
+      { trait: bigFive.N < 0.5 ? "neuroticism_low" : "feeling", score: bigFive.N < 0.5 ? (1 - bigFive.N) : 0 }
+    ];
+    
+    return traitScores.sort((a, b) => b.score - a.score);
+  };
   
-  const [displayedInsights, setDisplayedInsights] = useState<string[]>(["...", "..."]);
+  const getBestInsight = (): string => {
+    const rankedTraits = getTraitScores();
+    
+    for (const { trait } of rankedTraits) {
+      const pool = INSIGHT_POOL[trait] || [];
+      for (const insight of pool) {
+        if (!shownInsights.has(insight)) {
+          return insight;
+        }
+      }
+    }
+    
+    const fallbacks = INSIGHT_POOL[rankedTraits[0]?.trait || "extraverted"] || allInsights;
+    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+  };
+  
+  const finalInsight = getBestInsight();
+  
+  const [displayedInsight, setDisplayedInsight] = useState<string>("...");
   const [spinComplete, setSpinComplete] = useState(false);
   const [buttonActive, setButtonActive] = useState(false);
   
   useEffect(() => {
     let cycleCount = 0;
-    const totalCycles = 20; // Number of cycles before settling
-    const baseInterval = 80; // Starting speed in ms
+    const totalCycles = 20;
+    const baseInterval = 80;
     
     const spinCycle = () => {
       cycleCount++;
       
-      // Calculate delay - starts fast, slows down exponentially
       const progress = cycleCount / totalCycles;
-      const delay = baseInterval + (progress * progress * 400); // Exponential slowdown
+      const delay = baseInterval + (progress * progress * 400);
       
       if (cycleCount < totalCycles) {
-        // Still spinning - show random insights
-        const randomInsight1 = allInsights[Math.floor(Math.random() * allInsights.length)];
-        let randomInsight2 = allInsights[Math.floor(Math.random() * allInsights.length)];
-        while (randomInsight2 === randomInsight1) {
-          randomInsight2 = allInsights[Math.floor(Math.random() * allInsights.length)];
-        }
-        setDisplayedInsights([randomInsight1, randomInsight2]);
+        const randomInsight = allInsights[Math.floor(Math.random() * allInsights.length)];
+        setDisplayedInsight(randomInsight);
         
         setTimeout(spinCycle, delay);
       } else {
-        // Settle on final accurate insights
-        setDisplayedInsights(finalInsights);
+        setDisplayedInsight(finalInsight);
+        onInsightShown(finalInsight);
         setSpinComplete(true);
         
-        // Activate button after a brief pause
         setTimeout(() => {
           setButtonActive(true);
         }, 500);
       }
     };
     
-    // Start spinning after a brief delay
     const startTimer = setTimeout(() => {
       spinCycle();
     }, 300);
@@ -344,32 +428,29 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue }
             </p>
           </motion.div>
           
-          <div className="space-y-3 mb-8">
-            {displayedInsights.map((insight, idx) => (
-              <motion.div
-                key={idx}
-                animate={spinComplete ? { scale: [1, 1.02, 1] } : {}}
-                transition={{ duration: 0.3 }}
-                className={`p-4 rounded-xl border transition-all duration-200 ${
+          <div className="mb-8">
+            <motion.div
+              animate={spinComplete ? { scale: [1, 1.02, 1] } : {}}
+              transition={{ duration: 0.3 }}
+              className={`p-5 rounded-xl border transition-all duration-200 ${
+                spinComplete 
+                  ? "bg-sage-green/10 dark:bg-sage-green/20 border-sage-green/30 dark:border-sage-green/40" 
+                  : "bg-soft-cream/50 dark:bg-gray-800/50 border-warm-gray/10 dark:border-white/10"
+              }`}
+            >
+              <motion.p 
+                key={displayedInsight}
+                initial={{ opacity: 0.5 }}
+                animate={{ opacity: 1 }}
+                className={`font-medium text-lg transition-colors duration-200 ${
                   spinComplete 
-                    ? "bg-sage-green/10 dark:bg-sage-green/20 border-sage-green/30 dark:border-sage-green/40" 
-                    : "bg-soft-cream/50 dark:bg-gray-800/50 border-warm-gray/10 dark:border-white/10"
+                    ? "text-sage-green dark:text-sage-green" 
+                    : "text-warm-gray/70 dark:text-soft-cream/70"
                 }`}
               >
-                <motion.p 
-                  key={insight}
-                  initial={{ opacity: 0.5 }}
-                  animate={{ opacity: 1 }}
-                  className={`font-medium transition-colors duration-200 ${
-                    spinComplete 
-                      ? "text-sage-green dark:text-sage-green" 
-                      : "text-warm-gray/70 dark:text-soft-cream/70"
-                  }`}
-                >
-                  {insight}
-                </motion.p>
-              </motion.div>
-            ))}
+                {displayedInsight}
+              </motion.p>
+            </motion.div>
           </div>
           
           <motion.div
@@ -579,6 +660,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [completedSuperpower, setCompletedSuperpower] = useState(false);
   const [completedMystery, setCompletedMystery] = useState(false);
   const [completedRecaps, setCompletedRecaps] = useState<Set<number>>(new Set()); // Track which recap milestones have been shown
+  const [shownInsights, setShownInsights] = useState<Set<string>>(new Set()); // Track shown insights to prevent repeats
   
   // Phase 2.3: Random event state with queue for sequential display
   const [currentRandomEvent, setCurrentRandomEvent] = useState<RandomEvent | null>(null);
@@ -659,7 +741,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const FRAMEWORK_QUOTAS = getAdaptiveQuotas(tier);
   
   // IRT Adaptive Branching: Detect ambiguous traits and prioritize relevant questions
-  const detectAmbiguousTraits = (scores: typeof initialScores): string[] => {
+  const detectAmbiguousTraits = (scoresData: typeof scores): string[] => {
     const ambiguousTraits: string[] = [];
     const AMBIGUITY_THRESHOLD = 0.15; // 15% difference = ambiguous
     
@@ -859,7 +941,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         if (pendingRandomEvent.effect === "skip_allowed") {
           setCanSkip(true);
         }
-        setActiveEffects(prev => new Set([...prev, pendingRandomEvent.effect]));
+        setActiveEffects(prev => new Set(Array.from(prev).concat(pendingRandomEvent.effect)));
         
         // Auto-dismiss after duration
         setTimeout(() => {
@@ -1073,7 +1155,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       if (event.effect === "skip_allowed") {
         setCanSkip(true);
       }
-      setActiveEffects(prev => new Set([...prev, event.effect]));
+      setActiveEffects(prev => new Set(Array.from(prev).concat(event.effect)));
       
       // Auto-dismiss after duration
       setTimeout(() => {
@@ -1418,6 +1500,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         currentIndex={currentIndex}
         scores={scores}
         questionsRemaining={questions.length - currentIndex - 1}
+        shownInsights={shownInsights}
+        onInsightShown={(insight) => {
+          setShownInsights(prev => new Set(Array.from(prev).concat(insight)));
+        }}
         onContinue={() => {
           const recapMilestone = Math.floor((currentIndex + 1) / 10) * 10;
           setCompletedRecaps(prev => {

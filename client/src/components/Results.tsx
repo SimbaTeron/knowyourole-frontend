@@ -1185,7 +1185,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     }
   };
 
-  const allFeedbackAnswered = usefulApp !== "" && resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "" && suggestions.trim().length > 0;
+  const allFeedbackAnswered = usefulApp !== "" && resultsAccurate !== "" && questionsEngaging !== "" && wouldShare !== "";
 
   // 30-second timer for feedback in Premium section
   useEffect(() => {
