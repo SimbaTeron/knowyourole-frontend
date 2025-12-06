@@ -225,7 +225,8 @@ const RANDOM_EVENTS: RandomEvent[] = [
   { id: "energy_surge", title: "Energy Surge!", description: "Feeling extra decisive!", effect: "mood_boost", duration: 2000, icon: "zap" },
 ];
 
-const RANDOM_EVENT_CHANCE = 0.07; // 7% chance per question
+const RANDOM_EVENT_BASE_CHANCE = 0.08; // 8% base chance per question
+const RANDOM_EVENT_MAX_CHANCE = 0.15; // 15% max chance cap
 
 type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "mid1" | "mid1-countdown" | "mid2" | "mid2-countdown" | "mystery" | "mystery-countdown" | "random-event" | "recap";
 
@@ -775,9 +776,13 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return "easy"; // Slower responses -> easier questions
   };
 
-  // Phase 2.3: Trigger random event with 7% chance - queue if another popup is active
+  // Phase 2.3: Trigger random event with dynamic chance (8-15%) - queue if another popup is active
   const triggerRandomEvent = useCallback(() => {
-    if (Math.random() < RANDOM_EVENT_CHANCE) {
+    // Dynamic chance based on engagement, capped at 15%
+    const engagementBoost = Math.max(0, scores.engagement * 0.01); // +1% per engagement point
+    const dynamicChance = Math.min(RANDOM_EVENT_MAX_CHANCE, RANDOM_EVENT_BASE_CHANCE + engagementBoost);
+    
+    if (Math.random() < dynamicChance) {
       const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
       
       // If badge overlay is showing or another random event is active, queue this one
@@ -799,7 +804,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         setCurrentRandomEvent(null);
       }, event.duration);
     }
-  }, [showBadgeOverlay, currentRandomEvent]);
+  }, [showBadgeOverlay, currentRandomEvent, scores.engagement]);
 
   // Phase 2.3: Handle skip (from random event)
   const handleSkip = useCallback(() => {
