@@ -165,7 +165,13 @@ export default function QuizPage() {
   };
 
   const handleQuizExit = () => {
-    setLocation("/location");
+    // Clear all session data and go to home
+    sessionStorage.clear();
+    localStorage.removeItem("knowrole-premium-results");
+    setQuizScores(null);
+    setQuizSessionId(null);
+    setShowResults(false);
+    setLocation("/");
   };
 
   const handleRestart = () => {

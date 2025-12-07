@@ -567,14 +567,18 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
   const [draggedOrb, setDraggedOrb] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   
-  const handleOrbClick = (orbId: string, event: React.MouseEvent) => {
+  // Tap-based interaction: first tap shows details, second tap selects
+  const handleOrbTap = (orbId: string, event: React.MouseEvent | React.PointerEvent) => {
     if (selectedOrbs.length >= 2 || selectedOrbs.includes(orbId) || isColliding) return;
     
     if (navigator.vibrate) navigator.vibrate(15);
     
+    // If tooltip is already showing for this orb, select it (second tap)
     if (showTooltip === orbId) {
       setShowTooltip(null);
+      selectOrb(orbId);
     } else {
+      // First tap - show tooltip with details
       setShowTooltip(orbId);
       const rect = (event.target as Element).getBoundingClientRect();
       setTooltipPosition({ x: rect.left + rect.width / 2, y: rect.top });
@@ -737,9 +741,21 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
               ))}
             </div>
             <div className="mt-2 pt-2 border-t border-gray-200/50 dark:border-gray-700/50">
-              <p className="text-xs italic text-gray-500 dark:text-gray-400">
+              <p className="text-xs italic text-gray-500 dark:text-gray-400 mb-2">
                 "{tooltipOrb.sampleQuestion}"
               </p>
+              <Button
+                size="sm"
+                className="w-full text-xs"
+                style={{ backgroundColor: tooltipOrb.color }}
+                onClick={() => {
+                  setShowTooltip(null);
+                  selectOrb(tooltipOrb.id);
+                }}
+              >
+                <Sparkles className="w-3 h-3 mr-1" />
+                Select {tooltipOrb.label}
+              </Button>
             </div>
           </motion.div>
         )}
@@ -867,45 +883,21 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
               key={orb.id}
               initial={false}
               animate={{
-                x: animateX,
-                y: animateY,
-                scale: isSelected ? 0.7 : isDragging ? 1.1 : 1,
+                x: pos.x - centerX,
+                y: pos.y - centerY,
+                scale: isSelected ? 0.7 : 1,
                 opacity: isSelected && !isColliding ? 0 : 1
               }}
-              transition={isDragging ? { duration: 0 } : {
+              transition={{
                 type: "spring",
                 stiffness: 180,
                 damping: 18
               }}
               style={{ 
-                cursor: isAvailable ? 'grab' : 'default',
-                touchAction: 'none'
+                cursor: isAvailable ? 'pointer' : 'default',
+                touchAction: 'manipulation'
               }}
-              onClick={(e) => isAvailable && handleOrbClick(orb.id, e)}
-              onPointerDown={(e) => {
-                if (!isAvailable) return;
-                e.preventDefault();
-                (e.target as Element).setPointerCapture(e.pointerId);
-                setDraggedOrb(orb.id);
-                setShowTooltip(null);
-              }}
-              onPointerMove={(e) => {
-                if (draggedOrb !== orb.id) return;
-                setDragOffset(prev => ({
-                  x: prev.x + e.movementX * 1.2,
-                  y: prev.y + e.movementY * 1.2
-                }));
-              }}
-              onPointerUp={(e) => {
-                if (draggedOrb !== orb.id) return;
-                (e.target as Element).releasePointerCapture(e.pointerId);
-                handleDragEnd(orb.id, dragOffset.x, dragOffset.y);
-              }}
-              onPointerCancel={(e) => {
-                if (draggedOrb !== orb.id) return;
-                setDraggedOrb(null);
-                setDragOffset({ x: 0, y: 0 });
-              }}
+              onClick={(e) => isAvailable && handleOrbTap(orb.id, e)}
               data-testid={`orb-${orb.id}`}
             >
               <motion.circle
