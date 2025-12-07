@@ -744,7 +744,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   useEffect(() => {
     const tierQuestions = questionsData.questions.filter(q => q.tier === tier);
-    const targetCount = tierConfig.baseCount;
+    const targetCount = quizConfig.totalQuestions;
     
     // Phase 1.2: Quota-based selection
     const quotaSelection: Question[] = [];
@@ -783,7 +783,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     // Final shuffle
     setQuestions(quotaSelection.sort(() => Math.random() - 0.5));
-  }, [tier, tierConfig.baseCount]);
+  }, [tier, quizConfig.totalQuestions]);
 
   useEffect(() => {
     if (questions.length > 0 && currentIndex < questions.length) {
