@@ -27,6 +27,12 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
 - **Mood Interaction**: Separate pages for mood selection and an interactive "Mood Mixer" cauldron.
 - **Pre-Quiz Demo**: Animated 3-card walkthrough of question types.
 - **Quiz Flow**: Age-tiered binary swipe questions with strategic breaks. Features include a timer, tactile feedback, dynamic difficulty scaling, and strategic checkpoint pauses. Supports MBTI, DISC, Big Five, Critical Thinking, and First Principles traits. Includes a `Slider UI Component` for nuanced responses.
+  - **Question Database**: 1,200 total questions across all tiers:
+    - Youth (7-12): 200 questions (6s timer)
+    - Teen (13-18): 200 questions (7s timer)
+    - Young Adult (19-25): 400 questions (8s timer)
+    - Adult (25+): 400 questions (8-9s timer)
+    - 72 slider-type questions, 28 wildcard questions (Critical Thinking + First Principles)
   - **Tier-Specific Quiz Configurations**:
     - Youth (7-12): 25 questions - superpower (Q6), energy (Q12), mystery (Q18), no checkpoints
     - Teen (13-18): 30 questions - superpower (Q6), checkpoint (Q11), energy (Q16), mystery (Q21)
