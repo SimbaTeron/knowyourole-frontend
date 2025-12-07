@@ -4014,12 +4014,12 @@
     },
     {
       "id": 201,
-      "prompt": "Big assignment due:",
-      "leftDesc": "Pull an all-nighter powered by last-minute panic.",
-      "rightDesc": "Start weeks early stress-free.",
+      "prompt": "Big assignment due soon",
+      "leftDesc": "Night before cram",
+      "rightDesc": "Start early plan",
       "options": [
-        "Night before",
-        "Start early"
+        "Night before cram",
+        "Start early plan"
       ],
       "optionMeta": [
         "C-",
@@ -4034,12 +4034,12 @@
     },
     {
       "id": 202,
-      "prompt": "Friend group drama erupts:",
-      "leftDesc": "Step in as peacemaker to fix the misunderstanding.",
-      "rightDesc": "Stay out until the storm passes.",
+      "prompt": "Friend group drama erupts",
+      "leftDesc": "Be the peacemaker",
+      "rightDesc": "Stay out of it",
       "options": [
-        "Peacemaker",
-        "Stay out"
+        "Be the peacemaker",
+        "Stay out of it"
       ],
       "optionMeta": [
         "A+",
@@ -4054,12 +4054,12 @@
     },
     {
       "id": 203,
-      "prompt": "You bombed a test:",
-      "leftDesc": "Shake it off—one bad grade won't define you.",
-      "rightDesc": "Replay every wrong answer mentally for days.",
+      "prompt": "You bombed a test badly",
+      "leftDesc": "Shake it off",
+      "rightDesc": "Overthink all night",
       "options": [
-        "Shake off",
-        "Overthink"
+        "Shake it off",
+        "Overthink all night"
       ],
       "optionMeta": [
         "N-",
@@ -4074,12 +4074,12 @@
     },
     {
       "id": 204,
-      "prompt": "Class presentation day:",
-      "leftDesc": "Volunteer first to get it over with fast.",
-      "rightDesc": "Handle slides while your partner does the talking.",
+      "prompt": "Class presentation day arrives",
+      "leftDesc": "Speak up confidently",
+      "rightDesc": "Handle slides duty",
       "options": [
-        "Speak up",
-        "Slides duty"
+        "Speak up confidently",
+        "Handle slides duty"
       ],
       "optionMeta": [
         "E",
@@ -4090,17 +4090,16 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false,
-      "responseType": "slider"
+      "wildcard": false
     },
     {
       "id": 205,
-      "prompt": "Thinking about your future:",
-      "leftDesc": "Steady paycheck and clear career path ahead.",
-      "rightDesc": "Chase what excites you even with bigger risks.",
+      "prompt": "Thinking about your future career",
+      "leftDesc": "Steady pay job",
+      "rightDesc": "Follow your passion",
       "options": [
-        "Steady pay",
-        "Follow passion"
+        "Steady pay job",
+        "Follow your passion"
       ],
       "optionMeta": [
         "S",
@@ -4111,17 +4110,16 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false,
-      "is2x": true
+      "wildcard": false
     },
     {
       "id": 206,
-      "prompt": "Teacher gave unfair grade:",
-      "leftDesc": "Schedule a meeting and argue your case.",
-      "rightDesc": "Accept it to avoid awkward confrontation or grudges.",
+      "prompt": "Teacher gave unfair grade",
+      "leftDesc": "Argue it logically",
+      "rightDesc": "Accept and move on",
       "options": [
-        "Argue it",
-        "Accept it"
+        "Argue it logically",
+        "Accept and move on"
       ],
       "optionMeta": [
         "T",
@@ -4136,12 +4134,12 @@
     },
     {
       "id": 207,
-      "prompt": "Finals week approach:",
-      "leftDesc": "Create a color-coded calendar mapped out.",
-      "rightDesc": "Wing it based on vibes the night before each.",
+      "prompt": "Finals week is approaching",
+      "leftDesc": "Color-coded schedule",
+      "rightDesc": "Wing it daily",
       "options": [
-        "Color-coded",
-        "Wing it"
+        "Color-coded schedule",
+        "Wing it daily"
       ],
       "optionMeta": [
         "J",
@@ -4156,12 +4154,12 @@
     },
     {
       "id": 208,
-      "prompt": "You're team captain:",
-      "leftDesc": "Pump everyone up with an epic team huddle speech.",
-      "rightDesc": "Draw the winning play on the whiteboard quietly.",
+      "prompt": "You're team captain now",
+      "leftDesc": "Pump up everyone",
+      "rightDesc": "Draw the plays",
       "options": [
-        "Pump up",
-        "Draw plays"
+        "Pump up everyone",
+        "Draw the plays"
       ],
       "optionMeta": [
         "I",
@@ -4172,19 +4170,16 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false,
-      "responseType": "slider",
-      "isBadge": true,
-      "badgeHint": "Pattern Spotter"
+      "wildcard": false
     },
     {
       "id": 209,
-      "prompt": "First day at new school:",
-      "leftDesc": "Introduce yourself to everyone and make lunch plans.",
-      "rightDesc": "Observe the social scene for a week first.",
+      "prompt": "First day at new school",
+      "leftDesc": "Introduce yourself",
+      "rightDesc": "Observe quietly",
       "options": [
-        "Introduce",
-        "Observe"
+        "Introduce yourself",
+        "Observe quietly"
       ],
       "optionMeta": [
         "I",
@@ -4199,12 +4194,12 @@
     },
     {
       "id": 210,
-      "prompt": "Gap year dreams:",
-      "leftDesc": "Backpack solo through hostels meeting strangers.",
-      "rightDesc": "Road trip with your squad sharing every moment.",
+      "prompt": "Gap year dreams big",
+      "leftDesc": "Hostels solo travel",
+      "rightDesc": "Squad group trip",
       "options": [
-        "Hostels solo",
-        "Squad trip"
+        "Hostels solo travel",
+        "Squad group trip"
       ],
       "optionMeta": [
         "O+",
@@ -4219,12 +4214,12 @@
     },
     {
       "id": 211,
-      "prompt": "Party invite arrives:",
-      "leftDesc": "Excited! Time to meet new people and have fun.",
-      "rightDesc": "Check who's going first, stay home instead.",
+      "prompt": "Party invite arrives tonight",
+      "leftDesc": "Excited to go",
+      "rightDesc": "Maybe skip it",
       "options": [
-        "Excited",
-        "Maybe skip"
+        "Excited to go",
+        "Maybe skip it"
       ],
       "optionMeta": [
         "E",
@@ -4239,12 +4234,12 @@
     },
     {
       "id": 212,
-      "prompt": "Prom date ask:",
-      "leftDesc": "Big public promposal with fanfare.",
-      "rightDesc": "Private moment one-on-one.",
+      "prompt": "Prom date ask time",
+      "leftDesc": "Big promposal",
+      "rightDesc": "Private quiet ask",
       "options": [
-        "Promposal",
-        "Private ask"
+        "Big promposal",
+        "Private quiet ask"
       ],
       "optionMeta": [
         "E+",
@@ -4255,17 +4250,16 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false,
-      "responseType": "slider"
+      "wildcard": false
     },
     {
       "id": 213,
-      "prompt": "College essay topic:",
-      "leftDesc": "A meaningful experience that changed who you are.",
-      "rightDesc": "Your big achievements and concrete accomplishments.",
+      "prompt": "College essay topic choice",
+      "leftDesc": "Meaningful personal story",
+      "rightDesc": "List achievements",
       "options": [
-        "Meaningful story",
-        "Achievements"
+        "Meaningful personal story",
+        "List achievements"
       ],
       "optionMeta": [
         "N",
@@ -4280,12 +4274,12 @@
     },
     {
       "id": 214,
-      "prompt": "Friend asks for brutally honest feedback:",
-      "leftDesc": "The truth, even if it stings a little.",
-      "rightDesc": "A softer version that protects their feelings.",
+      "prompt": "Friend asks for brutally honest feedback",
+      "leftDesc": "Give hard truth",
+      "rightDesc": "Softer gentle truth",
       "options": [
-        "Hard truth",
-        "Softer truth"
+        "Give hard truth",
+        "Softer gentle truth"
       ],
       "optionMeta": [
         "T",
@@ -4300,12 +4294,12 @@
     },
     {
       "id": 215,
-      "prompt": "Weekend plan changes last minute:",
-      "leftDesc": "Annoyed. You already had things scheduled and ready.",
-      "rightDesc": "Excited! Spontaneous adventures are the best kind.",
+      "prompt": "Weekend plan changes last minute",
+      "leftDesc": "Get annoyed",
+      "rightDesc": "Get excited",
       "options": [
-        "Annoyed",
-        "Excited"
+        "Get annoyed",
+        "Get excited"
       ],
       "optionMeta": [
         "J",
@@ -4316,16 +4310,15 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false,
-      "is2x": true
+      "wildcard": false
     },
     {
       "id": 216,
-      "prompt": "Group project partner isn't pulling weight:",
-      "leftDesc": "Confront them directly about doing their share.",
-      "rightDesc": "Do their work yourself to avoid conflict.",
+      "prompt": "Group project partner isn't pulling weight",
+      "leftDesc": "Confront them directly",
+      "rightDesc": "Do it yourself",
       "options": [
-        "Confront",
+        "Confront them directly",
         "Do it yourself"
       ],
       "optionMeta": [
@@ -4337,19 +4330,16 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false,
-      "responseType": "slider",
-      "isBadge": true,
-      "badgeHint": "Creative Mind"
+      "wildcard": false
     },
     {
       "id": 217,
-      "prompt": "Driver's license test coming:",
-      "leftDesc": "Practice with the manual and follow rules.",
-      "rightDesc": "Learn by doing, wing it with street smarts.",
+      "prompt": "Driver's license test coming up",
+      "leftDesc": "Manual rules study",
+      "rightDesc": "Street smarts practice",
       "options": [
-        "Manual rules",
-        "Street smarts"
+        "Manual rules study",
+        "Street smarts practice"
       ],
       "optionMeta": [
         "C",
@@ -4364,12 +4354,12 @@
     },
     {
       "id": 218,
-      "prompt": "New hobby to try:",
-      "leftDesc": "Something creative and unconventional like pottery.",
-      "rightDesc": "Something practical like cooking or budgeting.",
+      "prompt": "New hobby to try out",
+      "leftDesc": "Creative unusual hobby",
+      "rightDesc": "Practical useful skill",
       "options": [
-        "Creative hobby",
-        "Practical skill"
+        "Creative unusual hobby",
+        "Practical useful skill"
       ],
       "optionMeta": [
         "O+",
@@ -4384,11 +4374,11 @@
     },
     {
       "id": 219,
-      "prompt": "Your room organization:",
-      "leftDesc": "Everything has a place, labeled and color-coded.",
-      "rightDesc": "Organized chaoswith a hidden system.",
+      "prompt": "Your room organization style",
+      "leftDesc": "Color-coded neat",
+      "rightDesc": "Organized chaos",
       "options": [
-        "Color-coded",
+        "Color-coded neat",
         "Organized chaos"
       ],
       "optionMeta": [
@@ -4404,11 +4394,11 @@
     },
     {
       "id": 220,
-      "prompt": "Someone gossips about a friend:",
-      "leftDesc": "Defend your friend and shut it down immediately.",
-      "rightDesc": "Stay neutral, don't wanna get involved.",
+      "prompt": "Someone gossips about a friend",
+      "leftDesc": "Defend them strongly",
+      "rightDesc": "Stay neutral",
       "options": [
-        "Defend them",
+        "Defend them strongly",
         "Stay neutral"
       ],
       "optionMeta": [
@@ -4420,17 +4410,16 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false,
-      "responseType": "slider"
+      "wildcard": false
     },
     {
       "id": 221,
-      "prompt": "Before a big game or performance:",
-      "leftDesc": "Calm and focused, you've prepared, you're ready.",
-      "rightDesc": "Nervous butterflies that won't go away.",
+      "prompt": "Before a big game or performance",
+      "leftDesc": "Calm and focused",
+      "rightDesc": "Nervous energy",
       "options": [
-        "Calm focused",
-        "Nervous"
+        "Calm and focused",
+        "Nervous energy"
       ],
       "optionMeta": [
         "N-",
@@ -4445,12 +4434,12 @@
     },
     {
       "id": 222,
-      "prompt": "Part-time job interview:",
-      "leftDesc": "Research the company, prepare answers, dress sharp.",
-      "rightDesc": "Show up with confidence and charm your way through.",
+      "prompt": "Part-time job interview",
+      "leftDesc": "Research prep deep",
+      "rightDesc": "Wing it with charm",
       "options": [
-        "Research prep",
-        "Wing it charm"
+        "Research prep deep",
+        "Wing it with charm"
       ],
       "optionMeta": [
         "C",
@@ -4465,11 +4454,11 @@
     },
     {
       "id": 223,
-      "prompt": "Social media post goes viral:",
-      "leftDesc": "Love the attention! Engage with every comment.",
-      "rightDesc": "Feel slightly exposed, delete it later.",
+      "prompt": "Social media post goes viral",
+      "leftDesc": "Love the attention",
+      "rightDesc": "Feel exposed",
       "options": [
-        "Love it",
+        "Love the attention",
         "Feel exposed"
       ],
       "optionMeta": [
@@ -4485,12 +4474,12 @@
     },
     {
       "id": 224,
-      "prompt": "Planning senior trip:",
-      "leftDesc": "Take charge of all logistics.",
-      "rightDesc": "Go with the flow, let others handle details.",
+      "prompt": "Planning senior trip details",
+      "leftDesc": "Handle logistics all",
+      "rightDesc": "Go with the flow",
       "options": [
-        "Handle logistics",
-        "Go with flow"
+        "Handle logistics all",
+        "Go with the flow"
       ],
       "optionMeta": [
         "D",
@@ -4501,19 +4490,16 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": false,
-      "responseType": "slider",
-      "isBadge": true,
-      "badgeHint": "Pattern Spotter"
+      "wildcard": false
     },
     {
       "id": 225,
-      "prompt": "Debate team topic:",
-      "leftDesc": "Research every angle, anticipate counterarguments.",
-      "rightDesc": "Trust your quick thinking and improvise on stage.",
+      "prompt": "Debate team topic assigned",
+      "leftDesc": "Research deep first",
+      "rightDesc": "Improvise on spot",
       "options": [
-        "Research deep",
-        "Improvise"
+        "Research deep first",
+        "Improvise on spot"
       ],
       "optionMeta": [
         "C",
@@ -4524,11 +4510,3522 @@
       "tier": "13-18",
       "version": "v1",
       "paid": false,
-      "wildcard": true,
-      "is2x": true
+      "wildcard": true
     },
     {
       "id": 226,
+      "prompt": "Weekend morning vibes",
+      "leftDesc": "Early bird rise",
+      "rightDesc": "Sleep in late",
+      "options": [
+        "Early bird rise",
+        "Sleep in late"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 227,
+      "prompt": "Friend needs advice now",
+      "leftDesc": "Listen patiently",
+      "rightDesc": "Advise right away",
+      "options": [
+        "Listen patiently",
+        "Advise right away"
+      ],
+      "optionMeta": [
+        "I",
+        "E"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 228,
+      "prompt": "New recipe to try",
+      "leftDesc": "Follow recipe exactly",
+      "rightDesc": "Wing it creatively",
+      "options": [
+        "Follow recipe exactly",
+        "Wing it creatively"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 229,
+      "prompt": "Roommate conflict brewing up",
+      "leftDesc": "Chart the rules",
+      "rightDesc": "Heart-to-heart talk",
+      "options": [
+        "Chart the rules",
+        "Heart-to-heart talk"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 230,
+      "prompt": "Vacation planning style",
+      "leftDesc": "Planned itinerary full",
+      "rightDesc": "Spontaneous adventure",
+      "options": [
+        "Planned itinerary full",
+        "Spontaneous adventure"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 231,
+      "prompt": "Group dinner bill arrives",
+      "leftDesc": "Take charge split",
+      "rightDesc": "Go with flow",
+      "options": [
+        "Take charge split",
+        "Go with flow"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 232,
+      "prompt": "Party invite arrives",
+      "leftDesc": "Make big entrance",
+      "rightDesc": "Find a friend",
+      "options": [
+        "Make big entrance",
+        "Find a friend"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 233,
+      "prompt": "IKEA furniture arrives home",
+      "leftDesc": "Read all instructions",
+      "rightDesc": "Figure it out",
+      "options": [
+        "Read all instructions",
+        "Figure it out"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
+      "psych": "DISC-CD",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 234,
+      "prompt": "New music discovery",
+      "leftDesc": "Weird new genre",
+      "rightDesc": "Trusted fave artist",
+      "options": [
+        "Weird new genre",
+        "Trusted fave artist"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 235,
+      "prompt": "Deadline approaching fast",
+      "leftDesc": "Done early ahead",
+      "rightDesc": "Last minute rush",
+      "options": [
+        "Done early ahead",
+        "Last minute rush"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 236,
+      "prompt": "Meeting new people event",
+      "leftDesc": "Seek new faces",
+      "rightDesc": "Stick old friends",
+      "options": [
+        "Seek new faces",
+        "Stick old friends"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 237,
+      "prompt": "Someone cuts in line",
+      "leftDesc": "Speak up now",
+      "rightDesc": "Let it go",
+      "options": [
+        "Speak up now",
+        "Let it go"
+      ],
+      "optionMeta": [
+        "A-",
+        "A+"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v2",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 238,
+      "prompt": "Crush texts you back",
+      "leftDesc": "Reply quick",
+      "rightDesc": "Think response",
+      "options": [
+        "Reply quick",
+        "Think response"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 239,
+      "prompt": "Study group session",
+      "leftDesc": "Lead discussion",
+      "rightDesc": "Listen notes",
+      "options": [
+        "Lead discussion",
+        "Listen notes"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 240,
+      "prompt": "Bad grade feedback",
+      "leftDesc": "Argue teacher",
+      "rightDesc": "Reflect improve",
+      "options": [
+        "Argue teacher",
+        "Reflect improve"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 241,
+      "prompt": "Summer job choice",
+      "leftDesc": "Fun gig",
+      "rightDesc": "Stable pay",
+      "options": [
+        "Fun gig",
+        "Stable pay"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 242,
+      "prompt": "Online argument starts",
+      "leftDesc": "Debate hard",
+      "rightDesc": "Block user",
+      "options": [
+        "Debate hard",
+        "Block user"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 243,
+      "prompt": "Playlist creation time",
+      "leftDesc": "Mix genres",
+      "rightDesc": "Favorite repeats",
+      "options": [
+        "Mix genres",
+        "Favorite repeats"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 244,
+      "prompt": "New app download",
+      "leftDesc": "Explore features",
+      "rightDesc": "Basic use",
+      "options": [
+        "Explore features",
+        "Basic use"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 245,
+      "prompt": "School event planning",
+      "leftDesc": "Organize all",
+      "rightDesc": "Help out",
+      "options": [
+        "Organize all",
+        "Help out"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 246,
+      "prompt": "Budget allowance money",
+      "leftDesc": "Save monthly",
+      "rightDesc": "Spend weekly",
+      "options": [
+        "Save monthly",
+        "Spend weekly"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 247,
+      "prompt": "Help classmate study",
+      "leftDesc": "Tutor them",
+      "rightDesc": "Group session",
+      "options": [
+        "Tutor them",
+        "Group session"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 248,
+      "prompt": "Exam nerves hit",
+      "leftDesc": "Stay calm",
+      "rightDesc": "Worry bad",
+      "options": [
+        "Stay calm",
+        "Worry bad"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 249,
+      "prompt": "Club meeting dynamics",
+      "leftDesc": "Run agenda",
+      "rightDesc": "Add ideas",
+      "options": [
+        "Run agenda",
+        "Add ideas"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
+      "psych": "DISC-DC",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 250,
+      "prompt": "Outfit choice daily",
+      "leftDesc": "Trendy new",
+      "rightDesc": "Comfy old",
+      "options": [
+        "Trendy new",
+        "Comfy old"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
+      "psych": "DISC-CD",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 251,
+      "prompt": "Favorite subject class",
+      "leftDesc": "Math logic",
+      "rightDesc": "Art creative",
+      "options": [
+        "Math logic",
+        "Art creative"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 252,
+      "prompt": "Dream college pick",
+      "leftDesc": "Big campus",
+      "rightDesc": "Small town",
+      "options": [
+        "Big campus",
+        "Small town"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 253,
+      "prompt": "Peer pressure moment",
+      "leftDesc": "Stand firm",
+      "rightDesc": "Go along",
+      "options": [
+        "Stand firm",
+        "Go along"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 254,
+      "prompt": "Daily schedule teen",
+      "leftDesc": "Strict routine",
+      "rightDesc": "Flexible day",
+      "options": [
+        "Strict routine",
+        "Flexible day"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 255,
+      "prompt": "Video game night",
+      "leftDesc": "Competitive win",
+      "rightDesc": "Fun play",
+      "options": [
+        "Competitive win",
+        "Fun play"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 256,
+      "prompt": "Social feed scroll",
+      "leftDesc": "Like everything",
+      "rightDesc": "Selective posts",
+      "options": [
+        "Like everything",
+        "Selective posts"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 257,
+      "prompt": "New trend try",
+      "leftDesc": "Jump in",
+      "rightDesc": "Watch first",
+      "options": [
+        "Jump in",
+        "Watch first"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 258,
+      "prompt": "Group chat active",
+      "leftDesc": "Reply fast",
+      "rightDesc": "Quiet read",
+      "options": [
+        "Reply fast",
+        "Quiet read"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 259,
+      "prompt": "Homework strategy",
+      "leftDesc": "Plan breaks",
+      "rightDesc": "All at once",
+      "options": [
+        "Plan breaks",
+        "All at once"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 260,
+      "prompt": "Lend phone charger",
+      "leftDesc": "Yes anytime",
+      "rightDesc": "No my battery",
+      "options": [
+        "Yes anytime",
+        "No my battery"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 261,
+      "prompt": "Late night study",
+      "leftDesc": "Focused quiet",
+      "rightDesc": "Stressed out",
+      "options": [
+        "Focused quiet",
+        "Stressed out"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 262,
+      "prompt": "Debate club join",
+      "leftDesc": "Argue side",
+      "rightDesc": "Research facts",
+      "options": [
+        "Argue side",
+        "Research facts"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 263,
+      "prompt": "Book report due",
+      "leftDesc": "Summarize plot",
+      "rightDesc": "Analyze themes",
+      "options": [
+        "Summarize plot",
+        "Analyze themes"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 264,
+      "prompt": "Friend breakup hard",
+      "leftDesc": "Talk it out",
+      "rightDesc": "Move on",
+      "options": [
+        "Talk it out",
+        "Move on"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 265,
+      "prompt": "Weekend curfew set",
+      "leftDesc": "Follow rule",
+      "rightDesc": "Bend it",
+      "options": [
+        "Follow rule",
+        "Bend it"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 266,
+      "prompt": "School dance night",
+      "leftDesc": "Dance floor",
+      "rightDesc": "Wall chat",
+      "options": [
+        "Dance floor",
+        "Wall chat"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 267,
+      "prompt": "New phone case",
+      "leftDesc": "Funky design",
+      "rightDesc": "Plain color",
+      "options": [
+        "Funky design",
+        "Plain color"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 268,
+      "prompt": "Team tryouts day",
+      "leftDesc": "Compete hard",
+      "rightDesc": "Support others",
+      "options": [
+        "Compete hard",
+        "Support others"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 269,
+      "prompt": "Allowance spending plan",
+      "leftDesc": "Budget list",
+      "rightDesc": "Impulse buy",
+      "options": [
+        "Budget list",
+        "Impulse buy"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 270,
+      "prompt": "Volunteer event",
+      "leftDesc": "Lead group",
+      "rightDesc": "Help quietly",
+      "options": [
+        "Lead group",
+        "Help quietly"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 271,
+      "prompt": "Movie night choice",
+      "leftDesc": "Action flick",
+      "rightDesc": "Drama story",
+      "options": [
+        "Action flick",
+        "Drama story"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 272,
+      "prompt": "Science project team",
+      "leftDesc": "Direct build",
+      "rightDesc": "Brainstorm ideas",
+      "options": [
+        "Direct build",
+        "Brainstorm ideas"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
+      "psych": "DISC-DC",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 273,
+      "prompt": "Math homework tough",
+      "leftDesc": "Step by step",
+      "rightDesc": "Guess check",
+      "options": [
+        "Step by step",
+        "Guess check"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
+      "psych": "DISC-CD",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 274,
+      "prompt": "Favorite hangout spot",
+      "leftDesc": "Busy mall",
+      "rightDesc": "Quiet park",
+      "options": [
+        "Busy mall",
+        "Quiet park"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 275,
+      "prompt": "Future invention idea",
+      "leftDesc": "Practical tool",
+      "rightDesc": "Weird gadget",
+      "options": [
+        "Practical tool",
+        "Weird gadget"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 276,
+      "prompt": "Sibling rivalry hits",
+      "leftDesc": "Compete win",
+      "rightDesc": "Compromise fair",
+      "options": [
+        "Compete win",
+        "Compromise fair"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 277,
+      "prompt": "Study abroad dream",
+      "leftDesc": "Planned trip",
+      "rightDesc": "Spont adventure",
+      "options": [
+        "Planned trip",
+        "Spont adventure"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 278,
+      "prompt": "Online friend meet",
+      "leftDesc": "Excited chat",
+      "rightDesc": "Cautious wait",
+      "options": [
+        "Excited chat",
+        "Cautious wait"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 279,
+      "prompt": "Playlist share",
+      "leftDesc": "Public all",
+      "rightDesc": "Private few",
+      "options": [
+        "Public all",
+        "Private few"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 280,
+      "prompt": "Viral challenge do",
+      "leftDesc": "Join trend",
+      "rightDesc": "Skip it",
+      "options": [
+        "Join trend",
+        "Skip it"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 281,
+      "prompt": "School club lead",
+      "leftDesc": "Run meetings",
+      "rightDesc": "Attend only",
+      "options": [
+        "Run meetings",
+        "Attend only"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 282,
+      "prompt": "Daily journal keep",
+      "leftDesc": "Regular entries",
+      "rightDesc": "Random notes",
+      "options": [
+        "Regular entries",
+        "Random notes"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 283,
+      "prompt": "Group conflict resolve",
+      "leftDesc": "Mediate talk",
+      "rightDesc": "Ignore it",
+      "options": [
+        "Mediate talk",
+        "Ignore it"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 284,
+      "prompt": "First date nerves",
+      "leftDesc": "Calm plan",
+      "rightDesc": "Worry lots",
+      "options": [
+        "Calm plan",
+        "Worry lots"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 285,
+      "prompt": "Essay writing style",
+      "leftDesc": "Outline first",
+      "rightDesc": "Free write",
+      "options": [
+        "Outline first",
+        "Free write"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 286,
+      "prompt": "Poem assignment",
+      "leftDesc": "Rhyme scheme",
+      "rightDesc": "Free verse",
+      "options": [
+        "Rhyme scheme",
+        "Free verse"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 287,
+      "prompt": "Teacher conflict",
+      "leftDesc": "Discuss calm",
+      "rightDesc": "Yell back",
+      "options": [
+        "Discuss calm",
+        "Yell back"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 288,
+      "prompt": "Part time shift",
+      "leftDesc": "Punctual always",
+      "rightDesc": "Late sometimes",
+      "options": [
+        "Punctual always",
+        "Late sometimes"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 289,
+      "prompt": "Social cause join",
+      "leftDesc": "Protest loud",
+      "rightDesc": "Donate quiet",
+      "options": [
+        "Protest loud",
+        "Donate quiet"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 290,
+      "prompt": "New hairstyle try",
+      "leftDesc": "Bold change",
+      "rightDesc": "Safe trim",
+      "options": [
+        "Bold change",
+        "Safe trim"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 291,
+      "prompt": "Festival crowd big",
+      "leftDesc": "Front stage",
+      "rightDesc": "Back chill",
+      "options": [
+        "Front stage",
+        "Back chill"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 292,
+      "prompt": "Goal setting teen",
+      "leftDesc": "Long term plan",
+      "rightDesc": "Short fun",
+      "options": [
+        "Long term plan",
+        "Short fun"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 293,
+      "prompt": "Share feelings with",
+      "leftDesc": "Best friend",
+      "rightDesc": "Keep inside",
+      "options": [
+        "Best friend",
+        "Keep inside"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 294,
+      "prompt": "Competition loss",
+      "leftDesc": "Accept grace",
+      "rightDesc": "Get upset",
+      "options": [
+        "Accept grace",
+        "Get upset"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 295,
+      "prompt": "Art class project",
+      "leftDesc": "Lead design",
+      "rightDesc": "Follow group",
+      "options": [
+        "Lead design",
+        "Follow group"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
+      "psych": "DISC-DC",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 296,
+      "prompt": "Music practice",
+      "leftDesc": "Daily routine",
+      "rightDesc": "When inspired",
+      "options": [
+        "Daily routine",
+        "When inspired"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
+      "psych": "DISC-CD",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 297,
+      "prompt": "Favorite vacation type",
+      "leftDesc": "Adventure trip",
+      "rightDesc": "Relax beach",
+      "options": [
+        "Adventure trip",
+        "Relax beach"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 298,
+      "prompt": "Dream business idea",
+      "leftDesc": "Safe store",
+      "rightDesc": "Innovative app",
+      "options": [
+        "Safe store",
+        "Innovative app"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 299,
+      "prompt": "Parent argument",
+      "leftDesc": "Logic debate",
+      "rightDesc": "Emotional plea",
+      "options": [
+        "Logic debate",
+        "Emotional plea"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 300,
+      "prompt": "Travel packing list",
+      "leftDesc": "Organized bag",
+      "rightDesc": "Last minute",
+      "options": [
+        "Organized bag",
+        "Last minute"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 301,
+      "prompt": "Team sports role",
+      "leftDesc": "Captain lead",
+      "rightDesc": "Player support",
+      "options": [
+        "Captain lead",
+        "Player support"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 302,
+      "prompt": "Online profile",
+      "leftDesc": "Public posts",
+      "rightDesc": "Private account",
+      "options": [
+        "Public posts",
+        "Private account"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 303,
+      "prompt": "New tech gadget",
+      "leftDesc": "Buy latest",
+      "rightDesc": "Wait reviews",
+      "options": [
+        "Buy latest",
+        "Wait reviews"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 304,
+      "prompt": "Concert tickets get",
+      "leftDesc": "Go with crowd",
+      "rightDesc": "Solo enjoy",
+      "options": [
+        "Go with crowd",
+        "Solo enjoy"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 305,
+      "prompt": "Chore schedule home",
+      "leftDesc": "Fixed times",
+      "rightDesc": "When free",
+      "options": [
+        "Fixed times",
+        "When free"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 306,
+      "prompt": "Donate allowance",
+      "leftDesc": "Give generously",
+      "rightDesc": "Save first",
+      "options": [
+        "Give generously",
+        "Save first"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 307,
+      "prompt": "Public speaking class",
+      "leftDesc": "Confident talk",
+      "rightDesc": "Nervous sweat",
+      "options": [
+        "Confident talk",
+        "Nervous sweat"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 308,
+      "prompt": "History report",
+      "leftDesc": "Facts list",
+      "rightDesc": "Story tell",
+      "options": [
+        "Facts list",
+        "Story tell"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 309,
+      "prompt": "Science fair idea",
+      "leftDesc": "Known experiment",
+      "rightDesc": "New invention",
+      "options": [
+        "Known experiment",
+        "New invention"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 310,
+      "prompt": "Bully situation",
+      "leftDesc": "Stand up",
+      "rightDesc": "Report teacher",
+      "options": [
+        "Stand up",
+        "Report teacher"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 311,
+      "prompt": "Extracurricular choice",
+      "leftDesc": "Structured club",
+      "rightDesc": "Free hobby",
+      "options": [
+        "Structured club",
+        "Free hobby"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 312,
+      "prompt": "Group text reply",
+      "leftDesc": "Quick emoji",
+      "rightDesc": "Thoughtful message",
+      "options": [
+        "Quick emoji",
+        "Thoughtful message"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 313,
+      "prompt": "New book genre",
+      "leftDesc": "Fantasy wild",
+      "rightDesc": "Real life",
+      "options": [
+        "Fantasy wild",
+        "Real life"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 314,
+      "prompt": "Cafeteria lunch",
+      "leftDesc": "Sit popular",
+      "rightDesc": "Alone quiet",
+      "options": [
+        "Sit popular",
+        "Alone quiet"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 315,
+      "prompt": "Test prep method",
+      "leftDesc": "Study guide",
+      "rightDesc": "Flash cards",
+      "options": [
+        "Study guide",
+        "Flash cards"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 316,
+      "prompt": "Apologize to friend",
+      "leftDesc": "Say sorry",
+      "rightDesc": "Buy gift",
+      "options": [
+        "Say sorry",
+        "Buy gift"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 317,
+      "prompt": "Stormy weather day",
+      "leftDesc": "Stay inside",
+      "rightDesc": "Go out",
+      "options": [
+        "Stay inside",
+        "Go out"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 318,
+      "prompt": "Math club puzzle",
+      "leftDesc": "Solve lead",
+      "rightDesc": "Team input",
+      "options": [
+        "Solve lead",
+        "Team input"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
+      "psych": "DISC-DC",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 319,
+      "prompt": "Coding class",
+      "leftDesc": "Follow tutorial",
+      "rightDesc": "Experiment code",
+      "options": [
+        "Follow tutorial",
+        "Experiment code"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
+      "psych": "DISC-CD",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 320,
+      "prompt": "Favorite movie type",
+      "leftDesc": "Comedy laugh",
+      "rightDesc": "Deep drama",
+      "options": [
+        "Comedy laugh",
+        "Deep drama"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 321,
+      "prompt": "Everyone agrees on plan",
+      "leftDesc": "Follow consensus",
+      "rightDesc": "Question assumption",
+      "options": [
+        "Follow consensus",
+        "Question assumption"
+      ],
+      "optionMeta": [
+        "CT0",
+        "CT1"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": true
+    },
+    {
+      "id": 322,
+      "prompt": "Facing complex problem",
+      "leftDesc": "Accept surface level",
+      "rightDesc": "Break to basics",
+      "options": [
+        "Accept surface level",
+        "Break to basics"
+      ],
+      "optionMeta": [
+        "FP0",
+        "FP1"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": true
+    },
+    {
+      "id": 323,
+      "prompt": "Popular opinion contradicts data",
+      "leftDesc": "Trust the data",
+      "rightDesc": "Consider crowd view",
+      "options": [
+        "Trust the data",
+        "Consider crowd view"
+      ],
+      "optionMeta": [
+        "CT1",
+        "CT0"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": true
+    },
+    {
+      "id": 324,
+      "prompt": "Solving a stuck problem",
+      "leftDesc": "Rebuild from zero",
+      "rightDesc": "Vary what works",
+      "options": [
+        "Rebuild from zero",
+        "Vary what works"
+      ],
+      "optionMeta": [
+        "FP1",
+        "FP0"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": true
+    },
+    {
+      "id": 325,
+      "prompt": "Group decision seems off",
+      "leftDesc": "Agree with all",
+      "rightDesc": "Ask why",
+      "options": [
+        "Agree with all",
+        "Ask why"
+      ],
+      "optionMeta": [
+        "CT0",
+        "CT1"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 326,
+      "prompt": "Project fails midway",
+      "leftDesc": "Start over fresh",
+      "rightDesc": "Adjust current",
+      "options": [
+        "Start over fresh",
+        "Adjust current"
+      ],
+      "optionMeta": [
+        "FP1",
+        "FP0"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 327,
+      "prompt": "Friend shares wrong info",
+      "leftDesc": "Correct immediately",
+      "rightDesc": "Let pass",
+      "options": [
+        "Correct immediately",
+        "Let pass"
+      ],
+      "optionMeta": [
+        "CT1",
+        "CT0"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 328,
+      "prompt": "New school rule",
+      "leftDesc": "Think basics why",
+      "rightDesc": "Accept it",
+      "options": [
+        "Think basics why",
+        "Accept it"
+      ],
+      "optionMeta": [
+        "FP0",
+        "FP1"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 329,
+      "prompt": "Story plot confusing",
+      "leftDesc": "Ignore gap",
+      "rightDesc": "Figure logic",
+      "options": [
+        "Ignore gap",
+        "Figure logic"
+      ],
+      "optionMeta": [
+        "CT0",
+        "CT1"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 330,
+      "prompt": "Experiment goes wrong",
+      "leftDesc": "New setup",
+      "rightDesc": "Check cause",
+      "options": [
+        "New setup",
+        "Check cause"
+      ],
+      "optionMeta": [
+        "FP1",
+        "FP0"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 331,
+      "prompt": "Team idea flawed",
+      "leftDesc": "Follow anyway",
+      "rightDesc": "Improve it",
+      "options": [
+        "Follow anyway",
+        "Improve it"
+      ],
+      "optionMeta": [
+        "CT1",
+        "CT0"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 332,
+      "prompt": "Homework method stuck",
+      "leftDesc": "Disassemble steps",
+      "rightDesc": "Vary approach",
+      "options": [
+        "Disassemble steps",
+        "Vary approach"
+      ],
+      "optionMeta": [
+        "FP0",
+        "FP1"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 333,
+      "prompt": "All like one trend",
+      "leftDesc": "Join same",
+      "rightDesc": "Why popular",
+      "options": [
+        "Join same",
+        "Why popular"
+      ],
+      "optionMeta": [
+        "CT0",
+        "CT1"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 334,
+      "prompt": "Gadget breaks down",
+      "leftDesc": "Rebuild core",
+      "rightDesc": "Add fixes",
+      "options": [
+        "Rebuild core",
+        "Add fixes"
+      ],
+      "optionMeta": [
+        "FP1",
+        "FP0"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 335,
+      "prompt": "Answer too simple",
+      "leftDesc": "Trust quick",
+      "rightDesc": "Double check",
+      "options": [
+        "Trust quick",
+        "Double check"
+      ],
+      "optionMeta": [
+        "CT1",
+        "CT0"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 336,
+      "prompt": "Essay structure new",
+      "leftDesc": "From basics build",
+      "rightDesc": "Copy old",
+      "options": [
+        "From basics build",
+        "Copy old"
+      ],
+      "optionMeta": [
+        "FP0",
+        "FP1"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 337,
+      "prompt": "Teacher fact wrong",
+      "leftDesc": "Believe all",
+      "rightDesc": "Ask proof",
+      "options": [
+        "Believe all",
+        "Ask proof"
+      ],
+      "optionMeta": [
+        "CT0",
+        "CT1"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 338,
+      "prompt": "Strategy fails test",
+      "leftDesc": "New from zero",
+      "rightDesc": "Tweak old",
+      "options": [
+        "New from zero",
+        "Tweak old"
+      ],
+      "optionMeta": [
+        "FP1",
+        "FP0"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 339,
+      "prompt": "Friends all agree",
+      "leftDesc": "Join quick",
+      "rightDesc": "Think alone",
+      "options": [
+        "Join quick",
+        "Think alone"
+      ],
+      "optionMeta": [
+        "CT1",
+        "CT0"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 340,
+      "prompt": "Puzzle piece missing",
+      "leftDesc": "Make own",
+      "rightDesc": "Search more",
+      "options": [
+        "Make own",
+        "Search more"
+      ],
+      "optionMeta": [
+        "FP0",
+        "FP1"
+      ],
+      "psych": "FirstPrinciples",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 341,
+      "prompt": "Viral fact check",
+      "leftDesc": "Accept share",
+      "rightDesc": "Verify source",
+      "options": [
+        "Accept share",
+        "Verify source"
+      ],
+      "optionMeta": [
+        "CT0",
+        "CT1"
+      ],
+      "psych": "Critical",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 342,
+      "prompt": "I enjoy big parties with lots of people",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "I",
+        "E"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 343,
+      "prompt": "I prefer practical solutions over wild ideas",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "N",
+        "S"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 344,
+      "prompt": "I make decisions based on feelings more than logic",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 345,
+      "prompt": "I like having my day fully planned out",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "P",
+        "J"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 346,
+      "prompt": "I take the lead in group situations often",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "S",
+        "D"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 347,
+      "prompt": "I focus on building relationships in teams",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "D",
+        "I"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 348,
+      "prompt": "I prioritize accuracy over speed in tasks",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "I",
+        "C"
+      ],
+      "psych": "DISC-CD",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 349,
+      "prompt": "I seek out new experiences frequently",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "O-",
+        "O+"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 350,
+      "prompt": "I feel energized after social events",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "E-",
+        "E+"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 351,
+      "prompt": "I always meet deadlines without reminders",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "C-",
+        "C+"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 352,
+      "prompt": "I go out of my way to help others",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "A-",
+        "A+"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 353,
+      "prompt": "I get stressed easily in tough situations",
+      "leftDesc": "Strongly disagree",
+      "rightDesc": "Strongly agree",
+      "options": [
+        "Strongly disagree",
+        "Strongly agree"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false,
+      "responseType": "slider"
+    },
+    {
+      "id": 354,
+      "prompt": "New class elective",
+      "leftDesc": "Creative writing",
+      "rightDesc": "Math advanced",
+      "options": [
+        "Creative writing",
+        "Math advanced"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 355,
+      "prompt": "After school hang",
+      "leftDesc": "Crowd fun",
+      "rightDesc": "Quiet chat",
+      "options": [
+        "Crowd fun",
+        "Quiet chat"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 356,
+      "prompt": "Phone organization",
+      "leftDesc": "App folders",
+      "rightDesc": "Home screen mess",
+      "options": [
+        "App folders",
+        "Home screen mess"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 357,
+      "prompt": "See unfairness",
+      "leftDesc": "Speak against",
+      "rightDesc": "Stay silent",
+      "options": [
+        "Speak against",
+        "Stay silent"
+      ],
+      "optionMeta": [
+        "A-",
+        "A+"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 358,
+      "prompt": "Big change school",
+      "leftDesc": "Adapt quick",
+      "rightDesc": "Worry lots",
+      "options": [
+        "Adapt quick",
+        "Worry lots"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 359,
+      "prompt": "Debate topic teen",
+      "leftDesc": "Lead argument",
+      "rightDesc": "Support side",
+      "options": [
+        "Lead argument",
+        "Support side"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 360,
+      "prompt": "Favorite book type",
+      "leftDesc": "Real history",
+      "rightDesc": "Fantasy world",
+      "options": [
+        "Real history",
+        "Fantasy world"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 361,
+      "prompt": "Parent rule break",
+      "leftDesc": "Explain reason",
+      "rightDesc": "Accept punishment",
+      "options": [
+        "Explain reason",
+        "Accept punishment"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 362,
+      "prompt": "Summer break plan",
+      "leftDesc": "Schedule activities",
+      "rightDesc": "Chill daily",
+      "options": [
+        "Schedule activities",
+        "Chill daily"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 363,
+      "prompt": "Share opinion online",
+      "leftDesc": "Post bold",
+      "rightDesc": "Comment soft",
+      "options": [
+        "Post bold",
+        "Comment soft"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 364,
+      "prompt": "New sport try",
+      "leftDesc": "Extreme one",
+      "rightDesc": "Team game",
+      "options": [
+        "Extreme one",
+        "Team game"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 365,
+      "prompt": "Group study session",
+      "leftDesc": "Teach others",
+      "rightDesc": "Learn quiet",
+      "options": [
+        "Teach others",
+        "Learn quiet"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 366,
+      "prompt": "Save birthday money",
+      "leftDesc": "Invest smart",
+      "rightDesc": "Spend fun",
+      "options": [
+        "Invest smart",
+        "Spend fun"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 367,
+      "prompt": "Console friend upset",
+      "leftDesc": "Give advice",
+      "rightDesc": "Hug listen",
+      "options": [
+        "Give advice",
+        "Hug listen"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 368,
+      "prompt": "Performance anxiety",
+      "leftDesc": "Push through",
+      "rightDesc": "Freak out",
+      "options": [
+        "Push through",
+        "Freak out"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 369,
+      "prompt": "Class group work",
+      "leftDesc": "Assign tasks",
+      "rightDesc": "Go flow",
+      "options": [
+        "Assign tasks",
+        "Go flow"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
+      "psych": "DISC-DC",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 370,
+      "prompt": "Essay format",
+      "leftDesc": "Structured outline",
+      "rightDesc": "Stream thoughts",
+      "options": [
+        "Structured outline",
+        "Stream thoughts"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
+      "psych": "DISC-CD",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 371,
+      "prompt": "Favorite downtime",
+      "leftDesc": "Social media",
+      "rightDesc": "Read book",
+      "options": [
+        "Social media",
+        "Read book"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 372,
+      "prompt": "Ideal future home",
+      "leftDesc": "City buzz",
+      "rightDesc": "Country calm",
+      "options": [
+        "City buzz",
+        "Country calm"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 373,
+      "prompt": "Conflict with teacher",
+      "leftDesc": "Debate point",
+      "rightDesc": "Apologize quick",
+      "options": [
+        "Debate point",
+        "Apologize quick"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 374,
+      "prompt": "Travel style teen",
+      "leftDesc": "Packed itinerary",
+      "rightDesc": "Explore free",
+      "options": [
+        "Packed itinerary",
+        "Explore free"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 375,
+      "prompt": "Sports team drama",
+      "leftDesc": "Confront issue",
+      "rightDesc": "Ignore it",
+      "options": [
+        "Confront issue",
+        "Ignore it"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 376,
+      "prompt": "DM response time",
+      "leftDesc": "Instant reply",
+      "rightDesc": "Later thought",
+      "options": [
+        "Instant reply",
+        "Later thought"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 377,
+      "prompt": "New fashion trend",
+      "leftDesc": "Adopt quick",
+      "rightDesc": "Stick style",
+      "options": [
+        "Adopt quick",
+        "Stick style"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 378,
+      "prompt": "Concert vibe",
+      "leftDesc": "Mosh pit",
+      "rightDesc": "Seat back",
+      "options": [
+        "Mosh pit",
+        "Seat back"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 379,
+      "prompt": "Goal tracking app",
+      "leftDesc": "Daily check",
+      "rightDesc": "Weekly glance",
+      "options": [
+        "Daily check",
+        "Weekly glance"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 380,
+      "prompt": "Lend homework notes",
+      "leftDesc": "Share freely",
+      "rightDesc": "Only friends",
+      "options": [
+        "Share freely",
+        "Only friends"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 381,
+      "prompt": "Unexpected test pop",
+      "leftDesc": "Calm recall",
+      "rightDesc": "Panic blank",
+      "options": [
+        "Calm recall",
+        "Panic blank"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 382,
+      "prompt": "History debate",
+      "leftDesc": "Facts argue",
+      "rightDesc": "Story weave",
+      "options": [
+        "Facts argue",
+        "Story weave"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 383,
+      "prompt": "Science hypothesis",
+      "leftDesc": "Test method",
+      "rightDesc": "Intuit guess",
+      "options": [
+        "Test method",
+        "Intuit guess"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 384,
+      "prompt": "Peer feedback give",
+      "leftDesc": "Honest direct",
+      "rightDesc": "Gentle words",
+      "options": [
+        "Honest direct",
+        "Gentle words"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 385,
+      "prompt": "Club event plan",
+      "leftDesc": "Timeline set",
+      "rightDesc": "Improv day",
+      "options": [
+        "Timeline set",
+        "Improv day"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 386,
+      "prompt": "Online game play",
+      "leftDesc": "Solo quest",
+      "rightDesc": "Team up",
+      "options": [
+        "Solo quest",
+        "Team up"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 387,
+      "prompt": "New app feature",
+      "leftDesc": "Beta test",
+      "rightDesc": "Safe update",
+      "options": [
+        "Beta test",
+        "Safe update"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 388,
+      "prompt": "School rally",
+      "leftDesc": "Cheer loud",
+      "rightDesc": "Watch side",
+      "options": [
+        "Cheer loud",
+        "Watch side"
+      ],
+      "optionMeta": [
+        "E+",
+        "E-"
+      ],
+      "psych": "Big5-E",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 389,
+      "prompt": "Routine workout",
+      "leftDesc": "Scheduled gym",
+      "rightDesc": "Random run",
+      "options": [
+        "Scheduled gym",
+        "Random run"
+      ],
+      "optionMeta": [
+        "C+",
+        "C-"
+      ],
+      "psych": "Big5-C",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 390,
+      "prompt": "Charity drive teen",
+      "leftDesc": "Organize event",
+      "rightDesc": "Donate cash",
+      "options": [
+        "Organize event",
+        "Donate cash"
+      ],
+      "optionMeta": [
+        "A+",
+        "A-"
+      ],
+      "psych": "Big5-A",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 391,
+      "prompt": "Rollercoaster ride",
+      "leftDesc": "Front seat",
+      "rightDesc": "Back safe",
+      "options": [
+        "Front seat",
+        "Back safe"
+      ],
+      "optionMeta": [
+        "N-",
+        "N+"
+      ],
+      "psych": "Big5-N",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 392,
+      "prompt": "Math problem solve",
+      "leftDesc": "Formula use",
+      "rightDesc": "Creative way",
+      "options": [
+        "Formula use",
+        "Creative way"
+      ],
+      "optionMeta": [
+        "D",
+        "C"
+      ],
+      "psych": "DISC-DC",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 393,
+      "prompt": "English paper",
+      "leftDesc": "Grammar check",
+      "rightDesc": "Flow read",
+      "options": [
+        "Grammar check",
+        "Flow read"
+      ],
+      "optionMeta": [
+        "C",
+        "D"
+      ],
+      "psych": "DISC-CD",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 394,
+      "prompt": "Favorite music venue",
+      "leftDesc": "Big arena",
+      "rightDesc": "Small club",
+      "options": [
+        "Big arena",
+        "Small club"
+      ],
+      "optionMeta": [
+        "E",
+        "I"
+      ],
+      "psych": "MBTI-EI",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 395,
+      "prompt": "Dream superpower teen",
+      "leftDesc": "Invisibility",
+      "rightDesc": "Flying high",
+      "options": [
+        "Invisibility",
+        "Flying high"
+      ],
+      "optionMeta": [
+        "S",
+        "N"
+      ],
+      "psych": "MBTI-SN",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 396,
+      "prompt": "Family decision input",
+      "leftDesc": "Logic argue",
+      "rightDesc": "Feelings share",
+      "options": [
+        "Logic argue",
+        "Feelings share"
+      ],
+      "optionMeta": [
+        "T",
+        "F"
+      ],
+      "psych": "MBTI-TF",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 397,
+      "prompt": "Homework group",
+      "leftDesc": "Host home",
+      "rightDesc": "Join others",
+      "options": [
+        "Host home",
+        "Join others"
+      ],
+      "optionMeta": [
+        "J",
+        "P"
+      ],
+      "psych": "MBTI-JP",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 398,
+      "prompt": "Peer mentor role",
+      "leftDesc": "Guide strict",
+      "rightDesc": "Encourage soft",
+      "options": [
+        "Guide strict",
+        "Encourage soft"
+      ],
+      "optionMeta": [
+        "D",
+        "S"
+      ],
+      "psych": "DISC-DS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 399,
+      "prompt": "Social app use",
+      "leftDesc": "Post daily",
+      "rightDesc": "Scroll only",
+      "options": [
+        "Post daily",
+        "Scroll only"
+      ],
+      "optionMeta": [
+        "I",
+        "S"
+      ],
+      "psych": "DISC-IS",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": false
+    },
+    {
+      "id": 400,
+      "prompt": "New hobby class",
+      "leftDesc": "Unusual skill",
+      "rightDesc": "Common one",
+      "options": [
+        "Unusual skill",
+        "Common one"
+      ],
+      "optionMeta": [
+        "O+",
+        "O-"
+      ],
+      "psych": "Big5-O",
+      "time": 7,
+      "tier": "13-18",
+      "version": "v1",
+      "paid": false,
+      "wildcard": true
+    },
+    {
+      "id": 401,
       "prompt": "New work project lands:",
       "leftDesc": "Dive in fast, iterating and fixing as you go.",
       "rightDesc": "Map out every requirement first.",
@@ -4548,7 +8045,7 @@
       "wildcard": false
     },
     {
-      "id": 227,
+      "id": 402,
       "prompt": "Networking mixer tonight:",
       "leftDesc": "Work the room making connections.",
       "rightDesc": "Find one interesting person for a real conversation.",
@@ -4568,7 +8065,7 @@
       "wildcard": false
     },
     {
-      "id": 228,
+      "id": 403,
       "prompt": "Career crossroads:",
       "leftDesc": "Corporate ladder with clear promotions and benefits.",
       "rightDesc": "Startup gamble with equity and chance to build.",
@@ -4588,7 +8085,7 @@
       "wildcard": false
     },
     {
-      "id": 229,
+      "id": 404,
       "prompt": "Performance review hits hard:",
       "leftDesc": "Analyze feedback objectively objectively.",
       "rightDesc": "Feel the sting first then analyze.",
@@ -4609,7 +8106,7 @@
       "responseType": "slider"
     },
     {
-      "id": 230,
+      "id": 405,
       "prompt": "Trip abroad booked:",
       "leftDesc": "Create detailed itinerary with all details.",
       "rightDesc": "Book the flight only, solve the rest there.",
@@ -4630,7 +8127,7 @@
       "is2x": true
     },
     {
-      "id": 231,
+      "id": 406,
       "prompt": "Roommate tension brewing:",
       "leftDesc": "Have the direct awkward conversation directly.",
       "rightDesc": "Wait it out, hoping things naturally improve.",
@@ -4650,7 +8147,7 @@
       "wildcard": false
     },
     {
-      "id": 232,
+      "id": 407,
       "prompt": "Side hustle idea sparks:",
       "leftDesc": "Experiment with a wild untested idea for big upside.",
       "rightDesc": "Stick to proven models to minimize risk.",
@@ -4670,7 +8167,7 @@
       "wildcard": false
     },
     {
-      "id": 233,
+      "id": 408,
       "prompt": "Friday night arrives:",
       "leftDesc": "Hit the group chat, FOMO-fueled and ready to rally.",
       "rightDesc": "Decline everything for couch time.",
@@ -4693,7 +8190,7 @@
       "badgeHint": "Deep Diver"
     },
     {
-      "id": 234,
+      "id": 409,
       "prompt": "Your email inbox:",
       "leftDesc": "Inbox zero—every email sorted within 24 hours.",
       "rightDesc": "10,000 unread but somehow still fully functioning.",
@@ -4713,7 +8210,7 @@
       "wildcard": false
     },
     {
-      "id": 235,
+      "id": 410,
       "prompt": "Apartment rent negotiation:",
       "leftDesc": "Haggle hard firmly.",
       "rightDesc": "Pay listed price to avoid the hassle.",
@@ -4733,7 +8230,7 @@
       "wildcard": false
     },
     {
-      "id": 236,
+      "id": 411,
       "prompt": "Group dinner bill comes:",
       "leftDesc": "Split it equally, who cares about exact amounts.",
       "rightDesc": "Calculate each person's items for fair payment.",
@@ -4753,7 +8250,7 @@
       "wildcard": false
     },
     {
-      "id": 237,
+      "id": 412,
       "prompt": "First day at new job:",
       "leftDesc": "Introduce yourself to everyone in the office.",
       "rightDesc": "Observe the culture quietly before engaging much.",
@@ -4774,7 +8271,7 @@
       "responseType": "slider"
     },
     {
-      "id": 238,
+      "id": 413,
       "prompt": "Investment decision:",
       "leftDesc": "Research data, charts, and fundamentals extensively.",
       "rightDesc": "Trust your intuition about future trends.",
@@ -4794,7 +8291,7 @@
       "wildcard": false
     },
     {
-      "id": 239,
+      "id": 414,
       "prompt": "Relationship disagreement:",
       "leftDesc": "Debate the issue to resolution.",
       "rightDesc": "Focus on feelings first, facts can wait.",
@@ -4814,7 +8311,7 @@
       "wildcard": false
     },
     {
-      "id": 240,
+      "id": 415,
       "prompt": "Morning routine:",
       "leftDesc": "Same time, same order, every day.",
       "rightDesc": "Varies based on mood, energy, and what's happening.",
@@ -4835,7 +8332,7 @@
       "is2x": true
     },
     {
-      "id": 241,
+      "id": 416,
       "prompt": "Co-worker asks for feedback:",
       "leftDesc": "Honest critique that helps them improve directly.",
       "rightDesc": "Encouraging words that keep morale high.",
@@ -4858,7 +8355,7 @@
       "badgeHint": "Pattern Spotter"
     },
     {
-      "id": 242,
+      "id": 417,
       "prompt": "Learning new skill:",
       "leftDesc": "Exploring something outside your wheelhouse.",
       "rightDesc": "Getting better at something you're already good at.",
@@ -4878,7 +8375,7 @@
       "wildcard": false
     },
     {
-      "id": 243,
+      "id": 418,
       "prompt": "Work from home day:",
       "leftDesc": "Dedicated desk, proper lighting, workstation vibes.",
       "rightDesc": "Couch, bed, coffee shop, wherever feels right.",
@@ -4898,7 +8395,7 @@
       "wildcard": false
     },
     {
-      "id": 244,
+      "id": 419,
       "prompt": "Friend needs help moving:",
       "leftDesc": "Show up ready to work, no questions asked.",
       "rightDesc": "Check your schedule first, offer when convenient.",
@@ -4918,7 +8415,7 @@
       "wildcard": false
     },
     {
-      "id": 245,
+      "id": 420,
       "prompt": "Big deadline looming:",
       "leftDesc": "Stressed but thriving under the pressure.",
       "rightDesc": "Anxious, losing sleep, counting down the hours.",
@@ -4939,7 +8436,7 @@
       "responseType": "slider"
     },
     {
-      "id": 246,
+      "id": 421,
       "prompt": "Team meeting dynamics:",
       "leftDesc": "Drive the agenda and keep things going forward.",
       "rightDesc": "Listen and contribute when it matters.",
@@ -4959,7 +8456,7 @@
       "wildcard": false
     },
     {
-      "id": 247,
+      "id": 422,
       "prompt": "Grocery shopping style:",
       "leftDesc": "List made, organized by aisle, in and out fast.",
       "rightDesc": "Wander and grab what looks good in the moment.",
@@ -4979,7 +8476,7 @@
       "wildcard": false
     },
     {
-      "id": 248,
+      "id": 423,
       "prompt": "Salary negotiation:",
       "leftDesc": "Confident and direct about what you're worth.",
       "rightDesc": "Nervous but willing to try with some coaching.",
@@ -4999,7 +8496,7 @@
       "wildcard": false
     },
     {
-      "id": 249,
+      "id": 424,
       "prompt": "Weekend plans fall through:",
       "leftDesc": "Find something else to do, keep the momentum going.",
       "rightDesc": "Embrace the unexpected free time for yourself.",
@@ -5022,7 +8519,7 @@
       "badgeHint": "Bold Explorer"
     },
     {
-      "id": 250,
+      "id": 425,
       "prompt": "Project brainstorm session:",
       "leftDesc": "Throw out wild ideas, see what sticks.",
       "rightDesc": "Analyze feasibility of ideas others suggest.",
@@ -5043,7 +8540,7 @@
       "is2x": true
     },
     {
-      "id": 251,
+      "id": 426,
       "prompt": "Life philosophy at this stage:",
       "leftDesc": "Maximize experiences now while you're still healthy.",
       "rightDesc": "Build lasting legacy and foundations for the future.",
@@ -5063,7 +8560,7 @@
       "wildcard": false
     },
     {
-      "id": 252,
+      "id": 427,
       "prompt": "Workplace tension with leadership:",
       "leftDesc": "Address it formally in a meeting with documentation.",
       "rightDesc": "Suggest casual coffee chat to build rapport first.",
@@ -5083,7 +8580,7 @@
       "wildcard": false
     },
     {
-      "id": 253,
+      "id": 428,
       "prompt": "Mid-career crossroads:",
       "leftDesc": "Keep climbing the ladder you've built for years.",
       "rightDesc": "Pivot to your true calling even starting over.",
@@ -5103,7 +8600,7 @@
       "wildcard": false
     },
     {
-      "id": 254,
+      "id": 429,
       "prompt": "Unexpected bonus arrives:",
       "leftDesc": "Max out retirement contributions for compound magic.",
       "rightDesc": "Splurge on something you've wanted forever now.",
@@ -5124,7 +8621,7 @@
       "responseType": "slider"
     },
     {
-      "id": 255,
+      "id": 430,
       "prompt": "Partner disagreement escalates:",
       "leftDesc": "Approach logically identifying the core issue first.",
       "rightDesc": "Reconnect emotionally so you both feel heard.",
@@ -5145,7 +8642,7 @@
       "is2x": true
     },
     {
-      "id": 256,
+      "id": 431,
       "prompt": "Major life decision ahead:",
       "leftDesc": "Trust gut instincts built from decades of experience.",
       "rightDesc": "Deep-dive research with experts.",
@@ -5165,7 +8662,7 @@
       "wildcard": false
     },
     {
-      "id": 257,
+      "id": 432,
       "prompt": "Burnout signals appearing:",
       "leftDesc": "Power through quarter—the project can't wait.",
       "rightDesc": "Take mental health days now to recharge.",
@@ -5185,7 +8682,7 @@
       "wildcard": false
     },
     {
-      "id": 258,
+      "id": 433,
       "prompt": "Want to learn something new:",
       "leftDesc": "YouTube university at your own pace when motivated.",
       "rightDesc": "Sign up for a structured course with clear deadlines.",
@@ -5208,7 +8705,7 @@
       "badgeHint": "Creative Mind"
     },
     {
-      "id": 259,
+      "id": 434,
       "prompt": "Dinner party happening:",
       "leftDesc": "Host and curate every detail of the whole evening.",
       "rightDesc": "Attend as guest enjoying food without stress.",
@@ -5228,7 +8725,7 @@
       "wildcard": false
     },
     {
-      "id": 260,
+      "id": 435,
       "prompt": "Life throws a major curveball:",
       "leftDesc": "Lean into chaos as opportunity.",
       "rightDesc": "Anchor down to protect what you've carefully built.",
@@ -5248,7 +8745,7 @@
       "wildcard": false
     },
     {
-      "id": 261,
+      "id": 436,
       "prompt": "Retirement planning discussion:",
       "leftDesc": "Max contributions, compound interest is magic.",
       "rightDesc": "Live now, worry about retirement when it comes.",
@@ -5268,7 +8765,7 @@
       "wildcard": false
     },
     {
-      "id": 262,
+      "id": 437,
       "prompt": "Family gathering coming:",
       "leftDesc": "Excited to catch up with everyone at once.",
       "rightDesc": "Prefer smaller one-on-one conversations throughout.",
@@ -5289,7 +8786,7 @@
       "responseType": "slider"
     },
     {
-      "id": 263,
+      "id": 438,
       "prompt": "Mentoring junior colleague:",
       "leftDesc": "Give direct feedback, they'll learn faster that way.",
       "rightDesc": "Guide gently, let them discover insights themselves.",
@@ -5309,7 +8806,7 @@
       "wildcard": false
     },
     {
-      "id": 264,
+      "id": 439,
       "prompt": "Health checkup reminder:",
       "leftDesc": "Schedule immediately, prevention is key.",
       "rightDesc": "Put it off, you feel fine now.",
@@ -5329,7 +8826,7 @@
       "wildcard": false
     },
     {
-      "id": 265,
+      "id": 440,
       "prompt": "Old friend reaches out after years:",
       "leftDesc": "Excited to reconnect and catch up immediately.",
       "rightDesc": "Cautious, wondering what they might want from you.",
@@ -5350,7 +8847,7 @@
       "is2x": true
     },
     {
-      "id": 266,
+      "id": 441,
       "prompt": "Market downturn hits:",
       "leftDesc": "Stay calm, this is normal, don't panic sell.",
       "rightDesc": "Stress about losses, consider changing strategy.",
@@ -5373,7 +8870,7 @@
       "badgeHint": "Bold Explorer"
     },
     {
-      "id": 267,
+      "id": 442,
       "prompt": "New technology emerges:",
       "leftDesc": "Curious to explore and learn how it works.",
       "rightDesc": "Skeptical, prefer what already works well.",
@@ -5393,7 +8890,7 @@
       "wildcard": false
     },
     {
-      "id": 268,
+      "id": 443,
       "prompt": "Career achievement unlocked:",
       "leftDesc": "Set the next ambitious goal immediately.",
       "rightDesc": "Pause to appreciate before going forward.",
@@ -5413,7 +8910,7 @@
       "wildcard": false
     },
     {
-      "id": 269,
+      "id": 444,
       "prompt": "Work meeting you organized:",
       "leftDesc": "Agenda prepared, materials ready, rehearsed.",
       "rightDesc": "Know the topic well, trust yourself to facilitate.",
@@ -5433,7 +8930,7 @@
       "wildcard": false
     },
     {
-      "id": 270,
+      "id": 445,
       "prompt": "Difficult conversation needed:",
       "leftDesc": "Address it directly and soon to clear the air.",
       "rightDesc": "Wait for the right moment when tensions ease.",
@@ -5454,7 +8951,7 @@
       "responseType": "slider"
     },
     {
-      "id": 271,
+      "id": 446,
       "prompt": "Morning routine on vacation:",
       "leftDesc": "Still wake up early, same habits, new location.",
       "rightDesc": "Sleep in, no schedule, go with the flow.",
@@ -5474,7 +8971,7 @@
       "wildcard": false
     },
     {
-      "id": 272,
+      "id": 447,
       "prompt": "Team conflict arises:",
       "leftDesc": "Mediate and find common ground for everyone.",
       "rightDesc": "Let people work it out themselves.",
@@ -5494,7 +8991,7 @@
       "wildcard": false
     },
     {
-      "id": 273,
+      "id": 448,
       "prompt": "Investment opportunity arises:",
       "leftDesc": "Due diligence, research, consult advisors first.",
       "rightDesc": "Trust your instinct, opportunities don't wait.",
@@ -5514,7 +9011,7 @@
       "wildcard": false
     },
     {
-      "id": 274,
+      "id": 449,
       "prompt": "Hobby time carved out:",
       "leftDesc": "Something social with a group or club.",
       "rightDesc": "Solo activity for personal enjoyment and peace.",
@@ -5537,7 +9034,7 @@
       "badgeHint": "Deep Diver"
     },
     {
-      "id": 275,
+      "id": 450,
       "prompt": "Legacy thinking:",
       "leftDesc": "Impact and achievements remembered by many.",
       "rightDesc": "Deep connections with loved ones close to you.",
@@ -5558,7 +9055,7 @@
       "is2x": true
     },
     {
-      "id": 276,
+      "id": 451,
       "prompt": "Sunday evening arrives:",
       "leftDesc": "Recharged and ready for the week ahead.",
       "rightDesc": "Dread creeps in thinking about Monday tasks.",
@@ -5578,7 +9075,7 @@
       "wildcard": false
     },
     {
-      "id": 277,
+      "id": 452,
       "prompt": "Colleague takes credit for your work:",
       "leftDesc": "Speak up directly and correct the record.",
       "rightDesc": "Let it slide, not worth the conflict.",
@@ -5598,7 +9095,7 @@
       "wildcard": false
     },
     {
-      "id": 278,
+      "id": 453,
       "prompt": "Conference invitation arrives:",
       "leftDesc": "Excited to network and meet new industry contacts.",
       "rightDesc": "Prefer to watch the talks virtually from home.",
@@ -5619,7 +9116,7 @@
       "responseType": "slider"
     },
     {
-      "id": 279,
+      "id": 454,
       "prompt": "Reading preference:",
       "leftDesc": "Practical how-to books with actionable advice.",
       "rightDesc": "Philosophical works exploring big ideas and meaning.",
@@ -5639,7 +9136,7 @@
       "wildcard": false
     },
     {
-      "id": 280,
+      "id": 455,
       "prompt": "Friend's business idea sounds risky—you say:",
       "leftDesc": "Share honest analysis of potential pitfalls clearly.",
       "rightDesc": "Support their dream with encouragement first.",
@@ -5659,7 +9156,7 @@
       "wildcard": false
     },
     {
-      "id": 281,
+      "id": 456,
       "prompt": "Vacation booking approach:",
       "leftDesc": "Research extensively, all details checked.",
       "rightDesc": "Book spontaneously and figure it out when there.",
@@ -5679,7 +9176,7 @@
       "wildcard": false
     },
     {
-      "id": 282,
+      "id": 457,
       "prompt": "Leadership style in a crisis:",
       "leftDesc": "Take charge immediately with decisive action.",
       "rightDesc": "Gather team input before making major moves.",
@@ -5702,7 +9199,7 @@
       "badgeHint": "Creative Mind"
     },
     {
-      "id": 283,
+      "id": 458,
       "prompt": "Coworker struggling with task:",
       "leftDesc": "Jump in energetically to help them succeed.",
       "rightDesc": "Offer quiet support without overwhelming them.",
@@ -5722,7 +9219,7 @@
       "wildcard": false
     },
     {
-      "id": 284,
+      "id": 459,
       "prompt": "New restaurant opens nearby:",
       "leftDesc": "Try it immediately, love discovering new places.",
       "rightDesc": "Wait for reviews and recommendations first.",
@@ -5742,7 +9239,7 @@
       "wildcard": false
     },
     {
-      "id": 285,
+      "id": 460,
       "prompt": "Work anniversary arrives:",
       "leftDesc": "Public recognition from leadership and team.",
       "rightDesc": "Private satisfaction in your accomplishments.",
@@ -5763,7 +9260,7 @@
       "is2x": true
     },
     {
-      "id": 286,
+      "id": 461,
       "prompt": "Home project approach:",
       "leftDesc": "Research materials, plan steps, execute methodically.",
       "rightDesc": "Wing it, solve problems as they come.",
@@ -5784,7 +9281,7 @@
       "responseType": "slider"
     },
     {
-      "id": 287,
+      "id": 462,
       "prompt": "Someone needs a favor during busy time:",
       "leftDesc": "Help anyway, relationships first.",
       "rightDesc": "Politely decline, your priorities come first.",
@@ -5804,7 +9301,7 @@
       "wildcard": false
     },
     {
-      "id": 288,
+      "id": 463,
       "prompt": "Major presentation tomorrow:",
       "leftDesc": "Practice once more then relax and sleep well.",
       "rightDesc": "Can't stop rehearsing, mind racing through scenarios.",
@@ -5824,7 +9321,7 @@
       "wildcard": false
     },
     {
-      "id": 289,
+      "id": 464,
       "prompt": "Professional development approach:",
       "leftDesc": "Formal training programs with certifications.",
       "rightDesc": "Self-directed learning through experimentation.",
@@ -5844,7 +9341,7 @@
       "wildcard": false
     },
     {
-      "id": 290,
+      "id": 465,
       "prompt": "Work-life integration:",
       "leftDesc": "Clear boundaries between work and personal time.",
       "rightDesc": "Flexible blend where both flow together naturally.",
@@ -5867,7 +9364,7 @@
       "badgeHint": "Deep Diver"
     },
     {
-      "id": 291,
+      "id": 466,
       "prompt": "Receiving criticism:",
       "leftDesc": "Separate facts from emotions, analyze objectively.",
       "rightDesc": "Process feelings first, then consider the points.",
@@ -5887,7 +9384,7 @@
       "wildcard": false
     },
     {
-      "id": 292,
+      "id": 467,
       "prompt": "Weekend activity preference:",
       "leftDesc": "Busy schedule with social events and activities.",
       "rightDesc": "Quiet time at home with minimal obligations.",
@@ -5907,7 +9404,7 @@
       "wildcard": false
     },
     {
-      "id": 293,
+      "id": 468,
       "prompt": "Problem-solving approach:",
       "leftDesc": "Follow proven frameworks .",
       "rightDesc": "Invent novel approaches for each unique situation.",
@@ -5927,7 +9424,7 @@
       "wildcard": false
     },
     {
-      "id": 294,
+      "id": 469,
       "prompt": "Team celebration happening:",
       "leftDesc": "Big party with everyone together celebrating wins.",
       "rightDesc": "Individual recognition and quiet appreciation.",
@@ -5948,7 +9445,7 @@
       "responseType": "slider"
     },
     {
-      "id": 295,
+      "id": 470,
       "prompt": "Financial planning horizon:",
       "leftDesc": "Long-term wealth building over decades.",
       "rightDesc": "Enjoying life now while you can.",
@@ -5969,7 +9466,7 @@
       "is2x": true
     },
     {
-      "id": 296,
+      "id": 471,
       "prompt": "Weekend morning vibes:",
       "leftDesc": "Up early to catch sunrise and start adventures.",
       "rightDesc": "Cozy blanket cocoon until noon calls.",
@@ -5989,7 +9486,7 @@
       "wildcard": false
     },
     {
-      "id": 297,
+      "id": 472,
       "prompt": "Friend needs advice:",
       "leftDesc": "Listen quietly and let them figure it out.",
       "rightDesc": "Jump in with all your best solutions.",
@@ -6009,7 +9506,7 @@
       "wildcard": false
     },
     {
-      "id": 298,
+      "id": 473,
       "prompt": "New recipe to try:",
       "leftDesc": "Follow each step precisely for perfect results.",
       "rightDesc": "Eyeball ingredients and trust your instincts.",
@@ -6030,7 +9527,7 @@
       "responseType": "slider"
     },
     {
-      "id": 299,
+      "id": 474,
       "prompt": "Roommate conflict brewing:",
       "leftDesc": "Create a fair chore chart with clear rules.",
       "rightDesc": "Have a heart-to-heart about feelings first.",
@@ -6050,7 +9547,7 @@
       "wildcard": false
     },
     {
-      "id": 300,
+      "id": 475,
       "prompt": "Vacation planning style:",
       "leftDesc": "Detailed itinerary with reservations locked in.",
       "rightDesc": "Book the flight and solve the rest later.",
@@ -6070,7 +9567,7 @@
       "wildcard": false
     },
     {
-      "id": 301,
+      "id": 476,
       "prompt": "Group dinner bill arrives:",
       "leftDesc": "Take charge and calculate everyone's share.",
       "rightDesc": "Go with the flow and split equally.",
@@ -6090,7 +9587,7 @@
       "wildcard": false
     },
     {
-      "id": 302,
+      "id": 477,
       "prompt": "Party invite arrives:",
       "leftDesc": "Already planning your entrance and outfit.",
       "rightDesc": "Hoping your favorite person will be there.",
@@ -6113,7 +9610,7 @@
       "badgeHint": "Deep Diver"
     },
     {
-      "id": 303,
+      "id": 478,
       "prompt": "IKEA furniture arrives:",
       "leftDesc": "Read every page of instructions twice.",
       "rightDesc": "Dump pieces out and figure it out.",
@@ -6133,7 +9630,7 @@
       "wildcard": false
     },
     {
-      "id": 304,
+      "id": 479,
       "prompt": "New music discovery:",
       "leftDesc": "Try weird experimental sounds no one knows.",
       "rightDesc": "Stick with genres you already love.",
@@ -6153,7 +9650,7 @@
       "wildcard": false
     },
     {
-      "id": 305,
+      "id": 480,
       "prompt": "Deadline approaching:",
       "leftDesc": "Already done a week ago, feeling calm.",
       "rightDesc": "Thriving on last-minute adrenaline rush.",
@@ -6174,7 +9671,7 @@
       "is2x": true
     },
     {
-      "id": 306,
+      "id": 481,
       "prompt": "Meeting new people:",
       "leftDesc": "Energized by fresh faces and new stories.",
       "rightDesc": "Prefer deepening bonds with existing friends.",
@@ -6195,7 +9692,7 @@
       "responseType": "slider"
     },
     {
-      "id": 307,
+      "id": 482,
       "prompt": "Someone cuts in line:",
       "leftDesc": "Speak up politely but firmly about fairness.",
       "rightDesc": "Let it go to avoid any awkward tension.",
@@ -6215,7 +9712,7 @@
       "wildcard": false
     },
     {
-      "id": 308,
+      "id": 483,
       "prompt": "Everyone agrees on a solution:",
       "leftDesc": "Go with consensus trusting group wisdom.",
       "rightDesc": "Question the hidden assumption nobody else is seeing.",
@@ -6235,7 +9732,7 @@
       "wildcard": true
     },
     {
-      "id": 309,
+      "id": 484,
       "prompt": "Facing a complex problem:",
       "leftDesc": "Accept the surface answer and move forward quickly.",
       "rightDesc": "Break it down to the fundamental basics first.",
@@ -6255,7 +9752,7 @@
       "wildcard": true
     },
     {
-      "id": 310,
+      "id": 485,
       "prompt": "Popular opinion contradicts data:",
       "leftDesc": "Trust the data even when everyone disagrees.",
       "rightDesc": "Consider the crowd might know something data doesn't.",
@@ -6275,7 +9772,7 @@
       "wildcard": true
     },
     {
-      "id": 311,
+      "id": 486,
       "prompt": "Solving a stuck problem:",
       "leftDesc": "Start from zero and rebuild your assumptions.",
       "rightDesc": "Try variations of what already partially works.",

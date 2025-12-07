@@ -1,0 +1,202 @@
+ID,Prompt,Left Option,Right Option,Left Meta,Right Meta,Psychology Type,Timer (s),Age Tier,Version,Paid,Wildcard
+201,Big assignment due soon:,Night before cram,Start early plan,C-,C+,Big5-C,7,13-18,v1,No,No
+202,Friend group drama erupts:,Be the peacemaker,Stay out of it,A+,A-,Big5-A,7,13-18,v1,No,No
+203,You bombed a test badly:,Shake it off,Overthink all night,N-,N+,Big5-N,7,13-18,v1,No,No
+204,Class presentation day arrives:,Speak up confidently,Handle slides duty,E,I,MBTI-EI,7,13-18,v1,No,No
+205,Thinking about your future career:,Steady pay job,Follow your passion,S,N,MBTI-SN,7,13-18,v1,No,No
+206,Teacher gave unfair grade:,Argue it logically,Accept and move on,T,F,MBTI-TF,7,13-18,v1,No,No
+207,Finals week is approaching:,Color-coded schedule,Wing it daily,J,P,MBTI-JP,7,13-18,v1,No,No
+208,You're team captain now:,Pump up everyone,Draw the plays,I,D,DISC-ID,7,13-18,v1,No,No
+209,First day at new school:,Introduce yourself,Observe quietly,I,C,DISC-IC,7,13-18,v1,No,No
+210,Gap year dreams big:,Hostels solo travel,Squad group trip,O+,O-,Big5-O,7,13-18,v1,No,No
+211,Party invite arrives tonight:,Excited to go,Maybe skip it,E,I,MBTI-EI,7,13-18,v1,No,No
+212,Prom date ask time:,Big promposal,Private quiet ask,E+,E-,Big5-E,7,13-18,v1,No,No
+213,College essay topic choice:,Meaningful personal story,List achievements,N,S,MBTI-SN,7,13-18,v1,No,No
+214,Friend asks for brutally honest feedback:,Give hard truth,Softer gentle truth,T,F,MBTI-TF,7,13-18,v1,No,No
+215,Weekend plan changes last minute:,Get annoyed,Get excited,J,P,MBTI-JP,7,13-18,v1,No,No
+216,Group project partner isn't pulling weight:,Confront them directly,Do it yourself,D,S,DISC-DS,7,13-18,v1,No,No
+217,Driver's license test coming up:,Manual rules study,Street smarts practice,C,D,DISC-CD,7,13-18,v1,No,No
+218,New hobby to try out:,Creative unusual hobby,Practical useful skill,O+,O-,Big5-O,7,13-18,v1,No,No
+219,Your room organization style:,Color-coded neat,Organized chaos,C+,C-,Big5-C,7,13-18,v1,No,No
+220,Someone gossips about a friend:,Defend them strongly,Stay neutral,A+,A-,Big5-A,7,13-18,v1,No,No
+221,Before a big game or performance:,Calm and focused,Nervous energy,N-,N+,Big5-N,7,13-18,v1,No,No
+222,Part-time job interview:,Research prep deep,Wing it with charm,C,I,DISC-CI,7,13-18,v1,No,No
+223,Social media post goes viral:,Love the attention,Feel exposed,E,I,MBTI-EI,7,13-18,v1,No,No
+224,Planning senior trip details:,Handle logistics all,Go with the flow,D,S,DISC-DS,7,13-18,v1,No,No
+225,Debate team topic assigned:,Research deep first,Improvise on spot,C,I,DISC-CI,7,13-18,v1,No,Yes
+226,Weekend morning vibes:,Early bird rise,Sleep in late,E,I,MBTI-EI,7,13-18,v2,No,No
+227,Friend needs advice now:,Listen patiently,Advise right away,I,E,MBTI-EI,7,13-18,v2,No,No
+228,New recipe to try:,Follow recipe exactly,Wing it creatively,S,N,MBTI-SN,7,13-18,v2,No,No
+229,Roommate conflict brewing up:,Chart the rules,Heart-to-heart talk,T,F,MBTI-TF,7,13-18,v2,No,No
+230,Vacation planning style:,Planned itinerary full,Spontaneous adventure,J,P,MBTI-JP,7,13-18,v2,No,No
+231,Group dinner bill arrives:,Take charge split,Go with flow,D,S,DISC-DS,7,13-18,v2,No,No
+232,Party invite arrives:,Make big entrance,Find a friend,I,S,DISC-IS,7,13-18,v2,No,No
+233,IKEA furniture arrives home:,Read all instructions,Figure it out,C,D,DISC-CD,7,13-18,v2,No,No
+234,New music discovery:,Weird new genre,Trusted fave artist,O+,O-,Big5-O,7,13-18,v2,No,No
+235,Deadline approaching fast:,Done early ahead,Last minute rush,C+,C-,Big5-C,7,13-18,v2,No,No
+236,Meeting new people event:,Seek new faces,Stick old friends,E+,E-,Big5-E,7,13-18,v2,No,No
+237,Someone cuts in line:,Speak up now,Let it go,A-,A+,Big5-A,7,13-18,v2,No,No
+238,Crush texts you back:,Reply quick,Think response,E,I,MBTI-EI,7,13-18,v1,No,No
+239,Study group session:,Lead discussion,Listen notes,S,N,MBTI-SN,7,13-18,v1,No,No
+240,Bad grade feedback:,Argue teacher,Reflect improve,T,F,MBTI-TF,7,13-18,v1,No,No
+241,Summer job choice:,Fun gig,Stable pay,J,P,MBTI-JP,7,13-18,v1,No,No
+242,Online argument starts:,Debate hard,Block user,D,S,DISC-DS,7,13-18,v1,No,No
+243,Playlist creation time:,Mix genres,Favorite repeats,I,S,DISC-IS,7,13-18,v1,No,No
+244,New app download:,Explore features,Basic use,O+,O-,Big5-O,7,13-18,v1,No,No
+245,School event planning:,Organize all,Help out,E+,E-,Big5-E,7,13-18,v1,No,No
+246,Budget allowance money:,Save monthly,Spend weekly,C+,C-,Big5-C,7,13-18,v1,No,No
+247,Help classmate study:,Tutor them,Group session,A+,A-,Big5-A,7,13-18,v1,No,No
+248,Exam nerves hit:,Stay calm,Worry bad,N-,N+,Big5-N,7,13-18,v1,No,No
+249,Club meeting dynamics:,Run agenda,Add ideas,D,C,DISC-DC,7,13-18,v1,No,No
+250,Outfit choice daily:,Trendy new,Comfy old,C,D,DISC-CD,7,13-18,v1,No,No
+251,Favorite subject class:,Math logic,Art creative,E,I,MBTI-EI,7,13-18,v1,No,No
+252,Dream college pick:,Big campus,Small town,S,N,MBTI-SN,7,13-18,v1,No,No
+253,Peer pressure moment:,Stand firm,Go along,T,F,MBTI-TF,7,13-18,v1,No,No
+254,Daily schedule teen:,Strict routine,Flexible day,J,P,MBTI-JP,7,13-18,v1,No,No
+255,Video game night:,Competitive win,Fun play,D,S,DISC-DS,7,13-18,v1,No,No
+256,Social feed scroll:,Like everything,Selective posts,I,S,DISC-IS,7,13-18,v1,No,No
+257,New trend try:,Jump in,Watch first,O+,O-,Big5-O,7,13-18,v1,No,No
+258,Group chat active:,Reply fast,Quiet read,E+,E-,Big5-E,7,13-18,v1,No,No
+259,Homework strategy:,Plan breaks,All at once,C+,C-,Big5-C,7,13-18,v1,No,No
+260,Lend phone charger:,Yes anytime,No my battery,A+,A-,Big5-A,7,13-18,v1,No,No
+261,Late night study:,Focused quiet,Stressed out,N-,N+,Big5-N,7,13-18,v1,No,No
+262,Debate club join:,Argue side,Research facts,D,S,DISC-DS,7,13-18,v1,No,No
+263,Book report due:,Summarize plot,Analyze themes,S,N,MBTI-SN,7,13-18,v1,No,No
+264,Friend breakup hard:,Talk it out,Move on,T,F,MBTI-TF,7,13-18,v1,No,No
+265,Weekend curfew set:,Follow rule,Bend it,J,P,MBTI-JP,7,13-18,v1,No,No
+266,School dance night:,Dance floor,Wall chat,I,S,DISC-IS,7,13-18,v1,No,No
+267,New phone case:,Funky design,Plain color,O+,O-,Big5-O,7,13-18,v1,No,No
+268,Team tryouts day:,Compete hard,Support others,E+,E-,Big5-E,7,13-18,v1,No,No
+269,Allowance spending plan:,Budget list,Impulse buy,C+,C-,Big5-C,7,13-18,v1,No,No
+270,Volunteer event:,Lead group,Help quietly,A+,A-,Big5-A,7,13-18,v1,No,No
+271,Movie night choice:,Action flick,Drama story,N-,N+,Big5-N,7,13-18,v1,No,No
+272,Science project team:,Direct build,Brainstorm ideas,D,C,DISC-DC,7,13-18,v1,No,No
+273,Math homework tough:,Step by step,Guess check,C,D,DISC-CD,7,13-18,v1,No,No
+274,Favorite hangout spot:,Busy mall,Quiet park,E,I,MBTI-EI,7,13-18,v1,No,No
+275,Future invention idea:,Practical tool,Weird gadget,S,N,MBTI-SN,7,13-18,v1,No,No
+276,Sibling rivalry hits:,Compete win,Compromise fair,T,F,MBTI-TF,7,13-18,v1,No,No
+277,Study abroad dream:,Planned trip,Spont adventure,J,P,MBTI-JP,7,13-18,v1,No,No
+278,Online friend meet:,Excited chat,Cautious wait,D,S,DISC-DS,7,13-18,v1,No,No
+279,Playlist share:,Public all,Private few,I,S,DISC-IS,7,13-18,v1,No,No
+280,Viral challenge do:,Join trend,Skip it,O+,O-,Big5-O,7,13-18,v1,No,No
+281,School club lead:,Run meetings,Attend only,E+,E-,Big5-E,7,13-18,v1,No,No
+282,Daily journal keep:,Regular entries,Random notes,C+,C-,Big5-C,7,13-18,v1,No,No
+283,Group conflict resolve:,Mediate talk,Ignore it,A+,A-,Big5-A,7,13-18,v1,No,No
+284,First date nerves:,Calm plan,Worry lots,N-,N+,Big5-N,7,13-18,v1,No,No
+285,Essay writing style:,Outline first,Free write,D,S,DISC-DS,7,13-18,v1,No,No
+286,Poem assignment:,Rhyme scheme,Free verse,S,N,MBTI-SN,7,13-18,v1,No,No
+287,Teacher conflict:,Discuss calm,Yell back,T,F,MBTI-TF,7,13-18,v1,No,No
+288,Part time shift:,Punctual always,Late sometimes,J,P,MBTI-JP,7,13-18,v1,No,No
+289,Social cause join:,Protest loud,Donate quiet,I,S,DISC-IS,7,13-18,v1,No,No
+290,New hairstyle try:,Bold change,Safe trim,O+,O-,Big5-O,7,13-18,v1,No,No
+291,Festival crowd big:,Front stage,Back chill,E+,E-,Big5-E,7,13-18,v1,No,No
+292,Goal setting teen:,Long term plan,Short fun,C+,C-,Big5-C,7,13-18,v1,No,No
+293,Share feelings with:,Best friend,Keep inside,A+,A-,Big5-A,7,13-18,v1,No,No
+294,Competition loss:,Accept grace,Get upset,N-,N+,Big5-N,7,13-18,v1,No,No
+295,Art class project:,Lead design,Follow group,D,C,DISC-DC,7,13-18,v1,No,No
+296,Music practice:,Daily routine,When inspired,C,D,DISC-CD,7,13-18,v1,No,No
+297,Favorite vacation type:,Adventure trip,Relax beach,E,I,MBTI-EI,7,13-18,v1,No,No
+298,Dream business idea:,Safe store,Innovative app,S,N,MBTI-SN,7,13-18,v1,No,No
+299,Parent argument:,Logic debate,Emotional plea,T,F,MBTI-TF,7,13-18,v1,No,No
+300,Travel packing list:,Organized bag,Last minute,J,P,MBTI-JP,7,13-18,v1,No,No
+301,Team sports role:,Captain lead,Player support,D,S,DISC-DS,7,13-18,v1,No,No
+302,Online profile:,Public posts,Private account,I,S,DISC-IS,7,13-18,v1,No,No
+303,New tech gadget:,Buy latest,Wait reviews,O+,O-,Big5-O,7,13-18,v1,No,No
+304,Concert tickets get:,Go with crowd,Solo enjoy,E+,E-,Big5-E,7,13-18,v1,No,No
+305,Chore schedule home:,Fixed times,When free,C+,C-,Big5-C,7,13-18,v1,No,No
+306,Donate allowance:,Give generously,Save first,A+,A-,Big5-A,7,13-18,v1,No,No
+307,Public speaking class:,Confident talk,Nervous sweat,N-,N+,Big5-N,7,13-18,v1,No,No
+308,History report:,Facts list,Story tell,D,S,DISC-DS,7,13-18,v1,No,No
+309,Science fair idea:,Known experiment,New invention,S,N,MBTI-SN,7,13-18,v1,No,No
+310,Bully situation:,Stand up,Report teacher,T,F,MBTI-TF,7,13-18,v1,No,No
+311,Extracurricular choice:,Structured club,Free hobby,J,P,MBTI-JP,7,13-18,v1,No,No
+312,Group text reply:,Quick emoji,Thoughtful message,I,S,DISC-IS,7,13-18,v1,No,No
+313,New book genre:,Fantasy wild,Real life,O+,O-,Big5-O,7,13-18,v1,No,No
+314,Cafeteria lunch:,Sit popular,Alone quiet,E+,E-,Big5-E,7,13-18,v1,No,No
+315,Test prep method:,Study guide,Flash cards,C+,C-,Big5-C,7,13-18,v1,No,No
+316,Apologize to friend:,Say sorry,Buy gift,A+,A-,Big5-A,7,13-18,v1,No,No
+317,Stormy weather day:,Stay inside,Go out,N-,N+,Big5-N,7,13-18,v1,No,No
+318,Math club puzzle:,Solve lead,Team input,D,C,DISC-DC,7,13-18,v1,No,No
+319,Coding class:,Follow tutorial,Experiment code,C,D,DISC-CD,7,13-18,v1,No,No
+320,Favorite movie type:,Comedy laugh,Deep drama,E,I,MBTI-EI,7,13-18,v1,No,No
+321,Everyone agrees on plan:,Follow consensus,Question assumption,CT0,CT1,Critical,7,13-18,v1,No,Yes
+322,Facing complex problem:,Accept surface level,Break to basics,FP0,FP1,FirstPrinciples,7,13-18,v1,No,Yes
+323,Popular opinion contradicts data:,Trust the data,Consider crowd view,CT1,CT0,Critical,7,13-18,v1,No,Yes
+324,Solving a stuck problem:,Rebuild from zero,Vary what works,FP1,FP0,FirstPrinciples,7,13-18,v1,No,Yes
+325,Group decision seems off:,Agree with all,Ask why,CT0,CT1,Critical,7,13-18,v1,No,No
+326,Project fails midway:,Start over fresh,Adjust current,FP1,FP0,FirstPrinciples,7,13-18,v1,No,No
+327,Friend shares wrong info:,Correct immediately,Let pass,CT1,CT0,Critical,7,13-18,v1,No,No
+328,New school rule:,Think basics why,Accept it,FP0,FP1,FirstPrinciples,7,13-18,v1,No,No
+329,Story plot confusing:,Ignore gap,Figure logic,CT0,CT1,Critical,7,13-18,v1,No,No
+330,Experiment goes wrong:,New setup,Check cause,FP1,FP0,FirstPrinciples,7,13-18,v1,No,No
+331,Team idea flawed:,Follow anyway,Improve it,CT1,CT0,Critical,7,13-18,v1,No,No
+332,Homework method stuck:,Disassemble steps,Vary approach,FP0,FP1,FirstPrinciples,7,13-18,v1,No,No
+333,All like one trend:,Join same,Why popular,CT0,CT1,Critical,7,13-18,v1,No,No
+334,Gadget breaks down:,Rebuild core,Add fixes,FP1,FP0,FirstPrinciples,7,13-18,v1,No,No
+335,Answer too simple:,Trust quick,Double check,CT1,CT0,Critical,7,13-18,v1,No,No
+336,Essay structure new:,From basics build,Copy old,FP0,FP1,FirstPrinciples,7,13-18,v1,No,No
+337,Teacher fact wrong:,Believe all,Ask proof,CT0,CT1,Critical,7,13-18,v1,No,No
+338,Strategy fails test:,New from zero,Tweak old,FP1,FP0,FirstPrinciples,7,13-18,v1,No,No
+339,Friends all agree:,Join quick,Think alone,CT1,CT0,Critical,7,13-18,v1,No,No
+340,Puzzle piece missing:,Make own,Search more,FP0,FP1,FirstPrinciples,7,13-18,v1,No,No
+341,Viral fact check:,Accept share,Verify source,CT0,CT1,Critical,7,13-18,v1,No,No
+342,I enjoy big parties with lots of people.,Strongly disagree,Strongly agree,I,E,MBTI-EI-Slider,7,13-18,v1,No,No
+343,I prefer practical solutions over wild ideas.,Strongly disagree,Strongly agree,N,S,MBTI-SN-Slider,7,13-18,v1,No,No
+344,I make decisions based on feelings more than logic.,Strongly disagree,Strongly agree,T,F,MBTI-TF-Slider,7,13-18,v1,No,No
+345,I like having my day fully planned out.,Strongly disagree,Strongly agree,P,J,MBTI-JP-Slider,7,13-18,v1,No,No
+346,I take the lead in group situations often.,Strongly disagree,Strongly agree,S,D,DISC-DS-Slider,7,13-18,v1,No,No
+347,I focus on building relationships in teams.,Strongly disagree,Strongly agree,D,I,DISC-IS-Slider,7,13-18,v1,No,No
+348,I prioritize accuracy over speed in tasks.,Strongly disagree,Strongly agree,I,C,DISC-CD-Slider,7,13-18,v1,No,No
+349,I seek out new experiences frequently.,Strongly disagree,Strongly agree,O-,O+,Big5-O-Slider,7,13-18,v1,No,No
+350,I feel energized after social events.,Strongly disagree,Strongly agree,E-,E+,Big5-E-Slider,7,13-18,v1,No,No
+351,I always meet deadlines without reminders.,Strongly disagree,Strongly agree,C-,C+,Big5-C-Slider,7,13-18,v1,No,No
+352,I go out of my way to help others.,Strongly disagree,Strongly agree,A-,A+,Big5-A-Slider,7,13-18,v1,No,No
+353,I get stressed easily in tough situations.,Strongly disagree,Strongly agree,N-,N+,Big5-N-Slider,7,13-18,v1,No,No
+354,New class elective:,Creative writing,Math advanced,O+,O-,Big5-O,7,13-18,v1,No,No
+355,After school hang:,Crowd fun,Quiet chat,E+,E-,Big5-E,7,13-18,v1,No,No
+356,Phone organization:,App folders,Home screen mess,C+,C-,Big5-C,7,13-18,v1,No,No
+357,See unfairness:,Speak against,Stay silent,A-,A+,Big5-A,7,13-18,v1,No,No
+358,Big change school:,Adapt quick,Worry lots,N-,N+,Big5-N,7,13-18,v1,No,No
+359,Debate topic teen:,Lead argument,Support side,D,S,DISC-DS,7,13-18,v1,No,No
+360,Favorite book type:,Real history,Fantasy world,S,N,MBTI-SN,7,13-18,v1,No,No
+361,Parent rule break:,Explain reason,Accept punishment,T,F,MBTI-TF,7,13-18,v1,No,No
+362,Summer break plan:,Schedule activities,Chill daily,J,P,MBTI-JP,7,13-18,v1,No,No
+363,Share opinion online:,Post bold,Comment soft,I,S,DISC-IS,7,13-18,v1,No,No
+364,New sport try:,Extreme one,Team game,O+,O-,Big5-O,7,13-18,v1,No,No
+365,Group study session:,Teach others,Learn quiet,E+,E-,Big5-E,7,13-18,v1,No,No
+366,Save birthday money:,Invest smart,Spend fun,C+,C-,Big5-C,7,13-18,v1,No,No
+367,Console friend upset:,Give advice,Hug listen,A+,A-,Big5-A,7,13-18,v1,No,No
+368,Performance anxiety:,Push through,Freak out,N-,N+,Big5-N,7,13-18,v1,No,No
+369,Class group work:,Assign tasks,Go flow,D,C,DISC-DC,7,13-18,v1,No,No
+370,Essay format:,Structured outline,Stream thoughts,C,D,DISC-CD,7,13-18,v1,No,No
+371,Favorite downtime:,Social media,Read book,E,I,MBTI-EI,7,13-18,v1,No,No
+372,Ideal future home:,City buzz,Country calm,S,N,MBTI-SN,7,13-18,v1,No,No
+373,Conflict with teacher:,Debate point,Apologize quick,T,F,MBTI-TF,7,13-18,v1,No,No
+374,Travel style teen:,Packed itinerary,Explore free,J,P,MBTI-JP,7,13-18,v1,No,No
+375,Sports team drama:,Confront issue,Ignore it,D,S,DISC-DS,7,13-18,v1,No,No
+376,DM response time:,Instant reply,Later thought,I,S,DISC-IS,7,13-18,v1,No,No
+377,New fashion trend:,Adopt quick,Stick style,O+,O-,Big5-O,7,13-18,v1,No,No
+378,Concert vibe:,Mosh pit,Seat back,E+,E-,Big5-E,7,13-18,v1,No,No
+379,Goal tracking app:,Daily check,Weekly glance,C+,C-,Big5-C,7,13-18,v1,No,No
+380,Lend homework notes:,Share freely,Only friends,A+,A-,Big5-A,7,13-18,v1,No,No
+381,Unexpected test pop:,Calm recall,Panic blank,N-,N+,Big5-N,7,13-18,v1,No,No
+382,History debate:,Facts argue,Story weave,D,S,DISC-DS,7,13-18,v1,No,No
+383,Science hypothesis:,Test method,Intuit guess,S,N,MBTI-SN,7,13-18,v1,No,No
+384,Peer feedback give:,Honest direct,Gentle words,T,F,MBTI-TF,7,13-18,v1,No,No
+385,Club event plan:,Timeline set,Improv day,J,P,MBTI-JP,7,13-18,v1,No,No
+386,Online game play:,Solo quest,Team up,I,S,DISC-IS,7,13-18,v1,No,No
+387,New app feature:,Beta test,Safe update,O+,O-,Big5-O,7,13-18,v1,No,No
+388,School rally:,Cheer loud,Watch side,E+,E-,Big5-E,7,13-18,v1,No,No
+389,Routine workout:,Scheduled gym,Random run,C+,C-,Big5-C,7,13-18,v1,No,No
+390,Charity drive teen:,Organize event,Donate cash,A+,A-,Big5-A,7,13-18,v1,No,No
+391,Rollercoaster ride:,Front seat,Back safe,N-,N+,Big5-N,7,13-18,v1,No,No
+392,Math problem solve:,Formula use,Creative way,D,C,DISC-DC,7,13-18,v1,No,No
+393,English paper:,Grammar check,Flow read,C,D,DISC-CD,7,13-18,v1,No,No
+394,Favorite music venue:,Big arena,Small club,E,I,MBTI-EI,7,13-18,v1,No,No
+395,Dream superpower teen:,Invisibility,Flying high,S,N,MBTI-SN,7,13-18,v1,No,No
+396,Family decision input:,Logic argue,Feelings share,T,F,MBTI-TF,7,13-18,v1,No,No
+397,Homework group:,Host home,Join others,J,P,MBTI-JP,7,13-18,v1,No,No
+398,Peer mentor role:,Guide strict,Encourage soft,D,S,DISC-DS,7,13-18,v1,No,No
+399,Social app use:,Post daily,Scroll only,I,S,DISC-IS,7,13-18,v1,No,No
+400,New hobby class:,Unusual skill,Common one,O+,O-,Big5-O,7,13-18,v1,No,Yes
+
