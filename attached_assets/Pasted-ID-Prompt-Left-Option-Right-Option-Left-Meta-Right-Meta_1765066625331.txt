@@ -1,0 +1,202 @@
+ID,Prompt,Left Option,Right Option,Left Meta,Right Meta,Psychology Type,Timer (s),Age Tier,Version,Paid,Wildcard
+1,At the playground you prefer to:,Lead the tag game,Plan a fort together,E,I,MBTI-EI,6,7-12,v1,No,No
+2,When playing a new video game:,Mash buttons to start,Watch tutorial first,E,I,MBTI-EI,6,7-12,v1,No,No
+3,Your dream superpower would be:,Flying high in sky,Reading pet's thoughts,S,N,MBTI-SN,6,7-12,v1,No,No
+4,When a friend is sad:,Try to fix it,Quiet hug for comfort,T,F,MBTI-TF,6,7-12,v1,No,No
+5,Birthday party is coming up:,Know plans ahead,Love surprises,J,P,MBTI-JP,6,7-12,v1,No,No
+6,During group project time:,Be the captain,Help out where needed,D,S,DISC-DS,6,7-12,v1,No,No
+7,When recess bell rings:,Play with whole class,Just with bestie,I,S,DISC-IS,6,7-12,v1,No,No
+8,With a new LEGO set:,Follow the pics,Make my creation,C,D,DISC-CD,6,7-12,v1,No,No
+9,Ice cream truck arrives:,Try blue weird flavor,Stick with my fave,O+,O-,Big5-O,6,7-12,v1,No,No
+10,School talent show time:,Perform on stage,Help backstage,E+,E-,Big5-E,6,7-12,v1,No,No
+11,Homework time comes:,Do work first,Play first,C+,C-,Big5-C,6,7-12,v1,No,No
+12,Someone cuts in line:,Let it go,Speak up,A+,A-,Big5-A,6,7-12,v1,No,No
+13,Big test tomorrow:,Sleep fine,Worry lots,N-,N+,Big5-N,6,7-12,v1,No,No
+14,On class field trip:,Chat with bus friends,Explore the facts,E,I,MBTI-EI,6,7-12,v1,No,No
+15,Story writing time:,Magic world adventure,Real life events,N,S,MBTI-SN,6,7-12,v1,No,No
+16,Pet goldfish died:,Explain the facts,Give hugs,T,F,MBTI-TF,6,7-12,v1,No,No
+17,Room cleaning time:,Organize into piles,Stuff away fast,J,P,MBTI-JP,6,7-12,v1,No,No
+18,Classroom debate starts:,Lead the argument,Listen first,D,C,DISC-DC,6,7-12,v1,No,No
+19,New kid at school:,Invite to lunch,Wave hello,I,S,DISC-IS,6,7-12,v1,No,No
+20,Art class project:,Make wild art,Follow the example,O+,O-,Big5-O,6,7-12,v1,No,No
+21,Science fair project:,Do the presenting,Do the discovering,E+,E-,Big5-E,6,7-12,v1,No,No
+22,Summer reading list:,Finish it early,Read slowly,C+,C-,Big5-C,6,7-12,v1,No,No
+23,Someone is being bullied:,Tell the teacher,Step in to help,A+,D,Big5-AD,6,7-12,v1,No,No
+24,Movie night pick:,Funny comedy one,Exciting adventure,I,D,DISC-ID,6,7-12,v1,No,No
+25,Sports day at school:,Be the captain,Be reliable player,D,S,DISC-DS,6,7-12,v1,No,No
+26,Sleepover plans:,Big group fun,Just best friend,E,I,MBTI-EI,6,7-12,v1,No,No
+27,Vacation choice:,Theme park rides,Museum exhibits,S,N,MBTI-SN,6,7-12,v1,No,No
+28,Teacher asks a question you know:,Hand up fast,Wait a bit,D,S,DISC-DS,6,7-12,v1,No,No
+29,Building a treehouse:,Design the plans,Just build it,N,S,MBTI-SN,6,7-12,v1,No,No
+30,You made a mistake:,Move on quick,Feel bad inside,N-,N+,Big5-N,6,7-12,v1,No,Yes
+31,Favorite animal at zoo:,Loud roaring lion,Quiet fluffy bunny,E,I,MBTI-EI,6,7-12,v1,No,No
+32,Story time in class:,Adventure tale full of action,Everyday life story,S,N,MBTI-SN,6,7-12,v1,No,No
+33,You lost your toy:,Search for it alone,Ask friends to help,T,F,MBTI-TF,6,7-12,v1,No,No
+34,Playing game with rules:,Follow them strictly,Change them up,J,P,MBTI-JP,6,7-12,v1,No,No
+35,Snack time at school:,Share with everyone,Keep mine,D,S,DISC-DS,6,7-12,v1,No,No
+36,Playdate after school:,Many kids over,One close friend,I,S,DISC-IS,6,7-12,v1,No,No
+37,Drawing a picture:,Real things around,Imaginary creatures,C,D,DISC-CD,6,7-12,v1,No,No
+38,Trying a new toy:,Weird unusual one,Familiar type,O+,O-,Big5-O,6,7-12,v1,No,No
+39,Park visit on weekend:,Swing really high,Watch the birds,E+,E-,Big5-E,6,7-12,v1,No,No
+40,Doing your chores:,Finish them now,Do later,C+,C-,Big5-C,6,7-12,v1,No,No
+41,Sharing your candy:,Give out lots,Keep some,A+,A-,Big5-A,6,7-12,v1,No,No
+42,Stormy day outside:,Feel excited,Feel scared,N-,N+,Big5-N,6,7-12,v1,No,No
+43,Class game begins:,Be team leader,Be team player,D,S,DISC-DS,6,7-12,v1,No,No
+44,Bedtime story choice:,Funny silly one,Sad emotional one,E,I,MBTI-EI,6,7-12,v1,No,No
+45,Dream job when grown:,Astronaut in space,Teacher at school,S,N,MBTI-SN,6,7-12,v1,No,No
+46,Friend argues with you:,Say sorry first,Explain your side,T,F,MBTI-TF,6,7-12,v1,No,No
+47,Schedule for the day:,Planned fun activities,Anything goes,J,P,MBTI-JP,6,7-12,v1,No,No
+48,Hide and seek game:,Hide really well,Seek out fast,I,S,DISC-IS,6,7-12,v1,No,No
+49,Building sandcastle at beach:,Tall strong tower,Pretty design,O+,O-,Big5-O,6,7-12,v1,No,No
+50,Show and tell day:,Talk a lot,Show it quick,E+,E-,Big5-E,6,7-12,v1,No,No
+51,Tidy up your toys:,Sort by colors,Mix them up,C+,C-,Big5-C,6,7-12,v1,No,No
+52,Help a friend out:,Do it for them,Teach them how,A+,A-,Big5-A,6,7-12,v1,No,No
+53,Dark room at night:,Be brave inside,Feel worried,N-,N+,Big5-N,6,7-12,v1,No,No
+54,Group song in class:,Sing out loud,Harmonize softly,D,C,DISC-DC,6,7-12,v1,No,No
+55,Puzzle time at home:,Finish it fast,Enjoy the pieces,C,D,DISC-CD,6,7-12,v1,No,No
+56,Favorite color to pick:,Bright red,Soft blue,E,I,MBTI-EI,6,7-12,v1,No,No
+57,Learning a magic trick:,Learn how it works,Watch amazed,S,N,MBTI-SN,6,7-12,v1,No,No
+58,Late for school bus:,Run really quick,Walk calm,T,F,MBTI-TF,6,7-12,v1,No,No
+59,Lunch plan every day:,Set the table,Eat right now,J,P,MBTI-JP,6,7-12,v1,No,No
+60,Pet choice for home:,Playful active dog,Lazy cozy cat,D,S,DISC-DS,6,7-12,v1,No,No
+61,Story ending preference:,Happy fun ending,Sad thoughtful one,I,S,DISC-IS,6,7-12,v1,No,No
+62,Trying a new game:,Play it alone,With your friends,E,I,MBTI-EI,6,7-12,v1,No,No
+63,Art supply to use:,Crayons for drawing,Paint for mess,O+,O-,Big5-O,6,7-12,v1,No,No
+64,Party game choice:,Dance around,Chat with others,E+,E-,Big5-E,6,7-12,v1,No,No
+65,Homework help needed:,Ask the teacher,Figure it out,C+,C-,Big5-C,6,7-12,v1,No,No
+66,Share a secret with:,Tell bestie,Keep it quiet,A+,A-,Big5-A,6,7-12,v1,No,No
+67,Thunderstorm at night:,Watch from window,Hide under blanket,N-,N+,Big5-N,6,7-12,v1,No,No
+68,Bike ride with friends:,Race them ahead,Enjoy the view,D,S,DISC-DS,6,7-12,v1,No,No
+69,Draw an animal:,Real life lion,Fantasy dragon,S,N,MBTI-SN,6,7-12,v1,No,No
+70,Friend gets hurt:,Put on bandage,Give a hug,T,F,MBTI-TF,6,7-12,v1,No,No
+71,Plan for the day:,Make a list,See what happens,J,P,MBTI-JP,6,7-12,v1,No,No
+72,Class pet care:,Feed it daily,Watch it play,I,S,DISC-IS,6,7-12,v1,No,No
+73,New book to read:,Adventure story,Mystery puzzle,O+,O-,Big5-O,6,7-12,v1,No,No
+74,School play role:,Main character on stage,Backstage helper,E+,E-,Big5-E,6,7-12,v1,No,No
+75,Clean your room:,Every single day,Only sometimes,C+,C-,Big5-C,6,7-12,v1,No,No
+76,Help the teacher:,Carry the books,Erase the board,A+,A-,Big5-A,6,7-12,v1,No,No
+77,Scary movie night:,Laugh at it,Cover your eyes,N-,N+,Big5-N,6,7-12,v1,No,No
+78,Team sport game:,Lead the team,Support the player,D,C,DISC-DC,6,7-12,v1,No,No
+79,Craft time project:,Follow the steps,Make your own,C,D,DISC-CD,6,7-12,v1,No,No
+80,Favorite toy to play:,Loud toy car,Quiet soft doll,E,I,MBTI-EI,6,7-12,v1,No,No
+81,Dream vacation spot:,Beach with fun,Mountain hike,S,N,MBTI-SN,6,7-12,v1,No,No
+82,Sibling fight happens:,Yell back at them,Talk it calm,T,F,MBTI-TF,6,7-12,v1,No,No
+83,Weekend plan idea:,Set activities,Just relax,J,P,MBTI-JP,6,7-12,v1,No,No
+84,Play some music:,Sing along loud,Listen quiet,I,S,DISC-IS,6,7-12,v1,No,No
+85,New flavor to try:,Taste it now,Stick with old,O+,O-,Big5-O,6,7-12,v1,No,No
+86,Group photo time:,Stand front center,Back row spot,E+,E-,Big5-E,6,7-12,v1,No,No
+87,Save your money:,Buy toy now,Save for big,C+,C-,Big5-C,6,7-12,v1,No,No
+88,Lend your toy:,Yes always,No sometimes,A+,A-,Big5-A,6,7-12,v1,No,No
+89,New shoes to wear:,Run and test,Walk careful,N-,N+,Big5-N,6,7-12,v1,No,No
+90,Class leader election:,Vote for me,Help the winner,D,S,DISC-DS,6,7-12,v1,No,No
+91,Story character choice:,Brave hero,Tricky villain,S,N,MBTI-SN,6,7-12,v1,No,No
+92,Lost homework paper:,Search really hard,Cry about it,T,F,MBTI-TF,6,7-12,v1,No,No
+93,School bus ride:,Sit in front,Back for fun,E,I,MBTI-EI,6,7-12,v1,No,No
+94,Build a fort:,Draw plan map,Just start building,J,P,MBTI-JP,6,7-12,v1,No,No
+95,Share your lunch:,Trade some food,Eat your own,I,S,DISC-IS,6,7-12,v1,No,No
+96,New puzzle game:,Hard challenge one,Easy simple one,O+,O-,Big5-O,6,7-12,v1,No,No
+97,Recess time outside:,Play tag game,Swing by alone,E+,E-,Big5-E,6,7-12,v1,No,No
+98,Brush your teeth:,Every morning time,Only sometimes,C+,C-,Big5-C,6,7-12,v1,No,No
+99,Friend's birthday gift:,Make a card,Buy a toy,A+,A-,Big5-A,6,7-12,v1,No,No
+100,High slide at park:,Slide down fast,Climb up slow,N-,N+,Big5-N,6,7-12,v1,No,No
+101,Group craft project:,Boss the ideas,Follow along,D,C,DISC-DC,6,7-12,v1,No,No
+102,Learn a trick:,Practice lots,Watch once,C,D,DISC-CD,6,7-12,v1,No,No
+103,Favorite season of year:,Summer full of fun,Winter with snow,E,I,MBTI-EI,6,7-12,v1,No,No
+104,Invent a new game:,Create new rules,Play old game,S,N,MBTI-SN,6,7-12,v1,No,No
+105,Pet gets sick:,Take to vet now,Wait and see,T,F,MBTI-TF,6,7-12,v1,No,No
+106,Morning routine daily:,Same exact order,Change it up,J,P,MBTI-JP,6,7-12,v1,No,No
+107,Class helper needed:,Pick me now,Wait for call,D,S,DISC-DS,6,7-12,v1,No,No
+108,Read a book:,All by alone,With your mom,I,S,DISC-IS,6,7-12,v1,No,No
+109,New hat to wear:,Funny silly one,Plain simple one,O+,O-,Big5-O,6,7-12,v1,No,No
+110,Birthday song time:,Sing out loud,Just clap along,E+,E-,Big5-E,6,7-12,v1,No,No
+111,Pack school bag:,Check the list,Grab things quick,C+,C-,Big5-C,6,7-12,v1,No,No
+112,Share your bike:,Ride together now,Take turns,A+,A-,Big5-A,6,7-12,v1,No,No
+113,Dark night outside:,Use flashlight,Hold a hand,N-,N+,Big5-N,6,7-12,v1,No,No
+114,Team name choice:,Choose it myself,Vote with group,D,S,DISC-DS,6,7-12,v1,No,No
+115,Fairy tale story:,Keep real ending,Change it up,S,N,MBTI-SN,6,7-12,v1,No,No
+116,Broken toy at home:,Try to fix it,Get a new one,T,F,MBTI-TF,6,7-12,v1,No,No
+117,Play time choice:,Outside adventure,Inside cozy,E,I,MBTI-EI,6,7-12,v1,No,No
+118,Snack choice daily:,Sweet yummy one,Savory salty one,J,P,MBTI-JP,6,7-12,v1,No,No
+119,Dance party starts:,Lead the dance,Watch from side,I,S,DISC-IS,6,7-12,v1,No,No
+120,New fruit at store:,Taste it quick,Smell it first,O+,O-,Big5-O,6,7-12,v1,No,No
+121,School assembly day:,Sit front seat,Back row seat,E+,E-,Big5-E,6,7-12,v1,No,No
+122,Make your bed:,Every single day,When mom tells,C+,C-,Big5-C,6,7-12,v1,No,No
+123,Help your sibling:,Do their homework,Play a game,A+,A-,Big5-A,6,7-12,v1,No,No
+124,Big dog approaches:,Pet it gently,Run away fast,N-,N+,Big5-N,6,7-12,v1,No,No
+125,Class question asked:,Answer it first,Think a bit,D,C,DISC-DC,6,7-12,v1,No,No
+126,Draw a map:,Straight neat lines,Curvy fun paths,C,D,DISC-CD,6,7-12,v1,No,No
+127,Favorite hero character:,Strong tough one,Smart clever one,E,I,MBTI-EI,6,7-12,v1,No,No
+128,Mystery box appears:,Open it now,Guess inside first,S,N,MBTI-SN,6,7-12,v1,No,No
+129,Friend is mad:,Apologize quick,Ask why mad,T,F,MBTI-TF,6,7-12,v1,No,No
+130,Holiday plan time:,List the gifts,Surprise everyone,J,P,MBTI-JP,6,7-12,v1,No,No
+131,Share a story:,Tell it all,Keep it short,D,S,DISC-DS,6,7-12,v1,No,No
+132,Play all alone:,Feel bored,Have fun,I,S,DISC-IS,6,7-12,v1,No,No
+133,New ride at fair:,Thrill scary one,Calm gentle one,O+,O-,Big5-O,6,7-12,v1,No,No
+134,Group cheer time:,Yell out loud,Smile quietly,E+,E-,Big5-E,6,7-12,v1,No,No
+135,Study time at home:,Quiet desk spot,With music on,C+,C-,Big5-C,6,7-12,v1,No,No
+136,Lend a pencil:,Yes right away,No not now,A+,A-,Big5-A,6,7-12,v1,No,No
+137,High jump game:,Try it brave,Watch others,N-,N+,Big5-N,6,7-12,v1,No,No
+138,Everyone plays a game:,Join with rules,Make new ones,CT0,CT1,Critical,6,7-12,v1,No,Yes
+139,Facing a hard puzzle:,Copy from friend,Break to basics,FP0,FP1,FirstPrinciples,6,7-12,v1,No,Yes
+140,Popular toy breaks:,Fix with tape,Ask why broke,CT1,CT0,Critical,6,7-12,v1,No,Yes
+141,Solving a riddle:,Start over new,Guess it quick,FP1,FP0,FirstPrinciples,6,7-12,v1,No,Yes
+142,Class vote seems wrong:,Agree with all,Question why,CT0,CT1,Critical,6,7-12,v1,No,No
+143,Build a toy car:,From scratch new,Follow box steps,FP1,FP0,FirstPrinciples,6,7-12,v1,No,No
+144,Friend says wrong fact:,Correct it now,Let it go,CT1,CT0,Critical,6,7-12,v1,No,No
+145,New rule in game:,Think basics first,Accept it quick,FP0,FP1,FirstPrinciples,6,7-12,v1,No,No
+146,Story doesn't make sense:,Ignore and read,Figure it out,CT0,CT1,Critical,6,7-12,v1,No,No
+147,Plant grows wrong way:,Start a new one,Check why wrong,FP1,FP0,FirstPrinciples,6,7-12,v1,No,No
+148,Group idea is bad:,Follow it anyway,Improve it better,CT1,CT0,Critical,6,7-12,v1,No,No
+149,Toy assembly gets stuck:,Disassemble parts,Vary the steps,FP0,FP1,FirstPrinciples,6,7-12,v1,No,No
+150,Everyone likes one color:,Pick the same,Why they like,CT0,CT1,Critical,6,7-12,v1,No,No
+151,Simple machine breaks:,Rebuild from base,Add extra parts,FP1,FP0,FirstPrinciples,6,7-12,v1,No,No
+152,Answer seems too easy:,Trust it fully,Double check why,CT1,CT0,Critical,6,7-12,v1,No,No
+153,Draw something new:,From basics up,Copy old drawing,FP0,FP1,FirstPrinciples,6,7-12,v1,No,No
+154,Teacher says a fact:,Believe it all,Ask for proof,CT0,CT1,Critical,6,7-12,v1,No,No
+155,Game strategy fails:,New from zero,Adjust old one,FP1,FP0,FirstPrinciples,6,7-12,v1,No,No
+156,All friends agree on something:,Join in quick,Think alone first,CT1,CT0,Critical,6,7-12,v1,No,No
+157,Puzzle missing a piece:,Make your own,Search more spots,FP0,FP1,FirstPrinciples,6,7-12,v1,No,No
+158,Magic trick you see:,Accept as magic,Ask how works,CT0,CT1,Critical,6,7-12,v1,No,No
+159,I like trying new foods.,Strongly disagree,Strongly agree,O-,O+,Big5-O-Slider,6,7-12,v1,No,No
+160,I feel shy around new kids.,Strongly disagree,Strongly agree,E+,E-,Big5-E-Slider,6,7-12,v1,No,No
+161,I always finish my homework on time.,Strongly disagree,Strongly agree,C-,C+,Big5-C-Slider,6,7-12,v1,No,No
+162,I share my toys with others easily.,Strongly disagree,Strongly agree,A-,A+,Big5-A-Slider,6,7-12,v1,No,No
+163,I worry a lot about small things.,Strongly disagree,Strongly agree,N+,N-,Big5-N-Slider,6,7-12,v1,No,No
+164,I prefer playing alone most times.,Strongly disagree,Strongly agree,I,E,MBTI-EI-Slider,6,7-12,v1,No,No
+165,I like imagining wild stories.,Strongly disagree,Strongly agree,S,N,MBTI-SN-Slider,6,7-12,v1,No,No
+166,I think about feelings when deciding.,Strongly disagree,Strongly agree,T,F,MBTI-TF-Slider,6,7-12,v1,No,No
+167,I like having a daily routine.,Strongly disagree,Strongly agree,P,J,MBTI-JP-Slider,6,7-12,v1,No,No
+168,I take charge in group games.,Strongly disagree,Strongly agree,S,D,DISC-DS-Slider,6,7-12,v1,No,No
+169,I enjoy chatting with everyone.,Strongly disagree,Strongly agree,S,I,DISC-IS-Slider,6,7-12,v1,No,No
+170,I follow rules exactly as said.,Strongly disagree,Strongly agree,D,C,DISC-CD-Slider,6,7-12,v1,No,No
+171,New clothes style:,Try bold one,Stick with usual,O+,O-,Big5-O,6,7-12,v1,No,No
+172,Family game night:,Yell excited,Play quiet,E+,E-,Big5-E,6,7-12,v1,No,No
+173,Pack lunch box:,Neat organized,Messy quick,C+,C-,Big5-C,6,7-12,v1,No,No
+174,See a bug:,Catch it,Run away,A+,A-,Big5-A,6,7-12,v1,No,No
+175,Rainy day inside:,Build fort,Read book,N-,N+,Big5-N,6,7-12,v1,No,No
+176,Class art show:,Show mine first,Look at others,D,S,DISC-DS,6,7-12,v1,No,No
+177,Favorite snack:,Crunchy chips,Soft cookie,S,N,MBTI-SN,6,7-12,v1,No,No
+178,Lost in store:,Yell for mom,Stay put,T,F,MBTI-TF,6,7-12,v1,No,No
+179,Bedtime routine:,Same every night,Change sometimes,J,P,MBTI-JP,6,7-12,v1,No,No
+180,Share a joke:,Laugh loud,Tell quiet,I,S,DISC-IS,6,7-12,v1,No,No
+181,New park slide:,Slide first,Watch others,O+,O-,Big5-O,6,7-12,v1,No,No
+182,Group picnic:,Plan the games,Eat and chat,E+,E-,Big5-E,6,7-12,v1,No,No
+183,Save allowance:,Spend now,Save up,C+,C-,Big5-C,6,7-12,v1,No,No
+184,Help a stranger kid:,Offer toy,Ask adult,A+,A-,Big5-A,6,7-12,v1,No,No
+185,Big crowd at fair:,Excited run,Worried hold hand,N-,N+,Big5-N,6,7-12,v1,No,No
+186,Team puzzle:,Lead pieces,Fit where needed,D,C,DISC-DC,6,7-12,v1,No,No
+187,Learn instrument:,Practice daily,Play fun tunes,C,D,DISC-CD,6,7-12,v1,No,No
+188,Favorite weather:,Sunny play,Rainy inside,E,I,MBTI-EI,6,7-12,v1,No,No
+189,Imagine a pet:,Flying bird,Ground turtle,S,N,MBTI-SN,6,7-12,v1,No,No
+190,Friend forgets toy:,Remind them,Lend yours,T,F,MBTI-TF,6,7-12,v1,No,No
+191,Daily chores list:,Do in order,Pick random,J,P,MBTI-JP,6,7-12,v1,No,No
+192,Play tag game:,Chase fast,Hide smart,D,S,DISC-DS,6,7-12,v1,No,No
+193,Story with pictures:,Look at pics,Read words,I,S,DISC-IS,6,7-12,v1,No,No
+194,New candy type:,Eat quick,Save half,O+,O-,Big5-O,6,7-12,v1,No,No
+195,School field day:,Win races,Cheer friends,E+,E-,Big5-E,6,7-12,v1,No,No
+196,Tidy desk at school:,Every break,End of day,C+,C-,Big5-C,6,7-12,v1,No,No
+197,Share umbrella:,With friend,Alone dry,A+,A-,Big5-A,6,7-12,v1,No,No
+198,High tree climb:,Go up,Stay down,N-,N+,Big5-N,6,7-12,v1,No,No
+199,Group story tell:,Start it,Add part,D,S,DISC-DS,6,7-12,v1,No,No
+200,Fairy godmother wish:,Magic powers,Real toy,S,N,MBTI-SN,6,7-12,v1,No,Yes
+
