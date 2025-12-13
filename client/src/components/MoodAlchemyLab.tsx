@@ -761,6 +761,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
         )}
       </AnimatePresence>
 
+      {!hybridResult && (
       <svg 
         viewBox="0 0 360 360" 
         className="w-full h-auto"
@@ -1081,6 +1082,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
           </motion.text>
         )}
       </svg>
+      )}
 
       <AnimatePresence>
         {hybridResult && (
@@ -1088,7 +1090,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
             initial={{ opacity: 0, y: 15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10 }}
-            className="mt-4 p-5 rounded-2xl bg-gradient-to-br from-purple-50/90 to-pink-50/90 dark:from-purple-900/40 dark:to-pink-900/40 border border-purple-200/50 dark:border-purple-700/30 shadow-lg"
+            className="p-5 rounded-2xl bg-gradient-to-br from-purple-50/90 to-pink-50/90 dark:from-purple-900/40 dark:to-pink-900/40 border border-purple-200/50 dark:border-purple-700/30 shadow-lg"
           >
             <div className="text-center mb-3">
               <motion.span 
