@@ -7,10 +7,12 @@ import { getStripePublishableKey } from "./stripeClient";
 import { sql, eq, and, gte, lte, or, desc } from "drizzle-orm";
 import { db } from "./db";
 import { seedAll, seedPremiumInsights } from "./seedData";
+import { seedJobRoles } from "./seed-job-roles";
 import { 
   traitVibes, traitCombinations, adventureArchetypes,
   sideHustles, blindspots, careerPaths, growthTips,
-  strengths, communicationStyles, workEnvironments, relationshipInsights
+  strengths, communicationStyles, workEnvironments, relationshipInsights,
+  jobRoles
 } from "@shared/schema";
 
 const quizScoresSchema = z.object({
@@ -2868,6 +2870,28 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Premium insights seeding error:", error);
       res.status(500).json({ error: "Failed to seed premium insights" });
+    }
+  });
+
+  // Admin route to seed job roles database (150 roles with 13 trait dimensions)
+  app.post("/api/admin/seed-job-roles", async (_req: Request, res: Response) => {
+    try {
+      await seedJobRoles();
+      res.json({ success: true, message: "Job roles seeded successfully (150 roles)" });
+    } catch (error) {
+      console.error("Job roles seeding error:", error);
+      res.status(500).json({ error: "Failed to seed job roles" });
+    }
+  });
+
+  // Get all job roles from database
+  app.get("/api/job-roles", async (_req: Request, res: Response) => {
+    try {
+      const roles = await db.select().from(jobRoles);
+      res.json(roles);
+    } catch (error) {
+      console.error("Error fetching job roles:", error);
+      res.status(500).json({ error: "Failed to fetch job roles" });
     }
   });
 

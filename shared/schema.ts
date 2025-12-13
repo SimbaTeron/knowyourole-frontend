@@ -441,3 +441,44 @@ export const insertRelationshipInsightSchema = createInsertSchema(relationshipIn
 });
 export type InsertRelationshipInsight = z.infer<typeof insertRelationshipInsightSchema>;
 export type RelationshipInsight = typeof relationshipInsights.$inferSelect;
+
+// ============================================
+// JOB ROLES DATABASE - 150 Roles with 13 Trait Dimensions
+// ============================================
+
+export const jobRoles = pgTable("job_roles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  roleNumber: integer("role_number").notNull().unique(),
+  roleName: text("role_name").notNull(),
+  
+  // MBTI dimensions (1-5 scale)
+  mbtiEI: integer("mbti_ei").notNull(), // E/I preference (5=more E, 1=more I)
+  mbtiSN: integer("mbti_sn").notNull(), // S/N preference (5=more S, 1=more N)
+  mbtiTF: integer("mbti_tf").notNull(), // T/F preference (5=more T, 1=more F)
+  mbtiJP: integer("mbti_jp").notNull(), // J/P preference (5=more J, 1=more P)
+  
+  // DISC dimensions (1-5 scale)
+  discD: integer("disc_d").notNull(),
+  discI: integer("disc_i").notNull(),
+  discS: integer("disc_s").notNull(),
+  discC: integer("disc_c").notNull(),
+  
+  // Big Five dimensions (1-5 scale)
+  big5O: integer("big5_o").notNull(), // Openness
+  big5C: integer("big5_c").notNull(), // Conscientiousness
+  big5E: integer("big5_e").notNull(), // Extraversion
+  big5A: integer("big5_a").notNull(), // Agreeableness
+  big5N: integer("big5_n").notNull(), // Neuroticism (low = better for high-stress)
+  
+  // Job categorization
+  jobCollar: text("job_collar").notNull().default("white"), // white, blue, healthcare, service, arts
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertJobRoleSchema = createInsertSchema(jobRoles).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertJobRole = z.infer<typeof insertJobRoleSchema>;
+export type JobRole = typeof jobRoles.$inferSelect;
