@@ -832,7 +832,7 @@ export async function registerRoutes(
       
       y -= 100;
       
-      page.drawRectangle({ x: 40, y: y - 180, width: width - 80, height: 170, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98, 0.3), borderWidth: 1 });
+      page.drawRectangle({ x: 40, y: y - 180, width: width - 80, height: 170, color: cardBg, borderColor: purple, borderWidth: 1 });
       
       page.drawText("YOUR PERSONALITY TYPE", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
       
@@ -850,7 +850,7 @@ export async function registerRoutes(
       
       y -= 200;
       
-      page.drawRectangle({ x: 40, y: y - 180, width: width - 80, height: 170, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98, 0.3), borderWidth: 1 });
+      page.drawRectangle({ x: 40, y: y - 180, width: width - 80, height: 170, color: cardBg, borderColor: purple, borderWidth: 1 });
       
       page.drawText("BIG FIVE PERSONALITY PROFILE", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
       
@@ -878,13 +878,13 @@ export async function registerRoutes(
       
       y -= 200;
       
-      page.drawRectangle({ x: 40, y: y - 100, width: (width - 90) / 2, height: 90, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98, 0.3), borderWidth: 1 });
+      page.drawRectangle({ x: 40, y: y - 100, width: (width - 90) / 2, height: 90, color: cardBg, borderColor: purple, borderWidth: 1 });
       page.drawText("MOOD BLEND", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
       const moodText = mood || "Balanced";
       page.drawText(moodText.length > 25 ? moodText.slice(0, 25) + "..." : moodText, { x: 55, y: y - 55, size: 14, font: helveticaBold, color: lightText });
       page.drawText("Your emotional starting point", { x: 55, y: y - 75, size: 9, font: helvetica, color: mutedText });
       
-      page.drawRectangle({ x: 40 + (width - 90) / 2 + 10, y: y - 100, width: (width - 90) / 2, height: 90, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98, 0.3), borderWidth: 1 });
+      page.drawRectangle({ x: 40 + (width - 90) / 2 + 10, y: y - 100, width: (width - 90) / 2, height: 90, color: cardBg, borderColor: purple, borderWidth: 1 });
       page.drawText("AGE TIER", { x: 55 + (width - 90) / 2 + 10, y: y - 25, size: 10, font: helveticaBold, color: cyan });
       page.drawText(tier || "Adult", { x: 55 + (width - 90) / 2 + 10, y: y - 55, size: 14, font: helveticaBold, color: lightText });
       page.drawText("Quiz difficulty level", { x: 55 + (width - 90) / 2 + 10, y: y - 75, size: 9, font: helvetica, color: mutedText });
