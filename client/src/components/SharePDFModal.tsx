@@ -1,18 +1,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Download, 
-  Mail, 
-  Smartphone, 
   X, 
   Loader2, 
   Check,
-  FileText,
-  Share2
+  Share2,
+  Copy,
+  Link2
 } from "lucide-react";
 
 interface SharePDFModalProps {
@@ -31,29 +28,74 @@ interface SharePDFModalProps {
 }
 
 export function SharePDFModal({ isOpen, onClose, sessionId, result, mood, tier }: SharePDFModalProps) {
-  const [activeTab, setActiveTab] = useState<"download" | "email" | "sms">("download");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const { toast } = useToast();
 
-  const handleDownload = async () => {
+  const shareUrl = typeof window !== 'undefined' ? window.location.origin : 'https://knowyourole.com';
+
+  const generatePDF = async (): Promise<Blob> => {
+    const response = await fetch("/api/generate-pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, result, mood, tier }),
+    });
+
+    if (!response.ok) throw new Error("Failed to generate PDF");
+    return await response.blob();
+  };
+
+  const handleNativeShare = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/generate-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, result, mood, tier }),
+      const pdfBlob = await generatePDF();
+      const pdfFile = new File([pdfBlob], `KnowYouRole-Results-${sessionId.slice(-6)}.pdf`, { 
+        type: 'application/pdf' 
       });
 
-      if (!response.ok) throw new Error("Failed to generate PDF");
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        await navigator.share({
+          title: `I'm a ${result.mbtiType} - My KnowYouRole Results`,
+          text: `I discovered my personality type is ${result.mbtiType}! Take the quiz and discover yours: ${shareUrl}`,
+          files: [pdfFile]
+        });
+        
+        setSuccess(true);
+        toast({
+          title: "Shared!",
+          description: "Your results have been shared successfully.",
+        });
+        setTimeout(() => {
+          setSuccess(false);
+          onClose();
+        }, 1500);
+      } else {
+        await handleDownload(pdfBlob);
+      }
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        return;
+      }
+      console.error("Share error:", error);
+      toast({
+        title: "Share Failed",
+        description: "Unable to share. Try downloading instead.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-      const blob = await response.blob();
+  const handleDownload = async (existingBlob?: Blob) => {
+    setIsLoading(true);
+    try {
+      const blob = existingBlob || await generatePDF();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `KnowRole-Results-${sessionId.slice(-6)}.pdf`;
+      a.download = `KnowYouRole-Results-${sessionId.slice(-6)}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -80,92 +122,25 @@ export function SharePDFModal({ isOpen, onClose, sessionId, result, mood, tier }
     }
   };
 
-  const handleEmail = async () => {
-    if (!email || !email.includes("@")) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
+  const handleCopyLink = async () => {
     try {
-      const response = await fetch("/api/share/email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, sessionId, result, mood, tier }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to send email");
-
-      setSuccess(true);
+      await navigator.clipboard.writeText(shareUrl);
+      setLinkCopied(true);
       toast({
-        title: "Email Sent!",
-        description: `Your results have been sent to ${email}`,
+        title: "Link Copied!",
+        description: "Share this link with friends to try the quiz.",
       });
-      setTimeout(() => {
-        setSuccess(false);
-        setEmail("");
-        onClose();
-      }, 1500);
-    } catch (error: any) {
-      console.error("Email error:", error);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (error) {
       toast({
-        title: "Email Failed",
-        description: error.message || "Unable to send email. Please try again.",
+        title: "Copy Failed",
+        description: "Unable to copy link. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const handleSMS = async () => {
-    const cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.length < 10) {
-      toast({
-        title: "Invalid Phone Number",
-        description: "Please enter a valid phone number.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/share/sms", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: cleanPhone, sessionId, result }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to send SMS");
-
-      setSuccess(true);
-      toast({
-        title: "SMS Sent!",
-        description: `A link to your results has been sent to ${phone}`,
-      });
-      setTimeout(() => {
-        setSuccess(false);
-        setPhone("");
-        onClose();
-      }, 1500);
-    } catch (error: any) {
-      console.error("SMS error:", error);
-      toast({
-        title: "SMS Failed",
-        description: error.message || "Unable to send SMS. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const canNativeShare = typeof navigator !== 'undefined' && 'share' in navigator;
 
   if (!isOpen) return null;
 
@@ -200,164 +175,83 @@ export function SharePDFModal({ isOpen, onClose, sessionId, result, mood, tier }
               </div>
               <div>
                 <h2 className="text-xl font-bold">Share Your Results</h2>
-                <p className="text-sm text-white/80">Download or send your personality report</p>
+                <p className="text-sm text-white/80">Share your personality discovery with friends</p>
               </div>
             </div>
           </div>
 
-          <div className="p-1 bg-gray-100 dark:bg-gray-800 flex gap-1">
-            {[
-              { id: "download", icon: Download, label: "Download" },
-              { id: "email", icon: Mail, label: "Email" },
-              { id: "sms", icon: Smartphone, label: "SMS" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-all ${
-                  activeTab === tab.id
-                    ? "bg-white dark:bg-gray-700 text-terracotta shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-700/50"
-                }`}
-                data-testid={`tab-${tab.id}`}
+          <div className="p-6 space-y-4">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                You're a <span className="font-bold text-terracotta">{result.mbtiType}</span> personality type!
+              </p>
+            </div>
+
+            {canNativeShare ? (
+              <Button
+                onClick={handleNativeShare}
+                disabled={isLoading || success}
+                className="w-full bg-gradient-to-r from-terracotta to-sage-green hover:opacity-90 text-white py-6"
+                data-testid="button-share-native"
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
-              </button>
-            ))}
-          </div>
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                ) : success ? (
+                  <Check className="w-5 h-5 mr-2" />
+                ) : (
+                  <Share2 className="w-5 h-5 mr-2" />
+                )}
+                {isLoading ? "Preparing..." : success ? "Shared!" : "Share Results"}
+              </Button>
+            ) : (
+              <Button
+                onClick={() => handleDownload()}
+                disabled={isLoading || success}
+                className="w-full bg-gradient-to-r from-terracotta to-sage-green hover:opacity-90 text-white py-6"
+                data-testid="button-download-pdf"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                ) : success ? (
+                  <Check className="w-5 h-5 mr-2" />
+                ) : (
+                  <Download className="w-5 h-5 mr-2" />
+                )}
+                {isLoading ? "Generating..." : success ? "Downloaded!" : "Download PDF"}
+              </Button>
+            )}
 
-          <div className="p-6">
-            <AnimatePresence mode="wait">
-              {activeTab === "download" && (
-                <motion.div
-                  key="download"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  className="space-y-4"
-                >
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 flex items-start gap-4">
-                    <FileText className="w-10 h-10 text-terracotta flex-shrink-0" />
-                    <div>
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-                        Download PDF Report
-                      </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Get a beautifully designed PDF with your MBTI type, Big Five scores, 
-                        mood insights, and personalized recommendations.
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={handleDownload}
-                    disabled={isLoading || success}
-                    className="w-full bg-gradient-to-r from-terracotta to-sage-green hover:opacity-90 text-white py-6"
-                    data-testid="button-download-pdf"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    ) : success ? (
-                      <Check className="w-5 h-5 mr-2" />
-                    ) : (
-                      <Download className="w-5 h-5 mr-2" />
-                    )}
-                    {isLoading ? "Generating..." : success ? "Downloaded!" : "Download PDF"}
-                  </Button>
-                </motion.div>
-              )}
-
-              {activeTab === "email" && (
-                <motion.div
-                  key="email"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  className="space-y-4"
-                >
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
-                      Email Address
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="py-6"
-                      data-testid="input-email"
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      We'll send your PDF report to this address. Your email is not stored.
-                    </p>
-                  </div>
-                  <Button
-                    onClick={handleEmail}
-                    disabled={isLoading || success || !email}
-                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:opacity-90 text-white py-6"
-                    data-testid="button-send-email"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    ) : success ? (
-                      <Check className="w-5 h-5 mr-2" />
-                    ) : (
-                      <Mail className="w-5 h-5 mr-2" />
-                    )}
-                    {isLoading ? "Sending..." : success ? "Sent!" : "Send Email"}
-                  </Button>
-                </motion.div>
-              )}
-
-              {activeTab === "sms" && (
-                <motion.div
-                  key="sms"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  className="space-y-4"
-                >
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-gray-700 dark:text-gray-300">
-                      Phone Number
-                    </Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="(555) 123-4567"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="py-6"
-                      data-testid="input-phone"
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      We'll text you a link to view your results. Your number is not stored.
-                    </p>
-                  </div>
-                  <Button
-                    onClick={handleSMS}
-                    disabled={isLoading || success || !phone}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 text-white py-6"
-                    data-testid="button-send-sms"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    ) : success ? (
-                      <Check className="w-5 h-5 mr-2" />
-                    ) : (
-                      <Smartphone className="w-5 h-5 mr-2" />
-                    )}
-                    {isLoading ? "Sending..." : success ? "Sent!" : "Send SMS"}
-                  </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => handleDownload()}
+                disabled={isLoading}
+                className="flex-1"
+                data-testid="button-download-fallback"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download PDF
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleCopyLink}
+                disabled={linkCopied}
+                className="flex-1"
+                data-testid="button-copy-link"
+              >
+                {linkCopied ? (
+                  <Check className="w-4 h-4 mr-2" />
+                ) : (
+                  <Link2 className="w-4 h-4 mr-2" />
+                )}
+                {linkCopied ? "Copied!" : "Copy Link"}
+              </Button>
+            </div>
           </div>
 
           <div className="px-6 pb-6">
             <p className="text-xs text-center text-gray-400 dark:text-gray-500">
-              Your contact information is used only to send this report and is not stored.
+              Share the quiz link with friends so they can discover their personality too!
             </p>
           </div>
         </motion.div>
