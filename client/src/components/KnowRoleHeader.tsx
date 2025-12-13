@@ -54,12 +54,6 @@ export default function KnowRoleHeader({ theme, onThemeChange }: KnowRoleHeaderP
           >
             KnowYouRole
           </h1>
-          <img 
-            src={appIcon} 
-            alt="KnowYouRole compass icon" 
-            className="w-10 h-10 rounded-lg shadow-md dark:shadow-[0_0_15px_rgba(167,139,250,0.2)] object-cover"
-            data-testid="img-app-icon-right"
-          />
         </div>
 
         <ThemeToggle
