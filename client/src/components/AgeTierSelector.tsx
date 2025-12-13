@@ -35,10 +35,10 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
   return (
     <div className="w-full">
       <div className="text-center mb-6">
-        <h2 className="md:text-3xl font-display font-semibold text-warm-gray dark:text-soft-cream mb-2 text-[36px]">
+        <h2 className="md:text-3xl font-display font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2 text-[36px]">
           Choose your path
         </h2>
-        <p className="text-base md:text-lg text-warm-gray/70 dark:text-soft-cream/60">
+        <p className="text-base md:text-lg text-warm-gray/70 dark:text-[#94A3B8]">
           Select the journey that fits you best
         </p>
       </div>
@@ -65,21 +65,21 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
                 <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all ${
                   isSelected 
                     ? "bg-white/20" 
-                    : "bg-terracotta/10 dark:bg-sunset-amber/20"
+                    : "bg-terracotta/10 dark:bg-[#A78BFA]/20"
                 }`}>
                   <Icon className={`w-7 h-7 transition-colors ${
-                    isSelected ? "text-white" : "text-terracotta dark:text-sunset-amber"
+                    isSelected ? "text-white" : "text-terracotta dark:text-[#A78BFA]"
                   }`} />
                 </div>
                 
                 <div className="flex-1">
                   <span className={`font-semibold block text-2xl md:text-3xl ${
-                    isSelected ? "text-white" : "text-warm-gray dark:text-soft-cream"
+                    isSelected ? "text-white" : "text-warm-gray dark:text-[#F8FAFC]"
                   }`}>
                     {tier.label}
                   </span>
                   <span className={`text-xl md:text-2xl mt-1 block font-medium ${
-                    isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-soft-cream/40"
+                    isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-[#94A3B8]"
                   }`}>
                     {tier.sublabel}
                   </span>
@@ -99,7 +99,7 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
           );
         })}
       </div>
-      <p className="text-center text-sm text-warm-gray/50 dark:text-soft-cream/40 italic mt-6">
+      <p className="text-center text-sm text-warm-gray/50 dark:text-[#64748B] italic mt-6">
         Tap to select your age tier
       </p>
     </div>

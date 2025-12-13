@@ -367,7 +367,7 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
   }, []);
   
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0F]">
       <main className="flex-1 flex items-center justify-center px-4 py-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -387,10 +387,10 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
                 <Sparkles className="w-8 h-8 text-sage-green" />
               </motion.div>
             </div>
-            <h2 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2">
+            <h2 className="text-2xl font-bold text-warm-gray dark:text-[#F8FAFC] mb-2">
               Checkpoint: {recapMilestone} Questions
             </h2>
-            <p className="text-warm-gray/70 dark:text-soft-cream/70">
+            <p className="text-warm-gray/70 dark:text-[#94A3B8]">
               {spinComplete ? "Here's what we're seeing so far..." : "Analyzing your responses..."}
             </p>
           </motion.div>
@@ -402,7 +402,7 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
               className={`p-5 rounded-xl border transition-all duration-200 ${
                 spinComplete 
                   ? "bg-sage-green/10 dark:bg-sage-green/20 border-sage-green/30 dark:border-sage-green/40" 
-                  : "bg-soft-cream/50 dark:bg-gray-800/50 border-warm-gray/10 dark:border-white/10"
+                  : "bg-soft-cream/50 dark:bg-[#12121A]/50 border-warm-gray/10 dark:border-white/10"
               }`}
             >
               <motion.p 
@@ -412,7 +412,7 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
                 className={`font-medium text-lg transition-colors duration-200 ${
                   spinComplete 
                     ? "text-sage-green dark:text-sage-green" 
-                    : "text-warm-gray/70 dark:text-soft-cream/70"
+                    : "text-warm-gray/70 dark:text-[#94A3B8]"
                 }`}
               >
                 {displayedInsight}
@@ -432,14 +432,14 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
               className={`w-full transition-all duration-300 ${
                 buttonActive 
                   ? "bg-terracotta hover:bg-terracotta/90 text-white" 
-                  : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                  : "bg-gray-300 dark:bg-[#1E1E2E] text-gray-500 dark:text-[#64748B] cursor-not-allowed"
               }`}
               data-testid="button-recap-continue"
             >
               Keep Going
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
-            <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-3">
+            <p className="text-xs text-warm-gray/50 dark:text-[#64748B] mt-3">
               {questionsRemaining} questions remaining
             </p>
           </motion.div>
@@ -1182,20 +1182,20 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     const mcTimerProgress = (mcBreakTimer / 20) * 100;
     
     return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0F]">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/90 dark:bg-[#0A0A0F]/90 backdrop-blur-md border-b border-gray-100 dark:border-[#A78BFA]/20">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center gap-2">
             <Timer className={`w-5 h-5 ${mcBreakTimer < 5 ? "text-red-500" : "text-terracotta"}`} />
-            <span className={`text-lg font-mono font-bold ${mcBreakTimer < 5 ? "text-red-500" : "text-warm-gray dark:text-soft-cream"}`}>
+            <span className={`text-lg font-mono font-bold ${mcBreakTimer < 5 ? "text-red-500" : "text-warm-gray dark:text-[#F8FAFC]"}`}>
               {mcBreakTimer.toFixed(1)}s
             </span>
           </div>
-          <span className="text-lg font-bold text-warm-gray dark:text-soft-cream">
+          <span className="text-lg font-bold text-warm-gray dark:text-[#F8FAFC]">
             {mcQuestionNum}/{quizConfig.totalQuestions}
           </span>
         </div>
-        <div className="max-w-md mx-auto mt-2 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="max-w-md mx-auto mt-2 h-2 bg-gray-200 dark:bg-[#1E1E2E] rounded-full overflow-hidden">
           <motion.div
             className={`h-full ${mcBreakTimer < 5 ? "bg-red-500" : "bg-gradient-to-r from-terracotta to-dusty-blue"}`}
             initial={{ width: "100%" }}
@@ -1234,7 +1234,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               initial={{ opacity: 0 }}
               animate={{ opacity: mcBreakVisible ? 1 : 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="text-warm-gray/60 dark:text-soft-cream/50 mb-2 text-[16px]"
+              className="text-warm-gray/60 dark:text-[#64748B] mb-2 text-[16px]"
             >
               {question.subtitle}
             </motion.p>
@@ -1242,7 +1242,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               initial={{ opacity: 0 }}
               animate={{ opacity: mcBreakVisible ? 1 : 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="text-2xl font-bold text-warm-gray dark:text-soft-cream"
+              className="text-2xl font-bold text-warm-gray dark:text-[#F8FAFC]"
             >
               {question.prompt}
             </motion.h2>
@@ -1273,7 +1273,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                     min-h-[140px]
                     ${isSelected 
                       ? "border-terracotta bg-terracotta/10 dark:bg-terracotta/20 scale-105" 
-                      : "border-terracotta/20 dark:border-terracotta/30 bg-soft-cream/50 dark:bg-gray-800 hover:border-terracotta/50 hover:bg-terracotta/5"
+                      : "border-terracotta/20 dark:border-terracotta/30 bg-soft-cream/50 dark:bg-[#12121A] hover:border-terracotta/50 hover:bg-terracotta/5"
                     }
                     ${selectedChoice && !isSelected ? "opacity-50" : ""}
                   `}
@@ -1288,7 +1288,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   `}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <span className="font-medium text-warm-gray dark:text-soft-cream text-[18px]">
+                  <span className="font-medium text-warm-gray dark:text-[#F8FAFC] text-[18px]">
                     {option.label}
                   </span>
                   {isSelected && (
@@ -1311,7 +1311,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             initial={{ opacity: 0 }}
             animate={{ opacity: mcBreakVisible ? 1 : 0 }}
             transition={{ delay: 1.2 }}
-            className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-6"
+            className="text-center text-xs text-warm-gray/50 dark:text-[#64748B] mt-6"
           >
             Your answers shape your personalized results
           </motion.p>
@@ -1394,7 +1394,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   
   if (questions.length === 0 || !currentQuestion) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0A0A0F]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -1413,8 +1413,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     : "text-sage-green";
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0F]">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/95 dark:bg-[#0A0A0F]/95 backdrop-blur-md">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AnimatePresence mode="wait">
@@ -1475,7 +1475,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   className="flex items-center gap-2"
                 >
                   <Timer className={`w-6 h-6 ${timerProgress < 30 ? "text-red-500" : "text-terracotta"}`} />
-                  <span className={`text-xl font-mono font-bold ${timerProgress < 30 ? "text-red-500" : "text-warm-gray dark:text-soft-cream"}`}>
+                  <span className={`text-xl font-mono font-bold ${timerProgress < 30 ? "text-red-500" : "text-warm-gray dark:text-[#F8FAFC]"}`}>
                     {timeRemaining.toFixed(1)}s
                   </span>
                 </motion.div>
@@ -1484,7 +1484,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </div>
           
           <div className="flex items-center gap-3">
-            <span className="text-xl font-bold text-warm-gray dark:text-soft-cream">
+            <span className="text-xl font-bold text-warm-gray dark:text-[#F8FAFC]">
               {currentIndex + 1}/{questions.length}
             </span>
             {useLocalityColors && isLocalitySet && (
@@ -1512,7 +1512,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           }}
         />
         
-        <div className="max-w-md mx-auto mt-2 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+        <div className="max-w-md mx-auto mt-2 h-3 bg-gray-200 dark:bg-[#1E1E2E] rounded-full overflow-hidden shadow-inner">
           <motion.div
             className={`h-full ${timerProgress < 30 ? "bg-red-500" : "bg-gradient-to-r from-terracotta to-dusty-blue"}`}
             initial={{ width: "100%" }}
@@ -1555,7 +1555,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                   role="article"
                   aria-label={`Swipe left for ${currentQuestion.options[0]}, right for ${currentQuestion.options[1]}`}
                 >
-                  <div className="absolute inset-0 bg-white dark:bg-gray-800" />
+                  <div className="absolute inset-0 bg-white dark:bg-[#12121A]" />
                   
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-sage-green/30 to-transparent rounded-3xl"
@@ -1634,7 +1634,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                             />
                             
                             {/* Value indicator labels */}
-                            <div className="flex justify-between mt-3 text-xs sm:text-sm font-medium text-warm-gray/70 dark:text-soft-cream/60" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                            <div className="flex justify-between mt-3 text-xs sm:text-sm font-medium text-warm-gray/70 dark:text-[#94A3B8]" style={{ fontFamily: 'Nunito, sans-serif' }}>
                               <span>Strong</span>
                               <span>Slight</span>
                               <span>Neutral</span>
@@ -1649,7 +1649,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                               sliderValue < 0 ? 'bg-sage-green/10 text-sage-green/80' :
                               sliderValue > 1 ? 'bg-terracotta/20 text-terracotta' :
                               sliderValue > 0 ? 'bg-terracotta/10 text-terracotta/80' :
-                              'bg-warm-gray/10 text-warm-gray dark:text-soft-cream/70'
+                              'bg-warm-gray/10 text-warm-gray dark:text-[#94A3B8]'
                             }`}
                             style={{ fontFamily: 'Nunito, sans-serif' }}
                             animate={{ scale: [1, 1.02, 1] }}
@@ -1734,7 +1734,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       <motion.div 
                         initial={{ opacity: 1 }}
                         animate={{ opacity: hasInteracted ? 0 : 1 }}
-                        className="text-center pt-2 text-xs text-warm-gray/50 dark:text-soft-cream/40"
+                        className="text-center pt-2 text-xs text-warm-gray/50 dark:text-[#64748B]"
                       >
                         Tap a card or swipe to choose
                       </motion.div>
@@ -1778,9 +1778,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
         </div>
       </main>
-      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 bg-white/80 dark:bg-[#0A0A0F]/80 backdrop-blur-sm">
         <div className="flex items-center justify-center gap-4">
-          <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
+          <p className="text-center text-xs text-warm-gray/50 dark:text-[#64748B]">
             Tap, swipe, or use keyboard (Tab + Enter) to choose
           </p>
         </div>
@@ -1831,7 +1831,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                 Got It!
               </Button>
               
-              <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40 mt-3">
+              <p className="text-center text-xs text-warm-gray/50 dark:text-[#64748B] mt-3">
                 You can pause anytime during the quiz
               </p>
             </motion.div>
@@ -1848,7 +1848,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           <div className="max-w-sm mx-auto">
             <button
               onClick={togglePause}
-              className="w-full py-3 px-6 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 shadow-sm"
+              className="w-full py-3 px-6 rounded-xl bg-gray-100 dark:bg-[#12121A] hover:bg-gray-200 dark:hover:bg-[#1E1E2E] transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200 dark:border-[#A78BFA]/20 shadow-sm"
               data-testid="button-pause"
             >
               <Pause className="w-5 h-5 text-gray-600 dark:text-gray-300" />
@@ -1877,7 +1877,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
               className="w-full max-w-md mx-4 mb-4"
               onClick={e => e.stopPropagation()}
             >
-              <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-[#0A0A0F] rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-[#A78BFA]/20">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -1887,7 +1887,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                       <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                         Quiz Paused
                       </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500 dark:text-[#64748B]">
                         Take your time
                       </p>
                     </div>

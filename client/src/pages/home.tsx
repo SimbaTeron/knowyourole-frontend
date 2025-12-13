@@ -120,9 +120,9 @@ export default function Home() {
                       className="flex-shrink-0"
                     >
                       {ROTATING_TAGLINES[taglineIndex].icon === "sparkle" ? (
-                        <Sparkles className="w-6 h-6 text-terracotta" />
+                        <Sparkles className="w-6 h-6 text-terracotta dark:text-[#A78BFA]" />
                       ) : (
-                        <Compass className="w-6 h-6 text-sage-green" />
+                        <Compass className="w-6 h-6 text-sage-green dark:text-[#67E8F9]" />
                       )}
                     </motion.div>
                     <p
@@ -141,8 +141,8 @@ export default function Home() {
                     key={i}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       i === taglineIndex 
-                        ? "w-6 bg-terracotta" 
-                        : "w-1.5 bg-warm-gray/20 dark:bg-soft-cream/20"
+                        ? "w-6 bg-terracotta dark:bg-[#A78BFA] dark:shadow-[0_0_10px_rgba(167,139,250,0.5)]" 
+                        : "w-1.5 bg-warm-gray/20 dark:bg-[#A78BFA]/20"
                     }`}
                     animate={i === taglineIndex ? { scale: [1, 1.2, 1] } : {}}
                     transition={{ duration: 0.3 }}
@@ -170,7 +170,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="fixed bottom-0 left-0 right-0 z-10 py-5 text-center">
-        <p className="text-sm italic font-handwritten text-warm-gray/50 dark:text-soft-cream/40 cursor-pointer hover:text-terracotta transition-colors">
+        <p className="text-sm italic font-handwritten text-warm-gray/50 dark:text-[#64748B] cursor-pointer hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors">
           Unfold your trait trail
         </p>
       </footer>

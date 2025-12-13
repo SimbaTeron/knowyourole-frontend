@@ -1402,7 +1402,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   if (!result) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0A0A0F]">
         <motion.div
           animate={shouldReduceMotion ? {} : { rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -1461,16 +1461,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     const variantClasses = {
       no: isSelected 
         ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 ring-2 ring-red-400" 
-        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20",
+        : "bg-gray-100 dark:bg-[#1E1E2E] text-gray-600 dark:text-[#94A3B8] hover:bg-red-50 dark:hover:bg-red-900/20",
       middle: isSelected 
         ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 ring-2 ring-amber-400" 
-        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-900/20",
+        : "bg-gray-100 dark:bg-[#1E1E2E] text-gray-600 dark:text-[#94A3B8] hover:bg-amber-50 dark:hover:bg-amber-900/20",
       yes: isSelected 
         ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-2 ring-green-400" 
-        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20",
+        : "bg-gray-100 dark:bg-[#1E1E2E] text-gray-600 dark:text-[#94A3B8] hover:bg-green-50 dark:hover:bg-green-900/20",
       default: isSelected 
         ? "bg-terracotta/20 text-terracotta ring-2 ring-terracotta" 
-        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-terracotta/10",
+        : "bg-gray-100 dark:bg-[#1E1E2E] text-gray-600 dark:text-[#94A3B8] hover:bg-terracotta/10",
     };
 
     return (
@@ -1521,7 +1521,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   };
 
   return (
-    <div className="min-h-screen pb-36 bg-white dark:bg-gray-900">
+    <div className="min-h-screen pb-36 bg-white dark:bg-[#0A0A0F]">
       {/* Validation Questions Overlay - 2 quick questions before premium unlock */}
       <AnimatePresence>
         {showValidation && (
@@ -1831,7 +1831,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.8, y: 50 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-md w-full shadow-2xl border-2 border-terracotta/30 dark:border-terracotta/50 max-h-[90vh] overflow-y-auto"
+              className="bg-white dark:bg-[#12121A] rounded-3xl p-6 max-w-md w-full shadow-2xl border-2 border-terracotta/30 dark:border-terracotta/50 max-h-[90vh] overflow-y-auto"
             >
               <div className="text-center mb-5">
                 <motion.div 
@@ -1842,10 +1842,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 >
                   <MessageCircle className="w-8 h-8 text-white" />
                 </motion.div>
-                <h3 className="text-xl font-bold text-warm-gray dark:text-soft-cream mb-1">
+                <h3 className="text-xl font-bold text-warm-gray dark:text-[#F8FAFC] mb-1">
                   Quick Feedback
                 </h3>
-                <p className="text-sm text-warm-gray/60 dark:text-soft-cream/50">
+                <p className="text-sm text-warm-gray/60 dark:text-[#64748B]">
                   Help us improve KnowRole in 30 seconds
                 </p>
               </div>
@@ -1853,7 +1853,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               <div className="space-y-4">
                 <fieldset className="space-y-2">
                   <Label asChild>
-                    <legend className="font-medium text-warm-gray dark:text-soft-cream mb-2 text-sm">
+                    <legend className="font-medium text-warm-gray dark:text-[#F8FAFC] mb-2 text-sm">
                       Useful App?
                     </legend>
                   </Label>
@@ -1866,7 +1866,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                 <fieldset className="space-y-2">
                   <Label asChild>
-                    <legend className="font-medium text-warm-gray dark:text-soft-cream mb-2 text-sm">
+                    <legend className="font-medium text-warm-gray dark:text-[#F8FAFC] mb-2 text-sm">
                       Results feel accurate?
                     </legend>
                   </Label>
@@ -1879,7 +1879,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                 <fieldset className="space-y-2">
                   <Label asChild>
-                    <legend className="font-medium text-warm-gray dark:text-soft-cream mb-2 text-sm">
+                    <legend className="font-medium text-warm-gray dark:text-[#F8FAFC] mb-2 text-sm">
                       Questions engaging?
                     </legend>
                   </Label>
@@ -1892,7 +1892,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                 <fieldset className="space-y-2">
                   <Label asChild>
-                    <legend className="font-medium text-warm-gray dark:text-soft-cream mb-2 text-sm">
+                    <legend className="font-medium text-warm-gray dark:text-[#F8FAFC] mb-2 text-sm">
                       Would share with a friend?
                     </legend>
                   </Label>
@@ -1903,7 +1903,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </fieldset>
 
                 <div className="space-y-2">
-                  <Label htmlFor="modal-suggestions" className="text-sm font-medium text-warm-gray dark:text-soft-cream">
+                  <Label htmlFor="modal-suggestions" className="text-sm font-medium text-warm-gray dark:text-[#F8FAFC]">
                     Suggestions for improvement?
                   </Label>
                   <Textarea
@@ -1935,7 +1935,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </Button>
                 
                 {!allFeedbackAnswered && (
-                  <p className="text-center text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                  <p className="text-center text-xs text-warm-gray/50 dark:text-[#64748B]">
                     All fields required
                   </p>
                 )}
@@ -1990,7 +1990,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-2xl font-display font-bold text-warm-gray dark:text-soft-cream mb-2"
+          className="text-2xl font-display font-bold text-warm-gray dark:text-[#F8FAFC] mb-2"
           data-testid="text-result-title"
         >
           {isFull ? "Your Personality Map" : "Your Quick Glimpse"}
@@ -2000,7 +2000,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           initial={shouldReduceMotion ? {} : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-sm text-warm-gray/70 dark:text-soft-cream/60"
+          className="text-sm text-warm-gray/70 dark:text-[#94A3B8]"
         >
           Based on your {scores.responses.length} path choices
         </motion.p>
@@ -2030,7 +2030,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 <h3 className="text-2xl font-bold text-purple-700 dark:text-purple-200 mb-2" data-testid="text-adventure-archetype">
                   {adventureArchetype.name}
                 </h3>
-                <div className="mb-4 px-4 py-2 rounded-xl bg-white/50 dark:bg-gray-800/50 border border-purple-200 dark:border-purple-700">
+                <div className="mb-4 px-4 py-2 rounded-xl bg-white/50 dark:bg-[#12121A]/50 border border-purple-200 dark:border-purple-700">
                   <p className="text-lg font-semibold text-purple-600 dark:text-purple-300">
                     {adventureArchetype.superpower}
                   </p>
@@ -2056,7 +2056,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </div>
                 </div>
                 <p className="text-xs text-terracotta font-medium mb-1 tracking-wide uppercase">Your Primary Role Match</p>
-                <h3 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2" data-testid="text-primary-role">
+                <h3 className="text-2xl font-bold text-warm-gray dark:text-[#F8FAFC] mb-2" data-testid="text-primary-role">
                   {result.primaryRole.title}
                 </h3>
                 {/* Salary - Only show for premium users */}
@@ -2072,13 +2072,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                           <span className="text-xs opacity-70">in {cityName}</span>
                         )}
                       </div>
-                      <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                      <p className="text-xs text-warm-gray/60 dark:text-[#64748B]">
                         {regionalInfo.growthOutlook}
                       </p>
                     </div>
                   );
                 })()}
-                <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed max-w-sm mx-auto">
+                <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed max-w-sm mx-auto">
                   {result.primaryRole.desc}: {result.mbtiType.includes('E') 
                     ? "Your natural energy and communication style make you well-suited for collaborative environments." 
                     : "Your thoughtful, focused approach brings unique depth and precision to this field."} 
@@ -2217,7 +2217,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                             transition={{ delay: 0.9 + i * 0.1 }}
                             className="group"
                           >
-                            <summary className="flex items-center justify-between cursor-pointer list-none px-3 py-2.5 rounded-xl bg-white/60 dark:bg-gray-800/60 border border-indigo-200/50 dark:border-indigo-700/30 hover:bg-white/80 dark:hover:bg-gray-700/60 transition-colors">
+                            <summary className="flex items-center justify-between cursor-pointer list-none px-3 py-2.5 rounded-xl bg-white/60 dark:bg-[#12121A]/60 border border-indigo-200/50 dark:border-indigo-700/30 hover:bg-white/80 dark:hover:bg-[#1E1E2E]/60 transition-colors">
                               <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
                                   <Sparkles className="w-4 h-4 text-white" />
@@ -2230,7 +2230,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                               <p className="text-sm font-medium text-indigo-600 dark:text-indigo-300 mb-1">
                                 {hybridInfo.short}
                               </p>
-                              <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed">
+                              <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
                                 {hybridInfo.description}
                               </p>
                             </div>
@@ -2413,25 +2413,25 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
-            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <Card className="bg-white dark:bg-[#12121A] border border-gray-200 dark:border-[#A78BFA]/20 overflow-hidden">
               <CardContent className="p-0">
-                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-                  <h3 className="text-sm font-bold text-warm-gray dark:text-soft-cream flex items-center gap-2">
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-[#A78BFA]/20 bg-gray-50/50 dark:bg-[#12121A]/50">
+                  <h3 className="text-sm font-bold text-warm-gray dark:text-[#F8FAFC] flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-terracotta" />
                     Your Personality Profile
                   </h3>
-                  <p className="text-xs text-warm-gray/50 dark:text-soft-cream/50 mt-0.5">Tap each to learn more</p>
+                  <p className="text-xs text-warm-gray/50 dark:text-[#64748B] mt-0.5">Tap each to learn more</p>
                 </div>
                 
                 {/* MBTI Row */}
-                <details className="group border-b border-gray-100 dark:border-gray-700">
-                  <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors list-none">
+                <details className="group border-b border-gray-100 dark:border-[#A78BFA]/20">
+                  <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E1E2E]/30 transition-colors list-none">
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-terracotta/10 flex items-center justify-center">
                       <Brain className="w-5 h-5 text-terracotta" aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] text-warm-gray/50 dark:text-soft-cream/50 uppercase tracking-wide">Thinking Style</p>
-                      <p className="text-sm font-bold text-warm-gray dark:text-soft-cream leading-tight" data-testid="text-mbti">
+                      <p className="text-[10px] text-warm-gray/50 dark:text-[#64748B] uppercase tracking-wide">Thinking Style</p>
+                      <p className="text-sm font-bold text-warm-gray dark:text-[#F8FAFC] leading-tight" data-testid="text-mbti">
                         {funMode && FUN_MODE_TITLES[result.mbtiType] 
                           ? FUN_MODE_TITLES[result.mbtiType]
                           : result.mbtiLabel}
@@ -2441,21 +2441,21 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     <ChevronDown className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" />
                   </summary>
                   <div className="px-4 pb-4 pt-1">
-                    <p className="text-xs text-warm-gray/70 dark:text-soft-cream/70 leading-relaxed pl-[52px]">
+                    <p className="text-xs text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed pl-[52px]">
                       {result.mbtiDesc}
                     </p>
                   </div>
                 </details>
 
                 {/* DISC Row */}
-                <details className="group border-b border-gray-100 dark:border-gray-700">
-                  <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors list-none">
+                <details className="group border-b border-gray-100 dark:border-[#A78BFA]/20">
+                  <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E1E2E]/30 transition-colors list-none">
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-sage-green/10 flex items-center justify-center">
                       <Award className="w-5 h-5 text-sage-green" aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] text-warm-gray/50 dark:text-soft-cream/50 uppercase tracking-wide">Work Style</p>
-                      <p className="text-sm font-bold text-warm-gray dark:text-soft-cream leading-tight" data-testid="text-disc">
+                      <p className="text-[10px] text-warm-gray/50 dark:text-[#64748B] uppercase tracking-wide">Work Style</p>
+                      <p className="text-sm font-bold text-warm-gray dark:text-[#F8FAFC] leading-tight" data-testid="text-disc">
                         {funMode && FUN_MODE_DISC[result.discStyle] 
                           ? FUN_MODE_DISC[result.discStyle].nickname 
                           : result.discLabel}
@@ -2465,7 +2465,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     <ChevronDown className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" />
                   </summary>
                   <div className="px-4 pb-4 pt-1">
-                    <p className="text-xs text-warm-gray/70 dark:text-soft-cream/70 leading-relaxed pl-[52px]">
+                    <p className="text-xs text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed pl-[52px]">
                       {result.discDesc}
                     </p>
                   </div>
@@ -2479,13 +2479,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   const quartileData = TRAIT_QUARTILE_DESCRIPTIONS[topTrait[0]]?.[quartileKey];
                   return (
                     <details className="group">
-                      <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors list-none">
+                      <summary className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E1E2E]/30 transition-colors list-none">
                         <div className={`flex-shrink-0 w-10 h-10 rounded-full ${colors.bg}/10 flex items-center justify-center`}>
                           <Icon className={`w-5 h-5 ${colors.text}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[10px] text-warm-gray/50 dark:text-soft-cream/50 uppercase tracking-wide">Core Strength</p>
-                          <p className="text-sm font-bold text-warm-gray dark:text-soft-cream leading-tight" data-testid="text-bigfive">
+                          <p className="text-[10px] text-warm-gray/50 dark:text-[#64748B] uppercase tracking-wide">Core Strength</p>
+                          <p className="text-sm font-bold text-warm-gray dark:text-[#F8FAFC] leading-tight" data-testid="text-bigfive">
                             {TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]}
                             <span className={`text-xs font-mono ml-1.5 ${colors.text}`}>({topTrait[1]}%)</span>
                           </p>
@@ -2493,7 +2493,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         <ChevronDown className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" />
                       </summary>
                       <div className="px-4 pb-4 pt-1">
-                        <p className="text-xs text-warm-gray/70 dark:text-soft-cream/70 leading-relaxed pl-[52px]">
+                        <p className="text-xs text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed pl-[52px]">
                           <span className="font-semibold">{quartileData?.vibe}:</span> {quartileData?.description}
                         </p>
                       </div>
@@ -2520,14 +2520,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-sm font-bold text-warm-gray dark:text-soft-cream">
+                      <h4 className="text-sm font-bold text-warm-gray dark:text-[#F8FAFC]">
                         Your {localeInsight.city} Edge
                       </h4>
                       <span className="text-xs px-2 py-0.5 rounded-full bg-dusty-blue/10 text-dusty-blue">
                         {localeInsight.metro}
                       </span>
                     </div>
-                    <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed mb-3">
+                    <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed mb-3">
                       {getPersonalizedInsight(
                         cityName,
                         stateName,
@@ -2568,10 +2568,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   >
                     <Sparkles className="w-8 h-8 text-white" />
                   </motion.div>
-                  <h3 className="font-bold text-warm-gray dark:text-soft-cream text-[22px]">
+                  <h3 className="font-bold text-warm-gray dark:text-[#F8FAFC] text-[22px]">
                     View Your Complete Results
                   </h3>
-                  <p className="text-warm-gray/60 dark:text-soft-cream/50 mt-2 text-base max-w-xs">
+                  <p className="text-warm-gray/60 dark:text-[#64748B] mt-2 text-base max-w-xs">
                     See your full personality profile, Big Five traits, and personalized insights
                   </p>
                 </div>
@@ -2597,13 +2597,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <Card className="overflow-hidden bg-white dark:bg-gray-800">
+                <Card className="overflow-hidden bg-white dark:bg-[#12121A]">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Zap className="w-4 h-4 text-terracotta" aria-hidden="true" />
                       Your Big Five Profile
                     </CardTitle>
-                    <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">
+                    <p className="text-xs text-warm-gray/60 dark:text-[#64748B] mt-1">
                       Tap any trait to learn more about what it means for you
                     </p>
                   </CardHeader>
@@ -2626,7 +2626,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                             className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-left transition-all ${
                               isSelected 
                                 ? `${colors.bg} text-white shadow-lg` 
-                                : `bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700`
+                                : `bg-gray-50 dark:bg-[#1E1E2E]/50 hover:bg-gray-100 dark:hover:bg-[#1E1E2E]`
                             }`}
                             aria-pressed={isSelected}
                             aria-expanded={isSelected}
@@ -2640,7 +2640,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                                 <Icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-white'}`} aria-hidden="true" />
                               </div>
                               <div>
-                                <span className={`font-semibold ${isSelected ? 'text-white' : 'text-warm-gray dark:text-soft-cream'}`}>
+                                <span className={`font-semibold ${isSelected ? 'text-white' : 'text-warm-gray dark:text-[#F8FAFC]'}`}>
                                   {TRAIT_LABELS[trait as keyof typeof TRAIT_LABELS]}
                                 </span>
                                 {!isSelected && quartileData && (
@@ -2665,7 +2665,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                                   );
                                 })()}
                               </div>
-                              <ChevronDown className={`w-4 h-4 transition-transform ${isSelected ? 'rotate-180 text-white' : 'text-warm-gray/40 dark:text-soft-cream/40'}`} />
+                              <ChevronDown className={`w-4 h-4 transition-transform ${isSelected ? 'rotate-180 text-white' : 'text-warm-gray/40 dark:text-[#64748B]'}`} />
                             </div>
                           </button>
                           
@@ -2678,7 +2678,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                                 className="overflow-hidden"
                               >
                                 <div 
-                                  className="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border-l-4"
+                                  className="p-4 rounded-xl bg-gray-50 dark:bg-[#1E1E2E]/50 border-l-4"
                                   style={{ borderColor: colors.border }}
                                   role="region"
                                   aria-live="polite"
@@ -2688,11 +2688,11 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                                     <span className={`text-sm font-bold ${colors.text}`}>
                                       {quartileData.vibe}
                                     </span>
-                                    <span className="text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                                    <span className="text-xs text-warm-gray/50 dark:text-[#64748B]">
                                       ({value <= 25 ? '0-25%' : value <= 50 ? '26-50%' : value <= 75 ? '51-75%' : '76-100%'})
                                     </span>
                                   </div>
-                                  <p className="text-sm text-warm-gray/80 dark:text-soft-cream/70 leading-relaxed mb-3">
+                                  <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed mb-3">
                                     {quartileData.description}
                                   </p>
                                   {/* Percentile comparison */}
@@ -2705,7 +2705,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                                         <span className={`text-xs font-medium ${pLabel.color}`}>
                                           {pLabel.label}
                                         </span>
-                                        <span className="text-xs text-warm-gray/50 dark:text-soft-cream/40">
+                                        <span className="text-xs text-warm-gray/50 dark:text-[#64748B]">
                                           — You score higher than {percentile}% of people
                                         </span>
                                       </div>
@@ -2872,7 +2872,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </Card>
 
                   {/* Arc Tracker - Moved below Crossroads */}
-                  <Card className="bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 overflow-hidden">
+                  <Card className="bg-white dark:bg-[#12121A] border-blue-200 dark:border-blue-800 overflow-hidden">
                     <div className="h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500" />
                     <CardContent className="p-5">
                       <h5 className="text-base font-bold text-blue-700 dark:text-blue-300 mb-4 flex items-center gap-2">
@@ -2888,7 +2888,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">First Assessment</p>
                           <p className="text-xs text-blue-600 dark:text-blue-400">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                          <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mt-1">Retake in 3-6 months to track growth</p>
+                          <p className="text-xs text-warm-gray/60 dark:text-[#64748B] mt-1">Retake in 3-6 months to track growth</p>
                         </div>
                       </div>
                     </CardContent>
@@ -2899,7 +2899,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     <CardContent className="p-5 text-center">
                       <RefreshCw className="w-8 h-8 text-pink-500 mx-auto mb-3" />
                       <h5 className="text-base font-bold text-pink-700 dark:text-pink-300 mb-2">Ready for a Retest?</h5>
-                      <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60 mb-4">
+                      <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8] mb-4">
                         Compare your results to see how you've evolved
                       </p>
                       <Button 
@@ -2955,7 +2955,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         ].map((feature, idx) => (
                           <div 
                             key={idx}
-                            className="flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-gray-800/40 border border-amber-200/50 dark:border-amber-700/50"
+                            className="flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-[#12121A]/40 border border-amber-200/50 dark:border-amber-700/50"
                           >
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
                               <feature.icon className="w-5 h-5 text-white" />
@@ -3015,7 +3015,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           )}
         </AnimatePresence>
       </main>
-      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-[#0A0A0F] border-t border-gray-200 dark:border-[#A78BFA]/20">
         <div className="max-w-md mx-auto flex gap-2">
           <Button
             variant="outline"

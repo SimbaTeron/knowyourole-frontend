@@ -87,7 +87,7 @@ export default function MoodPage() {
             <h1 className="text-3xl md:text-4xl font-display font-semibold compass-gradient-text mb-3">
               How are you feeling right now?
             </h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60 text-base max-w-sm mx-auto">
+            <p className="text-warm-gray/70 dark:text-[#94A3B8] text-base max-w-sm mx-auto">
               Your current mood helps us personalize your journey. Pick the one that best describes where you're at today.
             </p>
           </motion.div>
@@ -116,15 +116,15 @@ export default function MoodPage() {
                     onClick={() => handleMoodSelect(moodOption.id)}
                     className={`relative w-24 h-24 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 ${
                       isSelected
-                        ? "bg-gradient-to-br from-terracotta to-sunset-amber shadow-lg shadow-terracotta/30 scale-110"
-                        : "bg-warm-gray/10 dark:bg-soft-cream/10 hover:bg-warm-gray/20 dark:hover:bg-soft-cream/20"
+                        ? "bg-gradient-to-br from-[#A78BFA] to-[#67E8F9] shadow-lg shadow-[#A78BFA]/30 scale-110"
+                        : "bg-warm-gray/10 dark:bg-[#1E1E2E]/50 hover:bg-warm-gray/20 dark:hover:bg-[#A78BFA]/20"
                     }`}
                     data-testid={`button-mood-${moodOption.id}`}
                   >
                     {/* Pulse animation for unselected */}
                     {!mood && (
                       <motion.div
-                        className="absolute inset-0 rounded-2xl border-2 border-terracotta/30"
+                        className="absolute inset-0 rounded-2xl border-2 border-[#A78BFA]/30"
                         animate={{ 
                           scale: [1, 1.1, 1],
                           opacity: [0.5, 0, 0.5]
@@ -150,12 +150,12 @@ export default function MoodPage() {
                     <Icon className={`w-8 h-8 mb-1 ${
                       isSelected 
                         ? "text-white" 
-                        : "text-terracotta dark:text-sunset-amber"
+                        : "text-terracotta dark:text-[#A78BFA]"
                     }`} />
                     <span className={`text-xs font-medium ${
                       isSelected 
                         ? "text-white/90" 
-                        : "text-warm-gray/70 dark:text-soft-cream/60"
+                        : "text-warm-gray/70 dark:text-[#94A3B8]"
                     }`}>
                       {moodOption.label}
                     </span>
@@ -175,7 +175,7 @@ export default function MoodPage() {
                   transition={{ duration: 0.2 }}
                   className="mt-8 text-center"
                 >
-                  <p className="text-lg text-warm-gray/80 dark:text-soft-cream/70">
+                  <p className="text-lg text-warm-gray/80 dark:text-[#C4B5FD]">
                     {MOODS.find(m => m.id === mood)?.desc}
                   </p>
                 </motion.div>
@@ -188,7 +188,7 @@ export default function MoodPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="mt-8 text-center text-sm text-warm-gray/40 dark:text-soft-cream/30"
+                className="mt-8 text-center text-sm text-warm-gray/40 dark:text-[#64748B]"
               >
                 Tap an icon to select your mood
               </motion.p>
@@ -196,7 +196,7 @@ export default function MoodPage() {
           </motion.div>
         </div>
       </main>
-      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-deep-cream dark:via-deep-cream/95 pb-8">
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-[#0A0A0F] dark:via-[#0A0A0F]/95 pb-8">
         <div className="max-w-md mx-auto space-y-3">
           <motion.button
             initial={{ opacity: 0, y: 20 }}
@@ -207,7 +207,7 @@ export default function MoodPage() {
             className={`w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
               mood
                 ? "trail-button text-white"
-                : "bg-warm-gray/20 text-warm-gray/40 dark:bg-deep-cream/40 dark:text-soft-cream/30 cursor-not-allowed"
+                : "bg-warm-gray/20 text-warm-gray/40 dark:bg-[#1E1E2E] dark:text-[#64748B] cursor-not-allowed"
             }`}
             data-testid="button-continue-mood"
           >
@@ -220,7 +220,7 @@ export default function MoodPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
             onClick={handleSkip}
-            className="w-full py-3 text-sm text-warm-gray/50 dark:text-soft-cream/40 flex items-center justify-center gap-1 hover:text-warm-gray/70 dark:hover:text-soft-cream/60 transition-colors"
+            className="w-full py-3 text-sm text-warm-gray/50 dark:text-[#64748B] flex items-center justify-center gap-1 hover:text-warm-gray/70 dark:hover:text-[#94A3B8] transition-colors"
             data-testid="button-skip-mood"
           >
             <SkipForward className="w-4 h-4" />

@@ -95,7 +95,7 @@ export default function MoodMixerPage() {
             <h1 className="md:text-4xl font-display font-semibold compass-gradient-text mb-3 text-[36px]">
               How are you feeling?
             </h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60 max-w-sm mx-auto text-[16px]">
+            <p className="text-warm-gray/70 dark:text-[#94A3B8] max-w-sm mx-auto text-[16px]">
               Tap two moods to brew your unique blend. This personalizes your questions and boosts specific traits.
             </p>
           </motion.div>
@@ -107,7 +107,7 @@ export default function MoodMixerPage() {
           
         </div>
       </main>
-      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-deep-cream dark:via-deep-cream/95 pb-8">
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-[#0A0A0F] dark:via-[#0A0A0F]/95 pb-8">
         <div className="max-w-md mx-auto space-y-2">
           {hasBrewedMood && blendName && (
             <motion.div

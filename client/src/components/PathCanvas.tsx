@@ -10,11 +10,16 @@ export default function PathCanvas() {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" data-testid="path-canvas">
-      <div className="absolute inset-0 bg-gradient-to-br from-soft-cream via-warm-white to-soft-cream dark:from-deep-cream dark:via-[#1a1612] dark:to-deep-cream" />
+      <div className="absolute inset-0 bg-gradient-to-br from-soft-cream via-warm-white to-soft-cream dark:from-[#0A0A0F] dark:via-[#0D0D14] dark:to-[#0A0A0F]" />
       
-      <div className="absolute top-20 -left-20 w-96 h-96 rounded-full bg-terracotta/[0.03] blur-3xl" />
-      <div className="absolute bottom-20 -right-20 w-80 h-80 rounded-full bg-sage-green/[0.04] blur-3xl" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-dusty-blue/[0.02] blur-3xl" />
+      <div className="absolute top-20 -left-20 w-96 h-96 rounded-full bg-terracotta/[0.03] dark:bg-[#A78BFA]/[0.08] blur-3xl" />
+      <div className="absolute bottom-20 -right-20 w-80 h-80 rounded-full bg-sage-green/[0.04] dark:bg-[#67E8F9]/[0.06] blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-dusty-blue/[0.02] dark:bg-[#A78BFA]/[0.04] blur-3xl" />
+      
+      <div className="hidden dark:block absolute inset-0" style={{
+        backgroundImage: 'radial-gradient(rgba(167, 139, 250, 0.15) 1px, transparent 1px)',
+        backgroundSize: '40px 40px'
+      }} />
       
       <svg
         className="absolute inset-0 w-full h-full"
@@ -27,7 +32,7 @@ export default function PathCanvas() {
           stroke="url(#grad1)"
           strokeWidth="1.5"
           strokeLinecap="round"
-          opacity="0.15"
+          className="opacity-[0.15] dark:opacity-[0.25]"
           style={{ 
             strokeDasharray: 1000, 
             strokeDashoffset: mounted ? 0 : 1000, 
@@ -39,7 +44,7 @@ export default function PathCanvas() {
           stroke="url(#grad2)"
           strokeWidth="1"
           strokeLinecap="round"
-          opacity="0.12"
+          className="opacity-[0.12] dark:opacity-[0.20]"
           style={{ 
             strokeDasharray: 1000, 
             strokeDashoffset: mounted ? 0 : 1000, 
@@ -51,7 +56,7 @@ export default function PathCanvas() {
           stroke="url(#grad1)"
           strokeWidth="1"
           strokeLinecap="round"
-          opacity="0.1"
+          className="opacity-[0.10] dark:opacity-[0.18]"
           style={{ 
             strokeDasharray: 1000, 
             strokeDashoffset: mounted ? 0 : 1000, 
@@ -63,7 +68,7 @@ export default function PathCanvas() {
           stroke="url(#grad3)"
           strokeWidth="0.75"
           strokeLinecap="round"
-          opacity="0.08"
+          className="opacity-[0.08] dark:opacity-[0.15]"
           style={{ 
             strokeDasharray: 1000, 
             strokeDashoffset: mounted ? 0 : 1000, 
@@ -71,26 +76,26 @@ export default function PathCanvas() {
           }}
         />
         
-        <circle cx="350" cy="200" r="3" fill="#C67B5C" opacity={mounted ? 0.2 : 0} style={{ transition: "opacity 0.5s ease-out 2.5s" }} />
-        <circle cx="700" cy="350" r="2.5" fill="#8B9A6D" opacity={mounted ? 0.2 : 0} style={{ transition: "opacity 0.5s ease-out 2.7s" }} />
-        <circle cx="450" cy="650" r="3" fill="#C67B5C" opacity={mounted ? 0.2 : 0} style={{ transition: "opacity 0.5s ease-out 2.9s" }} />
-        <circle cx="200" cy="380" r="2" fill="#7BA3B5" opacity={mounted ? 0.15 : 0} style={{ transition: "opacity 0.5s ease-out 3.1s" }} />
+        <circle cx="350" cy="200" r="3" className="fill-[#C67B5C] dark:fill-[#A78BFA]" opacity={mounted ? 0.3 : 0} style={{ transition: "opacity 0.5s ease-out 2.5s" }} />
+        <circle cx="700" cy="350" r="2.5" className="fill-[#8B9A6D] dark:fill-[#67E8F9]" opacity={mounted ? 0.3 : 0} style={{ transition: "opacity 0.5s ease-out 2.7s" }} />
+        <circle cx="450" cy="650" r="3" className="fill-[#C67B5C] dark:fill-[#C4B5FD]" opacity={mounted ? 0.3 : 0} style={{ transition: "opacity 0.5s ease-out 2.9s" }} />
+        <circle cx="200" cy="380" r="2" className="fill-[#7BA3B5] dark:fill-[#A78BFA]" opacity={mounted ? 0.25 : 0} style={{ transition: "opacity 0.5s ease-out 3.1s" }} />
 
         <defs>
           <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#C67B5C" stopOpacity="0" />
-            <stop offset="50%" stopColor="#C67B5C" stopOpacity="1" />
-            <stop offset="100%" stopColor="#C67B5C" stopOpacity="0" />
+            <stop offset="0%" className="[stop-color:#C67B5C] dark:[stop-color:#A78BFA]" stopOpacity="0" />
+            <stop offset="50%" className="[stop-color:#C67B5C] dark:[stop-color:#A78BFA]" stopOpacity="1" />
+            <stop offset="100%" className="[stop-color:#C67B5C] dark:[stop-color:#A78BFA]" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#8B9A6D" stopOpacity="0" />
-            <stop offset="50%" stopColor="#8B9A6D" stopOpacity="1" />
-            <stop offset="100%" stopColor="#8B9A6D" stopOpacity="0" />
+            <stop offset="0%" className="[stop-color:#8B9A6D] dark:[stop-color:#67E8F9]" stopOpacity="0" />
+            <stop offset="50%" className="[stop-color:#8B9A6D] dark:[stop-color:#67E8F9]" stopOpacity="1" />
+            <stop offset="100%" className="[stop-color:#8B9A6D] dark:[stop-color:#67E8F9]" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#7BA3B5" stopOpacity="0" />
-            <stop offset="50%" stopColor="#7BA3B5" stopOpacity="1" />
-            <stop offset="100%" stopColor="#7BA3B5" stopOpacity="0" />
+            <stop offset="0%" className="[stop-color:#7BA3B5] dark:[stop-color:#C4B5FD]" stopOpacity="0" />
+            <stop offset="50%" className="[stop-color:#7BA3B5] dark:[stop-color:#C4B5FD]" stopOpacity="1" />
+            <stop offset="100%" className="[stop-color:#7BA3B5] dark:[stop-color:#C4B5FD]" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>

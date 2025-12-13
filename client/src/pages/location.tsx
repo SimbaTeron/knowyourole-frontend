@@ -185,13 +185,13 @@ export default function LocationPage() {
             transition={{ delay: 0.1 }}
             className="text-center mb-8"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-terracotta/10 dark:bg-sunset-amber/20 mb-4">
-              <Compass className="w-8 h-8 text-terracotta dark:text-sunset-amber" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-terracotta/10 dark:bg-[#A78BFA]/20 mb-4">
+              <Compass className="w-8 h-8 text-terracotta dark:text-[#A78BFA]" />
             </div>
             <h1 className="text-3xl md:text-4xl font-display font-semibold compass-gradient-text mb-3">
               Personalize Your Path
             </h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60 text-base">
+            <p className="text-warm-gray/70 dark:text-[#94A3B8] text-base">
               Add local flavor to your journey (optional)
             </p>
           </motion.div>
@@ -203,8 +203,8 @@ export default function LocationPage() {
             className="premium-card p-6 space-y-6"
           >
             <div className="space-y-3">
-              <label className="text-sm font-medium text-warm-gray dark:text-soft-cream flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-terracotta dark:text-sunset-amber" />
+              <label className="text-sm font-medium text-warm-gray dark:text-[#F8FAFC] flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
                 Your Area (Zip Code)
               </label>
               <input
@@ -213,10 +213,10 @@ export default function LocationPage() {
                 onChange={(e) => handlePostalChange(e.target.value.toUpperCase())}
                 placeholder="Enter zip code (e.g., 10001)"
                 maxLength={10}
-                className="w-full px-4 py-3 rounded-xl bg-soft-cream/50 dark:bg-deep-cream/30 border border-terracotta/10 dark:border-sunset-amber/20 text-warm-gray dark:text-soft-cream placeholder:text-warm-gray/40 dark:placeholder:text-soft-cream/30 focus:outline-none focus:ring-2 focus:ring-terracotta/30"
+                className="w-full px-4 py-3 rounded-xl bg-soft-cream/50 dark:bg-[#1E1E2E]/50 border border-terracotta/10 dark:border-[#A78BFA]/20 text-warm-gray dark:text-[#F8FAFC] placeholder:text-warm-gray/40 dark:placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-terracotta/30 dark:focus:ring-[#A78BFA]/30"
                 data-testid="input-postal"
               />
-              <p className="text-xs text-warm-gray/50 dark:text-soft-cream/40 text-center">
+              <p className="text-xs text-warm-gray/50 dark:text-[#64748B] text-center">
                 US and Canada zip codes supported
               </p>
               
@@ -227,7 +227,7 @@ export default function LocationPage() {
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-terracotta/10"
                 >
                   <div className="w-4 h-4 border-2 border-terracotta/30 border-t-terracotta rounded-full animate-spin" />
-                  <span className="text-sm text-warm-gray/70 dark:text-soft-cream/60">
+                  <span className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
                     Finding your area...
                   </span>
                 </motion.div>
@@ -262,7 +262,7 @@ export default function LocationPage() {
               )}
             </div>
 
-            <div className="pt-4 border-t border-terracotta/8 dark:border-sunset-amber/10">
+            <div className="pt-4 border-t border-terracotta/8 dark:border-[#A78BFA]/10">
               <FunModeToggle 
                 enabled={funMode} 
                 onToggle={handleFunModeToggle}
@@ -272,7 +272,7 @@ export default function LocationPage() {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-deep-cream dark:via-deep-cream/95 pb-8">
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-[#0A0A0F] dark:via-[#0A0A0F]/95 pb-8">
         <div className="max-w-md mx-auto space-y-3">
           <motion.button
             initial={{ opacity: 0, y: 20 }}
@@ -296,7 +296,7 @@ export default function LocationPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
             onClick={handleSkip}
-            className="w-full py-3 text-sm text-warm-gray/50 dark:text-soft-cream/40 flex items-center justify-center gap-1 hover:text-warm-gray/70 dark:hover:text-soft-cream/60 transition-colors"
+            className="w-full py-3 text-sm text-warm-gray/50 dark:text-[#64748B] flex items-center justify-center gap-1 hover:text-warm-gray/70 dark:hover:text-[#94A3B8] transition-colors"
             data-testid="button-skip-location"
           >
             <SkipForward className="w-4 h-4" />

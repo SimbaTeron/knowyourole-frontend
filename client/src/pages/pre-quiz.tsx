@@ -11,7 +11,7 @@ const SKIP_BUTTON_DELAY = 0; // Show skip button immediately
 const DEMO_STEPS = [
   {
     id: 1,
-    title: "Binary Questions",
+    title: "Swipe or Tap",
     description: "Most questions have two choices. Tap or swipe left/right to answer. Watch the timer - trust your gut!",
     icon: Hand,
     demo: "binary",
@@ -174,7 +174,7 @@ export default function PreQuizPage() {
             <h1 className="md:text-3xl font-display font-semibold compass-gradient-text mb-2 text-[36px]">
               Here's How It Works
             </h1>
-            <p className="text-warm-gray/70 dark:text-soft-cream/60 text-[18px]">Five minutes of focus REQUIRED ;-)</p>
+            <p className="text-warm-gray/70 dark:text-[#94A3B8] text-[18px]">Five minutes of focus REQUIRED ;-)</p>
           </motion.div>
 
           {/* Step Counter */}
@@ -185,10 +185,10 @@ export default function PreQuizPage() {
                 onClick={() => setCurrentStep(idx)}
                 className={`w-3 h-3 rounded-full transition-all ${
                   idx === currentStep 
-                    ? "bg-terracotta scale-125" 
+                    ? "bg-terracotta dark:bg-[#A78BFA] scale-125" 
                     : viewedSteps.has(idx)
-                    ? "bg-sage-green"
-                    : "bg-warm-gray/20 dark:bg-soft-cream/20"
+                    ? "bg-sage-green dark:bg-[#67E8F9]"
+                    : "bg-warm-gray/20 dark:bg-[#1E1E2E]"
                 }`}
                 data-testid={`button-demo-step-${idx}`}
               />
@@ -224,86 +224,86 @@ export default function PreQuizPage() {
                   onDragEnd={handleDragEnd}
                   className="absolute inset-0 cursor-grab active:cursor-grabbing"
                 >
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-warm-gray/10 dark:border-soft-cream/10 h-full flex flex-col">
+                  <div className="bg-white dark:bg-[#12121A] rounded-2xl shadow-lg dark:shadow-[0_0_30px_rgba(167,139,250,0.1)] p-6 border border-warm-gray/10 dark:border-[#A78BFA]/20 h-full flex flex-col">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-terracotta to-sunset-amber flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-terracotta to-sunset-amber dark:from-[#A78BFA] dark:to-[#67E8F9] flex items-center justify-center">
                         <Icon className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-warm-gray dark:text-soft-cream text-[24px]">
+                        <h3 className="font-semibold text-warm-gray dark:text-[#F8FAFC] text-[24px]">
                           {currentDemoStep.title}
                         </h3>
-                        <p className="text-warm-gray/60 dark:text-soft-cream/50 text-[18px]">
+                        <p className="text-warm-gray/60 dark:text-[#64748B] text-[18px]">
                           Step {currentStep + 1} of {DEMO_STEPS.length}
                         </p>
                       </div>
                     </div>
 
-                    <p className="text-warm-gray/80 dark:text-soft-cream/70 mb-6 text-[18px]">
+                    <p className="text-warm-gray/80 dark:text-[#94A3B8] mb-6 text-[18px]">
                       {currentDemoStep.description}
                     </p>
 
                     {/* Visual Demo */}
-                    <div className="bg-soft-cream/50 dark:bg-gray-700/50 rounded-xl p-4 flex-1 flex items-center justify-center">
+                    <div className="bg-soft-cream/50 dark:bg-[#1E1E2E]/50 rounded-xl p-4 flex-1 flex items-center justify-center">
                       {currentDemoStep.demo === "binary" && (
                         <div className="w-full max-w-[280px]">
-                          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 shadow-md border border-warm-gray/10 dark:border-soft-cream/10 relative">
+                          <div className="bg-white dark:bg-[#1E1E2E] rounded-xl p-4 shadow-md border border-warm-gray/10 dark:border-[#A78BFA]/20 relative">
                             <div className="flex items-center justify-between mb-3">
                               <div className="relative w-12 h-12">
                                 <svg className="w-full h-full transform -rotate-90">
-                                  <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" className="text-warm-gray/10 dark:text-soft-cream/10" />
-                                  <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${125 * (timerProgress / 100)} 125`} strokeLinecap="round" className={`transition-all duration-100 ${timerProgress < 30 ? "text-red-500" : "text-terracotta"}`} />
+                                  <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" className="text-warm-gray/10 dark:text-[#1E1E2E]" />
+                                  <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${125 * (timerProgress / 100)} 125`} strokeLinecap="round" className={`transition-all duration-100 ${timerProgress < 30 ? "text-red-500" : "text-terracotta dark:text-[#A78BFA]"}`} />
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                  <span className="text-xs font-bold text-warm-gray dark:text-soft-cream">{Math.ceil(timerProgress / 10)}s</span>
+                                  <span className="text-xs font-bold text-warm-gray dark:text-[#F8FAFC]">{Math.ceil(timerProgress / 10)}s</span>
                                 </div>
                               </div>
-                              <div className="w-8 h-8 rounded-full bg-warm-gray/10 dark:bg-soft-cream/10 flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full bg-warm-gray/10 dark:bg-[#1E1E2E] flex items-center justify-center">
                                 <div className="flex gap-0.5">
                                   <div className="w-1 h-3 bg-warm-gray/50 rounded-sm" />
                                   <div className="w-1 h-3 bg-warm-gray/50 rounded-sm" />
                                 </div>
                               </div>
                             </div>
-                            <div className="w-full h-1.5 bg-warm-gray/10 dark:bg-soft-cream/10 rounded-full mb-4 overflow-hidden">
-                              <motion.div className={`h-full rounded-full transition-all ${timerProgress < 30 ? "bg-red-500" : "bg-terracotta"}`} style={{ width: `${timerProgress}%` }} />
+                            <div className="w-full h-1.5 bg-warm-gray/10 dark:bg-[#1E1E2E] rounded-full mb-4 overflow-hidden">
+                              <motion.div className={`h-full rounded-full transition-all ${timerProgress < 30 ? "bg-red-500" : "bg-terracotta dark:bg-[#A78BFA]"}`} style={{ width: `${timerProgress}%` }} />
                             </div>
-                            <motion.div animate={{ x: demoCardX, rotate: demoCardX / 5 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="bg-soft-cream/70 dark:bg-gray-600 rounded-lg p-3 mb-3 shadow-sm">
-                              <p className="text-sm text-center text-warm-gray dark:text-soft-cream font-medium">"I enjoy meeting new people"</p>
+                            <motion.div animate={{ x: demoCardX, rotate: demoCardX / 5 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="bg-soft-cream/70 dark:bg-[#0A0A0F] rounded-lg p-3 mb-3 shadow-sm dark:border dark:border-[#A78BFA]/20">
+                              <p className="text-sm text-center text-warm-gray dark:text-[#F8FAFC] font-medium">"I enjoy meeting new people"</p>
                             </motion.div>
                             <div className="flex gap-2">
-                              <motion.div animate={{ scale: demoCardX < 0 ? 1.05 : 1, opacity: demoCardX < 0 ? 1 : 0.7 }} className="flex-1 py-2 rounded-lg bg-sage-green/20 text-sage-green text-sm text-center font-semibold flex items-center justify-center gap-1">
+                              <motion.div animate={{ scale: demoCardX < 0 ? 1.05 : 1, opacity: demoCardX < 0 ? 1 : 0.7 }} className="flex-1 py-2 rounded-lg bg-sage-green/20 dark:bg-[#67E8F9]/20 text-sage-green dark:text-[#67E8F9] text-sm text-center font-semibold flex items-center justify-center gap-1">
                                 <span>←</span> Agree
                               </motion.div>
-                              <motion.div animate={{ scale: demoCardX > 0 ? 1.05 : 1, opacity: demoCardX > 0 ? 1 : 0.7 }} className="flex-1 py-2 rounded-lg bg-terracotta/20 text-terracotta text-sm text-center font-semibold flex items-center justify-center gap-1">
+                              <motion.div animate={{ scale: demoCardX > 0 ? 1.05 : 1, opacity: demoCardX > 0 ? 1 : 0.7 }} className="flex-1 py-2 rounded-lg bg-terracotta/20 dark:bg-[#A78BFA]/20 text-terracotta dark:text-[#A78BFA] text-sm text-center font-semibold flex items-center justify-center gap-1">
                                 Disagree <span>→</span>
                               </motion.div>
                             </div>
                           </div>
-                          <p className="text-xs text-center text-warm-gray/50 dark:text-soft-cream/40 mt-3">Tap or swipe left/right to choose</p>
+                          <p className="text-xs text-center text-warm-gray/50 dark:text-[#64748B] mt-3">Tap or swipe left/right to choose</p>
                         </div>
                       )}
 
                       {currentDemoStep.demo === "slider" && (
                         <div className="w-full max-w-[260px]">
-                          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 shadow-md">
-                            <p className="text-sm text-center text-warm-gray dark:text-soft-cream font-medium mb-4">"I prefer plans over spontaneity"</p>
+                          <div className="bg-white dark:bg-[#1E1E2E] rounded-xl p-4 shadow-md dark:border dark:border-[#A78BFA]/20">
+                            <p className="text-sm text-center text-warm-gray dark:text-[#F8FAFC] font-medium mb-4">"I prefer plans over spontaneity"</p>
                             <div className="flex justify-between text-sm mb-2">
-                              <span className="text-sage-green font-semibold">Agree</span>
-                              <span className="text-terracotta font-semibold">Disagree</span>
+                              <span className="text-sage-green dark:text-[#67E8F9] font-semibold">Agree</span>
+                              <span className="text-terracotta dark:text-[#A78BFA] font-semibold">Disagree</span>
                             </div>
                             <div className="relative py-2">
-                              <div className="h-4 rounded-full bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta" />
-                              <motion.div animate={{ x: [-70, 0, 70, 0, -70] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-xl border-4 border-terracotta" style={{ left: "calc(50% - 16px)" }} />
+                              <div className="h-4 rounded-full bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta dark:from-[#67E8F9] dark:via-[#1E1E2E] dark:to-[#A78BFA]" />
+                              <motion.div animate={{ x: [-70, 0, 70, 0, -70] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-xl border-4 border-terracotta dark:border-[#A78BFA]" style={{ left: "calc(50% - 16px)" }} />
                             </div>
-                            <div className="flex justify-between mt-2 text-xs text-warm-gray/60 dark:text-soft-cream/50">
+                            <div className="flex justify-between mt-2 text-xs text-warm-gray/60 dark:text-[#64748B]">
                               <span>Strong</span>
                               <span>Slight</span>
                               <span>Neutral</span>
                               <span>Slight</span>
                               <span>Strong</span>
                             </div>
-                            <motion.div animate={{ scale: [1, 1.03, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="mt-4 px-4 py-3 rounded-xl bg-terracotta text-white text-sm text-center font-bold">
+                            <motion.div animate={{ scale: [1, 1.03, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="mt-4 px-4 py-3 rounded-xl bg-terracotta dark:bg-gradient-to-r dark:from-[#A78BFA] dark:to-[#67E8F9] text-white text-sm text-center font-bold">
                               Confirm Choice
                             </motion.div>
                           </div>
@@ -313,29 +313,29 @@ export default function PreQuizPage() {
                       {currentDemoStep.demo === "results" && (
                         <div className="w-full max-w-[280px]">
                           <div className="flex justify-center gap-3 mb-4">
-                            <motion.div animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                            <motion.div animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-12 h-12 rounded-full bg-gradient-to-br from-[#A78BFA] to-[#C4B5FD] flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(167,139,250,0.3)]">
                               <Award className="w-6 h-6 text-white" />
                             </motion.div>
-                            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.6, repeat: Infinity }} className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
+                            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.6, repeat: Infinity }} className="w-12 h-12 rounded-full bg-gradient-to-br from-[#67E8F9] to-[#06B6D4] flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(103,232,249,0.3)]">
                               <span className="text-base font-black text-white">2X</span>
                             </motion.div>
-                            <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.8, repeat: Infinity, delay: 0.3 }} className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg">
+                            <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.8, repeat: Infinity, delay: 0.3 }} className="w-12 h-12 rounded-full bg-gradient-to-br from-[#C4B5FD] to-[#A78BFA] flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(196,181,253,0.3)]">
                               <Sparkles className="w-6 h-6 text-white" />
                             </motion.div>
                           </div>
-                          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 shadow-md space-y-2">
+                          <div className="bg-white dark:bg-[#1E1E2E] rounded-xl p-4 shadow-md dark:border dark:border-[#A78BFA]/20 space-y-2">
                             {[
-                              { label: "Personality Type", value: "ENFP", color: "text-purple-600" },
-                              { label: "Top Strength", value: "Creativity", color: "text-amber-600" },
-                              { label: "Career Match", value: "Designer", color: "text-teal-600" }
+                              { label: "Personality Type", value: "ENFP", color: "text-purple-600 dark:text-[#A78BFA]" },
+                              { label: "Top Strength", value: "Creativity", color: "text-amber-600 dark:text-[#67E8F9]" },
+                              { label: "Career Match", value: "Designer", color: "text-teal-600 dark:text-[#C4B5FD]" }
                             ].map((item, idx) => (
-                              <motion.div key={item.label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.15 }} className="flex justify-between items-center py-1.5 border-b border-warm-gray/10 dark:border-soft-cream/10 last:border-0">
-                                <span className="text-xs text-warm-gray/70 dark:text-soft-cream/60">{item.label}</span>
+                              <motion.div key={item.label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.15 }} className="flex justify-between items-center py-1.5 border-b border-warm-gray/10 dark:border-[#A78BFA]/10 last:border-0">
+                                <span className="text-xs text-warm-gray/70 dark:text-[#94A3B8]">{item.label}</span>
                                 <span className={`text-sm font-bold ${item.color}`}>{item.value}</span>
                               </motion.div>
                             ))}
                           </div>
-                          <p className="text-xs text-center text-warm-gray/50 dark:text-soft-cream/40 mt-3">Unlock insights about your unique traits</p>
+                          <p className="text-xs text-center text-warm-gray/50 dark:text-[#64748B] mt-3">Unlock insights about your unique traits</p>
                         </div>
                       )}
                     </div>
@@ -348,10 +348,10 @@ export default function PreQuizPage() {
         </div>
       </main>
       {/* Start Button */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-deep-cream dark:via-deep-cream/95 pb-8">
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-[#0A0A0F] dark:via-[#0A0A0F]/95 pb-8">
         <div className="max-w-md mx-auto">
           {!allStepsViewed && (
-            <p className="text-center text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-2">
+            <p className="text-center text-xs text-warm-gray/60 dark:text-[#64748B] mb-2">
               Swipe through all {DEMO_STEPS.length} steps to unlock ({viewedSteps.size}/{DEMO_STEPS.length})
             </p>
           )}
@@ -382,7 +382,7 @@ export default function PreQuizPage() {
             className={`w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all ${
               allStepsViewed 
                 ? "trail-button text-white" 
-                : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                : "bg-gray-300 dark:bg-[#1E1E2E] text-gray-500 dark:text-[#64748B] cursor-not-allowed"
             }`}
             data-testid="button-start-quiz"
           >
