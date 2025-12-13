@@ -696,8 +696,8 @@ export async function registerRoutes(
     try {
       const { amount, sessionId } = req.body;
 
-      if (!amount || (amount !== 333 && amount !== 3333)) {
-        return res.status(400).json({ error: "Invalid donation amount. Use 333 ($3.33) or 3333 ($33.33)" });
+      if (!amount || amount < 100 || !Number.isInteger(amount)) {
+        return res.status(400).json({ error: "Invalid donation amount. Minimum $1.00 (100 cents)" });
       }
 
       const protocol = req.headers['x-forwarded-proto'] || req.protocol;
@@ -709,13 +709,14 @@ export async function registerRoutes(
 
       const stripe = await stripeService.getStripe();
       
+      const donationAmount = (amount / 100).toFixed(2);
       const checkoutSession = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [{
           price_data: {
             currency: 'usd',
             product_data: {
-              name: amount === 333 ? 'KnowRole Donation - $3.33' : 'KnowRole Donation - $33.33',
+              name: `KnowRole Donation - $${donationAmount}`,
               description: 'Thank you for supporting KnowRole development!',
             },
             unit_amount: amount,
