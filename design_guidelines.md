@@ -1,123 +1,123 @@
-# KnowRole Design Guidelines
+# KnowYouRole Design Guidelines - Futuristic Premium Dark Theme
 
-## Design Approach
-**Reference-Based:** Drawing inspiration from modern career platforms like LinkedIn Learning and Headspace's calm interface aesthetics. The "Everyday Compass" maintains its warm, grounded journey of self-discovery with hand-drawn path visuals and journal-like feel, now with a refreshed contemporary palette suitable for professional career guidance.
-
-**Key Principles:**
-- 70% whitespace for contemplative breathing room
-- Warm professionalism balanced with approachability
-- Hand-drawn path visuals as journey metaphors (no cosmic imagery)
-- Soft curved lines symbolizing life trails and trait branches
+## Design Philosophy
+A sophisticated, futuristic aesthetic inspired by premium tech/AI companies. Dark backgrounds with elegant typography, subtle glow effects, and refined minimalism. The design should feel like a premium AI-powered personality discovery platform.
 
 ## Color Palette
 
-**Light Mode:**
-- **coral-warm**: #E57A6F (primary accent - inviting, energetic)
-- **coral-deep**: #C85F54 (hover states, emphasis)
-- **amber-soft**: #D4A574 (secondary accent - guidance, clarity)
-- **amber-dark**: #B8895E (hover states)
-- **slate-cool**: #5D6F7F (text, professional anchor)
-- **slate-muted**: #8A99A8 (secondary text)
-- **cream-soft**: #FAF7F4 (page background)
-- **cream-warm**: #FFFDFB (card backgrounds)
-- **lavender-mist**: #9FA8C7 (accent, calm contrast)
-- **stone-light**: #E8E4DF (borders, subtle divisions)
+### Primary Colors
+- **Background**: Near-black (#0A0A0F) with subtle purple undertones
+- **Surface/Cards**: Dark gray (#12121A) with slight transparency
+- **Elevated Surface**: Slightly lighter (#1A1A24)
 
-**Dark Mode:**
-- **Background**: #1A1715 (deep warm charcoal)
-- **Card Surface**: #2A2522 (elevated warm gray)
-- **Text Primary**: #F5F1ED (warm white)
-- **Text Secondary**: #B8AFA6 (muted warm gray)
-- **coral-warm**: #F08B7F (brighter for visibility)
-- **amber-soft**: #E3B886 (enhanced warmth)
-- **Borders**: #3D3632 (subtle warm divisions)
+### Accent Colors
+- **Primary Accent**: Electric purple/violet (#A78BFA) - main interactive elements
+- **Secondary Accent**: Soft lavender (#C4B5FD) - highlights and glows
+- **Tertiary Accent**: Cool cyan (#67E8F9) - secondary highlights
+- **Success**: Emerald (#34D399)
+- **Warning**: Amber (#FBBF24)
+- **Error**: Rose (#F87171)
+
+### Text Colors
+- **Primary Text**: Near-white (#F8FAFC) - headings, important content
+- **Secondary Text**: Light gray (#94A3B8) - body text, descriptions
+- **Muted Text**: Dim gray (#64748B) - labels, hints
+- **Accent Text**: Purple (#A78BFA) - links, emphasis
 
 ## Typography
-- **Font**: Inter via Google Fonts CDN
-- **Titles**: text-3xl to 4xl, font-bold, gradient from coral-warm to amber-soft
-- **Section Headers**: text-xl to 2xl, font-semibold, slate-cool
-- **Body Text**: text-sm to base, slate-cool/slate-muted
-- **Labels**: text-xs, uppercase, tracking-[0.15em], slate-muted
-- **Hierarchy**: Clear size jumps (3xl → xl → base → xs)
 
-## Layout System
-**Spacing Units:** Consistent use of Tailwind's 4, 6, 8, 12 spacing scale
-- **Component Padding**: p-6, p-8
-- **Section Gaps**: gap-6, gap-8
-- **Vertical Rhythm**: mt-12, mb-16 for sections
-- **Container**: max-w-md centered with mx-auto
-- **Mobile Touch**: Minimum 44px tap targets
+### Font Families
+- **Headings**: 'Playfair Display' - elegant serif for large headlines
+- **Body**: 'Inter' or 'Plus Jakarta Sans' - clean sans-serif for readability
+- **Accent/Labels**: 'Space Grotesk' - modern geometric for labels and badges
+- **Mono**: 'JetBrains Mono' - for stats and numbers
 
-## Component Library
+### Font Sizes (Mobile First)
+- Hero heading: 2.5rem (40px) to 4rem (64px) on desktop
+- Section heading: 1.875rem (30px) to 2.5rem (40px) on desktop
+- Subheading: 1.25rem (20px) to 1.5rem (24px) on desktop
+- Body: 1rem (16px)
+- Small: 0.875rem (14px)
+- Caption: 0.75rem (12px)
 
-### Path Canvas Background
-Animated SVG paths as fixed background (z-0) creating the journey visual:
-- Smooth bezier curves in coral-warm, amber-soft, and lavender-mist
-- Stroke-dashoffset draw animation on mount
-- Small circular markers at intersections (4px diameter)
-- Semi-transparent strokes (opacity-30 in light, opacity-20 in dark)
-- Positioned absolutely behind all content
+### Typography Styles
+- Headlines use italic serif for artistic words
+- Labels use ALL CAPS with letter-spacing: 0.1em
+- Stats/Numbers use large bold weights
 
-### Tier Selection Cards
-Beveled corner cards using clip-path polygon:
-- Default: cream-warm background with stone-light border
-- Selected: coral-warm gradient with shadow-lg, white text
-- Hover: scale-[1.02], enhanced shadow
-- Padding: p-6
-- Border radius simulation via clip-path
+## Spacing System
+- Base unit: 4px
+- xs: 4px, sm: 8px, md: 16px, lg: 24px, xl: 32px, 2xl: 48px, 3xl: 64px
 
-### Mood Selector Grid
-Horizontal scrollable grid of emoji-led mood cards:
-- Bordered rounded cards (rounded-xl)
-- Everyday emojis: ☕ (energized), 📖 (reflective), 🛤️ (navigating)
-- Selected: coral-warm background with shadow-md
-- Unselected: cream-warm with stone-light border
-- Size: min-w-[120px] for touch comfort
+## Effects and Decorations
 
-### Fun Mode Toggle
-Checkbox-style toggle with personality:
-- Sage-style checkmark when enabled
-- "Add trail twists?" label with 😏 emoji
-- Background tint shifts to amber-soft/10 when active
-- Animated emoji float when enabled
+### Glow Effects
+- Primary glow: box-shadow: 0 0 60px rgba(167, 139, 250, 0.15)
+- Accent glow on hover: box-shadow: 0 0 80px rgba(167, 139, 250, 0.25)
+- Text glow: text-shadow: 0 0 40px rgba(167, 139, 250, 0.5)
 
-### Primary CTA Button
-Full-width journey activation:
-- Gradient background: coral-warm to coral-deep
-- White text, font-semibold
-- Shadow-md with shadow-lg on hover
-- Arrow icon (→) that slides right 4px on hover
-- Padding: py-4 px-8
+### Gradients
+- Hero gradient overlay: linear-gradient(180deg, transparent 0%, #0A0A0F 100%)
+- Card gradient border: linear-gradient(135deg, rgba(167, 139, 250, 0.2) 0%, rgba(103, 232, 249, 0.1) 100%)
+- Accent gradient: linear-gradient(135deg, #A78BFA 0%, #67E8F9 100%)
 
-### Progress Indicators
-Stepped progress bar for quiz flow:
-- Completed steps: coral-warm circles
-- Current step: coral-warm ring with pulse animation
-- Future steps: stone-light circles
-- Connecting lines in stone-light
+### Borders
+- Subtle borders: 1px solid rgba(148, 163, 184, 0.1)
+- Accent borders: 1px solid rgba(167, 139, 250, 0.3)
+- Border radius: 12px for cards, 8px for buttons, 9999px for pills
 
-## Interactions & Animations
-- **Path Draw**: 2s ease-out stroke-dashoffset on mount
-- **Content Entrance**: Slide up 20px with fade-in, stagger delay
-- **Hover Lift**: translateY(-2px) with shadow enhancement
-- **Selection**: Quick scale-[1.02] with color transition
-- **Fun Mode Float**: Gentle 0-8px translateY bounce (3s infinite)
+### Background Patterns
+- Dot grid pattern for hero sections
+- Subtle noise/grain overlay
+- Animated particle effects
+
+## Components
+
+### Buttons
+- **Primary**: Purple gradient background, white text, glow on hover
+- **Secondary**: Transparent with border, light text
+- **Ghost**: No background, subtle hover state
+
+### Cards
+- Dark background (#12121A)
+- Subtle border (rgba(148, 163, 184, 0.1))
+- Glow on hover
+- Icon in top-left with colored background
+
+### Badges/Pills
+- Small, rounded-full
+- Colored background with opacity (purple-500/20)
+- Matching text color
+- Used for labels like "PERSONALITY DISCOVERY"
+
+### Stats Display
+- Large serif number
+- Small uppercase label above
+- Subtle glow behind number
+
+## Animation Guidelines
+- Subtle fade-ins (300-500ms)
+- Smooth hover transitions (200ms)
+- Floating animations for decorative elements
+- Particle/dot animations in backgrounds
+- No jarring or fast animations
+
+## Layout Principles
+- Generous whitespace (70% rule)
+- Asymmetric layouts for visual interest
+- Full-bleed hero sections
+- Grid-based card layouts
+- Sticky navigation
+
+## Mobile Responsiveness
+- Stack layouts vertically on mobile
+- Reduce heading sizes by 20-30%
+- Full-width cards on mobile
+- Touch-friendly tap targets (min 44px)
+- Simplified navigation
 
 ## Accessibility
-- WCAG AA contrast ratios maintained across all color pairs
-- Focus rings using coral-warm at ring-2 ring-offset-2
-- ARIA labels on all interactive elements
-- Semantic heading hierarchy (h1 → h2 → h3)
-- Screen reader text for icon-only buttons
-- Keyboard navigation support for all interactions
-
-## Responsive Behavior
-Mobile-first, single-column design:
-- Base: max-w-md (448px)
-- Padding: px-4 on mobile, px-6 on sm+
-- Vertical stacking of all components
-- Maintain 70% whitespace ratio at all breakpoints
-- Touch-optimized spacing and targets
-
-## Images
-**No hero images** - The animated path canvas serves as the primary visual anchor. The journal-like, hand-drawn path background creates sufficient visual interest without traditional hero imagery. Focus remains on the interactive journey elements and warm color palette.
+- Minimum contrast ratio 4.5:1 for text
+- Focus states with visible outlines
+- Reduced motion support
+- Screen reader friendly labels
