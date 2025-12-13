@@ -5,7 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import appIcon from "@assets/image (5)_1764388202854.jpg";
+
 
 interface KnowRoleHeaderProps {
   theme: ThemeMode;
@@ -42,12 +42,6 @@ export default function KnowRoleHeader({ theme, onThemeChange }: KnowRoleHeaderP
         </Popover>
         
         <div className="flex items-center gap-2">
-          <img 
-            src={appIcon} 
-            alt="KnowYouRole compass icon" 
-            className="w-10 h-10 rounded-lg shadow-md dark:shadow-[0_0_15px_rgba(167,139,250,0.2)] object-cover"
-            data-testid="img-app-icon-left"
-          />
           <h1
             className="text-display compass-gradient-text dark:bg-gradient-to-r dark:from-[#A78BFA] dark:via-[#C4B5FD] dark:to-[#67E8F9] dark:bg-clip-text dark:text-transparent"
             data-testid="text-title"
