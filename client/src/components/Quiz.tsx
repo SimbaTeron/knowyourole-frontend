@@ -452,42 +452,42 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
 const getQuizConfig = (tier: string) => {
   switch (tier) {
     case "7-12":
-      // Youth 25: 5 binary → Superpower → 5 mix → Energy → 5 mix → Mystery → 10 mix → Results (NO checkpoints)
+      // Youth 25: Q5 Superpower → Q10 Checkpoint → Q15 Energy → Q20 Mystery → Results
       return { 
         totalQuestions: 25, 
         superpowerAfter: 5,
-        energyAfter: 10,
-        mysteryAfter: 15,
-        checkpoint1After: null,
+        checkpoint1After: 10,
+        energyAfter: 15,
+        mysteryAfter: 20,
         checkpoint2After: null,
         hasMystery: true 
       };
     case "13-18":
-      // Teen 30: 5 binary → Superpower → 5 mix → Checkpoint → 5 mix → Energy → 5 mix → Mystery → 5 mix → Results
+      // Teen 30: Q10 Checkpoint → Q15 Superpower → Q20 Energy → Q25 Mystery → Results
       return { 
         totalQuestions: 30, 
-        superpowerAfter: 5,
-        checkpoint1After: 11,
-        energyAfter: 16,
-        mysteryAfter: 21,
+        checkpoint1After: 10,
+        superpowerAfter: 15,
+        energyAfter: 20,
+        mysteryAfter: 25,
         checkpoint2After: null,
         hasMystery: true 
       };
     case "19-25":
-      // Young Adult 35: 5 binary → 5 mix → Superpower → Checkpoint → 10 mix → Checkpoint → 5 mix → Energy → 5 mix → Mystery → 5 mix → Results
+      // Young Adult 35: Q10 Checkpoint → Q15 Superpower → Q20 Checkpoint2 → Q25 Energy → Q30 Mystery → Results
       return { 
         totalQuestions: 35, 
-        superpowerAfter: 11,
-        checkpoint1After: 11,
-        checkpoint2After: 21,
-        energyAfter: 27,
-        mysteryAfter: 32,
+        checkpoint1After: 10,
+        superpowerAfter: 15,
+        checkpoint2After: 20,
+        energyAfter: 25,
+        mysteryAfter: 30,
         hasMystery: true 
       };
     case "25+":
     case "25plus":
     default:
-      // Adult 40: 5 binary → 5 mix → Checkpoint → 10 mix → Checkpoint → 5 mix → Superpower → 5 mix → Energy → 5 mix → Mystery → 5 mix → Results
+      // Adult 40: Q10 Checkpoint → Q20 Checkpoint2 → Q25 Superpower → Q30 Energy → Q35 Mystery → Results
       return { 
         totalQuestions: 40, 
         checkpoint1After: 10,
