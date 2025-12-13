@@ -1083,6 +1083,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   // Share PDF Modal state
   const [showSharePDFModal, setShowSharePDFModal] = useState(false);
   
+  // Paginated results state (Page 1 = Summary, Page 2 = Details, Page 3 = Premium)
+  const [currentResultsPage, setCurrentResultsPage] = useState<1 | 2 | 3>(1);
+  const [showPremiumGatewayModal, setShowPremiumGatewayModal] = useState(false);
+  
   // Mood Blend Badge state
   const [moodBlendInfo, setMoodBlendInfo] = useState<BlendInfo | null>(null);
   const [moodBlendKey, setMoodBlendKey] = useState<string>("");
