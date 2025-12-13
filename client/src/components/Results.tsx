@@ -7,6 +7,17 @@ import {
   Rocket, Timer, CheckCircle2, Calendar, ArrowRight, ArrowLeft, Shield, Compass, 
   Mountain, Sunrise, CircleDot, Play, Building2, DollarSign, PartyPopper
 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+
+// Job match types from API
+interface JobMatch {
+  roleName: string;
+  roleNumber: number;
+  matchScore: number;
+  explanation: string;
+  traitHighlights: string[];
+  jobCollar: string;
+}
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -1032,6 +1043,11 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const isMiniExplorer = tier === "7-12";
   const [adventureArchetype, setAdventureArchetype] = useState<AdventureArchetype | null>(null);
   
+  // Job Matches from API (for non-Youth tiers)
+  const [topJobMatch, setTopJobMatch] = useState<JobMatch | null>(null);
+  const [jobMatches, setJobMatches] = useState<JobMatch[]>([]);
+  const [jobMatchLoading, setJobMatchLoading] = useState(false);
+  
   const [showJustKidding, setShowJustKidding] = useState(false);
   const [showDonationTiers, setShowDonationTiers] = useState(false);
   const [customDonationAmount, setCustomDonationAmount] = useState(0);
@@ -1167,6 +1183,70 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     
     fetchArchetype();
   }, [result]);
+
+  // Fetch Job Matches for non-Youth tiers
+  useEffect(() => {
+    if (!result || isMiniExplorer) return;
+    
+    const fetchJobMatches = async () => {
+      setJobMatchLoading(true);
+      try {
+        const requestBody = {
+          mbti: {
+            E: scores.mbti.E, I: scores.mbti.I,
+            S: scores.mbti.S, N: scores.mbti.N,
+            T: scores.mbti.T, F: scores.mbti.F,
+            J: scores.mbti.J, P: scores.mbti.P,
+          },
+          disc: {
+            D: scores.disc.D, I: scores.disc.I,
+            S: scores.disc.S, C: scores.disc.C,
+          },
+          bigFive: {
+            O: result.bigFiveProfile.O,
+            C: result.bigFiveProfile.C,
+            E: result.bigFiveProfile.E,
+            A: result.bigFiveProfile.A,
+            N: result.bigFiveProfile.N,
+          },
+        };
+        
+        // Fetch top job match for basic display
+        const topResponse = await fetch('/api/job-match/top', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        });
+        
+        if (topResponse.ok) {
+          const topData = await topResponse.json();
+          if (topData.success && topData.match) {
+            setTopJobMatch(topData.match);
+          }
+        }
+        
+        // Fetch top 3 job matches for premium display
+        const matchesResponse = await fetch('/api/job-matches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...requestBody, limit: 3, diversityBoost: true }),
+        });
+        
+        if (matchesResponse.ok) {
+          const matchesData = await matchesResponse.json();
+          if (matchesData.success && matchesData.matches) {
+            setJobMatches(matchesData.matches);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch job matches:', error);
+      } finally {
+        setJobMatchLoading(false);
+      }
+    };
+    
+    fetchJobMatches();
+  }, [result, isMiniExplorer, scores]);
 
   // DEV MODE: Set to true to show Just Kidding page before premium unlock
   const DEV_BYPASS_PAYMENT = true;
@@ -2117,40 +2197,73 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </div>
                 </div>
                 <p className="text-xs text-terracotta font-medium mb-1 tracking-wide uppercase">Your Primary Role Match</p>
-                <h3 className="text-2xl font-bold text-warm-gray dark:text-[#F8FAFC] mb-2" data-testid="text-primary-role">
-                  {result.primaryRole.title}
-                </h3>
-                {/* Salary - Only show for premium users */}
-                {isPremiumUnlocked && (() => {
-                  const regionalInfo = getRegionalSalary(result.primaryRole.title, cityName || undefined, stateName || undefined);
-                  const displaySalary = regionalInfo.hasRegionalData ? regionalInfo.salary : result.primaryRole.salary;
-                  return (
-                    <div className="space-y-1 mb-3">
-                      <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green">
-                        {regionalInfo.hasRegionalData ? <DollarSign className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
-                        <span className="text-sm font-semibold">{displaySalary}</span>
-                        {regionalInfo.hasRegionalData && cityName && (
-                          <span className="text-xs opacity-70">in {cityName}</span>
-                        )}
+                {jobMatchLoading ? (
+                  <div className="animate-pulse">
+                    <div className="h-8 bg-terracotta/20 rounded w-48 mx-auto mb-2" />
+                    <div className="h-4 bg-terracotta/10 rounded w-64 mx-auto" />
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="text-2xl font-bold text-warm-gray dark:text-[#F8FAFC] mb-2" data-testid="text-primary-role">
+                      {topJobMatch ? topJobMatch.roleName : result.primaryRole.title}
+                    </h3>
+                    {/* Match Score Badge - Show when job match is available */}
+                    {topJobMatch && (
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-terracotta/10 text-terracotta mb-3">
+                        <Target className="w-3 h-3" />
+                        <span className="text-sm font-semibold">{topJobMatch.matchScore}% Match</span>
                       </div>
-                      <p className="text-xs text-warm-gray/60 dark:text-[#64748B]">
-                        {regionalInfo.growthOutlook}
-                      </p>
-                    </div>
-                  );
-                })()}
-                <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed max-w-sm mx-auto">
-                  {result.primaryRole.desc}: {result.mbtiType.includes('E') 
-                    ? "Your natural energy and communication style make you well-suited for collaborative environments." 
-                    : "Your thoughtful, focused approach brings unique depth and precision to this field."} 
-                  {result.discStyle === 'D' ? " As a natural leader, you thrive when given autonomy and clear goals." 
-                    : result.discStyle === 'I' ? " Your enthusiasm and persuasive abilities help you connect with diverse people." 
-                    : result.discStyle === 'S' ? " Your steady reliability makes you a trusted anchor in team settings." 
-                    : " Your attention to detail ensures high-quality outcomes in everything you do."} 
-                  {topTrait[1] > 60 
-                    ? ` With ${TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]} as your strongest trait, you bring a distinctive edge to your work.`
-                    : ` You have a balanced personality profile that adapts well across different situations.`}
-                </p>
+                    )}
+                    {/* Salary - Only show for premium users */}
+                    {isPremiumUnlocked && (() => {
+                      const roleTitle = topJobMatch ? topJobMatch.roleName : result.primaryRole.title;
+                      const regionalInfo = getRegionalSalary(roleTitle, cityName || undefined, stateName || undefined);
+                      const displaySalary = regionalInfo.hasRegionalData ? regionalInfo.salary : result.primaryRole.salary;
+                      return (
+                        <div className="space-y-1 mb-3">
+                          <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sage-green/10 text-sage-green">
+                            {regionalInfo.hasRegionalData ? <DollarSign className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
+                            <span className="text-sm font-semibold">{displaySalary}</span>
+                            {regionalInfo.hasRegionalData && cityName && (
+                              <span className="text-xs opacity-70">in {cityName}</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-warm-gray/60 dark:text-[#64748B]">
+                            {regionalInfo.growthOutlook}
+                          </p>
+                        </div>
+                      );
+                    })()}
+                    {/* Personalized explanation from job matching API */}
+                    <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed max-w-sm mx-auto">
+                      {topJobMatch ? topJobMatch.explanation : (
+                        `${result.primaryRole.desc}: ${result.mbtiType.includes('E') 
+                          ? "Your natural energy and communication style make you well-suited for collaborative environments." 
+                          : "Your thoughtful, focused approach brings unique depth and precision to this field."} 
+                        ${result.discStyle === 'D' ? " As a natural leader, you thrive when given autonomy and clear goals." 
+                          : result.discStyle === 'I' ? " Your enthusiasm and persuasive abilities help you connect with diverse people." 
+                          : result.discStyle === 'S' ? " Your steady reliability makes you a trusted anchor in team settings." 
+                          : " Your attention to detail ensures high-quality outcomes in everything you do."} 
+                        ${topTrait[1] > 60 
+                          ? ` With ${TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS]} as your strongest trait, you bring a distinctive edge to your work.`
+                          : ` You have a balanced personality profile that adapts well across different situations.`}`
+                      )}
+                    </p>
+                    {/* Trait Highlights - Show when job match is available */}
+                    {topJobMatch && topJobMatch.traitHighlights && topJobMatch.traitHighlights.length > 0 && (
+                      <div className="flex flex-wrap justify-center gap-2 mt-3">
+                        {topJobMatch.traitHighlights.slice(0, 3).map((trait, i) => (
+                          <span 
+                            key={i}
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dusty-blue/10 text-dusty-blue"
+                          >
+                            {trait}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
               
               <div className="grid grid-cols-3 gap-2 mt-6">
                 <motion.div 
@@ -2222,31 +2335,97 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   transition={{ delay: 0.9 }}
                   className="mt-6 pt-5 border-t border-terracotta/20"
                 >
-                  <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-purple-100/60 to-pink-100/60 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200/50 dark:border-purple-700/50">
+                  <div className="flex items-center justify-center gap-3">
                     <motion.div 
-                      className="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center shadow-lg"
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: adventureArchetype.badgeColor }}
                       animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2.5, repeat: Infinity }}
+                      transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <Star className="w-6 h-6 text-white" />
+                      <Compass className="w-5 h-5 text-white" />
                     </motion.div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] text-purple-600 dark:text-purple-300 font-medium uppercase tracking-wider mb-0.5">
-                        Your Inner Hero
-                      </p>
-                      <p className="text-lg font-bold text-purple-700 dark:text-purple-200 leading-tight" data-testid="text-adventure-type-compact">
-                        {adventureArchetype.name}
-                      </p>
-                      <p className="text-xs text-purple-600/80 dark:text-purple-300/80 mt-0.5">
-                        {adventureArchetype.superpower}
-                      </p>
+                    <div className="text-left">
+                      <p className="text-[10px] text-terracotta/60 font-medium uppercase tracking-wide">Adventure Type</p>
+                      <p className="text-sm font-bold text-warm-gray dark:text-[#F8FAFC]">{adventureArchetype.name}</p>
                     </div>
                   </div>
                 </motion.div>
               )}
-            </CardContent>
+              </CardContent>
             </Card>)
+          )}
+          
+          {/* Premium Job Matches Card - Top 3 diverse matches (for Teen+ tiers, premium only) */}
+          {!isMiniExplorer && isPremiumUnlocked && jobMatches.length > 0 && (
+            <motion.div
+              initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card className="overflow-hidden border-2 border-sage-green/30 bg-gradient-to-br from-sage-green/5 to-transparent">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Crown className="w-5 h-5 text-sage-green" />
+                    <span className="text-warm-gray dark:text-[#F8FAFC]">Your Top Career Matches</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {jobMatches.map((match, index) => (
+                    <div 
+                      key={match.roleNumber}
+                      className={`p-4 rounded-xl border ${
+                        index === 0 
+                          ? 'bg-sage-green/10 border-sage-green/30' 
+                          : 'bg-warm-gray/5 dark:bg-[#1E1E2A] border-warm-gray/10 dark:border-[#2A2A3A]'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                              index === 0 
+                                ? 'bg-sage-green text-white' 
+                                : 'bg-warm-gray/20 dark:bg-[#2A2A3A] text-warm-gray dark:text-[#94A3B8]'
+                            }`}>
+                              #{index + 1}
+                            </span>
+                            <span className="text-xs text-warm-gray/60 dark:text-[#64748B] capitalize">
+                              {match.jobCollar} collar
+                            </span>
+                          </div>
+                          <h4 className="font-bold text-warm-gray dark:text-[#F8FAFC] mb-1">
+                            {match.roleName}
+                          </h4>
+                          <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed">
+                            {match.explanation}
+                          </p>
+                          {match.traitHighlights && match.traitHighlights.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {match.traitHighlights.map((trait, i) => (
+                                <span 
+                                  key={i}
+                                  className="text-xs px-2 py-0.5 rounded-full bg-dusty-blue/10 text-dusty-blue"
+                                >
+                                  {trait}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-lg font-bold ${
+                            index === 0 ? 'text-sage-green' : 'text-dusty-blue'
+                          }`}>
+                            {match.matchScore}%
+                          </div>
+                          <div className="text-[10px] text-warm-gray/50 dark:text-[#64748B]">match</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
           )}
 
           {/* Phase 2.2: Badges & Hybrid Types Section */}

@@ -835,28 +835,28 @@
   },
   "traitDescriptions": {
     "mbti": {
-      "INTJ": { "label": "Architect", "desc": "Strategic visionary with independent drive" },
-      "INTP": { "label": "Logician", "desc": "Curious solver who loves complex puzzles" },
-      "ENTJ": { "label": "Commander", "desc": "Bold leader who drives results" },
-      "ENTP": { "label": "Debater", "desc": "Innovative thinker who challenges norms" },
-      "INFJ": { "label": "Advocate", "desc": "Insightful idealist with quiet determination" },
-      "INFP": { "label": "Mediator", "desc": "Empathetic dreamer seeking authentic meaning" },
-      "ENFJ": { "label": "Protagonist", "desc": "Inspiring leader who uplifts others" },
-      "ENFP": { "label": "Campaigner", "desc": "Enthusiastic creative with infectious energy" },
-      "ISTJ": { "label": "Logistician", "desc": "Reliable organizer who values tradition" },
-      "ISFJ": { "label": "Defender", "desc": "Dedicated protector with warm heart" },
-      "ESTJ": { "label": "Executive", "desc": "Efficient administrator who gets things done" },
-      "ESFJ": { "label": "Consul", "desc": "Caring connector who builds community" },
-      "ISTP": { "label": "Virtuoso", "desc": "Practical experimenter with cool precision" },
-      "ISFP": { "label": "Adventurer", "desc": "Flexible artist with quiet sensitivity" },
-      "ESTP": { "label": "Entrepreneur", "desc": "Energetic doer who seizes opportunities" },
-      "ESFP": { "label": "Entertainer", "desc": "Spontaneous performer who loves life" }
+      "INTJ": { "label": "Architect", "desc": "Strategic, logical, and driven by your own original ideas. You are an innovative, independent thinker who enjoys speculation and creative problem-solving to achieve long-term improvements." },
+      "INTP": { "label": "Logician", "desc": "Intellectual, logical, and reserved with a flexible, imaginative mind. You are an original thinker who loves exploring theories and abstract concepts to find creative solutions." },
+      "ENTJ": { "label": "Commander", "desc": "Strategic, logical, and ambitious with a gift for organizing people. You are an effective organizer who drives long-range planning and gets things done with decisive confidence." },
+      "ENTP": { "label": "Debater", "desc": "Inventive, enthusiastic, and entrepreneurial with a strategic mind. You enjoy new ideas, challenges, and value inspiration, often seeing possibilities others miss." },
+      "INFJ": { "label": "Advocate", "desc": "Idealistic, organized, and insightful with deep compassion. You seek harmony and cooperation, valuing personal growth and meaningful connections with others." },
+      "INFP": { "label": "Mediator", "desc": "Sensitive, creative, and perceptive with an idealistic heart. You value inner harmony and personal growth, focusing on dreams and possibilities that feel authentic." },
+      "ENFJ": { "label": "Protagonist", "desc": "Caring, enthusiastic, and diplomatically organized. You are a skilled communicator who values connection with people and inspires others through genuine warmth." },
+      "ENFP": { "label": "Campaigner", "desc": "Enthusiastic, creative, and spontaneously optimistic. You value inspiration and enjoy starting new projects while seeing the potential in others around you." },
+      "ISTJ": { "label": "Logistician", "desc": "Responsible, sincere, and realistically systematic. You are hardworking and trustworthy, valuing practical judgment and a methodical approach to getting things done." },
+      "ISFJ": { "label": "Defender", "desc": "Warm, considerate, and responsibly thorough. You are a devoted caretaker who enjoys being helpful to others, approaching life with pragmatic gentleness." },
+      "ESTJ": { "label": "Executive", "desc": "Efficient, outgoing, and systematically dependable. You like to run the show and get things done in an orderly fashion, bringing analytical leadership to every situation." },
+      "ESFJ": { "label": "Consul", "desc": "Friendly, outgoing, and conscientiously organized. You seek to be helpful and please others, enjoying being active and productive in building community." },
+      "ISTP": { "label": "Virtuoso", "desc": "Action-oriented, logical, and spontaneously reserved. You enjoy adventure and are skilled at understanding how mechanical things work with cool, analytical precision." },
+      "ISFP": { "label": "Adventurer", "desc": "Gentle, sensitive, and flexibly realistic. You seek to create a personal environment that is both beautiful and practical, approaching life with quiet curiosity." },
+      "ESTP": { "label": "Entrepreneur", "desc": "Outgoing, realistic, and versatile with a spontaneous edge. You are a pragmatic problem solver and skillful negotiator who thrives on action and new challenges." },
+      "ESFP": { "label": "Entertainer", "desc": "Playful, enthusiastic, and tactfully flexible. You have strong common sense and enjoy helping people in tangible ways with your spontaneous, friendly energy." }
     },
     "disc": {
-      "D": { "label": "Dominance", "color": "terracotta", "desc": "Direct, decisive, and driven by results" },
-      "I": { "label": "Influence", "color": "amber", "desc": "Enthusiastic, optimistic, and people-oriented" },
-      "S": { "label": "Steadiness", "color": "sage-green", "desc": "Patient, reliable, and team-focused" },
-      "C": { "label": "Conscientiousness", "color": "dusty-blue", "desc": "Analytical, precise, and quality-driven" }
+      "D": { "label": "Dominance", "color": "terracotta", "desc": "You are confident, direct, and results-driven. You make quick decisions, take action without hesitation, and care deeply about getting things done efficiently." },
+      "I": { "label": "Influence", "color": "amber", "desc": "You are energetic, enthusiastic, and inspiring. You excel at connecting with people, highlighting positive things, and convincing others through your natural persuasiveness." },
+      "S": { "label": "Steadiness", "color": "sage-green", "desc": "You are patient, dependable, and thoughtful. You stay calm under pressure, value honesty and consistency, and stick to your commitments while treating others with fairness." },
+      "C": { "label": "Conscientiousness", "color": "dusty-blue", "desc": "You value accuracy and doing things the right way. You are detail-oriented, care about high-quality work, and focus on precision with analytical thoroughness." }
     },
     "bigFive": {
       "O": { "label": "Openness", "desc": "Curiosity and creativity", "low": "Practical & consistent", "high": "Imaginative & curious" },
