@@ -33,7 +33,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setTaglineIndex((prev) => (prev + 1) % ROTATING_TAGLINES.length);
-    }, 2625);
+    }, 1970);
     return () => clearInterval(interval);
   }, []);
 
@@ -88,9 +88,9 @@ export default function Home() {
         theme={theme} 
         onThemeChange={handleThemeChange} 
       />
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-5 pt-32 pb-24">
+      <main className="relative z-10 flex flex-col items-center px-5 pt-20 pb-24">
         <div className="w-full max-w-md">
-          <div className="text-center mb-10">
+          <div className="text-center mb-4">
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -135,7 +135,7 @@ export default function Home() {
                 </AnimatePresence>
               </div>
               
-              <div className="flex justify-center gap-1.5 mt-4">
+              <div className="flex justify-center gap-1.5 mt-2">
                 {ROTATING_TAGLINES.map((_, i) => (
                   <motion.div
                     key={i}
