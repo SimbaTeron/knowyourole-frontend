@@ -171,6 +171,7 @@ const CARD_CONFIGS = [
   { id: "side-hustle", title: "Side Hustles", icon: DollarSign, color: "amber" as ColorKey, gradient: "from-amber-400 via-yellow-500 to-orange-500" },
   { id: "learning", title: "How You Learn", icon: BookOpen, color: "teal" as ColorKey, gradient: "from-teal-400 via-cyan-500 to-emerald-500" },
   { id: "thinking", title: "Sharpen Thinking", icon: Brain, color: "indigo" as ColorKey, gradient: "from-indigo-400 via-blue-500 to-cyan-500" },
+  { id: "crossroads", title: "Crossroads Adventure", icon: Compass, color: "amber" as ColorKey, gradient: "from-amber-400 via-orange-500 to-red-400" },
 ];
 
 // LocalStorage key constants
@@ -289,24 +290,20 @@ export function PremiumCardDeck({
   };
 
   const nextCard = () => {
-    if (currentCard < CARD_CONFIGS.length - 1) {
-      setDirection(1);
-      setCurrentCard(currentCard + 1);
-    }
+    setDirection(1);
+    setCurrentCard((currentCard + 1) % CARD_CONFIGS.length);
   };
 
   const prevCard = () => {
-    if (currentCard > 0) {
-      setDirection(-1);
-      setCurrentCard(currentCard - 1);
-    }
+    setDirection(-1);
+    setCurrentCard((currentCard - 1 + CARD_CONFIGS.length) % CARD_CONFIGS.length);
   };
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 50;
-    if (info.offset.x < -threshold && currentCard < CARD_CONFIGS.length - 1) {
+    if (info.offset.x < -threshold) {
       nextCard();
-    } else if (info.offset.x > threshold && currentCard > 0) {
+    } else if (info.offset.x > threshold) {
       prevCard();
     }
   };
@@ -429,6 +426,9 @@ export function PremiumCardDeck({
           weakProxy={weakProxy}
         />;
       
+      case "crossroads":
+        return <CrossroadsCard reduceMotion={shouldReduceMotion ?? false} />;
+      
       default:
         return null;
     }
@@ -457,9 +457,8 @@ export function PremiumCardDeck({
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 sm:h-11 sm:w-11 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40"
+            className="h-10 w-10 sm:h-11 sm:w-11 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
             onClick={prevCard}
-            disabled={currentCard === 0}
             data-testid="button-prev-card"
           >
             <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -467,9 +466,8 @@ export function PremiumCardDeck({
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 sm:h-11 sm:w-11 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40"
+            className="h-10 w-10 sm:h-11 sm:w-11 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
             onClick={nextCard}
-            disabled={currentCard === CARD_CONFIGS.length - 1}
             data-testid="button-next-card"
           >
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -1538,6 +1536,33 @@ function ThinkingCard({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// Crossroads Adventure Card - Coming Soon preview
+function CrossroadsCard({ reduceMotion }: { reduceMotion: boolean }) {
+  return (
+    <div className="text-center py-4">
+      <motion.div 
+        className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-red-400 flex items-center justify-center shadow-xl"
+        animate={reduceMotion ? {} : { rotate: [0, 5, -5, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <Compass className="w-8 h-8 text-white" />
+      </motion.div>
+      <h5 className="text-xl font-bold text-amber-800 dark:text-amber-200 mb-2">Crossroads Adventure</h5>
+      <p className="text-base text-amber-700/80 dark:text-amber-300/70 mb-5 max-w-xs mx-auto">
+        Face 7 life scenarios with branching choices. Discover hidden traits you didn't know you had.
+      </p>
+      <div className="flex flex-wrap justify-center gap-2 mb-5">
+        <span className="px-3 py-1 text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 rounded-full">7 Scenarios</span>
+        <span className="px-3 py-1 text-xs font-medium bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 rounded-full">Your Choices Matter</span>
+        <span className="px-3 py-1 text-xs font-medium bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 rounded-full">Trait Reveals</span>
+      </div>
+      <p className="text-sm text-amber-600/70 dark:text-amber-400/60 italic">
+        Coming soon - an interactive adventure!
+      </p>
     </div>
   );
 }
