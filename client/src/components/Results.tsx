@@ -1518,18 +1518,40 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   };
   
   const handleDonationTierSelect = async (amount: number) => {
+    console.log('[Donation] Starting checkout for amount:', amount);
     try {
       const checkoutRes = await fetch('/api/stripe/donate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, sessionId: sessionId || undefined }),
       });
+      
+      console.log('[Donation] Response status:', checkoutRes.status);
       const checkoutData = await checkoutRes.json();
+      console.log('[Donation] Response data:', checkoutData);
+      
+      if (!checkoutRes.ok) {
+        toast({
+          title: "Donation Error",
+          description: checkoutData.error || "Failed to create checkout session",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       if (checkoutData.url) {
+        console.log('[Donation] Redirecting to:', checkoutData.url);
         window.location.href = checkoutData.url;
+      } else {
+        console.error('[Donation] No URL in response:', checkoutData);
+        toast({
+          title: "Donation Error",
+          description: "Failed to get checkout URL. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
-      console.error('Donation error:', error);
+      console.error('[Donation] Error:', error);
       toast({
         title: "Donation Error",
         description: "Unable to process donation. Please try again.",
