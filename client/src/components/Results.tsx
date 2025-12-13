@@ -645,72 +645,89 @@ const WEAKNESS_BLINDSPOTS: Record<string, { title: string; blindspot: string; wo
   "INTJ": [
     { title: "Dismissing Others' Ideas", blindspot: "You might shut down suggestions before fully hearing them out.", workaround: "Ask 'What if this worked?' before critiquing.", realWorld: "Try letting a team member lead a small project their way." },
     { title: "Over-Planning", blindspot: "Waiting for the perfect plan can mean missing opportunities.", workaround: "Set a 'good enough' threshold and act.", realWorld: "Launch that project at 80% instead of waiting for 100%." },
+    { title: "Emotional Blind Spot", blindspot: "You may overlook how your tone affects others emotionally.", workaround: "Pause to read the room before delivering feedback.", realWorld: "Ask 'How did that land?' after sharing a critical thought." },
   ],
   "INTP": [
     { title: "Analysis Paralysis", blindspot: "You can get lost researching when action is needed.", workaround: "Time-box your research with a hard deadline.", realWorld: "Give yourself 2 hours max to research, then decide." },
     { title: "Avoiding Emotions", blindspot: "Skipping emotional conversations damages relationships.", workaround: "Schedule regular check-ins with people who matter.", realWorld: "Ask 'How are we doing?' to one person weekly." },
+    { title: "Social Energy Neglect", blindspot: "You may withdraw when connection is what you actually need.", workaround: "Set a weekly social anchor, even if small.", realWorld: "Schedule one coffee or call with a friend each week." },
   ],
   "ENTJ": [
     { title: "Steamrolling Others", blindspot: "Your drive can make others feel unheard.", workaround: "Ask for input before sharing your conclusion.", realWorld: "In your next meeting, speak last instead of first." },
     { title: "Impatience with Process", blindspot: "Rushing can create mistakes and resentment.", workaround: "Build in buffer time for others to catch up.", realWorld: "Add 20% more time to project estimates." },
+    { title: "Vulnerability Avoidance", blindspot: "You may hide struggles to maintain a strong image.", workaround: "Share one challenge with someone you trust.", realWorld: "Tell a colleague about something you're still figuring out." },
   ],
   "ENTP": [
     { title: "Starting Without Finishing", blindspot: "New ideas distract you from completing current ones.", workaround: "Keep a 'parking lot' list for future ideas.", realWorld: "Finish one project before allowing yourself to start another." },
     { title: "Arguing for Sport", blindspot: "Debating can feel like attacking to others.", workaround: "State 'I'm just exploring ideas' before debating.", realWorld: "Notice when someone gets defensive and shift gears." },
+    { title: "Ignoring Routine Needs", blindspot: "You may neglect basics like sleep, food, or admin tasks.", workaround: "Automate or batch boring essentials.", realWorld: "Set recurring calendar blocks for self-care and admin." },
   ],
   "INFJ": [
     { title: "Absorbing Others' Stress", blindspot: "You take on problems that aren't yours to solve.", workaround: "Ask 'Is this my problem to fix?' before diving in.", realWorld: "Practice saying 'That sounds hard' instead of 'I'll fix it'." },
     { title: "Perfectionist Standards", blindspot: "Your high bar can paralyze you and frustrate others.", workaround: "Define 'done' before starting.", realWorld: "Ship something imperfect and iterate." },
+    { title: "Isolation Under Stress", blindspot: "You may withdraw when you most need support.", workaround: "Reach out before you feel ready to.", realWorld: "Text someone 'I'm having a rough day' this week." },
   ],
   "INFP": [
     { title: "Conflict Avoidance", blindspot: "Unaddressed issues build into bigger problems.", workaround: "Address small issues before they grow.", realWorld: "Practice: 'Can I share something that's been on my mind?'" },
     { title: "Dreaming Without Acting", blindspot: "Beautiful visions need ugly first steps.", workaround: "Identify the smallest possible action today.", realWorld: "Spend 10 minutes on that dream project right now." },
+    { title: "Self-Criticism Spiral", blindspot: "You may be harsher on yourself than anyone else.", workaround: "Treat yourself like you'd treat a close friend.", realWorld: "Write down 3 things you did well today before bed." },
   ],
   "ENFJ": [
     { title: "People-Pleasing Burnout", blindspot: "Saying yes to everyone means neglecting yourself.", workaround: "Check your energy before agreeing to help.", realWorld: "Practice: 'Let me check my schedule and get back to you.'" },
     { title: "Taking Rejection Personally", blindspot: "Others' choices aren't about your worth.", workaround: "Separate their decision from your value.", realWorld: "When rejected, list 3 things you're proud of." },
+    { title: "Overgiving Without Receiving", blindspot: "You give so much that you forget to ask for help.", workaround: "Ask for one favor this week.", realWorld: "Let someone do something nice for you without reciprocating immediately." },
   ],
   "ENFP": [
     { title: "Overcommitting", blindspot: "Enthusiasm leads to impossible schedules.", workaround: "Halve the commitments, double the impact.", realWorld: "Before saying yes, check if you can realistically deliver." },
     { title: "Avoiding Boring Tasks", blindspot: "Necessary routines get neglected.", workaround: "Pair boring tasks with something enjoyable.", realWorld: "Listen to your favorite podcast only while doing admin work." },
+    { title: "Shiny Object Syndrome", blindspot: "New opportunities distract from current commitments.", workaround: "Write down why you started before switching.", realWorld: "Keep a 'why I'm doing this' note visible for each major project." },
   ],
   "ISTJ": [
     { title: "Rigidity", blindspot: "Sticking to 'how it's always done' misses better ways.", workaround: "Try one new approach monthly.", realWorld: "Ask a younger colleague how they'd approach your task." },
     { title: "Difficulty Delegating", blindspot: "Doing everything yourself limits growth.", workaround: "Delegate the how, keep the what.", realWorld: "Let someone else handle a task their way this week." },
+    { title: "Underexpressing Appreciation", blindspot: "You may assume people know you value them.", workaround: "Say 'thank you' and 'good job' more often.", realWorld: "Compliment one person's work specifically today." },
   ],
   "ISFJ": [
     { title: "Difficulty Saying No", blindspot: "You exhaust yourself serving others.", workaround: "Your needs are needs too, not wants.", realWorld: "Decline one request this week without explaining why." },
     { title: "Change Resistance", blindspot: "Comfort zones can become prisons.", workaround: "Make small changes to build adaptability.", realWorld: "Take a different route or try a new restaurant." },
+    { title: "Holding Grudges Quietly", blindspot: "Unexpressed hurts can simmer into resentment.", workaround: "Address frustrations before they grow.", realWorld: "Share one thing that's been bothering you with someone you trust." },
   ],
   "ESTJ": [
     { title: "Dismissing Feelings", blindspot: "Efficiency without empathy creates resentment.", workaround: "Acknowledge feelings before problem-solving.", realWorld: "Say 'That sounds frustrating' before offering solutions." },
     { title: "Control Issues", blindspot: "Micromanaging destroys trust and motivation.", workaround: "Define outcomes, not methods.", realWorld: "Assign a task with a deadline but no process instructions." },
+    { title: "Ignoring Self-Care", blindspot: "Pushing through exhaustion hurts long-term performance.", workaround: "Schedule rest like you schedule work.", realWorld: "Block one hour this week purely for yourself." },
   ],
   "ESFJ": [
     { title: "Seeking Approval", blindspot: "Others' opinions shouldn't define your worth.", workaround: "Build internal validation sources.", realWorld: "Do one thing purely because YOU want to this week." },
     { title: "Avoiding Conflict", blindspot: "Keeping peace now creates war later.", workaround: "Address issues while they're small.", realWorld: "Have that conversation you've been putting off." },
+    { title: "Overidentifying with Others' Moods", blindspot: "Their bad day doesn't have to become yours.", workaround: "Notice when you're absorbing others' emotions.", realWorld: "After a heavy conversation, take 5 minutes alone to reset." },
   ],
   "ISTP": [
     { title: "Emotional Distance", blindspot: "People need words, not just actions.", workaround: "Express care verbally, not just through doing.", realWorld: "Tell someone 'I appreciate you' out loud this week." },
     { title: "Impulsive Decisions", blindspot: "Acting fast sometimes means acting wrong.", workaround: "Count to 10 before major decisions.", realWorld: "Sleep on any decision over $100 or affecting others." },
+    { title: "Underplanning Long-Term", blindspot: "Living in the moment may neglect future needs.", workaround: "Set one long-term goal and check progress monthly.", realWorld: "Write down where you want to be in 2 years." },
   ],
   "ISFP": [
     { title: "Avoiding Structure", blindspot: "Some structure enables more creativity.", workaround: "Create minimal frameworks that free you.", realWorld: "Schedule your creative time like an appointment." },
     { title: "Taking Criticism Hard", blindspot: "Feedback is data, not an attack.", workaround: "Ask 'What can I learn?' before reacting.", realWorld: "Request feedback proactively to reduce surprise." },
+    { title: "Hiding Your Strengths", blindspot: "You may downplay talents others need to see.", workaround: "Share one accomplishment without minimizing it.", realWorld: "When someone compliments you, just say 'Thank you.'" },
   ],
   "ESTP": [
     { title: "Risk Blindness", blindspot: "Excitement can overshadow danger.", workaround: "Ask one cautious person before leaping.", realWorld: "Run your next big idea by the most skeptical person you know." },
     { title: "Impatience with Details", blindspot: "Skipping steps causes revisiting them later.", workaround: "Build in quick check moments.", realWorld: "Re-read that important email before sending." },
+    { title: "Ignoring Emotional Depth", blindspot: "Surface-level interactions may miss deeper connections.", workaround: "Ask one follow-up question in every conversation.", realWorld: "When someone shares, ask 'How did that make you feel?'" },
   ],
   "ESFP": [
     { title: "Present-Focus Blindness", blindspot: "Today's fun can be tomorrow's regret.", workaround: "Ask 'How will I feel about this in a week?'", realWorld: "Before a big purchase, wait 48 hours." },
     { title: "Conflict Avoidance", blindspot: "Keeping things light means leaving issues unresolved.", workaround: "Schedule serious conversations like appointments.", realWorld: "Block 15 minutes to address something you've avoided." },
+    { title: "Underestimating Preparation", blindspot: "Winging it works until it doesn't.", workaround: "Prepare for important moments, even briefly.", realWorld: "Spend 10 minutes preparing before your next big meeting or event." },
   ],
 };
 
 const DEFAULT_BLINDSPOTS = [
   { title: "Blind to Blind Spots", blindspot: "We all have areas we can't see clearly about ourselves.", workaround: "Ask a trusted friend for honest feedback.", realWorld: "Have a 'what should I work on?' conversation with someone you trust." },
   { title: "Comfort Zone Trap", blindspot: "Staying comfortable can mean missing growth opportunities.", workaround: "Regularly try something that makes you slightly uncomfortable.", realWorld: "Sign up for one new experience this month." },
+  { title: "Confirmation Bias", blindspot: "You may seek out info that confirms what you already believe.", workaround: "Actively seek opposing viewpoints.", realWorld: "Read an article or talk to someone with a different perspective this week." },
 ];
 
 function getWeaknessBlindspots(mbtiType: string) {
