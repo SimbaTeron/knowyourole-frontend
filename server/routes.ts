@@ -770,219 +770,100 @@ export async function registerRoutes(
       const { sessionId, result, mood, tier } = req.body;
 
       const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([612, 792]); // Letter size
+      const page = pdfDoc.addPage([612, 792]);
       const { width, height } = page.getSize();
       
       const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
       const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
       
-      const terracotta = rgb(0.82, 0.45, 0.35);
-      const sageGreen = rgb(0.55, 0.63, 0.52);
-      const darkGray = rgb(0.2, 0.2, 0.2);
-      const lightGray = rgb(0.5, 0.5, 0.5);
+      const purple = rgb(0.65, 0.55, 0.98);
+      const darkPurple = rgb(0.4, 0.3, 0.7);
+      const darkBg = rgb(0.04, 0.04, 0.06);
+      const cardBg = rgb(0.07, 0.07, 0.1);
+      const lightText = rgb(0.97, 0.98, 0.99);
+      const mutedText = rgb(0.58, 0.64, 0.72);
+      const cyan = rgb(0.4, 0.91, 0.98);
       
-      let y = height - 60;
+      page.drawRectangle({ x: 0, y: 0, width, height, color: darkBg });
       
-      page.drawText("KnowRole", {
-        x: 50,
-        y,
-        size: 28,
-        font: helveticaBold,
-        color: terracotta,
+      let y = height - 50;
+      
+      page.drawRectangle({ x: 40, y: y - 70, width: width - 80, height: 80, color: cardBg, borderColor: purple, borderWidth: 1 });
+      
+      page.drawText("KnowYouRole", { x: 55, y: y - 30, size: 32, font: helveticaBold, color: purple });
+      page.drawText("Personality Discovery Report", { x: 55, y: y - 55, size: 14, font: helvetica, color: mutedText });
+      
+      y -= 100;
+      
+      page.drawRectangle({ x: 40, y: y - 180, width: width - 80, height: 170, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98, 0.3), borderWidth: 1 });
+      
+      page.drawText("YOUR PERSONALITY TYPE", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
+      
+      page.drawText(result?.mbtiType || "XXXX", { x: 55, y: y - 65, size: 48, font: helveticaBold, color: lightText });
+      
+      page.drawText(result?.title || "Your Unique Type", { x: 55, y: y - 95, size: 16, font: helveticaBold, color: purple });
+      
+      const spark = result?.spark || "Discover your unique strengths and potential!";
+      const sparkLines = spark.length > 70 ? [spark.slice(0, 70), spark.slice(70)] : [spark];
+      sparkLines.forEach((line: string, i: number) => {
+        page.drawText(line, { x: 55, y: y - 120 - (i * 16), size: 11, font: helveticaOblique, color: mutedText });
       });
       
-      page.drawText("Personality Discovery Report", {
-        x: 50,
-        y: y - 25,
-        size: 14,
-        font: helvetica,
-        color: lightGray,
-      });
+      page.drawText(`DISC: ${result?.discStyle || "Balanced"}`, { x: 55, y: y - 165, size: 12, font: helvetica, color: mutedText });
       
-      y -= 70;
-      page.drawLine({
-        start: { x: 50, y },
-        end: { x: width - 50, y },
-        thickness: 1,
-        color: rgb(0.9, 0.9, 0.9),
-      });
+      y -= 200;
       
-      y -= 40;
-      page.drawText("Your MBTI Type", {
-        x: 50,
-        y,
-        size: 12,
-        font: helveticaBold,
-        color: sageGreen,
-      });
+      page.drawRectangle({ x: 40, y: y - 180, width: width - 80, height: 170, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98, 0.3), borderWidth: 1 });
       
-      y -= 25;
-      page.drawText(result?.mbtiType || "XXXX", {
-        x: 50,
-        y,
-        size: 32,
-        font: helveticaBold,
-        color: darkGray,
-      });
-      
-      y -= 20;
-      page.drawText(result?.title || "Personality Type", {
-        x: 50,
-        y,
-        size: 14,
-        font: helvetica,
-        color: lightGray,
-      });
-      
-      y -= 40;
-      page.drawText("DISC Style", {
-        x: 50,
-        y,
-        size: 12,
-        font: helveticaBold,
-        color: sageGreen,
-      });
-      
-      y -= 20;
-      page.drawText(result?.discStyle || "Balanced", {
-        x: 50,
-        y,
-        size: 16,
-        font: helvetica,
-        color: darkGray,
-      });
-      
-      y -= 40;
-      page.drawText("Big Five Profile", {
-        x: 50,
-        y,
-        size: 12,
-        font: helveticaBold,
-        color: sageGreen,
-      });
+      page.drawText("BIG FIVE PERSONALITY PROFILE", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
       
       const bigFive = result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 };
       const traits = [
-        { name: "Openness", value: bigFive.O },
-        { name: "Conscientiousness", value: bigFive.C },
-        { name: "Extraversion", value: bigFive.E },
-        { name: "Agreeableness", value: bigFive.A },
-        { name: "Neuroticism", value: bigFive.N },
+        { name: "Openness", key: "O", value: bigFive.O, desc: "Creativity & Curiosity" },
+        { name: "Conscientiousness", key: "C", value: bigFive.C, desc: "Organization & Discipline" },
+        { name: "Extraversion", key: "E", value: bigFive.E, desc: "Social Energy" },
+        { name: "Agreeableness", key: "A", value: bigFive.A, desc: "Empathy & Cooperation" },
+        { name: "Neuroticism", key: "N", value: bigFive.N, desc: "Emotional Sensitivity" },
       ];
       
-      y -= 25;
+      let traitY = y - 50;
       for (const trait of traits) {
-        page.drawText(`${trait.name}:`, {
-          x: 50,
-          y,
-          size: 11,
-          font: helvetica,
-          color: darkGray,
-        });
+        page.drawText(trait.name, { x: 55, y: traitY, size: 10, font: helveticaBold, color: lightText });
+        page.drawText(trait.desc, { x: 180, y: traitY, size: 8, font: helvetica, color: mutedText });
         
-        page.drawRectangle({
-          x: 180,
-          y: y - 3,
-          width: 200,
-          height: 12,
-          color: rgb(0.95, 0.95, 0.95),
-        });
+        page.drawRectangle({ x: 340, y: traitY - 2, width: 160, height: 12, color: rgb(0.15, 0.15, 0.2) });
+        page.drawRectangle({ x: 340, y: traitY - 2, width: Math.min(trait.value * 1.6, 160), height: 12, color: purple });
         
-        page.drawRectangle({
-          x: 180,
-          y: y - 3,
-          width: trait.value * 2,
-          height: 12,
-          color: terracotta,
-        });
+        page.drawText(`${trait.value}%`, { x: 510, y: traitY, size: 10, font: helveticaBold, color: lightText });
         
-        page.drawText(`${trait.value}%`, {
-          x: 390,
-          y,
-          size: 10,
-          font: helvetica,
-          color: lightGray,
-        });
-        
-        y -= 22;
+        traitY -= 26;
       }
       
-      y -= 30;
-      page.drawText("Mood Blend", {
-        x: 50,
-        y,
-        size: 12,
-        font: helveticaBold,
-        color: sageGreen,
-      });
+      y -= 200;
       
-      y -= 20;
-      page.drawText(mood || "Not specified", {
-        x: 50,
-        y,
-        size: 14,
-        font: helvetica,
-        color: darkGray,
-      });
+      page.drawRectangle({ x: 40, y: y - 100, width: (width - 90) / 2, height: 90, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98, 0.3), borderWidth: 1 });
+      page.drawText("MOOD BLEND", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
+      const moodText = mood || "Balanced";
+      page.drawText(moodText.length > 25 ? moodText.slice(0, 25) + "..." : moodText, { x: 55, y: y - 55, size: 14, font: helveticaBold, color: lightText });
+      page.drawText("Your emotional starting point", { x: 55, y: y - 75, size: 9, font: helvetica, color: mutedText });
       
-      y -= 30;
-      page.drawText("Quiz Tier", {
-        x: 50,
-        y,
-        size: 12,
-        font: helveticaBold,
-        color: sageGreen,
-      });
+      page.drawRectangle({ x: 40 + (width - 90) / 2 + 10, y: y - 100, width: (width - 90) / 2, height: 90, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98, 0.3), borderWidth: 1 });
+      page.drawText("AGE TIER", { x: 55 + (width - 90) / 2 + 10, y: y - 25, size: 10, font: helveticaBold, color: cyan });
+      page.drawText(tier || "Adult", { x: 55 + (width - 90) / 2 + 10, y: y - 55, size: 14, font: helveticaBold, color: lightText });
+      page.drawText("Quiz difficulty level", { x: 55 + (width - 90) / 2 + 10, y: y - 75, size: 9, font: helvetica, color: mutedText });
       
-      y -= 20;
-      page.drawText(tier || "Standard", {
-        x: 50,
-        y,
-        size: 14,
-        font: helvetica,
-        color: darkGray,
-      });
+      y -= 120;
       
-      y -= 40;
-      page.drawText("Your Spark", {
-        x: 50,
-        y,
-        size: 12,
-        font: helveticaBold,
-        color: sageGreen,
-      });
-      
-      y -= 20;
-      const spark = result?.spark || "Discover your unique strengths!";
-      page.drawText(spark, {
-        x: 50,
-        y,
-        size: 12,
-        font: helvetica,
-        color: darkGray,
-        maxWidth: width - 100,
-      });
-      
-      page.drawText("Generated by KnowRole", {
-        x: 50,
-        y: 40,
-        size: 9,
-        font: helvetica,
-        color: lightGray,
-      });
-      
-      page.drawText(`Session: ${sessionId || "N/A"}`, {
-        x: width - 200,
-        y: 40,
-        size: 9,
-        font: helvetica,
-        color: lightGray,
-      });
+      page.drawRectangle({ x: 40, y: 30, width: width - 80, height: 50, color: cardBg });
+      page.drawText("Generated by KnowYouRole", { x: 55, y: 55, size: 10, font: helvetica, color: mutedText });
+      page.drawText("knowyourole.replit.app", { x: 55, y: 40, size: 9, font: helvetica, color: purple });
+      page.drawText(`Session: ${sessionId?.slice(-8) || "N/A"}`, { x: width - 160, y: 48, size: 9, font: helvetica, color: mutedText });
       
       const pdfBytes = await pdfDoc.save();
       
       res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", `attachment; filename=KnowRole-Results.pdf`);
+      res.setHeader("Content-Disposition", `attachment; filename=KnowYouRole-Results.pdf`);
       res.send(Buffer.from(pdfBytes));
     } catch (error) {
       console.error("PDF generation error:", error);
@@ -1016,91 +897,89 @@ export async function registerRoutes(
       
       const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
       const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
       
-      const terracotta = rgb(0.82, 0.45, 0.35);
-      const sageGreen = rgb(0.55, 0.63, 0.52);
-      const darkGray = rgb(0.2, 0.2, 0.2);
-      const lightGray = rgb(0.5, 0.5, 0.5);
+      const purple = rgb(0.65, 0.55, 0.98);
+      const darkBg = rgb(0.04, 0.04, 0.06);
+      const cardBg = rgb(0.07, 0.07, 0.1);
+      const lightText = rgb(0.97, 0.98, 0.99);
+      const mutedText = rgb(0.58, 0.64, 0.72);
+      const cyan = rgb(0.4, 0.91, 0.98);
       
-      let y = height - 60;
+      page.drawRectangle({ x: 0, y: 0, width, height, color: darkBg });
       
-      page.drawText("KnowRole", {
-        x: 50, y,
-        size: 28,
-        font: helveticaBold,
-        color: terracotta,
+      let y = height - 50;
+      
+      page.drawRectangle({ x: 40, y: y - 70, width: width - 80, height: 80, color: cardBg, borderColor: purple, borderWidth: 1 });
+      
+      page.drawText("KnowYouRole", { x: 55, y: y - 30, size: 32, font: helveticaBold, color: purple });
+      page.drawText("Personality Discovery Report", { x: 55, y: y - 55, size: 14, font: helvetica, color: mutedText });
+      
+      y -= 100;
+      
+      page.drawRectangle({ x: 40, y: y - 180, width: width - 80, height: 170, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98), borderWidth: 1 });
+      
+      page.drawText("YOUR PERSONALITY TYPE", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
+      
+      page.drawText(result?.mbtiType || "XXXX", { x: 55, y: y - 65, size: 48, font: helveticaBold, color: lightText });
+      
+      page.drawText(result?.title || "Your Unique Type", { x: 55, y: y - 95, size: 16, font: helveticaBold, color: purple });
+      
+      const spark = result?.spark || "Discover your unique strengths and potential!";
+      const sparkLines = spark.length > 70 ? [spark.slice(0, 70), spark.slice(70)] : [spark];
+      sparkLines.forEach((line: string, i: number) => {
+        page.drawText(line, { x: 55, y: y - 120 - (i * 16), size: 11, font: helveticaOblique, color: mutedText });
       });
       
-      page.drawText("Personality Discovery Report", {
-        x: 50, y: y - 25,
-        size: 14,
-        font: helvetica,
-        color: lightGray,
-      });
+      page.drawText(`DISC: ${result?.discStyle || "Balanced"}`, { x: 55, y: y - 165, size: 12, font: helvetica, color: mutedText });
       
-      y -= 70;
-      page.drawText(`Your MBTI Type: ${result?.mbtiType || "XXXX"}`, {
-        x: 50, y,
-        size: 18,
-        font: helveticaBold,
-        color: darkGray,
-      });
+      y -= 200;
       
-      y -= 25;
-      page.drawText(`${result?.title || "Your Personality Type"} - ${result?.spark || ""}`, {
-        x: 50, y,
-        size: 12,
-        font: helvetica,
-        color: lightGray,
-      });
+      page.drawRectangle({ x: 40, y: y - 180, width: width - 80, height: 170, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98), borderWidth: 1 });
       
-      y -= 40;
-      page.drawText(`DISC Style: ${result?.discStyle || "Balanced"}`, {
-        x: 50, y,
-        size: 14,
-        font: helvetica,
-        color: darkGray,
-      });
+      page.drawText("BIG FIVE PERSONALITY PROFILE", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
       
-      y -= 30;
-      page.drawText(`Mood: ${mood || "Not specified"} | Tier: ${tier || "Standard"}`, {
-        x: 50, y,
-        size: 12,
-        font: helvetica,
-        color: lightGray,
-      });
+      const bigFive = result?.bigFiveProfile || { openness: 50, conscientiousness: 50, extraversion: 50, agreeableness: 50, neuroticism: 50 };
+      const traits = [
+        { name: "Openness", value: bigFive.openness || bigFive.O || 50, desc: "Creativity & Curiosity" },
+        { name: "Conscientiousness", value: bigFive.conscientiousness || bigFive.C || 50, desc: "Organization & Discipline" },
+        { name: "Extraversion", value: bigFive.extraversion || bigFive.E || 50, desc: "Social Energy" },
+        { name: "Agreeableness", value: bigFive.agreeableness || bigFive.A || 50, desc: "Empathy & Cooperation" },
+        { name: "Neuroticism", value: bigFive.neuroticism || bigFive.N || 50, desc: "Emotional Sensitivity" },
+      ];
       
-      const bigFive = result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 };
-      y -= 40;
-      page.drawText("Big Five Profile:", {
-        x: 50, y,
-        size: 14,
-        font: helveticaBold,
-        color: sageGreen,
-      });
+      let traitY = y - 50;
+      for (const trait of traits) {
+        page.drawText(trait.name, { x: 55, y: traitY, size: 10, font: helveticaBold, color: lightText });
+        page.drawText(trait.desc, { x: 180, y: traitY, size: 8, font: helvetica, color: mutedText });
+        
+        page.drawRectangle({ x: 340, y: traitY - 2, width: 160, height: 12, color: rgb(0.15, 0.15, 0.2) });
+        page.drawRectangle({ x: 340, y: traitY - 2, width: Math.min(trait.value * 1.6, 160), height: 12, color: purple });
+        
+        page.drawText(`${Math.round(trait.value)}%`, { x: 510, y: traitY, size: 10, font: helveticaBold, color: lightText });
+        
+        traitY -= 26;
+      }
       
-      y -= 25;
-      page.drawText(`Openness: ${bigFive.O}% | Conscientiousness: ${bigFive.C}% | Extraversion: ${bigFive.E}%`, {
-        x: 50, y,
-        size: 11,
-        font: helvetica,
-        color: darkGray,
-      });
+      y -= 200;
       
-      y -= 18;
-      page.drawText(`Agreeableness: ${bigFive.A}% | Neuroticism: ${bigFive.N}%`, {
-        x: 50, y,
-        size: 11,
-        font: helvetica,
-        color: darkGray,
-      });
+      page.drawRectangle({ x: 40, y: y - 100, width: (width - 90) / 2, height: 90, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98), borderWidth: 1 });
+      page.drawText("MOOD BLEND", { x: 55, y: y - 25, size: 10, font: helveticaBold, color: cyan });
+      const moodText = mood || "Balanced";
+      page.drawText(moodText.length > 25 ? moodText.slice(0, 25) + "..." : moodText, { x: 55, y: y - 55, size: 14, font: helveticaBold, color: lightText });
+      page.drawText("Your emotional starting point", { x: 55, y: y - 75, size: 9, font: helvetica, color: mutedText });
       
-      page.drawText("Generated by KnowRole | knowrole.replit.app", {
-        x: 50, y: 40,
-        size: 9,
-        font: helvetica,
-        color: lightGray,
-      });
+      page.drawRectangle({ x: 40 + (width - 90) / 2 + 10, y: y - 100, width: (width - 90) / 2, height: 90, color: cardBg, borderColor: rgb(0.65, 0.55, 0.98), borderWidth: 1 });
+      page.drawText("AGE TIER", { x: 55 + (width - 90) / 2 + 10, y: y - 25, size: 10, font: helveticaBold, color: cyan });
+      page.drawText(tier || "Adult", { x: 55 + (width - 90) / 2 + 10, y: y - 55, size: 14, font: helveticaBold, color: lightText });
+      page.drawText("Quiz difficulty level", { x: 55 + (width - 90) / 2 + 10, y: y - 75, size: 9, font: helvetica, color: mutedText });
+      
+      y -= 120;
+      
+      page.drawRectangle({ x: 40, y: 30, width: width - 80, height: 50, color: cardBg });
+      page.drawText("Generated by KnowYouRole", { x: 55, y: 55, size: 10, font: helvetica, color: mutedText });
+      page.drawText("knowyourole.replit.app", { x: 55, y: 40, size: 9, font: helvetica, color: purple });
+      page.drawText(`Session: ${sessionId?.slice(-8) || "N/A"}`, { x: width - 160, y: 48, size: 9, font: helvetica, color: mutedText });
       
       const pdfBytes = await pdfDoc.save();
 
@@ -1115,33 +994,36 @@ export async function registerRoutes(
       });
 
       await transporter.sendMail({
-        from: `"KnowRole" <${emailUser}>`,
+        from: `"KnowYouRole" <${emailUser}>`,
         to: email,
-        subject: "Your KnowRole Personality Report",
+        subject: "Your KnowYouRole Personality Report",
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #D17B5F, #8FA482); padding: 30px; text-align: center;">
-              <h1 style="color: white; margin: 0;">KnowRole</h1>
-              <p style="color: rgba(255,255,255,0.8); margin: 10px 0 0;">Personality Discovery</p>
+          <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0f; border-radius: 12px; overflow: hidden;">
+            <div style="background: linear-gradient(135deg, #a58cfa 0%, #66e8f9 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="color: #0a0a0f; margin: 0; font-size: 32px; font-weight: 700;">KnowYouRole</h1>
+              <p style="color: rgba(10,10,15,0.7); margin: 10px 0 0; font-size: 14px;">Personality Discovery</p>
             </div>
-            <div style="padding: 30px; background: #f9f9f9;">
-              <h2 style="color: #333;">Your Personality Report is Ready!</h2>
-              <p style="color: #666;">Hello!</p>
-              <p style="color: #666;">Your KnowRole personality assessment results are attached as a PDF.</p>
-              <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0;"><strong>MBTI Type:</strong> ${result?.mbtiType || "XXXX"}</p>
-                <p style="margin: 10px 0 0;"><strong>DISC Style:</strong> ${result?.discStyle || "Balanced"}</p>
+            <div style="padding: 35px; background: #0a0a0f;">
+              <h2 style="color: #f8f9fa; font-size: 22px; margin: 0 0 20px;">Your Personality Report is Ready!</h2>
+              <p style="color: #94a3b8; font-size: 15px; line-height: 1.6;">Hello!</p>
+              <p style="color: #94a3b8; font-size: 15px; line-height: 1.6;">Your KnowYouRole personality assessment results are attached as a PDF.</p>
+              <div style="background: #12121a; padding: 25px; border-radius: 10px; margin: 25px 0; border: 1px solid rgba(165,140,250,0.3);">
+                <p style="margin: 0; color: #66e8f9; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Your Type</p>
+                <p style="margin: 8px 0 0; color: #f8f9fa; font-size: 28px; font-weight: 700;">${result?.mbtiType || "XXXX"}</p>
+                <p style="margin: 15px 0 0; color: #a58cfa; font-size: 16px; font-weight: 600;">${result?.title || "Discover Your Type"}</p>
+                <p style="margin: 15px 0 0; color: #94a3b8; font-size: 14px;">DISC Style: ${result?.discStyle || "Balanced"}</p>
               </div>
-              <p style="color: #666;">Open the attached PDF to see your complete results.</p>
+              <p style="color: #94a3b8; font-size: 15px; line-height: 1.6;">Open the attached PDF to see your complete results including your Big Five personality profile.</p>
             </div>
-            <div style="padding: 20px; text-align: center; color: #999; font-size: 12px;">
-              <p>This email was sent from KnowRole. Your email address was not stored.</p>
+            <div style="padding: 25px; text-align: center; background: #12121a; border-top: 1px solid rgba(165,140,250,0.2);">
+              <p style="color: #64748b; font-size: 12px; margin: 0;">This email was sent from KnowYouRole. Your email address was not stored.</p>
+              <p style="color: #a58cfa; font-size: 11px; margin: 10px 0 0;">knowyourole.replit.app</p>
             </div>
           </div>
         `,
         attachments: [
           {
-            filename: `KnowRole-Results-${sessionId?.slice(-6) || "report"}.pdf`,
+            filename: `KnowYouRole-Results-${sessionId?.slice(-6) || "report"}.pdf`,
             content: Buffer.from(pdfBytes),
             contentType: "application/pdf",
           },
@@ -1183,7 +1065,7 @@ export async function registerRoutes(
       const formattedPhone = cleanPhone.startsWith("1") ? `+${cleanPhone}` : `+1${cleanPhone}`;
 
       await client.messages.create({
-        body: `Your KnowRole personality results are ready! You're a ${result?.mbtiType || "unique type"} - ${result?.title || "discover more"}. View your full report: ${resultUrl}`,
+        body: `Your KnowYouRole personality results are ready! You're a ${result?.mbtiType || "unique type"} - ${result?.title || "discover more"}. View your full report: ${resultUrl}`,
         from: twilioPhone,
         to: formattedPhone,
       });
