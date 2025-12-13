@@ -119,7 +119,7 @@ export default function PreQuizPage() {
   };
 
   const handleBack = () => {
-    setLocation("/location");
+    setLocation("/mood-mixer");
   };
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -285,7 +285,6 @@ export default function PreQuizPage() {
                               </motion.div>
                             </div>
                           </div>
-                          <p className="text-xs text-center text-warm-gray/50 dark:text-[#64748B] mt-3">Tap or swipe left/right to choose</p>
                         </div>
                       )}
 
@@ -392,7 +391,7 @@ export default function PreQuizPage() {
             data-testid="button-start-quiz"
           >
             <Zap className="w-5 h-5" />
-            {allStepsViewed ? "I'm Ready" : `View All Steps (${viewedSteps.size}/${DEMO_STEPS.length})`}
+            {allStepsViewed ? "I'm Ready" : "Next"}
           </motion.button>
         </div>
       </div>
