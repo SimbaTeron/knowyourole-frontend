@@ -8,6 +8,7 @@ import { sql, eq, and, gte, lte, or, desc } from "drizzle-orm";
 import { db } from "./db";
 import { seedAll, seedPremiumInsights } from "./seedData";
 import { seedJobRoles } from "./seed-job-roles";
+import { getJobMatches, getTopJobMatch } from "./job-matching";
 import { 
   traitVibes, traitCombinations, adventureArchetypes,
   sideHustles, blindspots, careerPaths, growthTips,
@@ -2892,6 +2893,77 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching job roles:", error);
       res.status(500).json({ error: "Failed to fetch job roles" });
+    }
+  });
+
+  // Get personalized job matches based on personality scores
+  const jobMatchSchema = z.object({
+    mbti: z.object({
+      E: z.number(), I: z.number(),
+      S: z.number(), N: z.number(),
+      T: z.number(), F: z.number(),
+      J: z.number(), P: z.number(),
+    }),
+    disc: z.object({
+      D: z.number(), I: z.number(), S: z.number(), C: z.number(),
+    }),
+    bigFive: z.object({
+      O: z.number(), C: z.number(), E: z.number(), A: z.number(), N: z.number(),
+    }),
+    limit: z.number().optional().default(3),
+    diversityBoost: z.boolean().optional().default(true),
+  });
+
+  app.post("/api/job-matches", async (req: Request, res: Response) => {
+    try {
+      const data = jobMatchSchema.parse(req.body);
+      const { mbti, disc, bigFive, limit, diversityBoost } = data;
+      
+      const matches = await getJobMatches({ mbti, disc, bigFive }, limit, diversityBoost);
+      
+      res.json({
+        success: true,
+        matches: matches.map(m => ({
+          roleName: m.role.roleName,
+          roleNumber: m.role.roleNumber,
+          matchScore: m.matchScore,
+          explanation: m.explanation,
+          traitHighlights: m.traitHighlights,
+          jobCollar: m.role.jobCollar,
+        })),
+      });
+    } catch (error) {
+      console.error("Job matching error:", error);
+      res.status(500).json({ error: "Failed to get job matches" });
+    }
+  });
+
+  // Get single top job match (for basic results display)
+  app.post("/api/job-match/top", async (req: Request, res: Response) => {
+    try {
+      const data = jobMatchSchema.omit({ limit: true, diversityBoost: true }).parse(req.body);
+      const { mbti, disc, bigFive } = data;
+      
+      const match = await getTopJobMatch({ mbti, disc, bigFive });
+      
+      if (!match) {
+        return res.status(404).json({ error: "No job match found" });
+      }
+      
+      res.json({
+        success: true,
+        match: {
+          roleName: match.role.roleName,
+          roleNumber: match.role.roleNumber,
+          matchScore: match.matchScore,
+          explanation: match.explanation,
+          traitHighlights: match.traitHighlights,
+          jobCollar: match.role.jobCollar,
+        },
+      });
+    } catch (error) {
+      console.error("Job matching error:", error);
+      res.status(500).json({ error: "Failed to get job match" });
     }
   });
 
