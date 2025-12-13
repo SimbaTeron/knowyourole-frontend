@@ -1090,7 +1090,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
             initial={{ opacity: 0, y: 15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10 }}
-            className="p-5 rounded-2xl bg-gradient-to-br from-purple-50/90 to-pink-50/90 dark:from-purple-900/40 dark:to-pink-900/40 border border-purple-200/50 dark:border-purple-700/30 shadow-lg"
+            className="p-5 rounded-2xl bg-white/90 dark:bg-[#12121A] border border-purple-200/50 dark:border-[#A78BFA]/30 shadow-lg dark:shadow-[0_0_30px_rgba(167,139,250,0.15)]"
           >
             <div className="text-center mb-3">
               <motion.span 
@@ -1105,7 +1105,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-xl font-bold mt-2 bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent"
+                className="text-xl font-bold mt-2 bg-gradient-to-r from-purple-600 to-pink-600 dark:from-[#A78BFA] dark:to-[#C4B5FD] bg-clip-text text-transparent"
               >
                 {hybridResult.title}
               </motion.h3>
@@ -1113,7 +1113,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-sm text-purple-600/80 dark:text-purple-400/70 mt-1"
+                className="text-sm text-purple-600/80 dark:text-[#94A3B8] mt-1"
               >
                 {hybridResult.desc}
               </motion.p>
@@ -1123,9 +1123,9 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mt-4 pt-3 border-t border-purple-200/30 dark:border-purple-700/30"
+              className="mt-4 pt-3 border-t border-purple-200/30 dark:border-[#A78BFA]/20"
             >
-              <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-1">
+              <p className="text-xs font-medium text-purple-700 dark:text-[#A78BFA] mb-2 flex items-center gap-1">
                 <Zap className="w-3 h-3" /> Trait Boosts
               </p>
               <div className="flex flex-wrap gap-2">
@@ -1135,7 +1135,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 + i * 0.1 }}
-                    className="px-2 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-gray-800/60"
+                    className="px-2 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-[#1E1E2E]"
                     style={{ color: boost.color, borderColor: boost.color, borderWidth: 1 }}
                   >
                     {boost.trait} {boost.amount}
@@ -1148,12 +1148,12 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="mt-4 pt-3 border-t border-purple-200/30 dark:border-purple-700/30"
+              className="mt-4 pt-3 border-t border-purple-200/30 dark:border-[#A78BFA]/20"
             >
-              <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-1">
+              <p className="text-xs font-medium text-purple-700 dark:text-[#A78BFA] mb-2 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" /> Sample Question
               </p>
-              <p className="text-sm italic text-gray-600 dark:text-gray-400 bg-white/40 dark:bg-gray-800/40 rounded-lg p-2">
+              <p className="text-sm italic text-gray-600 dark:text-[#94A3B8] bg-white/40 dark:bg-[#1E1E2E]/60 rounded-lg p-2">
                 "{hybridResult.sampleQuestion}"
               </p>
             </motion.div>
