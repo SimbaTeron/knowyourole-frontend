@@ -59,10 +59,10 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
     - Shows proxy impact (Critical Thinking, First Principles boosts)
     - Tracks unique blends in localStorage for "Master Alchemist" meta-badge (3+ unique blends)
     - Animated Framer Motion pop entrance with sparkle effects
-- **PDF Sharing**: Multi-channel result sharing via SharePDFModal component:
-    - **Download**: Generates structured PDF with personality overview, MBTI type, Big Five breakdown, and mood blend using pdf-lib.
-    - **Email**: Sends beautifully designed HTML email with embedded results via Nodemailer (requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS secrets).
-    - **SMS**: Sends formatted text summary with download link via Twilio (requires TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER secrets).
+- **PDF Sharing**: Native device sharing via SharePDFModal component using Web Share API:
+    - **Native Share**: Uses `navigator.share()` with PDF file attachment on supported devices (iOS, Android, modern browsers)
+    - **Fallback**: Download PDF button + Copy Link button for browsers without Web Share API support
+    - **PDF Generation**: Server-side PDF generation with personality overview, MBTI type, Big Five breakdown via `/api/generate-pdf` endpoint using pdf-lib
 
 ## External Dependencies
 
@@ -72,7 +72,7 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
 
 ### Backend Libraries
 
-- Express, Node.js, Drizzle ORM, @neondatabase/serverless, connect-pg-simple, esbuild, pdf-lib, nodemailer, twilio.
+- Express, Node.js, Drizzle ORM, @neondatabase/serverless, connect-pg-simple, esbuild, pdf-lib.
 
 ### APIs & Services
 
