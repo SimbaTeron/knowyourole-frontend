@@ -9,20 +9,24 @@ import MoodAlchemyLab from "@/components/MoodAlchemyLab";
 
 export default function MoodMixerPage() {
   const [, setLocation] = useLocation();
-  const [theme, setTheme] = useState<ThemeMode>("light");
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
+      return stored === "light" ? "light" : "dark";
+    }
+    return "dark";
+  });
   const [hasBrewedMood, setHasBrewedMood] = useState(false);
   const [blendName, setBlendName] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
-    if (stored && (stored === "light" || stored === "dark")) {
-      setTheme(stored);
-      if (stored === "dark") {
-        document.documentElement.classList.add("dark");
-      }
+    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark", "dark-mysterious");
+    } else {
+      document.documentElement.classList.add("light-clinical");
     }
-    
-  }, []);
+  }, [theme]);
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);

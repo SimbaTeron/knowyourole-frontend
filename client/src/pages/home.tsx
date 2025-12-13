@@ -17,18 +17,23 @@ const ROTATING_TAGLINES = [
 export default function Home() {
   const [, setLocation] = useLocation();
   const [ageTier, setAgeTier] = useState<string | null>(null);
-  const [theme, setTheme] = useState<ThemeMode>("light");
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
+      return stored === "light" ? "light" : "dark";
+    }
+    return "dark";
+  });
   const [taglineIndex, setTaglineIndex] = useState(0);
 
   useEffect(() => {
-    const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
-    if (stored && (stored === "light" || stored === "dark")) {
-      setTheme(stored);
-      if (stored === "dark") {
-        document.documentElement.classList.add("dark");
-      }
+    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark", "dark-mysterious");
+    } else {
+      document.documentElement.classList.add("light-clinical");
     }
-  }, []);
+  }, [theme]);
 
   useEffect(() => {
     const interval = setInterval(() => {

@@ -23,7 +23,13 @@ interface EarnedBadge {
 
 export default function QuizPage() {
   const [, setLocation] = useLocation();
-  const [theme, setTheme] = useState<ThemeMode>("light");
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
+      return stored === "light" ? "light" : "dark";
+    }
+    return "dark";
+  });
   const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
   const [quizSessionId, setQuizSessionId] = useState<string | null>(null);
   const [apiScales, setApiScales] = useState<APIScales | null>(null);
@@ -81,16 +87,13 @@ export default function QuizPage() {
   }, []);
 
   useEffect(() => {
-    const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
-    if (stored && (stored === "light" || stored === "dark")) {
-      setTheme(stored);
-      if (stored === "dark") {
-        document.documentElement.classList.add("dark", "dark-mysterious");
-      } else {
-        document.documentElement.classList.add("light-clinical");
-      }
+    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark", "dark-mysterious");
+    } else {
+      document.documentElement.classList.add("light-clinical");
     }
-  }, []);
+  }, [theme]);
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);

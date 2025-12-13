@@ -15,21 +15,26 @@ const MOODS = [
 export default function MoodPage() {
   const [, setLocation] = useLocation();
   const [mood, setMood] = useState<string | null>(null);
-  const [theme, setTheme] = useState<ThemeMode>("light");
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
+      return stored === "light" ? "light" : "dark";
+    }
+    return "dark";
+  });
 
   useEffect(() => {
-    const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
     const storedMood = sessionStorage.getItem("knowrole-mood");
-    if (stored && (stored === "light" || stored === "dark")) {
-      setTheme(stored);
-      if (stored === "dark") {
-        document.documentElement.classList.add("dark");
-      }
-    }
     if (storedMood) {
       setMood(storedMood);
     }
-  }, []);
+    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark", "dark-mysterious");
+    } else {
+      document.documentElement.classList.add("light-clinical");
+    }
+  }, [theme]);
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);

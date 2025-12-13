@@ -21,27 +21,33 @@ export default function LocationPage() {
   const [country, setCountry] = useState("US");
   const [funMode, setFunMode] = useState(false);
   const [landmark, setLandmark] = useState<LandmarkResult | null>(null);
-  const [theme, setTheme] = useState<ThemeMode>("light");
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
+      return stored === "light" ? "light" : "dark";
+    }
+    return "dark";
+  });
   const { setLocality, teamName, isLocalitySet } = useLocalityTheme();
 
   useEffect(() => {
-    const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
     const storedFunMode = sessionStorage.getItem("knowrole-funmode");
     const storedLandmark = sessionStorage.getItem("knowrole-landmark");
     
-    if (stored && (stored === "light" || stored === "dark")) {
-      setTheme(stored);
-      if (stored === "dark") {
-        document.documentElement.classList.add("dark");
-      }
-    }
     if (storedFunMode === "true") {
       setFunMode(true);
     }
     if (storedLandmark) {
       setLandmark(JSON.parse(storedLandmark));
     }
-  }, []);
+    
+    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark", "dark-mysterious");
+    } else {
+      document.documentElement.classList.add("light-clinical");
+    }
+  }, [theme]);
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
