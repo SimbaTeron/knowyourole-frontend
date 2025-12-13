@@ -72,6 +72,32 @@ function zNormalize(rawScore: number, mean: number, std: number): number {
   return Math.max(0, Math.min(100, 50 + zScore * 15));
 }
 
+// Rate limiting tracker (IP-based abuse prevention)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function getRateLimitKey(req: Request): string {
+  return (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ||
+         req.socket.remoteAddress || 'unknown';
+}
+
+function checkRateLimit(req: Request, limit: number, windowMs: number): boolean {
+  const key = getRateLimitKey(req);
+  const now = Date.now();
+  const record = rateLimitStore.get(key);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+  
+  if (record.count < limit) {
+    record.count++;
+    return true;
+  }
+  
+  return false;
+}
+
 // Phase 3.1: Cronbach's alpha calculation for internal consistency
 interface ResponseItem {
   questionId: number;
@@ -406,6 +432,9 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   app.post("/api/score", async (req: Request, res: Response) => {
+    if (!checkRateLimit(req, 10, 3600000)) {
+      return res.status(429).json({ error: "Rate limit exceeded. Maximum 10 quiz submissions per hour." });
+    }
     try {
       const parsed = quizSubmitSchema.safeParse(req.body);
       
@@ -661,6 +690,9 @@ export async function registerRoutes(
 
   // Donation endpoint with dynamic pricing
   app.post("/api/stripe/donate", async (req: Request, res: Response) => {
+    if (!checkRateLimit(req, 5, 600000)) {
+      return res.status(429).json({ error: "Rate limit exceeded. Maximum 5 donation attempts per 10 minutes." });
+    }
     try {
       const { amount, sessionId } = req.body;
 
@@ -765,6 +797,9 @@ export async function registerRoutes(
 
   // PDF Generation endpoint
   app.post("/api/generate-pdf", async (req: Request, res: Response) => {
+    if (!checkRateLimit(req, 5, 3600000)) {
+      return res.status(429).json({ error: "Rate limit exceeded. Maximum 5 PDF generations per hour." });
+    }
     try {
       const { PDFDocument, rgb, StandardFonts } = await import("pdf-lib");
       const { sessionId, result, mood, tier } = req.body;

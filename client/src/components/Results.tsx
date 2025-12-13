@@ -1034,6 +1034,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   
   const [showJustKidding, setShowJustKidding] = useState(false);
   const [showDonationTiers, setShowDonationTiers] = useState(false);
+  const [customDonationAmount, setCustomDonationAmount] = useState(0);
   
   // Post-quiz validation before premium unlock
   const [showValidation, setShowValidation] = useState(false);
@@ -1804,25 +1805,45 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               <div className="space-y-3">
                 <Button
                   className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-4 text-lg shadow-lg"
-                  onClick={() => handleDonationTierSelect(333)}
-                  data-testid="button-donate-333"
+                  onClick={() => handleDonationTierSelect(1000)}
+                  data-testid="button-donate-10"
                 >
-                  $3.33
+                  $10
                 </Button>
                 
                 <Button
                   className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 text-lg shadow-lg"
-                  onClick={() => handleDonationTierSelect(3333)}
-                  data-testid="button-donate-3333"
+                  onClick={() => handleDonationTierSelect(2000)}
+                  data-testid="button-donate-20"
                 >
-                  $33.33
+                  $20
                 </Button>
+
+                <div className="space-y-2">
+                  <input
+                    type="number"
+                    placeholder="Enter custom amount ($)"
+                    value={customDonationAmount}
+                    onChange={(e) => setCustomDonationAmount(Math.max(0, parseInt(e.target.value) || 0))}
+                    min="1"
+                    className="w-full px-4 py-2 border-2 border-amber-300 dark:border-amber-600 rounded-lg bg-white dark:bg-amber-900/30 text-warm-gray dark:text-soft-cream focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    data-testid="input-custom-donation"
+                  />
+                  <Button
+                    className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white font-bold py-4 text-lg shadow-lg"
+                    onClick={() => customDonationAmount > 0 && handleDonationTierSelect(customDonationAmount * 100)}
+                    disabled={customDonationAmount <= 0}
+                    data-testid="button-donate-custom"
+                  >
+                    Donate ${customDonationAmount}
+                  </Button>
+                </div>
                 
                 <Button
                   variant="outline"
                   className="w-full border-2 border-amber-400 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 font-semibold py-4"
                   onClick={() => setShowDonationTiers(false)}
-                  data-testid="button-back-kidding"
+                  data-testid="button-back-donation"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Go Back

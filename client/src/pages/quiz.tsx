@@ -60,31 +60,6 @@ export default function QuizPage() {
   const funMode = storedFunMode ?? sessionFunMode;
   const landmark = storedLandmark ? { landmark: storedLandmark } : sessionLandmark;
 
-  // Check for stored premium results on mount (for returning from Crossroads, etc.)
-  useEffect(() => {
-    const storedResults = localStorage.getItem("knowrole-premium-results");
-    if (storedResults) {
-      try {
-        const parsed = JSON.parse(storedResults);
-        if (parsed.scores) {
-          setQuizScores(parsed.scores);
-          setQuizSessionId(parsed.sessionId || null);
-          setApiScales(parsed.apiScales || null);
-          setEarnedBadges(parsed.earnedBadges || []);
-          setHybridTypes(parsed.hybridTypes || []);
-          // Restore tier/mood/funMode/landmark from stored results
-          if (parsed.tier) setStoredTier(parsed.tier as TierValue);
-          if (parsed.mood !== undefined) setStoredMood(parsed.mood);
-          if (parsed.funMode !== undefined) setStoredFunMode(parsed.funMode);
-          if (parsed.landmark) setStoredLandmark(parsed.landmark);
-          if (parsed.theme) setTheme(parsed.theme);
-          setShowResults(true);
-        }
-      } catch (e) {
-        console.error("Failed to parse stored results:", e);
-      }
-    }
-  }, []);
 
   useEffect(() => {
     document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
@@ -144,21 +119,6 @@ export default function QuizPage() {
         setHybridTypes(data.result.hybridTypes);
       }
       
-      // Store premium results for returning from other pages (Crossroads, etc.)
-      const premiumResults = {
-        scores,
-        sessionId,
-        apiScales: scales,
-        earnedBadges: badges,
-        hybridTypes: hybrids,
-        tier: ageTier,
-        mood,
-        funMode,
-        landmark: landmark?.landmark,
-        theme,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem("knowrole-premium-results", JSON.stringify(premiumResults));
       
     } catch (error) {
       console.error("Failed to save quiz results:", error);
@@ -170,7 +130,6 @@ export default function QuizPage() {
   const handleQuizExit = () => {
     // Clear all session data and go to home
     sessionStorage.clear();
-    localStorage.removeItem("knowrole-premium-results");
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
@@ -179,7 +138,6 @@ export default function QuizPage() {
 
   const handleRestart = () => {
     sessionStorage.clear();
-    localStorage.removeItem("knowrole-premium-results"); // Clear stored results on explicit restart
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
