@@ -356,7 +356,7 @@ export default function PreQuizPage() {
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-[#0A0A0F] dark:via-[#0A0A0F]/95 pb-8">
         <div className="max-w-md mx-auto">
           {!allStepsViewed && (
-            <p className="text-center text-xs text-warm-gray/60 dark:text-[#64748B] mb-2">
+            <p className="text-center text-xs text-warm-gray/60 dark:text-[#64748B] mb-4">
               Swipe through all {DEMO_STEPS.length} steps to unlock ({viewedSteps.size}/{DEMO_STEPS.length})
             </p>
           )}

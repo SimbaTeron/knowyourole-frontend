@@ -1799,6 +1799,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={(e) => e.target === e.currentTarget && setShowDonationTiers(false)}
             data-testid="overlay-donation-tiers"
           >
             <motion.div
@@ -2931,29 +2932,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     </CardContent>
                   </Card>
 
-                  {/* Arc Tracker - Moved below Crossroads */}
-                  <Card className="bg-white dark:bg-[#12121A] border-blue-200 dark:border-blue-800 overflow-hidden">
-                    <div className="h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500" />
-                    <CardContent className="p-5">
-                      <h5 className="text-base font-bold text-blue-700 dark:text-blue-300 mb-4 flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/50">
-                          <TrendingUp className="w-4 h-4" />
-                        </div>
-                        Arc Tracker
-                      </h5>
-                      <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center flex-shrink-0">
-                          <Calendar className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">First Assessment</p>
-                          <p className="text-xs text-blue-600 dark:text-blue-400">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                          <p className="text-xs text-warm-gray/60 dark:text-[#64748B] mt-1">Retake in 3-6 months to track growth</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
                   {/* Retest Button */}
                   <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border-pink-200 dark:border-pink-800">
                     <CardContent className="p-5 text-center">
@@ -3101,7 +3079,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             data-testid="button-share"
           >
             <Share2 className="w-4 h-4 mr-1" />
-            Share
+            Share App
           </Button>
         </div>
       </footer>
