@@ -2151,6 +2151,17 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
         </motion.p>
       </header>
       <main className="px-4 max-w-md mx-auto space-y-6">
+        {/* ==================== PAGE 1: SUMMARY ==================== */}
+        <AnimatePresence mode="wait">
+          {currentResultsPage === 1 && (
+            <motion.div
+              key="page-1-summary"
+              initial={shouldReduceMotion ? {} : { opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={shouldReduceMotion ? {} : { opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
         {/* TIER 1: PRE-FEEDBACK (TEASER) - Always visible */}
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
@@ -2355,9 +2366,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </div>
                 </motion.div>
               )}
-              </CardContent>
-            </Card>)
-          )}
+            </CardContent>
+          </Card>)
+        )}
+        </motion.div>
           
           {/* Premium Job Matches Card - Top 3 diverse matches (for Teen+ tiers, premium only) */}
           {!isMiniExplorer && isPremiumUnlocked && jobMatches.length > 0 && (
@@ -2648,8 +2660,17 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               )}
             </motion.div>
           )}
-        </motion.div>
 
+          {/* ==================== PAGE 2: DETAILS ==================== */}
+          {currentResultsPage === 2 && (
+            <motion.div
+              key="page-2-details"
+              initial={shouldReduceMotion ? {} : { opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={shouldReduceMotion ? {} : { opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
         {/* TIER 2: POST-FEEDBACK (FULL) - Unified Personality Profile Card */}
         {isFull && (
           <motion.div
@@ -2833,15 +2854,15 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </motion.div>
         )}
 
-        <AnimatePresence>
-          {isFull && (
-            <>
-              <motion.div
-                initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card className="overflow-hidden bg-white dark:bg-[#12121A]">
+            <AnimatePresence>
+              {isFull && (
+                <>
+                  <motion.div
+                    initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <Card className="overflow-hidden bg-white dark:bg-[#12121A]">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Zap className="w-4 h-4 text-terracotta" aria-hidden="true" />
@@ -3022,14 +3043,31 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   </Card>
                 </motion.div>
               )}
+                </>
+              )}
+            </AnimatePresence>
+            </motion.div>
+          )}
 
-              {isPremiumUnlocked ? (
-                <motion.div
-                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 }}
-                  className="space-y-4"
-                >
+          {/* ==================== PAGE 3: PREMIUM ==================== */}
+          {currentResultsPage === 3 && (
+            <motion.div
+              key="page-3-premium"
+              initial={shouldReduceMotion ? {} : { opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={shouldReduceMotion ? {} : { opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              {isFull && (
+                <>
+                  {isPremiumUnlocked ? (
+                    <motion.div
+                      initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 }}
+                      className="space-y-4"
+                    >
                   {/* Premium Badge */}
                   <Card className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-900/30 dark:via-teal-900/20 dark:to-cyan-900/20 border-2 border-emerald-400 dark:border-emerald-600 overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-200/40 to-transparent rounded-bl-full" />
@@ -3137,7 +3175,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </motion.div>
               ) : (
                 /* COMPELLING CTA - Locked State */
-                (<motion.div
+                <motion.div
                   initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 }}
@@ -3230,14 +3268,90 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>)
+                </motion.div>
               )}
             </>
           )}
+          </motion.div>
+          )}
         </AnimatePresence>
       </main>
+
+      {/* Premium Gateway Modal */}
+      <AnimatePresence>
+        {showPremiumGatewayModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowPremiumGatewayModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-[#12121A] rounded-2xl shadow-xl max-w-sm w-full overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 text-center">
+                <motion.div
+                  initial={{ rotate: -10, scale: 0 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  transition={{ type: "spring", delay: 0.1 }}
+                  className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg"
+                >
+                  <Gift className="w-8 h-8 text-white" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-warm-gray dark:text-[#F8FAFC] mb-2">
+                  Premium is Free!
+                </h3>
+                <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8] mb-6 leading-relaxed">
+                  We're testing and building something useful. Help us by providing feedback or donating to support development.
+                </p>
+                <div className="space-y-3">
+                  <Button
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold py-6"
+                    onClick={() => {
+                      setShowPremiumGatewayModal(false);
+                      setCurrentResultsPage(3);
+                    }}
+                    data-testid="button-proceed-premium"
+                  >
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Proceed to Results
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full border-terracotta text-terracotta hover:bg-terracotta/10 font-semibold py-6"
+                    onClick={handleDonateClick}
+                    data-testid="button-donate-modal"
+                  >
+                    <Heart className="w-5 h-5 mr-2" />
+                    Donate (Help us build)
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Dynamic Footer based on current page */}
       <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-[#0A0A0F] border-t border-gray-200 dark:border-[#A78BFA]/20">
         <div className="max-w-md mx-auto flex gap-2">
+          {/* Back Button - Pages 2 and 3 */}
+          {currentResultsPage > 1 && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCurrentResultsPage((currentResultsPage - 1) as 1 | 2 | 3)}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+          )}
+          
           <Button
             variant="outline"
             className="flex-1"
@@ -3253,17 +3367,31 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             onClick={() => setShowSharePDFModal(true)}
             data-testid="button-download-pdf"
           >
-            <BookOpen className="w-4 h-4 mr-1" />
-            Share PDF
-          </Button>
-          <Button
-            className="flex-1 bg-terracotta hover:bg-terracotta/90"
-            onClick={onShare}
-            data-testid="button-share"
-          >
             <Share2 className="w-4 h-4 mr-1" />
-            Share App
+            Share
           </Button>
+          
+          {/* Forward Navigation Button */}
+          {currentResultsPage === 1 && (
+            <Button
+              className="flex-1 bg-terracotta hover:bg-terracotta/90"
+              onClick={() => setCurrentResultsPage(2)}
+              data-testid="button-more-details"
+            >
+              Details
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          )}
+          {currentResultsPage === 2 && (
+            <Button
+              className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+              onClick={() => setShowPremiumGatewayModal(true)}
+              data-testid="button-learn-more"
+            >
+              Learn More
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          )}
         </div>
       </footer>
       
