@@ -3120,60 +3120,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     LEARNING_STYLES={LEARNING_STYLES}
                     GROWTH_QUESTS={GROWTH_QUESTS}
                     TRAIT_LABELS={TRAIT_LABELS}
+                    onCrossroadsClick={handleCrossroadsClick}
                   />
 
-                  {/* Crossroads Adventure CTA - Featured prominently after Premium cards */}
-                  <Card className="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 dark:from-amber-900/30 dark:via-orange-900/20 dark:to-rose-900/20 border-2 border-amber-300 dark:border-amber-700 overflow-hidden shadow-lg">
-                    <div className="h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-400" />
-                    <CardContent className="p-6 text-center">
-                      <motion.div 
-                        className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-red-400 flex items-center justify-center shadow-xl"
-                        animate={{ rotate: [0, 5, -5, 0] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                      >
-                        <Compass className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h5 className="text-xl font-bold text-amber-800 dark:text-amber-200 mb-2">Crossroads Adventure</h5>
-                      <p className="text-base text-amber-700/80 dark:text-amber-300/70 mb-5 max-w-xs mx-auto">
-                        Face 7 life scenarios with branching choices. Discover hidden traits you didn't know you had.
-                      </p>
-                      <div className="flex flex-wrap justify-center gap-2 mb-5">
-                        <span className="px-3 py-1 text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 rounded-full">7 Scenarios</span>
-                        <span className="px-3 py-1 text-xs font-medium bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 rounded-full">Your Choices Matter</span>
-                        <span className="px-3 py-1 text-xs font-medium bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 rounded-full">Trait Reveals</span>
-                      </div>
-                      <Button 
-                        size="lg"
-                        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-8 py-6 text-lg shadow-lg shadow-orange-500/30"
-                        onClick={handleCrossroadsClick}
-                        data-testid="button-crossroads-cta"
-                      >
-                        <Compass className="w-5 h-5 mr-2" />
-                        Start Adventure
-                        <ArrowRight className="w-5 h-5 ml-2" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-
-                  {/* Retest Button */}
-                  <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border-pink-200 dark:border-pink-800">
-                    <CardContent className="p-5 text-center">
-                      <RefreshCw className="w-8 h-8 text-pink-500 mx-auto mb-3" />
-                      <h5 className="text-base font-bold text-pink-700 dark:text-pink-300 mb-2">Ready for a Retest?</h5>
-                      <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8] mb-4">
-                        Compare your results to see how you've evolved
-                      </p>
-                      <Button 
-                        variant="outline" 
-                        className="border-pink-300 text-pink-700 hover:bg-pink-100 dark:border-pink-600 dark:text-pink-300 dark:hover:bg-pink-900/30" 
-                        onClick={onRestart}
-                        data-testid="button-retest"
-                      >
-                        <Play className="w-4 h-4 mr-2" />
-                        Take Quiz Again
-                      </Button>
-                    </CardContent>
-                  </Card>
                 </motion.div>
               ) : (
                 /* COMPELLING CTA - Locked State */
@@ -3390,7 +3339,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               onClick={() => setShowPremiumGatewayModal(true)}
               data-testid="button-learn-more"
             >
-              Learn More
+              Want to Know More?
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           )}

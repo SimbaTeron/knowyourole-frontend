@@ -106,6 +106,7 @@ interface PremiumCardDeckProps {
   LEARNING_STYLES: Record<string, { style: string; description: string; bestFor: string[]; resources: string[]; tips: string[] }>;
   GROWTH_QUESTS: Record<string, { week1: string[]; week2: string[]; week3: string[]; week4: string[] }>;
   TRAIT_LABELS: Record<string, string>;
+  onCrossroadsClick?: () => void;
 }
 
 // Static color class mappings for Tailwind CSS compilation
@@ -247,6 +248,7 @@ export function PremiumCardDeck({
   LEARNING_STYLES,
   GROWTH_QUESTS,
   TRAIT_LABELS,
+  onCrossroadsClick,
 }: PremiumCardDeckProps) {
   const shouldReduceMotion = useReducedMotion();
   const [currentCard, setCurrentCard] = useState(0);
@@ -427,7 +429,7 @@ export function PremiumCardDeck({
         />;
       
       case "crossroads":
-        return <CrossroadsCard reduceMotion={shouldReduceMotion ?? false} />;
+        return <CrossroadsCard reduceMotion={shouldReduceMotion ?? false} onStartAdventure={onCrossroadsClick} />;
       
       default:
         return null;
@@ -1541,7 +1543,7 @@ function ThinkingCard({
 }
 
 // Crossroads Adventure Card - Coming Soon preview
-function CrossroadsCard({ reduceMotion }: { reduceMotion: boolean }) {
+function CrossroadsCard({ reduceMotion, onStartAdventure }: { reduceMotion: boolean; onStartAdventure?: () => void }) {
   return (
     <div className="text-center py-4">
       <motion.div 
@@ -1560,7 +1562,17 @@ function CrossroadsCard({ reduceMotion }: { reduceMotion: boolean }) {
         <span className="px-3 py-1 text-xs font-medium bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 rounded-full">Your Choices Matter</span>
         <span className="px-3 py-1 text-xs font-medium bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 rounded-full">Trait Reveals</span>
       </div>
-      <p className="text-sm text-amber-600/70 dark:text-amber-400/60 italic">
+      <Button 
+        size="lg"
+        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-8 py-6 text-lg shadow-lg shadow-orange-500/30"
+        onClick={onStartAdventure}
+        data-testid="button-start-adventure"
+      >
+        <Compass className="w-5 h-5 mr-2" />
+        Start Adventure
+        <ArrowRight className="w-5 h-5 ml-2" />
+      </Button>
+      <p className="text-sm text-amber-600/70 dark:text-amber-400/60 italic mt-4">
         Coming soon - an interactive adventure!
       </p>
     </div>
