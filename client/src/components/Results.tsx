@@ -34,6 +34,8 @@ import { AccountCreationModal } from "./AccountCreationModal";
 import { PremiumUpgradeModal } from "./PremiumUpgradeModal";
 import { ArcTracker } from "./ArcTracker";
 import { DreamRoleAdvisor } from "./DreamRoleAdvisor";
+import { PersonalityEvolutionTimeline } from "./PersonalityEvolutionTimeline";
+import { celebrateAchievement } from "@/lib/confetti";
 import { HYBRID_HINTS, getHybridKey, type BlendInfo } from "./MoodAlchemyLab";
 import { MOOD_PROXY_BOOSTS } from "@/lib/proxyCalculations";
 import { useAuth } from "@/hooks/useAuth";
@@ -1645,6 +1647,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
     setShowJustKidding(false);
     setIsPremiumUnlocked(true);
+    // Celebrate premium unlock with confetti
+    setTimeout(() => {
+      celebrateAchievement('premium');
+    }, 300);
   };
 
   const handleDonateClick = () => {
@@ -3191,7 +3197,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     onCrossroadsClick={handleCrossroadsClick}
                   />
 
-                  {/* Phase 3: Arc Tracker & Dream Role Advisor */}
+                  {/* Phase 3 & 4: Advanced Features */}
                   <div className="space-y-4 mt-6">
                     {/* Dream Role Advisor Button */}
                     <div className="flex justify-center">
@@ -3201,6 +3207,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         discStyle={result?.discStyle || "C"}
                       />
                     </div>
+                    
+                    {/* Personality Evolution Timeline */}
+                    <PersonalityEvolutionTimeline 
+                      mbtiType={result?.mbtiType || "INTJ"}
+                      bigFiveProfile={result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 }}
+                      tier={tier}
+                    />
                     
                     {/* Personality Arc Tracker */}
                     <ArcTracker />
