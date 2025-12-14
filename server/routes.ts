@@ -801,8 +801,8 @@ export async function registerRoutes(
 
   // PDF Generation endpoint
   app.post("/api/generate-pdf", async (req: Request, res: Response) => {
-    if (!checkRateLimit(req, 5, 3600000)) {
-      return res.status(429).json({ error: "Rate limit exceeded. Maximum 5 PDF generations per hour." });
+    if (!checkRateLimit(req, 20, 3600000)) {
+      return res.status(429).json({ error: "Rate limit exceeded. Maximum 20 PDF generations per hour." });
     }
     try {
       const { PDFDocument, rgb, StandardFonts } = await import("pdf-lib");
