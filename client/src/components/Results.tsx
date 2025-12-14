@@ -2660,6 +2660,8 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               )}
             </motion.div>
           )}
+            </motion.div>
+          )}
 
           {/* ==================== PAGE 2: DETAILS ==================== */}
           {currentResultsPage === 2 && (
