@@ -30,8 +30,10 @@ import { getLocaleInsight, getPersonalizedInsight, type LocaleInsight } from "@/
 import { getRegionalSalary, shouldShowSalary } from "@/data/regionalSalaries";
 import { PremiumCardDeck } from "./PremiumCardDeck";
 import { SharePDFModal } from "./SharePDFModal";
+import { AccountCreationModal } from "./AccountCreationModal";
 import { HYBRID_HINTS, getHybridKey, type BlendInfo } from "./MoodAlchemyLab";
 import { MOOD_PROXY_BOOSTS } from "@/lib/proxyCalculations";
+import { useAuth } from "@/hooks/useAuth";
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -1087,6 +1089,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   // Paginated results state (Page 1 = Summary, Page 2 = Details, Page 3 = Premium)
   const [currentResultsPage, setCurrentResultsPage] = useState<1 | 2 | 3>(startOnPremiumPage ? 3 : 1);
   const [showPremiumGatewayModal, setShowPremiumGatewayModal] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
+  
+  // Authentication state
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   
   // Mood Blend Badge state
   const [moodBlendInfo, setMoodBlendInfo] = useState<BlendInfo | null>(null);
@@ -3354,7 +3360,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           {currentResultsPage === 2 && (
             <Button
               className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
-              onClick={() => setShowPremiumGatewayModal(true)}
+              onClick={() => {
+                if (isAuthenticated) {
+                  setShowPremiumGatewayModal(true);
+                } else {
+                  setShowAccountModal(true);
+                }
+              }}
               data-testid="button-learn-more"
             >
               Want to Know More?
@@ -3381,6 +3393,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           tier={tier}
         />
       )}
+      
+      {/* Account Creation Modal for Premium Access */}
+      <AccountCreationModal
+        isOpen={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+        onContinueAsGuest={() => {
+          setShowAccountModal(false);
+          setShowPremiumGatewayModal(true);
+        }}
+      />
     </div>
   );
 }
