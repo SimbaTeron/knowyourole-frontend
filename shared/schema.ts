@@ -497,3 +497,47 @@ export const insertJobRoleSchema = createInsertSchema(jobRoles).omit({
 });
 export type InsertJobRole = z.infer<typeof insertJobRoleSchema>;
 export type JobRole = typeof jobRoles.$inferSelect;
+
+// ============================================
+// QUIZ RESULTS - Linked to User Accounts
+// ============================================
+
+export const quizResults = pgTable("quiz_results", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  sessionId: varchar("session_id"),
+  tier: text("tier").notNull(),
+  mood: text("mood"),
+  funMode: boolean("fun_mode").default(false),
+  landmark: text("landmark"),
+  
+  mbtiType: text("mbti_type").notNull(),
+  mbtiBlend: text("mbti_blend"),
+  discStyle: text("disc_style").notNull(),
+  
+  bigFiveO: integer("big_five_o").notNull(),
+  bigFiveC: integer("big_five_c").notNull(),
+  bigFiveE: integer("big_five_e").notNull(),
+  bigFiveA: integer("big_five_a").notNull(),
+  bigFiveN: integer("big_five_n").notNull(),
+  
+  primaryRoleTitle: text("primary_role_title"),
+  secondaryRoleTitle: text("secondary_role_title"),
+  
+  criticalThinking: integer("critical_thinking"),
+  firstPrinciples: integer("first_principles"),
+  
+  totalQuestions: integer("total_questions"),
+  avgResponseTime: integer("avg_response_time"),
+  
+  responses: jsonb("responses"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertQuizResultSchema = createInsertSchema(quizResults).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertQuizResult = z.infer<typeof insertQuizResultSchema>;
+export type QuizResult = typeof quizResults.$inferSelect;

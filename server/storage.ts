@@ -3,7 +3,10 @@ import {
   type UpsertUser,
   type InsertFeedback, 
   type Feedback,
-  users 
+  type InsertQuizResult,
+  type QuizResult,
+  users,
+  quizResults 
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -45,12 +48,17 @@ export interface QuizSession {
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUserPremium(userId: string, isPremium: boolean): Promise<User | undefined>;
   saveQuizSession(session: QuizSession): Promise<QuizSession>;
   getQuizSession(id: string): Promise<QuizSession | undefined>;
   getAllQuizSessions(): Promise<QuizSession[]>;
   saveFeedback(feedback: InsertFeedback): Promise<Feedback>;
   getAllFeedback(): Promise<Feedback[]>;
+  saveQuizResult(result: InsertQuizResult): Promise<QuizResult>;
+  getQuizResultsByUser(userId: string): Promise<QuizResult[]>;
+  getQuizResultById(id: string): Promise<QuizResult | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -123,6 +131,48 @@ export class DatabaseStorage implements IStorage {
     return Array.from(this.feedbackEntries.values()).sort(
       (a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
     );
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async updateUserPremium(userId: string, isPremium: boolean): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        isPremium,
+        premiumPurchasedAt: isPremium ? new Date() : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async saveQuizResult(result: InsertQuizResult): Promise<QuizResult> {
+    const [quizResult] = await db
+      .insert(quizResults)
+      .values(result)
+      .returning();
+    return quizResult;
+  }
+
+  async getQuizResultsByUser(userId: string): Promise<QuizResult[]> {
+    return await db
+      .select()
+      .from(quizResults)
+      .where(eq(quizResults.userId, userId))
+      .orderBy(quizResults.createdAt);
+  }
+
+  async getQuizResultById(id: string): Promise<QuizResult | undefined> {
+    const [result] = await db
+      .select()
+      .from(quizResults)
+      .where(eq(quizResults.id, id));
+    return result;
   }
 }
 
