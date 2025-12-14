@@ -63,6 +63,13 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
     - **Native Share**: Uses `navigator.share()` with PDF file attachment on supported devices (iOS, Android, modern browsers)
     - **Fallback**: Download PDF button + Copy Link button for browsers without Web Share API support
     - **PDF Generation**: Server-side PDF generation with personality overview, MBTI type, Big Five breakdown via `/api/generate-pdf` endpoint using pdf-lib
+- **Authentication System** (Replit Auth):
+    - **OAuth Flow**: Supports Google, Apple, X (Twitter), and email/password via Replit OIDC
+    - **Session Management**: PostgreSQL-backed sessions with 7-day TTL via connect-pg-simple
+    - **User Storage**: Users table with id, email, firstName, lastName, profileImageUrl, isPremium, premiumPurchasedAt
+    - **Account Creation Modal**: Triggered when unauthenticated users click "Want to Know More?" on Results Page 2
+    - **Auth Endpoints**: `/api/login` (start OAuth), `/api/logout`, `/api/callback`, `/api/auth/user`
+    - **Frontend Hook**: `useAuth()` hook provides user, isAuthenticated, isLoading states
 
 ## External Dependencies
 
