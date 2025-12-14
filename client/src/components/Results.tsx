@@ -3341,7 +3341,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           {currentResultsPage === 1 && (
             <Button
               className="flex-1 bg-terracotta hover:bg-terracotta/90"
-              onClick={() => setCurrentResultsPage(3)}
+              onClick={() => {
+                setDashboardStage("full");
+                setCurrentResultsPage(2);
+              }}
               data-testid="button-more-details"
             >
               Details
