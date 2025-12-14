@@ -32,6 +32,8 @@ import { PremiumCardDeck } from "./PremiumCardDeck";
 import { SharePDFModal } from "./SharePDFModal";
 import { AccountCreationModal } from "./AccountCreationModal";
 import { PremiumUpgradeModal } from "./PremiumUpgradeModal";
+import { ArcTracker } from "./ArcTracker";
+import { DreamRoleAdvisor } from "./DreamRoleAdvisor";
 import { HYBRID_HINTS, getHybridKey, type BlendInfo } from "./MoodAlchemyLab";
 import { MOOD_PROXY_BOOSTS } from "@/lib/proxyCalculations";
 import { useAuth } from "@/hooks/useAuth";
@@ -3188,6 +3190,21 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     TRAIT_LABELS={TRAIT_LABELS}
                     onCrossroadsClick={handleCrossroadsClick}
                   />
+
+                  {/* Phase 3: Arc Tracker & Dream Role Advisor */}
+                  <div className="space-y-4 mt-6">
+                    {/* Dream Role Advisor Button */}
+                    <div className="flex justify-center">
+                      <DreamRoleAdvisor 
+                        bigFive={result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 }}
+                        mbtiType={result?.mbtiType || "INTJ"}
+                        discStyle={result?.discStyle || "C"}
+                      />
+                    </div>
+                    
+                    {/* Personality Arc Tracker */}
+                    <ArcTracker />
+                  </div>
 
                 </motion.div>
               ) : (
