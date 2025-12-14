@@ -431,6 +431,192 @@ function calculatePersonality(scores: QuizSubmit["scores"], theme: string) {
   };
 }
 
+// Phase 3: Arc Evolution Calculator - Tracks personality changes over time
+function calculateArcEvolution(results: any[]): any {
+  if (results.length < 2) return null;
+  
+  const sorted = [...results].sort((a, b) => 
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
+  
+  const first = sorted[0];
+  const latest = sorted[sorted.length - 1];
+  
+  const traitNames = ['O', 'C', 'E', 'A', 'N'];
+  const traitLabels: Record<string, string> = {
+    O: 'Openness', C: 'Conscientiousness', E: 'Extraversion', 
+    A: 'Agreeableness', N: 'Neuroticism'
+  };
+  
+  const changes: Array<{ trait: string; label: string; change: number; direction: string; insight: string }> = [];
+  
+  for (const trait of traitNames) {
+    const firstVal = first[`bigFive${trait}`] || 50;
+    const latestVal = latest[`bigFive${trait}`] || 50;
+    const change = latestVal - firstVal;
+    
+    if (Math.abs(change) >= 5) {
+      const direction = change > 0 ? 'up' : 'down';
+      const insight = getTraitChangeInsight(trait, change);
+      changes.push({
+        trait,
+        label: traitLabels[trait],
+        change: Math.round(change),
+        direction,
+        insight
+      });
+    }
+  }
+  
+  // Sort by absolute change magnitude
+  changes.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
+  
+  return {
+    totalQuizzes: results.length,
+    firstQuizDate: first.createdAt,
+    latestQuizDate: latest.createdAt,
+    mbtiEvolution: {
+      first: first.mbtiType,
+      latest: latest.mbtiType,
+      changed: first.mbtiType !== latest.mbtiType
+    },
+    significantChanges: changes.slice(0, 3),
+    timeline: sorted.map((r, i) => ({
+      index: i + 1,
+      date: r.createdAt,
+      mbtiType: r.mbtiType,
+      bigFive: {
+        O: r.bigFiveO,
+        C: r.bigFiveC,
+        E: r.bigFiveE,
+        A: r.bigFiveA,
+        N: r.bigFiveN
+      }
+    }))
+  };
+}
+
+function getTraitChangeInsight(trait: string, change: number): string {
+  const insights: Record<string, { up: string; down: string }> = {
+    O: { 
+      up: "Creative roles expanding! You're more open to new experiences.", 
+      down: "Becoming more focused and practical in your approach." 
+    },
+    C: { 
+      up: "Your organizational skills are growing stronger!", 
+      down: "Embracing more flexibility and spontaneity." 
+    },
+    E: { 
+      up: "Social confidence rising! Leadership roles may suit you better now.", 
+      down: "Finding value in deeper, more focused connections." 
+    },
+    A: { 
+      up: "Your collaborative side is flourishing!", 
+      down: "Developing stronger boundaries and assertiveness." 
+    },
+    N: { 
+      up: "Increased emotional sensitivity - use it for empathy.", 
+      down: "Growing emotional resilience - stress management improving!" 
+    }
+  };
+  
+  return change > 0 ? insights[trait]?.up : insights[trait]?.down;
+}
+
+// Phase 3: Role Fit Analyzer - Compares personality to dream role requirements
+function analyzeRoleFit(dreamRole: string, bigFive: any, mbtiType: string, discStyle: string): any {
+  const roleLower = dreamRole.toLowerCase();
+  
+  // Role archetype patterns
+  const rolePatterns: Record<string, { traits: Record<string, { ideal: number; weight: number }>; tips: string[] }> = {
+    'nurse': {
+      traits: { A: { ideal: 75, weight: 0.3 }, E: { ideal: 60, weight: 0.2 }, C: { ideal: 70, weight: 0.25 }, N: { ideal: 35, weight: 0.25 } },
+      tips: ["Build emotional boundaries", "Practice active listening", "Develop stress coping strategies"]
+    },
+    'developer': {
+      traits: { O: { ideal: 65, weight: 0.25 }, C: { ideal: 75, weight: 0.3 }, E: { ideal: 40, weight: 0.15 }, N: { ideal: 35, weight: 0.3 } },
+      tips: ["Embrace pair programming", "Build presentation skills", "Practice explaining technical concepts"]
+    },
+    'manager': {
+      traits: { E: { ideal: 70, weight: 0.3 }, C: { ideal: 70, weight: 0.25 }, A: { ideal: 60, weight: 0.2 }, O: { ideal: 55, weight: 0.25 } },
+      tips: ["Develop delegation skills", "Practice giving feedback", "Build conflict resolution abilities"]
+    },
+    'artist': {
+      traits: { O: { ideal: 85, weight: 0.4 }, A: { ideal: 50, weight: 0.1 }, E: { ideal: 50, weight: 0.2 }, N: { ideal: 50, weight: 0.3 } },
+      tips: ["Develop business skills", "Build a support network", "Create sustainable routines"]
+    },
+    'teacher': {
+      traits: { E: { ideal: 65, weight: 0.25 }, A: { ideal: 70, weight: 0.25 }, O: { ideal: 65, weight: 0.2 }, C: { ideal: 65, weight: 0.3 } },
+      tips: ["Practice patience techniques", "Develop curriculum design skills", "Build parent communication strategies"]
+    },
+    'entrepreneur': {
+      traits: { O: { ideal: 75, weight: 0.3 }, E: { ideal: 65, weight: 0.2 }, C: { ideal: 60, weight: 0.2 }, N: { ideal: 30, weight: 0.3 } },
+      tips: ["Build a support team", "Develop financial literacy", "Practice pitching ideas"]
+    }
+  };
+  
+  // Find matching pattern or use generic
+  let rolePattern = rolePatterns['manager']; // Default
+  for (const [key, pattern] of Object.entries(rolePatterns)) {
+    if (roleLower.includes(key)) {
+      rolePattern = pattern;
+      break;
+    }
+  }
+  
+  const pros: string[] = [];
+  const cons: string[] = [];
+  const tips: string[] = [...rolePattern.tips];
+  
+  // Analyze each trait
+  const traitLabels: Record<string, string> = {
+    O: 'Creativity', C: 'Organization', E: 'Social Energy', A: 'Collaboration', N: 'Stress Handling'
+  };
+  
+  for (const [trait, config] of Object.entries(rolePattern.traits)) {
+    const userVal = bigFive[trait] || 50;
+    const diff = userVal - config.ideal;
+    const label = traitLabels[trait];
+    
+    if (Math.abs(diff) <= 15) {
+      pros.push(`${label}: Well-aligned (${userVal}% vs ${config.ideal}% ideal)`);
+    } else if (diff > 15) {
+      if (trait === 'N') {
+        cons.push(`Sensitivity: May feel role stress more intensely`);
+      } else {
+        pros.push(`${label}: Strong natural fit (${userVal}%)`);
+      }
+    } else {
+      if (trait === 'N') {
+        pros.push(`Stress resilience: Natural calm under pressure`);
+      } else {
+        cons.push(`${label}: May need development (${userVal}% vs ${config.ideal}% ideal)`);
+      }
+    }
+  }
+  
+  // Calculate overall match score
+  let matchScore = 0;
+  let totalWeight = 0;
+  for (const [trait, config] of Object.entries(rolePattern.traits)) {
+    const userVal = bigFive[trait] || 50;
+    const diff = Math.abs(userVal - config.ideal);
+    const traitScore = Math.max(0, 100 - diff * 1.5);
+    matchScore += traitScore * config.weight;
+    totalWeight += config.weight;
+  }
+  matchScore = Math.round(matchScore / totalWeight);
+  
+  return {
+    dreamRole,
+    matchScore,
+    pros: pros.slice(0, 4),
+    cons: cons.slice(0, 3),
+    tips: tips.slice(0, 3),
+    verdict: matchScore >= 70 ? 'Strong Fit' : matchScore >= 50 ? 'Moderate Fit' : 'Growth Opportunity'
+  };
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -447,6 +633,72 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Phase 3: Arc Tracker - Get user's quiz history for personality evolution tracking
+  app.get('/api/user/quiz-history', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const results = await storage.getQuizResultsByUser(userId);
+      
+      if (!results || results.length === 0) {
+        return res.json({ 
+          success: true, 
+          results: [],
+          arcData: null,
+          message: "No quiz history found" 
+        });
+      }
+
+      // Calculate arc data - personality evolution over time
+      const arcData = results.length >= 2 ? calculateArcEvolution(results) : null;
+      
+      res.json({
+        success: true,
+        results: results.map(r => ({
+          id: r.id,
+          createdAt: r.createdAt,
+          mbtiType: r.mbtiType,
+          discStyle: r.discStyle,
+          bigFive: {
+            O: r.bigFiveO,
+            C: r.bigFiveC,
+            E: r.bigFiveE,
+            A: r.bigFiveA,
+            N: r.bigFiveN
+          },
+          primaryRole: r.primaryRoleTitle,
+          criticalThinking: r.criticalThinking,
+          firstPrinciples: r.firstPrinciples
+        })),
+        arcData,
+      });
+    } catch (error) {
+      console.error("Error fetching quiz history:", error);
+      res.status(500).json({ message: "Failed to fetch quiz history" });
+    }
+  });
+
+  // Phase 3: Dream Role Advisor - Analyze role fit
+  app.post('/api/analyze-role-fit', async (req: Request, res: Response) => {
+    try {
+      const { dreamRole, bigFive, mbtiType, discStyle } = req.body;
+      
+      if (!dreamRole || !bigFive) {
+        return res.status(400).json({ error: "Dream role and personality data required" });
+      }
+
+      // Find matching job role from database or use general analysis
+      const roleAnalysis = analyzeRoleFit(dreamRole, bigFive, mbtiType, discStyle);
+      
+      res.json({
+        success: true,
+        analysis: roleAnalysis
+      });
+    } catch (error) {
+      console.error("Role fit analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze role fit" });
     }
   });
 
