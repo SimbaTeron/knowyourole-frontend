@@ -3169,10 +3169,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         <h4 className="font-bold text-amber-900 dark:text-amber-100 mb-1 text-[26px]">
                           Unlock Your Full Potential
                         </h4>
-                        <p className="text-sm text-amber-700 dark:text-amber-300">
-                          <Lightbulb className="w-3 h-3 inline mr-1" />
-                          Discover why <span className="font-semibold">{result.primaryRole.title}</span> fits your unique profile
-                        </p>
                       </div>
                       
                       {/* Feature list - 3 features only */}

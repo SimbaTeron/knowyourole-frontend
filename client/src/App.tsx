@@ -9,6 +9,7 @@ import Home from "@/pages/home";
 import MoodPage from "@/pages/mood";
 import MoodMixerPage from "@/pages/mood-mixer";
 import LocationPage from "@/pages/location";
+import PreQuizPage from "@/pages/pre-quiz";
 import QuizPage from "@/pages/quiz";
 import CheckoutSuccess from "@/pages/checkout-success";
 import CheckoutCancel from "@/pages/checkout-cancel";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/mood" component={MoodPage} />
       <Route path="/mood-mixer" component={MoodMixerPage} />
       <Route path="/location" component={LocationPage} />
+      <Route path="/pre-quiz" component={PreQuizPage} />
       <Route path="/quiz" component={QuizPage} />
       <Route path="/crossroads" component={CrossroadsPage} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
