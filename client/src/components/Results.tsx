@@ -31,6 +31,7 @@ import { getRegionalSalary, shouldShowSalary } from "@/data/regionalSalaries";
 import { PremiumCardDeck } from "./PremiumCardDeck";
 import { SharePDFModal } from "./SharePDFModal";
 import { AccountCreationModal } from "./AccountCreationModal";
+import { PremiumUpgradeModal } from "./PremiumUpgradeModal";
 import { HYBRID_HINTS, getHybridKey, type BlendInfo } from "./MoodAlchemyLab";
 import { MOOD_PROXY_BOOSTS } from "@/lib/proxyCalculations";
 import { useAuth } from "@/hooks/useAuth";
@@ -1092,7 +1093,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [showAccountModal, setShowAccountModal] = useState(false);
   
   // Authentication state
-  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading, isPremium } = useAuth();
+  
+  // Premium upgrade modal state
+  const [showPremiumUpgradeModal, setShowPremiumUpgradeModal] = useState(false);
   
   // Mood Blend Badge state
   const [moodBlendInfo, setMoodBlendInfo] = useState<BlendInfo | null>(null);
@@ -1117,6 +1121,43 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       console.log('[DEV MODE] Premium features unlocked for testing via ?test_premium=true');
     }
   }, [scores, apiScales, isTestPremium]);
+
+  // Save quiz results to user account when authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !user || !result || !sessionId) return;
+    
+    const saveKey = `knowrole-saved-result-${sessionId}`;
+    if (sessionStorage.getItem(saveKey)) return; // Already saved
+    
+    const saveQuizResult = async () => {
+      try {
+        const response = await fetch('/api/quiz-results', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            sessionId,
+            tier,
+            mood,
+            mbtiType: result.mbtiType,
+            discStyle: result.discStyle,
+            bigFiveScores: result.bigFiveProfile,
+            roleRecommendations: result.primaryRole ? [result.primaryRole.title] : [],
+            responses: scores.responses,
+          }),
+        });
+        
+        if (response.ok) {
+          sessionStorage.setItem(saveKey, 'true');
+          console.log('[Results] Quiz results saved to user account');
+        }
+      } catch (error) {
+        console.error('Failed to save quiz results:', error);
+      }
+    };
+    
+    saveQuizResult();
+  }, [isAuthenticated, user, result, sessionId, tier, mood, scores.responses]);
 
   // Process Mood Blend for Mood Alchemist badge
   useEffect(() => {
@@ -3361,16 +3402,27 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             <Button
               className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
               onClick={() => {
-                if (isAuthenticated) {
-                  setShowPremiumGatewayModal(true);
-                } else {
+                if (!isAuthenticated) {
                   setShowAccountModal(true);
+                } else if (isPremium) {
+                  setCurrentResultsPage(3);
+                } else {
+                  setShowPremiumUpgradeModal(true);
                 }
               }}
               data-testid="button-learn-more"
             >
-              Want to Know More?
-              <ChevronRight className="w-4 h-4 ml-1" />
+              {isPremium ? (
+                <>
+                  <Crown className="w-4 h-4 mr-1 text-amber-300" />
+                  View Premium Insights
+                </>
+              ) : (
+                <>
+                  Want to Know More?
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </>
+              )}
             </Button>
           )}
         </div>
@@ -3402,6 +3454,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           setShowAccountModal(false);
           setShowPremiumGatewayModal(true);
         }}
+      />
+      
+      {/* Premium Upgrade Modal for authenticated non-premium users */}
+      <PremiumUpgradeModal
+        isOpen={showPremiumUpgradeModal}
+        onClose={() => setShowPremiumUpgradeModal(false)}
+        sessionId={sessionId || undefined}
       />
     </div>
   );
