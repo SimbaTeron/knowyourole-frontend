@@ -1,5 +1,13 @@
-import { type User, type InsertUser, type InsertFeedback, type Feedback } from "@shared/schema";
+import { 
+  type User, 
+  type UpsertUser,
+  type InsertFeedback, 
+  type Feedback,
+  users 
+} from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface QuizSession {
   id: string;
@@ -37,8 +45,7 @@ export interface QuizSession {
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  upsertUser(user: UpsertUser): Promise<User>;
   saveQuizSession(session: QuizSession): Promise<QuizSession>;
   getQuizSession(id: string): Promise<QuizSession | undefined>;
   getAllQuizSessions(): Promise<QuizSession[]>;
@@ -46,31 +53,32 @@ export interface IStorage {
   getAllFeedback(): Promise<Feedback[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+export class DatabaseStorage implements IStorage {
   private quizSessions: Map<string, QuizSession>;
   private feedbackEntries: Map<string, Feedback>;
 
   constructor() {
-    this.users = new Map();
     this.quizSessions = new Map();
     this.feedbackEntries = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
     return user;
   }
 
@@ -118,4 +126,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
