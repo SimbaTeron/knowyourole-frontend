@@ -63,6 +63,20 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
     - **Native Share**: Uses `navigator.share()` with PDF file attachment on supported devices (iOS, Android, modern browsers)
     - **Fallback**: Download PDF button + Copy Link button for browsers without Web Share API support
     - **PDF Generation**: Server-side PDF generation with personality overview, MBTI type, Big Five breakdown via `/api/generate-pdf` endpoint using pdf-lib
+    - **Social Media Sharing**: Direct share buttons for X/Twitter, Facebook, LinkedIn, WhatsApp with personalized MBTI-based messages
+    - **Personalized Messages**: Auto-generated share text based on personality type, DISC style, and top Big Five trait
+- **Personality Evolution Timeline**: Premium feature showing personal growth journey:
+    - Four evolution stages: Current → Growth → Peak → Mature with age-based positioning
+    - Expandable trait exploration with personalized development tips
+    - Visual timeline with animated transitions
+- **User Profile Page**: Accessible at `/profile` route:
+    - User info display with premium status badge
+    - Quiz history with MBTI/DISC badges for each session
+    - ArcTracker component showing quiz statistics
+- **Celebration System**: Confetti animations for achievements:
+    - Functions: `celebrateAchievement()`, `fireConfettiEmoji()`, `celebrateCompletion()`
+    - Triggers on premium unlock, badge milestones, and streaks
+    - Uses canvas-confetti library
 - **Authentication System** (Replit Auth):
     - **OAuth Flow**: Supports Google, Apple, X (Twitter), and email/password via Replit OIDC
     - **Session Management**: PostgreSQL-backed sessions with 7-day TTL via connect-pg-simple
