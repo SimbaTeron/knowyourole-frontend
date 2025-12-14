@@ -100,6 +100,7 @@ interface ResultsProps {
   apiScales?: APIScales | null;
   earnedBadges?: EarnedBadge[];
   hybridTypes?: string[];
+  startOnPremiumPage?: boolean;
   onRestart: () => void;
   onShare: () => void;
   onDownloadPDF?: () => void;
@@ -1027,7 +1028,7 @@ interface AdventureArchetype {
   badgeColor: string;
 }
 
-export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, earnedBadges = [], hybridTypes = [], onRestart, onShare, onDownloadPDF }: ResultsProps) {
+export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, earnedBadges = [], hybridTypes = [], startOnPremiumPage = false, onRestart, onShare, onDownloadPDF }: ResultsProps) {
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
@@ -1037,7 +1038,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   
   const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
-  const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium);
+  const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium || startOnPremiumPage);
   
   // Mini Explorer (ages 12 and under) - Adventure Archetype instead of job roles
   const isMiniExplorer = tier === "7-12";
@@ -1084,7 +1085,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [showSharePDFModal, setShowSharePDFModal] = useState(false);
   
   // Paginated results state (Page 1 = Summary, Page 2 = Details, Page 3 = Premium)
-  const [currentResultsPage, setCurrentResultsPage] = useState<1 | 2 | 3>(1);
+  const [currentResultsPage, setCurrentResultsPage] = useState<1 | 2 | 3>(startOnPremiumPage ? 3 : 1);
   const [showPremiumGatewayModal, setShowPremiumGatewayModal] = useState(false);
   
   // Mood Blend Badge state
@@ -1604,6 +1605,24 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const handleDonationTierSelect = async (amount: number) => {
     console.log('[Donation] Starting checkout for amount:', amount);
     try {
+      // Save quiz state to localStorage before redirecting to Stripe
+      // This allows us to restore the state when the user returns from Stripe
+      const donationState = {
+        scores,
+        tier,
+        mood,
+        funMode,
+        landmark,
+        theme,
+        sessionId,
+        apiScales,
+        earnedBadges,
+        hybridTypes,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem('knowrole-donation-state', JSON.stringify(donationState));
+      console.log('[Donation] Saved state to localStorage before Stripe redirect');
+      
       const checkoutRes = await fetch('/api/stripe/donate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

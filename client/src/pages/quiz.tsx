@@ -36,6 +36,7 @@ export default function QuizPage() {
   const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>([]);
   const [hybridTypes, setHybridTypes] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [isDonationReturn, setIsDonationReturn] = useState(false);
   const { toast } = useToast();
   const { teamName, isLocalitySet } = useLocalityTheme();
 
@@ -59,6 +60,57 @@ export default function QuizPage() {
   const mood = storedMood ?? sessionMood;
   const funMode = storedFunMode ?? sessionFunMode;
   const landmark = storedLandmark ? { landmark: storedLandmark } : sessionLandmark;
+
+  // Handle donation return - restore state from localStorage and show results on Page 3
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const donationReturn = searchParams.get('donation_return') === 'true';
+    
+    if (donationReturn) {
+      console.log('[Donation Return] Detected donation return, restoring state...');
+      const savedState = localStorage.getItem('knowrole-donation-state');
+      
+      if (savedState) {
+        try {
+          const state = JSON.parse(savedState);
+          const stateAge = Date.now() - (state.timestamp || 0);
+          
+          // Only restore if state is less than 1 hour old
+          if (stateAge < 3600000) {
+            console.log('[Donation Return] Restoring saved state:', state);
+            setQuizScores(state.scores);
+            setStoredTier(state.tier);
+            setStoredMood(state.mood);
+            setStoredFunMode(state.funMode);
+            setStoredLandmark(state.landmark);
+            setQuizSessionId(state.sessionId);
+            setApiScales(state.apiScales);
+            setEarnedBadges(state.earnedBadges || []);
+            setHybridTypes(state.hybridTypes || []);
+            setIsDonationReturn(true);
+            setShowResults(true);
+            
+            // Clean up the stored state
+            localStorage.removeItem('knowrole-donation-state');
+            
+            // Clean up URL params
+            window.history.replaceState({}, '', '/quiz');
+          } else {
+            console.log('[Donation Return] Saved state too old, redirecting to home');
+            localStorage.removeItem('knowrole-donation-state');
+            setLocation('/');
+          }
+        } catch (e) {
+          console.error('[Donation Return] Error parsing saved state:', e);
+          localStorage.removeItem('knowrole-donation-state');
+          setLocation('/');
+        }
+      } else {
+        console.log('[Donation Return] No saved state found, redirecting to home');
+        setLocation('/');
+      }
+    }
+  }, [setLocation]);
 
 
   useEffect(() => {
@@ -698,6 +750,7 @@ export default function QuizPage() {
         apiScales={apiScales}
         earnedBadges={earnedBadges}
         hybridTypes={hybridTypes}
+        startOnPremiumPage={isDonationReturn}
         onRestart={handleRestart}
         onShare={handleShare}
         onDownloadPDF={handleDownloadPDF}
