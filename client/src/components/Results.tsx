@@ -1704,7 +1704,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                   1. Does this MBTI type ({result?.mbtiType || "XXXX"}) match you?
                 </p>
                 <div className="flex gap-2 justify-center">
-                  {["yes", "somewhat", "no"].map((option) => (
+                  {["no", "somewhat", "yes"].map((option) => (
                     <motion.button
                       key={option}
                       whileHover={{ scale: 1.05 }}
@@ -3169,10 +3169,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         <h4 className="font-bold text-amber-900 dark:text-amber-100 mb-1 text-[26px]">
                           Unlock Your Full Potential
                         </h4>
-                        <p className="text-sm text-amber-700 dark:text-amber-300">
-                          <Lightbulb className="w-3 h-3 inline mr-1" />
-                          Discover why <span className="font-semibold">{result.primaryRole.title}</span> fits your unique profile
-                        </p>
                       </div>
                       
                       {/* Feature list - 3 features only */}
@@ -3180,7 +3176,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                         {[
                           { icon: BookOpen, title: "Deep Dive", desc: "Full analysis" },
                           { icon: Gift, title: "Role Matches", desc: "More career paths" },
-                          { icon: Target, title: "30-Day Quest", desc: "Growth challenges and more" },
+                          { icon: Target, title: "Blindspots", desc: "Personalized blindspots and solutions" },
                         ].map((feature, idx) => (
                           <div 
                             key={idx}

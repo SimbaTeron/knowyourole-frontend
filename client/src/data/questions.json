@@ -24091,12 +24091,12 @@
     },
     "25+": {
       "minTime": 6,
-      "maxTime": 15,
+      "maxTime": 12,
       "totalQuestions": 40
     },
     "25plus": {
       "minTime": 6,
-      "maxTime": 15,
+      "maxTime": 12,
       "totalQuestions": 40
     }
   }
