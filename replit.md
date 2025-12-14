@@ -69,7 +69,15 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
     - **User Storage**: Users table with id, email, firstName, lastName, profileImageUrl, isPremium, premiumPurchasedAt
     - **Account Creation Modal**: Triggered when unauthenticated users click "Want to Know More?" on Results Page 2
     - **Auth Endpoints**: `/api/login` (start OAuth), `/api/logout`, `/api/callback`, `/api/auth/user`
-    - **Frontend Hook**: `useAuth()` hook provides user, isAuthenticated, isLoading states
+    - **Frontend Hook**: `useAuth()` hook provides user, isAuthenticated, isLoading, isPremium states
+- **Premium Features System**:
+    - **Premium Upgrade Modal**: `PremiumUpgradeModal` component shown when authenticated non-premium users click "Want to Know More?"
+    - **Stripe Integration**: One-time $9 payment for KnowRole Pro via Stripe checkout
+    - **Webhook Handler**: `server/webhookHandlers.ts` listens for `checkout.session.completed` to auto-mark users as premium
+    - **Quiz Results Storage**: `quizResults` table in schema links quiz sessions to user accounts
+    - **Premium Content Gating**: Results page checks `isPremium` status and shows upgrade modal or direct access accordingly
+    - **Premium Insights Database**: 8 categories seeded via `/api/admin/seed-premium` - side hustles (118), blindspots (30), career paths (32), growth tips (22), strengths (25), communication styles (12), work environments (19), relationship insights (14)
+    - **Results Flow**: Page 2 "Want to Know More?" → If not auth: AccountCreationModal → If auth but not premium: PremiumUpgradeModal → If premium: Direct to Page 3
 
 ## External Dependencies
 
