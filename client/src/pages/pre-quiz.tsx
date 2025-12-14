@@ -351,18 +351,12 @@ export default function PreQuizPage() {
           </motion.div>
         </div>
       </main>
-      {/* Start Button */}
+      {/* Navigation Button */}
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-[#0A0A0F] dark:via-[#0A0A0F]/95 pb-8">
         <div className="max-w-md mx-auto">
-          {!allStepsViewed && (
-            <p className="text-center text-xs text-warm-gray/60 dark:text-[#64748B] mb-4">
-              Swipe through all {DEMO_STEPS.length} steps to unlock ({viewedSteps.size}/{DEMO_STEPS.length})
-            </p>
-          )}
-          
-          {/* Subtle Skip Instructions button - appears after 2 seconds */}
+          {/* Subtle Skip Instructions button */}
           <AnimatePresence>
-            {showSkipButton && !allStepsViewed && (
+            {showSkipButton && currentStep < DEMO_STEPS.length - 1 && (
               <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -381,17 +375,19 @@ export default function PreQuizPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            onClick={handleStartQuiz}
-            disabled={!allStepsViewed}
-            className={`w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all ${
-              allStepsViewed 
-                ? "trail-button text-white" 
-                : "bg-gray-300 dark:bg-[#1E1E2E] text-gray-500 dark:text-[#64748B] cursor-not-allowed"
-            }`}
+            onClick={() => {
+              if (currentStep < DEMO_STEPS.length - 1) {
+                setCurrentStep(prev => prev + 1);
+                if (navigator.vibrate) navigator.vibrate(20);
+              } else {
+                handleStartQuiz();
+              }
+            }}
+            className="w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all trail-button text-white shadow-lg"
             data-testid="button-start-quiz"
           >
             <Zap className="w-5 h-5" />
-            {allStepsViewed ? "I'm Ready" : "Next"}
+            {currentStep === DEMO_STEPS.length - 1 ? "Ready" : "Next"}
           </motion.button>
         </div>
       </div>
