@@ -14,7 +14,7 @@ import {
   traitVibes, traitCombinations, adventureArchetypes,
   sideHustles, blindspots, careerPaths, growthTips,
   strengths, communicationStyles, workEnvironments, relationshipInsights,
-  jobRoles
+  jobRoles, quizResults, insertQuizResultSchema
 } from "@shared/schema";
 
 const quizScoresSchema = z.object({
@@ -3196,6 +3196,111 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Premium insights fetch error:", error);
       res.status(500).json({ error: "Failed to fetch premium insights" });
+    }
+  });
+
+  // ============================================
+  // QUIZ RESULTS - Save/Get for authenticated users
+  // ============================================
+
+  const saveQuizResultSchema = z.object({
+    sessionId: z.string().optional(),
+    tier: z.string(),
+    mood: z.string().optional(),
+    funMode: z.boolean().optional(),
+    landmark: z.string().optional(),
+    mbtiType: z.string(),
+    mbtiBlend: z.string().optional(),
+    discStyle: z.string(),
+    bigFive: z.object({
+      O: z.number(),
+      C: z.number(),
+      E: z.number(),
+      A: z.number(),
+      N: z.number(),
+    }),
+    primaryRoleTitle: z.string().optional(),
+    secondaryRoleTitle: z.string().optional(),
+    criticalThinking: z.number().optional(),
+    firstPrinciples: z.number().optional(),
+    totalQuestions: z.number().optional(),
+    avgResponseTime: z.number().optional(),
+    responses: z.any().optional(),
+  });
+
+  // Save quiz results to user account (requires auth)
+  app.post("/api/quiz-results", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user?.id) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const data = saveQuizResultSchema.parse(req.body);
+      
+      const result = await storage.saveQuizResult({
+        userId: user.id,
+        sessionId: data.sessionId,
+        tier: data.tier,
+        mood: data.mood,
+        funMode: data.funMode,
+        landmark: data.landmark,
+        mbtiType: data.mbtiType,
+        mbtiBlend: data.mbtiBlend,
+        discStyle: data.discStyle,
+        bigFiveO: data.bigFive.O,
+        bigFiveC: data.bigFive.C,
+        bigFiveE: data.bigFive.E,
+        bigFiveA: data.bigFive.A,
+        bigFiveN: data.bigFive.N,
+        primaryRoleTitle: data.primaryRoleTitle,
+        secondaryRoleTitle: data.secondaryRoleTitle,
+        criticalThinking: data.criticalThinking,
+        firstPrinciples: data.firstPrinciples,
+        totalQuestions: data.totalQuestions,
+        avgResponseTime: data.avgResponseTime,
+        responses: data.responses,
+      });
+
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Save quiz result error:", error);
+      res.status(500).json({ error: "Failed to save quiz result" });
+    }
+  });
+
+  // Get user's quiz results history (requires auth)
+  app.get("/api/quiz-results", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user?.id) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const results = await storage.getQuizResultsByUser(user.id);
+      res.json({ success: true, results });
+    } catch (error) {
+      console.error("Get quiz results error:", error);
+      res.status(500).json({ error: "Failed to get quiz results" });
+    }
+  });
+
+  // Get user's premium status
+  app.get("/api/user/premium-status", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user?.id) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const dbUser = await storage.getUser(user.id);
+      res.json({ 
+        isPremium: dbUser?.isPremium || false,
+        premiumPurchasedAt: dbUser?.premiumPurchasedAt || null,
+      });
+    } catch (error) {
+      console.error("Get premium status error:", error);
+      res.status(500).json({ error: "Failed to get premium status" });
     }
   });
 
