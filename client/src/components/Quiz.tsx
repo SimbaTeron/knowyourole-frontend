@@ -651,11 +651,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [showPauseMenu, setShowPauseMenu] = useState(false);
-  const [showFirstTimePauseMessage, setShowFirstTimePauseMessage] = useState(false);
-  const [hasShownFirstTimePause, setHasShownFirstTimePause] = useState(() => {
-    return localStorage.getItem('knowrole-first-pause-shown') === 'true';
-  });
-  const hasShownFirstTimePauseRef = useRef(localStorage.getItem('knowrole-first-pause-shown') === 'true');
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [isTimingOut, setIsTimingOut] = useState(false);
   const [showQuip, setShowQuip] = useState(false);
@@ -676,7 +671,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const useLocalityColors = isLocalitySet;
   
   // Derived state: check if any popup is active to disable interactions
-  const isAnyPopupActive = showPauseMenu || showFirstTimePauseMessage || showQuip;
+  const isAnyPopupActive = showPauseMenu || showQuip;
 
   // Phase 1.2: Adaptive framework quotas based on tier
   // Adults get more Big Five for nuanced percentiles, younger tiers get more MBTI for clarity
@@ -826,19 +821,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
 
   useEffect(() => {
     // Pause timer during paused state or other conditions
-    if (isPaused || questions.length === 0 || isTimingOut || showFirstTimePauseMessage) return;
+    if (isPaused || questions.length === 0 || isTimingOut) return;
     
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
-        // First-time auto-pause at 5 seconds - use ref for reliable check inside interval
-        if (prev <= 5.1 && prev > 4.9 && !hasShownFirstTimePauseRef.current) {
-          hasShownFirstTimePauseRef.current = true;
-          setIsPaused(true);
-          setShowFirstTimePauseMessage(true);
-          setHasShownFirstTimePause(true);
-          localStorage.setItem('knowrole-first-pause-shown', 'true');
-          return prev;
-        }
         if (prev <= 0.1) {
           handleTimeout();
           return 0;
@@ -850,7 +836,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout, showFirstTimePauseMessage]);
+  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout]);
 
   // Phase 1.1 & 1.4: Enhanced scoring with slider support and variable boosts
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1, sliderValue?: number) => {
@@ -1785,61 +1771,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </p>
         </div>
       </footer>
-      <AnimatePresence>
-        {showFirstTimePauseMessage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-soft-cream dark:bg-warm-charcoal rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl border-2 border-sage-green"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="text-center mb-4">
-                <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sage-green/20 mb-3"
-                >
-                  <Pause className="w-8 h-8 text-sage-green" />
-                </motion.div>
-                <h3 className="text-2xl font-display font-bold text-sage-green dark:text-sage-green mb-2">
-                  No Rush!
-                </h3>
-                <p className="text-sage-green/80 dark:text-sage-green/90 text-base leading-relaxed">
-                  Take your time. If you ever need a moment to think, just tap the <strong className="text-sage-green font-semibold text-[18px]">Pause</strong> button at the bottom. 
-                  The question will wait for you.
-                </p>
-              </div>
-              
-              <Button
-                className="w-full bg-sage-green hover:bg-sage-green/90 text-white"
-                onClick={() => {
-                  setShowFirstTimePauseMessage(false);
-                  setIsPaused(false);
-                  // Reset timer to full time
-                  setTimeRemaining(tierConfig.maxTime);
-                  setQuestionStartTime(Date.now());
-                }}
-                data-testid="button-first-pause-ok"
-              >
-                Got It!
-              </Button>
-              
-              <p className="text-center text-xs text-warm-gray/50 dark:text-[#64748B] mt-3">
-                You can pause anytime during the quiz
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       
-      {!isPaused && !showFirstTimePauseMessage && quizPhase === "quiz" && (
+      {!isPaused && quizPhase === "quiz" && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1861,7 +1794,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       )}
       
       <AnimatePresence>
-        {showPauseMenu && !showFirstTimePauseMessage && (
+        {showPauseMenu && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
