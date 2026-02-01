@@ -1089,6 +1089,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       };
       
       if (currentIndex >= questions.length - 1) {
+        console.log(`[Quiz] Last question answered (Q${currentIndex + 1}/${questions.length}), completing quiz...`);
         // Apply mood-based boosts to Big Five before completing
         const moodBoostedScores = {
           ...updatedScores,
@@ -1105,7 +1106,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
             firstPrinciples: moodEffects.firstPrinciplesBoost,
           }
         };
-        setTimeout(() => onComplete(moodBoostedScores), 300);
+        setTimeout(() => {
+          console.log(`[Quiz] Calling onComplete with scores`);
+          onComplete(moodBoostedScores);
+        }, 300);
       }
       
       return updatedScores;
