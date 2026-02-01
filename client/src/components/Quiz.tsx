@@ -992,12 +992,18 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }, [applyMultiChoiceWeights]);
 
   const handleCountdownComplete = useCallback(() => {
+    // Advance to next question when returning from break
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    }
     // Reset timer to full when returning to quiz from countdown
-    const currentQ = questions[currentIndex];
-    const extraTime = currentQ?.responseType === "slider" ? 3 : 0;
+    // Use currentIndex + 1 since we just advanced
+    const nextQ = questions[currentIndex + 1];
+    const extraTime = nextQ?.responseType === "slider" ? 3 : 0;
     setTimeRemaining(tierConfig.maxTime + extraTime);
     setQuestionStartTime(Date.now());
     isProcessingAnswerRef.current = false; // Reset processing lock when returning from break
+    console.log(`[Quiz] Returning from break, advancing to Q${currentIndex + 2}`);
     setQuizPhase("quiz");
   }, [questions, currentIndex, tierConfig.maxTime]);
 
@@ -1038,7 +1044,31 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       responseType: question.responseType || "binary" as const
     };
     
-    const nextQuestionNumber = currentIndex + 2;
+    const nextQuestionNumber = currentIndex + 2; // 1-based question number after this answer
+    
+    // Determine if we need to trigger a break phase BEFORE updating state
+    let shouldTriggerBreak = false;
+    let breakPhase: QuizPhase | null = null;
+    
+    if (currentIndex >= questions.length - 1) {
+      // Quiz complete - handled separately
+      shouldTriggerBreak = false;
+    } else if (quizConfig.superpowerAfter && nextQuestionNumber === quizConfig.superpowerAfter + 1 && !completedSuperpower) {
+      shouldTriggerBreak = true;
+      breakPhase = "superpower";
+    } else if (quizConfig.checkpoint1After && nextQuestionNumber === quizConfig.checkpoint1After + 1 && !completedCheckpoint1) {
+      shouldTriggerBreak = true;
+      breakPhase = "checkpoint";
+    } else if (quizConfig.checkpoint2After && nextQuestionNumber === quizConfig.checkpoint2After + 1 && !completedCheckpoint2) {
+      shouldTriggerBreak = true;
+      breakPhase = "checkpoint";
+    } else if (quizConfig.energyAfter && nextQuestionNumber === quizConfig.energyAfter + 1 && !completedEnergy) {
+      shouldTriggerBreak = true;
+      breakPhase = "energy";
+    } else if (quizConfig.hasMystery && quizConfig.mysteryAfter && nextQuestionNumber === quizConfig.mysteryAfter + 1 && !completedMystery) {
+      shouldTriggerBreak = true;
+      breakPhase = "mystery";
+    }
     
     // Reset slider for next question
     setSliderValue(0);
@@ -1076,16 +1106,6 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           }
         };
         setTimeout(() => onComplete(moodBoostedScores), 300);
-      } else if (quizConfig.superpowerAfter && nextQuestionNumber === quizConfig.superpowerAfter + 1 && !completedSuperpower) {
-        setTimeout(() => setQuizPhase("superpower"), 300);
-      } else if (quizConfig.checkpoint1After && nextQuestionNumber === quizConfig.checkpoint1After + 1 && !completedCheckpoint1) {
-        setTimeout(() => setQuizPhase("checkpoint"), 300);
-      } else if (quizConfig.checkpoint2After && nextQuestionNumber === quizConfig.checkpoint2After + 1 && !completedCheckpoint2) {
-        setTimeout(() => setQuizPhase("checkpoint"), 300);
-      } else if (quizConfig.energyAfter && nextQuestionNumber === quizConfig.energyAfter + 1 && !completedEnergy) {
-        setTimeout(() => setQuizPhase("energy"), 300);
-      } else if (quizConfig.hasMystery && quizConfig.mysteryAfter && nextQuestionNumber === quizConfig.mysteryAfter + 1 && !completedMystery) {
-        setTimeout(() => setQuizPhase("mystery"), 300);
       }
       
       return updatedScores;
@@ -1093,14 +1113,28 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     x.set(0);
     
-    if (currentIndex < questions.length - 1) {
+    // CRITICAL FIX: Only advance index if NOT triggering a break
+    // If a break triggers, we stay on current index until break completes
+    if (shouldTriggerBreak && breakPhase) {
+      // Trigger break phase SYNCHRONOUSLY (no setTimeout)
+      // Keep processing locked - it will be unlocked when returning from break
+      console.log(`[Quiz] Break triggered: ${breakPhase} after Q${currentIndex + 1}`);
+      setQuizPhase(breakPhase);
+      // DO NOT advance currentIndex - we'll do that when returning from break
+      // DO NOT unlock processing - it will be unlocked by handleCountdownComplete or onContinue
+    } else if (currentIndex < questions.length - 1) {
+      // Normal progression - advance to next question
       setCurrentIndex(prev => prev + 1);
+      // Unlock processing after animation completes
+      setTimeout(() => {
+        isProcessingAnswerRef.current = false;
+      }, 400);
+    } else {
+      // Quiz complete - unlock after completion animation
+      setTimeout(() => {
+        isProcessingAnswerRef.current = false;
+      }, 400);
     }
-    
-    // Unlock processing after animation completes (400ms to allow card transition)
-    setTimeout(() => {
-      isProcessingAnswerRef.current = false;
-    }, 400);
   }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -1367,7 +1401,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           } else if (quizConfig.checkpoint2After && currentIndex + 1 >= quizConfig.checkpoint2After && !completedCheckpoint2) {
             setCompletedCheckpoint2(true);
           }
+          // Advance to next question when returning from checkpoint break
+          if (currentIndex < questions.length - 1) {
+            setCurrentIndex(prev => prev + 1);
+          }
           isProcessingAnswerRef.current = false; // Reset processing lock when returning from break
+          console.log(`[Quiz] Returning from checkpoint, advancing to Q${currentIndex + 2}`);
           setQuizPhase("quiz");
           setTimerResetKey(prev => prev + 1);
         }}
