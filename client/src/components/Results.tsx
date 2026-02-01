@@ -2243,7 +2243,8 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           transition={{ delay: 0.5 }}
         >
           {/* Mini Explorer: Adventure Archetype Display */}
-          {isMiniExplorer && adventureArchetype ? (
+          {isMiniExplorer ? (
+            adventureArchetype ? (
             <Card className="overflow-hidden border-2 border-purple-300 dark:border-purple-600 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30">
               <CardContent className="p-6 text-center">
                 <div className="flex items-center justify-center gap-2 mb-4">

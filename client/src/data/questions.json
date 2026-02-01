@@ -24075,28 +24075,28 @@
   ],
   "tierConfig": {
     "7-12": {
-      "minTime": 4,
-      "maxTime": 8,
+      "minTime": 1,
+      "maxTime": 16,
       "totalQuestions": 25
     },
     "13-18": {
-      "minTime": 5,
-      "maxTime": 10,
+      "minTime": 1,
+      "maxTime": 14,
       "totalQuestions": 30
     },
     "19-25": {
-      "minTime": 6,
+      "minTime": 1,
       "maxTime": 12,
       "totalQuestions": 35
     },
     "25+": {
-      "minTime": 6,
-      "maxTime": 12,
+      "minTime": 1,
+      "maxTime": 10,
       "totalQuestions": 40
     },
     "25plus": {
-      "minTime": 6,
-      "maxTime": 12,
+      "minTime": 1,
+      "maxTime": 10,
       "totalQuestions": 40
     }
   }
