@@ -2278,8 +2278,25 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
               </CardContent>
             </Card>
           ) : (
-            /* Regular Role Display for Teen/Adult tiers */
-            (<Card className="overflow-hidden border-2 border-terracotta/30 bg-gradient-to-br from-terracotta/5 to-transparent">
+            /* Loading state for Mini Explorer while adventure archetype loads */
+            <Card className="overflow-hidden border-2 border-purple-300 dark:border-purple-600 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30">
+              <CardContent className="p-6 text-center">
+                <div className="flex flex-col items-center">
+                  <motion.div 
+                    className="w-16 h-16 rounded-full bg-purple-200 dark:bg-purple-700 flex items-center justify-center mb-4"
+                    animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <Star className="w-8 h-8 text-purple-400 dark:text-purple-300" />
+                  </motion.div>
+                  <p className="text-sm font-medium text-purple-600 dark:text-purple-300">Discovering your adventure type...</p>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        ) : (
+          /* Regular Role Display for Teen/Adult tiers */
+          <Card className="overflow-hidden border-2 border-terracotta/30 bg-gradient-to-br from-terracotta/5 to-transparent">
               <CardContent className="p-6 text-center">
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <div className="w-12 h-12 rounded-full bg-terracotta flex items-center justify-center flex-shrink-0">
@@ -2442,7 +2459,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                 </motion.div>
               )}
             </CardContent>
-          </Card>)
+          </Card>
         )}
         </motion.div>
           
