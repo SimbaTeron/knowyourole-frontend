@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Playful Theme */
-@import './styles/playful-theme.css';
-
-/* Import Playful Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap');
-
 /* LIGHT MODE */
 :root {
   --button-outline: rgba(0,0,0, .10);
