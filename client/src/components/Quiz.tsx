@@ -659,7 +659,9 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [vibrantColorIndex, setVibrantColorIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [timerResetKey, setTimerResetKey] = useState(0); // Forces timer reset when incremented
-  const [isProcessingAnswer, setIsProcessingAnswer] = useState(false); // Prevents rapid clicking
+  
+  // Use ref for processing lock - refs update synchronously, preventing race conditions
+  const isProcessingAnswerRef = useRef(false);
   
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-ROTATION_RANGE, 0, ROTATION_RANGE]);
@@ -995,7 +997,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     const extraTime = currentQ?.responseType === "slider" ? 3 : 0;
     setTimeRemaining(tierConfig.maxTime + extraTime);
     setQuestionStartTime(Date.now());
-    setIsProcessingAnswer(false); // Reset processing lock when returning from break
+    isProcessingAnswerRef.current = false; // Reset processing lock when returning from break
     setQuizPhase("quiz");
   }, [questions, currentIndex, tierConfig.maxTime]);
 
@@ -1008,12 +1010,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   };
 
   const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false, sliderVal?: number) => {
-    // Guard against rapid clicking - prevent new answers while processing
-    if (isProcessingAnswer) return;
+    // Guard against rapid clicking - use ref for synchronous check
+    if (isProcessingAnswerRef.current) return;
     if (questions.length === 0 || currentIndex >= questions.length) return;
     
-    // Lock to prevent rapid clicking
-    setIsProcessingAnswer(true);
+    // Lock immediately (ref updates synchronously, unlike state)
+    isProcessingAnswerRef.current = true;
     
     if (!hasInteracted) setHasInteracted(true);
     
@@ -1097,21 +1099,21 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     // Unlock processing after animation completes (400ms to allow card transition)
     setTimeout(() => {
-      setIsProcessingAnswer(false);
+      isProcessingAnswerRef.current = false;
     }, 400);
-  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects, isProcessingAnswer]);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (isTimingOut || isProcessingAnswer) return;
+    if (isTimingOut || isProcessingAnswerRef.current) return;
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
       handleSwipe(info.offset.x > 0 ? "right" : "left");
     } else {
       x.set(0);
     }
-  }, [handleSwipe, x, isTimingOut, isProcessingAnswer]);
+  }, [handleSwipe, x, isTimingOut]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (showPauseMenu || isTimingOut || isProcessingAnswer) return;
+    if (showPauseMenu || isTimingOut || isProcessingAnswerRef.current) return;
     
     if (e.key === "ArrowLeft" || e.key === "a") {
       handleSwipe("left");
@@ -1121,7 +1123,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       setIsPaused(true);
       setShowPauseMenu(true);
     }
-  }, [handleSwipe, showPauseMenu, isTimingOut, isProcessingAnswer]);
+  }, [handleSwipe, showPauseMenu, isTimingOut]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -1365,7 +1367,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           } else if (quizConfig.checkpoint2After && currentIndex + 1 >= quizConfig.checkpoint2After && !completedCheckpoint2) {
             setCompletedCheckpoint2(true);
           }
-          setIsProcessingAnswer(false); // Reset processing lock when returning from break
+          isProcessingAnswerRef.current = false; // Reset processing lock when returning from break
           setQuizPhase("quiz");
           setTimerResetKey(prev => prev + 1);
         }}
