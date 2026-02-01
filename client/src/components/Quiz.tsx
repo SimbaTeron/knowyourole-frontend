@@ -659,6 +659,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [vibrantColorIndex, setVibrantColorIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [timerResetKey, setTimerResetKey] = useState(0); // Forces timer reset when incremented
+  const [isProcessingAnswer, setIsProcessingAnswer] = useState(false); // Prevents rapid clicking
   
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-ROTATION_RANGE, 0, ROTATION_RANGE]);
@@ -994,6 +995,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     const extraTime = currentQ?.responseType === "slider" ? 3 : 0;
     setTimeRemaining(tierConfig.maxTime + extraTime);
     setQuestionStartTime(Date.now());
+    setIsProcessingAnswer(false); // Reset processing lock when returning from break
     setQuizPhase("quiz");
   }, [questions, currentIndex, tierConfig.maxTime]);
 
@@ -1006,7 +1008,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   };
 
   const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false, sliderVal?: number) => {
+    // Guard against rapid clicking - prevent new answers while processing
+    if (isProcessingAnswer) return;
     if (questions.length === 0 || currentIndex >= questions.length) return;
+    
+    // Lock to prevent rapid clicking
+    setIsProcessingAnswer(true);
     
     if (!hasInteracted) setHasInteracted(true);
     
@@ -1087,19 +1094,24 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects]);
+    
+    // Unlock processing after animation completes (400ms to allow card transition)
+    setTimeout(() => {
+      setIsProcessingAnswer(false);
+    }, 400);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects, isProcessingAnswer]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (isTimingOut) return;
+    if (isTimingOut || isProcessingAnswer) return;
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
       handleSwipe(info.offset.x > 0 ? "right" : "left");
     } else {
       x.set(0);
     }
-  }, [handleSwipe, x, isTimingOut]);
+  }, [handleSwipe, x, isTimingOut, isProcessingAnswer]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (showPauseMenu || isTimingOut) return;
+    if (showPauseMenu || isTimingOut || isProcessingAnswer) return;
     
     if (e.key === "ArrowLeft" || e.key === "a") {
       handleSwipe("left");
@@ -1109,7 +1121,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       setIsPaused(true);
       setShowPauseMenu(true);
     }
-  }, [handleSwipe, showPauseMenu, isTimingOut]);
+  }, [handleSwipe, showPauseMenu, isTimingOut, isProcessingAnswer]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -1353,6 +1365,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           } else if (quizConfig.checkpoint2After && currentIndex + 1 >= quizConfig.checkpoint2After && !completedCheckpoint2) {
             setCompletedCheckpoint2(true);
           }
+          setIsProcessingAnswer(false); // Reset processing lock when returning from break
           setQuizPhase("quiz");
           setTimerResetKey(prev => prev + 1);
         }}
