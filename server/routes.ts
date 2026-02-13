@@ -1005,6 +1005,9 @@ export async function registerRoutes(
     }
   });
 
+  // Track exported sessions to prevent duplicate Google Sheets exports
+  const exportedSessions = new Set<string>();
+
   // Feedback submission endpoint
   app.post("/api/feedback", async (req: Request, res: Response) => {
     try {
@@ -1026,8 +1029,9 @@ export async function registerRoutes(
       const saved = await storage.saveFeedback(feedbackData);
       console.log("Feedback saved:", saved.id);
       
-      // Auto-export to Google Sheets
-      if (feedbackData.sessionId) {
+      // Auto-export to Google Sheets (only once per session)
+      if (feedbackData.sessionId && !exportedSessions.has(feedbackData.sessionId)) {
+        exportedSessions.add(feedbackData.sessionId);
         try {
           const { autoExportQuizSession } = await import("./googleSheets");
           const fs = await import("fs");
@@ -1035,7 +1039,6 @@ export async function registerRoutes(
           
           const session = await storage.getQuizSession(feedbackData.sessionId);
           if (session) {
-            // Build questions map for response formatting
             const questionsPath = path.join(process.cwd(), "client/src/data/questions.json");
             const questionsData = JSON.parse(fs.readFileSync(questionsPath, "utf-8"));
             const questionsArray = questionsData.questions || questionsData || [];
@@ -1045,6 +1048,7 @@ export async function registerRoutes(
             await autoExportQuizSession(session, feedbackData, questionsMap);
           }
         } catch (exportError) {
+          exportedSessions.delete(feedbackData.sessionId);
           console.error("Auto-export failed (non-blocking):", exportError);
         }
       }

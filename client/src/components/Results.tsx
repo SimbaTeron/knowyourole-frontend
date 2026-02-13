@@ -1074,6 +1074,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     return sessionStorage.getItem("knowrole-feedback-completed") === "true";
   });
   const [pendingCrossroads, setPendingCrossroads] = useState(false);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const [usefulApp, setUsefulApp] = useState<string>("");
@@ -1469,7 +1470,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   // Submit feedback from modal
   const handleFeedbackSubmit = async () => {
-    if (!allFeedbackAnswered) return;
+    if (!allFeedbackAnswered || isSubmittingFeedback || feedbackCompleted) return;
+    
+    setIsSubmittingFeedback(true);
     
     if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
     
@@ -1489,29 +1492,33 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       timestamp: new Date().toISOString()
     };
     
-    // Save feedback to backend for Google Sheets export
     try {
-      await fetch('/api/feedback', {
+      const response = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(feedbackData)
       });
+      if (!response.ok) throw new Error("Server error");
       console.log("Feedback saved successfully:", feedbackData);
     } catch (error) {
       console.error("Failed to save feedback:", error);
+      setIsSubmittingFeedback(false);
+      toast({
+        title: "Oops",
+        description: "Could not save feedback. Please try again.",
+        variant: "destructive",
+      });
+      return;
     }
     
-    // Mark feedback as completed in session
     setFeedbackCompleted(true);
     sessionStorage.setItem("knowrole-feedback-completed", "true");
     setShowFeedbackModal(false);
     
-    // Clear the timer
     if (feedbackTimerRef.current) {
       clearTimeout(feedbackTimerRef.current);
     }
     
-    // If user was trying to go to Crossroads, redirect now
     if (pendingCrossroads) {
       setPendingCrossroads(false);
       window.location.href = "/crossroads";
@@ -2134,11 +2141,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                 <Button
                   onClick={handleFeedbackSubmit}
-                  disabled={!allFeedbackAnswered}
+                  disabled={!allFeedbackAnswered || isSubmittingFeedback}
                   className="w-full bg-terracotta hover:bg-terracotta/90 disabled:opacity-50 disabled:cursor-not-allowed min-h-12 text-base font-semibold"
                   data-testid="button-submit-feedback"
                 >
-                  {allFeedbackAnswered ? (
+                  {isSubmittingFeedback ? (
+                    "Submitting..."
+                  ) : allFeedbackAnswered ? (
                     <>
                       <CheckCircle2 className="w-5 h-5 mr-2" />
                       {pendingCrossroads ? "Submit & Start Adventure" : "Submit Feedback"}
