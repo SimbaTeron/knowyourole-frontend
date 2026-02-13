@@ -30,8 +30,7 @@ import { getLocaleInsight, getPersonalizedInsight, type LocaleInsight } from "@/
 import { getRegionalSalary, shouldShowSalary } from "@/data/regionalSalaries";
 import { PremiumCardDeck } from "./PremiumCardDeck";
 import { SharePDFModal } from "./SharePDFModal";
-import { AccountCreationModal } from "./AccountCreationModal";
-import { PremiumUpgradeModal } from "./PremiumUpgradeModal";
+import { UnlockInsightsModal } from "./UnlockInsightsModal";
 import { ArcTracker } from "./ArcTracker";
 import { DreamRoleAdvisor } from "./DreamRoleAdvisor";
 import { PersonalityEvolutionTimeline } from "./PersonalityEvolutionTimeline";
@@ -1093,14 +1092,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   
   // Paginated results state (Page 1 = Summary, Page 2 = Details, Page 3 = Premium)
   const [currentResultsPage, setCurrentResultsPage] = useState<1 | 2 | 3>(startOnPremiumPage ? 3 : 1);
-  const [showPremiumGatewayModal, setShowPremiumGatewayModal] = useState(false);
-  const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
   
   // Authentication state
   const { user, isAuthenticated, isLoading: isAuthLoading, isPremium } = useAuth();
-  
-  // Premium upgrade modal state
-  const [showPremiumUpgradeModal, setShowPremiumUpgradeModal] = useState(false);
   
   // Mood Blend Badge state
   const [moodBlendInfo, setMoodBlendInfo] = useState<BlendInfo | null>(null);
@@ -3338,65 +3333,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
         </AnimatePresence>
       </main>
 
-      {/* Premium Gateway Modal */}
-      <AnimatePresence>
-        {showPremiumGatewayModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-            onClick={() => setShowPremiumGatewayModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-[#12121A] rounded-2xl shadow-xl max-w-sm w-full overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6 text-center">
-                <motion.div
-                  initial={{ rotate: -10, scale: 0 }}
-                  animate={{ rotate: 0, scale: 1 }}
-                  transition={{ type: "spring", delay: 0.1 }}
-                  className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg"
-                >
-                  <Gift className="w-8 h-8 text-white" />
-                </motion.div>
-                <h3 className="text-2xl font-bold text-warm-gray dark:text-[#F8FAFC] mb-2">
-                  Premium is Free!
-                </h3>
-                <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8] mb-6 leading-relaxed">
-                  We're testing and building something useful. Help us by providing feedback or donating to support development.
-                </p>
-                <div className="space-y-3">
-                  <Button
-                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold py-6"
-                    onClick={() => {
-                      setShowPremiumGatewayModal(false);
-                      setCurrentResultsPage(3);
-                    }}
-                    data-testid="button-proceed-premium"
-                  >
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Proceed to Results
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full border-terracotta text-terracotta hover:bg-terracotta/10 font-semibold py-6"
-                    onClick={handleDonateClick}
-                    data-testid="button-donate-modal"
-                  >
-                    <Heart className="w-5 h-5 mr-2" />
-                    Donate (Help us build)
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Unified Unlock Insights Modal */}
+      <UnlockInsightsModal
+        isOpen={showUnlockModal}
+        onClose={() => setShowUnlockModal(false)}
+        onProceedFree={() => {
+          setIsPremiumUnlocked(true);
+          setCurrentResultsPage(3);
+        }}
+        onDonate={(amount) => handleDonationTierSelect(amount)}
+      />
 
       {/* Dynamic Footer based on current page */}
       <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-[#0A0A0F] border-t border-gray-200 dark:border-[#A78BFA]/20">
@@ -3450,20 +3396,18 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
             <Button
               className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
               onClick={() => {
-                if (!isAuthenticated) {
-                  setShowAccountModal(true);
-                } else if (isPremium) {
+                if (isPremiumUnlocked) {
                   setCurrentResultsPage(3);
                 } else {
-                  setShowPremiumUpgradeModal(true);
+                  setShowUnlockModal(true);
                 }
               }}
               data-testid="button-learn-more"
             >
-              {isPremium ? (
+              {isPremiumUnlocked ? (
                 <>
-                  <Crown className="w-4 h-4 mr-1 text-amber-300" />
-                  View Premium Insights
+                  <Sparkles className="w-4 h-4 mr-1" />
+                  View Insights
                 </>
               ) : (
                 <>
@@ -3494,22 +3438,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
         />
       )}
       
-      {/* Account Creation Modal for Premium Access */}
-      <AccountCreationModal
-        isOpen={showAccountModal}
-        onClose={() => setShowAccountModal(false)}
-        onContinueAsGuest={() => {
-          setShowAccountModal(false);
-          setShowPremiumGatewayModal(true);
-        }}
-      />
-      
-      {/* Premium Upgrade Modal for authenticated non-premium users */}
-      <PremiumUpgradeModal
-        isOpen={showPremiumUpgradeModal}
-        onClose={() => setShowPremiumUpgradeModal(false)}
-        sessionId={sessionId || undefined}
-      />
     </div>
   );
 }
