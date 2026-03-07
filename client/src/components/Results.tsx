@@ -8,6 +8,7 @@ import {
   Mountain, Sunrise, CircleDot, Play, Building2, DollarSign, PartyPopper
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { RadarChart, Radar, PolarAngleAxis, PolarGrid, PolarRadiusAxis, ResponsiveContainer } from "recharts";
 
 // Job match types from API
 interface JobMatch {
@@ -2868,6 +2869,83 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           </motion.div>
         )}
 
+        {isFull && (
+          <motion.div
+            initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+          >
+            <Card className="bg-white dark:bg-[#12121A] border border-gray-200 dark:border-[#A78BFA]/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Award className="w-4 h-4 text-terracotta" aria-hidden="true" />
+                  DISC Work Style Breakdown
+                </CardTitle>
+                <p className="text-xs text-warm-gray/60 dark:text-[#64748B] mt-1">
+                  How your behavioral traits compare across work styles
+                </p>
+              </CardHeader>
+              <CardContent className="pb-4 space-y-3">
+                {(() => {
+                  const discScores = {
+                    D: scores.disc.D,
+                    I: scores.disc.I,
+                    S: scores.disc.S,
+                    C: scores.disc.C,
+                  };
+                  const total = Object.values(discScores).reduce((sum, v) => sum + Math.abs(v), 0) || 1;
+                  const discItems = [
+                    { key: "D", label: "Dominance", color: "bg-terracotta", textColor: "text-terracotta", desc: "Direct, decisive, competitive" },
+                    { key: "I", label: "Influence", color: "bg-amber-500", textColor: "text-amber-500", desc: "Enthusiastic, optimistic, collaborative" },
+                    { key: "S", label: "Steadiness", color: "bg-sage-green", textColor: "text-sage-green", desc: "Patient, reliable, team-oriented" },
+                    { key: "C", label: "Conscientiousness", color: "bg-dusty-blue", textColor: "text-dusty-blue", desc: "Analytical, precise, systematic" },
+                  ];
+                  const dominant = discItems.reduce((best, item) =>
+                    Math.abs(discScores[item.key as keyof typeof discScores]) > Math.abs(discScores[best.key as keyof typeof discScores]) ? item : best
+                  );
+
+                  return discItems.map((item) => {
+                    const raw = Math.abs(discScores[item.key as keyof typeof discScores]);
+                    const pct = Math.round((raw / total) * 100);
+                    const isDominant = item.key === dominant.key;
+
+                    return (
+                      <div key={item.key} className={`rounded-xl p-3 transition-all ${isDominant ? "bg-gray-50 dark:bg-[#1E1E2E]/50 ring-1 ring-gray-200 dark:ring-[#A78BFA]/20" : ""}`}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-semibold ${isDominant ? item.textColor : "text-warm-gray dark:text-[#F8FAFC]"}`}>
+                              {item.label}
+                            </span>
+                            {isDominant && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-terracotta/10 text-terracotta font-medium" data-testid="badge-disc-dominant">
+                                Dominant
+                              </span>
+                            )}
+                          </div>
+                          <span className={`text-sm font-bold ${item.textColor}`} data-testid={`text-disc-pct-${item.key.toLowerCase()}`}>
+                            {pct}%
+                          </span>
+                        </div>
+                        <div className="w-full h-3 bg-gray-100 dark:bg-[#1E1E2E] rounded-full overflow-hidden">
+                          <motion.div
+                            className={`h-full rounded-full ${item.color}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+                          />
+                        </div>
+                        <p className="text-[11px] text-warm-gray/50 dark:text-[#64748B] mt-1">
+                          {item.desc}
+                        </p>
+                      </div>
+                    );
+                  });
+                })()}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Locale Insights Card - shows personalized insights based on location */}
         {isFull && localeInsight && (
           <motion.div
@@ -2971,6 +3049,46 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     </p>
                   </CardHeader>
                   <CardContent className="pb-4 space-y-3">
+                    <div className="w-full flex justify-center mb-2" data-testid="chart-bigfive-radar">
+                      <ResponsiveContainer width="100%" height={260}>
+                        <RadarChart
+                          data={Object.entries(result.bigFiveProfile).map(([key, val]) => ({
+                            trait: TRAIT_LABELS[key as keyof typeof TRAIT_LABELS],
+                            value: val,
+                            fullMark: 100,
+                          }))}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius="70%"
+                        >
+                          <PolarGrid stroke="currentColor" className="text-gray-200 dark:text-gray-700" />
+                          <PolarAngleAxis
+                            dataKey="trait"
+                            tick={{ fill: 'currentColor', fontSize: 11, className: 'text-warm-gray/70 dark:text-[#94A3B8]' }}
+                          />
+                          <PolarRadiusAxis
+                            angle={90}
+                            domain={[0, 100]}
+                            tick={{ fontSize: 9, fill: 'currentColor', className: 'text-warm-gray/40 dark:text-[#64748B]' }}
+                            tickCount={5}
+                          />
+                          <Radar
+                            name="Big Five"
+                            dataKey="value"
+                            stroke="rgb(139, 92, 246)"
+                            fill="rgba(139, 92, 246, 0.25)"
+                            fillOpacity={1}
+                            strokeWidth={2}
+                            dot={{
+                              r: 4,
+                              fill: 'rgb(139, 92, 246)',
+                              stroke: '#fff',
+                              strokeWidth: 1.5,
+                            }}
+                          />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </div>
                     {traitKeys.map((trait, index) => {
                       const Icon = TRAIT_ICONS[trait as keyof typeof TRAIT_ICONS];
                       const colors = TRAIT_COLORS[trait as keyof typeof TRAIT_COLORS];
@@ -3352,6 +3470,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
         }}
         onDonate={(amount) => handleDonationTierSelect(amount)}
       />
+
+      {/* Privacy Badge */}
+      <div className="fixed bottom-[68px] left-0 right-0 z-30 flex justify-center pointer-events-none" data-testid="privacy-badge">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/80 dark:bg-[#0A0A0F]/80 backdrop-blur-sm border border-gray-200 dark:border-[#A78BFA]/10 text-xs text-muted-foreground">
+          <Shield className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>Your results are processed locally and not stored on our servers</span>
+        </div>
+      </div>
 
       {/* Dynamic Footer based on current page */}
       <footer className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-white dark:bg-[#0A0A0F] border-t border-gray-200 dark:border-[#A78BFA]/20">

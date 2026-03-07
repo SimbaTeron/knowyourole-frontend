@@ -1,0 +1,71 @@
+You are an expert full-stack developer and UX designer specializing in interactive quiz/web apps. The project is "Know Your Role" (live at https://knowyourole.com) — a fun personality quiz web app that combines three major assessments:
+
+• Myers-Briggs (MBTI) 16 types
+• Big 5 (OCEAN)
+• DISC (Dominance, Influence, Steadiness, Conscientiousness)
+
+After completing the quiz, the user receives:
+- Detailed results for ALL THREE tests (descriptions, strengths, weaknesses, visuals)
+- A personalized "Job Role Match" with 3–5 career suggestions they are likely to succeed in, plus clear reasoning
+
+Current tech: Replit (likely Vite + React + Tailwind or similar — check package.json).
+
+TASK: Completely reassess the entire app (code + live behavior) and rewrite it into a significantly improved, production-ready version.
+
+STEP 1 — FULL ANALYSIS (do this first)
+1. Run the app in preview mode at https://knowyourole.com
+2. Walk through the complete user journey (landing → quiz → results) and document:
+   - Current UI/UX strengths and friction points
+   - Quiz flow (how many questions total? Are they mixed or separated by test?)
+   - Scoring logic for MBTI, Big 5, and DISC
+   - Job-matching algorithm
+   - State management, responsiveness, loading states, accessibility
+   - Code structure (components, folders, any duplication, performance issues)
+3. Identify technical debt, security issues (e.g. localStorage only?), and opportunities.
+
+STEP 2 — IMPROVEMENT GOALS (implement ALL of these)
+• Modern, polished, fun design (use Tailwind + Framer Motion or React Spring for smooth animations)
+• Fully responsive + mobile-first (perfect on phones)
+• Accessibility (ARIA labels, keyboard navigation, high contrast, screen-reader friendly)
+• Performance: code splitting, lazy loading, fast scoring (client-side only is fine, but optimize)
+• Clean architecture: separate quiz logic, scoring algorithms, job database, UI components
+• Use TypeScript if not already
+• State management: React Context + useReducer (or Zustand if you prefer)
+• Add these HIGH-VALUE features:
+   1. Progress bar with percentage + estimated time remaining
+   2. Ability to skip or go back (with warning)
+   3. Beautiful visualizations:
+      - MBTI: type grid + badge
+      - Big 5: radar/polar chart (Chart.js or Recharts)
+      - DISC: bar chart with color coding
+   4. Expanded job database (at least 50 real roles with keywords) + smarter matching logic (percentage fit score)
+   5. "Save My Results" (localStorage + optional email export using EmailJS or a simple form)
+   6. Social sharing buttons (Twitter/X, LinkedIn, copy link) with nice preview cards
+   7. Restart quiz + "Take again" button
+   8. Dark/light mode toggle (auto-detect system preference)
+   9. Fun confetti or celebration animation on results
+   10. Privacy notice + "Results are not stored on our servers" badge
+
+• Improve question quality:
+   - Make sure questions are properly tagged to their test (MBTI/Big5/DISC)
+   - Add 10–15 extra high-quality questions per test if needed
+   - Randomize order slightly for replay value
+
+• Make job matching smarter:
+   - Combine all three test results into one weighted score
+   - Show why each job is a good fit (e.g. "Your high Conscientiousness + INTJ traits make you perfect for…")
+
+STEP 3 — REWRITE PLAN
+Rewrite the app step-by-step:
+1. Update package.json (add any missing deps: framer-motion, recharts, lucide-react icons, etc.)
+2. Refactor folder structure (src/components, src/lib/scoring.ts, src/data/questions.ts, src/data/jobs.ts)
+3. Create clean, reusable components
+4. Implement the new features above
+5. Keep everything client-side (no backend needed)
+6. Add a beautiful new landing page hero with clear value proposition
+
+OUTPUT FORMAT
+After analysis, reply with:
+1. "CURRENT STATE SUMMARY" (bullet points)
+2. "KEY IMPROVEMENTS I WILL MAKE" (numbered list)
+3. Then output every updated file using Replit’s file editor format:

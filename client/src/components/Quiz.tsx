@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { Timer, Pause, Play, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Timer, Pause, Play, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search, ChevronLeft, ChevronRight, Clock, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import CelestialProgressTracker from "./CelestialProgressTracker";
 import questionsData from "@/data/questions.json";
@@ -618,6 +619,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const quizConfig = getQuizConfig(tier);
   const { teamName, isLocalitySet } = useLocalityTheme();
   const moodEffects = getMoodEffects(mood);
+  const { toast } = useToast();
   
   const [quizPhase, setQuizPhase] = useState<QuizPhase>("quiz");
   const [energyChoice, setEnergyChoice] = useState<string | null>(null);
@@ -647,6 +649,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     firstPrinciplesWildcard: 0,
     hybridTypes: [] // Phase 1.4: Hybrid type detection
   });
+  
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [hasUsedBack, setHasUsedBack] = useState(false);
+  const [previousScoresSnapshot, setPreviousScoresSnapshot] = useState<QuizScores | null>(null);
   
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -1015,6 +1021,31 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     return "easy"; // Slower responses -> easier questions
   };
 
+  const handleGoBack = useCallback(() => {
+    if (!canGoBack || hasUsedBack || currentIndex === 0 || !previousScoresSnapshot) return;
+    if (isProcessingAnswerRef.current) return;
+    
+    isProcessingAnswerRef.current = true;
+    
+    setScores(previousScoresSnapshot);
+    setPreviousScoresSnapshot(null);
+    setCurrentIndex(prev => prev - 1);
+    setCanGoBack(false);
+    setHasUsedBack(true);
+    
+    toast({
+      title: "Gone back one question",
+      description: "Your previous answer has been undone. Scores adjusted.",
+      duration: 3000,
+    });
+    
+    setTimerResetKey(prev => prev + 1);
+    
+    setTimeout(() => {
+      isProcessingAnswerRef.current = false;
+    }, 400);
+  }, [canGoBack, hasUsedBack, currentIndex, previousScoresSnapshot, toast]);
+
   const handleSwipe = useCallback((direction: "left" | "right", isTimeout = false, sliderVal?: number) => {
     // Guard against rapid clicking - use ref for synchronous check
     if (isProcessingAnswerRef.current) return;
@@ -1022,6 +1053,8 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     
     // Lock immediately (ref updates synchronously, unlike state)
     isProcessingAnswerRef.current = true;
+    
+    setPreviousScoresSnapshot({ ...scores, mbti: { ...scores.mbti }, disc: { ...scores.disc }, bigFive: { ...scores.bigFive }, responses: [...scores.responses], swipeTimes: [...scores.swipeTimes], hybridTypes: [...scores.hybridTypes] });
     
     if (!hasInteracted) setHasInteracted(true);
     
@@ -1124,11 +1157,14 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       // Keep processing locked - it will be unlocked when returning from break
       console.log(`[Quiz] Break triggered: ${breakPhase} after Q${currentIndex + 1}`);
       setQuizPhase(breakPhase);
+      setCanGoBack(false);
       // DO NOT advance currentIndex - we'll do that when returning from break
       // DO NOT unlock processing - it will be unlocked by handleCountdownComplete or onContinue
     } else if (currentIndex < questions.length - 1) {
       // Normal progression - advance to next question
       setCurrentIndex(prev => prev + 1);
+      setCanGoBack(true);
+      setHasUsedBack(false);
       // Unlock processing after animation completes
       setTimeout(() => {
         isProcessingAnswerRef.current = false;
@@ -1139,7 +1175,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         isProcessingAnswerRef.current = false;
       }, 400);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects]);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects, scores]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut || isProcessingAnswerRef.current) return;
@@ -1528,6 +1564,35 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </div>
           
           <div className="flex items-center gap-3">
+            {(() => {
+              const remainingQuestions = questions.length - (currentIndex + 1);
+              const avgTimePerQuestion = scores.swipeTimes.length >= 3
+                ? scores.averageSwipeTime
+                : tierConfig.maxTime * 0.6;
+              const estimatedSecondsLeft = remainingQuestions * avgTimePerQuestion;
+              const estimatedMinutes = Math.max(1, Math.ceil(estimatedSecondsLeft / 60));
+              if (remainingQuestions > 0) {
+                return (
+                  <div className="flex items-center gap-1 text-warm-gray/60 dark:text-[#94A3B8]" data-testid="text-time-estimate">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span className="text-xs font-medium">
+                      ~{estimatedMinutes} min left
+                    </span>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+            {canGoBack && !hasUsedBack && currentIndex > 0 && (
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handleGoBack}
+                data-testid="button-go-back"
+              >
+                <Undo2 className="w-5 h-5" />
+              </Button>
+            )}
             <span className="text-xl font-bold text-warm-gray dark:text-[#F8FAFC]">
               {currentIndex + 1}/{questions.length}
             </span>

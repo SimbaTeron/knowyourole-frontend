@@ -23,10 +23,11 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
 
 ### Feature Specifications
 
-- **User Journey**: Home (age) → Mood Selection → Mood Mixer → Location → Pre-Quiz Demo → Quiz → Results.
+- **User Journey**: Home (hero + age selection) → Mood Selection → Mood Mixer → Location → Pre-Quiz Demo → Quiz → Results.
+- **Landing Page**: Enhanced hero with "Discover Your True Potential" headline, feature highlights (3 Test Types, Career Matching, 100% Free), and a "How it works" 3-step section.
 - **Mood Interaction**: Separate pages for mood selection and an interactive "Mood Mixer" cauldron.
 - **Pre-Quiz Demo**: Animated 3-card walkthrough of question types.
-- **Quiz Flow**: Age-tiered binary swipe questions with strategic breaks. Features include a timer, tactile feedback, dynamic difficulty scaling, and strategic checkpoint pauses. Supports MBTI, DISC, Big Five, Critical Thinking, and First Principles traits. Includes a `Slider UI Component` for nuanced responses.
+- **Quiz Flow**: Age-tiered binary swipe questions with strategic breaks. Features include a per-question timer, estimated time remaining (~X min left), tactile feedback, dynamic difficulty scaling, strategic checkpoint pauses, and a back button (undo last answer, limited to 1 use per question). Supports MBTI, DISC, Big Five, Critical Thinking, and First Principles traits. Includes a `Slider UI Component` for nuanced responses.
   - **Question Database**: 1,200 total questions across all tiers:
     - Youth (7-12): 200 questions (6s timer)
     - Teen (13-18): 200 questions (7s timer)
@@ -39,7 +40,7 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
     - Young Adult (19-25): 35 questions - superpower (Q11), checkpoint1 (Q11), checkpoint2 (Q21), energy (Q27), mystery (Q32)
     - Adult (25+): 40 questions - checkpoint1 (Q10), checkpoint2 (Q20), superpower (Q25), energy (Q30), mystery (Q35)
   - **Removed mid-quiz circular badges** (Bold Explorer, 2x, random events, frequency badges) - only square insight badges in top-right corner remain
-- **Results Dashboard**: Displays Big Five Radar chart, MBTI/DISC/Big Five explanations, and personalized role recommendations. Includes percentile comparisons and a "Just Kidding!" interstitial for premium features.
+- **Results Dashboard**: Displays Big Five Radar chart (Recharts RadarChart), DISC bar chart with color-coded horizontal bars (D=Terracotta, I=Amber, S=Sage Green, C=Dusty Blue), MBTI/DISC/Big Five explanations, and personalized role recommendations. Includes percentile comparisons, privacy badge ("Results processed locally"), and a "Just Kidding!" interstitial for premium features.
 - **Donation System**: Two-tier donation modal integrated with Stripe.
 - **Feedback System**: 5-question feedback form that auto-exports quiz results to Google Sheets.
 - **Location & Geocoding**: Simplified zip code input (US/Canada) with auto-detection via `zippopotam.us` and mapping to sports team colors.
