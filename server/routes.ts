@@ -3332,6 +3332,7 @@ export async function registerRoutes(
 
       // 3. CAREER PATHS - Match by traits and MBTI/DISC
       const allCareerPaths = await db.select().from(careerPaths);
+      const seenCareerTitles = new Set<string>();
       const matchedCareerPaths = allCareerPaths
         .filter(c => {
           const traitScore = bigFive[c.primaryTrait as keyof typeof bigFive];
@@ -3348,6 +3349,12 @@ export async function registerRoutes(
           const aScore = bigFive[a.primaryTrait as keyof typeof bigFive] || 0;
           const bScore = bigFive[b.primaryTrait as keyof typeof bigFive] || 0;
           return bScore - aScore;
+        })
+        .filter(c => {
+          const key = c.title.toLowerCase().trim();
+          if (seenCareerTitles.has(key)) return false;
+          seenCareerTitles.add(key);
+          return true;
         })
         .slice(0, 5);
 

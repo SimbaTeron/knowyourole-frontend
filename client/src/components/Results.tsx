@@ -1288,7 +1288,14 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
         if (matchesResponse.ok) {
           const matchesData = await matchesResponse.json();
           if (matchesData.success && matchesData.matches) {
-            setJobMatches(matchesData.matches);
+            const seen = new Set<string>();
+            const unique = (matchesData.matches as JobMatch[]).filter(m => {
+              const key = m.roleName.toLowerCase().trim();
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+            setJobMatches(unique);
           }
         }
       } catch (error) {

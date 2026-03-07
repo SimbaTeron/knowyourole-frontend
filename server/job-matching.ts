@@ -182,11 +182,19 @@ export async function getJobMatches(
   
   jobsWithScores.sort((a, b) => b.matchScore - a.matchScore);
   
+  const usedNames = new Set<string>();
+  const deduped = jobsWithScores.filter(job => {
+    const name = job.role.roleName.toLowerCase().trim();
+    if (usedNames.has(name)) return false;
+    usedNames.add(name);
+    return true;
+  });
+
   if (diversityBoost && limit > 1) {
     const result: JobMatch[] = [];
     const usedCollars = new Set<string>();
     
-    for (const job of jobsWithScores) {
+    for (const job of deduped) {
       if (result.length >= limit) break;
       
       if (!usedCollars.has(job.role.jobCollar) || result.length >= limit - 1) {
@@ -195,15 +203,15 @@ export async function getJobMatches(
       }
     }
     
-    while (result.length < limit && jobsWithScores.length > result.length) {
-      const next = jobsWithScores.find(j => !result.includes(j));
+    while (result.length < limit && deduped.length > result.length) {
+      const next = deduped.find(j => !result.includes(j));
       if (next) result.push(next);
     }
     
     return result;
   }
   
-  return jobsWithScores.slice(0, limit);
+  return deduped.slice(0, limit);
 }
 
 export async function getTopJobMatch(userScores: UserScores): Promise<JobMatch | null> {

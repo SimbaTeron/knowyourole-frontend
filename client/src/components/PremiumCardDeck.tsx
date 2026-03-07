@@ -653,20 +653,36 @@ function RoleMatchesCard({
     }
   ];
   
-  // Map API career paths to roles format
+  // Map API career paths to roles format, deduplicating by title
+  const seenTitles = new Set<string>();
   const apiRoles: DisplayRole[] = hasApiData 
-    ? apiCareerPaths.slice(0, 3).map((path, idx) => ({
-        title: path.title,
-        salary: path.salaryRange,
-        desc: path.description,
-        icon: idx === 0 ? Star : idx === 1 ? TrendingUp : Sparkles,
-        fit: 95 - (idx * 3), // Best match first
-        industry: path.industry,
-        growthOutlook: path.growthOutlook,
-      }))
+    ? apiCareerPaths.reduce<DisplayRole[]>((acc, path, idx) => {
+        const key = (path.title || "").toLowerCase().trim();
+        if (seenTitles.has(key)) return acc;
+        seenTitles.add(key);
+        acc.push({
+          title: path.title,
+          salary: path.salaryRange,
+          desc: path.description,
+          icon: acc.length === 0 ? Star : acc.length === 1 ? TrendingUp : Sparkles,
+          fit: 95 - (acc.length * 3),
+          industry: path.industry,
+          growthOutlook: path.growthOutlook,
+        });
+        return acc;
+      }, []).slice(0, 3)
     : [];
   
-  const roles: DisplayRole[] = hasApiData ? apiRoles : staticRoles;
+  // Deduplicate static roles by title
+  const dedupedStaticRoles = staticRoles.reduce<DisplayRole[]>((acc, role) => {
+    const key = (role.title || "").toLowerCase().trim();
+    if (seenTitles.has(key)) return acc;
+    seenTitles.add(key);
+    acc.push(role);
+    return acc;
+  }, []);
+
+  const roles: DisplayRole[] = hasApiData ? apiRoles : dedupedStaticRoles;
 
   return (
     <div className="space-y-3">
