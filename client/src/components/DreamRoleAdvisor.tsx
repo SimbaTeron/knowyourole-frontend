@@ -38,15 +38,11 @@ export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvi
 
   const analyzeMutation = useMutation({
     mutationFn: async (role: string) => {
-      const response = await apiRequest('/api/analyze-role-fit', {
-        method: 'POST',
-        body: JSON.stringify({
-          dreamRole: role,
-          bigFive,
-          mbtiType,
-          discStyle
-        }),
-        headers: { 'Content-Type': 'application/json' }
+      const response = await apiRequest('POST', '/api/analyze-role-fit', {
+        dreamRole: role,
+        bigFive,
+        mbtiType,
+        discStyle
       });
       return response.json();
     },
@@ -144,6 +140,12 @@ export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvi
                   )}
                 </Button>
               </div>
+
+              {analyzeMutation.isError && (
+                <p className="text-sm text-rose-600 dark:text-rose-400" data-testid="text-dream-role-error">
+                  Something went wrong. Please try again.
+                </p>
+              )}
 
               <div className="text-xs text-warm-gray/50 dark:text-soft-cream/40">
                 <p className="font-medium mb-1">Popular roles to try:</p>

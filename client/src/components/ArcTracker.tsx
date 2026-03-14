@@ -80,9 +80,16 @@ export function ArcTracker() {
         <CardContent className="p-6 text-center">
           <Target className="w-12 h-12 mx-auto mb-4 text-amber-500" />
           <h3 className="font-semibold text-lg mb-2">Track Your Evolution</h3>
-          <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60">
+          <p className="text-sm text-warm-gray/70 dark:text-soft-cream/60 mb-4">
             Sign in to track how your personality evolves over time
           </p>
+          <Button
+            onClick={() => { window.location.href = "/api/login"; }}
+            className="bg-amber-600 hover:bg-amber-700 text-white"
+            data-testid="button-arctracker-sign-in"
+          >
+            Sign In
+          </Button>
         </CardContent>
       </Card>
     );
