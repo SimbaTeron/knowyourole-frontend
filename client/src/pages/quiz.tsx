@@ -89,6 +89,7 @@ export default function QuizPage() {
             setHybridTypes(state.hybridTypes || []);
             setIsDonationReturn(true);
             setShowResults(true);
+            window.scrollTo(0, 0);
             
             // Clean up the stored state
             localStorage.removeItem('knowrole-donation-state');
@@ -177,6 +178,7 @@ export default function QuizPage() {
     }
 
     setShowResults(true);
+    window.scrollTo(0, 0);
   };
 
   const handleQuizExit = () => {

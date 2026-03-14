@@ -31,7 +31,7 @@ const QUIZ_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     targetSelector: "[data-onboarding='answers'], [data-onboarding='slider']",
     title: "Tap to Answer",
-    description: "Choose the option that feels most like you. There are no wrong answers!",
+    description: "Tap, click, or swipe the option that feels most like you. There are no wrong answers!",
     icon: MousePointerClick,
     position: "above",
     buttonText: "Start Quiz",
@@ -93,16 +93,16 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
 
   const Icon = currentStep.icon;
 
+  const tooltipGap = 8;
+
   const getTooltipStyle = (): React.CSSProperties => {
     if (!spotlightRect) {
       return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
     }
 
-    const padding = 16;
-
     if (currentStep.position === "below") {
       return {
-        top: spotlightRect.bottom + padding,
+        top: spotlightRect.bottom + spotlightPadding + tooltipGap,
         left: "50%",
         transform: "translateX(-50%)",
         maxWidth: "min(340px, calc(100vw - 32px))",
@@ -111,7 +111,7 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
 
     if (currentStep.position === "above") {
       return {
-        bottom: window.innerHeight - spotlightRect.top + padding,
+        bottom: window.innerHeight - spotlightRect.top + spotlightPadding + tooltipGap,
         left: "50%",
         transform: "translateX(-50%)",
         maxWidth: "min(340px, calc(100vw - 32px))",
@@ -123,6 +123,36 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
 
   const spotlightPadding = 12;
 
+  const getArrowStyle = (): { className: string; style: React.CSSProperties } | null => {
+    if (!spotlightRect) return null;
+
+    if (currentStep.position === "below") {
+      return {
+        className: "onboarding-arrow-up",
+        style: {
+          position: "absolute" as const,
+          top: spotlightRect.bottom + spotlightPadding,
+          left: spotlightRect.left + spotlightRect.width / 2 - 10,
+        },
+      };
+    }
+
+    if (currentStep.position === "above") {
+      return {
+        className: "onboarding-arrow-down",
+        style: {
+          position: "absolute" as const,
+          bottom: window.innerHeight - spotlightRect.top + spotlightPadding - tooltipGap + 2,
+          left: spotlightRect.left + spotlightRect.width / 2 - 10,
+        },
+      };
+    }
+
+    return null;
+  };
+
+  const arrowProps = getArrowStyle();
+
   return (
     <div
       ref={overlayRef}
@@ -130,6 +160,31 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
       onClick={(e) => e.stopPropagation()}
       data-testid="quiz-onboarding-overlay"
     >
+      <style>{`
+        @keyframes onboarding-bounce {
+          0%, 100% { transform: translateY(0); opacity: 1; }
+          50% { transform: translateY(-6px); opacity: 0.7; }
+        }
+        .onboarding-arrow-up {
+          width: 0; height: 0;
+          border-left: 10px solid transparent;
+          border-right: 10px solid transparent;
+          border-bottom: 10px solid var(--arrow-color, #A78BFA);
+          animation: onboarding-bounce 1s ease-in-out infinite;
+          z-index: 10;
+          filter: drop-shadow(0 0 4px rgba(167,139,250,0.5));
+        }
+        .onboarding-arrow-down {
+          width: 0; height: 0;
+          border-left: 10px solid transparent;
+          border-right: 10px solid transparent;
+          border-top: 10px solid var(--arrow-color, #A78BFA);
+          animation: onboarding-bounce 1s ease-in-out infinite;
+          z-index: 10;
+          filter: drop-shadow(0 0 4px rgba(167,139,250,0.5));
+        }
+      `}</style>
+
       <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: "none" }}>
         <defs>
           <mask id="spotlight-mask">
@@ -169,6 +224,16 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
         />
       )}
 
+      {arrowProps && (
+        <div
+          className={arrowProps.className}
+          style={{
+            ...arrowProps.style,
+            "--arrow-color": "var(--terracotta, #A78BFA)",
+          } as React.CSSProperties}
+        />
+      )}
+
       <AnimatePresence mode="wait">
         <motion.div
           key={currentStepIndex}
@@ -181,14 +246,14 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
         >
           <div className="bg-white dark:bg-[#1E1E2E] rounded-2xl shadow-2xl border border-warm-gray/20 dark:border-[#A78BFA]/30 p-5 w-full">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-terracotta to-sunset-amber dark:from-[#A78BFA] dark:to-[#67E8F9] flex items-center justify-center flex-shrink-0">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-terracotta to-sunset-amber dark:from-[#A78BFA] dark:to-[#67E8F9] flex items-center justify-center flex-shrink-0">
                 <Icon className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-warm-gray dark:text-[#F8FAFC]" style={{ fontFamily: "Nunito, sans-serif" }}>
+              <h3 className="text-xl font-bold text-warm-gray dark:text-[#F8FAFC]" style={{ fontFamily: "Nunito, sans-serif" }}>
                 {currentStep.title}
               </h3>
             </div>
-            <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] mb-4 leading-relaxed" style={{ fontFamily: "Nunito, sans-serif" }}>
+            <p className="text-base text-warm-gray/80 dark:text-[#94A3B8] mb-4 leading-relaxed" style={{ fontFamily: "Nunito, sans-serif" }}>
               {currentStep.description}
             </p>
             <div className="flex items-center justify-between gap-3">
@@ -197,7 +262,7 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
                   {steps.map((_, idx) => (
                     <div
                       key={idx}
-                      className={`w-2 h-2 rounded-full transition-all ${
+                      className={`w-2.5 h-2.5 rounded-full transition-all ${
                         idx === currentStepIndex
                           ? "bg-terracotta dark:bg-[#A78BFA] scale-125"
                           : idx < currentStepIndex
@@ -210,7 +275,7 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
               )}
               <button
                 onClick={handleNext}
-                className="ml-auto px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all trail-button"
+                className="ml-auto px-6 py-3 rounded-xl text-base font-bold text-white transition-all trail-button"
                 data-testid={`button-onboarding-${currentStep.buttonText.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {currentStep.buttonText}
