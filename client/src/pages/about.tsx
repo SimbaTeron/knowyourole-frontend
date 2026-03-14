@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowLeft, Brain, Target, Users, BookOpen } from "lucide-react";
+import { ArrowLeft, Brain, Target, Users, BookOpen, Heart } from "lucide-react";
 
 export default function About() {
   return (
@@ -23,6 +23,27 @@ export default function About() {
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             We believe everyone deserves to understand their strengths, tendencies, and potential — without jargon, paywalls, or guesswork.
           </p>
+        </section>
+
+        <section className="mb-10">
+          <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
+            <Heart className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
+            Why We Built This
+          </h2>
+          <div className="space-y-4 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
+            <p>
+              KnowYouRole started from a simple frustration: most personality tools online are either oversimplified clickbait or locked behind expensive paywalls. The good science exists — Big Five, MBTI, DISC — but it's scattered across academic papers that most people will never read. We wanted to change that.
+            </p>
+            <p>
+              We noticed something else, too. A 10-year-old and a 35-year-old shouldn't get the same quiz. The questions that spark self-reflection for a teenager are different from the ones that resonate with a career-changer in their thirties. So we built age-tiered assessments from the ground up — questions written for where you actually are in life, not a one-size-fits-all template.
+            </p>
+            <p>
+              The career matching came from watching too many people feel stuck. When you can see that your unique blend of traits — say, high Openness combined with Steadiness — maps naturally to roles you may never have considered, it opens doors. We've mapped 150+ careers across industries, from creative arts to healthcare to skilled trades, because every personality type has work that fits.
+            </p>
+            <p>
+              This project is a labor of love. We keep the core experience completely free because we believe everyone — especially young people just starting to figure things out — deserves access to genuine self-insight. If this tool helps even one person see themselves more clearly, it's worth every line of code.
+            </p>
+          </div>
         </section>
 
         <section className="mb-10">

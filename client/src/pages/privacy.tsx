@@ -17,6 +17,13 @@ export default function Privacy() {
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-privacy-title">Privacy Policy</h1>
         <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last updated: March 2026</p>
 
+        <div className="p-4 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 mb-8" data-testid="section-no-data-promise">
+          <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Our No-Data Promise</h2>
+          <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed text-sm">
+            Your personality results are processed in your browser and are not stored on our servers unless you explicitly create an account and choose to save them. We never sell your data to third parties, and we never will. You can take the quiz, get your results, and leave without us keeping a thing.
+          </p>
+        </div>
+
         <div className="space-y-8 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Overview</h2>
@@ -64,8 +71,17 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Cookies & Local Storage</h2>
-            <p>
+            <p className="mb-2">
               We use browser local storage and session storage to save your preferences (such as theme selection) and maintain your session state during assessments. This data stays on your device and is not transmitted to our servers unless you create an account.
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm">
+              <li><span className="font-medium">Theme preference</span> — Remembers your light/dark mode choice</li>
+              <li><span className="font-medium">Session state</span> — Keeps your quiz progress if you navigate away</li>
+              <li><span className="font-medium">Mood selections</span> — Stores your mood choices during the current session</li>
+              <li><span className="font-medium">Analytics cookies</span> — We use Google Analytics to understand general usage patterns (pages visited, time on site). No personally identifiable information is collected through analytics.</li>
+            </ul>
+            <p className="mt-2 text-sm">
+              You can clear all stored data at any time through your browser settings. Clearing this data will reset your theme preference and any in-progress quiz sessions.
             </p>
           </section>
 

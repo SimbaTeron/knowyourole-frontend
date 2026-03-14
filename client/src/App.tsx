@@ -19,6 +19,7 @@ import About from "@/pages/about";
 import Faq from "@/pages/faq";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
+import Careers from "@/pages/careers";
 
 function Router() {
   return (
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/faq" component={Faq} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
+      <Route path="/careers" component={Careers} />
       <Route component={NotFound} />
     </Switch>
   );
