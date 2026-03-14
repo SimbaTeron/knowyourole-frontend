@@ -43,7 +43,7 @@ export default function MoodMixerPage() {
 
   const handleContinue = () => {
     if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-    setLocation("/pre-quiz");
+    setLocation("/quiz");
   };
 
   const handleBack = () => {
@@ -62,7 +62,7 @@ export default function MoodMixerPage() {
   const handleSkipNeutral = () => {
     setHasBrewedMood(true);
     setBlendName("Balanced Explorer");
-    setTimeout(() => setLocation("/pre-quiz"), 300);
+    setTimeout(() => setLocation("/quiz"), 300);
   };
 
   return (

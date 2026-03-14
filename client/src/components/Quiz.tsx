@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import CelestialProgressTracker from "./CelestialProgressTracker";
+import QuizOnboardingOverlay from "./QuizOnboarding";
 import questionsData from "@/data/questions.json";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { 
@@ -666,6 +667,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [hasInteracted, setHasInteracted] = useState(false);
   const [timerResetKey, setTimerResetKey] = useState(0); // Forces timer reset when incremented
   
+  const [showIntroOnboarding, setShowIntroOnboarding] = useState(() => {
+    return !sessionStorage.getItem("knowrole-onboarding-intro-done");
+  });
+  const [showSliderOnboarding, setShowSliderOnboarding] = useState(false);
+  const hasShownSliderOnboarding = useRef(!!sessionStorage.getItem("knowrole-onboarding-slider-done"));
+  
   // Use ref for processing lock - refs update synchronously, preventing race conditions
   const isProcessingAnswerRef = useRef(false);
   
@@ -680,7 +687,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const useLocalityColors = isLocalitySet;
   
   // Derived state: check if any popup is active to disable interactions
-  const isAnyPopupActive = showPauseMenu || showQuip;
+  const isAnyPopupActive = showPauseMenu || showQuip || showIntroOnboarding || showSliderOnboarding;
 
   // Phase 1.2: Adaptive framework quotas based on tier
   // Adults get more Big Five for nuanced percentiles, younger tiers get more MBTI for clarity
@@ -846,6 +853,26 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout]);
+
+  useEffect(() => {
+    if (showIntroOnboarding && currentIndex === 0 && questions.length > 0 && quizPhase === "quiz") {
+      setIsPaused(true);
+    }
+  }, [showIntroOnboarding, currentIndex, questions.length, quizPhase]);
+
+  useEffect(() => {
+    const currentQ = questions[currentIndex];
+    if (
+      currentQ?.responseType === "slider" &&
+      !hasShownSliderOnboarding.current &&
+      !showIntroOnboarding &&
+      quizPhase === "quiz"
+    ) {
+      hasShownSliderOnboarding.current = true;
+      setShowSliderOnboarding(true);
+      setIsPaused(true);
+    }
+  }, [currentIndex, questions, showIntroOnboarding, quizPhase]);
 
   // Phase 1.1 & 1.4: Enhanced scoring with slider support and variable boosts
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1, sliderValue?: number) => {
@@ -1178,16 +1205,16 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects, scores]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (isTimingOut || isProcessingAnswerRef.current) return;
+    if (isTimingOut || isProcessingAnswerRef.current || isPaused) return;
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
       handleSwipe(info.offset.x > 0 ? "right" : "left");
     } else {
       x.set(0);
     }
-  }, [handleSwipe, x, isTimingOut]);
+  }, [handleSwipe, x, isTimingOut, isPaused]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (showPauseMenu || isTimingOut || isProcessingAnswerRef.current) return;
+    if (showPauseMenu || isTimingOut || isProcessingAnswerRef.current || isPaused) return;
     
     if (e.key === "ArrowLeft" || e.key === "a") {
       handleSwipe("left");
@@ -1197,7 +1224,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       setIsPaused(true);
       setShowPauseMenu(true);
     }
-  }, [handleSwipe, showPauseMenu, isTimingOut]);
+  }, [handleSwipe, showPauseMenu, isTimingOut, isPaused]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -1496,7 +1523,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
     <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0F]">
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/95 dark:bg-[#0A0A0F]/95 backdrop-blur-md">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-onboarding="timer">
             <AnimatePresence mode="wait">
               {timeRemaining <= 3 && timeRemaining > 0 ? (
                 <motion.div
@@ -1708,7 +1735,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                     <div className="flex-1 flex flex-col justify-center gap-4">
                       {currentQuestion.responseType === "slider" ? (
                         /* Slider UI for nuanced responses - improved readability */
-                        (<div className="flex flex-col gap-5 px-2">
+                        (<div className="flex flex-col gap-5 px-2" data-onboarding="slider">
                           {/* Slider labels - larger text */}
                           <div className="flex justify-between gap-4">
                             <div className="flex-1 text-left">
@@ -1790,7 +1817,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                         </div>)
                       ) : (
                         /* Binary option buttons */
-                        (<>
+                        (<div data-onboarding="answers" className="flex flex-col gap-4">
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.97, rotate: -3 }}
@@ -1835,11 +1862,11 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
                             </p>
                             <ChevronRight className="w-6 h-6 text-terracotta/60 flex-shrink-0" />
                           </motion.button>
-                        </>)
+                        </div>)
                       )}
                     </div>
                     
-                    {currentIndex === 0 && (
+                    {currentIndex === 0 && !showIntroOnboarding && (
                       <motion.div 
                         initial={{ opacity: 1 }}
                         animate={{ opacity: hasInteracted ? 0 : 1 }}
@@ -1895,13 +1922,13 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
         </div>
       </footer>
       
-      {!isPaused && quizPhase === "quiz" && (
+      {(!isPaused || showIntroOnboarding) && quizPhase === "quiz" && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-warm-charcoal dark:via-warm-charcoal/95"
         >
-          <div className="max-w-sm mx-auto">
+          <div className="max-w-sm mx-auto" data-onboarding="pause">
             <button
               onClick={togglePause}
               className="w-full py-3 px-6 rounded-xl bg-gray-100 dark:bg-[#12121A] hover:bg-gray-200 dark:hover:bg-[#1E1E2E] transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200 dark:border-[#A78BFA]/20 shadow-sm"
@@ -1980,6 +2007,28 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showIntroOnboarding && quizPhase === "quiz" && (
+        <QuizOnboardingOverlay
+          type="intro"
+          onComplete={() => {
+            sessionStorage.setItem("knowrole-onboarding-intro-done", "true");
+            setShowIntroOnboarding(false);
+            setIsPaused(false);
+          }}
+        />
+      )}
+
+      {showSliderOnboarding && quizPhase === "quiz" && (
+        <QuizOnboardingOverlay
+          type="slider"
+          onComplete={() => {
+            sessionStorage.setItem("knowrole-onboarding-slider-done", "true");
+            setShowSliderOnboarding(false);
+            setIsPaused(false);
+          }}
+        />
+      )}
     </div>
   );
 }

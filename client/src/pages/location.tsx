@@ -158,12 +158,12 @@ export default function LocationPage() {
 
   const handleBeginJourney = () => {
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    setLocation("/pre-quiz");
+    setLocation("/quiz");
   };
 
   const handleSkip = () => {
     if (navigator.vibrate) navigator.vibrate(20);
-    setLocation("/pre-quiz");
+    setLocation("/quiz");
   };
 
   const handleBack = () => {

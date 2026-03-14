@@ -23,10 +23,10 @@ The frontend is a React 18+ SPA using TypeScript and Vite. It features a custom 
 
 ### Feature Specifications
 
-- **User Journey**: Home (hero + age selection) → Mood Selection → Mood Mixer → Location → Pre-Quiz Demo → Quiz → Results.
+- **User Journey**: Home (hero + age selection) → Mood Selection → Mood Mixer → Location → Quiz (with in-context onboarding) → Results.
 - **Landing Page**: Enhanced hero with "Discover Your True Potential" headline, feature highlights (3 Test Types, Career Matching, 100% Free), and a "How it works" 3-step section.
 - **Mood Interaction**: Separate pages for mood selection and an interactive "Mood Mixer" cauldron.
-- **Pre-Quiz Demo**: Animated 3-card walkthrough of question types.
+- **In-Context Quiz Onboarding**: Replaced pre-quiz instruction pages with spotlight tooltips on the actual quiz UI. On question 1, a 3-step guided overlay teaches timer → pause → answers. First slider question triggers a separate slider tooltip. Tracked in sessionStorage (once per session). `/pre-quiz` redirects to `/quiz` for legacy links.
 - **Quiz Flow**: Age-tiered binary swipe questions with strategic breaks. Features include a per-question timer, estimated time remaining (~X min left), tactile feedback, dynamic difficulty scaling, strategic checkpoint pauses, and a back button (undo last answer, limited to 1 use per question). Supports MBTI, DISC, Big Five, Critical Thinking, and First Principles traits. Includes a `Slider UI Component` for nuanced responses.
   - **Question Database**: 1,200 total questions across all tiers:
     - Youth (7-12): 200 questions (6s timer)
