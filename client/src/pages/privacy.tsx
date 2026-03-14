@@ -84,7 +84,7 @@ export default function Privacy() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Contact Us</h2>
             <p>
-              If you have questions about this Privacy Policy or your data, please contact us at privacy@knowyourole.com.
+              If you have questions about this Privacy Policy or your data, please contact us at info@knowyourole.com.
             </p>
           </section>
         </div>

@@ -82,7 +82,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Contact</h2>
             <p>
-              For questions about these Terms of Service, please contact us at legal@knowyourole.com.
+              For questions about these Terms of Service, please contact us at info@knowyourole.com.
             </p>
           </section>
         </div>

@@ -416,7 +416,7 @@ export default function Home() {
               Terms
             </Link>
             <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
-            <a href="mailto:contact@knowyourole.com" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-contact">
+            <a href="mailto:info@knowyourole.com" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-contact">
               Contact
             </a>
           </div>
