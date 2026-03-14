@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "CfgRZhXr6P98LE79Rifjw"
+uri = "file://market-research-feedback-sheet.md"
+type = "text"
+title = "KnowYourRole - Student Feedback Sheet"
