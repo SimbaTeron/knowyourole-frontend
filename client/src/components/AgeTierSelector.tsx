@@ -39,11 +39,11 @@ export default function AgeTierSelector({ selectedTier, onSelect, onConfirm }: A
 
   return (
     <div className="w-full">
-      <div className="text-center mb-6">
-        <h2 className="md:text-3xl font-display font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2 text-[36px]">
+      <div className="text-center mb-5">
+        <h2 className="text-xl md:text-3xl font-display font-semibold text-warm-gray dark:text-[#F8FAFC] mb-1.5">
           Choose your path
         </h2>
-        <p className="text-base md:text-lg text-warm-gray/70 dark:text-[#94A3B8]">
+        <p className="text-sm md:text-lg text-warm-gray/70 dark:text-[#94A3B8]">
           Select the journey that fits you best
         </p>
       </div>
@@ -62,33 +62,33 @@ export default function AgeTierSelector({ selectedTier, onSelect, onConfirm }: A
                 ease: [0.22, 1, 0.36, 1]
               }}
               onClick={() => handleSelect(tier.id)}
-              className={`group relative w-full p-5 md:p-6 text-left tier-card-premium ${isSelected ? "selected" : ""}`}
+              className={`group relative w-full p-4 md:p-6 text-left tier-card-premium ${isSelected ? "selected" : ""}`}
               aria-label={`Select ${tier.label}, ${tier.sublabel}`}
               data-testid={`button-tier-${tier.id}`}
             >
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all ${
+              <div className="flex items-center gap-3">
+                <div className={`w-11 h-11 md:w-14 md:h-14 rounded-xl flex items-center justify-center transition-all ${
                   isSelected 
                     ? "bg-white/20" 
                     : "bg-terracotta/10 dark:bg-[#A78BFA]/20"
                 }`}>
-                  <Icon className={`w-7 h-7 transition-colors ${
+                  <Icon className={`w-5 h-5 md:w-7 md:h-7 transition-colors ${
                     isSelected ? "text-white" : "text-terracotta dark:text-[#A78BFA]"
                   }`} />
                 </div>
                 
                 <div className="flex-1">
-                  <span className={`font-semibold block text-2xl md:text-3xl ${
+                  <span className={`font-semibold block text-base md:text-xl ${
                     isSelected ? "text-white" : "text-warm-gray dark:text-[#F8FAFC]"
                   }`}>
                     {tier.label}
                   </span>
-                  <span className={`text-xl md:text-2xl mt-0.5 block font-medium ${
+                  <span className={`text-sm md:text-base mt-0.5 block font-medium ${
                     isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-[#94A3B8]"
                   }`}>
                     {tier.sublabel}
                   </span>
-                  <span className={`text-xs mt-1 block ${
+                  <span className={`text-[11px] md:text-xs mt-0.5 block ${
                     isSelected ? "text-white/60" : "text-warm-gray/40 dark:text-[#64748B]"
                   }`}>
                     {tier.tagline}
@@ -99,9 +99,9 @@ export default function AgeTierSelector({ selectedTier, onSelect, onConfirm }: A
                   <motion.div 
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="w-8 h-8 rounded-full bg-white/25 flex items-center justify-center"
+                    className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/25 flex items-center justify-center"
                   >
-                    <Check className="w-5 h-5 text-white" />
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-white" />
                   </motion.div>
                 )}
               </div>
@@ -121,17 +121,17 @@ export default function AgeTierSelector({ selectedTier, onSelect, onConfirm }: A
           >
             <Button
               onClick={onConfirm}
-              className="w-full py-6 text-lg font-bold bg-gradient-to-r from-terracotta to-sage-green dark:from-[#A78BFA] dark:to-[#67E8F9] text-white border-0 rounded-xl"
+              className="w-full py-5 md:py-6 text-base md:text-lg font-bold bg-gradient-to-r from-terracotta to-sage-green dark:from-[#A78BFA] dark:to-[#67E8F9] text-white border-0 rounded-xl"
               data-testid="button-start-journey"
             >
               Start My {selectedTierData.label} Journey
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
             </Button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <p className="text-center text-sm text-warm-gray/50 dark:text-[#64748B] italic mt-6">
+      <p className="text-center text-xs md:text-sm text-warm-gray/50 dark:text-[#64748B] italic mt-4 md:mt-6">
         {selectedTier ? "Ready? Hit the button above to begin" : "Tap to select your age tier"}
       </p>
     </div>

@@ -159,30 +159,30 @@ export default function Home() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-3"
+            className="text-center mb-6 md:mb-8"
           >
             <h1
-              className="text-3xl md:text-4xl font-display font-bold text-warm-gray dark:text-[#F8FAFC] mb-1 leading-tight"
+              className="text-[1.75rem] md:text-4xl font-display font-bold text-warm-gray dark:text-[#F8FAFC] mb-2 md:mb-3 leading-tight"
               data-testid="text-hero-headline"
             >
               Discover Your <span className="italic text-terracotta dark:text-[#A78BFA]">True</span> Potential
             </h1>
             <p
-              className="text-base text-warm-gray/70 dark:text-[#94A3B8] mb-3"
+              className="text-sm md:text-base text-warm-gray/70 dark:text-[#94A3B8]"
               data-testid="text-hero-subtext"
             >
               Science-backed personality insights and career matching in minutes
             </p>
           </motion.div>
 
-          <div className="text-center mb-4">
+          <div className="text-center mb-6 md:mb-8">
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               className="relative"
             >
-              <div className="h-[52px] flex items-center justify-center overflow-hidden">
+              <div className="h-[44px] md:h-[52px] flex items-center justify-center overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={taglineIndex}
@@ -190,7 +190,7 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -20, scale: 0.95 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="flex items-center justify-center gap-3"
+                    className="flex items-center justify-center gap-2.5"
                   >
                     <motion.div
                       animate={{ 
@@ -205,34 +205,19 @@ export default function Home() {
                       className="flex-shrink-0"
                     >
                       {ROTATING_TAGLINES[taglineIndex].icon === "sparkle" ? (
-                        <Sparkles className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
+                        <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-terracotta dark:text-[#A78BFA]" />
                       ) : (
-                        <Compass className="w-5 h-5 text-sage-green dark:text-[#67E8F9]" />
+                        <Compass className="w-4 h-4 md:w-5 md:h-5 text-sage-green dark:text-[#67E8F9]" />
                       )}
                     </motion.div>
                     <p
-                      className="text-lg md:text-xl font-medium text-warm-gray dark:text-soft-cream"
+                      className="text-base md:text-xl font-medium text-warm-gray dark:text-soft-cream"
                       data-testid="text-subtitle"
                     >
                       {ROTATING_TAGLINES[taglineIndex].text}
                     </p>
                   </motion.div>
                 </AnimatePresence>
-              </div>
-              
-              <div className="flex justify-center gap-1.5 mt-1">
-                {ROTATING_TAGLINES.map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === taglineIndex 
-                        ? "w-6 bg-terracotta dark:bg-[#A78BFA] dark:shadow-[0_0_10px_rgba(167,139,250,0.5)]" 
-                        : "w-1.5 bg-warm-gray/20 dark:bg-[#A78BFA]/20"
-                    }`}
-                    animate={i === taglineIndex ? { scale: [1, 1.2, 1] } : {}}
-                    transition={{ duration: 0.3 }}
-                  />
-                ))}
               </div>
             </motion.div>
           </div>
@@ -241,7 +226,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex justify-center gap-4 mb-5"
+            className="flex justify-center gap-6 md:gap-8 mb-8 md:mb-10"
             data-testid="section-feature-highlights"
           >
             {FEATURES.map((feature) => (
@@ -250,13 +235,13 @@ export default function Home() {
                 className="flex flex-col items-center text-center flex-1"
                 data-testid={`feature-${feature.label.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <div className="w-10 h-10 rounded-full bg-warm-gray/5 dark:bg-white/5 flex items-center justify-center mb-1.5">
-                  <feature.icon className={`w-5 h-5 ${feature.color}`} />
+                <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-warm-gray/5 dark:bg-white/5 flex items-center justify-center mb-1.5">
+                  <feature.icon className={`w-4 h-4 md:w-5 md:h-5 ${feature.color}`} />
                 </div>
-                <span className="text-xs font-semibold text-warm-gray dark:text-[#F8FAFC] leading-tight">
+                <span className="text-[11px] md:text-xs font-semibold text-warm-gray dark:text-[#F8FAFC] leading-tight">
                   {feature.label}
                 </span>
-                <span className="text-[11px] text-warm-gray/60 dark:text-[#64748B] leading-tight mt-0.5">
+                <span className="text-[10px] md:text-[11px] text-warm-gray/60 dark:text-[#64748B] leading-tight mt-0.5">
                   {feature.description}
                 </span>
               </div>
@@ -264,7 +249,7 @@ export default function Home() {
           </motion.div>
 
           <div className="floating-card">
-            <div className="premium-card rounded-2xl p-6 md:p-8">
+            <div className="premium-card rounded-2xl p-5 md:p-8">
               <AnimatePresence mode="wait">
                 <motion.div
                   key="tier"

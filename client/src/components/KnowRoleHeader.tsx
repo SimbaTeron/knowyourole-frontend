@@ -19,11 +19,11 @@ export default function KnowRoleHeader({ theme, onThemeChange }: KnowRoleHeaderP
         <Popover>
           <PopoverTrigger asChild>
             <button
-              className="w-12 h-12 rounded-xl bg-soft-cream/80 dark:bg-[#12121A]/80 backdrop-blur-sm border border-terracotta/8 dark:border-[#A78BFA]/20 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-terracotta/20 dark:hover:border-[#A78BFA]/40 dark:hover:shadow-[0_0_20px_rgba(167,139,250,0.15)]"
+              className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-soft-cream/80 dark:bg-[#12121A]/80 backdrop-blur-sm border border-terracotta/8 dark:border-[#A78BFA]/20 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-terracotta/20 dark:hover:border-[#A78BFA]/40 dark:hover:shadow-[0_0_20px_rgba(167,139,250,0.15)]"
               aria-label="Settings"
               data-testid="button-settings"
             >
-              <Settings className="h-8 w-8 text-warm-gray/60 dark:text-[#A78BFA]" />
+              <Settings className="h-5 w-5 md:h-6 md:w-6 text-warm-gray/60 dark:text-[#A78BFA]" />
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-4 bg-warm-white dark:bg-[#12121A] border-terracotta/10 dark:border-[#A78BFA]/20" align="start">
