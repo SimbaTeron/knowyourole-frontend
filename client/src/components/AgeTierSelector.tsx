@@ -1,5 +1,6 @@
-import { Check, Compass, Rocket, Zap, Anchor } from "lucide-react";
-import { motion } from "framer-motion";
+import { Check, Compass, Rocket, Zap, Anchor, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 interface AgeTier {
   id: string;
@@ -24,13 +25,16 @@ const triggerHaptic = (duration = 50) => {
 interface AgeTierSelectorProps {
   selectedTier: string | null;
   onSelect: (tierId: string) => void;
+  onConfirm?: () => void;
 }
 
-export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelectorProps) {
+export default function AgeTierSelector({ selectedTier, onSelect, onConfirm }: AgeTierSelectorProps) {
   const handleSelect = (tierId: string) => {
     triggerHaptic(50);
     onSelect(tierId);
   };
+
+  const selectedTierData = ageTiers.find(t => t.id === selectedTier);
 
   return (
     <div className="w-full">
@@ -99,8 +103,30 @@ export default function AgeTierSelector({ selectedTier, onSelect }: AgeTierSelec
           );
         })}
       </div>
+
+      <AnimatePresence>
+        {selectedTier && selectedTierData && onConfirm && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: 10, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="mt-5"
+          >
+            <Button
+              onClick={onConfirm}
+              className="w-full py-6 text-lg font-bold bg-gradient-to-r from-terracotta to-sage-green dark:from-[#A78BFA] dark:to-[#67E8F9] text-white border-0 rounded-xl"
+              data-testid="button-start-journey"
+            >
+              Start My {selectedTierData.label} Journey
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <p className="text-center text-sm text-warm-gray/50 dark:text-[#64748B] italic mt-6">
-        Tap to select your age tier
+        {selectedTier ? "Ready? Hit the button above to begin" : "Tap to select your age tier"}
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { 
   X, 
@@ -122,7 +123,10 @@ export function AccountCreationModal({
 
           <div className="px-6 pb-6">
             <p className="text-xs text-center text-[#64748B]">
-              By signing in, you agree to our Terms of Service and Privacy Policy
+              By signing in, you agree to our{" "}
+              <Link href="/terms" className="underline hover:text-[#A78BFA] transition-colors" data-testid="link-terms">Terms of Service</Link>
+              {" "}and{" "}
+              <Link href="/privacy" className="underline hover:text-[#A78BFA] transition-colors" data-testid="link-privacy">Privacy Policy</Link>
             </p>
           </div>
         </motion.div>

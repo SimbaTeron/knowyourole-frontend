@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Compass, Brain, Briefcase, Gift, UserCheck, ClipboardList, BarChart3 } from "lucide-react";
+import { Sparkles, Compass, Brain, Briefcase, Gift, UserCheck, ClipboardList, BarChart3, FlaskConical, Quote, Shield } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import KnowRoleHeader from "@/components/KnowRoleHeader";
 import AgeTierSelector from "@/components/AgeTierSelector";
@@ -24,6 +24,37 @@ const STEPS = [
   { icon: UserCheck, step: "1", title: "Choose Your Age", description: "Pick the tier that fits you" },
   { icon: ClipboardList, step: "2", title: "Take the Quiz", description: "Answer fun, quick questions" },
   { icon: BarChart3, step: "3", title: "Get Results", description: "Explore your personality & careers" },
+];
+
+const TESTIMONIALS = [
+  {
+    quote: "I had no idea my personality traits pointed toward UX design. This tool helped me see a career path I never would have considered on my own.",
+    author: "Jordan, 22",
+    role: "College Senior"
+  },
+  {
+    quote: "My daughter loved taking the quiz. It sparked a great conversation about her strengths and what kind of work might make her happy one day.",
+    author: "Maria, Parent",
+    role: "of a 10-year-old"
+  },
+];
+
+const SCIENCE_HIGHLIGHTS = [
+  {
+    icon: Brain,
+    title: "Big Five (OCEAN)",
+    description: "The gold standard in personality psychology, backed by decades of peer-reviewed research."
+  },
+  {
+    icon: Compass,
+    title: "MBTI-Inspired",
+    description: "Understand your cognitive preferences through 16 personality types rooted in Jungian theory."
+  },
+  {
+    icon: Briefcase,
+    title: "DISC Behavioral",
+    description: "Professional-grade behavioral insights used in career coaching and team development."
+  },
 ];
 
 export default function Home() {
@@ -68,6 +99,12 @@ export default function Home() {
   };
 
   const handleTierSelect = (tierId: string) => {
+    setAgeTier(tierId);
+  };
+
+  const handleConfirmJourney = () => {
+    if (!ageTier) return;
+
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -86,10 +123,9 @@ export default function Home() {
     }
     sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
     
-    setAgeTier(tierId);
-    sessionStorage.setItem("knowrole-tier", tierId);
+    sessionStorage.setItem("knowrole-tier", ageTier);
     if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-    setTimeout(() => setLocation("/mood-mixer"), 300);
+    setLocation("/mood-mixer");
   };
 
   const getThemeClass = () => {
@@ -103,7 +139,7 @@ export default function Home() {
         theme={theme} 
         onThemeChange={handleThemeChange} 
       />
-      <main className="relative z-10 flex flex-col items-center px-5 pt-16 pb-24">
+      <main className="relative z-10 flex flex-col items-center px-5 pt-16 pb-12">
         <div className="w-full max-w-md">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -223,7 +259,11 @@ export default function Home() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <AgeTierSelector selectedTier={ageTier} onSelect={handleTierSelect} />
+                  <AgeTierSelector
+                    selectedTier={ageTier}
+                    onSelect={handleTierSelect}
+                    onConfirm={handleConfirmJourney}
+                  />
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -263,11 +303,127 @@ export default function Home() {
             </div>
           </motion.div>
         </div>
+
+        <div className="w-full max-w-lg mt-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            data-testid="section-our-science"
+          >
+            <div className="text-center mb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <FlaskConical className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
+                <p className="text-xs uppercase tracking-widest text-warm-gray/50 dark:text-[#64748B] font-semibold">
+                  Our Science
+                </p>
+              </div>
+              <h2 className="text-xl md:text-2xl font-display font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">
+                Research-Informed Assessments
+              </h2>
+              <p className="text-sm text-warm-gray/60 dark:text-[#94A3B8] max-w-sm mx-auto">
+                Built on three well-established psychological frameworks used by researchers and professionals worldwide.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {SCIENCE_HIGHLIGHTS.map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-start gap-3 p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/10"
+                  data-testid={`science-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                >
+                  <div className="w-9 h-9 rounded-lg bg-terracotta/10 dark:bg-[#A78BFA]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <item.icon className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-warm-gray dark:text-[#F8FAFC] mb-0.5">{item.title}</h3>
+                    <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8] leading-relaxed">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 p-4 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Shield className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
+                <span className="text-xs font-semibold text-warm-gray dark:text-[#F8FAFC]">Research-Informed</span>
+              </div>
+              <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8]">
+                Our assessments draw on decades of published personality research. Age-appropriate content for every tier.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="w-full max-w-lg mt-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            data-testid="section-testimonials"
+          >
+            <div className="text-center mb-6">
+              <p className="text-xs uppercase tracking-widest text-warm-gray/50 dark:text-[#64748B] font-semibold">
+                What People Say
+              </p>
+            </div>
+            <div className="space-y-4">
+              {TESTIMONIALS.map((testimonial, index) => (
+                <div
+                  key={index}
+                  className="relative p-5 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/10"
+                  data-testid={`testimonial-${index}`}
+                >
+                  <Quote className="w-5 h-5 text-terracotta/30 dark:text-[#A78BFA]/30 mb-2" />
+                  <p className="text-sm text-warm-gray/80 dark:text-[#E2E8F0] leading-relaxed mb-3 italic">
+                    "{testimonial.quote}"
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-8 rounded-full bg-terracotta/40 dark:bg-[#A78BFA]/40" />
+                    <div>
+                      <p className="text-xs font-semibold text-warm-gray dark:text-[#F8FAFC]">{testimonial.author}</p>
+                      <p className="text-[11px] text-warm-gray/50 dark:text-[#64748B]">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </main>
-      <footer className="fixed bottom-0 left-0 right-0 z-10 py-5 text-center">
-        <p className="text-sm italic font-handwritten text-warm-gray/50 dark:text-[#64748B] cursor-pointer hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors">
-          Unfold your trait trail
-        </p>
+
+      <footer className="relative z-10 border-t border-warm-gray/10 dark:border-[#A78BFA]/10 py-8 px-5 mt-8" data-testid="section-footer">
+        <div className="max-w-lg mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
+            <Link href="/about" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-about">
+              About
+            </Link>
+            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
+            <Link href="/about" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-science">
+              Our Science
+            </Link>
+            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
+            <Link href="/faq" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-faq">
+              FAQ
+            </Link>
+            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
+            <Link href="/privacy" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-privacy">
+              Privacy
+            </Link>
+            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
+            <Link href="/terms" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-terms">
+              Terms
+            </Link>
+            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
+            <a href="mailto:contact@knowyourole.com" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-contact">
+              Contact
+            </a>
+          </div>
+          <p className="text-xs text-center text-warm-gray/40 dark:text-[#64748B]">
+            KnowYouRole — Science-backed personality insights for every age.
+          </p>
+        </div>
       </footer>
     </div>
   );
