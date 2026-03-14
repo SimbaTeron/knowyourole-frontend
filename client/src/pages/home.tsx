@@ -40,9 +40,9 @@ const TESTIMONIALS = [
     icon: TrendingUp,
   },
   {
-    quote: "My daughter loved taking the quiz. It sparked a great conversation about her strengths and what kind of work might make her happy one day.",
+    quote: "My 15-year-old took the quiz and it opened up a real conversation about her strengths. She's already looking into the career paths it suggested.",
     author: "Maria, Parent",
-    role: "of a 10-year-old",
+    role: "of a teenager",
     icon: User,
   },
   {

@@ -47,7 +47,7 @@ export default function AgeTierSelector({ selectedTier, onSelect, onConfirm }: A
           Select the journey that fits you best
         </p>
       </div>
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {ageTiers.map((tier, index) => {
           const isSelected = selectedTier === tier.id;
           const Icon = tier.Icon;
