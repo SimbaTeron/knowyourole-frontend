@@ -6,14 +6,15 @@ interface AgeTier {
   id: string;
   label: string;
   sublabel: string;
+  tagline: string;
   Icon: typeof Compass;
 }
 
 const ageTiers: AgeTier[] = [
-  { id: "25+", label: "Adult Anchor", sublabel: "Ages 25+", Icon: Anchor },
-  { id: "19-25", label: "Young Trailblazer", sublabel: "Ages 19-25", Icon: Zap },
-  { id: "13-18", label: "Teen Navigator", sublabel: "Ages 13-18", Icon: Rocket },
-  { id: "7-12", label: "Mini Explorer", sublabel: "Ages 12 and under", Icon: Compass },
+  { id: "25+", label: "Adult Anchor", sublabel: "Ages 25+", tagline: "Career strategy & leadership insights", Icon: Anchor },
+  { id: "19-25", label: "Young Trailblazer", sublabel: "Ages 19-25", tagline: "Find your path & unlock potential", Icon: Zap },
+  { id: "13-18", label: "Teen Navigator", sublabel: "Ages 13-18", tagline: "Discover strengths & future direction", Icon: Rocket },
+  { id: "7-12", label: "Mini Explorer", sublabel: "Ages 12 and under", tagline: "Fun strengths discovery for kids", Icon: Compass },
 ];
 
 const triggerHaptic = (duration = 50) => {
@@ -82,10 +83,15 @@ export default function AgeTierSelector({ selectedTier, onSelect, onConfirm }: A
                   }`}>
                     {tier.label}
                   </span>
-                  <span className={`text-xl md:text-2xl mt-1 block font-medium ${
+                  <span className={`text-xl md:text-2xl mt-0.5 block font-medium ${
                     isSelected ? "text-white/70" : "text-warm-gray/50 dark:text-[#94A3B8]"
                   }`}>
                     {tier.sublabel}
+                  </span>
+                  <span className={`text-xs mt-1 block ${
+                    isSelected ? "text-white/60" : "text-warm-gray/40 dark:text-[#64748B]"
+                  }`}>
+                    {tier.tagline}
                   </span>
                 </div>
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Compass, Brain, Briefcase, Gift, UserCheck, ClipboardList, BarChart3, FlaskConical, Quote, Shield } from "lucide-react";
+import { Sparkles, Compass, Brain, Briefcase, Gift, UserCheck, ClipboardList, BarChart3, FlaskConical, Quote, Shield, User, Target, TrendingUp, Lightbulb, Eye } from "lucide-react";
 import PathCanvas from "@/components/PathCanvas";
 import KnowRoleHeader from "@/components/KnowRoleHeader";
 import AgeTierSelector from "@/components/AgeTierSelector";
@@ -30,12 +30,26 @@ const TESTIMONIALS = [
   {
     quote: "I had no idea my personality traits pointed toward UX design. This tool helped me see a career path I never would have considered on my own.",
     author: "Jordan, 22",
-    role: "College Senior"
+    role: "College Senior",
+    icon: UserCheck,
+  },
+  {
+    quote: "At 34, I was stuck in accounting and miserable. My results showed high Openness and Extraversion — now I'm exploring product management. Wish I'd found this sooner.",
+    author: "Marcus, 34",
+    role: "Career Changer",
+    icon: TrendingUp,
   },
   {
     quote: "My daughter loved taking the quiz. It sparked a great conversation about her strengths and what kind of work might make her happy one day.",
     author: "Maria, Parent",
-    role: "of a 10-year-old"
+    role: "of a 10-year-old",
+    icon: User,
+  },
+  {
+    quote: "The DISC breakdown was spot on. I shared my results with my study group and now we actually understand why we clash on projects.",
+    author: "Priya, 20",
+    role: "Engineering Student",
+    icon: Target,
   },
 ];
 
@@ -368,23 +382,91 @@ export default function Home() {
                 What People Say
               </p>
             </div>
-            <div className="space-y-4">
-              {TESTIMONIALS.map((testimonial, index) => (
-                <div
-                  key={index}
-                  className="relative p-5 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/10"
-                  data-testid={`testimonial-${index}`}
-                >
-                  <Quote className="w-5 h-5 text-terracotta/30 dark:text-[#A78BFA]/30 mb-2" />
-                  <p className="text-sm text-warm-gray/80 dark:text-[#E2E8F0] leading-relaxed mb-3 italic">
-                    "{testimonial.quote}"
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-8 rounded-full bg-terracotta/40 dark:bg-[#A78BFA]/40" />
-                    <div>
-                      <p className="text-xs font-semibold text-warm-gray dark:text-[#F8FAFC]">{testimonial.author}</p>
-                      <p className="text-[11px] text-warm-gray/50 dark:text-[#64748B]">{testimonial.role}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {TESTIMONIALS.map((testimonial, index) => {
+                const AvatarIcon = testimonial.icon;
+                return (
+                  <div
+                    key={index}
+                    className="relative p-5 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/10"
+                    data-testid={`testimonial-${index}`}
+                  >
+                    <Quote className="w-5 h-5 text-terracotta/30 dark:text-[#A78BFA]/30 mb-2" />
+                    <p className="text-sm text-warm-gray/80 dark:text-[#E2E8F0] leading-relaxed mb-3 italic">
+                      "{testimonial.quote}"
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-terracotta/10 dark:bg-[#A78BFA]/15 flex items-center justify-center flex-shrink-0">
+                        <AvatarIcon className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-warm-gray dark:text-[#F8FAFC]">{testimonial.author}</p>
+                        <p className="text-[11px] text-warm-gray/50 dark:text-[#64748B]">{testimonial.role}</p>
+                      </div>
                     </div>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="w-full max-w-lg mt-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            data-testid="section-results-teaser"
+          >
+            <div className="text-center mb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Eye className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
+                <p className="text-xs uppercase tracking-widest text-warm-gray/50 dark:text-[#64748B] font-semibold">
+                  Preview
+                </p>
+              </div>
+              <h2 className="text-xl md:text-2xl font-display font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">
+                What You'll Discover
+              </h2>
+              <p className="text-sm text-warm-gray/60 dark:text-[#94A3B8] max-w-sm mx-auto">
+                Complete the quiz to unlock your personalized insights
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {[
+                {
+                  icon: Brain,
+                  title: "Your Blended Personality Profile",
+                  description: "See how traits like Openness and Dominance combine to reveal types like Strategic Innovator or Empathic Leader.",
+                },
+                {
+                  icon: Briefcase,
+                  title: "Top Career Matches from 150+",
+                  description: "Roles like Product Manager, Counselor, Entrepreneur, and more — matched to your unique trait blend.",
+                },
+                {
+                  icon: TrendingUp,
+                  title: "Strengths & Growth Areas",
+                  description: "Discover what you're naturally good at and where targeted effort can unlock the most growth.",
+                },
+                {
+                  icon: Lightbulb,
+                  title: "Everyday Tips & Insights",
+                  description: "Practical advice for work, communication, and relationships based on your personality style.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-start gap-3 p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/10"
+                  data-testid={`teaser-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                >
+                  <div className="w-9 h-9 rounded-lg bg-terracotta/10 dark:bg-[#A78BFA]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <item.icon className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-warm-gray dark:text-[#F8FAFC] mb-0.5">{item.title}</h3>
+                    <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8] leading-relaxed">{item.description}</p>
                   </div>
                 </div>
               ))}
