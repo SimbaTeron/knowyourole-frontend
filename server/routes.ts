@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { stripeService } from "./stripeService";
 import { getStripePublishableKey } from "./stripeClient";
-import { sql, eq, and, gte, lte, or, desc } from "drizzle-orm";
+import { sql, eq, and, gte, lte, or, desc, ilike } from "drizzle-orm";
 import { db } from "./db";
 import { seedAll, seedPremiumInsights } from "./seedData";
 import { seedJobRoles } from "./seed-job-roles";
@@ -524,60 +524,27 @@ function getTraitChangeInsight(trait: string, change: number): string {
 }
 
 // Phase 3: Role Fit Analyzer - Compares personality to dream role requirements
-function analyzeRoleFit(dreamRole: string, bigFive: any, mbtiType: string, discStyle: string): any {
-  const roleLower = dreamRole.toLowerCase();
-  
-  // Role archetype patterns
-  const rolePatterns: Record<string, { traits: Record<string, { ideal: number; weight: number }>; tips: string[] }> = {
-    'nurse': {
-      traits: { A: { ideal: 75, weight: 0.3 }, E: { ideal: 60, weight: 0.2 }, C: { ideal: 70, weight: 0.25 }, N: { ideal: 35, weight: 0.25 } },
-      tips: ["Build emotional boundaries", "Practice active listening", "Develop stress coping strategies"]
-    },
-    'developer': {
-      traits: { O: { ideal: 65, weight: 0.25 }, C: { ideal: 75, weight: 0.3 }, E: { ideal: 40, weight: 0.15 }, N: { ideal: 35, weight: 0.3 } },
-      tips: ["Embrace pair programming", "Build presentation skills", "Practice explaining technical concepts"]
-    },
-    'manager': {
-      traits: { E: { ideal: 70, weight: 0.3 }, C: { ideal: 70, weight: 0.25 }, A: { ideal: 60, weight: 0.2 }, O: { ideal: 55, weight: 0.25 } },
-      tips: ["Develop delegation skills", "Practice giving feedback", "Build conflict resolution abilities"]
-    },
-    'artist': {
-      traits: { O: { ideal: 85, weight: 0.4 }, A: { ideal: 50, weight: 0.1 }, E: { ideal: 50, weight: 0.2 }, N: { ideal: 50, weight: 0.3 } },
-      tips: ["Develop business skills", "Build a support network", "Create sustainable routines"]
-    },
-    'teacher': {
-      traits: { E: { ideal: 65, weight: 0.25 }, A: { ideal: 70, weight: 0.25 }, O: { ideal: 65, weight: 0.2 }, C: { ideal: 65, weight: 0.3 } },
-      tips: ["Practice patience techniques", "Develop curriculum design skills", "Build parent communication strategies"]
-    },
-    'entrepreneur': {
-      traits: { O: { ideal: 75, weight: 0.3 }, E: { ideal: 65, weight: 0.2 }, C: { ideal: 60, weight: 0.2 }, N: { ideal: 30, weight: 0.3 } },
-      tips: ["Build a support team", "Develop financial literacy", "Practice pitching ideas"]
-    }
+function analyzeRoleFitFromDB(roleData: any, bigFive: any, mbtiType: string, discStyle: string): any {
+  const idealTraits: Record<string, { ideal: number; weight: number }> = {
+    O: { ideal: roleData.big5O * 20, weight: 0.2 },
+    C: { ideal: roleData.big5C * 20, weight: 0.2 },
+    E: { ideal: roleData.big5E * 20, weight: 0.2 },
+    A: { ideal: roleData.big5A * 20, weight: 0.2 },
+    N: { ideal: roleData.big5N * 20, weight: 0.2 },
   };
-  
-  // Find matching pattern or use generic
-  let rolePattern = rolePatterns['manager']; // Default
-  for (const [key, pattern] of Object.entries(rolePatterns)) {
-    if (roleLower.includes(key)) {
-      rolePattern = pattern;
-      break;
-    }
-  }
-  
+
   const pros: string[] = [];
   const cons: string[] = [];
-  const tips: string[] = [...rolePattern.tips];
-  
-  // Analyze each trait
+
   const traitLabels: Record<string, string> = {
     O: 'Creativity', C: 'Organization', E: 'Social Energy', A: 'Collaboration', N: 'Stress Handling'
   };
-  
-  for (const [trait, config] of Object.entries(rolePattern.traits)) {
+
+  for (const [trait, config] of Object.entries(idealTraits)) {
     const userVal = bigFive[trait] || 50;
     const diff = userVal - config.ideal;
     const label = traitLabels[trait];
-    
+
     if (Math.abs(diff) <= 15) {
       pros.push(`${label}: Well-aligned (${userVal}% vs ${config.ideal}% ideal)`);
     } else if (diff > 15) {
@@ -594,11 +561,10 @@ function analyzeRoleFit(dreamRole: string, bigFive: any, mbtiType: string, discS
       }
     }
   }
-  
-  // Calculate overall match score
+
   let matchScore = 0;
   let totalWeight = 0;
-  for (const [trait, config] of Object.entries(rolePattern.traits)) {
+  for (const [trait, config] of Object.entries(idealTraits)) {
     const userVal = bigFive[trait] || 50;
     const diff = Math.abs(userVal - config.ideal);
     const traitScore = Math.max(0, 100 - diff * 1.5);
@@ -606,9 +572,18 @@ function analyzeRoleFit(dreamRole: string, bigFive: any, mbtiType: string, discS
     totalWeight += config.weight;
   }
   matchScore = Math.round(matchScore / totalWeight);
-  
+
+  const collarTips: Record<string, string[]> = {
+    'white': ["Build cross-functional communication skills", "Develop strategic thinking habits", "Practice time management techniques"],
+    'blue': ["Invest in safety and certification training", "Build physical endurance routines", "Develop problem-solving under pressure"],
+    'healthcare': ["Build emotional boundaries", "Practice active listening", "Develop stress coping strategies"],
+    'service': ["Strengthen customer interaction skills", "Build patience and adaptability", "Practice conflict de-escalation"],
+    'arts': ["Develop business and self-promotion skills", "Build a support network", "Create sustainable creative routines"],
+  };
+  const tips = collarTips[roleData.jobCollar] || collarTips['white'];
+
   return {
-    dreamRole,
+    dreamRole: roleData.roleName,
     matchScore,
     pros: pros.slice(0, 4),
     cons: cons.slice(0, 3),
@@ -681,6 +656,24 @@ export async function registerRoutes(
   });
 
   // Phase 3: Dream Role Advisor - Analyze role fit
+  app.get('/api/job-roles/search', async (req: Request, res: Response) => {
+    try {
+      const q = (req.query.q as string || '').trim();
+      if (!q) {
+        return res.json({ roles: [] });
+      }
+      const results = await db.select({ roleNumber: jobRoles.roleNumber, roleName: jobRoles.roleName })
+        .from(jobRoles)
+        .where(ilike(jobRoles.roleName, `${q}%`))
+        .orderBy(jobRoles.roleName)
+        .limit(8);
+      res.json({ roles: results });
+    } catch (error) {
+      console.error("Job role search error:", error);
+      res.status(500).json({ error: "Failed to search roles" });
+    }
+  });
+
   app.post('/api/analyze-role-fit', async (req: Request, res: Response) => {
     try {
       const { dreamRole, bigFive, mbtiType, discStyle } = req.body;
@@ -689,8 +682,12 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Dream role and personality data required" });
       }
 
-      // Find matching job role from database or use general analysis
-      const roleAnalysis = analyzeRoleFit(dreamRole, bigFive, mbtiType, discStyle);
+      const [roleData] = await db.select().from(jobRoles).where(eq(jobRoles.roleName, dreamRole)).limit(1);
+      if (!roleData) {
+        return res.status(404).json({ error: "Role not found in database. Please select a role from the suggestions." });
+      }
+
+      const roleAnalysis = analyzeRoleFitFromDB(roleData, bigFive, mbtiType, discStyle);
       
       res.json({
         success: true,

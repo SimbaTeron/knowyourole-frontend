@@ -1,12 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, ThumbsUp, Lightbulb, 
-  Search, Loader2, TrendingUp, AlertCircle, RotateCcw, Briefcase
+  Search, Loader2, AlertCircle, RotateCcw, Briefcase
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -20,18 +19,37 @@ interface RoleAnalysis {
   verdict: string;
 }
 
+interface RoleSuggestion {
+  roleNumber: number;
+  roleName: string;
+}
+
 interface DreamRoleAdvisorProps {
   bigFive: { O: number; C: number; E: number; A: number; N: number };
   mbtiType: string;
   discStyle: string;
 }
 
-const POPULAR_ROLES = ['Nurse', 'Developer', 'Teacher', 'Manager', 'Artist', 'Entrepreneur'];
+const POPULAR_ROLES = [
+  'Registered Nurse',
+  'Software Developer', 
+  'Teacher (High School)',
+  'Marketing Manager',
+  'Graphic Designer',
+  'Architect'
+];
 
 export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvisorProps) {
   const [dreamRole, setDreamRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<RoleAnalysis | null>(null);
+  const [suggestions, setSuggestions] = useState<RoleSuggestion[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState(-1);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const analyzeMutation = useMutation({
     mutationFn: async (role: string) => {
@@ -56,18 +74,82 @@ export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvi
     }
   }, [analysis]);
 
-  const handleAnalyze = (role?: string) => {
-    const roleToAnalyze = role || dreamRole.trim();
-    if (roleToAnalyze) {
-      if (role) setDreamRole(role);
-      analyzeMutation.mutate(roleToAnalyze);
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
+          inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
     }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const searchRoles = useCallback(async (query: string) => {
+    if (query.trim().length === 0) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/job-roles/search?q=${encodeURIComponent(query.trim())}`);
+      const data = await res.json();
+      setSuggestions(data.roles || []);
+      setShowDropdown((data.roles || []).length > 0);
+      setHighlightIndex(-1);
+    } catch {
+      setSuggestions([]);
+      setShowDropdown(false);
+    }
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setDreamRole(val);
+    setSelectedRole(null);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => searchRoles(val), 300);
+  };
+
+  const selectRole = (roleName: string) => {
+    setDreamRole(roleName);
+    setSelectedRole(roleName);
+    setShowDropdown(false);
+    setSuggestions([]);
+    analyzeMutation.mutate(roleName);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleAnalyze();
+    if (!showDropdown || suggestions.length === 0) {
+      if (e.key === 'Enter' && selectedRole) {
+        analyzeMutation.mutate(selectedRole);
+      }
+      return;
     }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightIndex(prev => Math.min(prev + 1, suggestions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightIndex(prev => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (highlightIndex >= 0 && highlightIndex < suggestions.length) {
+        selectRole(suggestions[highlightIndex].roleName);
+      } else if (suggestions.length === 1) {
+        selectRole(suggestions[0].roleName);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+    }
+  };
+
+  const handlePopularRole = (role: string) => {
+    setDreamRole(role);
+    setSelectedRole(role);
+    setShowDropdown(false);
+    setSuggestions([]);
+    analyzeMutation.mutate(role);
   };
 
   const getScoreColor = (score: number) => {
@@ -97,6 +179,9 @@ export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvi
   const resetAnalysis = () => {
     setAnalysis(null);
     setDreamRole("");
+    setSelectedRole(null);
+    setSuggestions([]);
+    setShowDropdown(false);
     analyzeMutation.reset();
   };
 
@@ -124,41 +209,69 @@ export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvi
             <Sparkles className="w-5 h-5 text-amber-500" />
           </h3>
           <p className="text-sm text-amber-800/70 dark:text-amber-200/60 mt-1">
-            Enter your dream job and see how your personality matches
+            Search for your dream job and see how your personality matches
           </p>
         </div>
 
-        <div className="flex gap-2 mb-3">
-          <Input
-            placeholder="e.g., Nurse, Developer, Teacher..."
-            value={dreamRole}
-            onChange={(e) => setDreamRole(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 bg-white/80 dark:bg-black/20 border-amber-200 dark:border-amber-700 focus:border-amber-400"
-            data-testid="input-dream-role"
-          />
-          <Button 
-            onClick={() => handleAnalyze()}
-            disabled={!dreamRole.trim() || analyzeMutation.isPending}
-            className="bg-amber-600 hover:bg-amber-700 text-white min-w-[44px]"
-            data-testid="button-analyze-role"
-          >
-            {analyzeMutation.isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Search className="w-4 h-4" />
-            )}
-          </Button>
+        <div className="relative mb-3">
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <Input
+                ref={inputRef}
+                placeholder="Start typing a role (e.g., Nurse, Developer...)"
+                value={dreamRole}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
+                className="flex-1 bg-white/80 dark:bg-black/20 border-amber-200 dark:border-amber-700 focus:border-amber-400"
+                data-testid="input-dream-role"
+              />
+              {showDropdown && suggestions.length > 0 && (
+                <div 
+                  ref={dropdownRef}
+                  className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-amber-200 dark:border-amber-700 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto"
+                  data-testid="dropdown-role-suggestions"
+                >
+                  {suggestions.map((suggestion, idx) => (
+                    <button
+                      key={suggestion.roleNumber}
+                      onClick={() => selectRole(suggestion.roleName)}
+                      className={`w-full text-left px-3 py-2 text-sm transition-colors ${
+                        idx === highlightIndex 
+                          ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-100' 
+                          : 'text-gray-800 dark:text-gray-200 hover-elevate'
+                      }`}
+                      data-testid={`option-role-${suggestion.roleNumber}`}
+                    >
+                      {suggestion.roleName}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <Button 
+              onClick={() => { if (selectedRole) analyzeMutation.mutate(selectedRole); }}
+              disabled={!selectedRole || analyzeMutation.isPending}
+              className="bg-amber-600 text-white min-w-[44px]"
+              data-testid="button-analyze-role"
+            >
+              {analyzeMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Search className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-1.5 mb-2 justify-center">
           {POPULAR_ROLES.map(role => (
             <button
               key={role}
-              onClick={() => handleAnalyze(role)}
+              onClick={() => handlePopularRole(role)}
               disabled={analyzeMutation.isPending}
               className="px-3 py-1 text-xs rounded-full bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 border border-amber-200/60 dark:border-amber-700/40 hover-elevate transition-colors disabled:opacity-50"
-              data-testid={`button-popular-role-${role.toLowerCase()}`}
+              data-testid={`button-popular-role-${role.toLowerCase().replace(/[\s()\/]/g, '-')}`}
             >
               {role}
             </button>
@@ -194,7 +307,7 @@ export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvi
                     {analysis.matchScore}%
                   </span>
                 </motion.div>
-                <h4 className="text-lg font-bold text-amber-900 dark:text-amber-100 capitalize">
+                <h4 className="text-lg font-bold text-amber-900 dark:text-amber-100">
                   {analysis.dreamRole}
                 </h4>
                 <span className={`mt-1 px-3 py-0.5 rounded-full text-xs font-semibold ${getVerdictBadgeColor(analysis.matchScore)}`}>
