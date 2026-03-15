@@ -37,18 +37,16 @@ export function ResultsPage1({ s }: { s: ResultsState }) {
                   </span>
                 </div>
                 <h3 className="text-lg font-bold text-warm-gray dark:text-[#F8FAFC] mb-1">
-                  {adventureArchetype.archetype}
+                  {adventureArchetype.name}
                 </h3>
                 <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
                   {adventureArchetype.description}
                 </p>
-                {adventureArchetype.strengths && (
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {adventureArchetype.strengths.map((str: string) => (
-                      <span key={str} className="px-2.5 py-1 text-xs rounded-full bg-purple-100 dark:bg-purple-800/40 text-purple-700 dark:text-purple-300 font-medium">
-                        {str}
-                      </span>
-                    ))}
+                {adventureArchetype.superpower && (
+                  <div className="mt-3">
+                    <span className="px-2.5 py-1 text-xs rounded-full bg-purple-100 dark:bg-purple-800/40 text-purple-700 dark:text-purple-300 font-medium">
+                      {adventureArchetype.superpower}
+                    </span>
                   </div>
                 )}
               </CardContent>

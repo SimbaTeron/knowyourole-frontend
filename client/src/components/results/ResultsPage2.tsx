@@ -69,7 +69,7 @@ export function ResultsPage2({ s }: { s: ResultsState }) {
                       </div>
                     </div>
                   </summary>
-                  <div className="px-4 pb-3 text-sm text-warm-gray/70 dark:text-[#94A3B8]">{result.discDescription}</div>
+                  <div className="px-4 pb-3 text-sm text-warm-gray/70 dark:text-[#94A3B8]">{result.discDesc}</div>
                 </details>
 
                 <details className="group">
@@ -102,13 +102,9 @@ export function ResultsPage2({ s }: { s: ResultsState }) {
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-sage-green flex-shrink-0 mt-0.5" />
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-warm-gray dark:text-[#F8FAFC] text-sm">{localeInsight.regionName}</h4>
+                    <h4 className="font-semibold text-warm-gray dark:text-[#F8FAFC] text-sm">{localeInsight.metro || localeInsight.city}</h4>
                     <p className="text-xs text-warm-gray/70 dark:text-[#94A3B8]">
                       {getPersonalizedInsight(
-                        localeInsight,
-                        result.mbtiType,
-                        result.discStyle,
-                        TRAIT_LABELS[topTrait[0] as keyof typeof TRAIT_LABELS],
                         cityName,
                         stateName,
                         result.mbtiType.startsWith('E'),

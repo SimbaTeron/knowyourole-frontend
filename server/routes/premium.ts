@@ -17,7 +17,8 @@ export function registerPremiumRoutes(app: Express) {
       if (!bigFive || !mbtiType || !discStyle) {
         return res.status(400).json({ error: "Missing required fields" });
       }
-      const matches = await getJobMatches(bigFive, mbtiType, discStyle, limit);
+      const userScores = { bigFive, mbti: mbtiType, disc: discStyle };
+      const matches = await getJobMatches(userScores, limit);
       res.json(matches);
     } catch (error) {
       console.error("Job matching error:", error);
@@ -32,7 +33,7 @@ export function registerPremiumRoutes(app: Express) {
         return res.status(400).json({ error: "Missing required fields" });
       }
       const topMatch = await getTopJobMatch({
-        bigFive, mbtiType, discStyle, mbtiBlend, topTrait, cityName, stateName
+        bigFive, mbti: mbtiType, disc: discStyle
       });
       res.json(topMatch);
     } catch (error) {
