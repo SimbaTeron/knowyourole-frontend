@@ -3316,6 +3316,13 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
                     </CardContent>
                   </Card>
 
+                  {/* Dream Role Advisor - Prominent Inline Section */}
+                  <DreamRoleAdvisor 
+                    bigFive={result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 }}
+                    mbtiType={result?.mbtiType || "INTJ"}
+                    discStyle={result?.discStyle || "C"}
+                  />
+
                   {/* Interactive Premium Card Deck */}
                   <PremiumCardDeck 
                     result={result ? {
@@ -3350,15 +3357,6 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
                   {/* Phase 3 & 4: Advanced Features */}
                   <div className="space-y-4 mt-6">
-                    {/* Dream Role Advisor Button */}
-                    <div className="flex justify-center">
-                      <DreamRoleAdvisor 
-                        bigFive={result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 }}
-                        mbtiType={result?.mbtiType || "INTJ"}
-                        discStyle={result?.discStyle || "C"}
-                      />
-                    </div>
-                    
                     {/* Personality Evolution Timeline */}
                     <PersonalityEvolutionTimeline 
                       mbtiType={result?.mbtiType || "INTJ"}
