@@ -17,13 +17,15 @@ export function registerPremiumRoutes(app: Express) {
 
   app.post("/api/job-matches", async (req: Request, res: Response) => {
     try {
-      const { bigFive, mbtiType, discStyle, limit = 5 } = req.body;
-      if (!bigFive || !mbtiType || !discStyle) {
+      const { bigFive, mbti, disc, mbtiType, discStyle, limit = 5 } = req.body;
+      const resolvedMbti = mbti || mbtiType;
+      const resolvedDisc = disc || discStyle;
+      if (!bigFive || !resolvedMbti || !resolvedDisc) {
         return res.status(400).json({ error: "Missing required fields" });
       }
-      const userScores = { bigFive, mbti: mbtiType, disc: discStyle };
+      const userScores = { bigFive, mbti: resolvedMbti, disc: resolvedDisc };
       const matches = await getJobMatches(userScores, limit);
-      res.json(matches);
+      res.json({ success: true, matches });
     } catch (error) {
       console.error("Job matching error:", error);
       res.status(500).json({ error: "Failed to get job matches" });
@@ -32,14 +34,16 @@ export function registerPremiumRoutes(app: Express) {
 
   app.post("/api/job-match/top", async (req: Request, res: Response) => {
     try {
-      const { bigFive, mbtiType, discStyle, mbtiBlend, topTrait, cityName, stateName } = req.body;
-      if (!bigFive || !mbtiType || !discStyle) {
+      const { bigFive, mbti, disc, mbtiType, discStyle } = req.body;
+      const resolvedMbti = mbti || mbtiType;
+      const resolvedDisc = disc || discStyle;
+      if (!bigFive || !resolvedMbti || !resolvedDisc) {
         return res.status(400).json({ error: "Missing required fields" });
       }
       const topMatch = await getTopJobMatch({
-        bigFive, mbti: mbtiType, disc: discStyle
+        bigFive, mbti: resolvedMbti, disc: resolvedDisc
       });
-      res.json(topMatch);
+      res.json({ success: true, match: topMatch });
     } catch (error) {
       console.error("Top job match error:", error);
       res.status(500).json({ error: "Failed to get top job match" });

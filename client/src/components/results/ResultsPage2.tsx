@@ -210,11 +210,11 @@ export function ResultsPage2({ s }: { s: ResultsState }) {
                 </Card>
               )}
 
-              {(result as any).proxyNudge && (
+              {result.proxyNudge && (
                 <Card className="bg-dusty-blue/10 dark:bg-dusty-blue/20 border-dusty-blue/30">
                   <CardContent className="p-4 text-sm text-dusty-blue font-medium flex items-center gap-2">
                     <Zap className="w-4 h-4" />
-                    {(result as any).proxyNudge}
+                    {result.proxyNudge}
                   </CardContent>
                 </Card>
               )}

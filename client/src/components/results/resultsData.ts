@@ -115,6 +115,7 @@ export interface PersonalityResult {
   primaryRole: { title: string; salary: string; desc: string };
   secondaryRole: { title: string; salary: string; desc: string };
   spark: string;
+  proxyNudge?: string;
   scales?: {
     critical: ScaleData;
     firstPrinciples: ScaleData;

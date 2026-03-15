@@ -202,7 +202,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     try {
       const productsRes = await fetch('/api/stripe/products');
       const productsData = await productsRes.json();
-      const proProduct = productsData.products?.find((p: any) => p.metadata?.tier === 'pro' || p.name === 'KnowRole Pro');
+      const proProduct = productsData.products?.find((p: { metadata?: { tier?: string }; name?: string }) => p.metadata?.tier === 'pro' || p.name === 'KnowRole Pro');
       if (!proProduct || !proProduct.prices?.length) throw new Error('Pro product not found');
       const checkoutRes = await fetch('/api/stripe/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ priceId: proProduct.prices[0].id, sessionId: sessionId || undefined }) });
       const checkoutData = await checkoutRes.json();
