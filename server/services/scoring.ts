@@ -30,8 +30,32 @@ export const MBTI_LABELS: Record<string, { title: string; spark: string }> = {
   ESFP: { title: "Joyful Entertainer", spark: "Your energy lifts every room" },
 };
 
-export function calculatePersonality(data: any) {
-  const scores = data.scores || data;
+interface ResponseEntry {
+  questionId: number;
+  choice: 0 | 1;
+  timeSpent?: number;
+  sliderValue?: number;
+  psych?: string;
+  swipeDirection?: "left" | "right";
+  [k: string]: unknown;
+}
+
+interface ScoresData {
+  mbti: Record<string, number>;
+  disc: Record<string, number>;
+  bigFive: Record<string, number>;
+  responses: ResponseEntry[];
+  engagement: number;
+  averageSwipeTime: number;
+  wildcardBoost?: boolean | number;
+  criticalWildcard?: number;
+  firstPrinciplesWildcard?: number;
+  moodBoosts?: Record<string, number>;
+  [key: string]: unknown;
+}
+
+export function calculatePersonality(data: Record<string, unknown>) {
+  const scores = (data.scores || data) as ScoresData;
   const { mbti, disc, bigFive } = scores;
   
   const hybridTypes: string[] = [];
@@ -163,7 +187,7 @@ export function calculatePersonality(data: any) {
       color: badge.color,
     }));
 
-  const responsesWithPsych: ResponseItem[] = scores.responses.map((r: any) => ({
+  const responsesWithPsych: ResponseItem[] = scores.responses.map((r) => ({
     questionId: r.questionId,
     choice: r.choice,
     sliderValue: r.sliderValue,
@@ -195,7 +219,7 @@ export function calculatePersonality(data: any) {
     proxyNudge,
     engagement: scores.engagement,
     totalQuestions: scores.responses.length,
-    avgResponseTime: scores.responses.reduce((a: any, b: any) => a + b.timeSpent, 0) / (scores.responses.length || 1),
+    avgResponseTime: scores.responses.reduce((sum: number, r) => sum + (r.timeSpent || 0), 0) / (scores.responses.length || 1),
     criticalThinking: criticalScale,
     firstPrinciples: firstPrinciplesScale,
     criticalScale,
@@ -220,8 +244,8 @@ export function calculatePersonality(data: any) {
     swipeAnalytics: {
       averageTime: scores.averageSwipeTime || 0,
       difficulty: scores.currentDifficulty || "medium",
-      fastCount: scores.swipeTimes?.filter((t: number) => t < 2).length || 0,
-      slowCount: scores.swipeTimes?.filter((t: number) => t > 6).length || 0,
+      fastCount: Array.isArray(scores.swipeTimes) ? scores.swipeTimes.filter((t: number) => t < 2).length : 0,
+      slowCount: Array.isArray(scores.swipeTimes) ? scores.swipeTimes.filter((t: number) => t > 6).length : 0,
     },
     consistency: {
       alphas: consistency.alphas,

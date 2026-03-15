@@ -3,6 +3,15 @@ import { storage } from "../storage";
 import { db } from "../db";
 import { registerBlueprintExportRoute } from "./export-blueprint";
 
+interface QuestionEntry {
+  id: number;
+  tier: string;
+  psych?: string;
+  responseType?: string;
+  options?: string[];
+  [key: string]: unknown;
+}
+
 export function registerExportRoutes(app: Express) {
   app.post("/api/export/sheets/sessions", async (_req: Request, res: Response) => {
     try {
@@ -20,8 +29,8 @@ export function registerExportRoutes(app: Express) {
       
       const questionsPath = path.join(process.cwd(), "client/src/data/questions.json");
       const questionsData = JSON.parse(fs.readFileSync(questionsPath, "utf-8"));
-      const questionsMap = new Map<number, any>();
-      questionsData.questions.forEach((q: any) => questionsMap.set(q.id, q));
+      const questionsMap = new Map<number, QuestionEntry>();
+      questionsData.questions.forEach((q: QuestionEntry) => questionsMap.set(q.id, q));
       
       const spreadsheetId = await createOrGetSpreadsheet("KnowRole Quiz Data");
       
@@ -40,7 +49,7 @@ export function registerExportRoutes(app: Express) {
         const feedback = feedbackMap.get(session.id);
         const responses = session.responses || [];
         const responsesStr = responses
-          .map((r: any) => {
+          .map((r: { questionId: number; choice: number }) => {
             const q = questionsMap.get(r.questionId);
             const choiceText = q?.options?.[r.choice] ?? String(r.choice);
             return `Q${r.questionId}:${choiceText}`;
@@ -126,20 +135,20 @@ export function registerExportRoutes(app: Express) {
       const summaryRows = [
         ["KnowRole Questions Database Summary"], [""],
         ["Total Questions", questionsData.questions.length],
-        ["Binary Questions", questionsData.questions.filter((q: any) => !q.responseType || q.responseType === "binary").length],
-        ["Slider Questions", questionsData.questions.filter((q: any) => q.responseType === "slider").length],
+        ["Binary Questions", questionsData.questions.filter((q: QuestionEntry) => !q.responseType || q.responseType === "binary").length],
+        ["Slider Questions", questionsData.questions.filter((q: QuestionEntry) => q.responseType === "slider").length],
         [""], ["By Psychology Type:"],
-        ["MBTI", questionsData.questions.filter((q: any) => q.psych?.startsWith("MBTI")).length],
-        ["DISC", questionsData.questions.filter((q: any) => q.psych?.startsWith("DISC")).length],
-        ["Big Five", questionsData.questions.filter((q: any) => q.psych?.startsWith("Big5")).length],
-        ["Critical Thinking", questionsData.questions.filter((q: any) => q.psych === "Critical").length],
-        ["First Principles", questionsData.questions.filter((q: any) => q.psych === "FirstPrinciples").length],
+        ["MBTI", questionsData.questions.filter((q: QuestionEntry) => q.psych?.startsWith("MBTI")).length],
+        ["DISC", questionsData.questions.filter((q: QuestionEntry) => q.psych?.startsWith("DISC")).length],
+        ["Big Five", questionsData.questions.filter((q: QuestionEntry) => q.psych?.startsWith("Big5")).length],
+        ["Critical Thinking", questionsData.questions.filter((q: QuestionEntry) => q.psych === "Critical").length],
+        ["First Principles", questionsData.questions.filter((q: QuestionEntry) => q.psych === "FirstPrinciples").length],
         [""], ["By Age Tier:"],
-        ["All Tiers", questionsData.questions.filter((q: any) => q.tier === "all").length],
-        ["Mini (7-12)", questionsData.questions.filter((q: any) => q.tier === "7-12").length],
-        ["Teen (13-18)", questionsData.questions.filter((q: any) => q.tier === "13-18").length],
-        ["Young Adult (19-25)", questionsData.questions.filter((q: any) => q.tier === "19-25").length],
-        ["Adult (25+)", questionsData.questions.filter((q: any) => q.tier === "25+").length],
+        ["All Tiers", questionsData.questions.filter((q: QuestionEntry) => q.tier === "all").length],
+        ["Mini (7-12)", questionsData.questions.filter((q: QuestionEntry) => q.tier === "7-12").length],
+        ["Teen (13-18)", questionsData.questions.filter((q: QuestionEntry) => q.tier === "13-18").length],
+        ["Young Adult (19-25)", questionsData.questions.filter((q: QuestionEntry) => q.tier === "19-25").length],
+        ["Adult (25+)", questionsData.questions.filter((q: QuestionEntry) => q.tier === "25+").length],
         [""], ["Timer Configuration:"],
         ["Mini (7-12)", `${questionsData.tierConfig["7-12"]?.maxTime || 12}s base, ${questionsData.tierConfig["7-12"]?.baseCount || 16} questions`],
         ["Teen (13-18)", `${questionsData.tierConfig["13-18"]?.maxTime || 12}s base, ${questionsData.tierConfig["13-18"]?.baseCount || 22} questions`],

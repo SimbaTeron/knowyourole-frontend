@@ -1,4 +1,8 @@
 import type { Express, Request, Response } from "express";
+
+interface AuthenticatedRequest extends Request {
+  user?: { id: string; email?: string; isPremium?: boolean };
+}
 import { storage } from "../storage";
 import { z } from "zod";
 import { db } from "../db";
@@ -220,7 +224,7 @@ export function registerPremiumRoutes(app: Express) {
 
   app.post("/api/quiz-results", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const user = (req as any).user;
+      const user = (req as AuthenticatedRequest).user;
       if (!user?.id) return res.status(401).json({ error: "Authentication required" });
       const data = saveQuizResultSchema.parse(req.body);
       const result = await storage.saveQuizResult({
@@ -243,7 +247,7 @@ export function registerPremiumRoutes(app: Express) {
 
   app.get("/api/quiz-results", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const user = (req as any).user;
+      const user = (req as AuthenticatedRequest).user;
       if (!user?.id) return res.status(401).json({ error: "Authentication required" });
       const results = await storage.getQuizResultsByUser(user.id);
       res.json({ success: true, results });
@@ -255,7 +259,7 @@ export function registerPremiumRoutes(app: Express) {
 
   app.get("/api/user/premium-status", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const user = (req as any).user;
+      const user = (req as AuthenticatedRequest).user;
       if (!user?.id) return res.status(401).json({ error: "Authentication required" });
       const dbUser = await storage.getUser(user.id);
       res.json({ isPremium: dbUser?.isPremium || false, premiumPurchasedAt: dbUser?.premiumPurchasedAt || null });

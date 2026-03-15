@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import crypto from "crypto";
 import { storage } from "../storage";
 import { eq, ilike } from "drizzle-orm";
 import { db } from "../db";
@@ -70,25 +71,39 @@ export function registerQuizRoutes(app: Express) {
 
       const result = calculatePersonality(parsed.data);
 
-      const session = await storage.createQuizSession({
-        uniqueId: result.sessionId,
-        scores: parsed.data.scores,
-        responses: parsed.data.responses,
+      const sessionId = result.sessionId || crypto.randomUUID();
+      const session = await storage.saveQuizSession({
+        id: sessionId,
         tier: parsed.data.tier,
         mood: parsed.data.mood || "neutral",
-        duration: parsed.data.duration || null,
-        mbtiType: result.mbtiType,
-        discStyle: result.discStyle,
-        bigFive: result.bigFive,
-        traitConsistency: result.traitConsistency,
-        hybridTypes: result.hybridTypes,
-        criticalThinking: result.criticalThinking,
-        firstPrinciples: result.firstPrinciples,
+        funMode: parsed.data.funMode || false,
+        theme: parsed.data.theme || "compass",
+        result: {
+          mbtiType: result.mbtiType,
+          mbtiBlend: result.mbtiBlend || "",
+          discStyle: result.discStyle,
+          bigFiveProfile: {
+            openness: result.bigFive?.O ?? 50,
+            conscientiousness: result.bigFive?.C ?? 50,
+            extraversion: result.bigFive?.E ?? 50,
+            agreeableness: result.bigFive?.A ?? 50,
+            neuroticism: result.bigFive?.N ?? 50,
+          },
+          title: result.title || "",
+          spark: result.spark || "",
+          proxyNudge: result.proxyNudge || "",
+          engagement: result.engagement || 0,
+          totalQuestions: result.totalQuestions || 0,
+          avgResponseTime: result.avgResponseTime || 0,
+        },
+        responses: parsed.data.scores?.responses || [],
+        createdAt: new Date().toISOString(),
       });
 
+      const { sessionId: _discardedId, ...resultData } = result;
       return res.json({
-        sessionId: session.uniqueId,
-        ...result,
+        sessionId: session.id,
+        ...resultData,
       });
     } catch (error) {
       console.error("Score calculation error:", error);
@@ -104,18 +119,18 @@ export function registerQuizRoutes(app: Express) {
       }
       
       const result = calculatePersonality({
-        scores: session.scores as any,
-        responses: session.responses as any,
+        scores: { responses: session.responses },
+        responses: session.responses,
         tier: session.tier,
         mood: session.mood,
         sliderResponses: [],
         wildcardResponses: [],
-        duration: session.duration || undefined,
       });
 
+      const { sessionId: _sid, ...sessionResult } = result;
       return res.json({
-        sessionId: session.uniqueId,
-        ...result,
+        sessionId: session.id,
+        ...sessionResult,
       });
     } catch (error) {
       console.error("Session fetch error:", error);
@@ -136,12 +151,13 @@ export function registerQuizRoutes(app: Express) {
         return res.status(404).json({ error: "Session not found" });
       }
 
+      const bf = session.result?.bigFiveProfile;
       const currentBigFive = {
-        O: typeof session.bigFive === 'object' && session.bigFive !== null ? (session.bigFive as any).O || 50 : 50,
-        C: typeof session.bigFive === 'object' && session.bigFive !== null ? (session.bigFive as any).C || 50 : 50,
-        E: typeof session.bigFive === 'object' && session.bigFive !== null ? (session.bigFive as any).E || 50 : 50,
-        A: typeof session.bigFive === 'object' && session.bigFive !== null ? (session.bigFive as any).A || 50 : 50,
-        N: typeof session.bigFive === 'object' && session.bigFive !== null ? (session.bigFive as any).N || 50 : 50,
+        O: bf?.openness ?? 50,
+        C: bf?.conscientiousness ?? 50,
+        E: bf?.extraversion ?? 50,
+        A: bf?.agreeableness ?? 50,
+        N: bf?.neuroticism ?? 50,
       };
 
       let adjustedBigFive = { ...currentBigFive };
@@ -166,18 +182,22 @@ export function registerQuizRoutes(app: Express) {
         else if (rating >= 4) adjustedBigFive.O = Math.min(95, adjustedBigFive.O + 10);
       }
 
-      await storage.updateQuizSession(sessionId, {
-        bigFive: adjustedBigFive,
-      });
+      session.result.bigFiveProfile = {
+        openness: adjustedBigFive.O,
+        conscientiousness: adjustedBigFive.C,
+        extraversion: adjustedBigFive.E,
+        agreeableness: adjustedBigFive.A,
+        neuroticism: adjustedBigFive.N,
+      };
+      await storage.saveQuizSession(session);
 
       const result = calculatePersonality({
-        scores: session.scores as any,
-        responses: session.responses as any,
+        scores: { responses: session.responses },
+        responses: session.responses,
         tier: session.tier,
         mood: session.mood,
         sliderResponses: [],
         wildcardResponses: [],
-        duration: session.duration || undefined,
       });
 
       return res.json({
@@ -199,13 +219,12 @@ export function registerQuizRoutes(app: Express) {
       }
 
       const result = calculatePersonality({
-        scores: session.scores as any,
-        responses: session.responses as any,
+        scores: { responses: session.responses },
+        responses: session.responses,
         tier: session.tier,
         mood: session.mood,
         sliderResponses: [],
         wildcardResponses: [],
-        duration: session.duration || undefined,
       });
 
       res.json({
