@@ -118,19 +118,27 @@ export function registerQuizRoutes(app: Express) {
         return res.status(404).json({ error: "Session not found" });
       }
       
-      const result = calculatePersonality({
-        scores: { responses: session.responses },
-        responses: session.responses,
-        tier: session.tier,
-        mood: session.mood,
-        sliderResponses: [],
-        wildcardResponses: [],
-      });
-
-      const { sessionId: _sid, ...sessionResult } = result;
       return res.json({
         sessionId: session.id,
-        ...sessionResult,
+        mbtiType: session.result.mbtiType,
+        mbtiBlend: session.result.mbtiBlend,
+        discStyle: session.result.discStyle,
+        bigFive: {
+          O: session.result.bigFiveProfile.openness,
+          C: session.result.bigFiveProfile.conscientiousness,
+          E: session.result.bigFiveProfile.extraversion,
+          A: session.result.bigFiveProfile.agreeableness,
+          N: session.result.bigFiveProfile.neuroticism,
+        },
+        bigFiveProfile: session.result.bigFiveProfile,
+        title: session.result.title,
+        spark: session.result.spark,
+        proxyNudge: session.result.proxyNudge,
+        engagement: session.result.engagement,
+        totalQuestions: session.result.totalQuestions,
+        avgResponseTime: session.result.avgResponseTime,
+        tier: session.tier,
+        mood: session.mood,
       });
     } catch (error) {
       console.error("Session fetch error:", error);
@@ -191,19 +199,18 @@ export function registerQuizRoutes(app: Express) {
       };
       await storage.saveQuizSession(session);
 
-      const result = calculatePersonality({
-        scores: { responses: session.responses },
-        responses: session.responses,
-        tier: session.tier,
-        mood: session.mood,
-        sliderResponses: [],
-        wildcardResponses: [],
-      });
-
       return res.json({
         success: true,
         adjustedBigFive,
-        updatedResult: result,
+        updatedResult: {
+          mbtiType: session.result.mbtiType,
+          mbtiBlend: session.result.mbtiBlend,
+          discStyle: session.result.discStyle,
+          bigFive: adjustedBigFive,
+          bigFiveProfile: session.result.bigFiveProfile,
+          title: session.result.title,
+          spark: session.result.spark,
+        },
       });
     } catch (error) {
       console.error("Quiz refinement error:", error);
@@ -218,18 +225,9 @@ export function registerQuizRoutes(app: Express) {
         return res.status(404).json({ error: "Session not found" });
       }
 
-      const result = calculatePersonality({
-        scores: { responses: session.responses },
-        responses: session.responses,
-        tier: session.tier,
-        mood: session.mood,
-        sliderResponses: [],
-        wildcardResponses: [],
-      });
-
       res.json({
-        badges: result.earnedBadges || [],
-        hybridTypes: result.hybridTypes || [],
+        badges: [],
+        hybridTypes: [],
       });
     } catch (error) {
       console.error("Badges fetch error:", error);
