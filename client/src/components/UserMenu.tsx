@@ -6,7 +6,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/useAuth";
-import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 
@@ -16,11 +15,10 @@ interface UserMenuProps {
 
 export default function UserMenu({ compact = false }: UserMenuProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const [location] = useLocation();
   const [open, setOpen] = useState(false);
 
   const handleLogin = () => {
-    const returnTo = encodeURIComponent(location || "/");
+    const returnTo = encodeURIComponent(window.location.pathname + window.location.search);
     window.location.href = `/api/login?returnTo=${returnTo}`;
   };
 
@@ -88,7 +86,9 @@ export default function UserMenu({ compact = false }: UserMenuProps) {
       >
         <div className="px-3 py-3 border-b border-terracotta/8 dark:border-[#A78BFA]/10">
           <p className="text-sm font-semibold text-warm-gray dark:text-[#F8FAFC] truncate" data-testid="text-user-name">
-            {user.firstName} {user.lastName}
+            {user.firstName || user.lastName
+              ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
+              : user.email || "User"}
           </p>
           {user.email && (
             <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8] truncate mt-0.5" data-testid="text-user-email">
