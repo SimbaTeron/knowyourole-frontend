@@ -63,14 +63,9 @@ export default function ProfilePage() {
     enabled: isAuthenticated,
   });
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-      setLocation('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+  const handleLogout = () => {
+    queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    window.location.href = '/api/logout';
   };
 
   if (isAuthLoading) {
@@ -95,9 +90,17 @@ export default function ProfilePage() {
             <p className="text-warm-gray/70 dark:text-soft-cream/60 mb-6">
               Please sign in to view your profile and quiz history.
             </p>
-            <Button onClick={() => setLocation('/')} data-testid="button-go-home">
-              Go to Home
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={() => { window.location.href = '/api/login?returnTo=%2Fprofile'; }}
+                data-testid="button-profile-sign-in"
+              >
+                Sign In
+              </Button>
+              <Button variant="outline" onClick={() => setLocation('/')} data-testid="button-go-home">
+                Go to Home
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

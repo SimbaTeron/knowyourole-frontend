@@ -1,6 +1,7 @@
 import { ArrowLeft, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 import { ThemeMode } from "@/components/ThemeToggle";
+import UserMenu from "./UserMenu";
 
 interface CompactHeaderProps {
   onBack?: () => void;
@@ -40,7 +41,7 @@ export default function CompactHeader({
       className="fixed top-0 left-0 right-0 z-50 h-[60px] backdrop-blur-xl bg-soft-cream/80 dark:bg-[#0A0A0F]/90 border-b border-terracotta/8 dark:border-[#A78BFA]/10"
       data-testid="compact-header"
     >
-      <div className="h-full max-w-md mx-auto px-4 flex items-center justify-between">
+      <div className="h-full max-w-md mx-auto px-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           {showBack && onBack && (
             <button
@@ -60,14 +61,17 @@ export default function CompactHeader({
           </h1>
         </div>
 
-        <button
-          onClick={toggleTheme}
-          className="w-10 h-10 rounded-xl bg-soft-cream/60 dark:bg-[#12121A]/80 backdrop-blur-sm border border-terracotta/8 dark:border-[#A78BFA]/20 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-terracotta/20 dark:hover:border-[#A78BFA]/40 text-warm-gray dark:text-[#A78BFA]"
-          aria-label={`Switch to ${currentTheme === "light" ? "dark" : "light"} mode`}
-          data-testid="button-compact-theme"
-        >
-          {getThemeIcon()}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="w-10 h-10 rounded-xl bg-soft-cream/60 dark:bg-[#12121A]/80 backdrop-blur-sm border border-terracotta/8 dark:border-[#A78BFA]/20 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-terracotta/20 dark:hover:border-[#A78BFA]/40 text-warm-gray dark:text-[#A78BFA]"
+            aria-label={`Switch to ${currentTheme === "light" ? "dark" : "light"} mode`}
+            data-testid="button-compact-theme"
+          >
+            {getThemeIcon()}
+          </button>
+          <UserMenu compact />
+        </div>
       </div>
     </motion.header>
   );

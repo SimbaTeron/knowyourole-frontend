@@ -1,5 +1,6 @@
 import { Settings } from "lucide-react";
 import ThemeToggle, { ThemeMode } from "./ThemeToggle";
+import UserMenu from "./UserMenu";
 import {
   Popover,
   PopoverContent,
@@ -15,7 +16,7 @@ interface KnowRoleHeaderProps {
 export default function KnowRoleHeader({ theme, onThemeChange }: KnowRoleHeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
-      <div className="max-w-lg mx-auto flex justify-between items-center">
+      <div className="max-w-lg mx-auto flex justify-between items-center gap-2">
         <Popover>
           <PopoverTrigger asChild>
             <button
@@ -50,10 +51,13 @@ export default function KnowRoleHeader({ theme, onThemeChange }: KnowRoleHeaderP
           </h1>
         </div>
 
-        <ThemeToggle
-          currentTheme={theme}
-          onThemeChange={onThemeChange}
-        />
+        <div className="flex items-center gap-2">
+          <ThemeToggle
+            currentTheme={theme}
+            onThemeChange={onThemeChange}
+          />
+          <UserMenu />
+        </div>
       </div>
     </header>
   );
