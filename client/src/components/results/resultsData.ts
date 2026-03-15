@@ -9,6 +9,12 @@ export interface JobMatch {
   explanation: string;
   traitHighlights: string[];
   jobCollar: string;
+  salary?: string;
+  reason?: string;
+  growth?: string;
+  personalityFit?: string;
+  strengthsUsed?: string[];
+  dayInLife?: string;
 }
 
 export interface APIScales {
