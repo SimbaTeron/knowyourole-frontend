@@ -41,7 +41,8 @@ export function UnlockInsightsModal({
   ];
 
   const handleSignIn = () => {
-    window.location.href = "/api/login";
+    const returnTo = encodeURIComponent(window.location.pathname + window.location.search);
+    window.location.href = `/api/login?returnTo=${returnTo}`;
   };
 
   const resetAndClose = () => {

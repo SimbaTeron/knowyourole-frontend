@@ -84,7 +84,7 @@ export function ArcTracker() {
             Sign in to track how your personality evolves over time
           </p>
           <Button
-            onClick={() => { window.location.href = "/api/login"; }}
+            onClick={() => { const returnTo = encodeURIComponent(window.location.pathname + window.location.search); window.location.href = `/api/login?returnTo=${returnTo}`; }}
             className="bg-amber-600 hover:bg-amber-700 text-white"
             data-testid="button-arctracker-sign-in"
           >

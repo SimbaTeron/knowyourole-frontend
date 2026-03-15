@@ -22,7 +22,8 @@ export function AccountCreationModal({
 }: AccountCreationModalProps) {
   
   const handleSignIn = () => {
-    window.location.href = "/api/login";
+    const returnTo = encodeURIComponent(window.location.pathname + window.location.search);
+    window.location.href = `/api/login?returnTo=${returnTo}`;
   };
 
   if (!isOpen) return null;
