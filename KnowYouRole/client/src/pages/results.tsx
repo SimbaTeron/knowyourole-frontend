@@ -5,106 +5,46 @@ import { GlassCard } from '@/components/glass/GlassCard';
 import { GlassTabs } from '@/components/glass/GlassTabs';
 import { NeonButton } from '@/components/glass/NeonButton';
 import { NeonText } from '@/components/glass/NeonText';
+import { ProgressBar } from '@/components/glass/ProgressBar';
 
-const traits = [
-  { label: 'Openness', value: 92, color: 'purple' },
-  { label: 'Conscientiousness', value: 74, color: 'blue' },
-  { label: 'Extraversion', value: 61, color: 'green' },
-  { label: 'Agreeableness', value: 55, color: 'green' },
-  { label: 'Neuroticism', value: 68, color: 'red' },
+const TRAITS = [
+  { label: 'Openness', value: 92, color: '#A78BFA' },
+  { label: 'Conscientiousness', value: 74, color: '#60A5FA' },
+  { label: 'Extraversion', value: 61, color: '#34D399' },
+  { label: 'Agreeableness', value: 55, color: '#34D399' },
+  { label: 'Neuroticism', value: 68, color: '#F87171' },
 ];
 
-const careers = [
-  {
-    title: 'Software Architect',
-    match: 94,
-    salary: '$120K – $180K',
-    trend: '↑ 18% growth',
-    desc: 'Design systems that scale. Lead technical direction.',
-  },
-  {
-    title: 'Data Scientist',
-    match: 91,
-    salary: '$100K – $160K',
-    trend: '↑ 22% growth',
-    desc: 'Find patterns in chaos. Turn data into decisions.',
-  },
-  {
-    title: 'Strategy Consultant',
-    match: 88,
-    salary: '$90K – $150K',
-    trend: '↑ 12% growth',
-    desc: 'Shape decisions at the highest levels.',
-  },
-  {
-    title: 'Product Manager',
-    match: 85,
-    salary: '$110K – $170K',
-    trend: '↑ 15% growth',
-    desc: 'Bridge technical and human. Ship things that matter.',
-  },
-  {
-    title: 'Research Analyst',
-    match: 82,
-    salary: '$75K – $120K',
-    trend: '↑ 8% growth',
-    desc: 'Uncover insights that drive smarter decisions.',
-  },
-  {
-    title: 'UX Researcher',
-    match: 79,
-    salary: '$85K – $130K',
-    trend: '↑ 10% growth',
-    desc: 'Understand people deeply. Make products better.',
-  },
+const CAREERS = [
+  { title: 'Software Architect', match: 94, salary: '$120K – $180K', trend: '↑ 18% growth', desc: 'Design systems that scale. Lead technical direction.' },
+  { title: 'Data Scientist', match: 91, salary: '$100K – $160K', trend: '↑ 22% growth', desc: 'Find patterns in chaos. Turn data into decisions.' },
+  { title: 'Strategy Consultant', match: 88, salary: '$90K – $150K', trend: '↑ 12% growth', desc: 'Shape decisions at the highest levels.' },
+  { title: 'Product Manager', match: 85, salary: '$110K – $170K', trend: '↑ 15% growth', desc: 'Bridge technical and human. Ship things that matter.' },
 ];
 
-const growthItems = [
-  {
-    date: 'Openness — Age 16',
-    text: 'You scored 78% — Already showing strong curiosity and creative thinking',
-  },
-  {
-    date: 'Conscientiousness — Age 22',
-    text: 'You scored 85% — Career focus sharpened your discipline significantly',
-  },
-  {
-    date: 'Emotional Stability — Age 28',
-    text: 'You scored 68% — Life experience has helped build resilience',
-  },
-  {
-    date: 'Current',
-    text: 'Your pattern suggests continued growth in strategic thinking and leadership',
-  },
+const GROWTH = [
+  { label: 'Age 16', text: 'Openness scored 78% — already showing strong curiosity and creative thinking.' },
+  { label: 'Age 22', text: 'Conscientiousness at 85% — career focus sharpened your discipline.' },
+  { label: 'Age 28', text: 'Emotional Stability at 68% — life experience built real resilience.' },
+  { label: 'Today', text: 'Pattern shows continued growth in strategic thinking and leadership.' },
 ];
-
-const tabs = ['Personality', 'Careers', 'Growth'];
 
 export default function ResultsPage() {
-  const [activeTab, setActiveTab] = useState('Personality');
-
-  const traitColorClass: Record<string, string> = {
-    purple: 'bg-gradient-to-r from-purple-500 to-violet-400',
-    blue: 'bg-gradient-to-r from-cyan-400 to-blue-500',
-    green: 'bg-gradient-to-r from-green-400 to-emerald-500',
-    red: 'bg-gradient-to-r from-red-400 to-orange-500',
-  };
+  const [tab, setTab] = useState('Personality');
+  const tabs = ['Personality', 'Careers', 'Growth'];
 
   return (
     <PageContainer>
       <AppHeader />
-      <div className="container-sm mx-auto px-4 pt-28 pb-20">
-        {/* Hero Section */}
+      <div className="container mx-auto max-w-2xl px-4 pt-28 pb-20">
+
+        {/* Hero */}
         <div className="text-center mb-10">
-          <h1
-            className="text-3xl md:text-5xl font-black font-display tracking-tight mb-3"
-            style={{ letterSpacing: '-0.03em' }}
-          >
+          <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-5">
             Your Results
           </h1>
-          {/* Personality Badge */}
           <div
-            className="inline-block px-8 py-3 rounded-full text-2xl md:text-3xl font-black mb-4"
+            className="inline-block text-3xl md:text-4xl font-black px-6 py-2 rounded-2xl text-white"
             style={{
               background: 'linear-gradient(135deg, #00D4FF, #7B2FFF)',
               boxShadow: '0 0 30px rgba(0,212,255,0.4), 0 0 60px rgba(123,47,255,0.2)',
@@ -112,36 +52,32 @@ export default function ResultsPage() {
           >
             INTJ-A
           </div>
-          <p className="text-lg text-[var(--text-secondary)]">
-            The Architect — Strategic, independent, and determined
-          </p>
+          <p className="text-base text-white/50 mt-4">The Architect — Strategic, independent, and determined</p>
         </div>
 
         {/* Tabs */}
         <div className="mb-8">
-          <GlassTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+          <GlassTabs tabs={tabs} activeTab={tab} onChange={setTab} />
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'Personality' && (
-          <div>
-            <GlassCard className="mb-6">
-              <h2 className="text-xl font-bold mb-1">Big Five Profile</h2>
-              <p className="text-sm text-[var(--text-muted)] mb-6">
-                Your personality across the five major dimensions
-              </p>
-
-              <div className="flex flex-col gap-5">
-                {traits.map((trait) => (
-                  <div key={trait.label} className="trait-meter">
-                    <div className="trait-meter-label">
-                      <span className="font-medium">{trait.label}</span>
-                      <span className="font-bold">{trait.value}%</span>
+        {/* Personality Tab */}
+        {tab === 'Personality' && (
+          <div className="space-y-5">
+            <GlassCard className="p-6">
+              <h2 className="text-base font-display font-bold text-white/40 uppercase tracking-wider mb-5">
+                Big Five Profile
+              </h2>
+              <div className="space-y-5">
+                {TRAITS.map((t) => (
+                  <div key={t.label}>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="font-semibold text-white">{t.label}</span>
+                      <span className="font-bold" style={{ color: t.color }}>{t.value}%</span>
                     </div>
-                    <div className="trait-meter-bar">
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                       <div
-                        className={`trait-meter-fill ${traitColorClass[trait.color]}`}
-                        style={{ width: `${trait.value}%` }}
+                        className="h-full rounded-full transition-all duration-1000"
+                        style={{ width: `${t.value}%`, background: t.color }}
                       />
                     </div>
                   </div>
@@ -149,145 +85,94 @@ export default function ResultsPage() {
               </div>
             </GlassCard>
 
-            <GlassCard variant="selected">
-              <h3 className="text-lg font-bold mb-2">Your Personality Type</h3>
-              <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-                As an INTJ-A, you&rsquo;re a strategic visionary with a rare combination
-                of analytical brilliance and quiet confidence. You see patterns others
-                miss, question assumptions that others take for granted, and quietly
-                build systems and visions that reshape the world around you.
+            <GlassCard className="p-6">
+              <h3 className="text-lg font-display font-bold text-white mb-3">
+                Your Personality Type
+              </h3>
+              <p className="text-sm text-white/60 leading-relaxed">
+                As an INTJ-A, you're a strategic visionary with a rare combination of
+                analytical brilliance and quiet confidence. You see patterns others miss,
+                question assumptions that others take for granted, and quietly build systems
+                and visions that reshape the world around you.
               </p>
             </GlassCard>
           </div>
         )}
 
-        {activeTab === 'Careers' && (
-          <div>
-            <h2 className="text-xl font-bold mb-6">Your Career Matches</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {careers.map((career) => (
-                <GlassCard key={career.title} variant="interactive" className="relative overflow-hidden">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-base font-bold">{career.title}</h3>
-                    <span
-                      className="text-xs font-bold px-3 py-1 rounded-full"
-                      style={{
-                        background: career.match >= 90
-                          ? 'linear-gradient(135deg, #00D4FF, #7B2FFF)'
-                          : career.match >= 80
-                          ? 'rgba(0,212,255,0.15)'
-                          : 'rgba(255,255,255,0.08)',
-                        color: career.match >= 90 ? '#fff' : career.match >= 80 ? '#00D4FF' : 'rgba(255,255,255,0.6)',
-                        border: career.match < 90 ? '1px solid rgba(255,255,255,0.15)' : 'none',
-                      }}
-                    >
-                      {career.match}%
-                    </span>
-                  </div>
-                  <p className="text-[var(--text-muted)] text-xs mb-2">{career.salary}</p>
-                  <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-2">
-                    {career.desc}
-                  </p>
-                  <p className="text-xs font-semibold" style={{ color: '#39FF14' }}>
-                    {career.trend}
-                  </p>
-                </GlassCard>
-              ))}
-            </div>
+        {/* Careers Tab */}
+        {tab === 'Careers' && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-display font-bold text-white mb-2">Dream Roles</h2>
+            {CAREERS.map((c) => (
+              <GlassCard key={c.title} variant="interactive" className="p-5">
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="font-bold text-white">{c.title}</h3>
+                  <span
+                    className="text-xs font-bold px-2 py-1 rounded-full"
+                    style={{
+                      background: c.match >= 90 ? 'linear-gradient(135deg, #00D4FF, #7B2FFF)' : 'rgba(0,212,255,0.15)',
+                      color: c.match >= 90 ? '#fff' : '#00D4FF',
+                    }}
+                  >
+                    {c.match}%
+                  </span>
+                </div>
+                <p className="text-xs text-white/40 mb-2">{c.salary}</p>
+                <p className="text-sm text-white/60 mb-2">{c.desc}</p>
+                <p className="text-xs font-semibold" style={{ color: '#39FF14' }}>{c.trend}</p>
+              </GlassCard>
+            ))}
           </div>
         )}
 
-        {activeTab === 'Growth' && (
-          <div>
-            <h2 className="text-xl font-bold mb-6">Your Growth Journey</h2>
-            <GlassCard>
-              <div
-                className="relative pl-6"
-                style={{
-                  borderLeft: '2px solid transparent',
-                  borderImage: 'linear-gradient(180deg, #00D4FF, #7B2FFF) 1',
-                }}
-              >
-                {growthItems.map((item, i) => (
+        {/* Growth Tab */}
+        {tab === 'Growth' && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-display font-bold text-white mb-2">Your Growth Journey</h2>
+            {GROWTH.map((g, i) => (
+              <GlassCard key={i} className="p-5">
+                <div className="flex items-start gap-4">
                   <div
-                    key={i}
-                    className="relative mb-8 last:mb-0"
-                    style={{ paddingLeft: '4px' }}
-                  >
-                    {/* Dot */}
-                    <div
-                      className="absolute w-3 h-3 rounded-full -left-[21px] top-1"
-                      style={{
-                        background: '#00D4FF',
-                        boxShadow: '0 0 10px #00D4FF',
-                      }}
-                    />
-                    <p className="text-xs font-bold mb-1" style={{ color: '#00D4FF' }}>
-                      {item.date}
-                    </p>
-                    <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-                      {item.text}
-                    </p>
+                    className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
+                    style={{ background: '#00D4FF', boxShadow: '0 0 8px #00D4FF' }}
+                  />
+                  <div>
+                    <p className="text-xs font-bold text-glow-blue mb-1">{g.label}</p>
+                    <p className="text-sm text-white/60">{g.text}</p>
                   </div>
-                ))}
-              </div>
-            </GlassCard>
+                </div>
+              </GlassCard>
+            ))}
           </div>
         )}
 
         {/* Premium Unlock */}
         <div
-          className="mt-12 rounded-2xl p-6 md:p-8 text-center"
+          className="mt-10 rounded-2xl p-6 text-center"
           style={{
-            background: 'var(--glass-bg)',
-            backdropFilter: 'blur(20px)',
+            background: 'rgba(255,255,255,0.05)',
             border: '2px solid transparent',
             borderImage: 'linear-gradient(135deg, #00D4FF, #7B2FFF) 1',
           }}
         >
-          <h3
-            className="text-2xl font-black mb-3"
-            style={{
-              background: 'linear-gradient(135deg, #00D4FF, #7B2FFF)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            Unlock Your Full Report
-          </h3>
-          <p className="text-[var(--text-secondary)] mb-6 text-sm">
-            Deep dive into your personality with premium insights
-          </p>
-          <ul className="text-left max-w-sm mx-auto mb-6 space-y-3">
-            {[
-              'Complete 50-page personality report',
-              'Relationship compatibility analysis',
-              'Career path deep dive with salary data',
-              'Personal growth action plan',
-              'Shareable PDF report',
-            ].map((feature) => (
-              <li
-                key={feature}
-                className="flex items-center gap-3 text-sm font-medium"
-              >
-                <span style={{ color: '#39FF14', fontWeight: 900 }}>✓</span>
-                {feature}
+          <h3 className="text-xl font-display font-black mb-2 text-gradient">Unlock Your Full Report</h3>
+          <p className="text-sm text-white/50 mb-6">Deep dive into your personality with premium insights</p>
+          <ul className="text-left text-sm space-y-2 mb-6 max-w-xs mx-auto">
+            {['50-page personality report', 'Relationship compatibility analysis', 'Career path deep dive', 'Personal growth action plan', 'Shareable PDF report'].map((f) => (
+              <li key={f} className="flex items-center gap-2 text-white/70">
+                <span style={{ color: '#39FF14' }}>✓</span> {f}
               </li>
             ))}
           </ul>
           <div className="mb-4">
-            <span className="text-3xl font-black">$9.99</span>
-            <span className="text-[var(--text-muted)] text-sm ml-1">/month</span>
+            <span className="text-3xl font-black text-white">$9.99</span>
+            <span className="text-white/40 text-sm ml-1">/month</span>
           </div>
-          <NeonButton
-            variant="success"
-            size="lg"
-            onClick={() => alert('Premium signup — connect your backend!')}
-          >
-            Start Free Trial
+          <NeonButton variant="success" size="lg">
+            Start Free Trial →
           </NeonButton>
         </div>
+
       </div>
     </PageContainer>
   );
