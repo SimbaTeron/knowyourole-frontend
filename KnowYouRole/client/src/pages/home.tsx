@@ -180,6 +180,83 @@ export default function Home() {
         </div>
       </section>
 
+      {/* THE SCIENCE */}
+      <section style={{ padding: "clamp(60px, 10vw, 120px) clamp(16px, 4vw, 48px)" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#7800FF", marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>The Science</p>
+            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", fontFamily: "'Outfit',sans-serif" }}>Built on the Big Five.</h2>
+            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.45)", marginTop: 12, maxWidth: 560, margin: "12px auto 0", fontFamily: "'Outfit',sans-serif" }}>
+              The most validated personality model in psychology. Five traits, infinite depth.
+            </p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+            {[
+              { letter: "O", name: "Openness", desc: "Curiosity, creativity, and open-mindedness", color: "#00C8FF" },
+              { letter: "C", name: "Conscientiousness", desc: "Organization, discipline, and dependability", color: "#7800FF" },
+              { letter: "E", name: "Extraversion", desc: "Social energy, assertiveness, and enthusiasm", color: "#FF00E5" },
+              { letter: "A", name: "Agreeableness", desc: "Compassion, trust, and cooperation", color: "#39FF14" },
+              { letter: "N", name: "Neuroticism", desc: "Emotional stability and resilience", color: "#FF6B00" },
+            ].map((trait) => (
+              <div key={trait.letter} style={{
+                background: "rgba(255,255,255,0.04)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 20, padding: "20px 18px", textAlign: "center",
+              }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: "50%",
+                  background: `rgba(${trait.color === "#00C8FF" ? "0,200,255" : trait.color === "#7800FF" ? "120,0,255" : trait.color === "#FF00E5" ? "255,0,229" : trait.color === "#39FF14" ? "57,255,20" : "255,107,0"},0.15)`,
+                  border: `1px solid ${trait.color}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  margin: "0 auto 12px", fontSize: 20, fontWeight: 900, color: trait.color,
+                  fontFamily: "'Outfit',sans-serif",
+                }}>
+                  {trait.letter}
+                </div>
+                <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 4, color: "#fff", fontFamily: "'Outfit',sans-serif" }}>{trait.name}</p>
+                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.5, fontFamily: "'Outfit',sans-serif" }}>{trait.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ textAlign: "center", marginTop: 32, fontSize: 12, color: "rgba(255,255,255,0.25)", fontFamily: "'Outfit',sans-serif" }}>
+            Learn more about the research behind it → <a href="/about" style={{ color: "#00C8FF", textDecoration: "none" }}>Read the full breakdown</a>
+          </p>
+        </div>
+      </section>
+
+      {/* ABOUT STRIP */}
+      <section style={{ padding: "clamp(48px, 8vw, 80px) clamp(16px, 4vw, 48px)", background: "rgba(255,255,255,0.02)", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 40, alignItems: "center" }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#FF00E5", marginBottom: 10, fontFamily: "'Outfit',sans-serif" }}>About KYR</p>
+            <h3 style={{ fontSize: "clamp(1.5rem, 4vw, 2.5rem)", fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>We're here to help you<br /><span style={{ color: "#00C8FF" }}>know yourself.</span></h3>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, fontFamily: "'Outfit',sans-serif" }}>
+              KnowYouRole was built for a generation that refuses to be put in a box. We combine rigorous psychological science with a Gen Z-first experience — because self-knowledge shouldn't be boring.
+            </p>
+            <a href="/about" style={{ display: "inline-block", marginTop: 20, color: "#00C8FF", textDecoration: "none", fontWeight: 600, fontSize: 14, fontFamily: "'Outfit',sans-serif" }}>Meet the team →</a>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            {[
+              { emoji: "🔬", stat: "50+", label: "Published studies cited" },
+              { emoji: "🧬", stat: "5", label: "Personality dimensions" },
+              { emoji: "⚡", stat: "<10min", label: "Average completion" },
+              { emoji: "🔒", stat: "0", label: "Data points sold" },
+            ].map((item) => (
+              <div key={item.label} style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 16, padding: "16px 14px", textAlign: "center",
+              }}>
+                <div style={{ fontSize: 22, marginBottom: 6 }}>{item.emoji}</div>
+                <p style={{ fontSize: 22, fontWeight: 900, color: "#fff", marginBottom: 2, fontFamily: "'Outfit',sans-serif" }}>{item.stat}</p>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section style={{ padding: "clamp(60px, 10vw, 120px) clamp(16px, 4vw, 48px)", textAlign: "center" }}>
         <div style={{ maxWidth: 800, margin: "0 auto" }}>

@@ -1,17 +1,4 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
-import { GlassCard } from "@/components/glass/GlassCard";
-
-const glassCard: React.CSSProperties = {
-  background: "rgba(255,255,255,0.04)",
-  backdropFilter: "blur(20px)",
-  WebkitBackdropFilter: "blur(20px)",
-  border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: "24px",
-  padding: "20px",
-  cursor: "pointer",
-  transition: "all 0.25s ease",
-};
 
 const TIERS = [
   { id: "13-15", emoji: "🎉", title: "Young Teens (13-15)", sub: "Quick, fun quiz made just for you" },
@@ -21,73 +8,164 @@ const TIERS = [
 ];
 
 export default function QuizGateway() {
-  const [, setLocation] = useLocation();
   const [selected, setSelected] = useState<string | null>(null);
 
+  const handleContinue = () => {
+    if (selected) {
+      // Use window.location for reliable SPA navigation
+      window.location.href = `/quiz?tier=${encodeURIComponent(selected)}`;
+    }
+  };
+
+  const handleBack = () => {
+    window.history.back();
+  };
+
   return (
-    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
+    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+      `}</style>
 
       {/* Header */}
-      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <button onClick={() => history.back()} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: 20, padding: 8 }}>←</button>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#00C8FF" }}>Step 1 of 2</span>
+      <header style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
+        background: "rgba(0,0,0,0.7)", backdropFilter: "blur(20px)",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between",
+      }}>
+        <button onClick={handleBack} style={{
+          background: "none", border: "none", color: "rgba(255,255,255,0.6)",
+          cursor: "pointer", fontSize: 20, padding: "4px 8px", borderRadius: 8,
+          fontFamily: "'Outfit',sans-serif",
+        }}>←</button>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 1 OF 2</span>
         <div style={{ width: 40 }} />
       </header>
 
       {/* Progress bar */}
-      <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.1)", zIndex: 50 }}>
+      <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.08)", zIndex: 50 }}>
         <div style={{ width: "50%", height: "100%", background: "linear-gradient(90deg, #00C8FF, #7800FF)" }} />
       </div>
 
-      {/* Content */}
-      <div style={{ paddingTop: 120, paddingBottom: 80, padding: "clamp(80px, 15vw, 120px) clamp(16px, 4vw, 48px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
-        <div style={{ maxWidth: 500, width: "100%" }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#00C8FF", textAlign: "center", marginBottom: 12 }}>Before We Start</p>
-          <h1 style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textAlign: "center", marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>Who are you?</h1>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", textAlign: "center", marginBottom: 40 }}>Choose the option that fits you best.</p>
+      {/* Main content */}
+      <div style={{
+        paddingTop: 80, paddingBottom: 80,
+        padding: "clamp(80px, 12vw, 110px) clamp(16px, 4vw, 48px)",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        minHeight: "100vh", boxSizing: "border-box",
+      }}>
+        <div style={{ maxWidth: 520, width: "100%" }}>
+          <p style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: "0.25em",
+            textTransform: "uppercase", color: "#7800FF", textAlign: "center", marginBottom: 10,
+          }}>Before We Start</p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            {TIERS.map((tier) => (
-              <div
-                key={tier.id}
-                onClick={() => setSelected(tier.id)}
-                style={{
-                  ...glassCard,
-                  border: selected === tier.id
-                    ? "2px solid #00C8FF"
-                    : "1px solid rgba(255,255,255,0.08)",
-                  boxShadow: selected === tier.id ? "0 0 20px rgba(0,200,255,0.3)" : "none",
-                }}
-              >
-                <div style={{ fontSize: 32, marginBottom: 12 }}>{tier.emoji}</div>
-                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, fontFamily: "'Outfit',sans-serif" }}>{tier.title}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>{tier.sub}</div>
-                <div style={{ textAlign: "right", color: selected === tier.id ? "#00C8FF" : "rgba(255,255,255,0.3)", fontSize: 18 }}>→</div>
-              </div>
-            ))}
+          <h1 style={{
+            fontSize: "clamp(2rem, 7vw, 3.5rem)", fontWeight: 900,
+            letterSpacing: "-0.03em", textAlign: "center", marginBottom: 10,
+            fontFamily: "'Outfit',sans-serif",
+          }}>Who are you?</h1>
+
+          <p style={{
+            fontSize: 15, color: "rgba(255,255,255,0.45)", textAlign: "center", marginBottom: 36,
+          }}>Choose the option that fits you best.</p>
+
+          {/* Age tier cards */}
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14,
+          }}>
+            {TIERS.map((tier) => {
+              const isSelected = selected === tier.id;
+              return (
+                <button
+                  key={tier.id}
+                  onClick={() => setSelected(tier.id)}
+                  style={{
+                    background: isSelected
+                      ? "rgba(0, 200, 255, 0.12)"
+                      : "rgba(255,255,255,0.04)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    border: isSelected
+                      ? "2px solid #00C8FF"
+                      : "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: 20,
+                    padding: "18px 16px",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    transition: "all 0.2s ease",
+                    boxShadow: isSelected
+                      ? "0 0 24px rgba(0,200,255,0.25), inset 0 0 12px rgba(0,200,255,0.05)"
+                      : "none",
+                    fontFamily: "'Outfit',sans-serif",
+                    outline: "none",
+                    minHeight: 100,
+                  }}
+                >
+                  <div style={{ fontSize: 28, marginBottom: 10 }}>{tier.emoji}</div>
+                  <div style={{
+                    fontSize: 14, fontWeight: 700, marginBottom: 4,
+                    color: isSelected ? "#fff" : "rgba(255,255,255,0.85)",
+                    fontFamily: "'Outfit',sans-serif",
+                  }}>{tier.title}</div>
+                  <div style={{
+                    fontSize: 11, color: "rgba(255,255,255,0.35)",
+                    marginBottom: 8, fontFamily: "'Outfit',sans-serif",
+                    lineHeight: 1.4,
+                  }}>{tier.sub}</div>
+                  {isSelected && (
+                    <div style={{ color: "#00C8FF", fontSize: 16, fontWeight: 700, marginTop: 4 }}>✓</div>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
+          {/* Selection feedback */}
+          {selected && (
+            <p style={{
+              textAlign: "center", marginTop: 16, fontSize: 13,
+              color: "#00C8FF", fontWeight: 600,
+            }}>
+              You selected: {TIERS.find(t => t.id === selected)?.title}
+            </p>
+          )}
+
+          {/* Continue button */}
           <button
-            onClick={() => selected && setLocation(`/quiz?tier=${selected}`)}
+            onClick={handleContinue}
             disabled={!selected}
             style={{
-              marginTop: 32,
+              marginTop: 24,
               width: "100%",
-              padding: "16px",
-              background: selected ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.1)",
+              padding: "17px",
+              background: selected
+                ? "linear-gradient(90deg, #00C8FF, #7800FF)"
+                : "rgba(255,255,255,0.06)",
               border: "none",
               borderRadius: 16,
               color: selected ? "#fff" : "rgba(255,255,255,0.3)",
-              fontWeight: 700,
+              fontWeight: 800,
               fontSize: 16,
               cursor: selected ? "pointer" : "not-allowed",
               fontFamily: "'Outfit',sans-serif",
-              boxShadow: selected ? "0 0 30px rgba(0,200,255,0.4)" : "none",
+              boxShadow: selected ? "0 4px 30px rgba(0,200,255,0.35)" : "none",
+              transition: "all 0.25s ease",
+              letterSpacing: "0.02em",
             }}
           >
-            Continue →
+            {selected ? `Start Quiz →` : "Select your age to continue"}
           </button>
+
+          {/* Trust signal */}
+          <p style={{
+            textAlign: "center", marginTop: 16, fontSize: 12,
+            color: "rgba(255,255,255,0.25)",
+          }}>
+            🔒 Your answers are private. Always.
+          </p>
         </div>
       </div>
     </div>

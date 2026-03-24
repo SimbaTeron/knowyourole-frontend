@@ -2,63 +2,111 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth0 } from "@auth0/auth0-react";
 
-export default function AuthPage() {
+function AuthContent() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const { loginWithRedirect } = useAuth0();
+  const { loginWithRedirect, isLoading, error: authError } = useAuth0();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await loginWithRedirect({ authorizationParams: { redirect_uri: window.location.origin + "/callback" } });
+    try {
+      await loginWithRedirect({
+        authorizationParams: {
+          redirect_uri: window.location.origin + "/callback",
+        },
+      });
+    } catch (err) {
+      console.error("Login error:", err);
+    }
   };
 
   const handleGoogle = async () => {
-    await loginWithRedirect({ authorizationParams: { connection: "google-oauth2", redirect_uri: window.location.origin + "/callback" } });
+    try {
+      await loginWithRedirect({
+        authorizationParams: {
+          connection: "google-oauth2",
+          redirect_uri: window.location.origin + "/callback",
+        },
+      });
+    } catch (err) {
+      console.error("Google login error:", err);
+    }
   };
+
+  if (authError) {
+    return (
+      <div style={{
+        background: "#050510",
+        minHeight: "100vh",
+        fontFamily: "'Outfit',sans-serif",
+        color: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24,
+      }}>
+        <div style={{
+          background: "rgba(255,59,48,0.1)",
+          border: "1px solid rgba(255,59,48,0.3)",
+          borderRadius: 20,
+          padding: "24px 32px",
+          maxWidth: 400,
+          textAlign: "center",
+        }}>
+          <p style={{ color: "#ff3b30", fontSize: 14, marginBottom: 8, fontWeight: 600 }}>Authentication Error</p>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>{authError.message}</p>
+          <button
+            onClick={() => (window.location.href = "/")}
+            style={{
+              marginTop: 16,
+              padding: "10px 24px",
+              background: "linear-gradient(90deg, #00C8FF, #7800FF)",
+              border: "none",
+              borderRadius: 12,
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: 14,
+              cursor: "pointer",
+              fontFamily: "'Outfit',sans-serif",
+            }}
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div style={{
+        background: "#050510",
+        minHeight: "100vh",
+        fontFamily: "'Outfit',sans-serif",
+        color: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        <div style={{
+          width: 40,
+          height: 40,
+          border: "3px solid rgba(0,200,255,0.2)",
+          borderTopColor: "#00C8FF",
+          borderRadius: "50%",
+          animation: "spin 0.8s linear infinite",
+          marginBottom: 16,
+        }} />
+        <p style={{ color: "#00C8FF", fontSize: 14, fontWeight: 500 }}>Loading...</p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", display: "flex" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
-
-      {/* LEFT — Branding */}
-      <div style={{ display: "none", flex: "1", flexDirection: "column", justifyContent: "center", padding: "clamp(32px, 6vw, 80px)", position: "relative", overflow: "hidden" }
-        + /* @media min-768px: */ "" as unknown as React.CSSProperties}
-      >
-        {/* Gradient orbs */}
-        <div style={{ position: "absolute", top: "-20%", left: "-10%", width: "60%", height: "60%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,255,0.2) 0%, transparent 70%)", filter: "blur(40px)" }} />
-        <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: "50%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(120,0,255,0.25) 0%, transparent 70%)", filter: "blur(40px)" }} />
-
-        <div style={{ position: "relative", zIndex: 1 }}>
-          {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 48 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg, #00C8FF, #7800FF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round">
-                <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-              </svg>
-            </div>
-            <span style={{ fontSize: 20, fontWeight: 900 }}>KnowYouRole</span>
-          </div>
-
-          <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 20 }}>
-            Your personality,<br />
-            <span style={{ background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>decoded.</span>
-          </h1>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 380, marginBottom: 48 }}>
-            The Gen Z personality quiz. Combined Big Five, MBTI, and DISC into one wild ride. Know yourself. Own your energy.
-          </p>
-
-          {/* Phone preview */}
-          <div style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(30px)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 24, padding: 24, maxWidth: 240 }}>
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 8 }}>Your Type</p>
-            <p style={{ fontSize: 28, fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 4 }}>INTJ-A</p>
-            <p style={{ fontSize: 13, color: "#00C8FF", fontWeight: 700 }}>The Architect</p>
-            <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
-              {["O:78%", "C:85%", "E:42%"].map(s => (
-                <span key={s} style={{ fontSize: 10, padding: "2px 8px", background: "rgba(0,200,255,0.1)", border: "1px solid rgba(0,200,255,0.2)", borderRadius: 50, color: "#00C8FF" }}>{s}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap'); @keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       {/* RIGHT — Form */}
       <div style={{ flex: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "clamp(24px, 5vw, 64px)" }}>
@@ -114,4 +162,8 @@ export default function AuthPage() {
       </div>
     </div>
   );
+}
+
+export default function AuthPage() {
+  return <AuthContent />;
 }
