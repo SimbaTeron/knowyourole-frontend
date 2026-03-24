@@ -1,66 +1,19 @@
 import { Link } from "wouter";
-import { PageContainer } from "../components/layout/PageContainer";
-import { AppHeader } from "../components/layout/AppHeader";
-import { GlassCard } from "../components/glass/GlassCard";
-import { NeonButton } from "../components/glass/NeonButton";
-import { GlassBadge } from "../components/glass/GlassBadge";
-import { useAuth } from "../hooks/useAuth";
+import { AppHeader } from "@/components/layout/AppHeader";
 
 const FEATURES = [
-  {
-    emoji: "🎯",
-    title: "Precision Insights",
-    description: "Deep psychological analysis based on the Big Five model — the gold standard in personality science.",
-  },
-  {
-    emoji: "🧠",
-    title: "Mood Alchemy Lab",
-    description: "Track how your emotions shift and blend across different situations and environments.",
-  },
-  {
-    emoji: "💼",
-    title: "Career Compass",
-    description: "Discover roles where your natural traits translate into satisfaction and success.",
-  },
-  {
-    emoji: "🎮",
-    title: "Quizzes That Don't Suck",
-    description: "Say goodbye to boring quizzes. Ours are engaging, beautiful, and actually fun.",
-  },
-  {
-    emoji: "🔒",
-    title: "Privacy First",
-    description: "Your results are yours. Always. We never sell data or share anything without permission.",
-  },
-  {
-    emoji: "⚡",
-    title: "Instant Results",
-    description: "Get your full personality breakdown in under 10 minutes. No waiting, no surveys.",
-  },
+  { emoji: "🎯", title: "Precision Insights", description: "Deep psychological analysis based on the Big Five model — the gold standard in personality science." },
+  { emoji: "🧠", title: "Mood Alchemy Lab", description: "Track how your emotions shift and blend across different situations and environments." },
+  { emoji: "💼", title: "Career Compass", description: "Discover roles where your natural traits translate into satisfaction and success." },
+  { emoji: "🎮", title: "Quizzes That Don't Suck", description: "Say goodbye to boring quizzes. Ours are engaging, beautiful, and actually fun." },
+  { emoji: "🔒", title: "Privacy First", description: "Your results are yours. Always. We never sell data or share anything without permission." },
+  { emoji: "⚡", title: "Instant Results", description: "Get your full personality breakdown in under 10 minutes. No waiting, no surveys." },
 ];
 
 const TESTIMONIALS = [
-  {
-    name: "Jordan M.",
-    role: "Software Engineer at Stripe",
-    quote: "Finally a quiz that actually gets me. The career suggestions were spot-on.",
-    initials: "JM",
-    color: "from-[#00D4FF] to-[#7B2FFF]",
-  },
-  {
-    name: "Aaliyah T.",
-    role: "Product Designer at Figma",
-    quote: "The mood tracking is addictive. I've learned so much about myself.",
-    initials: "AT",
-    color: "from-[#7B2FFF] to-[#FF00E5]",
-  },
-  {
-    name: "Marcus R.",
-    role: "Medical Student, NYU",
-    quote: "Took it for fun, stayed for the science. Incredibly accurate.",
-    initials: "MR",
-    color: "from-[#FF00E5] to-[#00D4FF]",
-  },
+  { name: "Jordan M.", role: "Software Engineer at Stripe", quote: "Finally a quiz that actually gets me. The career suggestions were spot-on.", initials: "JM", gradient: "linear-gradient(135deg, #00C8FF, #7800FF)" },
+  { name: "Aaliyah T.", role: "Product Designer at Figma", quote: "The mood tracking is addictive. I've learned so much about myself.", initials: "AT", gradient: "linear-gradient(135deg, #7800FF, #FF00E5)" },
+  { name: "Marcus R.", role: "Medical Student, NYU", quote: "Took it for fun, stayed for the science. Incredibly accurate.", initials: "MR", gradient: "linear-gradient(135deg, #FF00E5, #00C8FF)" },
 ];
 
 const STATS = [
@@ -70,18 +23,21 @@ const STATS = [
   { num: "100%", label: "Private" },
 ];
 
-export default function Home() {
-  const { user } = useAuth();
+const phoneCardStyle: React.CSSProperties = {
+  background: "rgba(255,255,255,0.06)",
+  backdropFilter: "blur(30px)",
+  WebkitBackdropFilter: "blur(30px)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: "24px",
+  padding: "24px",
+};
 
+export default function Home() {
   return (
-    <>
+    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
-        
-        .font-outfit * {
-          font-family: 'Outfit', sans-serif;
-        }
-        
         .hero-gradient {
           background: linear-gradient(90deg, #00C8FF, #7800FF, #FF00E5);
           background-size: 400% 400%;
@@ -90,341 +46,168 @@ export default function Home() {
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
-        
         @keyframes gradientShift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        
-        .card-hover {
+        .glass-card {
+          background: rgba(255,255,255,0.04);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 24px;
           transition: all 0.3s ease;
         }
-        .card-hover:hover {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(0, 200, 255, 0.3);
+        .glass-card:hover {
+          background: rgba(255,255,255,0.08);
+          border-color: rgba(0,200,255,0.3);
           transform: translateY(-4px);
         }
       `}</style>
 
-      <PageContainer padded={false} className="font-outfit">
-        <AppHeader />
+      <AppHeader />
 
-        {/* Hero Section */}
-        <section
-          className="relative min-h-screen flex flex-col justify-center px-4 sm:px-6 lg:px-12 pt-24 pb-16"
-          style={{
-            background:
-              "radial-gradient(ellipse at 30% 20%, rgba(120,0,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(0,200,255,0.1) 0%, transparent 50%)",
-          }}
-        >
-          <div className="max-w-7xl mx-auto w-full">
-            <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-              {/* Left: Hero Content */}
-              <div className="flex-1 max-w-2xl">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 bg-[rgba(0,200,255,0.1)] border border-[rgba(0,200,255,0.3)] px-4 py-1.5 rounded-full text-xs font-semibold text-[#00C8FF] mb-6">
-                  ✦ 100% Free — No Account Needed
-                </div>
+      {/* HERO */}
+      <section style={{
+        position: "relative", minHeight: "100vh",
+        display: "flex", alignItems: "center",
+        padding: "clamp(60px, 10vw, 120px) clamp(16px, 4vw, 64px)",
+        background: "radial-gradient(ellipse at 30% 20%, rgba(120,0,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(0,200,255,0.1) 0%, transparent 50%)",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", width: "100%", display: "flex", flexDirection: "row", alignItems: "center", gap: "48px", flexWrap: "wrap" }}>
 
-                {/* Headline */}
-                <h1
-                  className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-[0.95] tracking-[-0.04em] mb-6"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
-                >
-                  Find out
-                  <br />
-                  who you{" "}
-                  <span className="hero-gradient">really</span>
-                  <br />
-                  are.
-                </h1>
-
-                {/* Subtitle */}
-                <p
-                  className="text-base sm:text-lg text-white/60 leading-relaxed mb-8 max-w-lg"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
-                >
-                  The Gen Z personality quiz. Combined Big Five, MBTI, and DISC into one
-                  wild ride. Know yourself. Own your energy.
-                </p>
-
-                {/* CTA Buttons */}
-                <div className="flex flex-wrap gap-3">
-                  <NeonButton
-                    variant="primary"
-                    size="lg"
-                    onClick={() => (window.location.href = "/quiz")}
-                    className="rounded-2xl"
-                    style={{
-                      background: "linear-gradient(90deg, #00C8FF, #7800FF)",
-                      boxShadow: "0 0 30px rgba(0,200,255,0.4)",
-                    }}
-                  >
-                    Take the Quiz — It's Free →
-                  </NeonButton>
-                  <NeonButton
-                    variant="secondary"
-                    size="lg"
-                    onClick={() => (window.location.href = "/about")}
-                    className="rounded-2xl"
-                  >
-                    Learn More
-                  </NeonButton>
-                </div>
-              </div>
-
-              {/* Right: Phone Stack */}
-              <div className="flex-1 flex justify-center lg:justify-end">
-                <div className="relative w-[260px] sm:w-[280px]">
-                  {/* Phone Card 1 */}
-                  <div className="relative bg-[rgba(255,255,255,0.06)] backdrop-blur-[30px] border border-[rgba(255,255,255,0.1)] rounded-3xl p-6 z-10"
-                    style={{ transform: "rotate(3deg)" }}>
-                    <p className="text-xs font-bold text-white/60 mb-1">Your Type</p>
-                    <p
-                      className="text-4xl font-black hero-gradient mb-1"
-                      style={{ fontFamily: "'Outfit', sans-serif" }}
-                    >
-                      INTJ-A
-                    </p>
-                    <p className="text-sm font-bold text-[#00C8FF]">The Architect</p>
-                    <p className="text-xs text-white/40 mt-1">12.4% of population</p>
-                  </div>
-
-                  {/* Phone Card 2 */}
-                  <div
-                    className="absolute top-4 -right-2 sm:top-5 sm:-right-4 bg-[rgba(255,255,255,0.06)] backdrop-blur-[30px] border border-[rgba(255,255,255,0.1)] rounded-3xl p-6 z-9"
-                    style={{ transform: "rotate(-2deg)" }}
-                  >
-                    <p className="text-xs font-bold text-white/60 mb-1">Big Five</p>
-                    <p className="text-sm font-black text-white leading-tight">
-                      O: 78% C: 85%
-                      <br />
-                      E: 42% A: 61%
-                      <br />
-                      N: 28%
-                    </p>
-                    <p className="text-xs text-white/40 mt-2 leading-tight">
-                      Openness, Conscientiousness
-                      <br />
-                      Extraversion, Agreeableness
-                      <br />
-                      Neuroticism
-                    </p>
-                  </div>
-
-                  {/* Phone Card 3 */}
-                  <div
-                    className="absolute top-8 -right-4 sm:top-10 sm:-right-8 bg-[rgba(255,255,255,0.06)] backdrop-blur-[30px] border border-[rgba(255,255,255,0.1)] rounded-3xl p-6 z-8"
-                    style={{ transform: "rotate(1deg)" }}
-                  >
-                    <p className="text-xs font-bold text-white/60 mb-1">DISC Profile</p>
-                    <p
-                      className="text-3xl font-black hero-gradient mb-1"
-                      style={{ fontFamily: "'Outfit', sans-serif" }}
-                    >
-                      DC
-                    </p>
-                    <p className="text-sm font-bold text-[#00C8FF]">The Challenger</p>
-                    <p className="text-xs text-white/40 mt-1">
-                      High dominance, high conscientiousness
-                    </p>
-                  </div>
-                </div>
-              </div>
+          {/* Left: Content */}
+          <div style={{ flex: "1 1 500px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(0,200,255,0.1)", border: "1px solid rgba(0,200,255,0.3)", padding: "6px 16px", borderRadius: 50, fontSize: 12, fontWeight: 600, color: "#00C8FF", marginBottom: 24 }}>
+              ✦ 100% Free — No Account Needed
             </div>
-          </div>
-        </section>
-
-        {/* Stats Bar */}
-        <section
-          className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/10 border-y border-white/10"
-          style={{ background: "rgba(255,255,255,0.02)" }}
-        >
-          {STATS.map((stat) => (
-            <div key={stat.label} className="text-center py-8 sm:py-10 px-4">
-              <p
-                className="text-2xl sm:text-3xl lg:text-4xl font-black hero-gradient mb-1"
-                style={{ fontFamily: "'Outfit', sans-serif" }}
-              >
-                {stat.num}
-              </p>
-              <p className="text-xs text-white/40 font-medium" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </section>
-
-        {/* Features Section */}
-        <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12">
-          <div className="max-w-6xl mx-auto">
-            {/* Section Header */}
-            <div className="text-center mb-14">
-              <p
-                className="text-xs font-bold tracking-[0.2em] uppercase text-[#00C8FF] mb-3"
-                style={{ fontFamily: "'Outfit', sans-serif" }}
-              >
-                Why KnowYouRole
-              </p>
-              <h2
-                className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-[-0.03em] text-white"
-                style={{ fontFamily: "'Outfit', sans-serif" }}
-              >
-                Not your average personality quiz.
-              </h2>
-            </div>
-
-            {/* Features Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {FEATURES.map((feature) => (
-                <GlassCard
-                  key={feature.title}
-                  variant="interactive"
-                  className="cursor-pointer"
-                  glowColor="blue"
-                >
-                  <div
-                    className="w-12 h-12 rounded-2xl bg-[rgba(0,200,255,0.15)] border border-[rgba(0,200,255,0.2)] flex items-center justify-center text-2xl mb-4"
-                  >
-                    {feature.emoji}
-                  </div>
-                  <h3
-                    className="text-lg font-bold text-white mb-2"
-                    style={{ fontFamily: "'Outfit', sans-serif" }}
-                  >
-                    {feature.title}
-                  </h3>
-                  <p
-                    className="text-sm text-white/50 leading-relaxed"
-                    style={{ fontFamily: "'Outfit', sans-serif" }}
-                  >
-                    {feature.description}
-                  </p>
-                </GlassCard>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <section
-          className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12"
-          style={{ background: "linear-gradient(180deg, transparent, rgba(120,0,255,0.05))" }}
-        >
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-14">
-              <p
-                className="text-xs font-bold tracking-[0.2em] uppercase text-[#00C8FF] mb-3"
-                style={{ fontFamily: "'Outfit', sans-serif" }}
-              >
-                What People Say
-              </p>
-              <h2
-                className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-[-0.03em] text-white"
-                style={{ fontFamily: "'Outfit', sans-serif" }}
-              >
-                Real people, real insights.
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {TESTIMONIALS.map((t) => (
-                <GlassCard key={t.name} variant="default">
-                  <p
-                    className="text-sm text-white/60 leading-relaxed mb-6 italic"
-                    style={{ fontFamily: "'Outfit', sans-serif" }}
-                  >
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}
-                      style={{ fontFamily: "'Outfit', sans-serif" }}
-                    >
-                      {t.initials}
-                    </div>
-                    <div>
-                      <p
-                        className="text-sm font-bold text-white"
-                        style={{ fontFamily: "'Outfit', sans-serif" }}
-                      >
-                        {t.name}
-                      </p>
-                      <p
-                        className="text-xs text-white/40"
-                        style={{ fontFamily: "'Outfit', sans-serif" }}
-                      >
-                        {t.role}
-                      </p>
-                    </div>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h2
-              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-[-0.04em] leading-[0.95] mb-4"
-              style={{ fontFamily: "'Outfit', sans-serif" }}
-            >
-              Stop scrolling.
-              <br />
-              <span className="hero-gradient">Start knowing.</span>
-            </h2>
-            <p
-              className="text-base text-white/50 mb-10"
-              style={{ fontFamily: "'Outfit', sans-serif" }}
-            >
-              2.4 million people already know who they are. Your turn.
+            <h1 style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)", fontWeight: 900, lineHeight: 0.95, letterSpacing: "-0.04em", marginBottom: 20, fontFamily: "'Outfit',sans-serif" }}>
+              Find out<br />who you{" "}
+              <span className="hero-gradient">really</span><br />are.
+            </h1>
+            <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(255,255,255,0.6)", lineHeight: 1.7, marginBottom: 32, maxWidth: 480 }}>
+              The Gen Z personality quiz. Combined Big Five, MBTI, and DISC into one wild ride. Know yourself. Own your energy.
             </p>
-            <NeonButton
-              variant="primary"
-              size="lg"
-              onClick={() => (window.location.href = "/quiz")}
-              style={{
-                background: "linear-gradient(90deg, #00C8FF, #7800FF)",
-                padding: "16px 36px",
-                fontSize: "1rem",
-                borderRadius: "16px",
-                boxShadow: "0 0 40px rgba(0,200,255,0.4)",
-                fontFamily: "'Outfit', sans-serif",
-              }}
-            >
-              Take the Free Quiz →
-            </NeonButton>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <Link href="/quiz" style={{ textDecoration: "none" }}>
+                <button style={{ background: "linear-gradient(90deg, #00C8FF, #7800FF)", padding: "14px 28px", borderRadius: 50, fontWeight: 700, fontSize: 14, color: "#fff", border: "none", cursor: "pointer", boxShadow: "0 0 30px rgba(0,200,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>
+                  Take the Quiz — It's Free →
+                </button>
+              </Link>
+              <Link href="/about" style={{ textDecoration: "none" }}>
+                <button style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.15)", padding: "14px 28px", borderRadius: 16, fontWeight: 700, fontSize: 14, color: "#fff", cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}>
+                  Learn More
+                </button>
+              </Link>
+            </div>
           </div>
-        </section>
 
-        {/* Footer */}
-        <footer
-          className="px-6 lg:px-12 py-8 border-t border-white/10 flex flex-wrap gap-3 justify-between text-xs text-white/30"
-          style={{ fontFamily: "'Outfit', sans-serif" }}
-        >
-          <span>© 2026 KnowYouRole</span>
-          <div className="flex gap-4">
-            <Link href="/privacy" className="hover:text-white/60 transition-colors no-underline">
-              Privacy
-            </Link>
-            <span>·</span>
-            <Link href="/terms" className="hover:text-white/60 transition-colors no-underline">
-              Terms
-            </Link>
-            <span>·</span>
-            <Link href="/faq" className="hover:text-white/60 transition-colors no-underline">
-              FAQ
-            </Link>
-            <span>·</span>
-            <Link href="/about" className="hover:text-white/60 transition-colors no-underline">
-              About
-            </Link>
+          {/* Right: Phone Stack */}
+          <div style={{ flex: "1 1 300px", display: "flex", justifyContent: "center" }}>
+            <div style={{ position: "relative", width: "min(280px, 80vw)", height: "min(560px, 150vw)" }}>
+              <div style={{ ...phoneCardStyle, position: "absolute", width: "90%", top: 0, right: 0, zIndex: 3, transform: "rotate(3deg)" }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", marginBottom: 4 }}>Your Type</p>
+                <p style={{ fontSize: "clamp(1.4rem, 4vw, 2rem)", fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>INTJ-A</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "#00C8FF" }}>The Architect</p>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>12.4% of population</p>
+              </div>
+              <div style={{ ...phoneCardStyle, position: "absolute", width: "85%", top: 20, right: 20, zIndex: 2, transform: "rotate(-2deg)" }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>Big Five</p>
+                <p style={{ fontSize: 14, fontWeight: 900, color: "#fff", lineHeight: 1.6 }}>O: 78% C: 85%<br />E: 42% A: 61%<br />N: 28%</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 8, lineHeight: 1.4 }}>Openness · Conscientiousness<br />Extraversion · Agreeableness<br />Neuroticism</p>
+              </div>
+              <div style={{ ...phoneCardStyle, position: "absolute", width: "80%", top: 40, right: 40, zIndex: 1, transform: "rotate(1deg)" }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", marginBottom: 4 }}>DISC Profile</p>
+                <p style={{ fontSize: "clamp(1.2rem, 3vw, 1.8rem)", fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>DC</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF" }}>The Challenger</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>High dominance, high conscientiousness</p>
+              </div>
+            </div>
           </div>
-        </footer>
-      </PageContainer>
-    </>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}>
+        {STATS.map((s) => (
+          <div key={s.label} style={{ textAlign: "center", padding: "40px 16px" }}>
+            <p style={{ fontSize: "clamp(1.5rem, 4vw, 2.5rem)", fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 4, fontFamily: "'Outfit',sans-serif" }}>{s.num}</p>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>{s.label}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* FEATURES */}
+      <section style={{ padding: "clamp(48px, 8vw, 100px) clamp(16px, 4vw, 48px)" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#00C8FF", marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>Why KnowYouRole</p>
+            <h2 style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)", fontWeight: 900, letterSpacing: "-0.03em", fontFamily: "'Outfit',sans-serif" }}>Not your average personality quiz.</h2>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+            {FEATURES.map((f) => (
+              <div key={f.title} className="glass-card" style={{ padding: "clamp(20px, 4vw, 32px)" }}>
+                <div style={{ width: 48, height: 48, background: "rgba(0,200,255,0.15)", border: "1px solid rgba(0,200,255,0.2)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", marginBottom: 16 }}>{f.emoji}</div>
+                <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>{f.title}</h3>
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.6, fontFamily: "'Outfit',sans-serif" }}>{f.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section style={{ padding: "clamp(48px, 8vw, 100px) clamp(16px, 4vw, 48px)", background: "linear-gradient(180deg, transparent, rgba(120,0,255,0.05))" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#00C8FF", marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>What People Say</p>
+            <h2 style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)", fontWeight: 900, letterSpacing: "-0.03em", fontFamily: "'Outfit',sans-serif" }}>Real people, real insights.</h2>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="glass-card" style={{ padding: 28 }}>
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, marginBottom: 24, fontStyle: "italic", fontFamily: "'Outfit',sans-serif" }}>&ldquo;{t.quote}&rdquo;</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: t.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0, fontFamily: "'Outfit',sans-serif" }}>{t.initials}</div>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 700, fontFamily: "'Outfit',sans-serif" }}>{t.name}</p>
+                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding: "clamp(60px, 10vw, 120px) clamp(16px, 4vw, 48px)", textAlign: "center" }}>
+        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+          <h2 style={{ fontSize: "clamp(2.5rem, 8vw, 5rem)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95, marginBottom: 16, fontFamily: "'Outfit',sans-serif" }}>
+            Stop scrolling.<br /><span className="hero-gradient">Start knowing.</span>
+          </h2>
+          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(255,255,255,0.5)", marginBottom: 40, fontFamily: "'Outfit',sans-serif" }}>
+            2.4 million people already know who they are. Your turn.
+          </p>
+          <Link href="/quiz" style={{ textDecoration: "none" }}>
+            <button style={{ background: "linear-gradient(90deg, #00C8FF, #7800FF)", padding: "16px 36px", borderRadius: 16, fontWeight: 700, fontSize: 16, color: "#fff", border: "none", cursor: "pointer", boxShadow: "0 0 40px rgba(0,200,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>
+              Take the Free Quiz →
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer style={{ padding: "24px clamp(16px, 4vw, 48px)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "rgba(255,255,255,0.3)", fontFamily: "'Outfit',sans-serif" }}>
+        <span>© 2026 KnowYouRole</span>
+        <div style={{ display: "flex", gap: 16 }}>
+          <Link href="/privacy" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Privacy</Link>
+          <Link href="/terms" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Terms</Link>
+          <Link href="/faq" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>FAQ</Link>
+          <Link href="/about" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>About</Link>
+        </div>
+      </footer>
+
+    </div>
   );
 }
