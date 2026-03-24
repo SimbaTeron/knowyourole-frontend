@@ -29,7 +29,7 @@ export function AppFooter() {
               <Link href="/quiz" className="block text-white/40 text-sm hover:text-white transition no-underline">Free Assessment</Link>
               <Link href="/about" className="block text-white/40 text-sm hover:text-white transition no-underline">How It Works</Link>
               <Link href="/careers" className="block text-white/40 text-sm hover:text-white transition no-underline">Career Matching</Link>
-              <Link href="/premium" className="block text-white/40 text-sm hover:text-white transition no-underline">Premium Features</Link>
+              <Link href="/results" className="block text-white/40 text-sm hover:text-white transition no-underline">Premium Features</Link>
             </div>
           </div>
 
@@ -38,8 +38,7 @@ export function AppFooter() {
             <h4 className="text-white font-semibold text-sm mb-4">Company</h4>
             <div className="space-y-3">
               <Link href="/about" className="block text-white/40 text-sm hover:text-white transition no-underline">About</Link>
-              <Link href="/science" className="block text-white/40 text-sm hover:text-white transition no-underline">Science</Link>
-              <Link href="/blog" className="block text-white/40 text-sm hover:text-white transition no-underline">Blog</Link>
+              <Link href="/about" className="block text-white/40 text-sm hover:text-white transition no-underline">Science</Link>
             </div>
           </div>
 
