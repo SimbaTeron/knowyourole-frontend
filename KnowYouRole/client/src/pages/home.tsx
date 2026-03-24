@@ -89,16 +89,16 @@ export default function Home() {
               The Gen Z personality quiz. Combined Big Five, MBTI, and DISC into one wild ride. Know yourself. Own your energy.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <Link href="/quiz" style={{ textDecoration: "none" }}>
+              <a href="/quiz" style={{ textDecoration: "none" }}>
                 <button style={{ background: "linear-gradient(90deg, #00C8FF, #7800FF)", padding: "14px 28px", borderRadius: 50, fontWeight: 700, fontSize: 14, color: "#fff", border: "none", cursor: "pointer", boxShadow: "0 0 30px rgba(0,200,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>
                   Take the Quiz — It's Free →
                 </button>
-              </Link>
-              <Link href="/about" style={{ textDecoration: "none" }}>
+              </a>
+              <a href="/about" style={{ textDecoration: "none" }}>
                 <button style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.15)", padding: "14px 28px", borderRadius: 16, fontWeight: 700, fontSize: 14, color: "#fff", cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}>
                   Learn More
                 </button>
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -189,11 +189,11 @@ export default function Home() {
           <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(255,255,255,0.5)", marginBottom: 40, fontFamily: "'Outfit',sans-serif" }}>
             2.4 million people already know who they are. Your turn.
           </p>
-          <Link href="/quiz" style={{ textDecoration: "none" }}>
+          <a href="/quiz" style={{ textDecoration: "none" }}>
             <button style={{ background: "linear-gradient(90deg, #00C8FF, #7800FF)", padding: "16px 36px", borderRadius: 16, fontWeight: 700, fontSize: 16, color: "#fff", border: "none", cursor: "pointer", boxShadow: "0 0 40px rgba(0,200,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>
               Take the Free Quiz →
             </button>
-          </Link>
+          </a>
         </div>
       </section>
 
@@ -201,10 +201,10 @@ export default function Home() {
       <footer style={{ padding: "24px clamp(16px, 4vw, 48px)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "rgba(255,255,255,0.3)", fontFamily: "'Outfit',sans-serif" }}>
         <span>© 2026 KnowYouRole</span>
         <div style={{ display: "flex", gap: 16 }}>
-          <Link href="/privacy" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Privacy</Link>
-          <Link href="/terms" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Terms</Link>
-          <Link href="/faq" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>FAQ</Link>
-          <Link href="/about" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>About</Link>
+          <a href="/privacy" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Privacy</a>
+          <a href="/terms" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Terms</a>
+          <a href="/faq" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>FAQ</a>
+          <a href="/about" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>About</a>
         </div>
       </footer>
 
