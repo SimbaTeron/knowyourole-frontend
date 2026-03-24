@@ -13,8 +13,8 @@ export default function QuizGateway() {
 
   const handleContinue = () => {
     if (selected) {
-      // Use window.location for reliable SPA navigation
-      window.location.href = `/quiz?tier=${encodeURIComponent(selected)}`;
+      localStorage.setItem("kyr_quiz_tier", selected);
+      window.location.href = `/mood-mixer?tier=${encodeURIComponent(selected)}`;
     }
   };
 
