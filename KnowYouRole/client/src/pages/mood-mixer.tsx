@@ -1,142 +1,234 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
-import { motion } from "framer-motion";
-import { ArrowRight, Beaker } from "lucide-react";
-import PathCanvas from "@/components/PathCanvas";
-import CompactHeader from "@/components/CompactHeader";
-import { ThemeMode } from "@/components/ThemeToggle";
-import MoodAlchemyLab from "@/components/MoodAlchemyLab";
+import { useState } from 'react';
+import { useLocation } from 'wouter';
+import { PageContainer } from '@/components/layout/PageContainer';
+import { CompactHeader } from '@/components/layout/CompactHeader';
+import { GlassCard } from '@/components/glass/GlassCard';
+import { NeonButton } from '@/components/glass/NeonButton';
+
+const moods = [
+  { id: 'happy', emoji: '😊', label: 'Happy', color: '#FBBF24' },
+  { id: 'calm', emoji: '😌', label: 'Calm', color: '#60A5FA' },
+  { id: 'curious', emoji: '🤔', label: 'Curious', color: '#A78BFA' },
+  { id: 'determined', emoji: '💪', label: 'Determined', color: '#F87171' },
+  { id: 'creative', emoji: '🎨', label: 'Creative', color: '#F472B6' },
+  { id: 'social', emoji: '🤝', label: 'Social', color: '#34D399' },
+];
 
 export default function MoodMixerPage() {
   const [, setLocation] = useLocation();
-  const [theme, setTheme] = useState<ThemeMode>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
-      return stored === "light" ? "light" : "dark";
-    }
-    return "dark";
-  });
-  const [hasBrewedMood, setHasBrewedMood] = useState(false);
-  const [blendName, setBlendName] = useState<string | null>(null);
+  const [selectedMoods, setSelectedMoods] = useState<Record<string, number>>({});
 
-  useEffect(() => {
-    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark", "dark-mysterious");
-    } else {
-      document.documentElement.classList.add("light-clinical");
-    }
-  }, [theme]);
-
-  const handleThemeChange = (newTheme: ThemeMode) => {
-    setTheme(newTheme);
-    localStorage.setItem("knowrole-theme", newTheme);
-    
-    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark", "dark-mysterious");
-    } else {
-      document.documentElement.classList.add("light-clinical");
-    }
+  const toggleMood = (id: string) => {
+    setSelectedMoods(prev => {
+      if (prev[id] !== undefined) {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      }
+      // Max 3 moods
+      if (Object.keys(prev).length >= 3) return prev;
+      return { ...prev, [id]: 50 };
+    });
   };
 
-  const handleContinue = () => {
-    if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-    setLocation("/quiz");
+  const handleSliderChange = (id: string, value: number) => {
+    setSelectedMoods(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleBack = () => {
-    setLocation("/");
-  };
-
-  const getThemeClass = () => {
-    return theme === "dark" ? "dark-mysterious" : "light-clinical";
-  };
-
-  const handleMoodBrewed = (mood1: string, mood2: string, name: string) => {
-    setHasBrewedMood(true);
-    setBlendName(name);
-  };
-
-  const handleSkipNeutral = () => {
-    setHasBrewedMood(true);
-    setBlendName("Balanced Explorer");
-    setTimeout(() => setLocation("/quiz"), 300);
+  const handleSave = () => {
+    alert('Mood blend saved!');
+    setLocation('/');
   };
 
   return (
-    <div className={`min-h-screen relative overflow-hidden ${getThemeClass()}`}>
-      <PathCanvas />
+    <PageContainer padded={false}>
       <CompactHeader
-        onBack={handleBack}
-        currentTheme={theme}
-        onThemeChange={handleThemeChange}
+        title="Mood Mixer"
+        onBack={() => setLocation('/')}
+        onMenu={() => {}}
       />
-      <main className="relative z-10 pt-16 pb-32 px-4 min-h-screen flex flex-col text-[20px]">
-        <div className="max-w-md mx-auto w-full flex-1 flex flex-col">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-center mb-4"
-          >
-            <motion.div 
-              className="inline-flex items-center justify-center gap-2 mb-3"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-            >
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Beaker className="w-7 h-7 text-purple-500 dark:text-purple-400" />
-              </motion.div>
-              <span className="text-xs uppercase tracking-widest text-purple-600/70 dark:text-purple-400/70 font-medium">
-                Mood Alchemy Lab
-              </span>
-            </motion.div>
-            <h1 className="md:text-4xl font-display font-semibold compass-gradient-text mb-3 text-[36px]">
-              How are you feeling?
-            </h1>
-            <p className="text-warm-gray/70 dark:text-[#94A3B8] max-w-sm mx-auto text-[16px]">
-              Tap two moods to brew your unique blend. This personalizes your questions and boosts specific traits.
-            </p>
-          </motion.div>
 
-          <MoodAlchemyLab 
-            onMoodBrewed={handleMoodBrewed} 
-            onSkip={handleSkipNeutral}
-          />
-          
-        </div>
-      </main>
-      <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-soft-cream via-soft-cream/95 to-transparent dark:from-[#0A0A0F] dark:via-[#0A0A0F]/95 pb-8">
-        <div className="max-w-md mx-auto space-y-2">
-          {hasBrewedMood && blendName && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-2"
+      {/* Page content */}
+      <div className="min-h-screen pt-20 pb-32 px-4">
+        <div className="max-w-lg mx-auto">
+          {/* Title + subtitle */}
+          <div className="mb-8">
+            <h1
+              className="text-white font-display font-bold mb-2"
+              style={{ fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', letterSpacing: '-0.03em', lineHeight: 1.1 }}
             >
-              <span className="text-sm text-purple-600 dark:text-purple-400 font-medium">
-                Your blend: {blendName}
-              </span>
-            </motion.div>
-          )}
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            onClick={handleContinue}
-            className="w-full py-5 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all duration-300 trail-button text-white"
-            data-testid="button-continue-mixer"
+              Create Your Mood Blend
+            </h1>
+            <p className="text-white/50 text-sm" style={{ maxWidth: 320 }}>
+              Select up to 3 moods to blend into your unique mix.
+            </p>
+          </div>
+
+          {/* 2x3 mood grid */}
+          <div
+            className="grid gap-4"
+            style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}
           >
-            {hasBrewedMood ? "Continue with Your Blend" : "Continue"}
-            <ArrowRight className="w-5 h-5" />
-          </motion.button>
+            {moods.map(mood => {
+              const isSelected = selectedMoods[mood.id] !== undefined;
+              const pct = selectedMoods[mood.id] ?? 50;
+
+              return (
+                <div
+                  key={mood.id}
+                  onClick={() => toggleMood(mood.id)}
+                  className="cursor-pointer"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: `2px solid ${isSelected ? mood.color : 'rgba(255,255,255,0.08)'}`,
+                    borderRadius: 16,
+                    padding: '24px 16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 8,
+                    transition: 'all 0.3s',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: isSelected
+                      ? `0 0 20px ${mood.color}40, 0 0 40px ${mood.color}20`
+                      : 'none',
+                    transform: 'translateY(0)',
+                  }}
+                >
+                  {/* Emoji */}
+                  <span
+                    className="text-4xl select-none"
+                    style={{ filter: isSelected ? 'none' : 'grayscale(30%)' }}
+                  >
+                    {mood.emoji}
+                  </span>
+
+                  {/* Mood name */}
+                  <span
+                    className="text-sm font-bold text-white"
+                    style={{ opacity: isSelected ? 1 : 0.7 }}
+                  >
+                    {mood.label}
+                  </span>
+
+                  {/* Percentage badge (always visible on selected) */}
+                  <span
+                    className="text-xs font-semibold"
+                    style={{
+                      color: mood.color,
+                      opacity: isSelected ? 1 : 0,
+                      transition: 'opacity 0.3s',
+                    }}
+                  >
+                    {pct}%
+                  </span>
+
+                  {/* Slider — only shown when selected */}
+                  {isSelected && (
+                    <div className="w-full mt-2 flex flex-col items-center gap-1">
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={pct}
+                        onChange={e => {
+                          e.stopPropagation();
+                          handleSliderChange(mood.id, Number(e.target.value));
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                          width: '100%',
+                          accentColor: mood.color,
+                          cursor: 'pointer',
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Selected checkmark */}
+                  {isSelected && (
+                    <div
+                      className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
+                      style={{ background: mood.color, color: '#000' }}
+                    >
+                      ✓
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Mobile: 1 column override */}
+          <style>{`
+            @media (max-width: 480px) {
+              .mood-grid-inner { grid-template-columns: 1fr !important; }
+            }
+          `}</style>
         </div>
       </div>
-    </div>
+
+      {/* Fixed bottom bar */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-8"
+        style={{
+          paddingTop: 20,
+          background: 'linear-gradient(to top, rgba(3,4,14,0.95), rgba(3,4,14,0.8), transparent)',
+        }}
+      >
+        <div
+          className="max-w-lg mx-auto flex items-center justify-between"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 20,
+            padding: '16px 20px',
+          }}
+        >
+          {/* Left: Your Blend */}
+          <div className="flex items-center gap-3">
+            <span className="text-white/50 text-sm font-semibold">Your Blend:</span>
+            <div className="flex items-center gap-1">
+              {Object.keys(selectedMoods).length === 0 ? (
+                <span className="text-white/30 text-sm">Select moods above</span>
+              ) : (
+                Object.entries(selectedMoods).map(([id, pct]) => {
+                  const mood = moods.find(m => m.id === id);
+                  if (!mood) return null;
+                  return (
+                    <div
+                      key={id}
+                      className="flex items-center gap-1 px-2 py-1 rounded-full text-xs"
+                      style={{ background: `${mood.color}20`, border: `1px solid ${mood.color}60` }}
+                    >
+                      <span>{mood.emoji}</span>
+                      <span style={{ color: mood.color }} className="font-semibold">
+                        {pct}%
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Right: Save Blend */}
+          <NeonButton
+            variant="success"
+            disabled={Object.keys(selectedMoods).length === 0}
+            onClick={handleSave}
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            Save Blend →
+          </NeonButton>
+        </div>
+      </div>
+    </PageContainer>
   );
 }

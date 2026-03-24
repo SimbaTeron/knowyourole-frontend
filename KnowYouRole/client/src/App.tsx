@@ -24,6 +24,7 @@ import Faq from "@/pages/faq";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import Careers from "@/pages/careers";
+import ResultsPage from "@/pages/results";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route path="/careers" component={Careers} />
+      <Route path="/results" component={ResultsPage} />
       <Route component={NotFound} />
     </Switch>
   );
