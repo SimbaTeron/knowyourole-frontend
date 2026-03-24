@@ -62,11 +62,24 @@ function AuthContent() {
     );
   }
 
-  return (
-    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", display: "flex", flexDirection: "column" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap'); @keyframes spin { to { transform: rotate(360deg); } }`}</style>
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-      {/* TOP NAV */}
+  return (
+    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", display: "flex", flexDirection: "column", overflowX: "hidden" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 767px) {
+          .desktop-nav { display: none !important; }
+          .mobile-header { display: flex !important; }
+        }
+        @media (min-width: 768px) {
+          .mobile-header { display: none !important; }
+          .mobile-nav { display: none !important; }
+        }
+      `}</style>
+
+      {/* DESKTOP TOP NAV */}
       <header style={{ padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg, #00C8FF, #7800FF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -74,12 +87,34 @@ function AuthContent() {
           </div>
           <span style={{ fontSize: 17, fontWeight: 900, color: "#fff" }}>KnowYouRole</span>
         </Link>
-        <nav style={{ display: "flex", gap: 20 }}>
+        <nav className="desktop-nav" style={{ display: "flex", gap: 20 }}>
           {[["/", "Home"], ["/about", "About"], ["/faq", "FAQ"], ["/quiz", "Quiz"]].map(([href, label]) => (
             <Link key={href} href={href} style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", textDecoration: "none", fontFamily: "'Outfit',sans-serif" }}>{label}</Link>
           ))}
         </nav>
       </header>
+
+      {/* MOBILE HEADER */}
+      <header className="mobile-header" style={{ display: "none", padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+          <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg, #00C8FF, #7800FF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <span style={{ fontSize: 17, fontWeight: 900, color: "#fff" }}>KnowYouRole</span>
+        </Link>
+        <button onClick={() => setMobileNavOpen(!mobileNavOpen)} style={{ background: "none", border: "none", color: "#fff", fontSize: 24, cursor: "pointer", padding: 4 }}>
+          {mobileNavOpen ? "✕" : "☰"}
+        </button>
+      </header>
+
+      {/* MOBILE NAV DRAWER */}
+      {mobileNavOpen && (
+        <nav className="mobile-nav" style={{ display: "flex", flexDirection: "column", background: "rgba(5,5,16,0.98)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px 20px", gap: 4 }}>
+          {[["/", "Home"], ["/about", "About"], ["/faq", "FAQ"], ["/quiz", "Quiz"]].map(([href, label]) => (
+            <Link key={href} href={href} onClick={() => setMobileNavOpen(false)} style={{ fontSize: 16, fontWeight: 600, color: "rgba(255,255,255,0.7)", textDecoration: "none", padding: "10px 0", fontFamily: "'Outfit',sans-serif", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{label}</Link>
+          ))}
+        </nav>
+      )}
 
       {/* PAGE CONTENT */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "clamp(24px, 5vw, 64px)" }}>
