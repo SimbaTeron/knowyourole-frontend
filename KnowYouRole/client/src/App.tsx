@@ -43,6 +43,7 @@ function Router() {
       <Route path="/location" component={LocationPage} />
       <Route path="/pre-quiz">{() => <Redirect to="/quiz" />}</Route>
       <Route path="/quiz/gateway" component={QuizGatewayPage} />
+      <Route path="/quiz/questions" component={QuizPage} />
       <Route path="/quiz" component={QuizGatewayPage} />
       <Route path="/crossroads" component={CrossroadsPage} />
       <Route path="/profile" component={ProfilePage} />

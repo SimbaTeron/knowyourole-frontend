@@ -53,17 +53,15 @@ export default function MoodMixer() {
       emoji: getBlendEmoji(),
     };
     localStorage.setItem("kyr_mood_blend", JSON.stringify(blend));
-    const tier = localStorage.getItem("kyr_quiz_tier") || "";
     setAnimating(true);
     setTimeout(() => {
-      window.location.href = `/quiz?tier=${encodeURIComponent(tier)}`;
+      window.location.href = "/quiz/questions";
     }, 400);
   };
 
   const handleSkip = () => {
     localStorage.removeItem("kyr_mood_blend");
-    const tier = localStorage.getItem("kyr_quiz_tier") || "";
-    window.location.href = `/quiz?tier=${encodeURIComponent(tier)}`;
+    window.location.href = "/quiz/questions";
   };
 
   return (

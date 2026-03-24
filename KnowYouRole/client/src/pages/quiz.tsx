@@ -19,25 +19,53 @@ const glassCard: React.CSSProperties = {
 };
 
 export default function QuizPage() {
-  const [, setLocation] = useLocation();
+  const [location] = useLocation();
+  const params = new URLSearchParams(location.split("?")[1] || "");
+  const stepParam = params.get("step"); // "questions" = show quiz questions
+
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answers, setAnswers] = useState<number[]>([]);
 
+  // If step=questions is set, skip to quiz questions immediately
   useEffect(() => {
-    // Guard: if user has already completed quiz, redirect to results
-    const saved = localStorage.getItem("kyr_quiz_answers");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.length >= QUESTIONS.length) {
-        window.location.href = "/results";
-        return;
+    if (stepParam === "questions") {
+      // Read any previously saved answers to resume where they left off
+      const saved = localStorage.getItem("kyr_quiz_answers");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAnswers(parsed);
+            setStep(parsed.length);
+          }
+        } catch {}
+      }
+    } else {
+      // Guard: if user has already completed quiz, redirect to results
+      const saved = localStorage.getItem("kyr_quiz_answers");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.length >= QUESTIONS.length) {
+            window.location.href = "/results";
+            return;
+          }
+        } catch {}
       }
     }
-  }, []);
+  }, [stepParam]);
+
+  // If showing questions but no step param, redirect
+  if (stepParam !== "questions" && step > 0) {
+    // User is at quiz page without step param but has progress — redirect to questions
+    window.location.href = "/quiz?step=questions";
+    return null;
+  }
 
   const q = QUESTIONS[step];
   const progress = (step / QUESTIONS.length) * 100;
+  const tier = localStorage.getItem("kyr_quiz_tier") || "18-24";
 
   const handleNext = () => {
     if (selected === null) return;
@@ -47,11 +75,10 @@ export default function QuizPage() {
     if (step < QUESTIONS.length - 1) {
       setStep(s => s + 1);
     } else {
-      // Save answers and read mood blend before navigating to results
       localStorage.setItem("kyr_quiz_answers", JSON.stringify(next));
       const moodBlendStr = localStorage.getItem("kyr_mood_blend");
       const moodBlend = moodBlendStr ? JSON.parse(moodBlendStr) : null;
-      localStorage.setItem("kyr_results", JSON.stringify({ answers: next, moodBlend }));
+      localStorage.setItem("kyr_results", JSON.stringify({ answers: next, moodBlend, tier }));
       window.location.href = "/results";
     }
   };
@@ -61,71 +88,109 @@ export default function QuizPage() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
 
       {/* Header */}
-      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <button onClick={() => history.back()} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: 20, padding: 8 }}>←</button>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 2 OF 3</span>
+      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.08)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <button onClick={() => window.location.href = "/quiz"} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: 20, padding: "4px 8px", borderRadius: 8, fontFamily: "'Outfit',sans-serif" }}>←</button>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 2 OF 3</span>
         <div style={{ width: 40 }} />
       </header>
 
       {/* Progress bar */}
-      <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.1)", zIndex: 50 }}>
+      <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.08)", zIndex: 50 }}>
         <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #00C8FF, #7800FF)", transition: "width 0.4s ease" }} />
       </div>
 
       {/* Question */}
-      <div style={{ padding: "clamp(80px, 15vw, 120px) clamp(16px, 4vw, 48px)", display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh" }}>
-        <div style={{ maxWidth: 640, width: "100%" }}>
-          <div style={{ ...glassCard, padding: "clamp(24px, 5vw, 40px)", marginBottom: 24 }}>
-            <h2 style={{ fontSize: "clamp(1.1rem, 3vw, 1.5rem)", fontWeight: 700, lineHeight: 1.4, fontFamily: "'Outfit',sans-serif" }}>{q.q}</h2>
+      <div style={{ paddingTop: 80, paddingBottom: 120, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", padding: "clamp(80px, 12vw, 100px) clamp(16px, 4vw, 48px)" }}>
+        <div style={{ maxWidth: 620, width: "100%" }}>
+          {/* Question number */}
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "#7800FF", textTransform: "uppercase", marginBottom: 12, textAlign: "center", fontFamily: "'Outfit',sans-serif" }}>
+            Question {step + 1} of {QUESTIONS.length}
+          </p>
+
+          {/* Question text */}
+          <h2 style={{ fontSize: "clamp(1.25rem, 4vw, 2rem)", fontWeight: 800, textAlign: "center", marginBottom: 36, lineHeight: 1.3, fontFamily: "'Outfit',sans-serif" }}>
+            {q.q}
+          </h2>
+
+          {/* Answer options */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {q.a.map((answer, i) => {
+              const isSelected = selected === i;
+              return (
+                <button
+                  key={i}
+                  onClick={() => setSelected(i)}
+                  style={{
+                    ...glassCard,
+                    padding: "16px 20px",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    background: isSelected ? "rgba(0,200,255,0.12)" : "rgba(255,255,255,0.04)",
+                    border: isSelected ? "2px solid #00C8FF" : "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 16,
+                    color: isSelected ? "#fff" : "rgba(255,255,255,0.75)",
+                    fontSize: 15,
+                    fontFamily: "'Outfit',sans-serif",
+                    fontWeight: isSelected ? 600 : 400,
+                    transition: "all 0.2s ease",
+                    boxShadow: isSelected ? "0 0 20px rgba(0,200,255,0.2)" : "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 14,
+                    minHeight: 56,
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <span style={{
+                    width: 32, height: 32, borderRadius: "50%",
+                    background: isSelected ? "#00C8FF" : "rgba(255,255,255,0.08)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 13, fontWeight: 700, flexShrink: 0,
+                    color: isSelected ? "#000" : "rgba(255,255,255,0.4)",
+                  }}>
+                    {String.fromCharCode(65 + i)}
+                  </span>
+                  {answer}
+                </button>
+              );
+            })}
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {q.a.map((ans, i) => (
-              <div
-                key={i}
-                onClick={() => setSelected(i)}
-                style={{
-                  ...glassCard,
-                  padding: "16px 20px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 16,
-                  cursor: "pointer",
-                  border: selected === i ? "2px solid #00C8FF" : "1px solid rgba(255,255,255,0.08)",
-                  boxShadow: selected === i ? "0 0 15px rgba(0,200,255,0.25)" : "none",
-                }}
-              >
-                <div style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${selected === i ? "#00C8FF" : "rgba(255,255,255,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
-                  {selected === i && <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#00C8FF", boxShadow: "0 0 8px rgba(0,200,255,0.6)" }} />}
-                </div>
-                <span style={{ fontSize: 15, color: "rgba(255,255,255,0.85)", fontFamily: "'Outfit',sans-serif" }}>{ans}</span>
-              </div>
+          {/* Next button */}
+          <button
+            onClick={handleNext}
+            disabled={selected === null}
+            style={{
+              marginTop: 32,
+              width: "100%",
+              padding: "17px",
+              background: selected !== null ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.06)",
+              border: "none",
+              borderRadius: 16,
+              color: selected !== null ? "#fff" : "rgba(255,255,255,0.3)",
+              fontWeight: 800,
+              fontSize: 16,
+              cursor: selected !== null ? "pointer" : "not-allowed",
+              fontFamily: "'Outfit',sans-serif",
+              boxShadow: selected !== null ? "0 4px 30px rgba(0,200,255,0.35)" : "none",
+              transition: "all 0.25s ease",
+              letterSpacing: "0.02em",
+            }}
+          >
+            {step < QUESTIONS.length - 1 ? "Next Question →" : "See My Results →"}
+          </button>
+
+          {/* Progress dots */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 24 }}>
+            {QUESTIONS.map((_, i) => (
+              <div key={i} style={{
+                width: 8, height: 8, borderRadius: "50%",
+                background: i < step ? "#00C8FF" : i === step ? "#7800FF" : "rgba(255,255,255,0.2)",
+                transition: "background 0.3s ease",
+              }} />
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Next button */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px clamp(16px, 4vw, 48px)", background: "rgba(5,5,16,0.9)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-        <button
-          onClick={handleNext}
-          disabled={selected === null}
-          style={{
-            width: "100%",
-            padding: "16px",
-            background: selected !== null ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.1)",
-            border: "none",
-            borderRadius: 16,
-            color: selected !== null ? "#fff" : "rgba(255,255,255,0.3)",
-            fontWeight: 700,
-            fontSize: 16,
-            cursor: selected !== null ? "pointer" : "not-allowed",
-            fontFamily: "'Outfit',sans-serif",
-            boxShadow: selected !== null ? "0 0 30px rgba(0,200,255,0.3)" : "none",
-          }}
-        >
-          {step < QUESTIONS.length - 1 ? "Next Question →" : "See Your Results →"}
-        </button>
       </div>
 
       <AppFooter />

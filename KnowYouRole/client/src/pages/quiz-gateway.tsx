@@ -14,7 +14,7 @@ export default function QuizGateway() {
   const handleContinue = () => {
     if (selected) {
       localStorage.setItem("kyr_quiz_tier", selected);
-      window.location.href = `/mood-mixer?tier=${encodeURIComponent(selected)}`;
+      window.location.href = `/mood-mixer`;
     }
   };
 
