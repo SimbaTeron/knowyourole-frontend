@@ -38,7 +38,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/mood" component={MoodPage} />
+      <Route path="/mood" component={MoodMixerPage} />
       <Route path="/mood-mixer" component={MoodMixerPage} />
       <Route path="/location" component={LocationPage} />
       <Route path="/pre-quiz">{() => <Redirect to="/quiz" />}</Route>
