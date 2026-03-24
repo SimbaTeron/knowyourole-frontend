@@ -47,8 +47,11 @@ export default function QuizPage() {
     if (step < QUESTIONS.length - 1) {
       setStep(s => s + 1);
     } else {
-      // Save answers before navigating to results
+      // Save answers and read mood blend before navigating to results
       localStorage.setItem("kyr_quiz_answers", JSON.stringify(next));
+      const moodBlendStr = localStorage.getItem("kyr_mood_blend");
+      const moodBlend = moodBlendStr ? JSON.parse(moodBlendStr) : null;
+      localStorage.setItem("kyr_results", JSON.stringify({ answers: next, moodBlend }));
       window.location.href = "/results";
     }
   };
