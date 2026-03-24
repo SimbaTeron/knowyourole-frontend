@@ -54,7 +54,7 @@ function AuthContent() {
 
   if (isLoading) {
     return (
-      <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", display:flex, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <div style={{ width: 40, height: 40, border: "3px solid rgba(0,200,255,0.2)", borderTopColor: "#00C8FF", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: 16 }} />
         <p style={{ color: "#00C8FF", fontSize: 14, fontWeight: 500 }}>Loading...</p>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>

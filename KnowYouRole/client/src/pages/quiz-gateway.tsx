@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AppFooter } from "@/components/layout/AppFooter";
 
 const TIERS = [
   { id: "13-15", emoji: "🎉", title: "Young Teens (13-15)", sub: "Quick, fun quiz made just for you" },
@@ -168,6 +169,8 @@ export default function QuizGateway() {
           </p>
         </div>
       </div>
+
+      <AppFooter />
     </div>
   );
 }

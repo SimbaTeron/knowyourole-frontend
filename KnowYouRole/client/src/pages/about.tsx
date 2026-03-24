@@ -1,23 +1,13 @@
 import { Link } from "wouter";
+import { AppHeader } from "@/components/layout/AppHeader";
+import { AppFooter } from "@/components/layout/AppFooter";
 
 export default function AboutPage() {
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
 
-      {/* Header */}
-      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "#fff" }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #00C8FF, #7800FF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-          </div>
-          <span style={{ fontSize: 18, fontWeight: 900 }}>KnowYouRole</span>
-        </Link>
-        <div style={{ display: "flex", gap: 24 }}>
-          <Link href="/quiz" style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", textDecoration: "none" }}>Quiz</Link>
-          <Link href="/about" style={{ fontSize: 14, color: "#00C8FF", textDecoration: "none" }}>About</Link>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Hero */}
       <div style={{ paddingTop: 140, paddingBottom: 60, textAlign: "center", padding: "140px 24px 60px" }}>
@@ -80,15 +70,7 @@ export default function AboutPage() {
         </Link>
       </section>
 
-      {/* Footer */}
-      <footer style={{ padding: "24px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,0.3)" }}>
-        <span>© 2026 KnowYouRole</span>
-        <div style={{ display: "flex", gap: 16 }}>
-          <Link href="/privacy" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Privacy</Link>
-          <Link href="/terms" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Terms</Link>
-          <Link href="/faq" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>FAQ</Link>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   );
 }

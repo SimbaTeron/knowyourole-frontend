@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { AppFooter } from "@/components/layout/AppFooter";
 
 const QUESTIONS = [
   { q: "You're at a party. What do you naturally do?", a: ["Work the room, meeting everyone", "Find one deep conversation", "Observe from the corner", "Make sure everyone's having fun", "Relax and enjoy your own company"] },
@@ -109,6 +110,8 @@ export default function QuizPage() {
           {step < QUESTIONS.length - 1 ? "Next Question →" : "See Your Results →"}
         </button>
       </div>
+
+      <AppFooter />
     </div>
   );
 }

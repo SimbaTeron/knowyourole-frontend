@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AppFooter } from "@/components/layout/AppFooter";
 
 const TRAITS = [
   { label: "Openness", value: 92, color: "#A78BFA" },
@@ -146,6 +147,8 @@ export default function ResultsPage() {
           </div>
         </div>
       </div>
+
+      <AppFooter />
     </div>
   );
 }

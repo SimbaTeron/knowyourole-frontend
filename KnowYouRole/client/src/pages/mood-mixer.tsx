@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { AppFooter } from "@/components/layout/AppFooter";
 
 const MOODS = [
   { id: "happy", emoji: "😊", label: "Happy", color: "#FBBF24" },
@@ -122,6 +123,8 @@ export default function MoodMixer() {
           Save Blend →
         </button>
       </div>
+
+      <AppFooter />
     </div>
   );
 }

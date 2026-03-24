@@ -1,6 +1,7 @@
 import { Link } from 'wouter';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { CompactHeader } from '@/components/layout/CompactHeader';
+import { AppFooter } from '@/components/layout/AppFooter';
 import { GlassCard } from '@/components/glass/GlassCard';
 import { NeonButton } from '@/components/glass/NeonButton';
 import { NeonText } from '@/components/glass/NeonText';
@@ -36,6 +37,7 @@ export default function CrossroadsPage() {
   ];
 
   return (
+    <>
     <PageContainer padded={false}>
       <CompactHeader title="What's Next?" onBack={() => history.back()} onMenu={() => {}} />
       <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-20">
@@ -77,5 +79,7 @@ export default function CrossroadsPage() {
         </div>
       </div>
     </PageContainer>
+    <AppFooter />
+    </>
   );
 }
