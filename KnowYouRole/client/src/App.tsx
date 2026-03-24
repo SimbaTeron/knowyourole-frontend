@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { Switch, Route, useLocation, Redirect } from "wouter";
+import { Auth0Provider } from "@auth0/auth0-react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { LocalityThemeProvider } from "@/contexts/LocalityThemeContext";
-import { AnimatedBackground } from "./components/layout/AnimatedBackground";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import MoodPage from "@/pages/mood";
@@ -66,14 +65,21 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AnimatedBackground />
-        <ScrollToTop />
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <Auth0Provider
+      domain="dev-f0lrnyg4uigdvae1.us.auth0.com"
+      clientId="edp3GnoatCBItXXQiu6jsxjL0Tc3CTIM"
+      authorizationParams={{
+        redirect_uri: window.location.origin + "/callback",
+      }}
+    >
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <ScrollToTop />
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </Auth0Provider>
   );
 }
 
