@@ -37,7 +37,7 @@ export default function MoodMixerPage() {
 
   const handleSave = () => {
     alert('Mood blend saved!');
-    setLocation('/');
+    setLocation('/crossroads');
   };
 
   return (

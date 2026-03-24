@@ -76,9 +76,8 @@ export default function QuizPage() {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(c => c + 1);
     } else {
-      // Quiz complete — for now alert with results and redirect
-      alert(`Quiz complete! You answered: ${JSON.stringify(newAnswers)}`);
-      setLocation('/');
+      // Quiz complete — go to results
+      setLocation('/results');
     }
   };
 
