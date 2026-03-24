@@ -1,501 +1,430 @@
-import { useState, useEffect } from "react";
-import { useLocation, Link } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Compass, Brain, Briefcase, Gift, UserCheck, ClipboardList, BarChart3, FlaskConical, Quote, Shield, User, Target, TrendingUp, Lightbulb, Eye } from "lucide-react";
-import PathCanvas from "@/components/PathCanvas";
-import KnowRoleHeader from "@/components/KnowRoleHeader";
-import AgeTierSelector from "@/components/AgeTierSelector";
-import { ThemeMode } from "@/components/ThemeToggle";
-
-const ROTATING_TAGLINES = [
-  { text: "What career fits your brain?", icon: "compass" },
-  { text: "What makes you... you?", icon: "sparkle" },
-  { text: "Discover your hidden traits", icon: "compass" },
-  { text: "Find your hidden superpowers", icon: "sparkle" },
-];
+import { Link } from "wouter";
+import { PageContainer } from "../components/layout/PageContainer";
+import { AppHeader } from "../components/layout/AppHeader";
+import { GlassCard } from "../components/glass/GlassCard";
+import { NeonButton } from "../components/glass/NeonButton";
+import { GlassBadge } from "../components/glass/GlassBadge";
+import { useAuth } from "../hooks/useAuth";
 
 const FEATURES = [
-  { icon: Brain, label: "3 Test Types", description: "Big Five, MBTI & DISC", color: "text-[#A78BFA]" },
-  { icon: Briefcase, label: "Career Matching", description: "150+ matched roles", color: "text-[#67E8F9]" },
-  { icon: Gift, label: "100% Free", description: "No sign-up required", color: "text-[#34D399]" },
-];
-
-const STEPS = [
-  { icon: UserCheck, step: "1", title: "Choose Your Age", description: "Pick the tier that fits you" },
-  { icon: ClipboardList, step: "2", title: "Take the Quiz", description: "Answer fun, quick questions" },
-  { icon: BarChart3, step: "3", title: "Get Results", description: "Explore your personality & careers" },
+  {
+    emoji: "🎯",
+    title: "Precision Insights",
+    description: "Deep psychological analysis based on the Big Five model — the gold standard in personality science.",
+  },
+  {
+    emoji: "🧠",
+    title: "Mood Alchemy Lab",
+    description: "Track how your emotions shift and blend across different situations and environments.",
+  },
+  {
+    emoji: "💼",
+    title: "Career Compass",
+    description: "Discover roles where your natural traits translate into satisfaction and success.",
+  },
+  {
+    emoji: "🎮",
+    title: "Quizzes That Don't Suck",
+    description: "Say goodbye to boring quizzes. Ours are engaging, beautiful, and actually fun.",
+  },
+  {
+    emoji: "🔒",
+    title: "Privacy First",
+    description: "Your results are yours. Always. We never sell data or share anything without permission.",
+  },
+  {
+    emoji: "⚡",
+    title: "Instant Results",
+    description: "Get your full personality breakdown in under 10 minutes. No waiting, no surveys.",
+  },
 ];
 
 const TESTIMONIALS = [
   {
-    quote: "I had no idea my personality traits pointed toward UX design. This tool helped me see a career path I never would have considered on my own.",
-    author: "Jordan, 22",
-    role: "College Senior",
-    icon: UserCheck,
+    name: "Jordan M.",
+    role: "Software Engineer at Stripe",
+    quote: "Finally a quiz that actually gets me. The career suggestions were spot-on.",
+    initials: "JM",
+    color: "from-[#00D4FF] to-[#7B2FFF]",
   },
   {
-    quote: "At 34, I was stuck in accounting and miserable. My results showed high Openness and Extraversion — now I'm exploring product management. Wish I'd found this sooner.",
-    author: "Marcus, 34",
-    role: "Career Changer",
-    icon: TrendingUp,
+    name: "Aaliyah T.",
+    role: "Product Designer at Figma",
+    quote: "The mood tracking is addictive. I've learned so much about myself.",
+    initials: "AT",
+    color: "from-[#7B2FFF] to-[#FF00E5]",
   },
   {
-    quote: "My 15-year-old took the quiz and it opened up a real conversation about her strengths. She's already looking into the career paths it suggested.",
-    author: "Maria, Parent",
-    role: "of a teenager",
-    icon: User,
-  },
-  {
-    quote: "The DISC breakdown was spot on. I shared my results with my study group and now we actually understand why we clash on projects.",
-    author: "Priya, 20",
-    role: "Engineering Student",
-    icon: Target,
+    name: "Marcus R.",
+    role: "Medical Student, NYU",
+    quote: "Took it for fun, stayed for the science. Incredibly accurate.",
+    initials: "MR",
+    color: "from-[#FF00E5] to-[#00D4FF]",
   },
 ];
 
-const SCIENCE_HIGHLIGHTS = [
-  {
-    icon: Brain,
-    title: "Big Five (OCEAN)",
-    description: "The gold standard in personality psychology, backed by decades of peer-reviewed research."
-  },
-  {
-    icon: Compass,
-    title: "MBTI-Inspired",
-    description: "Understand your cognitive preferences through 16 personality types rooted in Jungian theory."
-  },
-  {
-    icon: Briefcase,
-    title: "DISC Behavioral",
-    description: "Professional-grade behavioral insights used in career coaching and team development."
-  },
+const STATS = [
+  { num: "2M+", label: "Assessments" },
+  { num: "4.9★", label: "Avg Rating" },
+  { num: "3 min", label: "Avg Quiz" },
+  { num: "100%", label: "Private" },
 ];
 
 export default function Home() {
-  const [, setLocation] = useLocation();
-  const [ageTier, setAgeTier] = useState<string | null>(null);
-  const [theme, setTheme] = useState<ThemeMode>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
-      return stored === "light" ? "light" : "dark";
-    }
-    return "dark";
-  });
-  const [taglineIndex, setTaglineIndex] = useState(0);
-
-  useEffect(() => {
-    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark", "dark-mysterious");
-    } else {
-      document.documentElement.classList.add("light-clinical");
-    }
-  }, [theme]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTaglineIndex((prev) => (prev + 1) % ROTATING_TAGLINES.length);
-    }, 1970);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleThemeChange = (newTheme: ThemeMode) => {
-    setTheme(newTheme);
-    localStorage.setItem("knowrole-theme", newTheme);
-    
-    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark", "dark-mysterious");
-    } else {
-      document.documentElement.classList.add("light-clinical");
-    }
-  };
-
-  const handleTierSelect = (tierId: string) => {
-    setAgeTier(tierId);
-  };
-
-  const handleConfirmJourney = () => {
-    if (!ageTier) return;
-
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("knowrole-") && key !== "knowrole-theme") {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    const sessionKeysToRemove: string[] = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      if (key && key.startsWith("knowrole-")) {
-        sessionKeysToRemove.push(key);
-      }
-    }
-    sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
-    
-    sessionStorage.setItem("knowrole-tier", ageTier);
-    if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-    setLocation("/mood-mixer");
-  };
-
-  const getThemeClass = () => {
-    return theme === "dark" ? "dark-mysterious" : "light-clinical";
-  };
+  const { user } = useAuth();
 
   return (
-    <div className={`min-h-screen grain-overlay ${getThemeClass()}`}>
-      <PathCanvas />
-      <KnowRoleHeader 
-        theme={theme} 
-        onThemeChange={handleThemeChange} 
-      />
-      <main className="relative z-10 flex flex-col items-center px-5 pt-16 pb-12">
-        <div className="w-full max-w-md">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-6 md:mb-8"
-          >
-            <h1
-              className="text-[1.75rem] md:text-4xl font-display font-bold text-warm-gray dark:text-[#F8FAFC] mb-2 md:mb-3 leading-tight"
-              data-testid="text-hero-headline"
-            >
-              Discover Your <span className="italic text-terracotta dark:text-[#A78BFA]">True</span> Potential
-            </h1>
-            <p
-              className="text-sm md:text-base text-warm-gray/70 dark:text-[#94A3B8]"
-              data-testid="text-hero-subtext"
-            >
-              Science-backed personality insights and career matching in minutes
-            </p>
-          </motion.div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        
+        .font-outfit * {
+          font-family: 'Outfit', sans-serif;
+        }
+        
+        .hero-gradient {
+          background: linear-gradient(90deg, #00C8FF, #7800FF, #FF00E5);
+          background-size: 400% 400%;
+          animation: gradientShift 6s ease infinite;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        .card-hover {
+          transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(0, 200, 255, 0.3);
+          transform: translateY(-4px);
+        }
+      `}</style>
 
-          <div className="text-center mb-6 md:mb-8">
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="relative"
-            >
-              <div className="h-[44px] md:h-[52px] flex items-center justify-center overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={taglineIndex}
-                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="flex items-center justify-center gap-2.5"
-                  >
-                    <motion.div
-                      animate={{ 
-                        rotate: [0, 10, -10, 0],
-                        scale: [1, 1.1, 1]
-                      }}
-                      transition={{ 
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      className="flex-shrink-0"
-                    >
-                      {ROTATING_TAGLINES[taglineIndex].icon === "sparkle" ? (
-                        <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-terracotta dark:text-[#A78BFA]" />
-                      ) : (
-                        <Compass className="w-4 h-4 md:w-5 md:h-5 text-sage-green dark:text-[#67E8F9]" />
-                      )}
-                    </motion.div>
-                    <p
-                      className="text-base md:text-xl font-medium text-warm-gray dark:text-soft-cream"
-                      data-testid="text-subtitle"
-                    >
-                      {ROTATING_TAGLINES[taglineIndex].text}
-                    </p>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          </div>
+      <PageContainer padded={false} className="font-outfit">
+        <AppHeader />
 
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex justify-center gap-6 md:gap-8 mb-8 md:mb-10"
-            data-testid="section-feature-highlights"
-          >
-            {FEATURES.map((feature) => (
-              <div
-                key={feature.label}
-                className="flex flex-col items-center text-center flex-1"
-                data-testid={`feature-${feature.label.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-warm-gray/5 dark:bg-white/5 flex items-center justify-center mb-1.5">
-                  <feature.icon className={`w-4 h-4 md:w-5 md:h-5 ${feature.color}`} />
+        {/* Hero Section */}
+        <section
+          className="relative min-h-screen flex flex-col justify-center px-4 sm:px-6 lg:px-12 pt-24 pb-16"
+          style={{
+            background:
+              "radial-gradient(ellipse at 30% 20%, rgba(120,0,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(0,200,255,0.1) 0%, transparent 50%)",
+          }}
+        >
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+              {/* Left: Hero Content */}
+              <div className="flex-1 max-w-2xl">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 bg-[rgba(0,200,255,0.1)] border border-[rgba(0,200,255,0.3)] px-4 py-1.5 rounded-full text-xs font-semibold text-[#00C8FF] mb-6">
+                  ✦ 100% Free — No Account Needed
                 </div>
-                <span className="text-[11px] md:text-xs font-semibold text-warm-gray dark:text-[#F8FAFC] leading-tight">
-                  {feature.label}
-                </span>
-                <span className="text-[10px] md:text-[11px] text-warm-gray/60 dark:text-[#64748B] leading-tight mt-0.5">
-                  {feature.description}
-                </span>
-              </div>
-            ))}
-          </motion.div>
 
-          <div className="floating-card">
-            <div className="premium-card rounded-2xl p-5 md:p-8">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key="tier"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
+                {/* Headline */}
+                <h1
+                  className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-[0.95] tracking-[-0.04em] mb-6"
+                  style={{ fontFamily: "'Outfit', sans-serif" }}
                 >
-                  <AgeTierSelector
-                    selectedTier={ageTier}
-                    onSelect={handleTierSelect}
-                    onConfirm={handleConfirmJourney}
-                  />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
+                  Find out
+                  <br />
+                  who you{" "}
+                  <span className="hero-gradient">really</span>
+                  <br />
+                  are.
+                </h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-6"
-            data-testid="section-how-it-works"
-          >
-            <p className="text-xs uppercase tracking-widest text-center text-warm-gray/50 dark:text-[#64748B] font-semibold mb-3">
-              How it works
-            </p>
-            <div className="flex items-start justify-between gap-2">
-              {STEPS.map((step, index) => (
-                <div key={step.step} className="flex flex-col items-center text-center flex-1 relative">
-                  <div className="w-9 h-9 rounded-full bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/20 flex items-center justify-center mb-1.5">
-                    <step.icon className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
-                  </div>
-                  <span className="text-xs font-semibold text-warm-gray dark:text-[#F8FAFC] leading-tight">
-                    {step.title}
-                  </span>
-                  <span className="text-[11px] text-warm-gray/60 dark:text-[#64748B] leading-tight mt-0.5">
-                    {step.description}
-                  </span>
-                  {index < STEPS.length - 1 && (
-                    <div className="absolute top-4 -right-1 w-2 flex items-center" style={{ visibility: "visible" }}>
-                      <svg width="8" height="8" viewBox="0 0 8 8" className="text-warm-gray/20 dark:text-[#A78BFA]/30">
-                        <path d="M1 1L5 4L1 7" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        <div className="w-full max-w-lg mt-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            data-testid="section-our-science"
-          >
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <FlaskConical className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-                <p className="text-xs uppercase tracking-widest text-warm-gray/50 dark:text-[#64748B] font-semibold">
-                  Our Science
+                {/* Subtitle */}
+                <p
+                  className="text-base sm:text-lg text-white/60 leading-relaxed mb-8 max-w-lg"
+                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                >
+                  The Gen Z personality quiz. Combined Big Five, MBTI, and DISC into one
+                  wild ride. Know yourself. Own your energy.
                 </p>
-              </div>
-              <h2 className="text-xl md:text-2xl font-display font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">
-                Research-Informed Assessments
-              </h2>
-              <p className="text-sm text-warm-gray/60 dark:text-[#94A3B8] max-w-sm mx-auto">
-                Built on three well-established psychological frameworks used by researchers and professionals worldwide.
-              </p>
-            </div>
 
-            <div className="space-y-3">
-              {SCIENCE_HIGHLIGHTS.map((item) => (
-                <div
-                  key={item.title}
-                  className="flex items-start gap-3 p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/10"
-                  data-testid={`science-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                >
-                  <div className="w-9 h-9 rounded-lg bg-terracotta/10 dark:bg-[#A78BFA]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <item.icon className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
+                {/* CTA Buttons */}
+                <div className="flex flex-wrap gap-3">
+                  <NeonButton
+                    variant="primary"
+                    size="lg"
+                    onClick={() => (window.location.href = "/quiz")}
+                    className="rounded-2xl"
+                    style={{
+                      background: "linear-gradient(90deg, #00C8FF, #7800FF)",
+                      boxShadow: "0 0 30px rgba(0,200,255,0.4)",
+                    }}
+                  >
+                    Take the Quiz — It's Free →
+                  </NeonButton>
+                  <NeonButton
+                    variant="secondary"
+                    size="lg"
+                    onClick={() => (window.location.href = "/about")}
+                    className="rounded-2xl"
+                  >
+                    Learn More
+                  </NeonButton>
+                </div>
+              </div>
+
+              {/* Right: Phone Stack */}
+              <div className="flex-1 flex justify-center lg:justify-end">
+                <div className="relative w-[260px] sm:w-[280px]">
+                  {/* Phone Card 1 */}
+                  <div className="relative bg-[rgba(255,255,255,0.06)] backdrop-blur-[30px] border border-[rgba(255,255,255,0.1)] rounded-3xl p-6 z-10"
+                    style={{ transform: "rotate(3deg)" }}>
+                    <p className="text-xs font-bold text-white/60 mb-1">Your Type</p>
+                    <p
+                      className="text-4xl font-black hero-gradient mb-1"
+                      style={{ fontFamily: "'Outfit', sans-serif" }}
+                    >
+                      INTJ-A
+                    </p>
+                    <p className="text-sm font-bold text-[#00C8FF]">The Architect</p>
+                    <p className="text-xs text-white/40 mt-1">12.4% of population</p>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-warm-gray dark:text-[#F8FAFC] mb-0.5">{item.title}</h3>
-                    <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8] leading-relaxed">{item.description}</p>
+
+                  {/* Phone Card 2 */}
+                  <div
+                    className="absolute top-4 -right-2 sm:top-5 sm:-right-4 bg-[rgba(255,255,255,0.06)] backdrop-blur-[30px] border border-[rgba(255,255,255,0.1)] rounded-3xl p-6 z-9"
+                    style={{ transform: "rotate(-2deg)" }}
+                  >
+                    <p className="text-xs font-bold text-white/60 mb-1">Big Five</p>
+                    <p className="text-sm font-black text-white leading-tight">
+                      O: 78% C: 85%
+                      <br />
+                      E: 42% A: 61%
+                      <br />
+                      N: 28%
+                    </p>
+                    <p className="text-xs text-white/40 mt-2 leading-tight">
+                      Openness, Conscientiousness
+                      <br />
+                      Extraversion, Agreeableness
+                      <br />
+                      Neuroticism
+                    </p>
+                  </div>
+
+                  {/* Phone Card 3 */}
+                  <div
+                    className="absolute top-8 -right-4 sm:top-10 sm:-right-8 bg-[rgba(255,255,255,0.06)] backdrop-blur-[30px] border border-[rgba(255,255,255,0.1)] rounded-3xl p-6 z-8"
+                    style={{ transform: "rotate(1deg)" }}
+                  >
+                    <p className="text-xs font-bold text-white/60 mb-1">DISC Profile</p>
+                    <p
+                      className="text-3xl font-black hero-gradient mb-1"
+                      style={{ fontFamily: "'Outfit', sans-serif" }}
+                    >
+                      DC
+                    </p>
+                    <p className="text-sm font-bold text-[#00C8FF]">The Challenger</p>
+                    <p className="text-xs text-white/40 mt-1">
+                      High dominance, high conscientiousness
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-4 p-4 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 text-center">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <Shield className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
-                <span className="text-xs font-semibold text-warm-gray dark:text-[#F8FAFC]">Research-Informed</span>
               </div>
-              <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8]">
-                Our assessments draw on decades of published personality research. Age-appropriate content for every tier.
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Bar */}
+        <section
+          className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/10 border-y border-white/10"
+          style={{ background: "rgba(255,255,255,0.02)" }}
+        >
+          {STATS.map((stat) => (
+            <div key={stat.label} className="text-center py-8 sm:py-10 px-4">
+              <p
+                className="text-2xl sm:text-3xl lg:text-4xl font-black hero-gradient mb-1"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                {stat.num}
+              </p>
+              <p className="text-xs text-white/40 font-medium" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                {stat.label}
               </p>
             </div>
-          </motion.div>
-        </div>
+          ))}
+        </section>
 
-        <div className="w-full max-w-lg mt-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            data-testid="section-testimonials"
-          >
-            <div className="text-center mb-6">
-              <p className="text-xs uppercase tracking-widest text-warm-gray/50 dark:text-[#64748B] font-semibold">
+        {/* Features Section */}
+        <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-6xl mx-auto">
+            {/* Section Header */}
+            <div className="text-center mb-14">
+              <p
+                className="text-xs font-bold tracking-[0.2em] uppercase text-[#00C8FF] mb-3"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                Why KnowYouRole
+              </p>
+              <h2
+                className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-[-0.03em] text-white"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                Not your average personality quiz.
+              </h2>
+            </div>
+
+            {/* Features Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {FEATURES.map((feature) => (
+                <GlassCard
+                  key={feature.title}
+                  variant="interactive"
+                  className="cursor-pointer"
+                  glowColor="blue"
+                >
+                  <div
+                    className="w-12 h-12 rounded-2xl bg-[rgba(0,200,255,0.15)] border border-[rgba(0,200,255,0.2)] flex items-center justify-center text-2xl mb-4"
+                  >
+                    {feature.emoji}
+                  </div>
+                  <h3
+                    className="text-lg font-bold text-white mb-2"
+                    style={{ fontFamily: "'Outfit', sans-serif" }}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p
+                    className="text-sm text-white/50 leading-relaxed"
+                    style={{ fontFamily: "'Outfit', sans-serif" }}
+                  >
+                    {feature.description}
+                  </p>
+                </GlassCard>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section
+          className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12"
+          style={{ background: "linear-gradient(180deg, transparent, rgba(120,0,255,0.05))" }}
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-14">
+              <p
+                className="text-xs font-bold tracking-[0.2em] uppercase text-[#00C8FF] mb-3"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
                 What People Say
               </p>
+              <h2
+                className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-[-0.03em] text-white"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                Real people, real insights.
+              </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {TESTIMONIALS.map((testimonial, index) => {
-                const AvatarIcon = testimonial.icon;
-                return (
-                  <div
-                    key={index}
-                    className="relative p-5 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/10"
-                    data-testid={`testimonial-${index}`}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {TESTIMONIALS.map((t) => (
+                <GlassCard key={t.name} variant="default">
+                  <p
+                    className="text-sm text-white/60 leading-relaxed mb-6 italic"
+                    style={{ fontFamily: "'Outfit', sans-serif" }}
                   >
-                    <Quote className="w-5 h-5 text-terracotta/30 dark:text-[#A78BFA]/30 mb-2" />
-                    <p className="text-sm text-warm-gray/80 dark:text-[#E2E8F0] leading-relaxed mb-3 italic">
-                      "{testimonial.quote}"
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-terracotta/10 dark:bg-[#A78BFA]/15 flex items-center justify-center flex-shrink-0">
-                        <AvatarIcon className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-warm-gray dark:text-[#F8FAFC]">{testimonial.author}</p>
-                        <p className="text-[11px] text-warm-gray/50 dark:text-[#64748B]">{testimonial.role}</p>
-                      </div>
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}
+                      style={{ fontFamily: "'Outfit', sans-serif" }}
+                    >
+                      {t.initials}
+                    </div>
+                    <div>
+                      <p
+                        className="text-sm font-bold text-white"
+                        style={{ fontFamily: "'Outfit', sans-serif" }}
+                      >
+                        {t.name}
+                      </p>
+                      <p
+                        className="text-xs text-white/40"
+                        style={{ fontFamily: "'Outfit', sans-serif" }}
+                      >
+                        {t.role}
+                      </p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        </div>
-
-        <div className="w-full max-w-lg mt-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            data-testid="section-results-teaser"
-          >
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Eye className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-                <p className="text-xs uppercase tracking-widest text-warm-gray/50 dark:text-[#64748B] font-semibold">
-                  Preview
-                </p>
-              </div>
-              <h2 className="text-xl md:text-2xl font-display font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">
-                What You'll Discover
-              </h2>
-              <p className="text-sm text-warm-gray/60 dark:text-[#94A3B8] max-w-sm mx-auto">
-                Complete the quiz to unlock your personalized insights
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                {
-                  icon: Brain,
-                  title: "Your Blended Personality Profile",
-                  description: "See how traits like Openness and Dominance combine to reveal types like Strategic Innovator or Empathic Leader.",
-                },
-                {
-                  icon: Briefcase,
-                  title: "Top Career Matches from 150+",
-                  description: "Roles like Product Manager, Counselor, Entrepreneur, and more — matched to your unique trait blend.",
-                },
-                {
-                  icon: TrendingUp,
-                  title: "Strengths & Growth Areas",
-                  description: "Discover what you're naturally good at and where targeted effort can unlock the most growth.",
-                },
-                {
-                  icon: Lightbulb,
-                  title: "Everyday Tips & Insights",
-                  description: "Practical advice for work, communication, and relationships based on your personality style.",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="flex items-start gap-3 p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/10"
-                  data-testid={`teaser-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                >
-                  <div className="w-9 h-9 rounded-lg bg-terracotta/10 dark:bg-[#A78BFA]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <item.icon className="w-4 h-4 text-terracotta dark:text-[#A78BFA]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-warm-gray dark:text-[#F8FAFC] mb-0.5">{item.title}</h3>
-                    <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8] leading-relaxed">{item.description}</p>
-                  </div>
-                </div>
+                </GlassCard>
               ))}
             </div>
-          </motion.div>
-        </div>
-      </main>
+          </div>
+        </section>
 
-      <footer className="relative z-10 border-t border-warm-gray/10 dark:border-[#A78BFA]/10 py-8 px-5 mt-8" data-testid="section-footer">
-        <div className="max-w-lg mx-auto">
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
-            <Link href="/about" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-about">
-              About
-            </Link>
-            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
-            <Link href="/about" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-science">
-              Our Science
-            </Link>
-            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
-            <Link href="/faq" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-faq">
-              FAQ
-            </Link>
-            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
-            <Link href="/privacy" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-privacy">
+        {/* CTA Section */}
+        <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12 text-center">
+          <div className="max-w-4xl mx-auto">
+            <h2
+              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-[-0.04em] leading-[0.95] mb-4"
+              style={{ fontFamily: "'Outfit', sans-serif" }}
+            >
+              Stop scrolling.
+              <br />
+              <span className="hero-gradient">Start knowing.</span>
+            </h2>
+            <p
+              className="text-base text-white/50 mb-10"
+              style={{ fontFamily: "'Outfit', sans-serif" }}
+            >
+              2.4 million people already know who they are. Your turn.
+            </p>
+            <NeonButton
+              variant="primary"
+              size="lg"
+              onClick={() => (window.location.href = "/quiz")}
+              style={{
+                background: "linear-gradient(90deg, #00C8FF, #7800FF)",
+                padding: "16px 36px",
+                fontSize: "1rem",
+                borderRadius: "16px",
+                boxShadow: "0 0 40px rgba(0,200,255,0.4)",
+                fontFamily: "'Outfit', sans-serif",
+              }}
+            >
+              Take the Free Quiz →
+            </NeonButton>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer
+          className="px-6 lg:px-12 py-8 border-t border-white/10 flex flex-wrap gap-3 justify-between text-xs text-white/30"
+          style={{ fontFamily: "'Outfit', sans-serif" }}
+        >
+          <span>© 2026 KnowYouRole</span>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-white/60 transition-colors no-underline">
               Privacy
             </Link>
-            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
-            <Link href="/terms" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-terms">
+            <span>·</span>
+            <Link href="/terms" className="hover:text-white/60 transition-colors no-underline">
               Terms
             </Link>
-            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
-            <Link href="/careers" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-careers">
-              Careers
+            <span>·</span>
+            <Link href="/faq" className="hover:text-white/60 transition-colors no-underline">
+              FAQ
             </Link>
-            <span className="text-warm-gray/20 dark:text-[#64748B]/50">|</span>
-            <a href="mailto:info@knowyourole.com" className="text-sm text-warm-gray/60 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-footer-contact">
-              Contact
-            </a>
+            <span>·</span>
+            <Link href="/about" className="hover:text-white/60 transition-colors no-underline">
+              About
+            </Link>
           </div>
-          <p className="text-xs text-center text-warm-gray/40 dark:text-[#64748B]">
-            KnowYouRole — Science-backed personality insights for every age.
-          </p>
-        </div>
-      </footer>
-    </div>
+        </footer>
+      </PageContainer>
+    </>
   );
 }

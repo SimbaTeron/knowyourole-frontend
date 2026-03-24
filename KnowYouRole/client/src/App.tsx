@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LocalityThemeProvider } from "@/contexts/LocalityThemeContext";
+import { AnimatedBackground } from "./components/layout/AnimatedBackground";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import MoodPage from "@/pages/mood";
@@ -59,6 +60,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LocalityThemeProvider>
+          <AnimatedBackground />
           <ScrollToTop />
           <Toaster />
           <Router />
