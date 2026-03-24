@@ -1,155 +1,105 @@
 import { Link } from "wouter";
-import { ArrowLeft, Briefcase, Palette, Wrench, HeartPulse, HandHelping, Building2, Search } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { ArrowLeft, Briefcase, Users, Code, Heart, Palette } from "lucide-react";
+import { PageContainer } from "@/components/layout/PageContainer";
+import { AppHeader } from "@/components/layout/AppHeader";
+import { AppFooter } from "@/components/layout/AppFooter";
+import { GlassCard } from "@/components/glass/GlassCard";
+import { NeonText } from "@/components/glass/NeonText";
+import { NeonButton } from "@/components/glass/NeonButton";
 
-interface JobRole {
+interface JobOpening {
   id: string;
-  roleName: string;
-  jobCollar: string;
+  title: string;
+  department: string;
+  type: string;
+  description: string;
 }
 
-const CATEGORY_META: Record<string, { label: string; icon: typeof Briefcase; color: string }> = {
-  white: { label: "Professional & Office", icon: Building2, color: "text-dusty-blue dark:text-[#67E8F9]" },
-  blue: { label: "Skilled Trades & Technical", icon: Wrench, color: "text-sage-green dark:text-[#34D399]" },
-  healthcare: { label: "Healthcare & Wellness", icon: HeartPulse, color: "text-terracotta dark:text-[#F87171]" },
-  service: { label: "Service & Community", icon: HandHelping, color: "text-amber-600 dark:text-[#FBBF24]" },
-  arts: { label: "Creative & Arts", icon: Palette, color: "text-purple-600 dark:text-[#A78BFA]" },
-};
+const JOB_OPENINGS: JobOpening[] = [
+  {
+    id: "1",
+    title: "Senior Frontend Engineer",
+    department: "Engineering",
+    type: "Full-time",
+    description: "Build beautiful, accessible user interfaces using React and TypeScript. Work on our personality quiz platform serving thousands of daily users."
+  },
+  {
+    id: "2",
+    title: "Product Designer",
+    department: "Design",
+    type: "Full-time",
+    description: "Shape the visual identity and user experience of KnowYouRole. Create intuitive interfaces that make personality discovery fun and engaging."
+  },
+  {
+    id: "3",
+    title: "Psychology Research Lead",
+    department: "Research",
+    type: "Full-time",
+    description: "Lead research initiatives to improve our personality assessment algorithms. Collaborate with clinical psychologists to ensure scientific validity."
+  },
+  {
+    id: "4",
+    title: "Marketing Manager",
+    department: "Growth",
+    type: "Part-time",
+    description: "Drive user acquisition and brand awareness for our personality platform. Develop content strategies that resonate with our target audience."
+  }
+];
 
 export default function Careers() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const { data: roles = [], isLoading } = useQuery<JobRole[]>({
-    queryKey: ["/api/job-roles"],
-  });
-
-  const grouped: Record<string, string[]> = {};
-  for (const role of roles) {
-    if (!grouped[role.jobCollar]) grouped[role.jobCollar] = [];
-    grouped[role.jobCollar].push(role.roleName);
-  }
-  for (const key of Object.keys(grouped)) {
-    grouped[key].sort((a, b) => a.localeCompare(b));
-  }
-
-  const categoryOrder = ["white", "healthcare", "blue", "service", "arts"];
-  const filteredCategories = categoryOrder.filter(cat => grouped[cat]);
-
-  const lowerSearch = searchTerm.toLowerCase().trim();
-  const filteredGrouped: Record<string, string[]> = {};
-  for (const cat of filteredCategories) {
-    const filtered = (grouped[cat] || []).filter(name => name.toLowerCase().includes(lowerSearch));
-    if (filtered.length > 0) filteredGrouped[cat] = filtered;
-  }
-
-  const totalRoles = roles.length;
-  const totalFiltered = Object.values(filteredGrouped).reduce((sum, arr) => sum + arr.length, 0);
-
   return (
-    <div className="min-h-screen bg-soft-cream dark:bg-[#0A0A12] text-warm-gray dark:text-[#F8FAFC]">
-      <header className="sticky top-0 z-50 px-6 py-4 bg-soft-cream/90 dark:bg-[#0A0A12]/90 backdrop-blur-sm border-b border-warm-gray/10 dark:border-[#A78BFA]/10">
-        <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 text-sm text-warm-gray/70 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-back-home">
+    <div className="min-h-screen" style={{ background: '#050510' }}>
+      <AppHeader />
+      <PageContainer>
+        <div className="mb-8 text-center">
+          <Briefcase className="w-10 h-10 mx-auto mb-4" style={{ color: '#7800FF' }} />
+          <NeonText size="xl" className="mb-4">Join Our Mission</NeonText>
+          <p className="text-sm opacity-70 max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            Help us build the future of personality discovery. We're a small team passionate about helping people understand themselves better.
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {JOB_OPENINGS.map((job, index) => (
+            <GlassCard key={job.id} glowColor={index % 2 === 0 ? 'blue' : 'purple'} className="p-6">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-lg font-semibold mb-1" style={{ color: '#fff' }}>{job.title}</h3>
+                  <div className="flex items-center gap-3 text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                    <span className="flex items-center gap-1">
+                      {job.department === 'Engineering' && <Code className="w-3 h-3" />}
+                      {job.department === 'Design' && <Palette className="w-3 h-3" />}
+                      {job.department === 'Research' && <Heart className="w-3 h-3" />}
+                      {job.department === 'Growth' && <Users className="w-3 h-3" />}
+                      {job.department}
+                    </span>
+                    <span>•</span>
+                    <span>{job.type}</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>{job.description}</p>
+              <NeonButton variant="secondary">Apply Now</NeonButton>
+            </GlassCard>
+          ))}
+        </div>
+
+        <GlassCard className="mt-10 text-center p-6" glowColor="blue">
+          <h3 className="text-lg font-semibold mb-2" style={{ color: '#00C8FF' }}>Don't see a perfect fit?</h3>
+          <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            We're always looking for talented people. Send us your resume and tell us how you'd like to contribute.
+          </p>
+          <NeonButton variant="primary">Send Open Application</NeonButton>
+        </GlassCard>
+
+        <div className="mt-8 text-center">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
         </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Briefcase className="w-7 h-7 text-terracotta dark:text-[#A78BFA]" />
-            <h1 className="text-3xl font-display font-bold" data-testid="text-careers-title">Career Paths</h1>
-          </div>
-          <p className="text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed">
-            Explore the {totalRoles}+ career roles we match against your personality profile. Take the quiz to see which ones fit you best.
-          </p>
-        </div>
-
-        <div className="relative mb-8">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-warm-gray/40 dark:text-[#64748B]" />
-          <input
-            type="text"
-            placeholder="Search careers..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10 text-warm-gray dark:text-[#F8FAFC] placeholder:text-warm-gray/40 dark:placeholder:text-[#64748B] focus:outline-none focus:border-terracotta dark:focus:border-[#A78BFA] transition-colors"
-            data-testid="input-career-search"
-          />
-          {searchTerm && (
-            <p className="text-xs text-warm-gray/50 dark:text-[#64748B] mt-2">
-              Showing {totalFiltered} of {totalRoles} careers
-            </p>
-          )}
-        </div>
-
-        {isLoading ? (
-          <div className="space-y-6">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="animate-pulse">
-                <div className="h-6 w-48 bg-warm-gray/10 dark:bg-white/10 rounded mb-3" />
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {[1, 2, 3, 4, 5, 6].map(j => (
-                    <div key={j} className="h-10 bg-warm-gray/5 dark:bg-white/5 rounded-lg" />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : Object.keys(filteredGrouped).length === 0 ? (
-          <p className="text-center text-warm-gray/50 dark:text-[#64748B] py-8" data-testid="text-no-results">
-            No careers match "{searchTerm}"
-          </p>
-        ) : (
-          <div className="space-y-8">
-            {Object.keys(filteredGrouped).map(cat => {
-              const meta = CATEGORY_META[cat] || { label: cat, icon: Briefcase, color: "text-warm-gray" };
-              const CategoryIcon = meta.icon;
-              const names = filteredGrouped[cat];
-              return (
-                <section key={cat} data-testid={`section-category-${cat}`}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <CategoryIcon className={`w-5 h-5 ${meta.color}`} />
-                    <h2 className="text-lg font-display font-semibold">
-                      {meta.label}
-                    </h2>
-                    <span className="text-xs text-warm-gray/40 dark:text-[#64748B] ml-1">
-                      ({names.length})
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {names.map(name => (
-                      <div
-                        key={name}
-                        className="px-3 py-2.5 rounded-lg bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/8 dark:border-[#A78BFA]/8 text-sm text-warm-gray/80 dark:text-[#E2E8F0]"
-                        data-testid={`career-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                      >
-                        {name}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="mt-12 p-5 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 text-center">
-          <h3 className="font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Find Your Best Match</h3>
-          <p className="text-sm text-warm-gray/60 dark:text-[#94A3B8] mb-4">
-            Take the personality quiz to discover which of these {totalRoles}+ careers align with your unique trait blend.
-          </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-terracotta dark:bg-[#A78BFA] text-white font-medium text-sm transition-opacity hover:opacity-90"
-            data-testid="link-take-quiz"
-          >
-            Take the Quiz
-            <ArrowLeft className="w-4 h-4 rotate-180" />
-          </Link>
-        </div>
-      </main>
+      </PageContainer>
+      <AppFooter />
     </div>
   );
 }
