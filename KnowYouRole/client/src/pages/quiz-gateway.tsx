@@ -134,32 +134,47 @@ export default function QuizGateway() {
             </p>
           )}
 
-          {/* Continue button */}
-          <button
-            onClick={handleContinue}
-            disabled={!selected}
-            style={{
-              marginTop: 24,
-              width: "100%",
-              padding: "17px",
-              background: selected
-                ? "linear-gradient(90deg, #00C8FF, #7800FF)"
-                : "rgba(255,255,255,0.06)",
-              border: "none",
-              borderRadius: 16,
-              color: selected ? "#ffffff" : "rgba(255,255,255,0.3)",
-              fontWeight: 800,
-              fontSize: 16,
-              cursor: selected ? "pointer" : "not-allowed",
-              fontFamily: "'Outfit',sans-serif",
-              boxShadow: selected ? "0 4px 30px rgba(0,200,255,0.35)" : "none",
-              transition: "all 0.25s ease",
-              letterSpacing: "0.02em",
-              textShadow: "0 1px 3px rgba(0,0,0,0.5)",
-            }}
-          >
-            {selected ? `Start Quiz →` : "Select your age to continue"}
-          </button>
+          {/* Continue button — wrapped in glowing container */}
+          <div style={{
+            marginTop: 24,
+            borderRadius: 20,
+            padding: selected ? "2px" : "0px",
+            background: selected
+              ? "linear-gradient(90deg, #00C8FF, #7800FF, #FF00E5, #00C8FF)"
+              : "rgba(255,255,255,0.06)",
+            boxShadow: selected
+              ? "0 0 40px rgba(0,200,255,0.5), 0 0 80px rgba(120,0,255,0.3)"
+              : "0 0 0px rgba(255,255,255,0.05)",
+            transition: "all 0.4s ease",
+            animation: selected ? "none" : "none",
+          }}>
+            <button
+              onClick={handleContinue}
+              disabled={!selected}
+              style={{
+                width: "100%",
+                padding: "18px",
+                background: selected
+                  ? "linear-gradient(90deg, #00C8FF 0%, #7800FF 50%, #FF00E5 100%)"
+                  : "rgba(255,255,255,0.04)",
+                border: selected ? "2px solid rgba(0,200,255,0.6)" : "2px solid rgba(255,255,255,0.08)",
+                borderRadius: 18,
+                color: selected ? "#ffffff" : "rgba(255,255,255,0.25)",
+                fontWeight: 800,
+                fontSize: 17,
+                cursor: selected ? "pointer" : "not-allowed",
+                fontFamily: "'Outfit',sans-serif",
+                letterSpacing: "0.04em",
+                textShadow: selected ? "0 2px 8px rgba(0,0,0,0.7), 0 0 20px rgba(0,200,255,0.5)" : "0 1px 3px rgba(0,0,0,0.4)",
+                boxShadow: selected
+                  ? "0 0 30px rgba(0,200,255,0.5), 0 0 60px rgba(120,0,255,0.3), inset 0 1px 0 rgba(255,255,255,0.25)"
+                  : "none",
+                transition: "all 0.3s ease",
+              }}
+            >
+              {selected ? `Start Quiz →` : "Select your age to continue"}
+            </button>
+          </div>
 
           {/* Trust signal */}
           <p style={{

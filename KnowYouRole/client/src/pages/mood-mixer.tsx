@@ -88,7 +88,7 @@ export default function MoodMixer() {
       if (brewingTimerRef.current) clearTimeout(brewingTimerRef.current);
       setState("selecting");
     }
-  }, [bothSelected, state]);
+  }, [bothSelected]);
 
   useEffect(() => {
     const tier = localStorage.getItem("kyr_quiz_tier");
