@@ -4,6 +4,16 @@ import App from './App'
 import './index.css'
 import { Auth0Provider } from '@auth0/auth0-react'
 
+// Global error catch — catches Auth0 SDK errors that happen before React mounts
+window.onerror = (message, _source, _lineno, _colno, error) => {
+  console.error("[global onerror]", message, error);
+  return false;
+};
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("[unhandledrejection]", event.reason);
+});
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Auth0Provider

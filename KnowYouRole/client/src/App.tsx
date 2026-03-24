@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, Component, ReactNode } from "react";
 import { Switch, Route, useLocation, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -23,6 +23,39 @@ import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import Careers from "@/pages/careers";
 import ResultsPage from "@/pages/results";
+
+/** Root-level error boundary — catches any uncaught error in the entire app */
+class RootErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: string }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: "" };
+  }
+  static getDerivedStateFromError(e: Error) {
+    return { hasError: true, error: e?.message ?? "An unexpected error occurred" };
+  }
+  componentDidCatch(e: Error, info: any) {
+    console.error("[RootErrorBoundary]", e, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ background: "rgba(255,59,48,0.1)", border: "1px solid rgba(255,59,48,0.3)", borderRadius: 20, padding: "24px 32px", maxWidth: 420, textAlign: "center" }}>
+            <p style={{ color: "#ff3b30", fontSize: 16, marginBottom: 8, fontWeight: 700 }}>Something went wrong</p>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginBottom: 16 }}>{this.state.error}</p>
+            <button
+              onClick={() => { this.setState({ hasError: false, error: "" }); window.location.href = "/"; }}
+              style={{ padding: "10px 24px", background: "linear-gradient(90deg, #00C8FF, #7800FF)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}
+            >
+              Go Home
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -64,13 +97,15 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <ScrollToTop />
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <RootErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <ScrollToTop />
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </RootErrorBoundary>
   );
 }
 
