@@ -68,7 +68,6 @@ function App() {
     <Auth0Provider
       domain="dev-f0lrnyg4uigdvae1.us.auth0.com"
       clientId="edp3GnoatCBItXXQiu6jsxjL0Tc3CTIM"
-      redirectUri={typeof window !== "undefined" ? window.location.origin + "/callback" : "http://localhost:5173/callback"}
       cacheLocation="localstorage"
     >
       <QueryClientProvider client={queryClient}>
