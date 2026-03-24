@@ -41,13 +41,13 @@ export default function QuizGateway() {
           cursor: "pointer", fontSize: 20, padding: "4px 8px", borderRadius: 8,
           fontFamily: "'Outfit',sans-serif",
         }}>←</button>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 1 OF 2</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 1 OF 3</span>
         <div style={{ width: 40 }} />
       </header>
 
       {/* Progress bar */}
       <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.08)", zIndex: 50 }}>
-        <div style={{ width: "50%", height: "100%", background: "linear-gradient(90deg, #00C8FF, #7800FF)" }} />
+        <div style={{ width: "33%", height: "100%", background: "linear-gradient(90deg, #00C8FF, #7800FF)" }} />
       </div>
 
       {/* Main content */}

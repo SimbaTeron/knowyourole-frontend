@@ -60,7 +60,7 @@ export default function QuizPage() {
       {/* Header */}
       <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <button onClick={() => history.back()} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: 20, padding: 8 }}>←</button>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#00C8FF" }}>Question {step + 1} of {QUESTIONS.length}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 2 OF 3</span>
         <div style={{ width: 40 }} />
       </header>
 
