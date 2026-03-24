@@ -1,108 +1,105 @@
-import { Link } from "wouter";
-import { ArrowLeft, Brain, Target, Users, BookOpen, Heart } from "lucide-react";
+import { Link } from 'wouter';
+import { PageContainer } from '@/components/layout/PageContainer';
+import { AppHeader } from '@/components/layout/AppHeader';
+import { AppFooter } from '@/components/layout/AppFooter';
+import { GlassCard } from '@/components/glass/GlassCard';
+import { NeonButton } from '@/components/glass/NeonButton';
+import { NeonText } from '@/components/glass/NeonText';
+import { GlassBadge } from '@/components/glass/GlassBadge';
 
-export default function About() {
+export default function AboutPage() {
+  const steps = [
+    {
+      num: '01',
+      title: 'Take the Quiz',
+      desc: 'Answer simple questions about how you think, feel, and act. Takes just 3-5 minutes.',
+    },
+    {
+      num: '02',
+      title: 'Get Your Profile',
+      desc: 'Receive your detailed personality breakdown based on the Big Five model.',
+    },
+    {
+      num: '03',
+      title: 'Explore Your Path',
+      desc: 'Discover career matches, growth insights, and personalized recommendations.',
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-soft-cream dark:bg-[#0A0A12] text-warm-gray dark:text-[#F8FAFC]">
-      <header className="sticky top-0 z-50 px-6 py-4 bg-soft-cream/90 dark:bg-[#0A0A12]/90 backdrop-blur-sm border-b border-warm-gray/10 dark:border-[#A78BFA]/10">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 text-sm text-warm-gray/70 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-back-home">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-          </Link>
+    <PageContainer>
+      <AppHeader />
+      
+      {/* Hero */}
+      <div className="container mx-auto px-4 pt-28 pb-12 text-center max-w-3xl">
+        <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
+          About <span className="text-gradient">KnowYouRole</span>
+        </h1>
+        <p className="text-lg text-white/60">
+          Personality science made fun, fast, and genuinely useful.
+        </p>
+      </div>
+
+      {/* How It Works */}
+      <div className="container mx-auto px-4 pb-16">
+        <h2 className="text-2xl font-display font-bold text-white text-center mb-10">
+          How It Works
+        </h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {steps.map((step, i) => (
+            <GlassCard key={i} variant="default" className="p-6 text-center">
+              <div className="text-4xl font-display font-bold text-glow-blue mb-4">
+                {step.num}
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
+              <p className="text-sm text-white/60">{step.desc}</p>
+            </GlassCard>
+          ))}
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-2xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-display font-bold mb-6" data-testid="text-about-title">About KnowYouRole</h1>
-
-        <section className="space-y-4 mb-10">
-          <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            KnowYouRole was built to make personality science accessible, fun, and genuinely useful. Whether you're a teenager exploring who you are, a young adult choosing a career path, or someone looking for deeper self-understanding, our platform delivers personalized insights grounded in well-established psychological frameworks.
-          </p>
-          <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            We believe everyone deserves to understand their strengths, tendencies, and potential — without jargon, paywalls, or guesswork.
-          </p>
-        </section>
-
-        <section className="mb-10">
-          <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <Heart className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Why We Built This
+      {/* The Science */}
+      <div className="container mx-auto px-4 pb-16">
+        <GlassCard variant="default" className="p-8 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-display font-bold text-white mb-4 text-center">
+            The Science Behind It
           </h2>
-          <div className="space-y-4 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            <p>
-              KnowYouRole started from a simple frustration: most personality tools online are either oversimplified clickbait or locked behind expensive paywalls. The good science exists — Big Five, MBTI, DISC — but it's scattered across academic papers that most people will never read. We wanted to change that.
-            </p>
-            <p>
-              We noticed something else, too. A 10-year-old and a 35-year-old shouldn't get the same quiz. The questions that spark self-reflection for a teenager are different from the ones that resonate with a career-changer in their thirties. So we built age-tiered assessments from the ground up — questions written for where you actually are in life, not a one-size-fits-all template.
-            </p>
-            <p>
-              The career matching came from watching too many people feel stuck. When you can see that your unique blend of traits — say, high Openness combined with Steadiness — maps naturally to roles you may never have considered, it opens doors. We've mapped 150+ careers across industries, from creative arts to healthcare to skilled trades, because every personality type has work that fits.
-            </p>
-            <p>
-              This project is a labor of love. We keep the core experience completely free because we believe everyone — especially young people just starting to figure things out — deserves access to genuine self-insight. If this tool helps even one person see themselves more clearly, it's worth every line of code.
-            </p>
-          </div>
-        </section>
-
-        <section className="mb-10">
-          <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <Brain className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Our Science
-          </h2>
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
-              <h3 className="font-semibold mb-1">Big Five (OCEAN)</h3>
-              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
-                The most widely validated personality model in academic psychology, measuring Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism. Used in thousands of peer-reviewed studies worldwide.
-              </p>
+          <p className="text-white/70 text-center mb-8 leading-relaxed">
+            Based on the Big Five personality model — the most validated psychological framework 
+            for understanding human personality. Used by researchers, therapists, and Fortune 500 
+            companies alike.
+          </p>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="text-center p-4">
+              <NeonText color="blue" size="xl">50+</NeonText>
+              <p className="text-xs text-white/40 mt-1">years of research</p>
             </div>
-            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
-              <h3 className="font-semibold mb-1">MBTI-Inspired</h3>
-              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
-                Based on Jungian cognitive function theory, our MBTI-style assessment helps you understand how you process information, make decisions, and interact with the world through 16 personality types.
-              </p>
+            <div className="text-center p-4">
+              <NeonText color="purple" size="xl">500K+</NeonText>
+              <p className="text-xs text-white/40 mt-1">peer-reviewed studies</p>
             </div>
-            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
-              <h3 className="font-semibold mb-1">DISC</h3>
-              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
-                A behavioral assessment focusing on Dominance, Influence, Steadiness, and Conscientiousness — widely used in professional development and career coaching contexts.
-              </p>
+            <div className="text-center p-4">
+              <NeonText color="green" size="xl">100+</NeonText>
+              <p className="text-xs text-white/40 mt-1">cultures validated</p>
             </div>
           </div>
-        </section>
+        </GlassCard>
+      </div>
 
-        <section className="mb-10">
-          <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Our Mission
-          </h2>
-          <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            We're on a mission to help people of all ages discover what makes them unique — and use that knowledge to make better decisions about careers, relationships, and personal growth. Our age-tiered approach ensures the experience is appropriate and engaging for every stage of life.
-          </p>
-        </section>
+      {/* CTA */}
+      <div className="container mx-auto px-4 pb-20 text-center">
+        <h2 className="text-2xl font-display font-bold text-white mb-4">
+          Ready to discover yourself?
+        </h2>
+        <p className="text-white/60 mb-8">
+          Join millions who have unlocked their potential.
+        </p>
+        <Link href="/quiz">
+          <NeonButton size="lg">Start Your Journey →</NeonButton>
+        </Link>
+      </div>
 
-        <section className="mb-10">
-          <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <Users className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Who We Are
-          </h2>
-          <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            KnowYouRole was created by a team passionate about making personality psychology practical and fun. We combine expertise in behavioral science, education, and technology to deliver an experience that's both scientifically informed and genuinely enjoyable.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Research-Informed
-          </h2>
-          <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            Our assessments draw on decades of published research in personality psychology. While no online quiz can replace a clinical evaluation, our tools are designed to give you meaningful, research-informed insights that can guide your self-discovery journey.
-          </p>
-        </section>
-      </main>
-    </div>
+      <AppFooter />
+    </PageContainer>
   );
 }
