@@ -37,9 +37,10 @@ export default function QuizGateway() {
         padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <button onClick={handleBack} style={{
-          background: "none", border: "none", color: "rgba(255,255,255,0.6)",
-          cursor: "pointer", fontSize: 20, padding: "4px 8px", borderRadius: 8,
+          background: "none", border: "none", color: "#ffffff",
+          cursor: "pointer", fontSize: 22, padding: "4px 10px", borderRadius: 8,
           fontFamily: "'Outfit',sans-serif",
+          textShadow: "0 0 12px rgba(0,200,255,0.5)",
         }}>←</button>
         <span style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 1 OF 3</span>
         <div style={{ width: 40 }} />
@@ -86,20 +87,20 @@ export default function QuizGateway() {
                   style={{
                     background: isSelected
                       ? "rgba(0, 200, 255, 0.12)"
-                      : "rgba(255,255,255,0.04)",
+                      : "rgba(0,200,255,0.06)",
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
                     border: isSelected
                       ? "2px solid #00C8FF"
-                      : "1px solid rgba(255,255,255,0.08)",
+                      : "2px solid rgba(0,200,255,0.3)",
                     borderRadius: 20,
                     padding: "18px 16px",
                     cursor: "pointer",
                     textAlign: "left",
                     transition: "all 0.2s ease",
                     boxShadow: isSelected
-                      ? "0 0 24px rgba(0,200,255,0.25), inset 0 0 12px rgba(0,200,255,0.05)"
-                      : "none",
+                      ? "0 0 30px rgba(0,200,255,0.4), 0 0 60px rgba(0,200,255,0.2), inset 0 0 12px rgba(0,200,255,0.05)"
+                      : "0 0 0px rgba(0,200,255,0.1)",
                     fontFamily: "'Outfit',sans-serif",
                     outline: "none",
                     minHeight: 100,
@@ -112,12 +113,12 @@ export default function QuizGateway() {
                     fontFamily: "'Outfit',sans-serif",
                   }}>{tier.title}</div>
                   <div style={{
-                    fontSize: 11, color: "rgba(255,255,255,0.35)",
+                    fontSize: 11, color: "rgba(255,255,255,0.6)",
                     marginBottom: 8, fontFamily: "'Outfit',sans-serif",
                     lineHeight: 1.4,
                   }}>{tier.sub}</div>
                   {isSelected && (
-                    <div style={{ color: "#00C8FF", fontSize: 16, fontWeight: 700, marginTop: 4 }}>✓</div>
+                    <div style={{ color: "#00C8FF", fontSize: 18, fontWeight: 700, marginTop: 4, textShadow: "0 0 10px rgba(0,200,255,0.8)" }}>✓</div>
                   )}
                 </button>
               );
@@ -147,7 +148,7 @@ export default function QuizGateway() {
                 : "rgba(255,255,255,0.06)",
               border: "none",
               borderRadius: 16,
-              color: selected ? "#fff" : "rgba(255,255,255,0.3)",
+              color: selected ? "#ffffff" : "rgba(255,255,255,0.3)",
               fontWeight: 800,
               fontSize: 16,
               cursor: selected ? "pointer" : "not-allowed",
@@ -155,6 +156,7 @@ export default function QuizGateway() {
               boxShadow: selected ? "0 4px 30px rgba(0,200,255,0.35)" : "none",
               transition: "all 0.25s ease",
               letterSpacing: "0.02em",
+              textShadow: "0 1px 3px rgba(0,0,0,0.5)",
             }}
           >
             {selected ? `Start Quiz →` : "Select your age to continue"}
@@ -163,7 +165,7 @@ export default function QuizGateway() {
           {/* Trust signal */}
           <p style={{
             textAlign: "center", marginTop: 16, fontSize: 12,
-            color: "rgba(255,255,255,0.25)",
+            color: "rgba(255,255,255,0.5)",
           }}>
             🔒 Your answers are private. Always.
           </p>
