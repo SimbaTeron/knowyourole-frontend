@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { AppHeader } from "@/components/layout/AppHeader";
-import { AppFooter } from "@/components/layout/AppFooter";
+import { Link } from "wouter";
 
 const FAQS = [
   { q: "How long does the quiz take?", a: "Most people complete it in 3-5 minutes. It's designed to be quick, engaging, and insightful." },
@@ -11,73 +10,76 @@ const FAQS = [
   { q: "How accurate are the results?", a: "Our algorithm is based on decades of personality research and maps closely to clinical assessments." },
 ];
 
-export default function FAQ() {
+export default function FaqPage() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
-      <AppHeader />
+
+      {/* Header */}
+      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "#fff" }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #00C8FF, #7800FF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <span style={{ fontSize: 18, fontWeight: 900 }}>KnowYouRole</span>
+        </Link>
+        <div style={{ display: "flex", gap: 24 }}>
+          <Link href="/quiz" style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", textDecoration: "none" }}>Quiz</Link>
+          <Link href="/faq" style={{ fontSize: 14, color: "#00C8FF", textDecoration: "none" }}>FAQ</Link>
+        </div>
+      </header>
 
       {/* Hero */}
-      <div style={{ padding: "clamp(80px, 15vw, 140px) clamp(16px, 4vw, 64px) 48px", textAlign: "center" }}>
-        <h1 style={{ fontSize: "clamp(2rem, 6vw, 4rem)", fontWeight: 900, marginBottom: 16, letterSpacing: "-0.03em", fontFamily: "'Outfit',sans-serif" }}>
-          Frequently Asked <span style={{ background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Questions</span>
+      <div style={{ paddingTop: 140, paddingBottom: 48, textAlign: "center", padding: "140px 24px 48px" }}>
+        <h1 style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", marginBottom: 16, fontFamily: "'Outfit',sans-serif" }}>
+          Frequently Asked Questions
         </h1>
-        <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)" }}>Everything you need to know about KnowYouRole.</p>
+        <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)" }}>
+          Everything you need to know about KnowYouRole.
+        </p>
       </div>
 
-      {/* Accordion */}
-      <div style={{ padding: "0 clamp(16px, 4vw, 64px) 80px", maxWidth: 800, margin: "0 auto", display: "flex", flexDirection: "column", gap: 12 }}>
+      {/* FAQ */}
+      <div style={{ padding: "0 24px 80px", maxWidth: 700, margin: "0 auto", display: "flex", flexDirection: "column", gap: 12 }}>
         {FAQS.map((faq, i) => (
-          <div
-            key={i}
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              border: open === i ? "1px solid rgba(0,200,255,0.3)" : "1px solid rgba(255,255,255,0.08)",
-              borderRadius: 20,
-              overflow: "hidden",
-              boxShadow: open === i ? "0 0 20px rgba(0,200,255,0.1)" : "none",
-              transition: "all 0.25s ease",
-            }}
-          >
+          <div key={i} style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: open === i ? "1px solid rgba(0,200,255,0.3)" : "1px solid rgba(255,255,255,0.08)", borderRadius: 20, overflow: "hidden", transition: "all 0.25s" }}>
             <button
               onClick={() => setOpen(open === i ? null : i)}
-              style={{
-                width: "100%",
-                padding: "20px 24px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
+              style={{ width: "100%", padding: "20px 24px", background: "none", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left", gap: 16 }}
             >
-              <span style={{ fontSize: 15, fontWeight: 700, color: "#fff", fontFamily: "'Outfit',sans-serif", paddingRight: 16 }}>{faq.q}</span>
-              <span style={{ fontSize: 22, color: "#00C8FF", fontWeight: 300, flexShrink: 0, transform: open === i ? "rotate(45deg)" : "rotate(0)", transition: "transform 0.25s ease" }}>+</span>
+              <span style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Outfit',sans-serif" }}>{faq.q}</span>
+              <span style={{ fontSize: 22, color: open === i ? "#00C8FF" : "rgba(255,255,255,0.3)", transition: "transform 0.2s", transform: open === i ? "rotate(45deg)" : "rotate(0deg)", flexShrink: 0 }}>+</span>
             </button>
             {open === i && (
-              <div style={{ padding: "0 24px 20px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, paddingTop: 16 }}>{faq.a}</p>
+              <div style={{ padding: "0 24px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16 }}>
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, fontFamily: "'Outfit',sans-serif" }}>{faq.a}</p>
               </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* Still have questions */}
-      <div style={{ textAlign: "center", padding: "0 clamp(16px, 4vw, 64px) 80px" }}>
+      {/* CTA */}
+      <div style={{ textAlign: "center", padding: "0 24px 100px" }}>
         <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", marginBottom: 16 }}>Still have questions?</p>
-        <a href="mailto:hello@knowyourole.com" style={{ display: "inline-block", padding: "12px 32px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 50, color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 600, fontFamily: "'Outfit',sans-serif" }}>
-          Get in touch
-        </a>
+        <Link href="/quiz" style={{ textDecoration: "none" }}>
+          <button style={{ padding: "14px 32px", background: "linear-gradient(90deg, #00C8FF, #7800FF)", border: "none", borderRadius: 50, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}>
+            Take the Quiz →
+          </button>
+        </Link>
       </div>
 
-      <AppFooter />
+      {/* Footer */}
+      <footer style={{ padding: "24px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,0.3)" }}>
+        <span>© 2026 KnowYouRole</span>
+        <div style={{ display: "flex", gap: 16 }}>
+          <Link href="/privacy" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Privacy</Link>
+          <Link href="/terms" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Terms</Link>
+          <Link href="/about" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>About</Link>
+        </div>
+      </footer>
     </div>
   );
 }

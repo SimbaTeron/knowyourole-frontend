@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AppHeader } from "@/components/layout/AppHeader";
 
 const TRAITS = [
   { label: "Openness", value: 92, color: "#A78BFA" },
@@ -23,134 +22,128 @@ const GROWTH = [
   { label: "Today", text: "Pattern shows continued growth in strategic thinking and leadership." },
 ];
 
-const TABS = ["Personality", "Careers", "Growth"];
-
-export default function Results() {
+export default function ResultsPage() {
   const [tab, setTab] = useState("Personality");
-
-  const glassCard: React.CSSProperties = {
-    background: "rgba(255,255,255,0.04)",
-    backdropFilter: "blur(20px)",
-    WebkitBackdropFilter: "blur(20px)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: "24px",
-    padding: "0",
-  };
 
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
-      <AppHeader />
 
-      <div style={{ paddingTop: 120, padding: "clamp(80px, 12vw, 120px) clamp(16px, 4vw, 48px)", maxWidth: 800, margin: "0 auto" }}>
+      {/* Header */}
+      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ width: 40 }} />
+        <span style={{ fontSize: 16, fontWeight: 700 }}>Your Results</span>
+        <div style={{ width: 40 }} />
+      </header>
 
-        {/* Hero */}
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <h1 style={{ fontSize: "clamp(2rem, 6vw, 4rem)", fontWeight: 900, marginBottom: 20, fontFamily: "'Outfit',sans-serif" }}>Your Results</h1>
-          <div style={{ display: "inline-block", padding: "12px 32px", borderRadius: 50, background: "linear-gradient(90deg, #00C8FF, #7800FF)", boxShadow: "0 0 40px rgba(0,200,255,0.4)", fontSize: "clamp(1.5rem, 4vw, 2.5rem)", fontWeight: 900, marginBottom: 12 }}>INTJ-A</div>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)" }}>The Architect — Strategic, independent, and determined</p>
+      {/* Hero */}
+      <div style={{ paddingTop: 100, paddingBottom: 32, textAlign: "center", padding: "100px 24px 32px" }}>
+        <div style={{ display: "inline-block", background: "linear-gradient(135deg, #00C8FF, #7800FF)", borderRadius: 20, padding: "4px", marginBottom: 16 }}>
+          <div style={{ background: "#050510", borderRadius: 16, padding: "clamp(16px, 4vw, 32px) clamp(24px, 6vw, 48px)" }}>
+            <span style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, background: "linear-gradient(135deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>INTJ-A</span>
+          </div>
         </div>
+        <p style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, fontFamily: "'Outfit',sans-serif" }}>The Architect</p>
+        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>Strategic, independent, and determined</p>
+      </div>
 
-        {/* Tabs */}
-        <div style={{ display: "flex", gap: 4, padding: 4, background: "rgba(255,255,255,0.05)", borderRadius: 50, border: "1px solid rgba(255,255,255,0.08)", marginBottom: 32 }}>
-          {TABS.map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              style={{
-                flex: 1,
-                padding: "10px 16px",
-                borderRadius: 50,
-                border: "none",
-                background: tab === t ? "#00C8FF" : "transparent",
-                color: tab === t ? "#000" : "rgba(255,255,255,0.5)",
-                fontWeight: tab === t ? 700 : 500,
-                fontSize: 14,
-                cursor: "pointer",
-                fontFamily: "'Outfit',sans-serif",
-                transition: "all 0.25s ease",
-              }}
-            >{t}</button>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 4, padding: "0 24px", marginBottom: 32, background: "rgba(5,5,16,0.8)", position: "sticky", top: 57, zIndex: 40, paddingTop: 8, paddingBottom: 8 }}>
+        {["Personality", "Careers", "Growth"].map(t => (
+          <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "10px", borderRadius: 50, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13, background: tab === t ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.05)", color: tab === t ? "#fff" : "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif", transition: "all 0.2s" }}>
+            {t}
+          </button>
+        ))}
+      </div>
 
-        {/* Personality Tab */}
+      <div style={{ padding: "0 24px 80px", maxWidth: 800, margin: "0 auto" }}>
+
         {tab === "Personality" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ ...glassCard, padding: 28 }}>
-              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>Big Five Profile</p>
+          <div>
+            <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 28, marginBottom: 24 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#00C8FF", marginBottom: 24, fontFamily: "'Outfit',sans-serif" }}>Big Five Profile</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                 {TRAITS.map(t => (
                   <div key={t.label}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                      <span style={{ fontSize: 14, fontWeight: 600 }}>{t.label}</span>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: t.color }}>{t.value}%</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", fontFamily: "'Outfit',sans-serif" }}>{t.label}</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: t.color, fontFamily: "'Outfit',sans-serif" }}>{t.value}%</span>
                     </div>
-                    <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 10, overflow: "hidden" }}>
-                      <div style={{ width: `${t.value}%`, height: "100%", background: t.color, borderRadius: 10 }} />
+                    <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 50, overflow: "hidden" }}>
+                      <div style={{ width: `${t.value}%`, height: "100%", background: t.color, borderRadius: 50, transition: "width 1s ease" }} />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div style={{ ...glassCard, padding: 28 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>Your Personality Type</h3>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.7 }}>
-                As an INTJ-A, you're a strategic visionary with a rare combination of analytical brilliance and quiet confidence. You see patterns others miss, question assumptions that others take for granted, and quietly build systems and visions that reshape the world around you.
+
+            <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 28 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>Your Personality Type</h3>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, fontFamily: "'Outfit',sans-serif" }}>
+                As an INTJ-A, you're a strategic visionary with a rare combination of analytical brilliance and quiet confidence. You see patterns others miss, question assumptions, and quietly build systems and visions that reshape the world around you.
               </p>
             </div>
           </div>
         )}
 
-        {/* Careers Tab */}
         {tab === "Careers" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Dream Roles</h2>
-            {CAREERS.map(c => (
-              <div key={c.title} style={{ ...glassCard, padding: 24, border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 700 }}>{c.title}</h3>
-                  <span style={{ background: c.match >= 90 ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(0,200,255,0.15)", padding: "4px 12px", borderRadius: 50, fontSize: 12, fontWeight: 700, color: c.match >= 90 ? "#fff" : "#00C8FF" }}>{c.match}%</span>
+          <div>
+            <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, fontFamily: "'Outfit',sans-serif" }}>Dream Roles</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {CAREERS.map(c => (
+                <div key={c.title} style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 20 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, fontFamily: "'Outfit',sans-serif" }}>{c.title}</h3>
+                    <span style={{ fontSize: 12, fontWeight: 800, padding: "4px 12px", borderRadius: 50, background: c.match >= 90 ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(0,200,255,0.15)", color: c.match >= 90 ? "#fff" : "#00C8FF", fontFamily: "'Outfit',sans-serif" }}>{c.match}%</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>{c.salary}</p>
+                  <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", marginBottom: 8, lineHeight: 1.5, fontFamily: "'Outfit',sans-serif" }}>{c.desc}</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: "#39FF14", fontFamily: "'Outfit',sans-serif" }}>{c.trend}</p>
                 </div>
-                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>{c.salary}</p>
-                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", marginBottom: 8 }}>{c.desc}</p>
-                <p style={{ fontSize: 12, fontWeight: 700, color: "#39FF14" }}>{c.trend}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Growth Tab */}
         {tab === "Growth" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Your Growth Journey</h2>
-            {GROWTH.map((g, i) => (
-              <div key={i} style={{ ...glassCard, padding: 24, display: "flex", gap: 16 }}>
-                <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#00C8FF", boxShadow: "0 0 10px #00C8FF", flexShrink: 0, marginTop: 4 }} />
-                <div>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "#00C8FF", marginBottom: 6 }}>{g.label}</p>
-                  <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{g.text}</p>
+          <div>
+            <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, fontFamily: "'Outfit',sans-serif" }}>Your Growth Journey</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {GROWTH.map((g, i) => (
+                <div key={i} style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 24 }}>
+                  <div style={{ display: "flex", gap: 16 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#00C8FF", marginTop: 6, flexShrink: 0, boxShadow: "0 0 8px #00C8FF" }} />
+                    <div>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF", marginBottom: 6, fontFamily: "'Outfit',sans-serif" }}>{g.label}</p>
+                      <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, fontFamily: "'Outfit',sans-serif" }}>{g.text}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Premium Unlock */}
-        <div style={{ marginTop: 40, padding: 28, borderRadius: 24, border: "2px solid transparent", backgroundImage: "linear-gradient(rgba(255,255,255,0.04), rgba(255,255,255,0.04)), linear-gradient(90deg, #00C8FF, #7800FF)", backgroundOrigin: "border-box", textAlign: "center" }}>
-          <h3 style={{ fontSize: 20, fontWeight: 900, marginBottom: 8, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Unlock Your Full Report</h3>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 24 }}>Deep dive into your personality with premium insights</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24, textAlign: "left", maxWidth: 280, margin: "0 auto 24px" }}>
-            {["50-page personality report", "Relationship compatibility analysis", "Career path deep dive", "Personal growth action plan", "Shareable PDF report"].map(f => (
-              <div key={f} style={{ display: "flex", gap: 8, fontSize: 14, color: "rgba(255,255,255,0.7)" }}>
-                <span style={{ color: "#39FF14" }}>✓</span> {f}
-              </div>
-            ))}
+        {/* Premium */}
+        <div style={{ marginTop: 40, borderRadius: 24, padding: "2px", background: "linear-gradient(135deg, #00C8FF, #7800FF)" }}>
+          <div style={{ background: "#050510", borderRadius: 22, padding: 32, textAlign: "center" }}>
+            <h3 style={{ fontSize: 20, fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>Unlock Your Full Report</h3>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 24, fontFamily: "'Outfit',sans-serif" }}>Deep dive into your personality with premium insights</p>
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", textAlign: "left", display: "flex", flexDirection: "column", gap: 10 }}>
+              {["50-page personality report", "Relationship compatibility analysis", "Career path deep dive", "Personal growth action plan", "Shareable PDF report"].map(f => (
+                <li key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "rgba(255,255,255,0.7)", fontFamily: "'Outfit',sans-serif" }}>
+                  <span style={{ color: "#39FF14", fontWeight: 700 }}>✓</span> {f}
+                </li>
+              ))}
+            </ul>
+            <div style={{ marginBottom: 16 }}>
+              <span style={{ fontSize: 36, fontWeight: 900, color: "#fff", fontFamily: "'Outfit',sans-serif" }}>$9.99</span>
+              <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginLeft: 4 }}>/month</span>
+            </div>
+            <button style={{ width: "100%", padding: "16px", background: "#39FF14", border: "none", borderRadius: 16, color: "#000", fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "'Outfit',sans-serif", boxShadow: "0 0 30px rgba(57,255,20,0.4)" }}>
+              Start Free Trial →
+            </button>
           </div>
-          <div style={{ fontSize: 32, fontWeight: 900, marginBottom: 16 }}>$9.99<span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontWeight: 400 }}>/month</span></div>
-          <button style={{ padding: "14px 36px", background: "#39FF14", border: "none", borderRadius: 50, fontWeight: 700, fontSize: 16, color: "#000", cursor: "pointer", fontFamily: "'Outfit',sans-serif", boxShadow: "0 0 30px rgba(57,255,20,0.4)" }}>
-            Start Free Trial →
-          </button>
         </div>
       </div>
     </div>

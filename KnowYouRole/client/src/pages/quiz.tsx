@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 
 const QUESTIONS = [
-  { q: "You're at a party. What do you naturally do?", a: ["Work the room, meeting everyone", "Find one deep conversation", "Observe from the corner", "Make sure everyone is having fun", "Relax and enjoy your own company"] },
+  { q: "You're at a party. What do you naturally do?", a: ["Work the room, meeting everyone", "Find one deep conversation", "Observe from the corner", "Make sure everyone's having fun", "Relax and enjoy your own company"] },
   { q: "How do you prefer to make decisions?", a: ["Based on logic and data", "Based on how it affects people", "Following my gut feeling", "Weighing pros and cons carefully", "Quickly, based on instinct"] },
   { q: "Your ideal weekend involves:", a: ["Spontaneous adventures with friends", "Deep work on a personal project", "Planning my next big goal", "Quiet time with a good book", "Learning something entirely new"] },
   { q: "In a group project, you naturally:", a: ["Lead and delegate tasks", "Bring creative ideas", "Keep everyone on schedule", "Mediate conflicts", "Do your part independently"] },
@@ -14,24 +14,22 @@ const glassCard: React.CSSProperties = {
   backdropFilter: "blur(20px)",
   WebkitBackdropFilter: "blur(20px)",
   border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: "20px",
-  padding: "0",
-  cursor: "pointer",
+  borderRadius: "24px",
 };
 
-export default function Quiz() {
+export default function QuizPage() {
   const [, setLocation] = useLocation();
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answers, setAnswers] = useState<number[]>([]);
 
   const q = QUESTIONS[step];
-  const progress = ((step) / QUESTIONS.length) * 100;
+  const progress = (step / QUESTIONS.length) * 100;
 
   const handleNext = () => {
     if (selected === null) return;
-    const newAnswers = [...answers, selected];
-    setAnswers(newAnswers);
+    const next = [...answers, selected];
+    setAnswers(next);
     setSelected(null);
     if (step < QUESTIONS.length - 1) {
       setStep(s => s + 1);
@@ -52,21 +50,19 @@ export default function Quiz() {
       </header>
 
       {/* Progress bar */}
-      <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 4, background: "rgba(255,255,255,0.1)", zIndex: 50 }}>
+      <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.1)", zIndex: 50 }}>
         <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #00C8FF, #7800FF)", transition: "width 0.4s ease" }} />
       </div>
 
       {/* Question */}
-      <div style={{ paddingTop: 100, padding: "clamp(80px, 15vw, 100px) clamp(16px, 4vw, 48px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+      <div style={{ padding: "clamp(80px, 15vw, 120px) clamp(16px, 4vw, 48px)", display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh" }}>
         <div style={{ maxWidth: 640, width: "100%" }}>
-          {/* Question card */}
           <div style={{ ...glassCard, padding: "clamp(24px, 5vw, 40px)", marginBottom: 24 }}>
-            <p style={{ fontSize: "clamp(1.1rem, 3vw, 1.4rem)", fontWeight: 700, lineHeight: 1.4, marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>{q.q}</p>
+            <h2 style={{ fontSize: "clamp(1.1rem, 3vw, 1.5rem)", fontWeight: 700, lineHeight: 1.4, fontFamily: "'Outfit',sans-serif" }}>{q.q}</h2>
           </div>
 
-          {/* Answers */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {q.a.map((answer, i) => (
+            {q.a.map((ans, i) => (
               <div
                 key={i}
                 onClick={() => setSelected(i)}
@@ -76,21 +72,15 @@ export default function Quiz() {
                   display: "flex",
                   alignItems: "center",
                   gap: 16,
+                  cursor: "pointer",
                   border: selected === i ? "2px solid #00C8FF" : "1px solid rgba(255,255,255,0.08)",
-                  boxShadow: selected === i ? "0 0 20px rgba(0,200,255,0.25)" : "none",
+                  boxShadow: selected === i ? "0 0 15px rgba(0,200,255,0.25)" : "none",
                 }}
               >
-                <div style={{
-                  width: 22, height: 22, borderRadius: "50%",
-                  border: selected === i ? "2px solid #00C8FF" : "2px solid rgba(255,255,255,0.3)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  flexShrink: 0, transition: "all 0.2s ease",
-                }}>
-                  {selected === i && (
-                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#00C8FF", boxShadow: "0 0 8px #00C8FF" }} />
-                  )}
+                <div style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${selected === i ? "#00C8FF" : "rgba(255,255,255,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
+                  {selected === i && <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#00C8FF", boxShadow: "0 0 8px rgba(0,200,255,0.6)" }} />}
                 </div>
-                <span style={{ fontSize: 15, color: "rgba(255,255,255,0.85)", fontFamily: "'Outfit',sans-serif" }}>{answer}</span>
+                <span style={{ fontSize: 15, color: "rgba(255,255,255,0.85)", fontFamily: "'Outfit',sans-serif" }}>{ans}</span>
               </div>
             ))}
           </div>
@@ -98,14 +88,14 @@ export default function Quiz() {
       </div>
 
       {/* Next button */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px clamp(16px, 4vw, 48px)", background: "rgba(5,5,16,0.9)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px clamp(16px, 4vw, 48px)", background: "rgba(5,5,16,0.9)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
         <button
           onClick={handleNext}
           disabled={selected === null}
           style={{
             width: "100%",
             padding: "16px",
-            background: selected !== null ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.08)",
+            background: selected !== null ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.1)",
             border: "none",
             borderRadius: 16,
             color: selected !== null ? "#fff" : "rgba(255,255,255,0.3)",
@@ -113,6 +103,7 @@ export default function Quiz() {
             fontSize: 16,
             cursor: selected !== null ? "pointer" : "not-allowed",
             fontFamily: "'Outfit',sans-serif",
+            boxShadow: selected !== null ? "0 0 30px rgba(0,200,255,0.3)" : "none",
           }}
         >
           {step < QUESTIONS.length - 1 ? "Next Question →" : "See Your Results →"}
