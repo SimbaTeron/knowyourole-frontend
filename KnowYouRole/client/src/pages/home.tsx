@@ -275,13 +275,13 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ padding: "24px clamp(16px, 4vw, 48px)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "rgba(255,255,255,0.3)", fontFamily: "'Outfit',sans-serif" }}>
+      <footer style={{ padding: "24px clamp(16px, 4vw, 48px)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "rgba(255,255,255,0.5)", fontFamily: "'Outfit',sans-serif" }}>
         <span>© 2026 KnowYouRole</span>
         <div style={{ display: "flex", gap: 16 }}>
-          <a href="/privacy" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Privacy</a>
-          <a href="/terms" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Terms</a>
-          <a href="/faq" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>FAQ</a>
-          <a href="/about" style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>About</a>
+          <a href="/privacy" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>Privacy</a>
+          <a href="/terms" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>Terms</a>
+          <a href="/faq" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>FAQ</a>
+          <a href="/about" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>About</a>
         </div>
       </footer>
 
