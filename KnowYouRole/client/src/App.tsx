@@ -12,6 +12,7 @@ import MoodPage from "@/pages/mood";
 import MoodMixerPage from "@/pages/mood-mixer";
 import LocationPage from "@/pages/location";
 import QuizPage from "@/pages/quiz";
+import QuizGatewayPage from "@/pages/quiz-gateway";
 import CheckoutSuccess from "@/pages/checkout-success";
 import CheckoutCancel from "@/pages/checkout-cancel";
 import CrossroadsPage from "@/pages/crossroads";
@@ -40,7 +41,8 @@ function Router() {
       <Route path="/mood-mixer" component={MoodMixerPage} />
       <Route path="/location" component={LocationPage} />
       <Route path="/pre-quiz">{() => <Redirect to="/quiz" />}</Route>
-      <Route path="/quiz" component={QuizPage} />
+      <Route path="/quiz/gateway" component={QuizGatewayPage} />
+      <Route path="/quiz" component={QuizGatewayPage} />
       <Route path="/crossroads" component={CrossroadsPage} />
       <Route path="/profile" component={ProfilePage} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
