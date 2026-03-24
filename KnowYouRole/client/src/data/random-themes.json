@@ -1,0 +1,102 @@
+{
+  "themes": [
+    {
+      "id": "sunburst-trail",
+      "name": "Sunburst Trail",
+      "description": "Radiant warmth with orange-yellow gradients",
+      "class": "sunburst-trail",
+      "colors": {
+        "primary": "#FF8C00",
+        "secondary": "#FFB366",
+        "accent": "#FFA500",
+        "background": "radial-gradient(circle at 30% 20%, #FFF4E6 0%, #FFF8F0 100%)",
+        "text": "#5D4E37"
+      },
+      "motif": "radial-burst"
+    },
+    {
+      "id": "neon-urban",
+      "name": "Neon Urban",
+      "description": "Electric city vibes with cyan-magenta pulses",
+      "class": "neon-urban",
+      "colors": {
+        "primary": "#00D4FF",
+        "secondary": "#FF00FF",
+        "accent": "#7B2FFF",
+        "background": "linear-gradient(135deg, #0F0F23 0%, #1A1A2E 100%)",
+        "text": "#E0E0FF"
+      },
+      "motif": "zigzag-pulse"
+    },
+    {
+      "id": "forest-whisper",
+      "name": "Forest Whisper",
+      "description": "Earthy greens with leafy organic shapes",
+      "class": "forest-whisper",
+      "colors": {
+        "primary": "#2D5A27",
+        "secondary": "#8BC34A",
+        "accent": "#4CAF50",
+        "background": "linear-gradient(145deg, #F0F7F0 0%, #E8F5E9 100%)",
+        "text": "#1B3A1B"
+      },
+      "motif": "leafy-blob"
+    },
+    {
+      "id": "ocean-drift",
+      "name": "Ocean Drift",
+      "description": "Flowing blue-teal waves and fluid curves",
+      "class": "ocean-drift",
+      "colors": {
+        "primary": "#0077B6",
+        "secondary": "#00B4D8",
+        "accent": "#48CAE4",
+        "background": "linear-gradient(180deg, #CAF0F8 0%, #E0F7FA 100%)",
+        "text": "#023E8A"
+      },
+      "motif": "wave-flow"
+    },
+    {
+      "id": "desert-bloom",
+      "name": "Desert Bloom",
+      "description": "Warm sand-red flares with spiky motifs",
+      "class": "desert-bloom",
+      "colors": {
+        "primary": "#E07B39",
+        "secondary": "#F4A460",
+        "accent": "#CD5C5C",
+        "background": "linear-gradient(135deg, #FFF5EB 0%, #FFECD9 100%)",
+        "text": "#6B3A1F"
+      },
+      "motif": "spiky-flare"
+    },
+    {
+      "id": "city-pulse",
+      "name": "City Pulse",
+      "description": "Steel gray urban grids with subtle glows",
+      "class": "city-pulse",
+      "colors": {
+        "primary": "#607D8B",
+        "secondary": "#90A4AE",
+        "accent": "#78909C",
+        "background": "linear-gradient(145deg, #ECEFF1 0%, #F5F5F5 100%)",
+        "text": "#37474F"
+      },
+      "motif": "grid-glow"
+    },
+    {
+      "id": "meadow-dream",
+      "name": "Meadow Dream",
+      "description": "Soft pastel florals with gentle loops",
+      "class": "meadow-dream",
+      "colors": {
+        "primary": "#DDA0DD",
+        "secondary": "#FFB6C1",
+        "accent": "#98D8AA",
+        "background": "linear-gradient(135deg, #FFF0F5 0%, #F0FFF0 100%)",
+        "text": "#5D4157"
+      },
+      "motif": "soft-loop"
+    }
+  ]
+}
