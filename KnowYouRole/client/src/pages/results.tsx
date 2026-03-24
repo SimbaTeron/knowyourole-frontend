@@ -23,19 +23,50 @@ const GROWTH = [
   { label: "Today", text: "Pattern shows continued growth in strategic thinking and leadership." },
 ];
 
+function getMoodDescription(moodBlend: {label: string; emoji: string; mood1: string; mood2: string}): string {
+  const { mood1, mood2 } = moodBlend;
+  const descriptions: Record<string, string> = {
+    "Focused + Creative": "As an INTJ-A shaped by focused creative energy, you blend analytical precision with bold imagination. You're the rare type who can both dream up visionary systems AND engineer them into existence. Ideas don't stay abstract for long in your hands.",
+    "Focused + Calm": "Your focused calm gives you the patience of a master strategist. While others rush, you calculate — observing, planning, and executing with quiet precision that unnerves even seasoned professionals.",
+    "Creative + Energetic": "A creative-energetic fusion makes you a force of nature. Your ideas spark like electricity and your drive turns inspiration into immediate action. You're not just creative — you're relentlessly productive.",
+    "Calm + Curious": "Your calm curiosity makes you a quiet explorer of deep truths. You ask questions others overlook, sit with complexity longer than most, and emerge with insights that reshape how everyone sees things.",
+    "Determined + Focused": "Determination meets focus in you like a laser beam. Once you set your sights on a goal, nothing derails you. Your combination of relentless drive and pinpoint focus makes peak performance your baseline.",
+    "Social + Creative": "You're the kind of creative who builds things people actually want to be part of. Your social creativity isn't just about connection — it's about co-creation. You lift others' ideas while contributing your own.",
+    "Reflective + Determined": "Your reflective determination is a rare superpower — you think deeply before committing, then commit completely. Unlike pure strategists or pure doers, you embody both. Every action has been weighed; every step is intentional.",
+    "Curious + Creative": "Your curious creativity makes you a perpetual idea generator. You don't just learn — you extrapolate, combine, and reimagine. The world gives you information; you return it as innovation.",
+  };
+  const key = moodBlend.label;
+  return descriptions[key] || `As an INTJ-A with ${mood1 && mood2 ? `a blend of ${mood1} and ${mood2} energy` : mood1 || mood2 || 'your unique mood blend'}, you're a strategic visionary shaped by distinctive emotional textures. Your combination brings rare depth to your natural analytical brilliance — you see what others miss, feel what drives them, and build accordingly.`;
+}
+
 export default function ResultsPage() {
   const [tab, setTab] = useState("Personality");
+  const [moodBlend, setMoodBlend] = useState<{label: string; emoji: string; mood1: string; mood2: string} | null>(null);
 
   useEffect(() => {
-    const quizAnswers = localStorage.getItem("kyr_quiz_answers");
-    if (!quizAnswers) {
-      window.location.href = "/quiz";
+    const resultsStr = localStorage.getItem("kyr_results");
+    if (!resultsStr) {
+      const quizAnswers = localStorage.getItem("kyr_quiz_answers");
+      if (!quizAnswers) {
+        window.location.href = "/quiz";
+      }
+      return;
+    }
+    const results = JSON.parse(resultsStr);
+    if (results.moodBlend) {
+      setMoodBlend(results.moodBlend);
     }
   }, []);
 
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        @keyframes pulseGlow {
+          0%, 100% { box-shadow: 0 0 10px rgba(255,0,229,0.2); }
+          50% { box-shadow: 0 0 25px rgba(255,0,229,0.45); }
+        }
+      `}</style>
 
       {/* Header */}
       <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -44,8 +75,37 @@ export default function ResultsPage() {
         <div style={{ width: 40 }} />
       </header>
 
+      {/* Mood blend banner */}
+      {moodBlend && (
+        <div style={{
+          paddingTop: 100,
+          padding: "100px 24px 0",
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}>
+          <div style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 12,
+            background: "rgba(255,0,229,0.1)",
+            border: "1px solid rgba(255,0,229,0.25)",
+            borderRadius: 50,
+            padding: "8px 20px",
+            marginBottom: 20,
+            animation: "pulseGlow 3s ease-in-out infinite",
+          }}>
+            <span style={{ fontSize: "1.4rem" }}>{moodBlend.emoji}</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#FF00E5", fontFamily: "'Outfit',sans-serif" }}>
+              Your Mood Blend: {moodBlend.label}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Hero */}
-      <div style={{ paddingTop: 100, paddingBottom: 32, textAlign: "center", padding: "100px 24px 32px" }}>
+      <div style={{ paddingTop: moodBlend ? 0 : 100, paddingBottom: 32, textAlign: "center", padding: `${moodBlend ? 0 : 100}px 24px 32px` }}>
         <div style={{ display: "inline-block", background: "linear-gradient(135deg, #00C8FF, #7800FF)", borderRadius: 20, padding: "4px", marginBottom: 16 }}>
           <div style={{ background: "#050510", borderRadius: 16, padding: "clamp(16px, 4vw, 32px) clamp(24px, 6vw, 48px)" }}>
             <span style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, background: "linear-gradient(135deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>INTJ-A</span>
@@ -88,7 +148,7 @@ export default function ResultsPage() {
             <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 28 }}>
               <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>Your Personality Type</h3>
               <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, fontFamily: "'Outfit',sans-serif" }}>
-                As an INTJ-A, you're a strategic visionary with a rare combination of analytical brilliance and quiet confidence. You see patterns others miss, question assumptions, and quietly build systems and visions that reshape the world around you.
+                {moodBlend ? getMoodDescription(moodBlend) : "As an INTJ-A, you're a strategic visionary with a rare combination of analytical brilliance and quiet confidence. You see patterns others miss, question assumptions, and quietly build systems and visions that reshape the world around you."}
               </p>
             </div>
           </div>
