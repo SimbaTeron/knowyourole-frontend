@@ -32,8 +32,6 @@ export function AppHeader() {
         {/* Desktop Nav */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           <a href="/quiz" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>Quiz</a>
-          <a href="/mood-mixer" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>Mood Mixer</a>
-          <a href="/crossroads" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>Crossroads</a>
           <a href="/about" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>About</a>
           <a href="/faq" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>FAQ</a>
         </nav>
