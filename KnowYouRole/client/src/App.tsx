@@ -18,6 +18,7 @@ import CrossroadsPage from "@/pages/crossroads";
 import ProfilePage from "@/pages/profile";
 import Callback from "@/pages/callback";
 import About from "@/pages/about";
+import AuthPage from "@/pages/auth";
 import Faq from "@/pages/faq";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
@@ -45,6 +46,7 @@ function Router() {
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />
       <Route path="/callback" component={Callback} />
+      <Route path="/auth" component={AuthPage} />
       <Route path="/about" component={About} />
       <Route path="/faq" component={Faq} />
       <Route path="/privacy" component={Privacy} />
