@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useHistory } from "wouter";
 
 export default function Callback() {
   const { handleRedirectCallback, isAuthenticated, isLoading } = useAuth0();
-  const [, setLocation] = useHistory();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,20 +22,20 @@ export default function Callback() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      // Successfully authenticated — redirect to home or intended destination
-      setLocation("/");
+      window.location.href = "/";
     }
-  }, [isLoading, isAuthenticated, setLocation]);
+  }, [isLoading, isAuthenticated]);
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
-        <div className="text-center max-w-md p-6">
+      <div className="min-h-screen flex items-center justify-center bg-[#03045e]">
+        <div className="text-center max-w-md p-6 glass rounded-2xl">
           <p className="text-red-400 text-sm mb-2">Sign-in failed</p>
           <p className="text-white/60 text-xs">{error}</p>
           <button
-            onClick={() => setLocation("/")}
-            className="mt-4 px-4 py-2 bg-[#67E8F9] text-black text-sm rounded-lg"
+            onClick={() => { window.location.href = '/'; }}
+            className="mt-4 px-4 py-2 text-black text-sm rounded-lg cursor-pointer"
+            style={{ background: '#00D4FF' }}
           >
             Go Home
           </button>
@@ -47,10 +45,13 @@ export default function Callback() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
+    <div className="min-h-screen flex items-center justify-center bg-[#03045e]">
       <div className="text-center">
-        <div className="w-8 h-8 border-2 border-[#67E8F9] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-[#67E8F9] text-sm font-medium">Signing you in...</p>
+        <div
+          className="w-8 h-8 border-2 mx-auto mb-4 rounded-full animate-spin"
+          style={{ borderColor: '#00D4FF', borderTopColor: 'transparent' }}
+        />
+        <p className="text-[#00D4FF] text-sm font-medium">Signing you in...</p>
       </div>
     </div>
   );

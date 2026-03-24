@@ -91,18 +91,9 @@ export default function QuizGatewayPage() {
           {tiers.map((tier) => (
             <GlassCard
               key={tier.id}
-              variant="interactive"
-              className={`tier-card cursor-pointer border border-white/10 relative ${
-                selectedTier === tier.id ? 'selected' : ''
-              }`}
+              variant={selectedTier === tier.id ? 'selected' : 'interactive'}
+              className="tier-card cursor-pointer relative p-5"
               onClick={() => setSelectedTier(tier.id)}
-              style={{
-                padding: '20px 20px 20px 20px',
-                borderRadius: '20px',
-                border: selectedTier === tier.id
-                  ? '1px solid rgba(0, 200, 255, 0.7)'
-                  : '1px solid rgba(255, 255, 255, 0.1)',
-              }}
             >
               <div className="flex items-start gap-4">
                 {/* Emoji */}
