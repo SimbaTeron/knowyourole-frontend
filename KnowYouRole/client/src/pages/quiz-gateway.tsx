@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AppFooter } from "@/components/layout/AppFooter";
 
 const TIERS = [
   { id: "13-15", emoji: "🎉", title: "Young Teens (13-15)", sub: "Quick, fun quiz made just for you" },
@@ -14,35 +13,33 @@ export default function QuizGateway() {
   const handleContinue = () => {
     if (selected) {
       localStorage.setItem("kyr_quiz_tier", selected);
-      window.location.href = `/mood-mixer`;
+      window.location.href = "/mood-mixer";
     }
-  };
-
-  const handleBack = () => {
-    window.history.back();
   };
 
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
       <style>{`
-        @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(0,200,255,0.4), 0 0 40px rgba(120,0,255,0.3); }
+          50% { box-shadow: 0 0 35px rgba(0,200,255,0.7), 0 0 70px rgba(120,0,255,0.5); }
+        }
+        @keyframes border-pulse {
+          0%, 100% { border-color: rgba(0,200,255,0.7); }
+          50% { border-color: rgba(0,200,255,1); }
+        }
       `}</style>
 
       {/* Header */}
       <header style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-        background: "rgba(0,0,0,0.7)", backdropFilter: "blur(20px)",
+        background: "rgba(0,0,0,0.8)", backdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255,255,255,0.08)",
-        padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
-        <button onClick={handleBack} style={{
-          background: "none", border: "none", color: "#ffffff",
-          cursor: "pointer", fontSize: 22, padding: "4px 10px", borderRadius: 8,
-          fontFamily: "'Outfit',sans-serif",
-          textShadow: "0 0 12px rgba(0,200,255,0.5)",
-        }}>←</button>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 1 OF 3</span>
-        <div style={{ width: 40 }} />
+        <div style={{ width: 20 }} />
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#00C8FF", letterSpacing: "0.1em" }}>STEP 1 OF 3</span>
+        <div style={{ width: 20 }} />
       </header>
 
       {/* Progress bar */}
@@ -52,31 +49,19 @@ export default function QuizGateway() {
 
       {/* Main content */}
       <div style={{
-        paddingTop: 80, paddingBottom: 80,
-        padding: "clamp(80px, 12vw, 110px) clamp(16px, 4vw, 48px)",
+        paddingTop: 80,
+        padding: "clamp(80px, 12vw, 100px) clamp(16px, 4vw, 48px)",
         display: "flex", flexDirection: "column", alignItems: "center",
         minHeight: "100vh", boxSizing: "border-box",
       }}>
         <div style={{ maxWidth: 520, width: "100%" }}>
-          <p style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: "0.25em",
-            textTransform: "uppercase", color: "#7800FF", textAlign: "center", marginBottom: 10,
-          }}>Before We Start</p>
-
-          <h1 style={{
-            fontSize: "clamp(2rem, 7vw, 3.5rem)", fontWeight: 900,
-            letterSpacing: "-0.03em", textAlign: "center", marginBottom: 10,
-            fontFamily: "'Outfit',sans-serif",
-          }}>Who are you?</h1>
-
-          <p style={{
-            fontSize: 15, color: "rgba(255,255,255,0.45)", textAlign: "center", marginBottom: 36,
-          }}>Choose the option that fits you best.</p>
+          {/* Header text */}
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase" as const, color: "#7800FF", textAlign: "center" as const, marginBottom: 10 }}>Before We Start</p>
+          <h1 style={{ fontSize: "clamp(2rem, 7vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textAlign: "center" as const, marginBottom: 10 }}>Who are you?</h1>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", textAlign: "center" as const, marginBottom: 36 }}>Choose the option that fits you best.</p>
 
           {/* Age tier cards */}
-          <div style={{
-            display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14,
-          }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14, marginBottom: 40 }}>
             {TIERS.map((tier) => {
               const isSelected = selected === tier.id;
               return (
@@ -84,109 +69,91 @@ export default function QuizGateway() {
                   key={tier.id}
                   onClick={() => setSelected(tier.id)}
                   style={{
-                    background: isSelected
-                      ? "rgba(0, 200, 255, 0.12)"
-                      : "rgba(0,200,255,0.06)",
+                    background: isSelected ? "rgba(0,200,255,0.15)" : "rgba(255,255,255,0.04)",
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
-                    border: isSelected
-                      ? "2px solid #00C8FF"
-                      : "2px solid rgba(0,200,255,0.3)",
+                    border: isSelected ? "2px solid #00C8FF" : "2px solid rgba(0,200,255,0.25)",
                     borderRadius: 20,
                     padding: "18px 16px",
                     cursor: "pointer",
-                    textAlign: "left",
+                    textAlign: "left" as const,
                     transition: "all 0.2s ease",
-                    boxShadow: isSelected
-                      ? "0 0 30px rgba(0,200,255,0.4), 0 0 60px rgba(0,200,255,0.2), inset 0 0 12px rgba(0,200,255,0.05)"
-                      : "0 0 0px rgba(0,200,255,0.1)",
+                    boxShadow: isSelected ? "0 0 24px rgba(0,200,255,0.3), inset 0 0 12px rgba(0,200,255,0.05)" : "none",
                     fontFamily: "'Outfit',sans-serif",
                     outline: "none",
-                    minHeight: 100,
+                    minHeight: 110,
                   }}
                 >
                   <div style={{ fontSize: 28, marginBottom: 10 }}>{tier.emoji}</div>
-                  <div style={{
-                    fontSize: 14, fontWeight: 700, marginBottom: 4,
-                    color: isSelected ? "#fff" : "rgba(255,255,255,0.85)",
-                    fontFamily: "'Outfit',sans-serif",
-                  }}>{tier.title}</div>
-                  <div style={{
-                    fontSize: 11, color: "rgba(255,255,255,0.6)",
-                    marginBottom: 8, fontFamily: "'Outfit',sans-serif",
-                    lineHeight: 1.4,
-                  }}>{tier.sub}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, color: isSelected ? "#fff" : "rgba(255,255,255,0.85)" }}>{tier.title}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", lineHeight: 1.4 }}>{tier.sub}</div>
                   {isSelected && (
-                    <div style={{ color: "#00C8FF", fontSize: 18, fontWeight: 700, marginTop: 4, textShadow: "0 0 10px rgba(0,200,255,0.8)" }}>✓</div>
+                    <div style={{ color: "#00C8FF", fontSize: 16, fontWeight: 700, marginTop: 4 }}>✓ Selected</div>
                   )}
                 </button>
               );
             })}
           </div>
 
-          {/* Selection feedback */}
+          {/* Selected feedback */}
           {selected && (
-            <p style={{
-              textAlign: "center", marginTop: 16, fontSize: 13,
-              color: "#00C8FF", fontWeight: 600,
-            }}>
-              You selected: {TIERS.find(t => t.id === selected)?.title}
+            <p style={{ textAlign: "center", marginBottom: 16, fontSize: 14, color: "#00C8FF", fontWeight: 700 }}>
+              ✓ {TIERS.find(t => t.id === selected)?.title} selected
             </p>
           )}
 
-          {/* Continue button — wrapped in glowing container */}
+          {/* Continue button — MADE EXTREMELY VISIBLE */}
           <div style={{
-            marginTop: 24,
-            borderRadius: 20,
-            padding: selected ? "2px" : "0px",
+            width: "100%",
+            borderRadius: 22,
+            padding: "3px",
             background: selected
               ? "linear-gradient(90deg, #00C8FF, #7800FF, #FF00E5, #00C8FF)"
-              : "rgba(255,255,255,0.06)",
+              : "rgba(255,255,255,0.1)",
+            animation: selected ? "border-pulse 2s ease-in-out infinite" : "none",
             boxShadow: selected
-              ? "0 0 40px rgba(0,200,255,0.5), 0 0 80px rgba(120,0,255,0.3)"
-              : "0 0 0px rgba(255,255,255,0.05)",
-            transition: "all 0.4s ease",
-            animation: selected ? "none" : "none",
+              ? "0 0 25px rgba(0,200,255,0.4), 0 0 50px rgba(120,0,255,0.25)"
+              : "none",
           }}>
             <button
               onClick={handleContinue}
               disabled={!selected}
               style={{
                 width: "100%",
-                padding: "18px",
+                padding: "20px",
                 background: selected
-                  ? "linear-gradient(90deg, #00C8FF 0%, #7800FF 50%, #FF00E5 100%)"
+                  ? "linear-gradient(135deg, #0a0a1a 0%, #0d1a2a 50%, #0a0a1a 100%)"
                   : "rgba(255,255,255,0.04)",
-                border: selected ? "2px solid rgba(0,200,255,0.6)" : "2px solid rgba(255,255,255,0.08)",
-                borderRadius: 18,
-                color: selected ? "#ffffff" : "rgba(255,255,255,0.25)",
+                border: "none",
+                borderRadius: 20,
+                color: selected ? "#00C8FF" : "rgba(255,255,255,0.2)",
                 fontWeight: 800,
-                fontSize: 17,
+                fontSize: 18,
                 cursor: selected ? "pointer" : "not-allowed",
                 fontFamily: "'Outfit',sans-serif",
-                letterSpacing: "0.04em",
-                textShadow: selected ? "0 2px 8px rgba(0,0,0,0.7), 0 0 20px rgba(0,200,255,0.5)" : "0 1px 3px rgba(0,0,0,0.4)",
-                boxShadow: selected
-                  ? "0 0 30px rgba(0,200,255,0.5), 0 0 60px rgba(120,0,255,0.3), inset 0 1px 0 rgba(255,255,255,0.25)"
-                  : "none",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase" as const,
+                textShadow: selected ? "0 0 20px rgba(0,200,255,0.6)" : "none",
+                boxShadow: selected ? "inset 0 0 30px rgba(0,200,255,0.1)" : "none",
                 transition: "all 0.3s ease",
               }}
             >
-              {selected ? `Start Quiz →` : "Select your age to continue"}
+              {selected ? "START QUIZ  \u2192" : "SELECT YOUR AGE TO CONTINUE"}
             </button>
           </div>
 
-          {/* Trust signal */}
-          <p style={{
-            textAlign: "center", marginTop: 16, fontSize: 12,
-            color: "rgba(255,255,255,0.5)",
-          }}>
-            🔒 Your answers are private. Always.
+          {/* Secondary action */}
+          <p style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "rgba(255,255,255,0.35)" }}>
+            Takes less than 5 minutes
           </p>
+
+          {/* Trust signal */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 16 }}>
+            <span style={{ fontSize: 14 }}>🔒</span>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>Your answers are private. Always.</p>
+          </div>
         </div>
       </div>
-
-      <AppFooter />
     </div>
   );
 }
