@@ -53,10 +53,10 @@ export function AppFooter() {
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 14, fontFamily: "'Outfit',sans-serif" }}>Product</h4>
             <div>
-              <Link href="/quiz" style={linkStyle} activeClassName="" onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Free Assessment</Link>
-              <Link href="/about" style={linkStyle} activeClassName="" onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>How It Works</Link>
-              <Link href="/careers" style={linkStyle} activeClassName="" onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Career Matching</Link>
-              <Link href="/results" style={linkStyle} activeClassName="" onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Premium Features</Link>
+              <Link href="/quiz" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Free Assessment</Link>
+              <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>How It Works</Link>
+              <Link href="/careers" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Career Matching</Link>
+              <Link href="/results" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Premium Features</Link>
             </div>
           </div>
 
@@ -64,8 +64,8 @@ export function AppFooter() {
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 14, fontFamily: "'Outfit',sans-serif" }}>Company</h4>
             <div>
-              <Link href="/about" style={linkStyle} activeClassName="" onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>About</Link>
-              <Link href="/about" style={linkStyle} activeClassName="" onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Science</Link>
+              <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>About</Link>
+              <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Science</Link>
             </div>
           </div>
 
@@ -73,8 +73,8 @@ export function AppFooter() {
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 14, fontFamily: "'Outfit',sans-serif" }}>Legal</h4>
             <div>
-              <Link href="/privacy" style={linkStyle} activeClassName="" onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Privacy Policy</Link>
-              <Link href="/terms" style={linkStyle} activeClassName="" onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Terms of Service</Link>
+              <Link href="/privacy" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Privacy Policy</Link>
+              <Link href="/terms" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Terms of Service</Link>
             </div>
           </div>
         </div>
