@@ -31,17 +31,19 @@ export function AppHeader() {
 
         {/* Desktop Nav */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-          <a href="/quiz" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>Quiz</a>
-          <a href="/about" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>About</a>
-          <a href="/faq" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>FAQ</a>
+          <a href="/quiz" style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>Quiz</a>
+          <a href="/about" style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>About</a>
+          <a href="/faq" style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontFamily: "'Outfit',sans-serif", transition: 'color 0.2s' }}>FAQ</a>
         </nav>
 
         {/* Auth Buttons */}
         <div style={{ display: 'flex', gap: 12 }}>
           <a href="/auth" style={{
             padding: '10px 20px', borderRadius: 50, fontWeight: 600, fontSize: 14,
-            background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
+            background: 'transparent',
+            border: '1.5px solid rgba(255,255,255,0.55)',
             color: '#fff', cursor: 'pointer', textDecoration: 'none', fontFamily: "'Outfit',sans-serif",
+            boxShadow: '0 0 12px rgba(255,255,255,0.08)',
           }}>
             Sign In
           </a>

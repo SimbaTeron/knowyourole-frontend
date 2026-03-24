@@ -48,6 +48,8 @@ function Router() {
       <Route path="/profile" component={ProfilePage} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />
+      <Route path="/checkout-success" component={CheckoutSuccess} />
+      <Route path="/checkout-cancel" component={CheckoutCancel} />
       <Route path="/callback" component={Callback} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/about" component={About} />
