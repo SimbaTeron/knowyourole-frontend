@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppFooter } from "@/components/layout/AppFooter";
 
 const TRAITS = [
@@ -25,6 +25,13 @@ const GROWTH = [
 
 export default function ResultsPage() {
   const [tab, setTab] = useState("Personality");
+
+  useEffect(() => {
+    const quizAnswers = localStorage.getItem("kyr_quiz_answers");
+    if (!quizAnswers) {
+      window.location.href = "/quiz";
+    }
+  }, []);
 
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { AppFooter } from "@/components/layout/AppFooter";
 
@@ -24,6 +24,18 @@ export default function QuizPage() {
   const [selected, setSelected] = useState<number | null>(null);
   const [answers, setAnswers] = useState<number[]>([]);
 
+  useEffect(() => {
+    // Guard: if user has already completed quiz, redirect to results
+    const saved = localStorage.getItem("kyr_quiz_answers");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.length >= QUESTIONS.length) {
+        window.location.href = "/results";
+        return;
+      }
+    }
+  }, []);
+
   const q = QUESTIONS[step];
   const progress = (step / QUESTIONS.length) * 100;
 
@@ -35,7 +47,9 @@ export default function QuizPage() {
     if (step < QUESTIONS.length - 1) {
       setStep(s => s + 1);
     } else {
-      setLocation("/results");
+      // Save answers before navigating to results
+      localStorage.setItem("kyr_quiz_answers", JSON.stringify(next));
+      window.location.href = "/results";
     }
   };
 
