@@ -44,13 +44,8 @@ export default function QuizGateway() {
         minHeight: "100vh", boxSizing: "border-box",
       }}>
         <div style={{ maxWidth: 520, width: "100%" }}>
-          {/* Section label */}
           <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase" as const, color: "#7800FF", textAlign: "center" as const, marginBottom: 10 }}>Before We Start</p>
-
-          {/* Title */}
           <h1 style={{ fontSize: "clamp(2rem, 7vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textAlign: "center" as const, marginBottom: 10 }}>Who are you?</h1>
-
-          {/* Subtitle */}
           <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", textAlign: "center" as const, marginBottom: 36 }}>Choose the option that fits you best.</p>
 
           {/* Age tier cards */}
@@ -71,7 +66,7 @@ export default function QuizGateway() {
                     cursor: "pointer",
                     textAlign: "left" as const,
                     transition: "all 0.2s ease",
-                    boxShadow: isSelected ? "0 0 28px rgba(0,200,255,0.35), inset 0 0 12px rgba(0,200,255,0.05)" : "none",
+                    boxShadow: isSelected ? "0 0 28px rgba(0,200,255,0.35)" : "none",
                     fontFamily: "'Outfit',sans-serif",
                     outline: "none",
                     minHeight: 110,
@@ -95,32 +90,37 @@ export default function QuizGateway() {
             </p>
           )}
 
-          {/* THE BUTTON — absolutely impossible to miss */}
+          {/* THE BUTTON — SIMPLE SOLID COLOR, NO GRADIENT, MAXIMUM CONTRAST */}
           <button
             onClick={handleContinue}
             disabled={!selected}
             style={{
               width: "100%",
               padding: "22px 24px",
-              background: selected
-                ? "linear-gradient(135deg, #00C8FF 0%, #7800FF 100%)"
-                : "rgba(120,0,255,0.2)",
-              border: selected ? "none" : "2px solid rgba(120,0,255,0.3)",
-              borderRadius: 18,
-              color: selected ? "#000000" : "rgba(120,0,255,0.5)",
+              // SOLID #00C8FF — this is a bright cyan that iOS MUST show
+              background: selected ? "#00C8FF" : "rgba(0,200,255,0.12)",
+              border: selected ? "none" : "2px solid rgba(0,200,255,0.3)",
+              borderRadius: 16,
+              // Black text on cyan = maximum contrast, ALWAYS visible
+              color: selected ? "#000000" : "rgba(0,200,255,0.5)",
               fontWeight: 900,
-              fontSize: 20,
+              fontSize: 19,
               fontFamily: "'Outfit',sans-serif",
               letterSpacing: "0.06em",
               textTransform: "uppercase" as const,
               cursor: selected ? "pointer" : "not-allowed",
+              // Strong outer glow on the CYAN button
               boxShadow: selected
-                ? "0 8px 40px rgba(0,200,255,0.5), 0 4px 20px rgba(120,0,255,0.4)"
+                ? "0 0 30px rgba(0,200,255,0.8), 0 0 60px rgba(0,200,255,0.4)"
                 : "none",
               transition: "all 0.3s ease",
-              // Force visibility on mobile
-              WebkitAppearance: "none",
+              // Force hardware acceleration for smooth rendering on mobile
+              transform: "translateZ(0)",
+              WebkitTransform: "translateZ(0)",
               minHeight: 64,
+              // Ensure it's not allowing any overflow issues
+              display: "block",
+              boxSizing: "border-box",
             }}
           >
             {selected ? "START QUIZ \u2192" : "SELECT YOUR AGE TO CONTINUE"}
