@@ -1,167 +1,95 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
-import { PageContainer } from '@/components/layout/PageContainer';
-import { CompactHeader } from '@/components/layout/CompactHeader';
-import { GlassCard } from '@/components/glass/GlassCard';
-import { NeonButton } from '@/components/glass/NeonButton';
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { GlassCard } from "@/components/glass/GlassCard";
 
-const tiers = [
-  { id: '13-15', emoji: '🎉', title: 'Young Teens (13-15)', subtitle: 'Quick, fun quiz made just for you' },
-  { id: '16-17', emoji: '👦', title: 'Teens (16-17)', subtitle: 'Full quiz with career insights' },
-  { id: '18-24', emoji: '🧑', title: 'Young Adults (18-24)', subtitle: 'Complete personality + career matching' },
-  { id: '25+', emoji: '👴', title: 'Adults (25+)', subtitle: 'Full experience with premium features' },
+const glassCard: React.CSSProperties = {
+  background: "rgba(255,255,255,0.04)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "24px",
+  padding: "20px",
+  cursor: "pointer",
+  transition: "all 0.25s ease",
+};
+
+const TIERS = [
+  { id: "13-15", emoji: "🎉", title: "Young Teens (13-15)", sub: "Quick, fun quiz made just for you" },
+  { id: "16-17", emoji: "👦", title: "Teens (16-17)", sub: "Full quiz with career insights" },
+  { id: "18-24", emoji: "🧑", title: "Young Adults (18-24)", sub: "Complete personality + career matching" },
+  { id: "25+", emoji: "👴", title: "Adults (25+)", sub: "Full experience with premium features" },
 ];
 
-export default function QuizGatewayPage() {
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+export default function QuizGateway() {
+  const [, setLocation] = useLocation();
+  const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <PageContainer padded={false} className="font-outfit">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
-        
-        .font-outfit * {
-          font-family: 'Outfit', sans-serif;
-        }
-        
-        .tier-card {
-          transition: all 0.25s ease;
-        }
-        
-        .tier-card:hover {
-          background: rgba(255, 255, 255, 0.07);
-          border-color: rgba(0, 200, 255, 0.25);
-          transform: translateY(-2px);
-        }
-        
-        .tier-card.selected {
-          background: rgba(0, 200, 255, 0.08);
-          border-color: rgba(0, 200, 255, 0.7);
-          box-shadow: 0 0 28px rgba(0, 200, 255, 0.35), 0 0 60px rgba(0, 200, 255, 0.15), inset 0 0 20px rgba(0, 200, 255, 0.05);
-          transform: translateY(-2px);
-        }
-        
-        .tier-card .arrow {
-          transition: all 0.25s ease;
-          opacity: 0.4;
-        }
-        
-        .tier-card:hover .arrow,
-        .tier-card.selected .arrow {
-          opacity: 1;
-          transform: translateX(4px);
-        }
-      `}</style>
+    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
 
-      <CompactHeader onBack={() => history.back()} onMenu={() => {}} />
+      {/* Header */}
+      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <button onClick={() => history.back()} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: 20, padding: 8 }}>←</button>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#00C8FF" }}>Step 1 of 2</span>
+        <div style={{ width: 40 }} />
+      </header>
 
-      <div
-        className="min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-12"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 0%, rgba(120,0,255,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 60%, rgba(0,200,255,0.08) 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, rgba(255,0,229,0.05) 0%, transparent 50%)',
-        }}
-      >
-        {/* Section label */}
-        <p
-          className="text-xs font-bold tracking-[0.25em] uppercase text-white/40 mb-5"
-          style={{ fontFamily: "'Outfit', sans-serif" }}
-        >
-          Before We Start
-        </p>
-
-        {/* Main heading */}
-        <h1
-          className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-[-0.04em] leading-[0.95] text-white text-center mb-4"
-          style={{ fontFamily: "'Outfit', sans-serif" }}
-        >
-          Who are you?
-        </h1>
-
-        {/* Subtitle */}
-        <p
-          className="text-base text-white/50 text-center mb-12 max-w-sm"
-          style={{ fontFamily: "'Outfit', sans-serif" }}
-        >
-          Choose the option that fits you best.
-        </p>
-
-        {/* 2x2 grid of tier cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-[500px] mb-12">
-          {tiers.map((tier) => (
-            <GlassCard
-              key={tier.id}
-              variant={selectedTier === tier.id ? 'selected' : 'interactive'}
-              className="tier-card cursor-pointer relative p-5"
-              onClick={() => setSelectedTier(tier.id)}
-            >
-              <div className="flex items-start gap-4">
-                {/* Emoji */}
-                <div
-                  className="text-3xl flex-shrink-0 w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
-                >
-                  {tier.emoji}
-                </div>
-
-                {/* Text content */}
-                <div className="flex-1 min-w-0">
-                  <p
-                    className="text-base font-bold text-white leading-tight mb-1"
-                    style={{ fontFamily: "'Outfit', sans-serif" }}
-                  >
-                    {tier.title}
-                  </p>
-                  <p
-                    className="text-xs text-white/45 leading-relaxed"
-                    style={{ fontFamily: "'Outfit', sans-serif" }}
-                  >
-                    {tier.subtitle}
-                  </p>
-                </div>
-
-                {/* Arrow */}
-                <div
-                  className="arrow text-lg text-[#00C8FF] flex-shrink-0 flex items-center"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
-                >
-                  →
-                </div>
-              </div>
-            </GlassCard>
-          ))}
-        </div>
-
-        {/* Continue button */}
-        <NeonButton
-          variant="primary"
-          size="lg"
-          disabled={!selectedTier}
-          onClick={() => {
-            if (selectedTier) {
-              window.location.href = `/quiz?tier=${selectedTier}`;
-            }
-          }}
-          style={{
-            background: selectedTier
-              ? 'linear-gradient(90deg, #00C8FF, #7800FF)'
-              : 'rgba(255,255,255,0.08)',
-            boxShadow: selectedTier
-              ? '0 0 30px rgba(0,200,255,0.4)'
-              : 'none',
-            padding: '16px 48px',
-            fontSize: '1rem',
-            borderRadius: '16px',
-            fontFamily: "'Outfit', sans-serif",
-            cursor: selectedTier ? 'pointer' : 'not-allowed',
-            opacity: selectedTier ? 1 : 0.5,
-            border: 'none',
-            color: selectedTier ? 'white' : 'rgba(255,255,255,0.3)',
-          }}
-        >
-          Continue →
-        </NeonButton>
+      {/* Progress bar */}
+      <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.1)", zIndex: 50 }}>
+        <div style={{ width: "50%", height: "100%", background: "linear-gradient(90deg, #00C8FF, #7800FF)" }} />
       </div>
-    </PageContainer>
+
+      {/* Content */}
+      <div style={{ paddingTop: 120, paddingBottom: 80, padding: "clamp(80px, 15vw, 120px) clamp(16px, 4vw, 48px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+        <div style={{ maxWidth: 500, width: "100%" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#00C8FF", textAlign: "center", marginBottom: 12 }}>Before We Start</p>
+          <h1 style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textAlign: "center", marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>Who are you?</h1>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", textAlign: "center", marginBottom: 40 }}>Choose the option that fits you best.</p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {TIERS.map((tier) => (
+              <div
+                key={tier.id}
+                onClick={() => setSelected(tier.id)}
+                style={{
+                  ...glassCard,
+                  border: selected === tier.id
+                    ? "2px solid #00C8FF"
+                    : "1px solid rgba(255,255,255,0.08)",
+                  boxShadow: selected === tier.id ? "0 0 20px rgba(0,200,255,0.3)" : "none",
+                }}
+              >
+                <div style={{ fontSize: 32, marginBottom: 12 }}>{tier.emoji}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, fontFamily: "'Outfit',sans-serif" }}>{tier.title}</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>{tier.sub}</div>
+                <div style={{ textAlign: "right", color: selected === tier.id ? "#00C8FF" : "rgba(255,255,255,0.3)", fontSize: 18 }}>→</div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => selected && setLocation(`/quiz?tier=${selected}`)}
+            disabled={!selected}
+            style={{
+              marginTop: 32,
+              width: "100%",
+              padding: "16px",
+              background: selected ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.1)",
+              border: "none",
+              borderRadius: 16,
+              color: selected ? "#fff" : "rgba(255,255,255,0.3)",
+              fontWeight: 700,
+              fontSize: 16,
+              cursor: selected ? "pointer" : "not-allowed",
+              fontFamily: "'Outfit',sans-serif",
+              boxShadow: selected ? "0 0 30px rgba(0,200,255,0.4)" : "none",
+            }}
+          >
+            Continue →
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,135 +1,123 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
-import { PageContainer } from '@/components/layout/PageContainer';
-import { CompactHeader } from '@/components/layout/CompactHeader';
-import { GlassCard } from '@/components/glass/GlassCard';
-import { NeonButton } from '@/components/glass/NeonButton';
-import { ProgressBar } from '@/components/glass/ProgressBar';
+import { useState } from "react";
+import { useLocation } from "wouter";
 
-const questions = [
-  {
-    question: "You're at a party. What do you naturally do?",
-    answers: [
-      "Work the room, meeting everyone",
-      "Find one deep conversation",
-      "Observe from the corner",
-      "Make sure everyone is having fun",
-      "Relax and enjoy your own company"
-    ]
-  },
-  {
-    question: "How do you prefer to make decisions?",
-    answers: [
-      "Based on logic and data",
-      "Based on how it affects people",
-      "Following my gut feeling",
-      "Weighing pros and cons carefully",
-      "Quickly, based on instinct"
-    ]
-  },
-  {
-    question: "Your ideal weekend involves:",
-    answers: [
-      "Spontaneous adventures with friends",
-      "Deep work on a personal project",
-      "Planning my next big goal",
-      "Quiet time with a good book",
-      "Learning something entirely new"
-    ]
-  },
-  {
-    question: "In a group project, you naturally:",
-    answers: [
-      "Lead and delegate tasks",
-      "Bring creative ideas",
-      "Keep everyone on schedule",
-      "Mediate conflicts",
-      "Do your part independently"
-    ]
-  },
-  {
-    question: "What motivates you most?",
-    answers: [
-      "Recognition and achievement",
-      "Helping others succeed",
-      "Mastery and expertise",
-      "Freedom and autonomy",
-      "Impact and purpose"
-    ]
-  }
+const QUESTIONS = [
+  { q: "You're at a party. What do you naturally do?", a: ["Work the room, meeting everyone", "Find one deep conversation", "Observe from the corner", "Make sure everyone is having fun", "Relax and enjoy your own company"] },
+  { q: "How do you prefer to make decisions?", a: ["Based on logic and data", "Based on how it affects people", "Following my gut feeling", "Weighing pros and cons carefully", "Quickly, based on instinct"] },
+  { q: "Your ideal weekend involves:", a: ["Spontaneous adventures with friends", "Deep work on a personal project", "Planning my next big goal", "Quiet time with a good book", "Learning something entirely new"] },
+  { q: "In a group project, you naturally:", a: ["Lead and delegate tasks", "Bring creative ideas", "Keep everyone on schedule", "Mediate conflicts", "Do your part independently"] },
+  { q: "What motivates you most?", a: ["Recognition and achievement", "Helping others succeed", "Mastery and expertise", "Freedom and autonomy", "Impact and purpose"] },
 ];
 
-export default function QuizPage() {
+const glassCard: React.CSSProperties = {
+  background: "rgba(255,255,255,0.04)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "20px",
+  padding: "0",
+  cursor: "pointer",
+};
+
+export default function Quiz() {
   const [, setLocation] = useLocation();
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [step, setStep] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
   const [answers, setAnswers] = useState<number[]>([]);
 
-  const q = questions[currentQuestion];
-  const progress = (currentQuestion / questions.length) * 100;
+  const q = QUESTIONS[step];
+  const progress = ((step) / QUESTIONS.length) * 100;
 
   const handleNext = () => {
-    if (selectedAnswer === null) return;
-    const newAnswers = [...answers, selectedAnswer];
+    if (selected === null) return;
+    const newAnswers = [...answers, selected];
     setAnswers(newAnswers);
-    setSelectedAnswer(null);
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(c => c + 1);
+    setSelected(null);
+    if (step < QUESTIONS.length - 1) {
+      setStep(s => s + 1);
     } else {
-      // Quiz complete — go to results
-      setLocation('/results');
+      setLocation("/results");
     }
   };
 
   return (
-    <PageContainer padded={false}>
-      <CompactHeader onBack={() => history.back()} onMenu={() => {}} />
-      <div className="min-h-screen flex flex-col px-4 pt-20">
-        {/* Progress */}
-        <div className="w-full py-4 space-y-2">
-          <div className="text-xs text-white/40 text-center font-medium">
-            Question {currentQuestion + 1} of {questions.length}
+    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
+
+      {/* Header */}
+      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <button onClick={() => history.back()} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: 20, padding: 8 }}>←</button>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#00C8FF" }}>Question {step + 1} of {QUESTIONS.length}</span>
+        <div style={{ width: 40 }} />
+      </header>
+
+      {/* Progress bar */}
+      <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 4, background: "rgba(255,255,255,0.1)", zIndex: 50 }}>
+        <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #00C8FF, #7800FF)", transition: "width 0.4s ease" }} />
+      </div>
+
+      {/* Question */}
+      <div style={{ paddingTop: 100, padding: "clamp(80px, 15vw, 100px) clamp(16px, 4vw, 48px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+        <div style={{ maxWidth: 640, width: "100%" }}>
+          {/* Question card */}
+          <div style={{ ...glassCard, padding: "clamp(24px, 5vw, 40px)", marginBottom: 24 }}>
+            <p style={{ fontSize: "clamp(1.1rem, 3vw, 1.4rem)", fontWeight: 700, lineHeight: 1.4, marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>{q.q}</p>
           </div>
-          <ProgressBar progress={progress} />
-        </div>
 
-        {/* Question Card */}
-        <div className="flex-1 flex flex-col items-center justify-center max-w-xl mx-auto w-full">
-          <GlassCard className="w-full p-8" variant="default">
-            <div className="text-3xl font-display font-bold text-white mb-6">
-              {q.question}
-            </div>
-
-            <div className="space-y-3">
-              {q.answers.map((answer, i) => (
-                <GlassCard
-                  key={i}
-                  variant={selectedAnswer === i ? 'selected' : 'interactive'}
-                  className="flex items-center gap-4 p-4 cursor-pointer"
-                  onClick={() => setSelectedAnswer(i)}
-                >
-                  <div className="radio-outer">
-                    <div className="radio-inner" />
-                  </div>
-                  <span className="text-white/90 text-sm">{answer}</span>
-                </GlassCard>
-              ))}
-            </div>
-          </GlassCard>
-        </div>
-
-        {/* Next Button */}
-        <div className="w-full max-w-xl mx-auto py-6">
-          <NeonButton
-            fullWidth
-            size="lg"
-            disabled={selectedAnswer === null}
-            onClick={handleNext}
-          >
-            {currentQuestion < questions.length - 1 ? 'Next Question →' : 'See Your Results →'}
-          </NeonButton>
+          {/* Answers */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {q.a.map((answer, i) => (
+              <div
+                key={i}
+                onClick={() => setSelected(i)}
+                style={{
+                  ...glassCard,
+                  padding: "16px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  border: selected === i ? "2px solid #00C8FF" : "1px solid rgba(255,255,255,0.08)",
+                  boxShadow: selected === i ? "0 0 20px rgba(0,200,255,0.25)" : "none",
+                }}
+              >
+                <div style={{
+                  width: 22, height: 22, borderRadius: "50%",
+                  border: selected === i ? "2px solid #00C8FF" : "2px solid rgba(255,255,255,0.3)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0, transition: "all 0.2s ease",
+                }}>
+                  {selected === i && (
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#00C8FF", boxShadow: "0 0 8px #00C8FF" }} />
+                  )}
+                </div>
+                <span style={{ fontSize: 15, color: "rgba(255,255,255,0.85)", fontFamily: "'Outfit',sans-serif" }}>{answer}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </PageContainer>
+
+      {/* Next button */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px clamp(16px, 4vw, 48px)", background: "rgba(5,5,16,0.9)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 50 }}>
+        <button
+          onClick={handleNext}
+          disabled={selected === null}
+          style={{
+            width: "100%",
+            padding: "16px",
+            background: selected !== null ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.08)",
+            border: "none",
+            borderRadius: 16,
+            color: selected !== null ? "#fff" : "rgba(255,255,255,0.3)",
+            fontWeight: 700,
+            fontSize: 16,
+            cursor: selected !== null ? "pointer" : "not-allowed",
+            fontFamily: "'Outfit',sans-serif",
+          }}
+        >
+          {step < QUESTIONS.length - 1 ? "Next Question →" : "See Your Results →"}
+        </button>
+      </div>
+    </div>
   );
 }

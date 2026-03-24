@@ -1,234 +1,151 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
-import { PageContainer } from '@/components/layout/PageContainer';
-import { CompactHeader } from '@/components/layout/CompactHeader';
-import { GlassCard } from '@/components/glass/GlassCard';
-import { NeonButton } from '@/components/glass/NeonButton';
+import { useState } from "react";
+import { useLocation } from "wouter";
 
-const moods = [
-  { id: 'happy', emoji: '😊', label: 'Happy', color: '#FBBF24' },
-  { id: 'calm', emoji: '😌', label: 'Calm', color: '#60A5FA' },
-  { id: 'curious', emoji: '🤔', label: 'Curious', color: '#A78BFA' },
-  { id: 'determined', emoji: '💪', label: 'Determined', color: '#F87171' },
-  { id: 'creative', emoji: '🎨', label: 'Creative', color: '#F472B6' },
-  { id: 'social', emoji: '🤝', label: 'Social', color: '#34D399' },
+const MOODS = [
+  { id: "happy", emoji: "😊", label: "Happy", color: "#FBBF24" },
+  { id: "calm", emoji: "😌", label: "Calm", color: "#60A5FA" },
+  { id: "curious", emoji: "🤔", label: "Curious", color: "#A78BFA" },
+  { id: "determined", emoji: "💪", label: "Determined", color: "#F87171" },
+  { id: "creative", emoji: "🎨", label: "Creative", color: "#F472B6" },
+  { id: "social", emoji: "🤝", label: "Social", color: "#34D399" },
 ];
 
-export default function MoodMixerPage() {
-  const [, setLocation] = useLocation();
-  const [selectedMoods, setSelectedMoods] = useState<Record<string, number>>({});
+const glassCard: React.CSSProperties = {
+  background: "rgba(255,255,255,0.04)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "24px",
+  padding: "0",
+};
 
-  const toggleMood = (id: string) => {
-    setSelectedMoods(prev => {
+export default function MoodMixer() {
+  const [, setLocation] = useLocation();
+  const [selected, setSelected] = useState<Record<string, number>>({});
+
+  const toggle = (id: string) => {
+    setSelected(prev => {
       if (prev[id] !== undefined) {
         const next = { ...prev };
         delete next[id];
         return next;
       }
-      // Max 3 moods
-      if (Object.keys(prev).length >= 3) return prev;
-      return { ...prev, [id]: 50 };
+      if (Object.keys(prev).length < 3) {
+        return { ...prev, [id]: 50 };
+      }
+      return prev;
     });
   };
 
-  const handleSliderChange = (id: string, value: number) => {
-    setSelectedMoods(prev => ({ ...prev, [id]: value }));
+  const update = (id: string, val: number) => {
+    setSelected(prev => ({ ...prev, [id]: val }));
   };
 
   const handleSave = () => {
-    alert('Mood blend saved!');
-    setLocation('/crossroads');
+    setLocation("/crossroads");
   };
 
-  return (
-    <PageContainer padded={false}>
-      <CompactHeader
-        title="Mood Mixer"
-        onBack={() => setLocation('/')}
-        onMenu={() => {}}
-      />
+  const selectedList = Object.entries(selected);
 
-      {/* Page content */}
-      <div className="min-h-screen pt-20 pb-32 px-4">
-        <div className="max-w-lg mx-auto">
-          {/* Title + subtitle */}
-          <div className="mb-8">
-            <h1
-              className="text-white font-display font-bold mb-2"
-              style={{ fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', letterSpacing: '-0.03em', lineHeight: 1.1 }}
-            >
-              Create Your Mood Blend
-            </h1>
-            <p className="text-white/50 text-sm" style={{ maxWidth: 320 }}>
-              Select up to 3 moods to blend into your unique mix.
-            </p>
+  return (
+    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
+
+      {/* Header */}
+      <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <button onClick={() => history.back()} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: 20, padding: 8 }}>←</button>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#00C8FF" }}>Mood Mixer</span>
+        <div style={{ width: 40 }} />
+      </header>
+
+      {/* Content */}
+      <div style={{ paddingTop: 80, padding: "clamp(80px, 15vw, 100px) clamp(16px, 4vw, 48px) 160px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ maxWidth: 700, width: "100%" }}>
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <h1 style={{ fontSize: "clamp(1.8rem, 5vw, 2.8rem)", fontWeight: 900, letterSpacing: "-0.03em", marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>Create Your Mood Blend</h1>
+            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)" }}>Select up to 3 moods. Adjust how strongly each one affects you.</p>
           </div>
 
-          {/* 2x3 mood grid */}
-          <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}
-          >
-            {moods.map(mood => {
-              const isSelected = selectedMoods[mood.id] !== undefined;
-              const pct = selectedMoods[mood.id] ?? 50;
-
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
+            {MOODS.map((mood) => {
+              const isSelected = selected[mood.id] !== undefined;
               return (
                 <div
                   key={mood.id}
-                  onClick={() => toggleMood(mood.id)}
-                  className="cursor-pointer"
+                  onClick={() => toggle(mood.id)}
                   style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    border: `2px solid ${isSelected ? mood.color : 'rgba(255,255,255,0.08)'}`,
-                    borderRadius: 16,
-                    padding: '24px 16px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 8,
-                    transition: 'all 0.3s',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxShadow: isSelected
-                      ? `0 0 20px ${mood.color}40, 0 0 40px ${mood.color}20`
-                      : 'none',
-                    transform: 'translateY(0)',
+                    ...glassCard,
+                    padding: "24px 20px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    border: isSelected ? `2px solid ${mood.color}` : "1px solid rgba(255,255,255,0.08)",
+                    boxShadow: isSelected ? `0 0 20px ${mood.color}40` : "none",
+                    transition: "all 0.25s ease",
                   }}
                 >
-                  {/* Emoji */}
-                  <span
-                    className="text-4xl select-none"
-                    style={{ filter: isSelected ? 'none' : 'grayscale(30%)' }}
-                  >
-                    {mood.emoji}
-                  </span>
-
-                  {/* Mood name */}
-                  <span
-                    className="text-sm font-bold text-white"
-                    style={{ opacity: isSelected ? 1 : 0.7 }}
-                  >
-                    {mood.label}
-                  </span>
-
-                  {/* Percentage badge (always visible on selected) */}
-                  <span
-                    className="text-xs font-semibold"
-                    style={{
-                      color: mood.color,
-                      opacity: isSelected ? 1 : 0,
-                      transition: 'opacity 0.3s',
-                    }}
-                  >
-                    {pct}%
-                  </span>
-
-                  {/* Slider — only shown when selected */}
+                  <div style={{ fontSize: 48, marginBottom: 8 }}>{mood.emoji}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, fontFamily: "'Outfit',sans-serif", color: isSelected ? mood.color : "#fff" }}>{mood.label}</div>
                   {isSelected && (
-                    <div className="w-full mt-2 flex flex-col items-center gap-1">
+                    <div style={{ marginTop: 12 }}>
                       <input
                         type="range"
-                        min={0}
+                        min={10}
                         max={100}
-                        value={pct}
-                        onChange={e => {
-                          e.stopPropagation();
-                          handleSliderChange(mood.id, Number(e.target.value));
-                        }}
-                        onClick={e => e.stopPropagation()}
+                        value={selected[mood.id]}
+                        onChange={(e) => { e.stopPropagation(); update(mood.id, parseInt(e.target.value)); }}
+                        onClick={(e) => e.stopPropagation()}
                         style={{
-                          width: '100%',
+                          width: "100%",
                           accentColor: mood.color,
-                          cursor: 'pointer',
+                          cursor: "pointer",
                         }}
                       />
-                    </div>
-                  )}
-
-                  {/* Selected checkmark */}
-                  {isSelected && (
-                    <div
-                      className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
-                      style={{ background: mood.color, color: '#000' }}
-                    >
-                      ✓
+                      <div style={{ fontSize: 12, color: mood.color, marginTop: 4, fontWeight: 600 }}>{selected[mood.id]}%</div>
                     </div>
                   )}
                 </div>
               );
             })}
           </div>
-
-          {/* Mobile: 1 column override */}
-          <style>{`
-            @media (max-width: 480px) {
-              .mood-grid-inner { grid-template-columns: 1fr !important; }
-            }
-          `}</style>
         </div>
       </div>
 
-      {/* Fixed bottom bar */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-8"
-        style={{
-          paddingTop: 20,
-          background: 'linear-gradient(to top, rgba(3,4,14,0.95), rgba(3,4,14,0.8), transparent)',
-        }}
-      >
-        <div
-          className="max-w-lg mx-auto flex items-center justify-between"
-          style={{
-            background: 'rgba(255,255,255,0.05)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 20,
-            padding: '16px 20px',
-          }}
-        >
-          {/* Left: Your Blend */}
-          <div className="flex items-center gap-3">
-            <span className="text-white/50 text-sm font-semibold">Your Blend:</span>
-            <div className="flex items-center gap-1">
-              {Object.keys(selectedMoods).length === 0 ? (
-                <span className="text-white/30 text-sm">Select moods above</span>
-              ) : (
-                Object.entries(selectedMoods).map(([id, pct]) => {
-                  const mood = moods.find(m => m.id === id);
-                  if (!mood) return null;
-                  return (
-                    <div
-                      key={id}
-                      className="flex items-center gap-1 px-2 py-1 rounded-full text-xs"
-                      style={{ background: `${mood.color}20`, border: `1px solid ${mood.color}60` }}
-                    >
-                      <span>{mood.emoji}</span>
-                      <span style={{ color: mood.color }} className="font-semibold">
-                        {pct}%
-                      </span>
-                    </div>
-                  );
-                })
-              )}
-            </div>
+      {/* Bottom bar */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px clamp(16px, 4vw, 48px)", background: "rgba(5,5,16,0.95)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 50 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Your Blend:</span>
+            {selectedList.length === 0 ? (
+              <span style={{ fontSize: 13, color: "rgba(255,255,255,0.25)" }}>Select moods above</span>
+            ) : (
+              selectedList.map(([id, val]) => {
+                const m = MOODS.find(m => m.id === id)!;
+                return (
+                  <span key={id} style={{ fontSize: 20 }}>{m.emoji}</span>
+                );
+              })
+            )}
           </div>
-
-          {/* Right: Save Blend */}
-          <NeonButton
-            variant="success"
-            disabled={Object.keys(selectedMoods).length === 0}
+          <button
             onClick={handleSave}
-            style={{ whiteSpace: 'nowrap' }}
+            disabled={selectedList.length === 0}
+            style={{
+              padding: "12px 28px",
+              background: selectedList.length > 0 ? "#39FF14" : "rgba(255,255,255,0.08)",
+              border: "none",
+              borderRadius: 50,
+              color: selectedList.length > 0 ? "#000" : "rgba(255,255,255,0.3)",
+              fontWeight: 700,
+              fontSize: 14,
+              cursor: selectedList.length > 0 ? "pointer" : "not-allowed",
+              fontFamily: "'Outfit',sans-serif",
+              boxShadow: selectedList.length > 0 ? "0 0 20px rgba(57,255,20,0.4)" : "none",
+            }}
           >
             Save Blend →
-          </NeonButton>
+          </button>
         </div>
       </div>
-    </PageContainer>
+    </div>
   );
 }
