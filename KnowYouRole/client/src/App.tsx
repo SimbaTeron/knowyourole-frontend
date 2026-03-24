@@ -15,6 +15,7 @@ import CheckoutSuccess from "@/pages/checkout-success";
 import CheckoutCancel from "@/pages/checkout-cancel";
 import CrossroadsPage from "@/pages/crossroads";
 import ProfilePage from "@/pages/profile";
+import Callback from "@/pages/callback";
 import About from "@/pages/about";
 import Faq from "@/pages/faq";
 import Privacy from "@/pages/privacy";
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/profile" component={ProfilePage} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />
+      <Route path="/callback" component={Callback} />
       <Route path="/about" component={About} />
       <Route path="/faq" component={Faq} />
       <Route path="/privacy" component={Privacy} />
