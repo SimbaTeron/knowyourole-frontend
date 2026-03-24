@@ -11,7 +11,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       clientId="edp3GnoatCBItXXQiu6jsxjL0Tc3CTIM"
       authorizationParams={{
         audience: "https://knowyourole.com/api",
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin + '/callback'
       }}
     >
       <App />
