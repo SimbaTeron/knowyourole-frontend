@@ -67,7 +67,6 @@ export default function MoodMixer() {
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         @keyframes pulseGlow {
           0%, 100% { box-shadow: 0 0 20px rgba(0,200,255,0.2), 0 0 60px rgba(120,0,255,0.1); }
           50% { box-shadow: 0 0 40px rgba(0,200,255,0.4), 0 0 80px rgba(120,0,255,0.25); }

@@ -5,7 +5,7 @@ import { AppFooter } from "@/components/layout/AppFooter";
 export default function AboutPage() {
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');`}</style>
+      <style>{``}</style>
 
       <AppHeader />
 

@@ -37,7 +37,6 @@ export default function Home() {
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         .hero-gradient {
           background: linear-gradient(90deg, #00C8FF, #7800FF, #FF00E5);
           background-size: 400% 400%;

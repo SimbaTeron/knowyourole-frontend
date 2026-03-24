@@ -61,7 +61,6 @@ export default function ResultsPage() {
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         @keyframes pulseGlow {
           0%, 100% { box-shadow: 0 0 10px rgba(255,0,229,0.2); }
           50% { box-shadow: 0 0 25px rgba(255,0,229,0.45); }
