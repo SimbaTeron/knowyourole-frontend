@@ -19,21 +19,10 @@ export default function QuizGateway() {
 
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
-      <style>{`
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(0,200,255,0.4), 0 0 40px rgba(120,0,255,0.3); }
-          50% { box-shadow: 0 0 35px rgba(0,200,255,0.7), 0 0 70px rgba(120,0,255,0.5); }
-        }
-        @keyframes border-pulse {
-          0%, 100% { border-color: rgba(0,200,255,0.7); }
-          50% { border-color: rgba(0,200,255,1); }
-        }
-      `}</style>
-
       {/* Header */}
       <header style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-        background: "rgba(0,0,0,0.8)", backdropFilter: "blur(20px)",
+        background: "rgba(0,0,0,0.85)", backdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255,255,255,0.08)",
         padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
@@ -47,7 +36,7 @@ export default function QuizGateway() {
         <div style={{ width: "33%", height: "100%", background: "linear-gradient(90deg, #00C8FF, #7800FF)" }} />
       </div>
 
-      {/* Main content */}
+      {/* Page content */}
       <div style={{
         paddingTop: 80,
         padding: "clamp(80px, 12vw, 100px) clamp(16px, 4vw, 48px)",
@@ -55,9 +44,13 @@ export default function QuizGateway() {
         minHeight: "100vh", boxSizing: "border-box",
       }}>
         <div style={{ maxWidth: 520, width: "100%" }}>
-          {/* Header text */}
+          {/* Section label */}
           <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase" as const, color: "#7800FF", textAlign: "center" as const, marginBottom: 10 }}>Before We Start</p>
+
+          {/* Title */}
           <h1 style={{ fontSize: "clamp(2rem, 7vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textAlign: "center" as const, marginBottom: 10 }}>Who are you?</h1>
+
+          {/* Subtitle */}
           <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", textAlign: "center" as const, marginBottom: 36 }}>Choose the option that fits you best.</p>
 
           {/* Age tier cards */}
@@ -72,13 +65,13 @@ export default function QuizGateway() {
                     background: isSelected ? "rgba(0,200,255,0.15)" : "rgba(255,255,255,0.04)",
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
-                    border: isSelected ? "2px solid #00C8FF" : "2px solid rgba(0,200,255,0.25)",
+                    border: isSelected ? "2.5px solid #00C8FF" : "2px solid rgba(0,200,255,0.25)",
                     borderRadius: 20,
                     padding: "18px 16px",
                     cursor: "pointer",
                     textAlign: "left" as const,
                     transition: "all 0.2s ease",
-                    boxShadow: isSelected ? "0 0 24px rgba(0,200,255,0.3), inset 0 0 12px rgba(0,200,255,0.05)" : "none",
+                    boxShadow: isSelected ? "0 0 28px rgba(0,200,255,0.35), inset 0 0 12px rgba(0,200,255,0.05)" : "none",
                     fontFamily: "'Outfit',sans-serif",
                     outline: "none",
                     minHeight: 110,
@@ -88,7 +81,7 @@ export default function QuizGateway() {
                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, color: isSelected ? "#fff" : "rgba(255,255,255,0.85)" }}>{tier.title}</div>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", lineHeight: 1.4 }}>{tier.sub}</div>
                   {isSelected && (
-                    <div style={{ color: "#00C8FF", fontSize: 16, fontWeight: 700, marginTop: 4 }}>✓ Selected</div>
+                    <div style={{ color: "#00C8FF", fontSize: 14, fontWeight: 700, marginTop: 6 }}>✓ Selected</div>
                   )}
                 </button>
               );
@@ -102,56 +95,41 @@ export default function QuizGateway() {
             </p>
           )}
 
-          {/* Continue button — MADE EXTREMELY VISIBLE */}
-          <div style={{
-            width: "100%",
-            borderRadius: 22,
-            padding: "3px",
-            background: selected
-              ? "linear-gradient(90deg, #00C8FF, #7800FF, #FF00E5, #00C8FF)"
-              : "rgba(255,255,255,0.1)",
-            animation: selected ? "border-pulse 2s ease-in-out infinite" : "none",
-            boxShadow: selected
-              ? "0 0 25px rgba(0,200,255,0.4), 0 0 50px rgba(120,0,255,0.25)"
-              : "none",
-          }}>
-            <button
-              onClick={handleContinue}
-              disabled={!selected}
-              style={{
-                width: "100%",
-                padding: "20px",
-                background: selected
-                  ? "linear-gradient(135deg, #0a0a1a 0%, #0d1a2a 50%, #0a0a1a 100%)"
-                  : "rgba(255,255,255,0.04)",
-                border: "none",
-                borderRadius: 20,
-                color: selected ? "#00C8FF" : "rgba(255,255,255,0.2)",
-                fontWeight: 800,
-                fontSize: 18,
-                cursor: selected ? "pointer" : "not-allowed",
-                fontFamily: "'Outfit',sans-serif",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase" as const,
-                textShadow: selected ? "0 0 20px rgba(0,200,255,0.6)" : "none",
-                boxShadow: selected ? "inset 0 0 30px rgba(0,200,255,0.1)" : "none",
-                transition: "all 0.3s ease",
-              }}
-            >
-              {selected ? "START QUIZ  \u2192" : "SELECT YOUR AGE TO CONTINUE"}
-            </button>
-          </div>
+          {/* THE BUTTON — absolutely impossible to miss */}
+          <button
+            onClick={handleContinue}
+            disabled={!selected}
+            style={{
+              width: "100%",
+              padding: "22px 24px",
+              background: selected
+                ? "linear-gradient(135deg, #00C8FF 0%, #7800FF 100%)"
+                : "rgba(120,0,255,0.2)",
+              border: selected ? "none" : "2px solid rgba(120,0,255,0.3)",
+              borderRadius: 18,
+              color: selected ? "#000000" : "rgba(120,0,255,0.5)",
+              fontWeight: 900,
+              fontSize: 20,
+              fontFamily: "'Outfit',sans-serif",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase" as const,
+              cursor: selected ? "pointer" : "not-allowed",
+              boxShadow: selected
+                ? "0 8px 40px rgba(0,200,255,0.5), 0 4px 20px rgba(120,0,255,0.4)"
+                : "none",
+              transition: "all 0.3s ease",
+              // Force visibility on mobile
+              WebkitAppearance: "none",
+              minHeight: 64,
+            }}
+          >
+            {selected ? "START QUIZ \u2192" : "SELECT YOUR AGE TO CONTINUE"}
+          </button>
 
-          {/* Secondary action */}
-          <p style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "rgba(255,255,255,0.35)" }}>
-            Takes less than 5 minutes
+          {/* Trust line */}
+          <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+            Takes less than 5 minutes \u2022 100% private
           </p>
-
-          {/* Trust signal */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 16 }}>
-            <span style={{ fontSize: 14 }}>🔒</span>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>Your answers are private. Always.</p>
-          </div>
         </div>
       </div>
     </div>
