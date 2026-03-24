@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ============================================
    GLASSNEON DESIGN TOKENS
    Match KYR_Design_E_GlassNeon.html exactly

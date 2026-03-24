@@ -1,13 +1,38 @@
-import { useState } from "react";
+import { Component, ReactNode } from "react";
 import { Link } from "wouter";
 import { useAuth0 } from "@auth0/auth0-react";
+
+/** Error boundary to prevent auth page from going blank if Auth0 fails */
+class AuthErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: string }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: "" };
+  }
+  static getDerivedStateFromError(e: Error) {
+    return { hasError: true, error: e.message };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ background: "rgba(255,59,48,0.1)", border: "1px solid rgba(255,59,48,0.3)", borderRadius: 20, padding: "24px 32px", maxWidth: 400, textAlign: "center" }}>
+            <p style={{ color: "#ff3b30", fontSize: 14, marginBottom: 8, fontWeight: 600 }}>Sign-In Currently Unavailable</p>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginBottom: 16 }}>Please try again in a moment.</p>
+            <button onClick={() => (window.location.href = "/")} style={{ padding: "10px 24px", background: "linear-gradient(90deg, #00C8FF, #7800FF)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}>Go Home</button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function SocialButton({ provider, label, icon, bgColor, textColor = "#fff" }: {
   provider: string; label: string; icon: string; bgColor: string; textColor?: string;
 }) {
   const { loginWithRedirect } = useAuth0();
   const handleClick = () => {
-    const params: Record<string, string> = { redirect_uri: window.location.origin + "/callback" };
+    const params: Record<string, string> = {};
     if (provider !== "google-oauth2") params.connection = provider;
     loginWithRedirect({ authorizationParams: params }).catch(console.error);
   };
@@ -33,9 +58,11 @@ function AuthContent() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
     try {
       await loginWithRedirect({
-        authorizationParams: { redirect_uri: window.location.origin + "/callback" },
+        authorizationParams: { login_hint: email },
       });
     } catch (err) { console.error("Login error:", err); }
   };
@@ -156,8 +183,8 @@ function AuthContent() {
 
           {/* Email */}
           <form onSubmit={handleEmailSubmit}>
-            <input type="email" placeholder="Email" style={{ width: "100%", padding: "14px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, color: "#fff", fontSize: 15, marginBottom: 12, outline: "none", fontFamily: "'Outfit',sans-serif", boxSizing: "border-box" }} />
-            <input type="password" placeholder="Password" style={{ width: "100%", padding: "14px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, color: "#fff", fontSize: 15, marginBottom: 20, outline: "none", fontFamily: "'Outfit',sans-serif", boxSizing: "border-box" }} />
+            <input name="email" type="email" placeholder="Email" required style={{ width: "100%", padding: "14px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, color: "#fff", fontSize: 15, marginBottom: 12, outline: "none", fontFamily: "'Outfit',sans-serif", boxSizing: "border-box" }} />
+            <input name="password" type="password" placeholder="Password" style={{ width: "100%", padding: "14px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, color: "#fff", fontSize: 15, marginBottom: 20, outline: "none", fontFamily: "'Outfit',sans-serif", boxSizing: "border-box" }} />
             <button type="submit" style={{ width: "100%", padding: "15px", background: "linear-gradient(90deg, #00C8FF, #7800FF)", border: "none", borderRadius: 14, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "'Outfit',sans-serif", boxShadow: "0 0 30px rgba(0,200,255,0.3)" }}>
               {mode === "signin" ? "Sign In" : "Create Account"}
             </button>
@@ -176,5 +203,9 @@ function AuthContent() {
 }
 
 export default function AuthPage() {
-  return <AuthContent />;
+  return (
+    <AuthErrorBoundary>
+      <AuthContent />
+    </AuthErrorBoundary>
+  );
 }
