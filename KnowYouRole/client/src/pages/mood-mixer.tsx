@@ -52,12 +52,13 @@ function getBlendName(mood1: string, mood2: string): string {
 
 type BlendState = "selecting" | "brewing" | "brewed";
 
-function getOrbPositions(cx: number, cy: number, r: number) {
+function getOrbPixelPositions(w: number, ringTop: number, r: number) {
+  const cx = w / 2; // always centered horizontally
   return MOODS.map((_, i) => {
     const angle = (i / MOODS.length) * 2 * Math.PI - Math.PI / 2;
     return {
-      x: r * Math.cos(angle),
-      y: r * Math.sin(angle),
+      x: cx + r * Math.cos(angle),
+      y: ringTop + r * Math.sin(angle),
     };
   });
 }
@@ -367,7 +368,7 @@ function MoodOrb({
       onClick={onTap}
       style={{
         position: "absolute",
-        left: `calc(50% + ${pos.x}px)`,
+        left: pos.x,
         top: pos.y,
         transform: "translate(-50%, -50%)",
         width: 104,
@@ -677,10 +678,11 @@ export default function MoodMixer() {
 
   // Layout — ring centered horizontally, positioned near the top below the title
   const isMobile = typeof window !== "undefined" ? window.innerWidth < 640 : true;
-  const ringCY = isMobile ? 120 : 130; // y offset from the ring container top
+  const winW = typeof window !== "undefined" ? window.innerWidth : 400;
+  const ringTop = isMobile ? 100 : 110; // distance from top of container to ring center
   const r = isMobile ? 120 : 160;
-  const containerH = isMobile ? 400 : 420;
-  const orbPositions = getOrbPositions(0, ringCY, r);
+  const containerH = isMobile ? 420 : 440;
+  const orbPositions = getOrbPixelPositions(winW, ringTop, r);
 
   return (
     <div style={{
@@ -771,7 +773,8 @@ export default function MoodMixer() {
               transition={{ duration: 0.3 }}
               style={{
                 position: "relative",
-                height: typeof window !== "undefined" && window.innerWidth < 640 ? 420 : 420,
+                width: "100%",
+                height: containerH,
               }}
             >
               {/* Center hint — only when no selection yet */}
