@@ -624,7 +624,7 @@ export default function MoodMixer() {
 
   // Guard
   useEffect(() => {
-    const tier = localStorage.getItem("kyr_quiz_tier");
+    const tier = sessionStorage.getItem("knowrole-tier");
     if (!tier) window.location.href = "/quiz-gateway";
   }, []);
 

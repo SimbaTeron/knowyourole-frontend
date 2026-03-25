@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 const TIERS = [
-  { id: "13-15", emoji: "🎉", title: "Young Teens (13-15)", sub: "Quick, fun quiz made just for you" },
-  { id: "16-17", emoji: "👦", title: "Teens (16-17)", sub: "Full quiz with career insights" },
-  { id: "18-24", emoji: "🧑", title: "Young Adults (18-24)", sub: "Complete personality + career matching" },
+  { id: "7-12", emoji: "🌟", title: "Kids (7-12)", sub: "Fun strengths discovery for kids" },
+  { id: "13-18", emoji: "🎉", title: "Teens (13-18)", sub: "Quick, fun quiz made just for you" },
+  { id: "19-25", emoji: "🧑", title: "Young Adults (19-25)", sub: "Complete personality + career matching" },
   { id: "25+", emoji: "👴", title: "Adults (25+)", sub: "Full experience with premium features" },
 ];
 
@@ -12,7 +12,7 @@ export default function QuizGateway() {
 
   const handleContinue = () => {
     if (selected) {
-      localStorage.setItem("kyr_quiz_tier", selected);
+      sessionStorage.setItem("knowrole-tier", selected);
       window.location.href = "/mood-mixer";
     }
   };
