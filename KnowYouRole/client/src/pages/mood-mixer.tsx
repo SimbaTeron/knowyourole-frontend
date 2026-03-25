@@ -594,8 +594,8 @@ export default function MoodMixer() {
   const [previewMood, setPreviewMood] = useState<string | null>(null);
   const brewingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerW, setContainerW] = useState(400);
-  const [containerH, setContainerH] = useState(420);
+  const [containerW, setContainerW] = useState(432);
+  const [containerH, setContainerH] = useState(320);
 
   // Measure actual container dimensions from DOM
   const measureContainer = useCallback(() => {
@@ -699,13 +699,15 @@ export default function MoodMixer() {
     setPreviewMood(null);
   };
 
-  // Layout — ring centered in the actual container, positioned near the top
-  // Simba's measurements: top orb (Focused) at left=162, top=20 (iPhone Pro Max, containerW≈428)
-  const isMobile = containerW < 480;
-  // cx derived from Simba's perfect center measurement
-  const cx = isMobile ? containerW / 2 - 52 : containerW / 2;
-  const cy = 72; // ring center Y (Simba's top=20 + half orb height 52)
-  const r = 128;
+  // Layout — anchored to Simba's exact measurements:
+  // Top orb (Focused): left=164, top=20 → cx=215, cy=194, r=122
+  const isMobile = containerW < 600;
+  // cx shifts proportionally with container width (Simba's formula: cx = containerW/2 - 32)
+  const cx = containerW / 2 - 32;
+  // cy is fixed — ring stays at same vertical position
+  const cy = 194;
+  // radius scales up on desktop (proportional to viewport)
+  const r = isMobile ? 122 : Math.min(220, Math.round(122 * containerW / 432));
   const orbPositions = getOrbPixelPositions(containerW, cy, r);
 
   return (
@@ -799,7 +801,8 @@ export default function MoodMixer() {
               style={{
                 position: "relative",
                 width: "100%",
-                height: isMobile ? 300 : containerH,
+                // Tall enough to contain the ring with padding
+                height: Math.max(320, cy + r + 60),
               }}
             >
               {/* Center hint — only when no selection yet */}
