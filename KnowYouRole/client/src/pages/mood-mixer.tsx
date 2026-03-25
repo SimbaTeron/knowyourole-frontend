@@ -698,8 +698,7 @@ export default function MoodMixer() {
     setPreviewMood(null);
   };
 
-  // Layout — anchored to Simba's exact measurements:
-  // cx = containerW/2 - 30 (shifted left ~30px from original center)
+  // Layout — ring centered (cx = containerW/2 - 50, empirically tuned)
   // cy and r are fixed regardless of viewport
   const cx = containerW / 2 - 50;
   const cy = 246;
