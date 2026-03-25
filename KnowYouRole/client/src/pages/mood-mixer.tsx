@@ -52,8 +52,7 @@ function getBlendName(mood1: string, mood2: string): string {
 
 type BlendState = "selecting" | "brewing" | "brewed";
 
-function getOrbPixelPositions(w: number, ringTop: number, r: number) {
-  const cx = w / 2; // always centered horizontally
+function getOrbPixelPositions(cx: number, ringTop: number, r: number) {
   return MOODS.map((_, i) => {
     const angle = (i / MOODS.length) * 2 * Math.PI - Math.PI / 2;
     return {
@@ -705,7 +704,7 @@ export default function MoodMixer() {
   const cx = containerW / 2 - 170;
   const cy = 246;
   const r = 174;
-  const orbPositions = getOrbPixelPositions(containerW, cy, r);
+  const orbPositions = getOrbPixelPositions(cx, cy, r);
 
   return (
     <div style={{
