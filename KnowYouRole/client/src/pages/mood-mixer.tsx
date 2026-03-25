@@ -5,14 +5,14 @@ import { AppFooter } from "@/components/layout/AppFooter";
 import { ArrowRight, Sparkles, RotateCcw } from "lucide-react";
 
 const MOODS = [
-  { id: "focused", emoji: "🎯", label: "Focused", color: "#00C8FF", glow: "rgba(0,200,255,0.6)", desc: "Sharp and analytical" },
-  { id: "creative", emoji: "🎨", label: "Creative", color: "#A78BFA", glow: "rgba(167,139,250,0.6)", desc: "Imaginative and free" },
-  { id: "calm", emoji: "🌊", label: "Calm", color: "#60A5FA", glow: "rgba(96,165,250,0.6)", desc: "Peaceful and centered" },
-  { id: "energetic", emoji: "⚡", label: "Energetic", color: "#FBBF24", glow: "rgba(251,191,36,0.6)", desc: "Full of vibrant energy" },
-  { id: "curious", emoji: "🔮", label: "Curious", color: "#F472B6", glow: "rgba(244,114,182,0.6)", desc: "Always exploring" },
-  { id: "determined", emoji: "💪", label: "Determined", color: "#F87171", glow: "rgba(248,113,113,0.6)", desc: "Driven and relentless" },
-  { id: "social", emoji: "🤝", label: "Social", color: "#34D399", glow: "rgba(52,211,153,0.6)", desc: "Connected and warm" },
-  { id: "reflective", emoji: "🌙", label: "Reflective", color: "#818CF8", glow: "rgba(129,140,248,0.6)", desc: "Thoughtful and inward" },
+  { id: "focused", emoji: "🎯", label: "Focused", color: "#00C8FF", glow: "rgba(0,200,255,0.7)", desc: "Sharp and analytical" },
+  { id: "creative", emoji: "🎨", label: "Creative", color: "#A78BFA", glow: "rgba(167,139,250,0.7)", desc: "Imaginative and free" },
+  { id: "calm", emoji: "🌊", label: "Calm", color: "#60A5FA", glow: "rgba(96,165,250,0.7)", desc: "Peaceful and centered" },
+  { id: "energetic", emoji: "⚡", label: "Energetic", color: "#FBBF24", glow: "rgba(251,191,36,0.7)", desc: "Full of vibrant energy" },
+  { id: "curious", emoji: "🔮", label: "Curious", color: "#F472B6", glow: "rgba(244,114,182,0.7)", desc: "Always exploring" },
+  { id: "determined", emoji: "💪", label: "Determined", color: "#F87171", glow: "rgba(248,113,113,0.7)", desc: "Driven and relentless" },
+  { id: "social", emoji: "🤝", label: "Social", color: "#34D399", glow: "rgba(52,211,153,0.7)", desc: "Connected and warm" },
+  { id: "reflective", emoji: "🌙", label: "Reflective", color: "#818CF8", glow: "rgba(129,140,248,0.7)", desc: "Thoughtful and inward" },
 ];
 
 function getBlendName(mood1: string, mood2: string): string {
@@ -52,12 +52,14 @@ function getBlendName(mood1: string, mood2: string): string {
 
 type BlendState = "selecting" | "brewing" | "brewed";
 
-function getOrbPosition(index: number, total: number, centerX: number, centerY: number, radius: number) {
-  const angle = (index / total) * 2 * Math.PI - Math.PI / 2;
-  return {
-    x: centerX + radius * Math.cos(angle),
-    y: centerY + radius * Math.sin(angle),
-  };
+function getOrbPositions(cx: number, cy: number, r: number) {
+  return MOODS.map((_, i) => {
+    const angle = (i / MOODS.length) * 2 * Math.PI - Math.PI / 2;
+    return {
+      x: cx + r * Math.cos(angle),
+      y: cy + r * Math.sin(angle),
+    };
+  });
 }
 
 // ─── BACKGROUND ──────────────────────────────────────────────────────────────
@@ -65,57 +67,57 @@ function SwirlBg() {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
       <div style={{
-        position: "absolute", top: "5%", left: "10%",
-        width: 400, height: 400, borderRadius: "50%",
+        position: "absolute", top: "5%", left: "8%",
+        width: 380, height: 380, borderRadius: "50%",
         background: "radial-gradient(circle, rgba(0,200,255,0.1) 0%, transparent 70%)",
-        animation: "blob1 14s ease-in-out infinite",
+        animation: "b1 14s ease-in-out infinite",
       }} />
       <div style={{
-        position: "absolute", bottom: "10%", right: "5%",
-        width: 520, height: 520, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(120,0,255,0.13) 0%, transparent 70%)",
-        animation: "blob2 18s ease-in-out infinite reverse",
+        position: "absolute", bottom: "15%", right: "5%",
+        width: 500, height: 500, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(120,0,255,0.12) 0%, transparent 70%)",
+        animation: "b2 18s ease-in-out infinite reverse",
       }} />
       <div style={{
-        position: "absolute", top: "40%", left: "55%",
-        width: 300, height: 300, borderRadius: "50%",
+        position: "absolute", top: "35%", left: "55%",
+        width: 280, height: 280, borderRadius: "50%",
         background: "radial-gradient(circle, rgba(255,0,229,0.08) 0%, transparent 70%)",
-        animation: "blob3 12s ease-in-out infinite 3s",
+        animation: "b3 12s ease-in-out infinite 3s",
       }} />
       <style>{`
-        @keyframes blob1 { 0%,100%{transform:translate(0,0) scale(1)} 40%{transform:translate(50px,-35px) scale(1.08)} 70%{transform:translate(-35px,25px) scale(0.97)} }
-        @keyframes blob2 { 0%,100%{transform:translate(0,0) scale(1)} 40%{transform:translate(-55px,35px) scale(1.06)} 70%{transform:translate(40px,-25px) scale(1.1)} }
-        @keyframes blob3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-45px,-45px) scale(1.12)} }
+        @keyframes b1 { 0%,100%{transform:translate(0,0) scale(1)} 40%{transform:translate(48px,-34px) scale(1.07)} 70%{transform:translate(-34px,24px) scale(0.97)} }
+        @keyframes b2 { 0%,100%{transform:translate(0,0) scale(1)} 40%{transform:translate(-52px,34px) scale(1.06)} 70%{transform:translate(38px,-24px) scale(1.1)} }
+        @keyframes b3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-44px,-44px) scale(1.13)} }
       `}</style>
     </div>
   );
 }
 
-// ─── CENTER HINT ─────────────────────────────────────────────────────────────
+// ─── CENTER DASHED HINT ──────────────────────────────────────────────────────
 function CenterHint({ hasOne }: { hasOne: boolean }) {
   return (
     <motion.div
       key={hasOne ? "one" : "zero"}
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: [0.35, 0.65, 0.35], scale: 1 }}
-      exit={{ opacity: 0, scale: 0.8 }}
+      initial={{ opacity: 0, scale: 0.7 }}
+      animate={{ opacity: [0.3, 0.6, 0.3], scale: 1 }}
+      exit={{ opacity: 0, scale: 0.7 }}
       transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       style={{
         position: "absolute",
         left: "50%",
         top: "50%",
         transform: "translate(-50%, -50%)",
-        width: 100,
-        height: 100,
+        width: 110,
+        height: 110,
         borderRadius: "50%",
-        border: "2px dashed rgba(255,255,255,0.13)",
+        border: "2px dashed rgba(255,255,255,0.12)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: 11,
-        color: "rgba(255,255,255,0.28)",
+        color: "rgba(255,255,255,0.26)",
         textAlign: "center",
-        lineHeight: 1.3,
+        lineHeight: 1.35,
         fontFamily: "'Outfit',sans-serif",
         zIndex: 1,
         pointerEvents: "none",
@@ -126,34 +128,129 @@ function CenterHint({ hasOne }: { hasOne: boolean }) {
   );
 }
 
-// ─── SELECTED PILL ───────────────────────────────────────────────────────────
-function SelectedPill({ mood, offset }: { mood: typeof MOODS[0]; offset: number }) {
+// ─── CENTERED PREVIEW MODAL ─────────────────────────────────────────────────
+function PreviewModal({ mood, onConfirm, onDismiss }: {
+  mood: typeof MOODS[0];
+  onConfirm: () => void;
+  onDismiss: () => void;
+}) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0, x: offset }}
-      animate={{ opacity: 1, scale: 1, x: 0 }}
-      exit={{ opacity: 0, scale: 0, x: offset }}
-      transition={{ type: "spring", stiffness: 300, damping: 22 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={onDismiss}
       style={{
-        position: "absolute",
-        left: "50%",
-        top: offset === 0 ? "43%" : "57%",
-        transform: "translate(-50%, -50%)",
-        background: `${mood.color}22`,
-        border: `2px solid ${mood.color}90`,
-        borderRadius: 50,
-        padding: "10px 20px",
+        position: "fixed",
+        inset: 0,
+        zIndex: 200,
         display: "flex",
         alignItems: "center",
-        gap: 8,
-        fontFamily: "'Outfit',sans-serif",
-        boxShadow: `0 0 24px ${mood.color}45`,
-        zIndex: 15,
-        whiteSpace: "nowrap",
+        justifyContent: "center",
+        background: "rgba(0,0,0,0.55)",
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
+        padding: 24,
       }}
     >
-      <span style={{ fontSize: "1.4rem", filter: `drop-shadow(0 0 6px ${mood.color})` }}>{mood.emoji}</span>
-      <span style={{ fontSize: 13, fontWeight: 700, color: mood.color }}>{mood.label}</span>
+      <motion.div
+        initial={{ scale: 0.82, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.85, opacity: 0, y: 10 }}
+        transition={{ type: "spring", stiffness: 320, damping: 26 }}
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: "rgba(8,5,24,0.97)",
+          backdropFilter: "blur(40px)",
+          WebkitBackdropFilter: "blur(40px)",
+          border: `1.5px solid ${mood.color}55`,
+          borderRadius: 28,
+          padding: "36px 32px",
+          textAlign: "center",
+          width: "100%",
+          maxWidth: 300,
+          boxShadow: `0 0 60px ${mood.glow}, 0 30px 80px rgba(0,0,0,0.7)`,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Emoji */}
+        <div style={{
+          fontSize: "4rem",
+          marginBottom: 16,
+          filter: `drop-shadow(0 0 20px ${mood.color})`,
+        }}>
+          {mood.emoji}
+        </div>
+
+        {/* Name */}
+        <div style={{
+          fontSize: "1.7rem",
+          fontWeight: 900,
+          color: mood.color,
+          marginBottom: 8,
+          fontFamily: "'Outfit',sans-serif",
+          letterSpacing: "-0.02em",
+        }}>
+          {mood.label}
+        </div>
+
+        {/* Description */}
+        <div style={{
+          fontSize: "0.88rem",
+          color: "rgba(255,255,255,0.5)",
+          fontFamily: "'Outfit',sans-serif",
+          marginBottom: 28,
+          lineHeight: 1.55,
+        }}>
+          {mood.desc}
+        </div>
+
+        {/* Select button */}
+        <motion.button
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={onConfirm}
+          style={{
+            width: "100%",
+            padding: "14px 24px",
+            background: `${mood.color}22`,
+            border: `2px solid ${mood.color}80`,
+            borderRadius: 50,
+            color: mood.color,
+            fontWeight: 800,
+            fontSize: 14,
+            cursor: "pointer",
+            fontFamily: "'Outfit',sans-serif",
+            boxShadow: `0 0 24px ${mood.color}30`,
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
+          }}
+        >
+          Tap to Select
+        </motion.button>
+
+        {/* Dismiss */}
+        <button
+          onClick={onDismiss}
+          style={{
+            marginTop: 14,
+            background: "none",
+            border: "none",
+            color: "rgba(255,255,255,0.3)",
+            fontSize: 12,
+            cursor: "pointer",
+            fontFamily: "'Outfit',sans-serif",
+            padding: "4px 8px",
+            transition: "color 0.2s",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
+          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
+        >
+          tap elsewhere to cancel
+        </button>
+      </motion.div>
     </motion.div>
   );
 }
@@ -170,21 +267,21 @@ function CenterSwirl({ mood1, mood2 }: { mood1: typeof MOODS[0]; mood2: typeof M
         position: "relative",
         width: 180,
         height: 180,
+        margin: "0 auto",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        margin: "0 auto",
       }}
     >
-      {/* Outer spinning ring */}
+      {/* Outer ring */}
       <motion.div
         animate={{ rotate: 360 }}
-        transition={{ duration: 1.8, ease: [0.33, 1, 0.68, 1], repeat: 0 }}
+        transition={{ duration: 1.8, ease: [0.33, 1, 0.68, 1] }}
         style={{
           position: "absolute",
           inset: 0,
           borderRadius: "50%",
-          border: `2px solid rgba(255,255,255,0.12)`,
+          border: `2px solid rgba(255,255,255,0.1)`,
         }}
       >
         {[...Array(8)].map((_, i) => {
@@ -212,39 +309,34 @@ function CenterSwirl({ mood1, mood2 }: { mood1: typeof MOODS[0]; mood2: typeof M
         })}
       </motion.div>
 
-      {/* Counter-rotating dashed ring */}
+      {/* Counter ring */}
       <motion.div
         animate={{ rotate: -360 }}
-        transition={{ duration: 1.2, ease: "linear", repeat: 0 }}
+        transition={{ duration: 1.2, ease: "linear" }}
         style={{
           position: "absolute",
-          inset: 24,
+          inset: 22,
           borderRadius: "50%",
-          border: `1.5px dashed rgba(255,255,255,0.18)`,
+          border: `1.5px dashed rgba(255,255,255,0.16)`,
         }}
       />
 
-      {/* Inner glow ring */}
+      {/* Center glow */}
       <div style={{
         position: "absolute",
-        inset: 48,
+        inset: 46,
         borderRadius: "50%",
-        background: `radial-gradient(circle, ${mood1.color}35 0%, ${mood2.color}25 50%, transparent 100%)`,
-        animation: "cpulse 1s ease-in-out infinite",
+        background: `radial-gradient(circle, ${mood1.color}30 0%, ${mood2.color}22 50%, transparent 100%)`,
+        animation: "cp 1.1s ease-in-out infinite",
       }} />
 
       {/* Emojis */}
-      <div style={{
-        position: "relative", zIndex: 2,
-        display: "flex",
-        gap: 6,
-        filter: `drop-shadow(0 0 14px ${mood1.color}80)`,
-      }}>
-        <motion.span animate={{ rotate: [0, -20, 0] }} transition={{ duration: 0.5, delay: 0.3 }} style={{ fontSize: "2.2rem" }}>{mood1.emoji}</motion.span>
-        <motion.span animate={{ rotate: [0, 20, 0] }} transition={{ duration: 0.5, delay: 0.3 }} style={{ fontSize: "2.2rem" }}>{mood2.emoji}</motion.span>
+      <div style={{ position: "relative", zIndex: 2, display: "flex", gap: 4, filter: `drop-shadow(0 0 14px ${mood1.color}80)` }}>
+        <motion.span animate={{ rotate: [0, -22, 0] }} transition={{ duration: 0.5, delay: 0.3 }} style={{ fontSize: "2.2rem" }}>{mood1.emoji}</motion.span>
+        <motion.span animate={{ rotate: [0, 22, 0] }} transition={{ duration: 0.5, delay: 0.3 }} style={{ fontSize: "2.2rem" }}>{mood2.emoji}</motion.span>
       </div>
 
-      <style>{`@keyframes cpulse { 0%,100%{transform:scale(1);opacity:0.8} 50%{transform:scale(1.2);opacity:1} }`}</style>
+      <style>{`@keyframes cp { 0%,100%{transform:scale(1);opacity:0.75} 50%{transform:scale(1.18);opacity:1} }`}</style>
     </motion.div>
   );
 }
@@ -252,47 +344,41 @@ function CenterSwirl({ mood1, mood2 }: { mood1: typeof MOODS[0]; mood2: typeof M
 // ─── MOOD ORB ────────────────────────────────────────────────────────────────
 function MoodOrb({
   mood,
-  index,
-  total,
+  pos,
   isSelected,
   isOtherSelected,
   onTap,
-  onPreview,
-  orbRef,
 }: {
   mood: typeof MOODS[0];
-  index: number;
-  total: number;
+  pos: { x: number; y: number };
   isSelected: boolean;
   isOtherSelected: boolean;
   onTap: () => void;
-  onPreview: () => void;
-  orbRef: React.RefCallback<HTMLButtonElement>;
 }) {
   return (
     <motion.button
-      ref={orbRef}
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.1 + index * 0.07, type: "spring", stiffness: 260, damping: 20 }}
-      whileHover={!isOtherSelected ? { scale: 1.18 } : {}}
+      transition={{ delay: 0.1 + MOODS.indexOf(mood) * 0.07, type: "spring", stiffness: 260, damping: 20 }}
+      whileHover={!isOtherSelected ? { scale: 1.16 } : {}}
       whileTap={!isOtherSelected ? { scale: 0.9 } : {}}
       onClick={onTap}
-      onPointerDown={onPreview}
       style={{
         position: "absolute",
+        left: pos.x,
+        top: pos.y,
         transform: "translate(-50%, -50%)",
-        width: 100,
-        height: 100,
+        width: 104,
+        height: 104,
         borderRadius: "50%",
         background: isSelected
-          ? `radial-gradient(circle at 35% 35%, ${mood.color}50, ${mood.color}25)`
+          ? `radial-gradient(circle at 35% 35%, ${mood.color}55, ${mood.color}28)`
           : "rgba(255,255,255,0.07)",
         border: isSelected
           ? `2.5px solid ${mood.color}`
-          : "2px solid rgba(255,255,255,0.13)",
+          : "2px solid rgba(255,255,255,0.12)",
         boxShadow: isSelected
-          ? `0 0 35px ${mood.glow}, 0 0 70px ${mood.glow}40`
+          ? `0 0 38px ${mood.glow}, 0 0 72px ${mood.color}30`
           : "0 6px 24px rgba(0,0,0,0.5)",
         cursor: isOtherSelected ? "not-allowed" : "pointer",
         opacity: isOtherSelected ? 0.28 : 1,
@@ -300,7 +386,7 @@ function MoodOrb({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 3,
+        gap: 4,
         fontFamily: "'Outfit',sans-serif",
         zIndex: isSelected ? 10 : 5,
         backdropFilter: "blur(14px)",
@@ -310,16 +396,16 @@ function MoodOrb({
       }}
     >
       <span style={{
-        fontSize: "2.4rem",
-        filter: isSelected ? `drop-shadow(0 0 10px ${mood.color})` : "none",
+        fontSize: "2.5rem",
+        filter: isSelected ? `drop-shadow(0 0 11px ${mood.color})` : "none",
         transition: "filter 0.3s",
         lineHeight: 1,
       }}>{mood.emoji}</span>
       <span style={{
-        fontSize: "0.7rem",
+        fontSize: "0.68rem",
         fontWeight: 700,
-        color: isSelected ? mood.color : "rgba(255,255,255,0.55)",
-        letterSpacing: "0.04em",
+        color: isSelected ? mood.color : "rgba(255,255,255,0.52)",
+        letterSpacing: "0.05em",
         transition: "color 0.3s",
       }}>{mood.label}</span>
     </motion.button>
@@ -341,17 +427,17 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 250, damping: 22, delay: 0.08 }}
       style={{
-        background: "rgba(8,5,24,0.9)",
+        background: "rgba(8,5,24,0.92)",
         backdropFilter: "blur(40px)",
         WebkitBackdropFilter: "blur(40px)",
-        border: "1.5px solid rgba(255,255,255,0.14)",
+        border: "1.5px solid rgba(255,255,255,0.13)",
         borderRadius: 32,
         padding: "clamp(28px, 6vw, 48px)",
         textAlign: "center",
         width: "100%",
         maxWidth: 460,
         margin: "0 auto",
-        boxShadow: `0 0 80px ${mood1.color}28, 0 0 120px ${mood2.color}18, 0 30px 80px rgba(0,0,0,0.65)`,
+        boxShadow: `0 0 80px ${mood1.color}25, 0 0 120px ${mood2.color}16, 0 30px 80px rgba(0,0,0,0.65)`,
         position: "relative",
         overflow: "hidden",
       }}
@@ -360,7 +446,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
       <div style={{
         position: "absolute", inset: -1,
         borderRadius: 33,
-        background: `linear-gradient(135deg, ${mood1.color}35, transparent 40%, transparent 60%, ${mood2.color}35)`,
+        background: `linear-gradient(135deg, ${mood1.color}32, transparent 40%, transparent 60%, ${mood2.color}32)`,
         zIndex: -1,
       }} />
 
@@ -383,7 +469,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
           display: "flex",
           justifyContent: "center",
           gap: 10,
-          filter: `drop-shadow(0 0 18px ${mood1.color}70)`,
+          filter: `drop-shadow(0 0 18px ${mood1.color}68)`,
         }}
       >
         <motion.span animate={{ y: [0, -10, 0] }} transition={{ duration: 1.6, repeat: Infinity, delay: 0 }}>{mood1.emoji}</motion.span>
@@ -409,16 +495,16 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
       {/* Mood pills */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 22 }}>
         <span style={{
-          background: `${mood1.color}18`,
-          border: `1px solid ${mood1.color}45`,
+          background: `${mood1.color}16`,
+          border: `1px solid ${mood1.color}42`,
           borderRadius: 50, padding: "5px 16px",
           fontSize: 12, fontWeight: 700, color: mood1.color,
           fontFamily: "'Outfit',sans-serif",
         }}>{mood1.label}</span>
-        <span style={{ color: "rgba(255,255,255,0.28)", fontSize: 14 }}>✦</span>
+        <span style={{ color: "rgba(255,255,255,0.26)", fontSize: 14 }}>✦</span>
         <span style={{
-          background: `${mood2.color}18`,
-          border: `1px solid ${mood2.color}45`,
+          background: `${mood2.color}16`,
+          border: `1px solid ${mood2.color}42`,
           borderRadius: 50, padding: "5px 16px",
           fontSize: 12, fontWeight: 700, color: mood2.color,
           fontFamily: "'Outfit',sans-serif",
@@ -428,7 +514,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
       {/* Description */}
       <p style={{
         fontSize: 14,
-        color: "rgba(255,255,255,0.48)",
+        color: "rgba(255,255,255,0.47)",
         fontFamily: "'Outfit',sans-serif",
         maxWidth: 330,
         margin: "0 auto 26px",
@@ -458,7 +544,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
             fontSize: 16,
             cursor: "pointer",
             fontFamily: "'Outfit',sans-serif",
-            boxShadow: `0 0 45px ${mood1.color}38`,
+            boxShadow: `0 0 45px ${mood1.color}35`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -475,7 +561,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
           style={{
             background: "none",
             border: "none",
-            color: "rgba(255,255,255,0.32)",
+            color: "rgba(255,255,255,0.3)",
             fontWeight: 600,
             fontSize: 13,
             cursor: "pointer",
@@ -487,7 +573,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
             transition: "color 0.2s",
           }}
           onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.32)")}
+          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
         >
           <RotateCcw size={14} />
           Try different moods
@@ -503,27 +589,24 @@ export default function MoodMixer() {
   const [selector2, setSelector2] = useState<string | null>(null);
   const [state, setState] = useState<BlendState>("selecting");
   const [previewMood, setPreviewMood] = useState<string | null>(null);
-  const [previewPos, setPreviewPos] = useState({ x: 0, y: 0 });
   const brewingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const orbRefs = useRef<any[]>([]);
 
   const mood1 = MOODS.find(m => m.id === selector1);
   const mood2 = MOODS.find(m => m.id === selector2);
   const bothSelected = selector1 !== null && selector2 !== null;
   const hasOne = selector1 !== null && selector2 === null;
+  const previewMoodData = MOODS.find(m => m.id === previewMood);
+
+  // Guard
+  useEffect(() => {
+    const tier = localStorage.getItem("kyr_quiz_tier");
+    if (!tier) window.location.href = "/quiz-gateway";
+  }, []);
 
   useEffect(() => {
     return () => {
       if (brewingTimerRef.current) clearTimeout(brewingTimerRef.current);
-      if (previewTimerRef.current) clearTimeout(previewTimerRef.current);
     };
-  }, []);
-
-  useEffect(() => {
-    const tier = localStorage.getItem("kyr_quiz_tier");
-    if (!tier) window.location.href = "/quiz-gateway";
   }, []);
 
   // Brewing sequence
@@ -539,50 +622,30 @@ export default function MoodMixer() {
       setState("selecting");
       setPreviewMood(null);
     }
-  }, [bothSelected]);
+  }, [bothSelected, state]);
 
   const showOrbs = state === "selecting";
   const showBrewing = state === "brewing" && mood1 && mood2;
   const showResult = state === "brewed" && mood1 && mood2;
 
-  // ─── TAP HANDLERS ──────────────────────────────────────────────────────────
+  // ─── HANDLERS ───────────────────────────────────────────────────────────────
   const handleMoodTap = (moodId: string) => {
     if (state === "brewing" || state === "brewed") return;
-    if (previewTimerRef.current) clearTimeout(previewTimerRef.current);
-    setPreviewMood(null);
-
-    if (selector1 === null) {
-      setSelector1(moodId);
-    } else if (selector2 === null) {
-      if (selector1 !== moodId) {
-        setSelector2(moodId);
-      }
-    } else {
-      // Both already selected — reset and select new
-      setSelector1(moodId);
-      setSelector2(null);
-    }
+    if (previewMood) return; // preview modal is open — wait for confirm/dismiss
+    setPreviewMood(moodId);
   };
 
-  const handlePreview = (moodId: string, index: number) => {
-    if (state === "brewing" || state === "brewed") return;
-    if (selector1 === moodId || selector2 === moodId) return;
-    if (previewTimerRef.current) clearTimeout(previewTimerRef.current);
-
-    const orbEl = orbRefs.current[index];
-    if (orbEl) {
-      const rect = orbEl.getBoundingClientRect();
-      setPreviewPos({ x: rect.left + rect.width / 2, y: rect.top });
+  const handleConfirm = () => {
+    if (!previewMood) return;
+    if (selector1 === null) {
+      setSelector1(previewMood);
+    } else if (selector2 === null) {
+      setSelector2(previewMood);
     }
-
-    setPreviewMood(moodId);
-    previewTimerRef.current = setTimeout(() => {
-      setPreviewMood(null);
-    }, 1600);
+    setPreviewMood(null);
   };
 
   const handleDismissPreview = () => {
-    if (previewTimerRef.current) clearTimeout(previewTimerRef.current);
     setPreviewMood(null);
   };
 
@@ -610,18 +673,13 @@ export default function MoodMixer() {
     setPreviewMood(null);
   };
 
-  // Layout math
-  const getLayout = () => {
-    if (typeof window === "undefined") return { cx: 400, cy: 300, r: 160 };
-    const isMobile = window.innerWidth < 640;
-    const cx = window.innerWidth / 2;
-    const cy = isMobile ? 300 : 310;
-    const r = isMobile ? 130 : 170;
-    return { cx, cy, r };
-  };
-  const { cx, cy, r } = getLayout();
-
-  const previewMoodData = MOODS.find(m => m.id === previewMood);
+  // Layout — centered, positioned high
+  const cx = typeof window !== "undefined" ? window.innerWidth / 2 : 200;
+  const isMobile = typeof window !== "undefined" ? window.innerWidth < 640 : true;
+  // Circle positioned right below the title (around 55% down from top of content area)
+  const cy = isMobile ? 250 : 260;
+  const r = isMobile ? 118 : 158;
+  const orbPositions = getOrbPositions(cx, cy, r);
 
   return (
     <div style={{
@@ -664,20 +722,18 @@ export default function MoodMixer() {
       {/* Progress bar */}
       <div style={{ position: "fixed", top: 57, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.06)", zIndex: 50 }}>
         <motion.div
-          animate={{
-            width: showResult ? "100%" : showBrewing ? "75%" : "50%",
-          }}
+          animate={{ width: showResult ? "100%" : showBrewing ? "75%" : "50%" }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
           style={{ height: "100%", background: "linear-gradient(90deg, #7800FF, #FF00E5)" }}
         />
       </div>
 
-      {/* Page title */}
-      <div style={{ padding: "clamp(80px, 12vw, 110px) 24px 0", textAlign: "center", position: "relative", zIndex: 1 }}>
+      {/* Title */}
+      <div style={{ padding: "clamp(74px, 11vw, 100px) 24px 0", textAlign: "center", position: "relative", zIndex: 1 }}>
         <p style={{
           fontSize: 11, fontWeight: 700, letterSpacing: "0.25em",
           textTransform: "uppercase", color: "#FF00E5",
-          marginBottom: 8,
+          marginBottom: 6,
         }}>
           Set Your Vibe
         </p>
@@ -685,16 +741,16 @@ export default function MoodMixer() {
           fontSize: "clamp(1.9rem, 7vw, 3rem)",
           fontWeight: 900,
           letterSpacing: "-0.03em",
-          marginBottom: 10,
+          marginBottom: 8,
         }}>
           Mood Mixer
         </h1>
         <p style={{
-          fontSize: 15,
-          color: "rgba(255,255,255,0.42)",
-          maxWidth: 380,
+          fontSize: 14,
+          color: "rgba(255,255,255,0.4)",
+          maxWidth: 360,
           margin: "0 auto",
-          lineHeight: 1.6,
+          lineHeight: 1.55,
         }}>
           {showResult
             ? "Your blend is ready. Time to discover who you are."
@@ -714,99 +770,26 @@ export default function MoodMixer() {
               transition={{ duration: 0.3 }}
               style={{
                 position: "relative",
-                height: typeof window !== "undefined" && window.innerWidth < 640 ? 460 : 480,
+                height: typeof window !== "undefined" && window.innerWidth < 640 ? 420 : 420,
               }}
             >
-              {/* Center hint */}
+              {/* Center hint — only when no selection yet */}
               <AnimatePresence>
-                {!bothSelected && <CenterHint hasOne={hasOne} />}
-              </AnimatePresence>
-
-              {/* Selected mood pills */}
-              <AnimatePresence>
-                {mood1 && <SelectedPill mood={mood1} offset={0} />}
-                {mood2 && <SelectedPill mood={mood2} offset={1} />}
-              </AnimatePresence>
-
-              {/* Preview popup — anchored near orb */}
-              <AnimatePresence>
-                {previewMood && previewMoodData && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.88 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -6, scale: 0.9 }}
-                    transition={{ duration: 0.2, ease: "backOut" }}
-                    style={{
-                      position: "fixed",
-                      left: Math.min(Math.max(previewPos.x, 90), (typeof window !== "undefined" ? window.innerWidth : 800) - 90),
-                      top: Math.max(previewPos.y - 10, 70),
-                      transform: "translate(-50%, -100%)",
-                      background: "rgba(8,5,22,0.96)",
-                      backdropFilter: "blur(28px)",
-                      WebkitBackdropFilter: "blur(28px)",
-                      border: `1.5px solid ${previewMoodData.color}50`,
-                      borderRadius: 20,
-                      padding: "14px 18px",
-                      minWidth: 190,
-                      zIndex: 200,
-                      boxShadow: `0 0 40px ${previewMoodData.glow}, 0 16px 50px rgba(0,0,0,0.7)`,
-                      textAlign: "center",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    {/* Arrow */}
-                    <div style={{
-                      position: "absolute",
-                      bottom: -7,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      width: 14,
-                      height: 14,
-                      background: "rgba(8,5,22,0.96)",
-                      borderRight: `1.5px solid ${previewMoodData.color}50`,
-                      borderBottom: `1.5px solid ${previewMoodData.color}50`,
-                      borderRadius: "0 0 4px 0",
-                      rotate: "45deg",
-                    }} />
-                    <div style={{ fontSize: "2.2rem", marginBottom: 8, filter: `drop-shadow(0 0 10px ${previewMoodData.color})` }}>
-                      {previewMoodData.emoji}
-                    </div>
-                    <div style={{ fontSize: "1rem", fontWeight: 800, color: previewMoodData.color, marginBottom: 4, fontFamily: "'Outfit',sans-serif" }}>
-                      {previewMoodData.label}
-                    </div>
-                    <div style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)", fontFamily: "'Outfit',sans-serif" }}>
-                      {previewMoodData.desc}
-                    </div>
-                  </motion.div>
-                )}
+                {!hasOne && !bothSelected && <CenterHint hasOne={false} />}
+                {hasOne && <CenterHint hasOne={true} />}
               </AnimatePresence>
 
               {/* Mood orbs */}
-              {MOODS.map((mood, i) => {
-                const pos = getOrbPosition(i, MOODS.length, cx, cy, r);
-                return (
-                  <div
-                    key={mood.id}
-                    style={{
-                      position: "absolute",
-                      left: pos.x,
-                      top: pos.y,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
-                    <MoodOrb
-                      mood={mood}
-                      index={i}
-                      total={MOODS.length}
-                      isSelected={selector1 === mood.id || selector2 === mood.id}
-                      isOtherSelected={selector1 !== null && selector1 !== mood.id && selector2 === null}
-                      onTap={() => handleMoodTap(mood.id)}
-                      onPreview={() => handlePreview(mood.id, i)}
-                      orbRef={el => { orbRefs.current[i] = el; }}
-                    />
-                  </div>
-                );
-              })}
+              {MOODS.map((mood, i) => (
+                <MoodOrb
+                  key={mood.id}
+                  mood={mood}
+                  pos={orbPositions[i]}
+                  isSelected={selector1 === mood.id || selector2 === mood.id}
+                  isOtherSelected={selector1 !== null && selector1 !== mood.id && selector2 === null}
+                  onTap={() => handleMoodTap(mood.id)}
+                />
+              ))}
             </motion.div>
           )}
         </AnimatePresence>
@@ -823,21 +806,21 @@ export default function MoodMixer() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 20,
-                paddingTop: 10,
+                gap: 18,
+                paddingTop: 4,
               }}
             >
-              <CenterSwirl mood1={mood1} mood2={mood2} />
+              <CenterSwirl mood1={mood1!} mood2={mood2!} />
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
                 style={{
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: "0.18em",
                   textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.38)",
+                  color: "rgba(255,255,255,0.36)",
                   fontFamily: "'Outfit',sans-serif",
                 }}
               >
@@ -848,7 +831,7 @@ export default function MoodMixer() {
         </AnimatePresence>
 
         {/* RESULT */}
-        <div style={{ padding: "0 clamp(16px, 5vw, 48px)", marginTop: 32 }}>
+        <div style={{ padding: "0 clamp(16px, 5vw, 48px)", marginTop: 28 }}>
           <AnimatePresence>
             {showResult && (
               <ResultCard
@@ -876,7 +859,7 @@ export default function MoodMixer() {
               left: 0,
               right: 0,
               padding: "16px clamp(16px, 5vw, 48px) 28px",
-              background: "rgba(5,5,16,0.96)",
+              background: "rgba(5,5,16,0.97)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
               borderTop: "1px solid rgba(255,255,255,0.07)",
@@ -921,13 +904,24 @@ export default function MoodMixer() {
                 fontWeight: 700,
                 fontSize: 14,
                 fontFamily: "'Outfit',sans-serif",
-                minWidth: 160,
+                minWidth: 162,
                 textAlign: "center",
               }}
             >
               {!selector1 ? "Select 2 moods" : !selector2 ? "Select 1 more mood" : "Blend Ready"}
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Preview modal — centered, no auto-dismiss */}
+      <AnimatePresence>
+        {previewMood && previewMoodData && (
+          <PreviewModal
+            mood={previewMoodData}
+            onConfirm={handleConfirm}
+            onDismiss={handleDismissPreview}
+          />
         )}
       </AnimatePresence>
 
