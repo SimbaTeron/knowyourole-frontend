@@ -682,6 +682,8 @@ export default function MoodMixer() {
       mood2: selector2,
       label: blendName,
     }));
+    // Also save as simple string for Results component
+    sessionStorage.setItem("knowrole-mood-blend", blendName);
     window.location.href = "/quiz/questions";
   };
 

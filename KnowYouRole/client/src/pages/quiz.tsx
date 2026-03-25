@@ -12,9 +12,12 @@ export default function QuizPage() {
   const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
   const [showResults, setShowResults] = useState(false);
 
-  // Read tier and mood from sessionStorage (set by mood-mixer page)
+  // Read tier from sessionStorage (set by quiz-gateway)
   const sessionTier = (sessionStorage.getItem("knowrole-tier") || "25plus") as TierValue;
-  const sessionMood = sessionStorage.getItem("knowrole-mood") || "";
+  // Read mood from localStorage kyr_mood_blend (set by mood-mixer) - it's stored as JSON
+  const moodBlendStr = localStorage.getItem("kyr_mood_blend");
+  const moodBlend = moodBlendStr ? JSON.parse(moodBlendStr) : null;
+  const sessionMood = moodBlend?.label || "";
   const sessionFunMode = sessionStorage.getItem("knowrole-funmode") === "true";
   const landmarkData = sessionStorage.getItem("knowrole-landmark");
   const sessionLandmark = landmarkData ? JSON.parse(landmarkData) : null;
