@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import Quiz, { QuizScores } from "@/components/Quiz";
 import Results from "@/components/Results";
 import { ThemeMode } from "@/components/ThemeToggle";
+import { LocalityThemeProvider } from "@/contexts/LocalityThemeContext";
 
 type TierValue = "7-12" | "13-18" | "19-25" | "25plus";
 
@@ -60,42 +61,46 @@ export default function QuizPage() {
 
   if (showResults && quizScores) {
     return (
-      <Results
-        scores={quizScores}
-        tier={ageTier}
-        mood={mood}
-        funMode={funMode}
-        landmark={landmark}
-        theme={theme}
-        sessionId={null}
-        apiScales={null}
-        earnedBadges={[]}
-        hybridTypes={[]}
-        startOnPremiumPage={false}
-        onRestart={handleRestart}
-        onShare={() => {
-          if (navigator.share) {
-            navigator.share({ title: "My KnowRole Result", text: "I discovered my personality path!", url: window.location.origin });
-          } else {
-            navigator.clipboard.writeText("I discovered my personality path!");
-          }
-        }}
-        onDownloadPDF={() => window.print()}
-      />
+      <LocalityThemeProvider>
+        <Results
+          scores={quizScores}
+          tier={ageTier}
+          mood={mood}
+          funMode={funMode}
+          landmark={landmark}
+          theme={theme}
+          sessionId={null}
+          apiScales={null}
+          earnedBadges={[]}
+          hybridTypes={[]}
+          startOnPremiumPage={false}
+          onRestart={handleRestart}
+          onShare={() => {
+            if (navigator.share) {
+              navigator.share({ title: "My KnowRole Result", text: "I discovered my personality path!", url: window.location.origin });
+            } else {
+              navigator.clipboard.writeText("I discovered my personality path!");
+            }
+          }}
+          onDownloadPDF={() => window.print()}
+        />
+      </LocalityThemeProvider>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: "#050510" }}>
-      <Quiz
-        tier={ageTier}
-        mood={mood}
-        funMode={funMode}
-        landmark={landmark}
-        theme={theme}
-        onComplete={handleQuizComplete}
-        onExit={handleQuizExit}
-      />
-    </div>
+    <LocalityThemeProvider>
+      <div className="min-h-screen relative overflow-hidden" style={{ background: "#050510" }}>
+        <Quiz
+          tier={ageTier}
+          mood={mood}
+          funMode={funMode}
+          landmark={landmark}
+          theme={theme}
+          onComplete={handleQuizComplete}
+          onExit={handleQuizExit}
+        />
+      </div>
+    </LocalityThemeProvider>
   );
 }
