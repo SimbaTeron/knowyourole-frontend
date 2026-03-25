@@ -699,9 +699,9 @@ export default function MoodMixer() {
   };
 
   // Layout - ring centered in container
-  // cx = containerW/2 centers the ring horizontally; cy = containerH/2 dynamically centers the ring vertically
-  const cx = containerW / 2;
-  const cy = containerH / 2;
+  // cx = containerW/2 - 50 empirically tuned; cy tuned for equal top/bottom margin
+  const cx = containerW / 2 - 50;
+  const cy = 244;
   const r = 174;
   const orbPositions = getOrbPixelPositions(cx, cy, r);
 
