@@ -700,9 +700,9 @@ export default function MoodMixer() {
   };
 
   // Layout — anchored to Simba's exact measurements:
-  // cx = containerW/2 - 202 (shifted left 100px from prior formula)
+  // cx = containerW/2 - 152 (shifted left 150px from original center)
   // cy and r are fixed regardless of viewport
-  const cx = containerW / 2 - 202;
+  const cx = containerW / 2 - 152;
   const cy = 246;
   const r = 174;
   const orbPositions = getOrbPixelPositions(containerW, cy, r);
