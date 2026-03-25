@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { AppFooter } from "@/components/layout/AppFooter";
 import { X, ArrowRight, Sparkles, RotateCcw } from "lucide-react";
 
 const MOODS = [
@@ -279,7 +280,7 @@ function MoodOrb({
   isOtherSelected: boolean;
   isPreviewing: boolean;
   onTap: () => void;
-  onPreview: () => void;
+  onPreview: (e: React.PointerEvent) => void;
   onDismissPreview: () => void;
   previewPos: { x: number; y: number };
 }) {
@@ -944,7 +945,7 @@ export default function MoodMixer() {
                   isOtherSelected={selector1 !== null && selector1 !== mood.id && selector2 === null}
                   isPreviewing={previewMood === mood.id}
                   onTap={() => handleMoodTap(mood.id)}
-                  onPreview={(e) => handlePreview(mood.id, e as unknown as React.PointerEvent)}
+                  onPreview={(e) => handlePreview(mood.id, e)}
                   onDismissPreview={handleDismissPreview}
                   previewPos={previewPos}
                 />
