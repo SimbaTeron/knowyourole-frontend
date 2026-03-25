@@ -94,7 +94,7 @@ function SwirlBg() {
 }
 
 // ─── CENTER DASHED HINT ──────────────────────────────────────────────────────
-function CenterHint({ hasOne }: { hasOne: boolean }) {
+function CenterHint({ hasOne, cx, cy }: { hasOne: boolean; cx: number; cy: number }) {
   return (
     <motion.div
       key={hasOne ? "one" : "zero"}
@@ -104,8 +104,8 @@ function CenterHint({ hasOne }: { hasOne: boolean }) {
       transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       style={{
         position: "absolute",
-        left: "50%",
-        top: "50%",
+        left: cx,
+        top: cy,
         transform: "translate(-50%, -50%)",
         width: 140,
         height: 140,
@@ -698,9 +698,9 @@ export default function MoodMixer() {
     setPreviewMood(null);
   };
 
-  // Layout — ring centered (cx = containerW/2 - 50, empirically tuned)
-  // cy and r are fixed regardless of viewport
-  const cx = containerW / 2 - 50;
+  // Layout — ring centered in container
+  // cx = containerW/2 - 30 centers the ring properly in the viewport
+  const cx = containerW / 2 - 30;
   const cy = 246;
   const r = 174;
   const orbPositions = getOrbPixelPositions(cx, cy, r);
@@ -801,8 +801,8 @@ export default function MoodMixer() {
             >
               {/* Center hint — only when no selection yet */}
               <AnimatePresence>
-                {!hasOne && !bothSelected && <CenterHint hasOne={false} />}
-                {hasOne && <CenterHint hasOne={true} />}
+                {!hasOne && !bothSelected && <CenterHint hasOne={false} cx={cx} cy={cy} />}
+                {hasOne && <CenterHint hasOne={true} cx={cx} cy={cy} />}
               </AnimatePresence>
 
               {/* Mood orbs */}
