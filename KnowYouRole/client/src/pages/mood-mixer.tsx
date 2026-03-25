@@ -700,14 +700,11 @@ export default function MoodMixer() {
   };
 
   // Layout — anchored to Simba's exact measurements:
-  // Top orb (Focused): left=164, top=20 → cx=215, cy=194, r=122
-  const isMobile = containerW < 600;
-  // cx shifts proportionally with container width (Simba's formula: cx = containerW/2 - 32)
-  const cx = containerW / 2 - 32;
-  // cy is fixed — ring stays at same vertical position
-  const cy = 194;
-  // radius scales up on desktop (proportional to viewport)
-  const r = isMobile ? 122 : Math.min(220, Math.round(122 * containerW / 432));
+  // cx = containerW/2 - 52 (formula derived from Simba's left=255 on desktop)
+  // cy and r are fixed regardless of viewport
+  const cx = containerW / 2 - 52;
+  const cy = 246;
+  const r = 174;
   const orbPositions = getOrbPixelPositions(containerW, cy, r);
 
   return (
@@ -801,8 +798,7 @@ export default function MoodMixer() {
               style={{
                 position: "relative",
                 width: "100%",
-                // Tall enough to contain the ring with padding
-                height: Math.max(320, cy + r + 60),
+                height: Math.max(320, cy + r + 80),
               }}
             >
               {/* Center hint — only when no selection yet */}
