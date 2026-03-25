@@ -425,7 +425,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 70, scale: 0.82 }}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 250, damping: 22, delay: 0.08 }}
       style={{
@@ -824,16 +824,20 @@ export default function MoodMixer() {
         <AnimatePresence>
           {showBrewing && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.6 }}
+              initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.6 }}
-              transition={{ duration: 0.4, ease: "backOut" }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.5, ease: "backOut" }}
               style={{
+                position: "absolute",
+                left: cx,
+                top: cy,
+                transform: "translate(-50%, -50%)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 gap: 18,
-                paddingTop: 4,
+                zIndex: 20,
               }}
             >
               <CenterSwirl mood1={mood1!} mood2={mood2!} />
