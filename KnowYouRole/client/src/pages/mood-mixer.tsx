@@ -656,7 +656,7 @@ export default function MoodMixer() {
   // ─── HANDLERS ───────────────────────────────────────────────────────────────
   const handleMoodTap = (moodId: string) => {
     if (state === "brewing" || state === "brewed") return;
-    if (previewMood) return; // preview modal is open — wait for confirm/dismiss
+    if (previewMood) return; // preview modal is open - wait for confirm/dismiss
     setPreviewMood(moodId);
   };
 
@@ -698,10 +698,10 @@ export default function MoodMixer() {
     setPreviewMood(null);
   };
 
-  // Layout — ring centered in container
-  // cx = containerW/2 centers the ring horizontally; cy = 250 vertically centers the ring in the 500px container
+  // Layout - ring centered in container
+  // cx = containerW/2 centers the ring horizontally; cy = containerH/2 dynamically centers the ring vertically
   const cx = containerW / 2;
-  const cy = 250;
+  const cy = containerH / 2;
   const r = 174;
   const orbPositions = getOrbPixelPositions(cx, cy, r);
 
@@ -799,7 +799,7 @@ export default function MoodMixer() {
                 height: Math.max(320, 2 * cy),
               }}
             >
-              {/* Center hint — only when no selection yet */}
+              {/* Center hint - only when no selection yet */}
               <AnimatePresence>
                 {!hasOne && !bothSelected && <CenterHint hasOne={false} cx={cx} cy={cy} />}
                 {hasOne && <CenterHint hasOne={true} cx={cx} cy={cy} />}
@@ -940,7 +940,7 @@ export default function MoodMixer() {
         )}
       </AnimatePresence>
 
-      {/* Preview modal — centered, no auto-dismiss */}
+      {/* Preview modal - centered, no auto-dismiss */}
       <AnimatePresence>
         {previewMood && previewMoodData && (
           <PreviewModal
