@@ -699,9 +699,9 @@ export default function MoodMixer() {
   };
 
   // Layout — ring centered in container
-  // cx = containerW/2 - 30 centers the ring properly in the viewport
-  const cx = containerW / 2 - 30;
-  const cy = 246;
+  // cx = containerW/2 centers the ring horizontally; cy = 250 vertically centers the ring in the 500px container
+  const cx = containerW / 2;
+  const cy = 250;
   const r = 174;
   const orbPositions = getOrbPixelPositions(cx, cy, r);
 
@@ -796,7 +796,7 @@ export default function MoodMixer() {
               style={{
                 position: "relative",
                 width: "100%",
-                height: Math.max(320, cy + r + 80),
+                height: Math.max(320, 2 * cy),
               }}
             >
               {/* Center hint — only when no selection yet */}
