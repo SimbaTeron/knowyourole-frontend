@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AppFooter } from "@/components/layout/AppFooter";
@@ -593,6 +593,29 @@ export default function MoodMixer() {
   const [state, setState] = useState<BlendState>("selecting");
   const [previewMood, setPreviewMood] = useState<string | null>(null);
   const brewingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerW, setContainerW] = useState(400);
+  const [containerH, setContainerH] = useState(420);
+
+  // Measure actual container dimensions from DOM
+  const measureContainer = useCallback(() => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setContainerW(rect.width);
+      setContainerH(rect.height);
+    }
+  }, []);
+
+  useEffect(() => {
+    measureContainer();
+    const ro = new ResizeObserver(measureContainer);
+    if (containerRef.current) ro.observe(containerRef.current);
+    window.addEventListener("resize", measureContainer);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measureContainer);
+    };
+  }, [measureContainer]);
 
   const mood1 = MOODS.find(m => m.id === selector1);
   const mood2 = MOODS.find(m => m.id === selector2);
@@ -676,13 +699,12 @@ export default function MoodMixer() {
     setPreviewMood(null);
   };
 
-  // Layout — ring centered horizontally, positioned near the top below the title
-  const isMobile = typeof window !== "undefined" ? window.innerWidth < 640 : true;
-  const winW = typeof window !== "undefined" ? window.innerWidth : 400;
+  // Layout — ring centered in the actual container, positioned near the top
+  const isMobile = containerW < 480;
+  const cx = containerW / 2; // always centered in container
   const ringTop = isMobile ? 100 : 110; // distance from top of container to ring center
   const r = isMobile ? 120 : 160;
-  const containerH = isMobile ? 420 : 440;
-  const orbPositions = getOrbPixelPositions(winW, ringTop, r);
+  const orbPositions = getOrbPixelPositions(containerW, ringTop, r);
 
   return (
     <div style={{
@@ -771,6 +793,7 @@ export default function MoodMixer() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
+              ref={containerRef}
               style={{
                 position: "relative",
                 width: "100%",
