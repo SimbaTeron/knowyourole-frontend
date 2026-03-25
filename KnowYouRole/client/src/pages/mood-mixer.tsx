@@ -56,8 +56,8 @@ function getOrbPositions(cx: number, cy: number, r: number) {
   return MOODS.map((_, i) => {
     const angle = (i / MOODS.length) * 2 * Math.PI - Math.PI / 2;
     return {
-      x: cx + r * Math.cos(angle),
-      y: cy + r * Math.sin(angle),
+      x: r * Math.cos(angle),
+      y: r * Math.sin(angle),
     };
   });
 }
@@ -99,7 +99,7 @@ function CenterHint({ hasOne }: { hasOne: boolean }) {
     <motion.div
       key={hasOne ? "one" : "zero"}
       initial={{ opacity: 0, scale: 0.7 }}
-      animate={{ opacity: [0.3, 0.6, 0.3], scale: 1 }}
+      animate={{ opacity: [0.6, 0.9, 0.6], scale: 1 }}
       exit={{ opacity: 0, scale: 0.7 }}
       transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       style={{
@@ -107,20 +107,22 @@ function CenterHint({ hasOne }: { hasOne: boolean }) {
         left: "50%",
         top: "50%",
         transform: "translate(-50%, -50%)",
-        width: 110,
-        height: 110,
+        width: 140,
+        height: 140,
         borderRadius: "50%",
-        border: "2px dashed rgba(255,255,255,0.12)",
+        border: "2px dashed rgba(255,255,255,0.22)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 11,
-        color: "rgba(255,255,255,0.26)",
+        fontSize: 14,
+        fontWeight: 700,
+        color: "rgba(255,255,255,0.65)",
         textAlign: "center",
-        lineHeight: 1.35,
+        lineHeight: 1.3,
         fontFamily: "'Outfit',sans-serif",
         zIndex: 1,
         pointerEvents: "none",
+        letterSpacing: "0.04em",
       }}
     >
       {hasOne ? "Tap second mood" : "Tap first mood"}
@@ -265,8 +267,8 @@ function CenterSwirl({ mood1, mood2 }: { mood1: typeof MOODS[0]; mood2: typeof M
       transition={{ duration: 0.4, ease: "backOut" }}
       style={{
         position: "relative",
-        width: 180,
-        height: 180,
+        width: 270,
+        height: 270,
         margin: "0 auto",
         display: "flex",
         alignItems: "center",
@@ -287,8 +289,8 @@ function CenterSwirl({ mood1, mood2 }: { mood1: typeof MOODS[0]; mood2: typeof M
         {[...Array(8)].map((_, i) => {
           const angle = (i / 8) * 360;
           const rad = (angle * Math.PI) / 180;
-          const x = Math.cos(rad) * 86;
-          const y = Math.sin(rad) * 86;
+          const x = Math.cos(rad) * 130;
+          const y = Math.sin(rad) * 130;
           const dotColor = i % 2 === 0 ? mood1.color : mood2.color;
           return (
             <div
@@ -297,12 +299,12 @@ function CenterSwirl({ mood1, mood2 }: { mood1: typeof MOODS[0]; mood2: typeof M
                 position: "absolute",
                 top: "50%",
                 left: "50%",
-                transform: `translate(${x - 5}px, ${y - 5}px)`,
-                width: 10,
-                height: 10,
+                transform: `translate(${x - 7}px, ${y - 7}px)`,
+                width: 14,
+                height: 14,
                 borderRadius: "50%",
                 background: dotColor,
-                boxShadow: `0 0 14px ${dotColor}`,
+                boxShadow: `0 0 18px ${dotColor}`,
               }}
             />
           );
@@ -315,7 +317,7 @@ function CenterSwirl({ mood1, mood2 }: { mood1: typeof MOODS[0]; mood2: typeof M
         transition={{ duration: 1.2, ease: "linear" }}
         style={{
           position: "absolute",
-          inset: 22,
+          inset: 33,
           borderRadius: "50%",
           border: `1.5px dashed rgba(255,255,255,0.16)`,
         }}
@@ -324,16 +326,16 @@ function CenterSwirl({ mood1, mood2 }: { mood1: typeof MOODS[0]; mood2: typeof M
       {/* Center glow */}
       <div style={{
         position: "absolute",
-        inset: 46,
+        inset: 70,
         borderRadius: "50%",
         background: `radial-gradient(circle, ${mood1.color}30 0%, ${mood2.color}22 50%, transparent 100%)`,
         animation: "cp 1.1s ease-in-out infinite",
       }} />
 
       {/* Emojis */}
-      <div style={{ position: "relative", zIndex: 2, display: "flex", gap: 4, filter: `drop-shadow(0 0 14px ${mood1.color}80)` }}>
-        <motion.span animate={{ rotate: [0, -22, 0] }} transition={{ duration: 0.5, delay: 0.3 }} style={{ fontSize: "2.2rem" }}>{mood1.emoji}</motion.span>
-        <motion.span animate={{ rotate: [0, 22, 0] }} transition={{ duration: 0.5, delay: 0.3 }} style={{ fontSize: "2.2rem" }}>{mood2.emoji}</motion.span>
+      <div style={{ position: "relative", zIndex: 2, display: "flex", gap: 6, filter: `drop-shadow(0 0 18px ${mood1.color}80)` }}>
+        <motion.span animate={{ rotate: [0, -22, 0] }} transition={{ duration: 0.5, delay: 0.3 }} style={{ fontSize: "3.3rem" }}>{mood1.emoji}</motion.span>
+        <motion.span animate={{ rotate: [0, 22, 0] }} transition={{ duration: 0.5, delay: 0.3 }} style={{ fontSize: "3.3rem" }}>{mood2.emoji}</motion.span>
       </div>
 
       <style>{`@keyframes cp { 0%,100%{transform:scale(1);opacity:0.75} 50%{transform:scale(1.18);opacity:1} }`}</style>
@@ -365,7 +367,7 @@ function MoodOrb({
       onClick={onTap}
       style={{
         position: "absolute",
-        left: pos.x,
+        left: `calc(50% + ${pos.x}px)`,
         top: pos.y,
         transform: "translate(-50%, -50%)",
         width: 104,
@@ -673,13 +675,12 @@ export default function MoodMixer() {
     setPreviewMood(null);
   };
 
-  // Layout — centered, positioned high
-  const cx = typeof window !== "undefined" ? window.innerWidth / 2 : 200;
+  // Layout — ring centered horizontally, positioned near the top below the title
   const isMobile = typeof window !== "undefined" ? window.innerWidth < 640 : true;
-  // Circle positioned right below the title (around 55% down from top of content area)
-  const cy = isMobile ? 250 : 260;
-  const r = isMobile ? 118 : 158;
-  const orbPositions = getOrbPositions(cx, cy, r);
+  const ringCY = isMobile ? 120 : 130; // y offset from the ring container top
+  const r = isMobile ? 120 : 160;
+  const containerH = isMobile ? 400 : 420;
+  const orbPositions = getOrbPositions(0, ringCY, r);
 
   return (
     <div style={{
