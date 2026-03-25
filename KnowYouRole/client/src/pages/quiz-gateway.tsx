@@ -1,10 +1,10 @@
 import { useState } from "react";
 
 const TIERS = [
-  { id: "7-12", emoji: "👶", title: "Kids (12 & under)", sub: "Fun strengths discovery for kids" },
-  { id: "13-18", emoji: "🎒", title: "Youth (12-17)", sub: "High school quiz with career insights" },
-  { id: "19-25", emoji: "🎓", title: "Young Adults (18-25)", sub: "College & early career matching" },
   { id: "25+", emoji: "💼", title: "Adults (25+)", sub: "Full experience with premium features" },
+  { id: "19-25", emoji: "🎓", title: "Young Adults (18-25)", sub: "College & early career matching" },
+  { id: "13-18", emoji: "🎒", title: "Youth (12-17)", sub: "High school quiz with career insights" },
+  { id: "7-12", emoji: "👶", title: "Kids (12 & under)", sub: "Fun strengths discovery for kids" },
 ];
 
 export default function QuizGateway() {
