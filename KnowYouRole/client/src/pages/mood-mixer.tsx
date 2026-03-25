@@ -700,11 +700,13 @@ export default function MoodMixer() {
   };
 
   // Layout — ring centered in the actual container, positioned near the top
+  // Simba's measurements: top orb (Focused) at left=162, top=20 (iPhone Pro Max, containerW≈428)
   const isMobile = containerW < 480;
-  const cx = containerW / 2; // always centered in container
-  const ringTop = isMobile ? 100 : 110; // distance from top of container to ring center
-  const r = isMobile ? 120 : 160;
-  const orbPositions = getOrbPixelPositions(containerW, ringTop, r);
+  // cx derived from Simba's perfect center measurement
+  const cx = isMobile ? containerW / 2 - 52 : containerW / 2;
+  const cy = 72; // ring center Y (Simba's top=20 + half orb height 52)
+  const r = 128;
+  const orbPositions = getOrbPixelPositions(containerW, cy, r);
 
   return (
     <div style={{
@@ -797,7 +799,7 @@ export default function MoodMixer() {
               style={{
                 position: "relative",
                 width: "100%",
-                height: containerH,
+                height: isMobile ? 300 : containerH,
               }}
             >
               {/* Center hint — only when no selection yet */}
