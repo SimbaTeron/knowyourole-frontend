@@ -13,7 +13,12 @@ export default function QuizGateway() {
 
   // Dev test mode: if ?test=true&tier=X in URL, auto-select that tier and jump to mood mixer
   useEffect(() => {
-    if (!isTestMode()) return;
+    const testMode = isTestMode();
+    const urlTier = new URLSearchParams(window.location.search).get("tier");
+    if (testMode) {
+      console.log("[DEV TEST] testMode=true, tier=", urlTier);
+    }
+    if (!testMode) return;
     const urlParams = new URLSearchParams(window.location.search);
     const tier = urlParams.get("tier");
     if (tier && TIERS.some(t => t.id === tier)) {
