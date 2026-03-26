@@ -52,9 +52,10 @@ export default function ResultsPage() {
   const fakeTier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
   const devFakeScoresRaw = (typeof window !== "undefined" ? sessionStorage.getItem("knowrole-fake-scores") : null);
   const devFakeScores = devFakeScoresRaw ? JSON.parse(devFakeScoresRaw) : null;
-  // Use DevPanel MBTI if set, otherwise fall back to getFakeMBTIType
-  const fakeType = devFakeScores?.mbti
-    ? `${getFakeMBTIType(devFakeScores.mbti)}-A`
+  // DevPanel stores mbti directly (not wrapped in mbti property) - handle both formats
+  const mbtiScores = devFakeScores?.mbti ?? devFakeScores;
+  const fakeType = mbtiScores
+    ? `${getFakeMBTIType({ mbti: mbtiScores, disc: { D: 0, I: 0, S: 0, C: 0 }, bigFive: { O: 0, C: 0, E: 0, A: 0, N: 0 }, hybridTypes: [], responses: [], swipeTimes: [], averageSwipeTime: 0, currentDifficulty: "medium", engagement: 0, wildcardBoost: false, criticalWildcard: 0, firstPrinciplesWildcard: 0 } as any)}-A`
     : `${getFakeMBTIType(getFakeScores(fakeTier))}-A`;
 
   useEffect(() => {

@@ -440,8 +440,8 @@ function FakeDataGeneratorSection() {
     const fake = getFakeScores(tier);
     const combined = { ...fake, mbti: scores };
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(combined));
-    // Also update slider UI
-    setSliders({ E: scores.E, S: scores.N, T: scores.T, J: scores.J });
+    // Also update slider UI - S slider needs S value (inverse of N), not N
+    setSliders({ E: scores.E, S: scores.S, T: scores.T, J: scores.J });
   };
 
   // Slider format: {E: 0-100, S: 0-100, T: 0-100, J: 0-100}
