@@ -15,6 +15,7 @@ import { UnlockInsightsModal } from "./UnlockInsightsModal";
 import { celebrateAchievement } from "@/lib/confetti";
 import { HYBRID_HINTS, getHybridKey, type BlendInfo } from "./MoodAlchemyLab";
 import { useAuth } from "@/hooks/useAuth";
+import careerReasoningData from "@/data/careerReasoning.json";
 import {
   type JobMatch, type PersonalityResult, type ResultsProps, type AdventureArchetype,
   calculateResult,
@@ -183,7 +184,19 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       try {
         const requestBody = { mbti: { E: scores.mbti.E, I: scores.mbti.I, S: scores.mbti.S, N: scores.mbti.N, T: scores.mbti.T, F: scores.mbti.F, J: scores.mbti.J, P: scores.mbti.P }, disc: { D: scores.disc.D, I: scores.disc.I, S: scores.disc.S, C: scores.disc.C }, bigFive: { O: result.bigFiveProfile.O, C: result.bigFiveProfile.C, E: result.bigFiveProfile.E, A: result.bigFiveProfile.A, N: result.bigFiveProfile.N } };
         const topResponse = await fetch('/api/job-match/top', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
-        if (topResponse.ok) { const topData = await topResponse.json(); if (topData.success && topData.match) setTopJobMatch(topData.match); }
+        if (topResponse.ok) { const topData = await topResponse.json(); if (topData.success && topData.match) {
+          const enrichedMatch = { ...topData.match };
+          // Inject unique career reasoning from careerReasoning.json
+          const bigFiveEntries = Object.entries(result.bigFiveProfile) as [string, number][];
+          const sortedBigFive = bigFiveEntries.sort((a, b) => b[1] - a[1]);
+          const topTrait = sortedBigFive[0][0].toLowerCase();
+          const reasoningKey = `${result.mbtiType.toLowerCase()}-${(result.discStyle || '').toLowerCase()}-${topTrait}-high`;
+          const reasoningEntry = (careerReasoningData as Record<string, { reasoning: string }>)[reasoningKey];
+          if (reasoningEntry?.reasoning) {
+            enrichedMatch.reason = reasoningEntry.reasoning;
+          }
+          setTopJobMatch(enrichedMatch);
+        } }
         const matchesResponse = await fetch('/api/job-matches', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...requestBody, limit: 3, diversityBoost: true }) });
         if (matchesResponse.ok) {
           const matchesData = await matchesResponse.json();
