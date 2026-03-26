@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { isTestMode } from "@/utils/devTest";
 
 const TIERS = [
   { id: "25+", emoji: "💼", title: "Adults (25+)", sub: "Full experience with premium features" },
@@ -9,6 +10,17 @@ const TIERS = [
 
 export default function QuizGateway() {
   const [selected, setSelected] = useState<string | null>(null);
+
+  // Dev test mode: if ?test=true&tier=X in URL, auto-select that tier and jump to mood mixer
+  useEffect(() => {
+    if (!isTestMode()) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const tier = urlParams.get("tier");
+    if (tier && TIERS.some(t => t.id === tier)) {
+      sessionStorage.setItem("knowrole-tier", tier);
+      window.location.href = "/mood-mixer";
+    }
+  }, []);
 
   const handleContinue = () => {
     if (selected) {
