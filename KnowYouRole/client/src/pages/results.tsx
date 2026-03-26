@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AppFooter } from "@/components/layout/AppFooter";
+import { isTestMode, getFakeScores } from "@/utils/devTest";
 
 const TRAITS = [
   { label: "Openness", value: 92, color: "#A78BFA" },
@@ -44,6 +45,8 @@ export default function ResultsPage() {
   const [moodBlend, setMoodBlend] = useState<{label: string; emoji: string; mood1: string; mood2: string} | null>(null);
 
   useEffect(() => {
+    // ?test=true skips the redirect and uses fake scores
+    if (isTestMode()) return;
     const resultsStr = localStorage.getItem("kyr_results");
     if (!resultsStr) {
       const quizAnswers = localStorage.getItem("kyr_quiz_answers");
