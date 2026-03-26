@@ -102,13 +102,13 @@ export default function ResultsPage() {
         }
       `}</style>
 
-      {/* DEV TEST CONTROL PANEL */}
+      {/* DEV TEST CONTROL PANEL - DEPRECATED: use DevToolPanel instead */}
       {isTestMode() && (
         <div style={{
           position: "fixed",
           top: 60,
           left: 16,
-          zIndex: 9999,
+          zIndex: 1,
           background: "#FFD700",
           color: "#000",
           padding: "12px 16px",
