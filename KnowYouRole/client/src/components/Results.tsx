@@ -49,7 +49,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   // ── Dev Test Mode: Inject fake scores when ?test=true ────────
   // Only active on localhost
   const testTier = isTestMode() ? (new URLSearchParams(window.location.search).get("tier") || tier) : tier;
-  const effectiveScores = isTestMode() ? getFakeScores(testTier) : scores;
+  const effectiveScores = isTestMode() ? getFakeScores(testTier) as unknown as QuizScores : scores;
   const effectiveTier = isTestMode() ? testTier : tier;
 
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
@@ -123,8 +123,9 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     if (apiScales) calculated.scales = apiScales;
     // Override MBTI and DISC with deterministic fake types for test mode
     if (isTestMode()) {
-      calculated.mbtiType = getFakeMBTIType(effectiveScores);
-      calculated.discStyle = getFakeDiscStyle(effectiveScores);
+      const fakeScores = getFakeScores(testTier);
+      calculated.mbtiType = getFakeMBTIType(fakeScores);
+      calculated.discStyle = getFakeDiscStyle(fakeScores);
     }
     setResult(calculated);
     if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
