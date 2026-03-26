@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AppFooter } from "@/components/layout/AppFooter";
-import { isTestMode, getFakeScores } from "@/utils/devTest";
+import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
 
 const TRAITS = [
   { label: "Openness", value: 92, color: "#A78BFA" },
@@ -44,7 +44,28 @@ export default function ResultsPage() {
   const [tab, setTab] = useState("Personality");
   const [moodBlend, setMoodBlend] = useState<{label: string; emoji: string; mood1: string; mood2: string} | null>(null);
 
+  // Dev test state
+  const [devPage, setDevPage] = useState<1 | 2 | 3>(1);
+  const [devPremium, setDevPremium] = useState(false);
+
+  // Fake MBTI type for dev panel
+  const fakeTier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
+  const fakeScores = getFakeScores(fakeTier);
+  const fakeType = getFakeMBTIType(fakeScores);
+
   useEffect(() => {
+    // Initialize dev state from URL params
+    if (isTestMode()) {
+      const params = new URLSearchParams(window.location.search);
+      const pageParam = params.get("page");
+      if (pageParam) {
+        const p = parseInt(pageParam, 10);
+        if (p === 1 || p === 2 || p === 3) setDevPage(p as 1 | 2 | 3);
+      }
+      const force = params.get("force");
+      if (force === "true") setDevPremium(true);
+    }
+
     // ?test=true skips the redirect and uses fake scores
     if (isTestMode()) return;
     const resultsStr = localStorage.getItem("kyr_results");
@@ -61,6 +82,17 @@ export default function ResultsPage() {
     }
   }, []);
 
+  // When devPage changes, sync the visual tab selection
+  useEffect(() => {
+    if (isTestMode()) {
+      const tabMap: Record<1 | 2 | 3, string> = { 1: "Personality", 2: "Careers", 3: "Growth" };
+      setTab(tabMap[devPage]);
+    }
+  }, [devPage]);
+
+  // Determine active tab: use devPage in test mode, otherwise use the user's tab state
+  const activeTab = isTestMode() ? (["Personality", "Careers", "Growth"][devPage - 1] as typeof tab) : tab;
+
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
       <style>{`
@@ -70,6 +102,36 @@ export default function ResultsPage() {
         }
       `}</style>
 
+      {/* DEV TEST CONTROL PANEL */}
+      {isTestMode() && (
+        <div style={{
+          position: "fixed",
+          top: 60,
+          left: 16,
+          zIndex: 9999,
+          background: "#FFD700",
+          color: "#000",
+          padding: "12px 16px",
+          borderRadius: 12,
+          fontFamily: "monospace",
+          fontSize: 12,
+          fontWeight: 700,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+          minWidth: 200,
+        }}>
+          <div style={{ marginBottom: 8, fontSize: 11 }}>DEV TEST MODE</div>
+          <div style={{ marginBottom: 8 }}>Fake: {fakeType} | Tier: {fakeTier}</div>
+          <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+            <button onClick={() => setDevPage(1)} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: devPage === 1 ? "#7800FF" : "#ccc", color: "#fff", cursor: "pointer" }}>P1</button>
+            <button onClick={() => setDevPage(2)} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: devPage === 2 ? "#7800FF" : "#ccc", color: "#fff", cursor: "pointer" }}>P2</button>
+            <button onClick={() => setDevPage(3)} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: devPage === 3 ? "#7800FF" : "#ccc", color: "#fff", cursor: "pointer" }}>P3</button>
+          </div>
+          <button onClick={() => setDevPremium(p => !p)} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: devPremium ? "#39FF14" : "#ccc", color: "#000", cursor: "pointer", fontWeight: 700 }}>
+            {devPremium ? "🔓 PREMIUM ON" : "🔒 PREMIUM OFF"}
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.1)", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ width: 40 }} />
@@ -77,8 +139,8 @@ export default function ResultsPage() {
         <div style={{ width: 40 }} />
       </header>
 
-      {/* Mood blend banner */}
-      {moodBlend && (
+      {/* Mood blend banner — hidden in test mode */}
+      {!isTestMode() && moodBlend && (
         <div style={{
           paddingTop: 100,
           padding: "100px 24px 0",
@@ -107,7 +169,7 @@ export default function ResultsPage() {
       )}
 
       {/* Hero */}
-      <div style={{ paddingTop: moodBlend ? 0 : 100, paddingBottom: 32, textAlign: "center", padding: `${moodBlend ? 0 : 100}px 24px 32px` }}>
+      <div style={{ paddingTop: isTestMode() ? 60 : moodBlend ? 0 : 100, paddingBottom: 32, textAlign: "center", padding: `${isTestMode() ? 60 : moodBlend ? 0 : 100}px 24px 32px` }}>
         <div style={{ display: "inline-block", background: "linear-gradient(135deg, #00C8FF, #7800FF)", borderRadius: 20, padding: "4px", marginBottom: 16 }}>
           <div style={{ background: "#050510", borderRadius: 16, padding: "clamp(16px, 4vw, 32px) clamp(24px, 6vw, 48px)" }}>
             <span style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, background: "linear-gradient(135deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>INTJ-A</span>
@@ -120,7 +182,13 @@ export default function ResultsPage() {
       {/* Tabs */}
       <div style={{ display: "flex", gap: 4, padding: "0 24px", marginBottom: 32, background: "rgba(5,5,16,0.8)", position: "sticky", top: 57, zIndex: 40, paddingTop: 8, paddingBottom: 8 }}>
         {["Personality", "Careers", "Growth"].map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "10px", borderRadius: 50, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13, background: tab === t ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.05)", color: tab === t ? "#fff" : "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif", transition: "all 0.2s" }}>
+          <button key={t} onClick={() => {
+            setTab(t);
+            if (isTestMode()) {
+              const map: Record<string, 1 | 2 | 3> = { Personality: 1, Careers: 2, Growth: 3 };
+              setDevPage(map[t]);
+            }
+          }} style={{ flex: 1, padding: "10px", borderRadius: 50, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13, background: activeTab === t ? "linear-gradient(90deg, #00C8FF, #7800FF)" : "rgba(255,255,255,0.05)", color: activeTab === t ? "#fff" : "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif", transition: "all 0.2s" }}>
             {t}
           </button>
         ))}
@@ -128,7 +196,7 @@ export default function ResultsPage() {
 
       <div style={{ padding: "0 24px 80px", maxWidth: 800, margin: "0 auto" }}>
 
-        {tab === "Personality" && (
+        {activeTab === "Personality" && (
           <div>
             <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 28, marginBottom: 24 }}>
               <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#00C8FF", marginBottom: 24, fontFamily: "'Outfit',sans-serif" }}>Big Five Profile</p>
@@ -156,7 +224,7 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {tab === "Careers" && (
+        {activeTab === "Careers" && (
           <div>
             <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, fontFamily: "'Outfit',sans-serif" }}>Dream Roles</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -175,7 +243,7 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {tab === "Growth" && (
+        {activeTab === "Growth" && (
           <div>
             <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, fontFamily: "'Outfit',sans-serif" }}>Your Growth Journey</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -194,27 +262,39 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {/* Premium */}
-        <div style={{ marginTop: 40, borderRadius: 24, padding: "2px", background: "linear-gradient(135deg, #00C8FF, #7800FF)" }}>
-          <div style={{ background: "#050510", borderRadius: 22, padding: 32, textAlign: "center" }}>
-            <h3 style={{ fontSize: 20, fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>Unlock Your Full Report</h3>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 24, fontFamily: "'Outfit',sans-serif" }}>Deep dive into your personality with premium insights</p>
-            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", textAlign: "left", display: "flex", flexDirection: "column", gap: 10 }}>
-              {["50-page personality report", "Relationship compatibility analysis", "Career path deep dive", "Personal growth action plan", "Shareable PDF report"].map(f => (
-                <li key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "rgba(255,255,255,0.7)", fontFamily: "'Outfit',sans-serif" }}>
-                  <span style={{ color: "#39FF14", fontWeight: 700 }}>✓</span> {f}
-                </li>
-              ))}
-            </ul>
-            <div style={{ marginBottom: 16 }}>
-              <span style={{ fontSize: 36, fontWeight: 900, color: "#fff", fontFamily: "'Outfit',sans-serif" }}>$9.99</span>
-              <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginLeft: 4 }}>/month</span>
+        {/* Premium upsell — shown in test mode based on devPremium, otherwise always shown */}
+        {(!isTestMode() || !devPremium) && (
+          <div style={{ marginTop: 40, borderRadius: 24, padding: "2px", background: "linear-gradient(135deg, #00C8FF, #7800FF)" }}>
+            <div style={{ background: "#050510", borderRadius: 22, padding: 32, textAlign: "center" }}>
+              <h3 style={{ fontSize: 20, fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>Unlock Your Full Report</h3>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 24, fontFamily: "'Outfit',sans-serif" }}>Deep dive into your personality with premium insights</p>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", textAlign: "left", display: "flex", flexDirection: "column", gap: 10 }}>
+                {["50-page personality report", "Relationship compatibility analysis", "Career path deep dive", "Personal growth action plan", "Shareable PDF report"].map(f => (
+                  <li key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "rgba(255,255,255,0.7)", fontFamily: "'Outfit',sans-serif" }}>
+                    <span style={{ color: "#39FF14", fontWeight: 700 }}>✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <div style={{ marginBottom: 16 }}>
+                <span style={{ fontSize: 36, fontWeight: 900, color: "#fff", fontFamily: "'Outfit',sans-serif" }}>$9.99</span>
+                <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginLeft: 4 }}>/month</span>
+              </div>
+              <button style={{ width: "100%", padding: "16px", background: "#39FF14", border: "none", borderRadius: 16, color: "#000", fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "'Outfit',sans-serif", boxShadow: "0 0 30px rgba(57,255,20,0.4)" }}>
+                Start Free Trial →
+              </button>
             </div>
-            <button style={{ width: "100%", padding: "16px", background: "#39FF14", border: "none", borderRadius: 16, color: "#000", fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "'Outfit',sans-serif", boxShadow: "0 0 30px rgba(57,255,20,0.4)" }}>
-              Start Free Trial →
-            </button>
           </div>
-        </div>
+        )}
+
+        {/* Premium unlocked placeholder — shown when devPremium is true in test mode */}
+        {isTestMode() && devPremium && (
+          <div style={{ marginTop: 40, borderRadius: 24, padding: "2px", background: "linear-gradient(135deg, #39FF14, #00C8FF)", opacity: 0.5 }}>
+            <div style={{ background: "#050510", borderRadius: 22, padding: 32, textAlign: "center" }}>
+              <h3 style={{ fontSize: 20, fontWeight: 900, color: "#39FF14", marginBottom: 8, fontFamily: "'Outfit',sans-serif" }}>✅ Premium Unlocked</h3>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>Full report content would appear here when premium is active.</p>
+            </div>
+          </div>
+        )}
       </div>
 
       <AppFooter />
