@@ -436,25 +436,38 @@ function FakeDataGeneratorSection() {
     const fake = getFakeScores(tier);
     const combined = { ...fake, mbti: scores };
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(combined));
+    // Also update slider UI
+    setSliders({ E: scores.E, S: scores.N, T: scores.T, J: scores.J });
   };
 
-  const randomScores = () => ({
-    E: randomBetween(1, 5),
-    I: randomBetween(1, 5),
-    N: randomBetween(1, 5),
-    S: randomBetween(1, 5),
-    T: randomBetween(1, 5),
-    F: randomBetween(1, 5),
-    J: randomBetween(1, 5),
-    P: randomBetween(1, 5),
-  });
+  // Slider format: {E: 0-100, S: 0-100, T: 0-100, J: 0-100}
+  // Value >= 50 = right letter (E/I/N/F/P), < 50 = left letter (I/S/T/J)
+  // To get slider from pair: dominant_score / (dominant + recessive) * 100
+  const randomScores = () => {
+    // Random MBTI: pick a dominant letter for each pair
+    const pick = (a: number, b: number) => (Math.random() < 0.5 ? a : b);
+    const dominantE = pick(randomBetween(55, 95), randomBetween(5, 45));
+    const dominantS = pick(randomBetween(55, 95), randomBetween(5, 45));
+    const dominantT = pick(randomBetween(55, 95), randomBetween(5, 45));
+    const dominantJ = pick(randomBetween(55, 95), randomBetween(5, 45));
+    return {
+      E: dominantE,
+      I: 100 - dominantE,
+      S: dominantS,
+      N: 100 - dominantS,
+      T: dominantT,
+      F: 100 - dominantT,
+      J: dominantJ,
+      P: 100 - dominantJ,
+    };
+  };
 
   const extremeScores = () => ({
-    E: 9, I: 1, N: 9, S: 1, T: 9, F: 1, J: 9, P: 1,
+    E: 90, I: 10, N: 90, S: 10, T: 90, F: 10, J: 90, P: 10,
   });
 
   const neutralScores = () => ({
-    E: 5, I: 5, N: 5, S: 5, T: 5, F: 5, J: 5, P: 5,
+    E: 50, I: 50, N: 50, S: 50, T: 50, F: 50, J: 50, P: 50,
   });
 
   // Seed all 40 questions as answered
