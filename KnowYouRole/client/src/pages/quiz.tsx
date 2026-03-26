@@ -4,6 +4,7 @@ import Quiz, { QuizScores } from "@/components/Quiz";
 import Results from "@/components/Results";
 import { ThemeMode } from "@/components/ThemeToggle";
 import { LocalityThemeProvider } from "@/contexts/LocalityThemeContext";
+import { isTestMode, getFakeScores } from "@/utils/devTest";
 
 type TierValue = "7-12" | "13-18" | "19-25" | "25plus";
 
@@ -27,6 +28,18 @@ export default function QuizPage() {
   const mood = sessionMood;
   const funMode = sessionFunMode;
   const landmark = sessionLandmark?.landmark;
+
+  // Dev test mode: skip quiz and jump straight to results with fake scores
+  useEffect(() => {
+    if (!isTestMode()) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const testTier = (urlParams.get("tier") || "25+") as TierValue;
+    const fakeScores = getFakeScores(testTier) as unknown as QuizScores;
+    sessionStorage.setItem("knowrole-tier", testTier);
+    sessionStorage.setItem("knowrole-mood-blend", JSON.stringify({ mood1: "focused", mood2: "curious", label: "Zen Master" }));
+    setQuizScores(fakeScores);
+    setShowResults(true);
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");

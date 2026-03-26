@@ -16,6 +16,7 @@ import { celebrateAchievement } from "@/lib/confetti";
 import { HYBRID_HINTS, getHybridKey, type BlendInfo } from "./MoodAlchemyLab";
 import { useAuth } from "@/hooks/useAuth";
 import careerReasoningData from "@/data/careerReasoning.json";
+import { isTestMode, isTestForcePremium, getFakeScores, getFakeMBTIType, getFakeDiscStyle } from "@/utils/devTest";
 import {
   type JobMatch, type PersonalityResult, type ResultsProps, type AdventureArchetype,
   calculateResult,
@@ -37,7 +38,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const urlPage = urlParams.get("page");
   const urlPageNum: 1 | 2 | 3 | null = urlPage === "2" ? 2 : urlPage === "3" ? 3 : null;
   const isUrlForcePremium = urlParams.get("force") === "true" && urlPage === "3";
-  const isTestPremium = urlParams.get("test_premium") === "true" || isUrlForcePremium;
+  const isTestPremium = isTestMode() || isTestForcePremium() || urlParams.get("test_premium") === "true" || isUrlForcePremium;
 
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
@@ -45,10 +46,16 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const { teamName, cityName, stateName, isLocalitySet } = useLocalityTheme();
   const localeInsight = cityName ? getLocaleInsight(cityName, stateName || undefined) : null;
 
+  // ── Dev Test Mode: Inject fake scores when ?test=true ────────
+  // Only active on localhost
+  const testTier = isTestMode() ? (new URLSearchParams(window.location.search).get("tier") || tier) : tier;
+  const effectiveScores = isTestMode() ? getFakeScores(testTier) : scores;
+  const effectiveTier = isTestMode() ? testTier : tier;
+
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
   const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium || startOnPremiumPage);
 
-  const isMiniExplorer = tier === "7-12";
+  const isMiniExplorer = effectiveTier === "7-12";
   const [adventureArchetype, setAdventureArchetype] = useState<AdventureArchetype | null>(null);
   const [topJobMatch, setTopJobMatch] = useState<JobMatch | null>(null);
   const [jobMatches, setJobMatches] = useState<JobMatch[]>([]);
@@ -91,8 +98,10 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
 
   // ── Page 2 Auth Gating ─────────────────────────────────────────
   // If ?page=2 in URL and user is not authenticated, redirect to login
+  // Skip if ?test=true (dev test mode bypasses auth)
   useEffect(() => {
     if (isAuthLoading) return;
+    if (isTestMode()) return; // Dev test mode — skip auth
     if (urlPageNum === 2 && !isAuthenticated) {
       const returnTo = window.location.pathname + window.location.search;
       sessionStorage.setItem("knowrole-auth-returnTo", returnTo);
@@ -110,12 +119,17 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const { toast } = useToast();
 
   useEffect(() => {
-    const calculated = calculateResult(scores);
+    const calculated = calculateResult(effectiveScores);
     if (apiScales) calculated.scales = apiScales;
+    // Override MBTI and DISC with deterministic fake types for test mode
+    if (isTestMode()) {
+      calculated.mbtiType = getFakeMBTIType(effectiveScores);
+      calculated.discStyle = getFakeDiscStyle(effectiveScores);
+    }
     setResult(calculated);
     if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
-    if (isTestPremium) console.log('[DEV MODE] Premium features unlocked for testing via ?test_premium=true');
-  }, [scores, apiScales, isTestPremium]);
+    if (isTestPremium) console.log('[DEV MODE] Premium features unlocked for testing via ?test=true');
+  }, [effectiveScores, apiScales, isTestPremium]);
 
   useEffect(() => {
     if (!isAuthenticated || !user || !result || !sessionId) return;
