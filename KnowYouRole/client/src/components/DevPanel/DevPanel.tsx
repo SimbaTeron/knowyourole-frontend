@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { isTestMode, getFakeScores } from "@/utils/devTest";
+import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
 import { StateInspectorSection, ErrorInjectionSection, ViewportThemeSection, ResultsSharingSection } from "./Sections";
 import { PerformanceSection, UtilitiesSection } from "./Sections2";
 
@@ -434,13 +434,32 @@ function FakeDataGeneratorSection() {
   };
 
   const applyScores = (scores: { E: number; I: number; N: number; S: number; T: number; F: number; J: number; P: number }) => {
-    // Write to both keys so both old and new results pages work
+    // Build the canonical mbti object: dominant letter gets the HIGH score
+    // The getFakeMBTIType function: E>=I?"E":"I", S>=N?"S":"N", T>=F?"T":"F", J>=P?"J":"P"
+    // Dominant letter should be the one with the HIGHER score
+    const mbti = {
+      E: scores.E,
+      I: scores.I,
+      S: scores.S,
+      N: scores.N,
+      T: scores.T,
+      F: scores.F,
+      J: scores.J,
+      P: scores.P,
+    };
+    const computedType = getFakeMBTIType({ mbti, disc: { D: 0, I: 0, S: 0, C: 0 }, bigFive: { O: 0, C: 0, E: 0, A: 0, N: 0 }, hybridTypes: [], responses: [], swipeTimes: [], averageSwipeTime: 0, currentDifficulty: "medium", engagement: 0, wildcardBoost: false, criticalWildcard: 0, firstPrinciplesWildcard: 0 } as any);
+    const fakeType = `${computedType}-A`;
+
+    // Write tier to both keys
     sessionStorage.setItem("knowrole-tier", tier);
     sessionStorage.setItem("kyr_tier", tier);
+    // Write computed fake type — results.tsx reads this key directly
+    sessionStorage.setItem("kyr_fake_type", fakeType);
+    // Also write the full scores object
     const fake = getFakeScores(tier);
-    const combined = { ...fake, mbti: scores };
+    const combined = { ...fake, mbti };
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(combined));
-    // Also update slider UI - S slider needs S value (inverse of N), not N
+    // Update slider UI
     setSliders({ E: scores.E, S: scores.S, T: scores.T, J: scores.J });
   };
 

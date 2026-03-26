@@ -10,6 +10,17 @@ const TRAITS = [
   { label: "Neuroticism", value: 68, color: "#F87171" },
 ];
 
+// Maps MBTI base type to archetype name
+function getArchetypeFromMBTI(mbti: string): string {
+  const archetypes: Record<string, string> = {
+    INTJ: "The Architect", INTP: "The Thinker", ENTJ: "The Commander", ENTP: "The Debater",
+    INFJ: "The Advocate", INFP: "The Mediator", ENFJ: "The Protagonist", ENFP: "The Campaigner",
+    ISTJ: "The Logistician", ISFJ: "The Defender", ESTJ: "The Executive", ESFJ: "The Consul",
+    ISTP: "The Virtuoso", ISFP: "The Adventurer", ESTP: "The Entrepreneur", ESFP: "The Entertainer",
+  };
+  return archetypes[mbti] || "The Architect";
+}
+
 const CAREERS = [
   { title: "Software Architect", match: 94, salary: "$120K – $180K", trend: "↑ 18% growth", desc: "Design systems that scale. Lead technical direction." },
   { title: "Data Scientist", match: 91, salary: "$100K – $160K", trend: "↑ 22% growth", desc: "Find patterns in chaos. Turn data into decisions." },
@@ -48,15 +59,10 @@ export default function ResultsPage() {
   const [devPage, setDevPage] = useState<1 | 2 | 3>(1);
   const [devPremium, setDevPremium] = useState(false);
 
-  // Fake MBTI type for dev panel — reads from DevPanel's knowrole-fake-scores if available
+  // Fake MBTI type for dev panel — reads from DevPanel's kyr_fake_type if set
   const fakeTier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
-  const devFakeScoresRaw = (typeof window !== "undefined" ? sessionStorage.getItem("knowrole-fake-scores") : null);
-  const devFakeScores = devFakeScoresRaw ? JSON.parse(devFakeScoresRaw) : null;
-  // DevPanel stores mbti directly (not wrapped in mbti property) - handle both formats
-  const mbtiScores = devFakeScores?.mbti ?? devFakeScores;
-  const fakeType = mbtiScores
-    ? `${getFakeMBTIType({ mbti: mbtiScores, disc: { D: 0, I: 0, S: 0, C: 0 }, bigFive: { O: 0, C: 0, E: 0, A: 0, N: 0 }, hybridTypes: [], responses: [], swipeTimes: [], averageSwipeTime: 0, currentDifficulty: "medium", engagement: 0, wildcardBoost: false, criticalWildcard: 0, firstPrinciplesWildcard: 0 } as any)}-A`
-    : `${getFakeMBTIType(getFakeScores(fakeTier))}-A`;
+  const storedFakeType = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_fake_type") : null);
+  const fakeType = storedFakeType || `${getFakeMBTIType(getFakeScores(fakeTier))}-A`;
 
   useEffect(() => {
     // Initialize dev state from URL params
@@ -177,10 +183,10 @@ export default function ResultsPage() {
       <div style={{ paddingTop: isTestMode() ? 60 : moodBlend ? 0 : 100, paddingBottom: 32, textAlign: "center", padding: `${isTestMode() ? 60 : moodBlend ? 0 : 100}px 24px 32px` }}>
         <div style={{ display: "inline-block", background: "linear-gradient(135deg, #00C8FF, #7800FF)", borderRadius: 20, padding: "4px", marginBottom: 16 }}>
           <div style={{ background: "#050510", borderRadius: 16, padding: "clamp(16px, 4vw, 32px) clamp(24px, 6vw, 48px)" }}>
-            <span style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, background: "linear-gradient(135deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>INTJ-A</span>
+            <span style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, background: "linear-gradient(135deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>{fakeType}</span>
           </div>
         </div>
-        <p style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, fontFamily: "'Outfit',sans-serif" }}>The Architect</p>
+        <p style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, fontFamily: "'Outfit',sans-serif" }}>{getArchetypeFromMBTI(fakeType.split("-")[0])}</p>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>Strategic, independent, and determined</p>
       </div>
 
