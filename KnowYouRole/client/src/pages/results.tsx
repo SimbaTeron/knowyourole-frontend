@@ -48,10 +48,14 @@ export default function ResultsPage() {
   const [devPage, setDevPage] = useState<1 | 2 | 3>(1);
   const [devPremium, setDevPremium] = useState(false);
 
-  // Fake MBTI type for dev panel
+  // Fake MBTI type for dev panel — reads from DevPanel's knowrole-fake-scores if available
   const fakeTier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
-  const fakeScores = getFakeScores(fakeTier);
-  const fakeType = getFakeMBTIType(fakeScores);
+  const devFakeScoresRaw = (typeof window !== "undefined" ? sessionStorage.getItem("knowrole-fake-scores") : null);
+  const devFakeScores = devFakeScoresRaw ? JSON.parse(devFakeScoresRaw) : null;
+  // Use DevPanel MBTI if set, otherwise fall back to getFakeMBTIType
+  const fakeType = devFakeScores?.mbti
+    ? `${getFakeMBTIType(devFakeScores.mbti)}-A`
+    : `${getFakeMBTIType(getFakeScores(fakeTier))}-A`;
 
   useEffect(() => {
     // Initialize dev state from URL params

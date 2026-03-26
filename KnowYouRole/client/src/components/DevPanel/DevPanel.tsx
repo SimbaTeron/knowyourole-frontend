@@ -118,8 +118,10 @@ function QuickNavSection({
   ];
 
   const handleNav = (path: string) => {
+    // Always set tier to sessionStorage when navigating to results
+    sessionStorage.setItem("knowrole-tier", selectedTier);
+    sessionStorage.setItem("kyr_tier", selectedTier);
     if (autoSeed) {
-      sessionStorage.setItem("knowrole-tier", selectedTier);
       const fakeScores = getFakeScores(selectedTier);
       sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(fakeScores));
     }
@@ -432,7 +434,9 @@ function FakeDataGeneratorSection() {
   };
 
   const applyScores = (scores: { E: number; I: number; N: number; S: number; T: number; F: number; J: number; P: number }) => {
+    // Write to both keys so both old and new results pages work
     sessionStorage.setItem("knowrole-tier", tier);
+    sessionStorage.setItem("kyr_tier", tier);
     const fake = getFakeScores(tier);
     const combined = { ...fake, mbti: scores };
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(combined));
