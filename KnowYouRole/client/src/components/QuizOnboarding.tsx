@@ -30,18 +30,18 @@ const QUIZ_ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     targetSelector: "[data-onboarding='answers'], [data-onboarding='slider']",
-    title: "Tap to Answer",
-    description: "Tap, click, or swipe the option that feels most like you. There are no wrong answers!",
+    title: "Don't Worry About Time",
+    description: "No pressure here. If time runs out, the question will simply repeat until you're ready. Take your time!",
     icon: MousePointerClick,
     position: "above",
-    buttonText: "Start Quiz",
+    buttonText: "Begin",
   },
 ];
 
 const SLIDER_ONBOARDING_STEP: OnboardingStep = {
   targetSelector: "[data-onboarding='slider']",
   title: "Slide to Choose",
-  description: "Drag the slider to show how strongly you feel, then tap Confirm. The closer to the edge, the stronger your preference.",
+  description: "Drag the slider to show how strongly you feel about this statement. The closer to the edge, the stronger your preference. Tap Confirm when you're ready.",
   icon: SlidersHorizontal,
   position: "above",
   buttonText: "Got It",

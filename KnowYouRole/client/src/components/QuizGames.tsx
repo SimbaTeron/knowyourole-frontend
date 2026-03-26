@@ -638,7 +638,7 @@ export function TimedCountdown({ onComplete }: TimedCountdownProps) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.3, opacity: 0 }}
             transition={{ duration: 0.1 }}
-            className="text-7xl font-black bg-gradient-to-r from-terracotta to-dusty-blue bg-clip-text text-transparent"
+            className="text-7xl font-black text-white drop-shadow-[0_0_12px_rgba(167,139,250,0.9)]"
           >
             {count === 0 ? "GO!" : count}
           </motion.div>

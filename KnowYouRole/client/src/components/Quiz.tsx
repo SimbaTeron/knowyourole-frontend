@@ -754,7 +754,12 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   };
 
   useEffect(() => {
-    const tierQuestions = questionsData.questions.filter(q => q.tier === tier);
+    const tierQuestions = questionsData.questions.filter(q => {
+      if (q.tier !== tier) return false;
+      // Kids tier (7-12) never sees slider questions
+      if (tier === "7-12" && q.responseType === "slider") return false;
+      return true;
+    });
     const targetCount = quizConfig.totalQuestions;
     
     // Phase 1.2: Quota-based selection
