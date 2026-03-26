@@ -41,7 +41,9 @@ function SocialButtonInner({ provider, label, icon, bgColor, textColor = "#fff" 
   const handleClick = () => {
     const params: Record<string, string> = {};
     if (provider !== "google-oauth2") params.connection = provider;
-    loginWithRedirect({ authorizationParams: params }).catch(console.error);
+    const returnTo = new URLSearchParams(window.location.search).get("returnTo") || "/";
+    sessionStorage.setItem("knowrole-auth-returnTo", returnTo);
+    loginWithRedirect({ authorizationParams: params, appState: { returnTo } }).catch(console.error);
   };
   return (
     <button onClick={handleClick} style={{
@@ -134,7 +136,9 @@ function AuthForm({ mode }: { mode: "signin" | "signup" }) {
     const form = e.target as HTMLFormElement;
     const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
     try {
-      await loginWithRedirect({ authorizationParams: { login_hint: email } });
+      const returnTo = new URLSearchParams(window.location.search).get("returnTo") || "/";
+      sessionStorage.setItem("knowrole-auth-returnTo", returnTo);
+      await loginWithRedirect({ authorizationParams: { login_hint: email }, appState: { returnTo } });
     } catch (err) { console.error("Login error:", err); }
   };
 

@@ -22,7 +22,10 @@ export default function Callback() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      window.location.href = "/";
+      // Support returnTo from appState (set via loginWithRedirect)
+      const returnTo = sessionStorage.getItem("knowrole-auth-returnTo");
+      sessionStorage.removeItem("knowrole-auth-returnTo");
+      window.location.href = returnTo || "/";
     }
   }, [isLoading, isAuthenticated]);
 
