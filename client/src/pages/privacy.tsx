@@ -103,6 +103,52 @@ export default function Privacy() {
               If you have questions about this Privacy Policy or your data, please contact us at info@knowyourole.com.
             </p>
           </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">CCPA — Your California Privacy Rights</h2>
+            <p className="mb-3 text-sm text-warm-gray/80 dark:text-[#94A3B8]">
+              If you are a California resident, you have the right to:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm text-warm-gray/80 dark:text-[#94A3B8]">
+              <li>Know what personal information we collect about you</li>
+              <li>Request deletion of your personal information</li>
+              <li><strong>Opt out of the sale of your personal information</strong> — We do <em>not</em> sell your personal information. You do not need to take any action.</li>
+              <li>Non-discrimination for exercising your privacy rights</li>
+            </ul>
+            <div className="mt-4 p-4 rounded-xl bg-sky-50 dark:bg-sky-900/10 border border-sky-200 dark:border-sky-800">
+              <p className="text-sm text-sky-800 dark:text-sky-200 font-medium">
+                We Do Not Sell Your Data
+              </p>
+              <p className="text-xs text-sky-700 dark:text-sky-300 mt-1">
+                KnowYourRole does not sell, trade, or rent your personal information to third parties. Your data is yours, and we keep it that way.
+              </p>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">GDPR — Your European Privacy Rights</h2>
+            <p className="mb-3 text-sm text-warm-gray/80 dark:text-[#94A3B8]">
+              If you are located in the European Economic Area, you have the right to:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm text-warm-gray/80 dark:text-[#94A3B8]">
+              <li><strong>Access</strong> — Request a copy of your personal data</li>
+              <li><strong>Rectification</strong> — Correct inaccurate personal data</li>
+              <li><strong>Erasure</strong> — Request deletion of your personal data ("right to be forgotten")</li>
+              <li><strong>Data Portability</strong> — Receive your data in a structured, machine-readable format</li>
+              <li><strong>Restrict processing</strong> — Limit how we use your data</li>
+              <li><strong>Object</strong> — Object to certain processing activities</li>
+            </ul>
+            <p className="mt-3 text-sm text-warm-gray/80 dark:text-[#94A3B8]">
+              To exercise any of these rights, please contact us at{" "}
+              <a
+                href="mailto:info@knowyourole.com"
+                className="text-terracotta dark:text-[#A78BFA] underline"
+              >
+                info@knowyourole.com
+              </a>
+              . We will respond within 30 days.
+            </p>
+          </section>
         </div>
       </main>
     </div>

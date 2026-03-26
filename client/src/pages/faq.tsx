@@ -60,6 +60,8 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
     <div className="border-b border-warm-gray/10 dark:border-[#A78BFA]/10">
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-controls={`faq-answer-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30)}`}
         className="w-full flex items-center justify-between py-4 text-left"
         data-testid={`button-faq-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30)}`}
       >
@@ -67,7 +69,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         <ChevronDown className={`w-5 h-5 text-warm-gray/50 dark:text-[#94A3B8] flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && (
-        <p className="pb-4 text-sm text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed">
+        <p id={`faq-answer-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30)}`} className="pb-4 text-sm text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed">
           {answer}
         </p>
       )}

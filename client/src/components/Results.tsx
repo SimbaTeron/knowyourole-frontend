@@ -108,7 +108,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   }, [isAuthenticated, user, result, sessionId, tier, mood, scores.responses]);
 
   useEffect(() => {
-    const storedBlend = sessionStorage.getItem("knowrole-mood-blend");
+    const storedBlend = sessionStorage.getItem("kyr_mood_blend");
     if (!storedBlend || storedBlend === "neutral") return;
     const moods = storedBlend.toLowerCase().split('+').map(m => m.trim());
     if (moods.length < 2) return;
@@ -174,7 +174,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     fetchJobMatches();
   }, [result, isMiniExplorer, scores]);
 
-  const DEV_BYPASS_PAYMENT = true;
+  const DEV_BYPASS_PAYMENT = import.meta.env.DEV;
 
   const handleValidationSubmit = () => {
     if (!mbtiMatchAnswer || opennessRating === 0) return;

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { usePersistedSet, usePersistedState } from "@/hooks/usePersistedState";
 import { motion, AnimatePresence, useReducedMotion, PanInfo } from "framer-motion";
 import { 
   BookOpen, Shield, DollarSign, Target, Brain, Gift, Crown,
@@ -182,62 +183,6 @@ const STORAGE_KEYS = {
   CURRENT_CARD: 'knowrole-current-card',
 };
 
-// Custom hook for localStorage-persisted Set
-function usePersistedSet(key: string, defaultValue: Set<string> = new Set()): [Set<string>, (updater: (prev: Set<string>) => Set<string>) => void] {
-  const [value, setValue] = useState<Set<string>>(() => {
-    try {
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return new Set(Array.isArray(parsed) ? parsed : []);
-      }
-    } catch (e) {
-      console.warn(`Failed to load ${key} from localStorage`, e);
-    }
-    return defaultValue;
-  });
-
-  const setPersistedValue = useCallback((updater: (prev: Set<string>) => Set<string>) => {
-    setValue(prev => {
-      const next = updater(prev);
-      try {
-        localStorage.setItem(key, JSON.stringify(Array.from(next)));
-      } catch (e) {
-        console.warn(`Failed to save ${key} to localStorage`, e);
-      }
-      return next;
-    });
-  }, [key]);
-
-  return [value, setPersistedValue];
-}
-
-// Custom hook for localStorage-persisted value
-function usePersistedState<T>(key: string, defaultValue: T): [T, (value: T) => void] {
-  const [value, setValue] = useState<T>(() => {
-    try {
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        return JSON.parse(stored) as T;
-      }
-    } catch (e) {
-      console.warn(`Failed to load ${key} from localStorage`, e);
-    }
-    return defaultValue;
-  });
-
-  const setPersistedValue = useCallback((newValue: T) => {
-    setValue(newValue);
-    try {
-      localStorage.setItem(key, JSON.stringify(newValue));
-    } catch (e) {
-      console.warn(`Failed to save ${key} to localStorage`, e);
-    }
-  }, [key]);
-
-  return [value, setPersistedValue];
-}
-
 export function PremiumCardDeck({
   result,
   topTrait,
@@ -277,7 +222,7 @@ export function PremiumCardDeck({
           bigFive: result?.bigFiveProfile || { O: 50, C: 50, E: 50, A: 50, N: 50 },
           mbtiType: result?.mbtiType,
           discStyle: result?.discStyle,
-          ageTier: sessionStorage.getItem('knowrole-age-tier') || 'adult',
+          ageTier: sessionStorage.getItem('kyr_quiz_tier') || 'adult',
         }),
       });
       return response.json();

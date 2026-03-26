@@ -49,7 +49,7 @@ export default function QuizPage() {
   const [storedFunMode, setStoredFunMode] = useState<boolean | null>(null);
   const [storedLandmark, setStoredLandmark] = useState<string | null>(null);
 
-  const sessionTier = (sessionStorage.getItem("knowrole-tier") || "25plus") as TierValue;
+  const sessionTier = (sessionStorage.getItem("kyr_quiz_tier") || "25plus") as TierValue;
   const sessionMood = sessionStorage.getItem("knowrole-mood") || "";
   const sessionFunMode = sessionStorage.getItem("knowrole-funmode") === "true";
   const landmarkData = sessionStorage.getItem("knowrole-landmark");
@@ -175,6 +175,23 @@ export default function QuizPage() {
     } catch (error) {
       console.error("Failed to save quiz results:", error);
     }
+
+    // BUG-02 FIX: Write results to localStorage so Results.tsx can read them
+    // This is the canonical kyr_results payload
+    const submissionPayload = {
+      scores,
+      tier: ageTier,
+      mood,
+      funMode,
+      landmark: landmark?.landmark,
+      theme,
+      sessionId,
+      apiScales: apiScales || null,
+      earnedBadges: badges,
+      hybridTypes: hybrids,
+      completedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('kyr_results', JSON.stringify(submissionPayload));
 
     setShowResults(true);
   };

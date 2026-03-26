@@ -137,7 +137,7 @@ export default function Home() {
     }
     sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
     
-    sessionStorage.setItem("knowrole-tier", ageTier);
+    sessionStorage.setItem("kyr_quiz_tier", ageTier);
     if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
     setLocation("/mood-mixer");
   };

@@ -9,6 +9,7 @@ import { registerTraitRoutes } from "./routes/traits";
 import { registerExportRoutes } from "./routes/export";
 import { registerPremiumRoutes } from "./routes/premium";
 import { registerAdminRoutes } from "./routes/admin";
+import { registerPrivacyRoutes } from "./routes/privacy";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -24,6 +25,7 @@ export async function registerRoutes(
   registerExportRoutes(app);
   registerPremiumRoutes(app);
   registerAdminRoutes(app);
+  registerPrivacyRoutes(app);
 
   return httpServer;
 }

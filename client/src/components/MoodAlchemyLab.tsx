@@ -631,8 +631,8 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
           setIsColliding(false);
           
           const storedMood = `${newSelected[0]}|${newSelected[1]}`;
-          sessionStorage.setItem("knowrole-mood-blend", storedMood);
-          sessionStorage.setItem("knowrole-blend-name", result.title);
+          sessionStorage.setItem("kyr_mood_blend", storedMood);
+          sessionStorage.setItem("kyr_blend_name", result.title);
           
           if (onMoodBrewed) onMoodBrewed(newSelected[0], newSelected[1], result.title);
         }, 700);
@@ -670,8 +670,8 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
     setSwirlParticles([]);
     setShowTooltip(null);
     
-    sessionStorage.removeItem("knowrole-mood-blend");
-    sessionStorage.removeItem("knowrole-blend-name");
+    sessionStorage.removeItem("kyr_mood_blend");
+    sessionStorage.removeItem("kyr_blend_name");
     
     const resetPositions: Record<string, { angle: number; pulled: boolean }> = {};
     MOOD_ORBS.forEach((orb, idx) => {
@@ -685,8 +685,8 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
 
   const handleSkipNeutral = () => {
     if (navigator.vibrate) navigator.vibrate(20);
-    sessionStorage.setItem("knowrole-mood-blend", "neutral");
-    sessionStorage.setItem("knowrole-blend-name", "Balanced Explorer");
+    sessionStorage.setItem("kyr_mood_blend", "neutral");
+    sessionStorage.setItem("kyr_blend_name", "Balanced Explorer");
     if (onSkip) onSkip();
   };
 

@@ -675,6 +675,15 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   
   // Use ref for processing lock - refs update synchronously, preventing race conditions
   const isProcessingAnswerRef = useRef(false);
+
+  // BUG-08 FIX: Reset processing lock on component unmount
+  // This prevents the lock from staying true if user navigates away mid-quiz
+  // (e.g., during a break phase), which would silently ignore the next answer
+  useEffect(() => {
+    return () => {
+      isProcessingAnswerRef.current = false;
+    };
+  }, []);
   
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-ROTATION_RANGE, 0, ROTATION_RANGE]);
@@ -811,6 +820,53 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
       setSliderValue(0); // Reset slider for new question
     }
   }, [currentIndex, questions, tierConfig.maxTime, timerResetKey]);
+
+  // FIX: Backup quiz state to localStorage periodically and on beforeunload
+  // This provides a fallback if sessionStorage is cleared mid-quiz
+  useEffect(() => {
+    if (questions.length === 0 || currentIndex === 0) return; // Don't save before quiz starts
+    const backupState = () => {
+      try {
+        const state = {
+          scores,
+          currentIndex,
+          quizPhase,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem('kyr_quiz_backup', JSON.stringify(state));
+      } catch (e) {
+        // Storage full or unavailable - silently fail
+      }
+    };
+    // Save on state changes (debounced via effect dependency)
+    const interval = setInterval(backupState, 5000);
+    // Also save on beforeunload
+    window.addEventListener('beforeunload', backupState);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('beforeunload', backupState);
+    };
+  }, [scores, currentIndex, quizPhase, questions.length]);
+
+  // FIX: Handle browser back button during quiz
+  // Shows a confirmation rather than silently losing progress
+  useEffect(() => {
+    const handlePopState = () => {
+      if (questions.length > 0 && currentIndex > 0) {
+        const confirmBack = window.confirm(
+          "Are you sure you want to go back? Your current progress will be lost."
+        );
+        if (!confirmBack) {
+          // Push state back to prevent navigation
+          window.history.pushState(null, '', window.location.href);
+        }
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    // Initial state push to enable proper back-button detection
+    window.history.pushState(null, '', window.location.href);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [questions.length, currentIndex]);
 
   useEffect(() => {
     return () => {
@@ -1501,12 +1557,42 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   
   if (questions.length === 0 || !currentQuestion) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0A0A0F]">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-white dark:bg-[#0A0A0F]">
+        {/* BUG-16 FIX: Loading skeleton — questions.json is ~500KB, show informative skeleton */}
+        <div className="w-full max-w-md mx-auto px-6 space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="w-24 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div className="w-16 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          </div>
+          {/* Progress bar skeleton */}
+          <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          {/* Card skeleton */}
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A1A2E] p-8 space-y-6">
+            {/* Question text skeleton */}
+            <div className="space-y-2">
+              <div className="h-6 rounded bg-gray-200 dark:bg-gray-700 animate-pulse mx-auto w-3/4" />
+              <div className="h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse mx-auto w-1/2" />
+            </div>
+            {/* Swipe options skeleton */}
+            <div className="flex gap-4 pt-4">
+              <div className="flex-1 h-32 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              <div className="flex-1 h-32 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            </div>
+          </div>
+          {/* Timer skeleton */}
+          <div className="flex justify-center">
+            <div className="w-14 h-14 rounded-full border-2 border-gray-200 dark:border-gray-700 animate-pulse" />
+          </div>
+        </div>
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           className="w-8 h-8 border-2 border-terracotta border-t-transparent rounded-full"
         />
+        <p className="text-sm text-gray-400 dark:text-gray-500 animate-pulse">
+          Preparing your personality path…
+        </p>
       </div>
     );
   }

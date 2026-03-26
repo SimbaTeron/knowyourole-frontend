@@ -3,17 +3,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, Crown, Calendar, Trophy, ChevronRight,
   LogOut, History, Star, Sparkles, Target, RefreshCw,
-  Mail, Shield
+  Mail, Shield, Download, Trash2, AlertTriangle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { ArcTracker } from "@/components/ArcTracker";
 import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/components/ui/use-toast";
 
 interface QuizResult {
   id: string;
@@ -57,6 +58,8 @@ export default function ProfilePage() {
   const { user, isAuthenticated, isLoading: isAuthLoading, isPremium } = useAuth();
   const [, setLocation] = useLocation();
   const [showAllHistory, setShowAllHistory] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { toast } = useToast();
 
   const { data: historyData, isLoading: isHistoryLoading } = useQuery<QuizHistoryResponse>({
     queryKey: ['/api/user/quiz-history'],
@@ -362,6 +365,121 @@ export default function ProfilePage() {
               Take New Quiz
             </Button>
           </div>
+
+          {/* GDPR / CCPA Privacy Section */}
+          <Card className="border-red-200 dark:border-red-800">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg text-red-600 dark:text-red-400">
+                <Shield className="w-5 h-5" />
+                Your Privacy Rights
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
+                You have the right to access, export, and delete your personal data under GDPR and CCPA.
+              </p>
+
+              {/* Export My Data */}
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3"
+                onClick={() => {
+                  window.open('/api/user/export', '_blank');
+                  toast({
+                    title: "Export started",
+                    description: "Your data download will begin shortly.",
+                  });
+                }}
+              >
+                <Download className="w-4 h-4 text-emerald-500" />
+                <span>Export My Data (JSON)</span>
+              </Button>
+
+              {/* Do Not Sell */}
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3"
+                onClick={() => {
+                  toast({
+                    title: "Do Not Sell",
+                    description: "We do not sell your personal data. Learn more in our Privacy Policy.",
+                  });
+                }}
+              >
+                <Shield className="w-4 h-4 text-sky-500" />
+                <span>Do Not Sell My Information (CCPA)</span>
+              </Button>
+
+              {/* Delete My Data */}
+              {!showDeleteConfirm ? (
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-3 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  onClick={() => setShowDeleteConfirm(true)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete My Account & Data</span>
+                </Button>
+              ) : (
+                <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-sm text-red-700 dark:text-red-300">
+                        Are you sure?
+                      </p>
+                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                        This will permanently delete your account, all quiz results, and all personal data. This action cannot be undone.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => setShowDeleteConfirm(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white border-0"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch('/api/user/delete', { method: 'POST' });
+                          if (res.ok) {
+                            toast({
+                              title: "Account deleted",
+                              description: "All your data has been permanently removed.",
+                            });
+                            setTimeout(() => {
+                              window.location.href = '/api/logout';
+                            }, 1500);
+                          } else {
+                            toast({
+                              title: "Error",
+                              description: "Failed to delete account. Please try again.",
+                              variant: "destructive",
+                            });
+                          }
+                        } catch {
+                          toast({
+                            title: "Error",
+                            description: "Failed to delete account. Please try again.",
+                            variant: "destructive",
+                          });
+                        }
+                        setShowDeleteConfirm(false);
+                      }}
+                    >
+                      Yes, Delete Forever
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     </div>

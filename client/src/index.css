@@ -266,6 +266,33 @@
   }
 }
 
+/* WCAG 2.4.7 Focus Visible — Keyboard navigation indicator */
+*:focus-visible {
+  outline: 2px solid var(--neon-blue, #00C8FF);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Skip-to-main link — off-screen by default, visible on keyboard focus */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary, #C67B5C);
+  color: var(--primary-foreground, #fff);
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+  transition: top 0.2s ease;
+}
+.skip-link:focus-visible {
+  top: 0;
+  outline: 2px solid var(--neon-blue, #00C8FF);
+  outline-offset: 3px;
+}
+
 /* KnowRole Premium Design System */
 :root {
   --font-display: 'Playfair Display', Georgia, serif;
@@ -397,11 +424,11 @@
   position: relative;
   overflow: hidden;
   transition: all 0.5s var(--spring-ease);
-  background: linear-gradient(135deg, #C67B5C 0%, #A85D3F 100%);
+  background: linear-gradient(135deg, #B5694D 0%, #9A5235 100%);
   box-shadow: 
-    0 2px 4px rgba(198,123,92,0.15),
-    0 4px 8px rgba(198,123,92,0.1),
-    0 8px 16px rgba(198,123,92,0.08);
+    0 2px 4px rgba(181,105,77,0.15),
+    0 4px 8px rgba(181,105,77,0.1),
+    0 8px 16px rgba(181,105,77,0.08);
 }
 .trail-button::before {
   content: "";
@@ -419,9 +446,9 @@
 .trail-button:hover {
   transform: translateY(-3px);
   box-shadow: 
-    0 4px 8px rgba(198,123,92,0.2),
-    0 8px 16px rgba(198,123,92,0.15),
-    0 16px 32px rgba(198,123,92,0.1);
+    0 4px 8px rgba(181,105,77,0.2),
+    0 8px 16px rgba(181,105,77,0.15),
+    0 16px 32px rgba(181,105,77,0.1);
 }
 .trail-button:active {
   transform: translateY(-1px);
