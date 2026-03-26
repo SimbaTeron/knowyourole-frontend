@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { isTestMode, getFakeScores } from "@/utils/devTest";
+import { StateInspectorSection, ErrorInjectionSection, ViewportThemeSection, ResultsSharingSection } from "./Sections";
+import { PerformanceSection, UtilitiesSection } from "./Sections2";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -817,6 +819,30 @@ export default function DevPanel() {
 
             <AccordionSection title="Fake Data Generator" icon="🎲">
               <FakeDataGeneratorSection />
+            </AccordionSection>
+
+            <AccordionSection title="State Inspector" icon="📦">
+              <StateInspectorSection />
+            </AccordionSection>
+
+            <AccordionSection title="Error Injection" icon="⚠️">
+              <ErrorInjectionSection />
+            </AccordionSection>
+
+            <AccordionSection title="Viewport & Theme" icon="📱">
+              <ViewportThemeSection />
+            </AccordionSection>
+
+            <AccordionSection title="Results & Sharing" icon="🔗">
+              <ResultsSharingSection />
+            </AccordionSection>
+
+            <AccordionSection title="Performance Monitor" icon="⚡">
+              <PerformanceSection />
+            </AccordionSection>
+
+            <AccordionSection title="Utilities" icon="🔧">
+              <UtilitiesSection />
             </AccordionSection>
           </div>
         </div>

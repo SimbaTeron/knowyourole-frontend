@@ -387,7 +387,7 @@ function StateInspectorSection() {
               <pre style={styles.pre}>
                 {diff.length === 0 ? 'No differences found' : diff.map(d => (
                   `Key: ${d.key}\nBefore: ${d.before}\nAfter: ${d.after}\n---`
-                ).join('\n'))}
+                )).join('\n')}
               </pre>
             );
           })()}
