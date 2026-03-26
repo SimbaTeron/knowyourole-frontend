@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { getLocaleInsight } from "@/data/localeInsights";
 import { SharePDFModal } from "./SharePDFModal";
+import { ShareableResultCard } from "./ShareableResultCard";
 import { UnlockInsightsModal } from "./UnlockInsightsModal";
 import { celebrateAchievement } from "@/lib/confetti";
 import { HYBRID_HINTS, getHybridKey, type BlendInfo } from "./MoodAlchemyLab";
@@ -27,13 +28,22 @@ import type { ResultsState } from "./results/ResultsTypes";
 export default function Results({ scores, tier, mood, funMode, landmark, theme, sessionId, apiScales, earnedBadges = [], hybridTypes = [], startOnPremiumPage = false, onRestart, onShare, onDownloadPDF }: ResultsProps) {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
+  // ── URL-based page routing ──────────────────────────────────────
+  // ?page=1 → Page 1 (MBTI/DISC/Big5) — free, no auth
+  // ?page=2 → Page 2 (career/locale) — auth required
+  // ?page=3 → Page 3 (premium) — ?force=true bypasses paywall for testing
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlPage = urlParams.get("page");
+  const urlPageNum: 1 | 2 | 3 | null = urlPage === "2" ? 2 : urlPage === "3" ? 3 : null;
+  const isUrlForcePremium = urlParams.get("force") === "true" && urlPage === "3";
+  const isTestPremium = urlParams.get("test_premium") === "true" || isUrlForcePremium;
+
   const [result, setResult] = useState<PersonalityResult | null>(null);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [focusedTraitIndex, setFocusedTraitIndex] = useState<number>(-1);
   const { teamName, cityName, stateName, isLocalitySet } = useLocalityTheme();
   const localeInsight = cityName ? getLocaleInsight(cityName, stateName || undefined) : null;
 
-  const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
   const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium || startOnPremiumPage);
 
@@ -69,10 +79,25 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const [showSharePDFModal, setShowSharePDFModal] = useState(false);
-  const [currentResultsPage, setCurrentResultsPage] = useState<1 | 2 | 3>(startOnPremiumPage ? 3 : 1);
+  const [showShareCardModal, setShowShareCardModal] = useState(false);
+  // Start on URL-specified page, or page 3 if startOnPremiumPage, else page 1
+  const [currentResultsPage, setCurrentResultsPage] = useState<1 | 2 | 3>(
+    urlPageNum === 2 ? 2 : urlPageNum === 3 ? 3 : startOnPremiumPage ? 3 : 1
+  );
   const [showUnlockModal, setShowUnlockModal] = useState(false);
 
   const { user, isAuthenticated, isLoading: isAuthLoading, isPremium } = useAuth();
+
+  // ── Page 2 Auth Gating ─────────────────────────────────────────
+  // If ?page=2 in URL and user is not authenticated, redirect to login
+  useEffect(() => {
+    if (isAuthLoading) return;
+    if (urlPageNum === 2 && !isAuthenticated) {
+      const returnTo = window.location.pathname + window.location.search;
+      sessionStorage.setItem("knowrole-auth-returnTo", returnTo);
+      window.location.href = "/auth?returnTo=" + encodeURIComponent(returnTo);
+    }
+  }, [isAuthLoading, isAuthenticated, urlPageNum]);
 
   const [moodBlendInfo, setMoodBlendInfo] = useState<BlendInfo | null>(null);
   const [moodBlendKey, setMoodBlendKey] = useState<string>("");
@@ -374,24 +399,63 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
           <Button variant="outline" className="flex-1" onClick={onRestart} data-testid="button-restart">
             <RefreshCw className="w-4 h-4 mr-1" />Restart
           </Button>
-          <Button variant="outline" className="flex-1" onClick={() => setShowSharePDFModal(true)} data-testid="button-download-pdf">
-            <Share2 className="w-4 h-4 mr-1" />Share
+          <Button variant="outline" className="flex-1" onClick={() => setShowShareCardModal(true)} data-testid="button-share-card">
+            <Share2 className="w-4 h-4 mr-1" />Share Card
           </Button>
           {currentResultsPage === 1 && (
-            <Button className="flex-1 bg-terracotta hover:bg-terracotta/90" onClick={() => { setDashboardStage("full"); setCurrentResultsPage(2); }} data-testid="button-more-details">
-              Details<ChevronRight className="w-4 h-4 ml-1" />
+            <Button
+              className="flex-1 bg-terracotta hover:bg-terracotta/90"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  const returnTo = window.location.pathname + "?page=2" + window.location.hash;
+                  sessionStorage.setItem("knowrole-auth-returnTo", returnTo);
+                  window.location.href = "/auth?returnTo=" + encodeURIComponent(returnTo);
+                  return;
+                }
+                setDashboardStage("full");
+                setCurrentResultsPage(2);
+              }}
+              data-testid="button-more-details"
+            >
+              {isAuthenticated ? (<><Sparkles className="w-4 h-4 mr-1" />Deeper Details</>) : (<><Sparkles className="w-4 h-4 mr-1" />Log In for More</>)}<ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           )}
           {currentResultsPage === 2 && (
-            <Button className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600" onClick={() => { if (isPremiumUnlocked) setCurrentResultsPage(3); else setShowUnlockModal(true); }} data-testid="button-learn-more">
-              {isPremiumUnlocked ? (<><Sparkles className="w-4 h-4 mr-1" />View Insights</>) : (<>Want to Know More?<ChevronRight className="w-4 h-4 ml-1" /></>)}
+            <Button
+              className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+              onClick={() => { if (isPremiumUnlocked) setCurrentResultsPage(3); else setShowUnlockModal(true); }}
+              data-testid="button-learn-more"
+            >
+              {isPremiumUnlocked ? (
+                <><Sparkles className="w-4 h-4 mr-1" />View Premium Insights</>
+              ) : (
+                <><Crown className="w-4 h-4 mr-1" />Unlock Premium Insights<ChevronRight className="w-4 h-4 ml-1" /></>
+              )}
             </Button>
           )}
         </div>
       </footer>
 
       {result && (
-        <SharePDFModal isOpen={showSharePDFModal} onClose={() => setShowSharePDFModal(false)} sessionId={sessionId || ""} result={{ mbtiType: result.mbtiType, discStyle: result.discStyle, bigFiveProfile: result.bigFiveProfile, title: result.primaryRole.title, spark: result.spark }} mood={mood} tier={tier} />
+        <>
+          <SharePDFModal isOpen={showSharePDFModal} onClose={() => setShowSharePDFModal(false)} sessionId={sessionId || ""} result={{ mbtiType: result.mbtiType, discStyle: result.discStyle, bigFiveProfile: result.bigFiveProfile, title: result.primaryRole.title, spark: result.spark }} mood={mood} tier={tier} />
+          <ShareableResultCard
+            isOpen={showShareCardModal}
+            onClose={() => setShowShareCardModal(false)}
+            sessionId={sessionId || undefined}
+            funMode={funMode}
+            result={{
+              mbtiType: result.mbtiType,
+              mbtiLabel: result.mbtiLabel,
+              discStyle: result.discStyle,
+              discLabel: result.discLabel,
+              bigFiveProfile: result.bigFiveProfile,
+              primaryRole: result.primaryRole,
+              moodBlendTitle: moodBlendInfo?.title,
+              moodBlendEmoji: moodBlendInfo?.emoji,
+            }}
+          />
+        </>
       )}
     </div>
   );
