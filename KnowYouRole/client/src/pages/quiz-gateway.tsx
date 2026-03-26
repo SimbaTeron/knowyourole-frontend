@@ -14,15 +14,18 @@ export default function QuizGateway() {
   // Dev test mode: if ?test=true&tier=X in URL, auto-select that tier and jump to mood mixer
   useEffect(() => {
     const testMode = isTestMode();
-    const urlTier = new URLSearchParams(window.location.search).get("tier");
-    if (testMode) {
-      console.log("[DEV TEST] testMode=true, tier=", urlTier);
-    }
-    if (!testMode) return;
     const urlParams = new URLSearchParams(window.location.search);
     const tier = urlParams.get("tier");
-    if (tier && TIERS.some(t => t.id === tier)) {
-      sessionStorage.setItem("knowrole-tier", tier);
+    if (testMode) {
+      console.log("[DEV TEST] testMode=true, tier=", tier);
+    }
+    if (!testMode) return;
+    if (!tier) return;
+    // Normalize tier (e.g. "25+" from URL may decode as "25 " — trim and check)
+    const normalizedTier = tier.trim();
+    const matchedTier = TIERS.find(t => t.id === normalizedTier || t.id.startsWith(normalizedTier));
+    if (matchedTier) {
+      sessionStorage.setItem("knowrole-tier", matchedTier.id);
       window.location.href = "/mood-mixer";
     }
   }, []);
