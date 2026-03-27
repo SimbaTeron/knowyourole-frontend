@@ -1,0 +1,30 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+import { Auth0Provider } from '@auth0/auth0-react'
+
+// Global error catch — catches Auth0 SDK errors that happen before React mounts
+window.onerror = (message, _source, _lineno, _colno, error) => {
+  console.error("[global onerror]", message, error);
+  return false;
+};
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("[unhandledrejection]", event.reason);
+});
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <Auth0Provider
+      domain="dev-f0lrnyg4uigdvae1.us.auth0.com"
+      clientId="edp3GnoatCBItXXQiu6jsxjL0Tc3CTIM"
+      authorizationParams={{
+        audience: "https://knowyourole.com/api",
+        redirect_uri: window.location.origin + '/callback'
+      }}
+    >
+      <App />
+    </Auth0Provider>
+  </React.StrictMode>,
+)
