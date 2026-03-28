@@ -50,6 +50,157 @@ function getBlendName(mood1: string, mood2: string): string {
   return names[key] || `${mood1.charAt(0).toUpperCase() + mood1.slice(1)} ${mood2.charAt(0).toUpperCase() + mood2.slice(1)} Blend`;
 }
 
+// 3 unique description sentences per blend — randomly pick one on each render
+const BLEND_DESCRIPTIONS: Record<string, string[]> = {
+  "focused+creative": [
+    "Your mind oscillates between laser-sharp precision and wild creative leaps — you build things that shouldn't exist yet, and you build them perfectly.",
+    "Ideas take shape in your head before others can articulate them. You don't just think outside the box; you redesign the box entirely.",
+    "You're the rare type who can both dream up visionary systems AND engineer them into reality. Abstract thinking meets flawless execution.",
+  ],
+  "focused+calm": [
+    "Your mind is a war room — always calculating, always planning — but the room itself is eerily quiet. Others wonder how you stay so composed under pressure.",
+    "You possess the patience of a master strategist. While others rush, you observe, calculate, and strike with pinpoint precision.",
+    "Stillness is your superpower. You think three moves ahead while appearing completely at ease — and that's exactly how you want it.",
+  ],
+  "focused+energetic": [
+    "You're a force multiplier wherever you go. Focused energy is already powerful; yours is a precision strike that reshapes entire landscapes.",
+    "While most people choose between speed and accuracy, you invented a third option: both, delivered relentlessly, at scale.",
+    "Your drive isn't noise — it's signal. Every burst of energy is channeled toward exactly the right target, every single time.",
+  ],
+  "focused+curious": [
+    "You don't just seek information — you weaponize it. Every curiosity feeds a mental model that grows sharper and more terrifyingly accurate with time.",
+    "Your questions cut deeper than most people's answers. You exist at the intersection of analytical rigor and genuine wonder.",
+    "You want to understand the machine, not just use it. Knowledge isn't status for you — it's ammunition for the next breakthrough.",
+  ],
+  "focused+determined": [
+    "Once you've locked onto a target, nothing short of an extinction event redirects you. Your focus is a physical force.",
+    "You don't do half-measures. When determination meets focus in a single mind, the results aren't incremental — they're seismic.",
+    "Peak performance isn't a peak for you; it's your baseline. Others burn bright and fade; you burn at exactly the right temperature forever.",
+  ],
+  "focused+social": [
+    "You lead without fanfare. Your influence comes from seeing what others need before they ask, and delivering it with quiet precision.",
+    "You make people feel like the most important person in the room — while simultaneously running the entire room. A rare and disarming combination.",
+    "Your social intelligence supercharges your strategic thinking. You don't just know the plan; you know exactly how to get everyone else to believe in it.",
+  ],
+  "focused+reflective": [
+    "Your inner world is as developed as your outer one — you think deeply before committing, then commit completely. Every move is weighted and intentional.",
+    "You're the quiet authority in every room. Others speak first; you speak last, and when you do, the conversation shifts.",
+    "Reflection isn't delay for you — it's fuel. The deeper you go inward, the more devastating your outward impact becomes.",
+  ],
+  "creative+calm": [
+    "Your ideas simmer quietly until they're ready to emerge fully formed. You don't think in bursts — you think in slow, inevitable crystallizations.",
+    "Calm creativity is your native habitat. You produce work that's simultaneously zen and revolutionary, often without anyone noticing how rare that is.",
+    "You think like water: no sudden movements, but the Grand Canyon was carved by exactly this kind of persistent, unhurried force.",
+  ],
+  "creative+energetic": [
+    "You don't brainstorm — you brainstorm WITH VELOCITY. Ideas don't just flow; they ignite, collide, and explode into things that actually get built.",
+    "Your creative output is prolific because you don't wait for perfect conditions. You channel energy directly into making, iterating, shipping.",
+    "You make creativity look like a contact sport. Others watch you generate, build, and discard ideas at a pace that makes them dizzy — and inspired.",
+  ],
+  "creative+curious": [
+    "Curiosity doesn't kill the cat — for you it sharpened the cat's claws into precision instruments. You explore with intent and create with precision.",
+    "You ask the questions nobody thought to ask, then answer them with something nobody predicted. Your mind is a dangerous, beautiful place.",
+    "Knowledge and imagination fuel each other in you like a closed loop. The more you learn, the more creatively you extrapolate — and vice versa.",
+  ],
+  "creative+determined": [
+    "Purpose drives your creativity off the page and into the world. You don't just imagine better systems — you build them and defend them.",
+    "When creative vision meets relentless drive, the result is a person who doesn't accept 'good enough' and doesn't know how to quit.",
+    "You turn inspiration into momentum better than anyone. An idea isn't real for you until it's been built, tested, and rebuilt again.",
+  ],
+  "creative+social": [
+    "You build things people actually want to be part of. Your creativity isn't solo brilliance — it's social architecture that draws others in and makes them co-authors.",
+    "Your ideas spread because you spread them with genuine warmth. You don't just present a vision — you make people feel ownership of it.",
+    "You have the rare gift of making collaboration feel like acceleration rather than compromise. Creative work with you is always more than the sum of its parts.",
+  ],
+  "creative+reflective": [
+    "Your creativity has depth because you give it space to breathe. You sit with ideas longer than others, and emerge with work that shows it.",
+    "Introspective artists produce the most distinct work. Yours carries a signature that comes from honest, unhurried self-examination.",
+    "You create from the inside out. The richer your inner world, the more unmistakable your outer work becomes.",
+  ],
+  "calm+energetic": [
+    "You contain multitudes: the stillness of deep water and the current that reshapes coastlines. People don't know which version of you they'll get — and that's the point.",
+    "Your energy is always perfectly calibrated to the room. You can be a安静 presence or a controlled explosion — and you choose intentionally.",
+    "The calm+energetic paradox is your greatest tool. You observe everything, then act decisively, then return to calm. Others find it mesmerizing.",
+  ],
+  "calm+curious": [
+    "You ask questions that make people pause — not because they're difficult, but because nobody has thought to ask them before. Your curiosity is quiet and devastating.",
+    "You explore ideas the way water explores a landscape: without force, but with absolute inevitability. What you don't know today, you will know tomorrow.",
+    "Curiosity without anxiety is your operating mode. You can hold a question open indefinitely without stress — and that's exactly why you always find the answer.",
+  ],
+  "calm+determined": [
+    "You achieve things without drama. The quieter the room, the more powerful your presence — and the more unstoppable your output.",
+    "Your determination is like a slow-burning fuse: invisible until the explosion. Others don't see you coming because you never rush.",
+    "Steady wins more races than explosive. You know this instinctively, and your consistent, unhurried output speaks for itself.",
+  ],
+  "calm+social": [
+    "You connect with warmth and depth, but you also know how to hold space in silence without discomfort. A rare and deeply reassuring presence.",
+    "Your social energy is like a warm current — always present, never overwhelming. You make people feel held, not pushed.",
+    "You're the person others want in the room when everything is on fire — because you bring calm, competence, and genuine warmth simultaneously.",
+  ],
+  "calm+reflective": [
+    "Your inner life is a vast, well-organized library. You think deeply, process thoroughly, and speak with the confidence of someone who's already been here mentally.",
+    "Stillness is your creative medium. You don't need external chaos to fuel great ideas — your reflective practice is a bottomless well.",
+    "You produce insights the way certain trees grow: slowly, from deep roots, and with a longevity that faster-growing things can't match.",
+  ],
+  "energetic+curious": [
+    "You're a human sparkler — ideas fly off you in every direction, and somehow they all connect. Your curiosity generates as much energy as it consumes.",
+    "You don't learn about things — you fall down rabbit holes and emerge with treasures. Your curiosity is an adventure sport.",
+    "The world is endlessly fascinating to you, and your energy makes exploring it contagious. You're the person who makes others want to learn more too.",
+  ],
+  "energetic+determined": [
+    "You're not a force of nature — you're a force with a blueprint. All that energy has a target, and the target has already been chosen.",
+    "Your determination makes your energy terrifyingly efficient. Others sprint and stop; you sprint and never intend to stop.",
+    "You were built for long games. That burst of energy you have? It doesn't fade — it just finds the next hill to conquer.",
+  ],
+  "energetic+social": [
+    "You are the person who walks into a room and the room changes. Not because you demand it — because your presence makes everyone slightly more alive.",
+    "Your social energy doesn't just connect people — it catalyzes them. You're the spark in the room that makes other sparks possible.",
+    "Life is a party and you're both the host AND the reason people showed up. Your energy makes gatherings feel like movements.",
+  ],
+  "energetic+reflective": [
+    "You observe everything and miss nothing. Your reflectiveness makes your energy smarter, and your energy makes your reflections more urgent.",
+    "You process the world intensely, then act decisively. The combination makes you seem like you're thinking and doing at twice normal speed.",
+    "Your reflective nature doesn't slow your energy — it aims it. You know what matters, and your energy goes exactly there.",
+  ],
+  "curious+determined": [
+    "You investigate like a detective, but you also close the case. Curiosity drives you to seek, and determination ensures you actually find.",
+    "The combination of curiosity and drive means you don't just discover things — you master them. Surface knowledge has never interested you.",
+    "You want to know why, and you want to know NOW, and you won't stop until the answer becomes part of who you are.",
+  ],
+  "curious+social": [
+    "You turn exploration into a team sport. Your curiosity is generous — you share what you find and make others hungry to discover alongside you.",
+    "Your social curiosity isn't small talk — it's genuine interest in what makes people tick. You ask questions that open people up.",
+    "You collect perspectives like some collect art. Every conversation adds a lens you didn't have before, and you use them all.",
+  ],
+  "curious+reflective": [
+    "Your curiosity has gravity. When you fall into a question, you fall all the way — and you always come back with something worth sharing.",
+    "You think so others can think alongside you. Your reflective curiosity is a gift to everyone who gets to witness it.",
+    "You hold questions with reverence and interrogate them with rigor. The result is understanding that goes so deep it changes how you see everything.",
+  ],
+  "determined+social": [
+    "You achieve things WITH people, not despite them. Your drive doesn't isolate — it magnetizes. Others want to be part of what you're building.",
+    "You're the person who makes ambitious goals feel achievable. Your combination of determination and warmth turns skeptics into believers.",
+    "You lead with energy and follow-through. People don't just root for you — they want to run beside you.",
+  ],
+  "determined+reflective": [
+    "You commit after deep thought, and then you commit completely. Others know that when you speak, the words have been weighed.",
+    "Your reflectiveness makes your determination more powerful, not less. You don't act on impulse — you act on conviction.",
+    "You have the quiet authority of someone who has already thought this through. When you move, the thought is already done.",
+  ],
+  "social+reflective": [
+    "You read rooms the way scholars read texts — with care, depth, and genuine interest in what isn't immediately visible.",
+    "Your social insight comes from the inside out. You understand people because you first took the time to understand yourself.",
+    "You connect with uncommon depth. Every conversation is an opportunity to learn something true, and you treat it that way.",
+  ],
+};
+
+function getBlendDescription(mood1: string, mood2: string): string {
+  const key = [mood1, mood2].sort().join("+");
+  const options = BLEND_DESCRIPTIONS[key];
+  if (!options) return `A unique blend of ${mood1} and ${mood2} energy that shapes your personality in distinct ways.`;
+  return options[Math.floor(Math.random() * options.length)];
+}
+
 type BlendState = "selecting" | "brewing" | "brewed";
 
 function getOrbPixelPositions(cx: number, ringTop: number, r: number) {
@@ -94,39 +245,94 @@ function SwirlBg() {
 }
 
 // ─── CENTER DASHED HINT ──────────────────────────────────────────────────────
-function CenterHint({ hasOne, cx, cy }: { hasOne: boolean; cx: number; cy: number }) {
+// ─── ANIMATED HAND + SELECT 2 MOODS HINT ───────────────────────────────────
+// Shown only when no mood has been selected yet (selector1 === null)
+// Disappears permanently after first selection
+function SelectHintOverlay({ cx, cy }: { cx: number; cy: number }) {
   return (
-    <motion.div
-      key={hasOne ? "one" : "zero"}
-      initial={{ opacity: 0, scale: 0.7 }}
-      animate={{ opacity: [0.6, 0.9, 0.6], scale: 1 }}
-      exit={{ opacity: 0, scale: 0.7 }}
-      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-      style={{
-        position: "absolute",
-        left: cx,
-        top: cy,
-        transform: "translate(-50%, -50%)",
-        width: 140,
-        height: 140,
-        borderRadius: "50%",
-        border: "2px dashed rgba(255,255,255,0.22)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 14,
-        fontWeight: 700,
-        color: "rgba(255,255,255,0.65)",
-        textAlign: "center",
-        lineHeight: 1.3,
-        fontFamily: "'Outfit',sans-serif",
-        zIndex: 1,
-        pointerEvents: "none",
-        letterSpacing: "0.04em",
-      }}
-    >
-      {hasOne ? "Tap second mood" : "Tap first mood"}
-    </motion.div>
+    <>
+      {/* CSS animation injected once */}
+      <style>{`
+        @keyframes hand-tap-loop {
+          0%   { opacity: 0; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+          8%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+          18%  { opacity: 1; transform: translate(-50%, -50%) translate(0px, -132px) scale(1); }
+          21%  { opacity: 1; transform: translate(-50%, -50%) translate(0px, -132px) scale(0.82); }
+          25%  { opacity: 1; transform: translate(-50%, -50%) translate(0px, -132px) scale(1); }
+          38%  { opacity: 1; transform: translate(-50%, -50%) translate(0px, -132px) scale(1); }
+          45%  { opacity: 0; transform: translate(-50%, -50%) translate(0px, -132px) scale(1); }
+          55%  { opacity: 0; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+          62%  { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+          72%  { opacity: 1; transform: translate(-50%, -50%) translate(132px, 0px) scale(1); }
+          75%  { opacity: 1; transform: translate(-50%, -50%) translate(132px, 0px) scale(0.82); }
+          79%  { opacity: 1; transform: translate(-50%, -50%) translate(132px, 0px) scale(1); }
+          90%  { opacity: 1; transform: translate(-50%, -50%) translate(132px, 0px) scale(1); }
+          96%  { opacity: 0; transform: translate(-50%, -50%) translate(132px, 0px) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+        }
+        @keyframes pill-breathe {
+          0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 20px rgba(120,0,255,0.15); }
+          50%       { box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 35px rgba(120,0,255,0.3); }
+        }
+      `}</style>
+
+      {/* Animated hand — positioned center, floats up/down, moves left/right to tap orbs */}
+      <div
+        style={{
+          position: "absolute",
+          left: cx,
+          top: cy,
+          transform: "translate(-50%, -50%)",
+          width: 32,
+          height: 32,
+          zIndex: 20,
+          pointerEvents: "none",
+          animation: "hand-tap-loop 5s ease-in-out infinite",
+          filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.6))",
+        }}
+      >
+        {/* Tiny pointing hand SVG */}
+        <svg viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
+          {/* sleeve */}
+          <rect x="10" y="28" width="12" height="10" rx="3" fill="#4a7fca" />
+          {/* hand */}
+          <path d="M16 28 C9 28 5 22 5 16 C5 11 8.5 9 12 10.5 C13.5 11 14 13 14 14.5 L14 9 C14 6.5 15.2 5 16.5 5 C17.8 5 19 6.5 19 9 L19 14.5 C20 13.5 21 12.5 22 12.5 C24.5 12.5 26.5 15 25.5 19.5 C24.5 24 20 27 16 28Z" fill="#f5d0b0" stroke="#c09070" strokeWidth="0.8" />
+          {/* fingernail */}
+          <ellipse cx="16" cy="6.5" rx="2" ry="1.5" fill="#f0c0a0" opacity="0.6" />
+        </svg>
+      </div>
+
+      {/* "Select 2 moods" pill */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 8 }}
+        transition={{ delay: 0.3, duration: 0.4 }}
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "calc(50% + 110px)",
+          transform: "translateX(-50%)",
+          zIndex: 20,
+          pointerEvents: "none",
+          background: "linear-gradient(90deg, rgba(120,0,255,0.9), rgba(255,0,229,0.9))",
+          border: "1px solid rgba(255,255,255,0.2)",
+          borderRadius: 50,
+          padding: "9px 22px",
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase" as const,
+          color: "#fff",
+          whiteSpace: "nowrap" as const,
+          fontFamily: "'Outfit',sans-serif",
+          animation: "pill-breathe 3s ease-in-out infinite",
+          textShadow: "0 1px 3px rgba(0,0,0,0.4)",
+        }}
+      >
+        ✦ Select 2 moods ✦
+      </motion.div>
+    </>
   );
 }
 
@@ -357,14 +563,65 @@ function MoodOrb({
   isOtherSelected: boolean;
   onTap: () => void;
 }) {
+  // When selected: render a plain non-interactive div (no onClick, no touch events)
+  if (isSelected) {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          left: pos.x,
+          top: pos.y,
+          transform: "translate(-50%, -50%)",
+          width: 104,
+          height: 104,
+          borderRadius: "50%",
+          background: `radial-gradient(circle at 35% 35%, ${mood.color}55, ${mood.color}28)`,
+          border: `2.5px solid ${mood.color}`,
+          boxShadow: `0 0 38px ${mood.glow}, 0 0 72px ${mood.color}30`,
+          cursor: "not-allowed",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 4,
+          fontFamily: "'Outfit',sans-serif",
+          zIndex: 10,
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
+      >
+        <span style={{
+          fontSize: "2.5rem",
+          filter: `drop-shadow(0 0 11px ${mood.color})`,
+          lineHeight: 1,
+        }}>{mood.emoji}</span>
+        <span style={{
+          fontSize: "0.68rem",
+          fontWeight: 700,
+          color: mood.color,
+          letterSpacing: "0.05em",
+        }}>{mood.label}</span>
+      </div>
+    );
+  }
+
   return (
-    <motion.button
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.1 + MOODS.indexOf(mood) * 0.07, type: "spring", stiffness: 260, damping: 20 }}
-      whileHover={!isOtherSelected ? { scale: 1.16 } : {}}
-      whileTap={!isOtherSelected ? { scale: 0.9 } : {}}
+    <div
       onClick={onTap}
+      onMouseEnter={e => {
+        const el = e.currentTarget;
+        el.style.transform = "translate(-50%, -50%) scale(1.12)";
+        el.style.border = "2px solid rgba(255,255,255,0.35)";
+        el.style.boxShadow = "0 0 20px rgba(0,200,255,0.15)";
+      }}
+      onMouseLeave={e => {
+        const el = e.currentTarget;
+        el.style.transform = "translate(-50%, -50%) scale(1)";
+        el.style.border = "2px solid rgba(255,255,255,0.12)";
+        el.style.boxShadow = "0 6px 24px rgba(0,0,0,0.5)";
+      }}
       style={{
         position: "absolute",
         left: pos.x,
@@ -373,44 +630,34 @@ function MoodOrb({
         width: 104,
         height: 104,
         borderRadius: "50%",
-        background: isSelected
-          ? `radial-gradient(circle at 35% 35%, ${mood.color}55, ${mood.color}28)`
-          : "rgba(255,255,255,0.07)",
-        border: isSelected
-          ? `2.5px solid ${mood.color}`
-          : "2px solid rgba(255,255,255,0.12)",
-        boxShadow: isSelected
-          ? `0 0 38px ${mood.glow}, 0 0 72px ${mood.color}30`
-          : "0 6px 24px rgba(0,0,0,0.5)",
-        cursor: isOtherSelected ? "not-allowed" : "pointer",
-        opacity: isOtherSelected ? 0.28 : 1,
+        background: "rgba(255,255,255,0.07)",
+        border: "2px solid rgba(255,255,255,0.12)",
+        boxShadow: "0 6px 24px rgba(0,0,0,0.5)",
+        cursor: "pointer",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         gap: 4,
         fontFamily: "'Outfit',sans-serif",
-        zIndex: isSelected ? 10 : 5,
+        zIndex: 5,
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
-        transition: "background 0.3s, border 0.3s, box-shadow 0.3s",
+        transition: "transform 0.18s ease, border 0.18s ease, box-shadow 0.18s ease",
         touchAction: "manipulation",
       }}
     >
       <span style={{
         fontSize: "2.5rem",
-        filter: isSelected ? `drop-shadow(0 0 11px ${mood.color})` : "none",
-        transition: "filter 0.3s",
         lineHeight: 1,
       }}>{mood.emoji}</span>
       <span style={{
         fontSize: "0.68rem",
         fontWeight: 700,
-        color: isSelected ? mood.color : "rgba(255,255,255,0.52)",
+        color: "rgba(255,255,255,0.52)",
         letterSpacing: "0.05em",
-        transition: "color 0.3s",
       }}>{mood.label}</span>
-    </motion.button>
+    </div>
   );
 }
 
@@ -522,11 +769,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
         margin: "0 auto 26px",
         lineHeight: 1.65,
       }}>
-        A fusion of{" "}
-        <span style={{ color: mood1.color }}>{mood1.label.toLowerCase()}</span>{" "}
-        energy and{" "}
-        <span style={{ color: mood2.color }}>{mood2.label.toLowerCase()}</span>{" "}
-        spirit. This blend shapes how your personality is revealed.
+        {getBlendDescription(mood1.id, mood2.id)}
       </p>
 
       {/* Actions */}
@@ -625,7 +868,7 @@ export default function MoodMixer() {
   // Guard
   useEffect(() => {
     const tier = sessionStorage.getItem("knowrole-tier");
-    if (!tier) window.location.href = "/quiz-gateway";
+    if (!tier) window.location.href = "/quiz/gateway";
   }, []);
 
   useEffect(() => {
@@ -657,6 +900,8 @@ export default function MoodMixer() {
   const handleMoodTap = (moodId: string) => {
     if (state === "brewing" || state === "brewed") return;
     if (previewMood) return; // preview modal is open - wait for confirm/dismiss
+    // Prevent selecting the same mood twice
+    if (selector1 === moodId || selector2 === moodId) return;
     setPreviewMood(moodId);
   };
 
@@ -700,11 +945,11 @@ export default function MoodMixer() {
     setPreviewMood(null);
   };
 
-  // Layout - ring centered in container
-  // cx = containerW/2 - 50 empirically tuned; cy tuned for equal top/bottom margin
-  const cx = containerW / 2 - 50;
-  const cy = 257;
-  const r = 174;
+  // Layout - ring centered in container — orbs edge-to-edge touching
+  // 8 orbs × 104px diameter = 832px circumference → r = 832/(2π) ≈ 132.5
+  const cx = containerW / 2;
+  const cy = 200;
+  const r = 132;
   const orbPositions = getOrbPixelPositions(cx, cy, r);
 
   return (
@@ -798,13 +1043,14 @@ export default function MoodMixer() {
               style={{
                 position: "relative",
                 width: "100%",
-                height: Math.max(320, 2 * cy),
+                height: cy + r + 100,
               }}
             >
-              {/* Center hint - only when no selection yet */}
+              {/* Animated hand + Select 2 moods hint — shown only before first selection */}
               <AnimatePresence>
-                {!hasOne && !bothSelected && <CenterHint hasOne={false} cx={cx} cy={cy} />}
-                {hasOne && <CenterHint hasOne={true} cx={cx} cy={cy} />}
+                {!hasOne && !bothSelected && (
+                  <SelectHintOverlay key="select-hint" cx={cx} cy={cy} />
+                )}
               </AnimatePresence>
 
               {/* Mood orbs */}

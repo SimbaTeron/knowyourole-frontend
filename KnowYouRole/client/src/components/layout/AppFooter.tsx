@@ -57,6 +57,7 @@ export function AppFooter() {
               <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>How It Works</Link>
               <Link href="/careers" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Career Matching</Link>
               <Link href="/results" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Premium Features</Link>
+              <a href="https://knowyourole-feedback.vercel.app" target="_blank" rel="noopener noreferrer" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Feedback</a>
             </div>
           </div>
 

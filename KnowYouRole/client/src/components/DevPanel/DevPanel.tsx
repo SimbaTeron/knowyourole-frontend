@@ -108,7 +108,7 @@ function QuickNavSection({
   ];
 
   const navButtons: { path: string; label: string }[] = [
-    { path: "/quiz-gateway", label: "1. Quiz Gateway" },
+    { path: "/quiz/gateway", label: "1. Quiz Gateway" },
     { path: "/mood-mixer", label: "2. Mood Mixer" },
     { path: "/quiz/questions", label: "3. Quiz Questions" },
     { path: "/results?test=true&page=1", label: "4. Results P1" },
@@ -248,6 +248,17 @@ function AuthSimulatorSection() {
   const applyAuth = (state: AuthState) => {
     setAuthState(state);
     sessionStorage.setItem("knowrole-auth-state", state);
+    // Write canonical auth keys for components that read them
+    if (state === "logged_out") {
+      sessionStorage.removeItem("kyr_auth_state");
+      sessionStorage.removeItem("kyr_premium_unlocked");
+    } else if (state === "logged_in_premium") {
+      sessionStorage.setItem("kyr_auth_state", "premium");
+      sessionStorage.setItem("kyr_premium_unlocked", "true");
+    } else {
+      sessionStorage.setItem("kyr_auth_state", "free");
+      sessionStorage.removeItem("kyr_premium_unlocked");
+    }
   };
 
   // Fake decoded JWT payload
@@ -459,6 +470,22 @@ function FakeDataGeneratorSection() {
     const fake = getFakeScores(tier);
     const combined = { ...fake, mbti };
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(combined));
+    // Write canonical kyr_fake_scores (for ResultsPage1 components that use useResultsData)
+    sessionStorage.setItem("kyr_fake_scores", JSON.stringify({
+      mbti: {
+        E: scores.E,
+        I: scores.I,
+        S: scores.S,
+        N: scores.N,
+        T: scores.T,
+        F: scores.F,
+        J: scores.J,
+        P: scores.P,
+      },
+      disc: fake.disc || { D: 0, I: 0, S: 0, C: 0 },
+      bigFive: fake.bigFive || { O: 75, C: 75, E: 50, A: 50, N: 50 },
+      hybridTypes: fake.hybridTypes || [],
+    }));
     // Update slider UI
     setSliders({ E: scores.E, S: scores.S, T: scores.T, J: scores.J });
   };

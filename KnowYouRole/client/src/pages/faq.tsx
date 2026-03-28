@@ -37,13 +37,15 @@ export default function FaqPage() {
           <div key={i} style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: open === i ? "1px solid rgba(0,200,255,0.3)" : "1px solid rgba(255,255,255,0.08)", borderRadius: 20, overflow: "hidden", transition: "all 0.25s" }}>
             <button
               onClick={() => setOpen(open === i ? null : i)}
+              aria-expanded={open === i}
+              aria-controls={`faq-answer-${i}`}
               style={{ width: "100%", padding: "20px 24px", background: "none", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left", gap: 16 }}
             >
               <span style={{ fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: "'Outfit',sans-serif" }}>{faq.q}</span>
               <span style={{ fontSize: 22, color: open === i ? "#00C8FF" : "rgba(255,255,255,0.3)", transition: "transform 0.2s", transform: open === i ? "rotate(45deg)" : "rotate(0deg)", flexShrink: 0 }}>+</span>
             </button>
             {open === i && (
-              <div style={{ padding: "0 24px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16 }}>
+              <div id={`faq-answer-${i}`} style={{ padding: "0 24px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16 }}>
                 <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, fontFamily: "'Outfit',sans-serif" }}>{faq.a}</p>
               </div>
             )}

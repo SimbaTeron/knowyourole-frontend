@@ -2,13 +2,46 @@ import { useState, useEffect } from "react";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
 
-const TRAITS = [
-  { label: "Openness", value: 92, color: "#A78BFA" },
-  { label: "Conscientiousness", value: 74, color: "#60A5FA" },
-  { label: "Extraversion", value: 61, color: "#34D399" },
-  { label: "Agreeableness", value: 55, color: "#34D399" },
-  { label: "Neuroticism", value: 68, color: "#F87171" },
-];
+function getSessionBigFive() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem("kyr_fake_scores");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.bigFive || null;
+  } catch { return null; }
+}
+
+function getSessionDisc() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem("kyr_fake_scores");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.disc || null;
+  } catch { return null; }
+}
+
+function normalizeBigFive(raw: { O: number; C: number; E: number; A: number; N: number }) {
+  return [
+    { label: "Openness", value: Math.min(99, Math.max(1, raw.O)), color: "#A78BFA" },
+    { label: "Conscientiousness", value: Math.min(99, Math.max(1, raw.C)), color: "#60A5FA" },
+    { label: "Extraversion", value: Math.min(99, Math.max(1, raw.E)), color: "#34D399" },
+    { label: "Agreeableness", value: Math.min(99, Math.max(1, raw.A)), color: "#34D399" },
+    { label: "Neuroticism", value: Math.min(99, Math.max(1, raw.N)), color: "#F87171" },
+  ];
+}
+
+function getDiscLabel(disc: { D: number; I: number; S: number; C: number }) {
+  const entries = Object.entries(disc) as [string, number][];
+  entries.sort((a, b) => b[1] - a[1]);
+  const primary = entries[0][0];
+  const secondary = entries[1][0];
+  const labels: Record<string, string> = { D: "Dominance", I: "Influence", S: "Steadiness", C: "Conscientiousness" };
+  const colors: Record<string, string> = { D: "#F87171", I: "#FBBF24", S: "#34D399", C: "#60A5FA" };
+  const nicknames: Record<string, string> = { D: "The Challenger", I: "The Persuader", S: "The Supporter", C: "The Analyst" };
+  return { primary, secondary, label: labels[primary], nickname: nicknames[primary], color: colors[primary] };
+}
 
 // Maps MBTI base type to archetype name
 function getArchetypeFromMBTI(mbti: string): string {
@@ -63,6 +96,19 @@ export default function ResultsPage() {
   const fakeTier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
   const storedFakeType = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_fake_type") : null);
   const fakeType = storedFakeType || `${getFakeMBTIType(getFakeScores(fakeTier))}-A`;
+
+  // Derived from sessionStorage
+  const bigFiveData = getSessionBigFive();
+  const TRAITS = bigFiveData ? normalizeBigFive(bigFiveData) : [
+    { label: "Openness", value: 92, color: "#A78BFA" },
+    { label: "Conscientiousness", value: 74, color: "#60A5FA" },
+    { label: "Extraversion", value: 61, color: "#34D399" },
+    { label: "Agreeableness", value: 55, color: "#34D399" },
+    { label: "Neuroticism", value: 68, color: "#F87171" },
+  ];
+
+  const discData = getSessionDisc();
+  const discInfo = discData ? getDiscLabel(discData) : null;
 
   useEffect(() => {
     // Initialize dev state from URL params
@@ -187,7 +233,7 @@ export default function ResultsPage() {
           </div>
         </div>
         <p style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, fontFamily: "'Outfit',sans-serif" }}>{getArchetypeFromMBTI(fakeType.split("-")[0])}</p>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>Strategic, independent, and determined</p>
+        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>{( {INTJ:"Strategic, independent, and determined",INTP:"Analytical, curious, and conceptual",ENTJ:"Bold, systematic, and commanding",ENTP:"Inventive, energetic, and intellectual",INFJ:"Insightful, principled, and compassionate",INFP:"Idealistic, curious, and empathetic",ENFJ:"Inspiring, warm, and influential",ENFP:"Creative, enthusiastic, and spontaneous",ISTJ:"Responsible, organized, and reliable",ISFJ:"Devoted, gentle, and protective",ESTJ:"Efficient, loyal, and decisive",ESFJ:"Friendly, cooperative, and social",ISTP:"Practical, logical, and hands-on",ISFP:"Artistic, gentle, and adaptable",ESTP:"Energetic, pragmatic, and bold",ESFP:"Playful, spontaneous, and charismatic"} as Record<string,string>)[fakeType.split("-")[0]] || "Unique personality profile"}</p>
       </div>
 
       {/* Tabs */}
@@ -229,9 +275,64 @@ export default function ResultsPage() {
             <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 28 }}>
               <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, fontFamily: "'Outfit',sans-serif" }}>Your Personality Type</h3>
               <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, fontFamily: "'Outfit',sans-serif" }}>
-                {moodBlend ? getMoodDescription(moodBlend) : "As an INTJ-A, you're a strategic visionary with a rare combination of analytical brilliance and quiet confidence. You see patterns others miss, question assumptions, and quietly build systems and visions that reshape the world around you."}
+                {moodBlend ? getMoodDescription(moodBlend) : `As an ${fakeType.split("-")[0]}, you're a ${getArchetypeFromMBTI(fakeType.split("-")[0]).toLowerCase()} with a distinctive personality profile. Your combination of traits shapes how you see the world, connect with others, and approach challenges.`}
               </p>
             </div>
+
+            {/* Share & PDF */}
+            <div style={{ display: "flex", gap: 12 }}>
+              <button
+                onClick={() => {
+                  const shareUrl = `${window.location.origin}/results?shareCode=fake_${Math.random().toString(36).substring(2, 8)}`;
+                  if (navigator.share) {
+                    navigator.share({ title: `My MBTI: ${fakeType}`, text: "Check out my personality type!", url: shareUrl }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(shareUrl).catch(() => {});
+                  }
+                }}
+                style={{ flex: 1, padding: "14px 20px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}
+              >
+                🔗 Share Results
+              </button>
+              <button
+                onClick={() => window.print()}
+                style={{ flex: 1, padding: "14px 20px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}
+              >
+                📄 Download PDF
+              </button>
+            </div>
+
+            {/* DISC Section */}
+            {discInfo && (
+              <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 28 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#FF00E5", marginBottom: 16, fontFamily: "'Outfit',sans-serif" }}>DISC Profile</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+                  <div style={{ fontSize: "2.2rem", fontWeight: 900, color: discInfo.color, fontFamily: "'Outfit',sans-serif" }}>{discInfo.primary}</div>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", fontFamily: "'Outfit',sans-serif" }}>{discInfo.nickname}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'Outfit',sans-serif" }}>{discInfo.label} · Secondary: {discInfo.secondary}</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {(["D", "I", "S", "C"] as const).map(letter => {
+                    const val = discData![letter];
+                    const colors: Record<string, string> = { D: "#F87171", I: "#FBBF24", S: "#34D399", C: "#60A5FA" };
+                    const labels: Record<string, string> = { D: "Dominance", I: "Influence", S: "Steadiness", C: "Conscientiousness" };
+                    return (
+                      <div key={letter}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "#fff", fontFamily: "'Outfit',sans-serif" }}><span style={{ color: colors[letter] }}>{letter}</span> — {labels[letter]}</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: colors[letter], fontFamily: "'Outfit',sans-serif" }}>{val}%</span>
+                        </div>
+                        <div style={{ height: 8, background: "rgba(255,255,255,0.08)", borderRadius: 50, overflow: "hidden" }}>
+                          <div style={{ width: `${val}%`, height: "100%", background: colors[letter], borderRadius: 50 }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

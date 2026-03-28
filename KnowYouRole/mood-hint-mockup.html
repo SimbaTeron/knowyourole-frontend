@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnowYouRole — Mood Hint Option D</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #050510;
+      font-family: 'Outfit', sans-serif;
+      color: #fff;
+      min-height: 100vh;
+    }
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .prog { position: fixed; top: 57px; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.06); z-index: 50; }
+    .prog-fill { height: 100%; width: 50%; background: linear-gradient(90deg, #7800FF, #FF00E5); }
+
+    .page { padding: 120px 24px 60px; max-width: 700px; margin: 0 auto; }
+    .page h1 { font-size: 1.8rem; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .page > p { color: rgba(255,255,255,0.35); font-size: 13px; margin-bottom: 44px; line-height: 1.6; }
+
+    .card { border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; overflow: hidden; margin-bottom: 40px; background: rgba(255,255,255,0.025); }
+    .card h2 { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); padding: 14px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); letter-spacing: 0.05em; }
+
+    /* ── ORB LAYOUT (shared) ── */
+    .ring-area {
+      position: relative;
+      width: 100%; height: 420px;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at 50% 50%, rgba(120,0,255,0.08) 0%, transparent 65%);
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      width: 86px; height: 86px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      border: 2px solid rgba(255,255,255,0.12);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.52); letter-spacing: 0.04em;
+      transition: border 0.3s, box-shadow 0.3s, background 0.3s;
+    }
+    .orb span:first-child { font-size: 1.85rem; line-height: 1; }
+    .orb.selected {
+      border-color: #7800FF;
+      background: radial-gradient(circle at 35% 35%, rgba(120,0,255,0.3), rgba(120,0,255,0.1));
+      box-shadow: 0 0 28px rgba(120,0,255,0.5), 0 0 60px rgba(120,0,255,0.2);
+    }
+
+    /* ── HAND ANIMATION ── */
+    .hand {
+      position: absolute;
+      width: 32px; height: 32px;
+      pointer-events: none;
+      z-index: 20;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+      transform-origin: center;
+    }
+    .hand path { fill: #f5d0b0; stroke: #c8a07a; stroke-width: 1; }
+    .hand .sleeve { fill: #4a90d9; stroke: none; }
+
+    /* animation keyframes — hand moves from orb to orb, tapping */
+    /* Phase 1 (0-1.5s): hand moves to top orb → tap */
+    /* Phase 2 (1.5-3s): top orb glows → hand moves to right orb → tap */
+    /* Phase 3 (3-4.5s): right orb glows → both glow → reset */
+    /* Total loop: 5s */
+    @keyframes hand-phase1 {
+      0%   { transform: translate(0px, 0px) scale(1); opacity: 0; }
+      8%   { transform: translate(0px, 0px) scale(1); opacity: 1; }
+      15%  { transform: translate(0px, -126px) scale(1); opacity: 1; }
+      17%  { transform: translate(0px, -126px) scale(0.85); opacity: 1; }
+      20%  { transform: translate(0px, -126px) scale(1); opacity: 1; }
+      30%  { transform: translate(0px, -126px) scale(1); opacity: 1; }
+      40%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes hand-phase2 {
+      0%   { transform: translate(0px, 0px) scale(1); opacity: 0; }
+      38%  { transform: translate(0px, 0px) scale(1); opacity: 0; }
+      42%  { transform: translate(0px, 0px) scale(1); opacity: 1; }
+      50%  { transform: translate(89px, 89px) scale(1); opacity: 1; }
+      52%  { transform: translate(89px, 89px) scale(0.85); opacity: 1; }
+      55%  { transform: translate(89px, 89px) scale(1); opacity: 1; }
+      65%  { transform: translate(89px, 89px) scale(1); opacity: 1; }
+      70%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes orb1-select {
+      0%,  30% { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.07); box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
+      32%, 100% { border-color: #7800FF; background: radial-gradient(circle at 35% 35%, rgba(120,0,255,0.3), rgba(120,0,255,0.1)); box-shadow: 0 0 28px rgba(120,0,255,0.5), 0 0 60px rgba(120,0,255,0.2); }
+    }
+    @keyframes orb2-select {
+      0%,  55% { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.07); box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
+      58%, 100% { border-color: #7800FF; background: radial-gradient(circle at 35% 35%, rgba(120,0,255,0.3), rgba(120,0,255,0.1)); box-shadow: 0 0 28px rgba(120,0,255,0.5), 0 0 60px rgba(120,0,255,0.2); }
+    }
+    .hand-phase1 { animation: hand-phase1 5s ease-in-out infinite; }
+    .hand-phase2 { animation: hand-phase2 5s ease-in-out infinite; }
+    .orb1-anim { animation: orb1-select 5s ease-in-out infinite; }
+    .orb2-anim { animation: orb2-select 5s ease-in-out infinite; }
+
+    /* label overlay */
+    .demo-label {
+      position: absolute;
+      bottom: 18px; left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, rgba(120,0,255,0.85), rgba(255,0,229,0.85));
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50px;
+      padding: 9px 22px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #fff; white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 20px rgba(120,0,255,0.2);
+      pointer-events: none;
+    }
+
+    .cta {
+      display: block; width: 100%; padding: 15px;
+      background: linear-gradient(90deg, #00C8FF, #7800FF);
+      border: none; border-radius: 0 0 23px 23px;
+      color: #fff; font-family: 'Outfit', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .cta:hover { opacity: 0.82; }
+
+    /* ── OPTION A: Static subtitle ── */
+    .opt-a-label {
+      position: absolute;
+      bottom: 18px; left: 50%; transform: translateX(-50%);
+      font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); white-space: nowrap; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#00C8FF,#7800FF);display:flex;align-items:center;justify-content:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    </div>
+    <span style="font-size:15px;font-weight:900;color:#fff;">KnowYouRole</span>
+  </div>
+  <span style="font-size:11px;font-weight:700;color:#7800FF;letter-spacing:0.12em;">STEP 2 OF 3</span>
+  <div style="width:40px;"></div>
+</header>
+<div class="prog"><div class="prog-fill"></div></div>
+
+<div class="page">
+  <h1>Option D — Animated Demo</h1>
+  <p>A tiny animated hand shows exactly what to do. Loops continuously. "Select 2 moods" in a pill below.</p>
+
+  <div class="card">
+    <h2>Animated hand demo — plays on loop</h2>
+    <div class="ring-area">
+
+      <!-- orbs (positions match the app: r=132, cx/cy centered) -->
+      <!-- top orb -->
+      <div class="orb orb1-anim" id="o1" style="top:50%;left:50%;transform:translate(-50%,-50%) translateY(-132px)">🎯<span>Focused</span></div>
+      <!-- top-right -->
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(93px,-93px)">🎨<span>Creative</span></div>
+      <!-- right -->
+      <div class="orb orb2-anim" id="o2" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(132px,0)">🌊<span>Calm</span></div>
+      <!-- bottom-right -->
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(93px,93px)">⚡<span>Energetic</span></div>
+      <!-- bottom -->
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(0,132px)">🔮<span>Curious</span></div>
+      <!-- bottom-left -->
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(-93px,93px)">💪<span>Determined</span></div>
+      <!-- left -->
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(-132px,0)">🤝<span>Social</span></div>
+      <!-- top-left -->
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(-93px,-93px)">🌙<span>Reflective</span></div>
+
+      <!-- animated hand - phase 1: moves to top orb, taps -->
+      <svg class="hand hand-phase1" style="top:calc(50% - 32px);left:calc(50% - 16px)"
+           viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <rect class="sleeve" x="10" y="24" width="12" height="8" rx="2"/>
+        <path d="M16 24 C10 24 6 19 6 14 C6 10 9 8 12 9 C13 9.5 14 11 14 12 L14 7 C14 5 15 4 16 4 C17 4 18 5 18 7 L18 12 C19 11 20 10 21 10 C23 10 25 12 24 16 C23 20 20 22 16 24Z"/>
+      </svg>
+
+      <!-- animated hand - phase 2: moves to right orb, taps -->
+      <svg class="hand hand-phase2" style="top:calc(50% - 16px);left:calc(50% + 100px)"
+           viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <rect class="sleeve" x="10" y="24" width="12" height="8" rx="2"/>
+        <path d="M16 24 C10 24 6 19 6 14 C6 10 9 8 12 9 C13 9.5 14 11 14 12 L14 7 C14 5 15 4 16 4 C17 4 18 5 18 7 L18 12 C19 11 20 10 21 10 C23 10 25 12 24 16 C23 20 20 22 16 24Z"/>
+      </svg>
+
+      <!-- label -->
+      <div class="demo-label">✦ Select 2 moods ✦</div>
+    </div>
+    <button class="cta" onclick="alert('Option D selected!')">Use Option D</button>
+  </div>
+
+  <div class="card">
+    <h2>Option A — simple static label (fallback/contrast)</h2>
+    <div class="ring-area">
+      <!-- orbs (same positions) -->
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translateY(-132px)">🎯<span>Focused</span></div>
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(93px,-93px)">🎨<span>Creative</span></div>
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(132px,0)">🌊<span>Calm</span></div>
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(93px,93px)">⚡<span>Energetic</span></div>
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(0,132px)">🔮<span>Curious</span></div>
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(-93px,93px)">💪<span>Determined</span></div>
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(-132px,0)">🤝<span>Social</span></div>
+      <div class="orb" style="top:50%;left:50%;transform:translate(-50%,-50%) translate(-93px,-93px)">🌙<span>Reflective</span></div>
+      <div class="opt-a-label">✦ Select 2 moods ✦</div>
+    </div>
+    <button class="cta" onclick="alert('Option A selected!')">Use Option A</button>
+  </div>
+
+</div>
+
+</body>
+</html>
