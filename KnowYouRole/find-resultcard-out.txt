@@ -1,7 +1,0 @@
-Line 743
-Line content: // ─── RESULT CARD ─────────────────────────────────────────────────────────────
-Prev line: }
-
-Next line: function ResultCard({ mood1, mood2, onContinue, onReset }: {
-
-Function start search...
