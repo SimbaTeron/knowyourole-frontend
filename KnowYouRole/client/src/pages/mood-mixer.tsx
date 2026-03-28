@@ -661,7 +661,54 @@ function MoodOrb({
   );
 }
 
-// ─── RESULT CARD ─────────────────────────────────────────────────────────────
+// ─── MOOD SHIFT ALGORITHM ────────────────────────────────────────────────────
+type TraitKey = "focus" | "emotion" | "creative" | "social" | "resilience";
+
+interface TraitShift {
+  key: TraitKey;
+  label: string;
+  emoji: string;
+  delta: number;
+  direction: "boost" | "nudge" | "dampen";
+}
+
+interface MoodVector {
+  focus: number; emotion: number; creative: number; social: number; resilience: number;
+}
+
+const MOOD_VECTORS: Record<string, MoodVector> = {
+  focused:    { focus: 9,  emotion: 2,  creative: 5,  social: -2, resilience: 7 },
+  creative:   { focus: 4,  emotion: 1,  creative: 9,  social: 6,  resilience: 3 },
+  calm:       { focus: 2,  emotion: 9,  creative: 4,  social: -2, resilience: 5 },
+  energetic:  { focus: 3,  emotion: -3, creative: 5,  social: 9,  resilience: 7 },
+  curious:    { focus: 6,  emotion: 5,  creative: 8,  social: 4,  resilience: 3 },
+  determined: { focus: 8,  emotion: 3,  creative: 3,  social: 2,  resilience: 9 },
+  social:     { focus: 2,  emotion: 7,  creative: 4,  social: 9,  resilience: 4 },
+  reflective: { focus: 3,  emotion: 8,  creative: 7,  social: 1,  resilience: 5 },
+};
+
+const TRAIT_LABELS: Record<TraitKey, { label: string; emoji: string }> = {
+  focus:     { label: "Focus Depth",        emoji: "\uD83C\uDFAF" },
+  emotion:   { label: "Emotional Balance",  emoji: "\uD83D\uDC8E" },
+  creative:  { label: "Creative Vision",    emoji: "\uD83C\uDFA8" },
+  social:    { label: "Social Magnetism",   emoji: "\uD83E\uDD1D" },
+  resilience:{ label: "Resilience",          emoji: "\u26A1" },
+};
+
+function getMoodShiftData(mood1Id: string, mood2Id: string): TraitShift[] {
+  const v1 = MOOD_VECTORS[mood1Id] ?? { focus: 0, emotion: 0, creative: 0, social: 0, resilience: 0 };
+  const v2 = MOOD_VECTORS[mood2Id] ?? { focus: 0, emotion: 0, creative: 0, social: 0, resilience: 0 };
+  const traits: TraitKey[] = ["focus", "emotion", "creative", "social", "resilience"];
+  const combined = traits.map(t => ({ key: t, delta: Math.round((v1[t] + v2[t]) / 2) }));
+  const top3 = [...combined].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 3);
+  return top3.map(({ key, delta }) => {
+    const abs = Math.abs(delta);
+    const direction: TraitShift["direction"] = abs <= 2 ? "nudge" : delta > 0 ? "boost" : "dampen";
+    return { key, label: TRAIT_LABELS[key].label, emoji: TRAIT_LABELS[key].emoji, delta, direction };
+  });
+}
+
+// ─── RESULT CARD ──────────────────────────────────────────────────────────────
 function ResultCard({ mood1, mood2, onContinue, onReset }: {
   mood1: typeof MOODS[0];
   mood2: typeof MOODS[0];
@@ -669,6 +716,19 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
   onReset: () => void;
 }) {
   const blendName = getBlendName(mood1.id, mood2.id);
+  const shifts = getMoodShiftData(mood1.id, mood2.id);
+
+  const tagStyle = (dir: TraitShift["direction"]): React.CSSProperties => {
+    if (dir === "boost") return { padding: "4px 12px", borderRadius: 50, fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", whiteSpace: "nowrap", flexShrink: 0, background: "rgba(74,222,128,0.15)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.35)" };
+    if (dir === "nudge") return { padding: "4px 12px", borderRadius: 50, fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", whiteSpace: "nowrap", flexShrink: 0, background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" };
+    return { padding: "4px 12px", borderRadius: 50, fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", whiteSpace: "nowrap", flexShrink: 0, background: "rgba(248,113,113,0.12)", color: "#f87171", border: "1px solid rgba(248,113,113,0.25)" };
+  };
+
+  const tagLabel = (dir: TraitShift["direction"]) => {
+    if (dir === "boost") return "\u21b7 Strong Boost";
+    if (dir === "nudge") return "\u21b7 Light Nudge";
+    return "\u21b9 Dampens";
+  };
 
   return (
     <motion.div
@@ -691,7 +751,6 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
         overflow: "hidden",
       }}
     >
-      {/* Shimmer rim */}
       <div style={{
         position: "absolute", inset: -1,
         borderRadius: 33,
@@ -699,7 +758,6 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
         zIndex: -1,
       }} />
 
-      {/* Sparkles */}
       <div style={{ position: "absolute", top: 16, right: 20 }}>
         <Sparkles size={20} color="#FBBF24" style={{ filter: "drop-shadow(0 0 6px #FBBF24)" }} />
       </div>
@@ -707,7 +765,6 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
         <Sparkles size={14} color={mood1.color} style={{ filter: `drop-shadow(0 0 6px ${mood1.color})` }} />
       </div>
 
-      {/* Emoji */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -725,7 +782,6 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
         <motion.span animate={{ y: [0, -10, 0] }} transition={{ duration: 1.6, repeat: Infinity, delay: 0.25 }}>{mood2.emoji}</motion.span>
       </motion.div>
 
-      {/* Blend name */}
       <div style={{
         fontSize: "clamp(1.5rem, 6vw, 2.4rem)",
         fontWeight: 900,
@@ -741,7 +797,6 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
         {blendName}
       </div>
 
-      {/* Mood pills */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 22 }}>
         <span style={{
           background: `${mood1.color}16`,
@@ -750,7 +805,7 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
           fontSize: 12, fontWeight: 700, color: mood1.color,
           fontFamily: "'Outfit',sans-serif",
         }}>{mood1.label}</span>
-        <span style={{ color: "rgba(255,255,255,0.26)", fontSize: 14 }}>✦</span>
+        <span style={{ color: "rgba(255,255,255,0.26)", fontSize: 14 }}>*</span>
         <span style={{
           background: `${mood2.color}16`,
           border: `1px solid ${mood2.color}42`,
@@ -760,7 +815,42 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
         }}>{mood2.label}</span>
       </div>
 
-      {/* Description */}
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16, marginBottom: 16 }}>
+        <div style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: "0.22em",
+          textTransform: "uppercase",
+          color: "rgba(255,255,255,0.28)",
+          marginBottom: 12,
+        }}>
+          How your moods shape your result
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {shifts.map(shift => (
+            <div key={shift.key} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, width: 130, flexShrink: 0 }}>
+                <span style={{ fontSize: "1rem" }}>{shift.emoji}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.55)" }}>{shift.label}</span>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={tagStyle(shift.direction)}>{tagLabel(shift.direction)}</div>
+              </div>
+              <div style={{
+                width: 44,
+                textAlign: "right",
+                fontSize: 11,
+                fontWeight: 800,
+                flexShrink: 0,
+                color: shift.delta > 0 ? "#4ade80" : shift.delta < 0 ? "#f87171" : "rgba(255,255,255,0.3)",
+              }}>
+                {shift.delta > 0 ? "+" : ""}{shift.delta}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <p style={{
         fontSize: 14,
         color: "rgba(255,255,255,0.47)",
@@ -772,7 +862,6 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
         {getBlendDescription(mood1.id, mood2.id)}
       </p>
 
-      {/* Actions */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -827,6 +916,8 @@ function ResultCard({ mood1, mood2, onContinue, onReset }: {
     </motion.div>
   );
 }
+
+
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 export default function MoodMixer() {
