@@ -6,7 +6,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import DevToolPanel from "@/components/DevToolPanel";
-import DevPanel from "@/components/DevPanel/DevPanel";
 import Home from "@/pages/home";
 import MoodPage from "@/pages/mood";
 import MoodMixerPage from "@/pages/mood-mixer";
@@ -92,7 +91,6 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/careers" component={Careers} />
       <Route path="/results" component={ResultsPage} />
-      <DevToolPanel />
       <Route component={NotFound} />
     </Switch>
   );
@@ -105,7 +103,7 @@ function App() {
         <TooltipProvider>
           <ScrollToTop />
           <Toaster />
-          <DevPanel />
+          <DevToolPanel />
           <Router />
         </TooltipProvider>
       </QueryClientProvider>

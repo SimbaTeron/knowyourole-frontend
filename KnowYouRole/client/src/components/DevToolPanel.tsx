@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
 
 const TIER_OPTIONS = [
@@ -14,7 +14,7 @@ const PAGE_OPTIONS = [
   { path: "/quiz/questions", label: "3. Quiz Questions", desc: "Answer 40 personality questions" },
   { path: "/results", label: "4. Results Page", desc: "See your personality results" },
   { path: "/auth", label: "Auth Login", desc: "Login/signup page" },
-  { path: "/about", label: "About Page", desc: "About KnowYouRole" },
+  { path: "/about", label: "About Page", desc: "About KnowYourRole" },
   { path: "/faq", label: "FAQ Page", desc: "Frequently asked questions" },
 ];
 
@@ -30,34 +30,33 @@ export default function DevToolPanel() {
   if (!isTestMode()) return null;
 
   const handleNavigate = (path: string) => {
-    // Set fake data in sessionStorage before navigating
-    sessionStorage.setItem("knowrole-tier", selectedTier);
+    // Write to NEW canonical keys (results page reads these)
     const fakeScores = getFakeScores(selectedTier);
-    // Override MBTI in the fake scores
     const scoresWithMBTI = { ...fakeScores, mbti: selectedMBTI };
+    sessionStorage.setItem("kyr_tier", selectedTier);
+    sessionStorage.setItem("kyr_fake_scores", JSON.stringify(scoresWithMBTI));
+    sessionStorage.setItem("kyr_fake_type", selectedMBTI + "-A");
+    // Also write old keys for backwards compat
+    sessionStorage.setItem("knowrole-tier", selectedTier);
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(scoresWithMBTI));
     window.location.href = path + "?test=true";
   };
 
   const handleRandomize = () => {
-    // Random tier
     const randomTier = TIER_OPTIONS[Math.floor(Math.random() * TIER_OPTIONS.length)].id;
-    // Random MBTI
     const randomMBTI = MBTI_TYPES[Math.floor(Math.random() * MBTI_TYPES.length)];
-    // Random DISC
     const randomDISC = DISC_TYPES[Math.floor(Math.random() * DISC_TYPES.length)];
-    // Random Big Five
     const randomBigFive = {
-      O: Math.floor(Math.random() * 40) + 60,  // 60-100
+      O: Math.floor(Math.random() * 40) + 60,
       C: Math.floor(Math.random() * 40) + 60,
       E: Math.floor(Math.random() * 40) + 60,
       A: Math.floor(Math.random() * 40) + 60,
       N: Math.floor(Math.random() * 40) + 60,
     };
-    
+
     setSelectedTier(randomTier);
     setSelectedMBTI(randomMBTI);
-    
+
     const fakeScores = getFakeScores(randomTier);
     const randomizedScores = {
       ...fakeScores,
@@ -65,12 +64,16 @@ export default function DevToolPanel() {
       disc: randomDISC,
       bigFive: randomBigFive,
     };
-    
+
+    // Write NEW canonical keys
+    sessionStorage.setItem("kyr_tier", randomTier);
+    sessionStorage.setItem("kyr_fake_scores", JSON.stringify(randomizedScores));
+    sessionStorage.setItem("kyr_fake_type", randomMBTI + "-A");
+    // Also write old keys for backwards compat
     sessionStorage.setItem("knowrole-tier", randomTier);
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(randomizedScores));
     sessionStorage.setItem("knowrole-randomized", "true");
-    
-    // Reload current page with new fake data
+
     window.location.reload();
   };
 
@@ -93,8 +96,8 @@ export default function DevToolPanel() {
       overflow: "hidden",
       transition: "width 0.2s ease",
     }}>
-      {/* Header bar - click to collapse/expand */}
-      <div 
+      {/* Header bar */}
+      <div
         onClick={() => setExpanded(!expanded)}
         style={{
           background: "#FFD700",
@@ -109,7 +112,7 @@ export default function DevToolPanel() {
         }}
       >
         <span>🛠️ DEV TOOL</span>
-        <span style={{fontSize: 14}}>{expanded ? "−" : "+"}</span>
+        <span style={{ fontSize: 14 }}>{expanded ? "−" : "+"}</span>
       </div>
 
       {expanded && (
@@ -121,7 +124,7 @@ export default function DevToolPanel() {
             <div style={{ color: "#666", fontSize: 9, marginTop: 2 }}>Test Mode Active</div>
           </div>
 
-          {/* NAVIGATE SECTION */}
+          {/* NAVIGATE */}
           <div style={{ marginBottom: 12 }}>
             <div style={{ color: "#FFD700", fontWeight: 700, fontSize: 10, marginBottom: 6, letterSpacing: "0.1em" }}>▶ NAVIGATE</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -133,41 +136,40 @@ export default function DevToolPanel() {
                     background: currentPath === opt.path ? "rgba(0,200,255,0.15)" : "rgba(255,255,255,0.05)",
                     border: `1px solid ${currentPath === opt.path ? "#00C8FF" : "rgba(255,255,255,0.1)"}`,
                     borderRadius: 6,
-                    padding: "6px 8px",
-                    color: "#fff",
+                    padding: "5px 8px",
+                    color: currentPath === opt.path ? "#00C8FF" : "#ccc",
                     cursor: "pointer",
                     textAlign: "left",
-                    width: "100%",
+                    fontSize: 10,
+                    fontFamily: "'Courier New', monospace",
                   }}
                 >
-                  <div style={{ fontSize: 10, fontWeight: 700, color: currentPath === opt.path ? "#00C8FF" : "#ccc" }}>
-                    {opt.label}
-                  </div>
-                  <div style={{ fontSize: 9, color: "#666", marginTop: 1 }}>{opt.desc}</div>
+                  <div style={{ fontWeight: 700 }}>{opt.label}</div>
+                  <div style={{ color: "#666", fontSize: 8, marginTop: 1 }}>{opt.desc}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* FAKE DATA SECTION */}
+          {/* FAKE DATA */}
           <div style={{ marginBottom: 12 }}>
-            <div style={{ color: "#FFD700", fontWeight: 700, fontSize: 10, marginBottom: 6, letterSpacing: "0.1em" }}>⚙️ FAKE DATA</div>
-            
-            {/* Tier selector */}
-            <div style={{ marginBottom: 6 }}>
-              <div style={{ color: "#888", fontSize: 9, marginBottom: 3 }}>TIER</div>
+            <div style={{ color: "#FFD700", fontWeight: 700, fontSize: 10, marginBottom: 6, letterSpacing: "0.1em" }}>⚙ FAKE DATA</div>
+
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ color: "#888", fontSize: 9, marginBottom: 4 }}>TIER</div>
               <select
                 value={selectedTier}
                 onChange={e => setSelectedTier(e.target.value)}
                 style={{
                   width: "100%",
                   background: "#0d0d1a",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  borderRadius: 4,
-                  color: "#fff",
-                  padding: "4px 6px",
+                  color: "#00C8FF",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 6,
+                  padding: "5px 8px",
                   fontSize: 10,
-                  fontFamily: "monospace",
+                  fontFamily: "'Courier New', monospace",
+                  cursor: "pointer",
                 }}
               >
                 {TIER_OPTIONS.map(t => (
@@ -176,21 +178,21 @@ export default function DevToolPanel() {
               </select>
             </div>
 
-            {/* MBTI selector */}
-            <div style={{ marginBottom: 6 }}>
-              <div style={{ color: "#888", fontSize: 9, marginBottom: 3 }}>MBTI TYPE</div>
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ color: "#888", fontSize: 9, marginBottom: 4 }}>MBTI TYPE</div>
               <select
                 value={selectedMBTI}
                 onChange={e => setSelectedMBTI(e.target.value)}
                 style={{
                   width: "100%",
                   background: "#0d0d1a",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  borderRadius: 4,
                   color: "#00C8FF",
-                  padding: "4px 6px",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 6,
+                  padding: "5px 8px",
                   fontSize: 10,
-                  fontFamily: "monospace",
+                  fontFamily: "'Courier New', monospace",
+                  cursor: "pointer",
                 }}
               >
                 {MBTI_TYPES.map(m => (
@@ -200,68 +202,62 @@ export default function DevToolPanel() {
             </div>
           </div>
 
-          {/* RANDOMIZE SECTION */}
+          {/* RANDOMISE */}
           <div style={{ marginBottom: 12 }}>
-            <div style={{ color: "#FFD700", fontWeight: 700, fontSize: 10, marginBottom: 6, letterSpacing: "0.1em" }}>🎲 RANDOMIZE</div>
+            <div style={{ color: "#FFD700", fontWeight: 700, fontSize: 10, marginBottom: 6, letterSpacing: "0.1em" }}>🎲 RANDOMISE</div>
             <button
               onClick={handleRandomize}
               style={{
                 width: "100%",
                 padding: "10px",
-                background: "linear-gradient(135deg, #7800FF, #00C8FF)",
+                background: "#00C8FF",
                 border: "none",
                 borderRadius: 8,
-                color: "#fff",
+                color: "#000",
                 fontWeight: 900,
                 fontSize: 11,
                 cursor: "pointer",
-                fontFamily: "monospace",
+                fontFamily: "'Courier New', monospace",
                 letterSpacing: "0.05em",
               }}
             >
               🎲 RANDOMIZE ALL DATA
             </button>
-            <div style={{ color: "#666", fontSize: 9, marginTop: 4, textAlign: "center" }}>
+            <div style={{ color: "#555", fontSize: 8, marginTop: 4, textAlign: "center" }}>
               Picks random tier + MBTI + DISC + Big Five
             </div>
           </div>
 
-          {/* QUICK LINKS */}
+          {/* QUICK JUMP */}
           <div>
-            <div style={{ color: "#FFD700", fontWeight: 700, fontSize: 10, marginBottom: 6, letterSpacing: "0.1em" }}>🔗 QUICK JUMP</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
-              <button
-                onClick={() => handleNavigate("/results")}
-                style={{ padding: "6px", background: "#0d0d1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: "#ccc", cursor: "pointer", fontSize: 9 }}
-              >
-                Results P1
-              </button>
-              <button
-                onClick={() => {
-                  sessionStorage.setItem("knowrole-tier", selectedTier);
-                  window.location.href = "/results?test=true&page=2";
-                }}
-                style={{ padding: "6px", background: "#0d0d1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: "#ccc", cursor: "pointer", fontSize: 9 }}
-              >
-                Results P2
-              </button>
-              <button
-                onClick={() => {
-                  sessionStorage.setItem("knowrole-tier", selectedTier);
-                  window.location.href = "/results?test=true&page=3&force=true";
-                }}
-                style={{ padding: "6px", background: "#0d0d1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: "#ccc", cursor: "pointer", fontSize: 9 }}
-              >
-                Results P3
-              </button>
-              <button
-                onClick={() => handleNavigate("/auth")}
-                style={{ padding: "6px", background: "#0d0d1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: "#ccc", cursor: "pointer", fontSize: 9 }}
-              >
-                Auth Page
-              </button>
+            <div style={{ color: "#FFD700", fontWeight: 700, fontSize: 10, marginBottom: 6, letterSpacing: "0.1em" }}>⚡ QUICK JUMP</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+              {[
+                { label: "Results P1", path: "/results?page=1&test=true" },
+                { label: "Results P2", path: "/results?page=2&test=true" },
+                { label: "Results P3", path: "/results?page=3&test=true" },
+                { label: "Auth Page", path: "/auth?test=true" },
+              ].map(item => (
+                <button
+                  key={item.label}
+                  onClick={() => { window.location.href = item.path; }}
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 6,
+                    padding: "6px 8px",
+                    color: "#ccc",
+                    fontSize: 9,
+                    cursor: "pointer",
+                    fontFamily: "'Courier New', monospace",
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
           </div>
+
         </div>
       )}
     </div>

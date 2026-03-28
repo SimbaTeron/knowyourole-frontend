@@ -1,0 +1,5 @@
+Idx: 32539
+'}\n\n// ─── RESULT CARD ────────────────────────────────────────────────'
+'}\n\n// ─── RESULT CARD ─────────────────────────────────────────────────────────────\nfunction ResultCard({ mood1, mood2, onContinue, onReset }: {\n  mood1: typeof MOODS[0];\n  mood2: typeof MOODS[0];\n  onContinue:'
+Lines around:
+Line 663: '// ─── RESULT CARD ─────────────────────────────────────────────────────────────'

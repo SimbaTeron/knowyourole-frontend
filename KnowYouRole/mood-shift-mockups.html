@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnowYouRole — Mood Shift Mockups</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #050510; font-family: 'Outfit', sans-serif; color: #fff; min-height: 100vh; padding: 24px; }
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(0,0,0,0.75); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.07); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .prog { position: fixed; top: 57px; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.06); z-index: 50; }
+    .prog-fill { height: 100%; width: 66%; background: linear-gradient(90deg, #7800FF, #FF00E5); }
+
+    .page { padding: 110px 24px 60px; max-width: 680px; margin: 0 auto; }
+    .page h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+    .page > p { color: rgba(255,255,255,0.35); font-size: 12px; margin-bottom: 36px; line-height: 1.6; }
+
+    .opt-label { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #FF00E5; margin-bottom: 8px; }
+
+    .tabs { display: flex; gap: 4px; margin-bottom: 28px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; width: fit-content; }
+    .tab { padding: 8px 18px; border-radius: 9px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); cursor: pointer; border: none; background: none; transition: all 0.2s; letter-spacing: 0.05em; }
+    .tab.active { background: rgba(120,0,255,0.5); color: #fff; }
+
+    .mock { border-radius: 22px; overflow: hidden; margin-bottom: 56px; border: 1px solid rgba(255,255,255,0.08); background: rgba(8,8,24,0.95); }
+    .mock h2 { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.35); padding: 12px 22px; border-bottom: 1px solid rgba(255,255,255,0.06); letter-spacing: 0.05em; }
+
+    .card { padding: 22px 22px; }
+
+    /* MOOD BADGES */
+    .badges { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .badge { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; border: 1px solid; }
+    .f { background: rgba(120,0,255,0.15); border-color: rgba(120,0,255,0.4); color: #c084fc; }
+    .c { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.4); color: #93c5fd; }
+    .plus { font-size: 14px; color: rgba(255,255,255,0.2); }
+
+    /* BLEND NAME */
+    .blend-name { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.02em; background: linear-gradient(135deg, #00C8FF, #FF00E5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
+    .blend-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 18px; }
+
+    .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 18px 0; }
+    .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 14px; }
+
+    /* ── ROW 1: Number lines ── */
+    .row1-lines { display: flex; flex-direction: column; gap: 10px; }
+    .row1-line { display: flex; align-items: center; gap: 10px; }
+    .row1-icon { font-size: 14px; width: 22px; text-align: center; flex-shrink: 0; }
+    .row1-name { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; width: 110px; flex-shrink: 0; }
+    .row1-arrow { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; width: 42px; flex-shrink: 0; }
+    .row1-bar-wrap { flex: 1; height: 4px; background: rgba(255,255,255,0.07); border-radius: 50px; overflow: hidden; position: relative; }
+    /* center pivot = 50% mark */
+    .row1-fill { position: absolute; height: 100%; border-radius: 50px; }
+    .row1-note { font-size: 10px; color: rgba(255,255,255,0.3); width: 70px; text-align: right; flex-shrink: 0; }
+
+    /* ── ROW 2: Mood tag pills ── */
+    .row2-pills { display: flex; flex-direction: column; gap: 12px; }
+    .row2-pill { display: flex; align-items: center; gap: 0; }
+    .pill-left { display: flex; align-items: center; gap: 6px; width: 110px; flex-shrink: 0; }
+    .pill-icon { font-size: 13px; }
+    .pill-name { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; }
+    .pill-center { flex: 1; display: flex; align-items: center; }
+    .pill-tag { padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .pill-right { width: 70px; flex-shrink: 0; text-align: right; }
+
+    /* ── ROW 3: Centered pivot bars ── */
+    .row3-bars { display: flex; flex-direction: column; gap: 14px; }
+    .row3-row { display: flex; align-items: center; gap: 10px; }
+    .row3-name { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 600; width: 110px; flex-shrink: 0; }
+    .row3-pivot-wrap { flex: 1; height: 8px; background: rgba(255,255,255,0.07); border-radius: 50px; position: relative; overflow: visible; }
+    .row3-pivot { position: absolute; left: 50%; top: -2px; width: 2px; height: 12px; background: rgba(255,255,255,0.2); border-radius: 1px; }
+    .row3-fill { position: absolute; top: 0; height: 100%; border-radius: 50px; }
+    .row3-delta { width: 70px; text-align: right; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+    .row3-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    /* SHARED */
+    .cta { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: linear-gradient(90deg, #00C8FF, #7800FF); border: none; border-radius: 12px; color: #fff; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer; width: 100%; margin-top: 4px; }
+    .cta-bar { padding: 14px 22px; background: rgba(120,0,255,0.05); border-top: 1px solid rgba(120,0,255,0.12); display: flex; align-items: center; justify-content: space-between; }
+    .cta-bar-left { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600; }
+    .cta-bar-right { font-size: 10px; color: rgba(255,255,255,0.2); }
+
+    /* ── SHIFT INDICATOR COLORS ── */
+    .up { color: #4ade80; }
+    .down { color: #f87171; }
+    .up-bg { background: linear-gradient(90deg, rgba(74,222,128,0.0), rgba(74,222,128,0.5)); }
+    .down-bg { background: linear-gradient(90deg, rgba(248,113,113,0.5), rgba(248,113,113,0.0)); }
+    .flat { color: rgba(255,255,255,0.35); }
+    .flat-bg { background: rgba(255,255,255,0.08); }
+
+    /* tag colors */
+    .tag-boost { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .tag-nudge { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .tag-dampen { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#00C8FF,#7800FF);display:flex;align-items:center;justify-content:center;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    </div>
+    <span style="font-size:14px;font-weight:900;color:#fff;">KnowYouRole</span>
+  </div>
+  <span style="font-size:10px;font-weight:700;color:#7800FF;letter-spacing:0.12em;">STEP 3 OF 3</span>
+  <div style="width:36px;"></div>
+</header>
+<div class="prog"><div class="prog-fill"></div></div>
+
+<div class="page">
+  <h1>Mood Shift — Compact Options</h1>
+  <p>3 intuitive ways to show how two selected moods sway the result. No percentages — just + or − direction and strength.</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="show('A')">Option A — Arrow Lines</button>
+    <button class="tab" onclick="show('B')">Option B — Tag Pills</button>
+    <button class="tab" onclick="show('C')">Option C — Pivot Bars</button>
+  </div>
+
+  <!-- ── OPTION A: Arrow + number + bar ── -->
+  <div class="opt-label">Option A</div>
+  <div class="mock" id="mockA">
+    <h2>Arrow + nudge number + small fill bar — the most glanceable</h2>
+    <div class="card">
+      <div class="badges">
+        <div class="badge f">🎯 Focused</div>
+        <div class="plus">+</div>
+        <div class="badge c">🌊 Calm</div>
+      </div>
+      <div class="blend-name">The Visionary Architect</div>
+      <div class="blend-tag">Mood Blend</div>
+
+      <div class="divider"></div>
+      <div class="section-label">How your moods shape your result</div>
+
+      <div class="row1-lines">
+
+        <!-- Focus Depth — strong boost -->
+        <div class="row1-line">
+          <div class="row1-icon">🎯</div>
+          <div class="row1-name">Focus Depth</div>
+          <div class="row1-arrow up">↑ +22</div>
+          <div class="row1-bar-wrap">
+            <div class="row1-fill up-bg" style="left:50%;width:22%;"></div>
+          </div>
+          <div class="row1-note">sharpens</div>
+        </div>
+
+        <!-- Emotional Stability — moderate boost -->
+        <div class="row1-line">
+          <div class="row1-icon">🌊</div>
+          <div class="row1-name">Emotional Balance</div>
+          <div class="row1-arrow up">↑ +14</div>
+          <div class="row1-bar-wrap">
+            <div class="row1-fill up-bg" style="left:50%;width:14%;"></div>
+          </div>
+          <div class="row1-note">steadies</div>
+        </div>
+
+        <!-- Creative Vision — slight nudge -->
+        <div class="row1-line">
+          <div class="row1-icon">🎨</div>
+          <div class="row1-name">Creative Vision</div>
+          <div class="row1-arrow up">↑ +5</div>
+          <div class="row1-bar-wrap">
+            <div class="row1-fill up-bg" style="left:50%;width:5%;"></div>
+          </div>
+          <div class="row1-note">nudges</div>
+        </div>
+
+      </div>
+
+      <button class="cta">Unlock Full Insight →</button>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-left">Mood Alchemy Lab</div>
+      <div class="cta-bar-right">KnowYouRole</div>
+    </div>
+  </div>
+
+  <!-- ── OPTION B: Mood tag pills ── -->
+  <div class="opt-label">Option B</div>
+  <div class="mock" id="mockB" style="display:none;">
+    <h2>Each trait gets a colored mood tag — Boost / Nudge / Dampen</h2>
+    <div class="card">
+      <div class="badges">
+        <div class="badge f">🎯 Focused</div>
+        <div class="plus">+</div>
+        <div class="badge c">🌊 Calm</div>
+      </div>
+      <div class="blend-name">The Visionary Architect</div>
+      <div class="blend-tag">Mood Blend</div>
+
+      <div class="divider"></div>
+      <div class="section-label">How your moods shape your result</div>
+
+      <div class="row2-pills">
+
+        <div class="row2-pill">
+          <div class="pill-left">
+            <div class="pill-icon">🎯</div>
+            <div class="pill-name">Focus Depth</div>
+          </div>
+          <div class="pill-center">
+            <div class="pill-tag tag-boost">↑ Strong Boost</div>
+          </div>
+          <div class="pill-right" style="font-size:11px;color:#4ade80;font-weight:700;">+22</div>
+        </div>
+
+        <div class="row2-pill">
+          <div class="pill-left">
+            <div class="pill-icon">🌊</div>
+            <div class="pill-name">Emotional Balance</div>
+          </div>
+          <div class="pill-center">
+            <div class="pill-tag tag-nudge">↗ Nudges Up</div>
+          </div>
+          <div class="pill-right" style="font-size:11px;color:#fbbf24;font-weight:700;">+14</div>
+        </div>
+
+        <div class="row2-pill">
+          <div class="pill-left">
+            <div class="pill-icon">🎨</div>
+            <div class="pill-name">Creative Vision</div>
+          </div>
+          <div class="pill-center">
+            <div class="pill-tag tag-nudge">↗ Gentle Nudge</div>
+          </div>
+          <div class="pill-right" style="font-size:11px;color:#fbbf24;font-weight:700;">+5</div>
+        </div>
+
+      </div>
+
+      <button class="cta">Unlock Full Insight →</button>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-left">Mood Alchemy Lab</div>
+      <div class="cta-bar-right">KnowYouRole</div>
+    </div>
+  </div>
+
+  <!-- ── OPTION C: Diverging pivot bars ── -->
+  <div class="opt-label">Option C</div>
+  <div class="mock" id="mockC" style="display:none;">
+    <h2>Bar grows/shrinks from center pivot — visually intuitive left/right sway</h2>
+    <div class="card">
+      <div class="badges">
+        <div class="badge f">🎯 Focused</div>
+        <div class="plus">+</div>
+        <div class="badge c">🌊 Calm</div>
+      </div>
+      <div class="blend-name">The Visionary Architect</div>
+      <div class="blend-tag">Mood Blend</div>
+
+      <div class="divider"></div>
+      <div class="section-label">How your moods shape your result</div>
+
+      <div class="row3-bars">
+
+        <div class="row3-row">
+          <div class="row3-name">Focus Depth</div>
+          <div class="row3-pivot-wrap">
+            <div class="row3-pivot"></div>
+            <div class="row3-fill up-bg" style="left:50%;width:30%;"></div>
+          </div>
+          <div class="row3-delta up">
+            <div style="font-size:13px;font-weight:900;">↑ 22</div>
+            <div class="row3-label">boost</div>
+          </div>
+        </div>
+
+        <div class="row3-row">
+          <div class="row3-name">Emotional Balance</div>
+          <div class="row3-pivot-wrap">
+            <div class="row3-pivot"></div>
+            <div class="row3-fill up-bg" style="left:50%;width:18%;"></div>
+          </div>
+          <div class="row3-delta up">
+            <div style="font-size:13px;font-weight:900;">↑ 14</div>
+            <div class="row3-label">nudge</div>
+          </div>
+        </div>
+
+        <div class="row3-row">
+          <div class="row3-name">Creative Vision</div>
+          <div class="row3-pivot-wrap">
+            <div class="row3-pivot"></div>
+            <div class="row3-fill up-bg" style="left:50%;width:7%;"></div>
+          </div>
+          <div class="row3-delta" style="color:rgba(255,255,255,0.35)">
+            <div style="font-size:13px;font-weight:900;">+ 5</div>
+            <div class="row3-label">light</div>
+          </div>
+        </div>
+
+      </div>
+
+      <button class="cta">Unlock Full Insight →</button>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-left">Mood Alchemy Lab</div>
+      <div class="cta-bar-right">KnowYouRole</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function show(letter) {
+    document.querySelectorAll('.mock').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('mock' + letter).style.display = 'block';
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>

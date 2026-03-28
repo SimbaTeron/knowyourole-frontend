@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnowYouRole — Mood Blend Results Mockups</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #050510; font-family: 'Outfit', sans-serif; color: #fff; min-height: 100vh; padding: 24px; }
+
+    /* HEADER */
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(0,0,0,0.75); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.07); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .prog { position: fixed; top: 57px; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.06); z-index: 50; }
+    .prog-fill { height: 100%; width: 66%; background: linear-gradient(90deg, #7800FF, #FF00E5); }
+
+    /* PAGE */
+    .page { padding: 120px 24px 60px; max-width: 860px; margin: 0 auto; }
+    .page h1 { font-size: 1.8rem; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .page > p { color: rgba(255,255,255,0.35); font-size: 13px; margin-bottom: 48px; line-height: 1.6; }
+    .opt-label { font-size: 10px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #FF00E5; margin-bottom: 10px; }
+
+    /* NAV TABS */
+    .tabs { display: flex; gap: 4px; margin-bottom: 32px; background: rgba(255,255,255,0.05); border-radius: 14px; padding: 4px; width: fit-content; }
+    .tab { padding: 10px 20px; border-radius: 10px; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); cursor: pointer; border: none; background: none; transition: all 0.2s; letter-spacing: 0.05em; }
+    .tab.active { background: rgba(120,0,255,0.5); color: #fff; }
+    .tab:hover:not(.active) { color: rgba(255,255,255,0.7); }
+
+    /* MOCK CONTAINER */
+    .mock { border-radius: 24px; overflow: hidden; margin-bottom: 64px; border: 1px solid rgba(255,255,255,0.08); background: rgba(8,8,24,0.95); }
+    .mock h2 { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); padding: 14px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); letter-spacing: 0.05em; }
+
+    /* SHARED RESULT STYLES */
+    .result-card { padding: 32px 28px; }
+    .blend-name { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 4px; background: linear-gradient(135deg, #00C8FF, #FF00E5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .blend-sub { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 20px; }
+
+    /* MOOD BADGES ROW */
+    .mood-badges { display: flex; gap: 10px; margin-bottom: 24px; }
+    .mood-badge { display: flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 50px; font-size: 12px; font-weight: 700; border: 1px solid; }
+    .mood-badge.f { background: rgba(120,0,255,0.15); border-color: rgba(120,0,255,0.5); color: #c084fc; }
+    .mood-badge.c { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.5); color: #93c5fd; }
+
+    /* DIVIDER */
+    .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 24px 0; }
+
+    /* SECTION LABEL */
+    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
+
+    /* TRAIT BARS */
+    .trait-bars { display: flex; flex-direction: column; gap: 14px; }
+    .trait-row { display: flex; flex-direction: column; gap: 6px; }
+    .trait-meta { display: flex; justify-content: space-between; align-items: center; }
+    .trait-name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); }
+    .trait-pct { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.35); }
+    .trait-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 50px; overflow: hidden; }
+    .trait-fill { height: 100%; border-radius: 50px; }
+
+    /* CTA */
+    .cta { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; background: linear-gradient(90deg, #00C8FF, #7800FF); border: none; border-radius: 14px; color: #fff; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer; width: 100%; margin-top: 8px; }
+
+    /* MOOD CARDS */
+    .mood-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+    .mood-card { border-radius: 16px; padding: 16px; border: 1px solid; }
+    .mood-card.f { background: rgba(120,0,255,0.1); border-color: rgba(120,0,255,0.25); }
+    .mood-card.c { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.25); }
+    .mood-card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+    .mood-card.f .mood-card-label { color: #c084fc; }
+    .mood-card.c .mood-card-label { color: #93c5fd; }
+    .mood-card-trait { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .mood-card-desc { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.5; margin-bottom: 12px; }
+    .mini-bars { display: flex; flex-direction: column; gap: 8px; }
+    .mini-row { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+    .mini-bar { height: 3px; background: rgba(255,255,255,0.08); border-radius: 50px; overflow: hidden; }
+    .mini-fill { height: 100%; border-radius: 50px; }
+
+    /* CTA BAR */
+    .cta-bar { padding: 16px 24px; background: rgba(120,0,255,0.06); border-top: 1px solid rgba(120,0,255,0.15); display: flex; align-items: center; justify-content: space-between; }
+    .cta-bar-left { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 600; }
+    .cta-bar-right { font-size: 12px; font-weight: 700; color: #fff; background: linear-gradient(90deg, #7800FF, #FF00E5); padding: 9px 18px; border-radius: 50px; cursor: pointer; }
+
+    /* OPTION A: Compact horizontal bars */
+    .opt-a .result-card { padding: 28px; }
+    .opt-a-blend { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .opt-a-blend .blend-info { flex: 1; }
+    .opt-a-plus { font-size: 20px; color: rgba(255,255,255,0.2); font-weight: 300; }
+
+    /* OPTION B: Mood cards side by side, then bars */
+    .opt-b .result-card { padding: 28px; }
+
+    /* OPTION C: Full original MoodAlchemyLab style */
+    .opt-c .result-card { padding: 32px 28px; background: linear-gradient(180deg, rgba(120,0,255,0.08) 0%, transparent 100%); }
+    .opt-c-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 28px; }
+    .opt-c-icon { width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, #7800FF, #FF00E5); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; box-shadow: 0 0 30px rgba(120,0,255,0.4); }
+    .opt-c-traits { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .opt-c-trait { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 12px; }
+    .opt-c-trait-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 6px; }
+    .opt-c-trait-value { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+    .opt-c-trait-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 50px; overflow: hidden; }
+    .opt-c-trait-fill { height: 100%; border-radius: 50px; }
+    .opt-c-mood-desc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 20px; font-style: italic; border-left: 2px solid #7800FF; padding-left: 14px; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .mood-cards { grid-template-columns: 1fr; }
+      .opt-c-traits { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#00C8FF,#7800FF);display:flex;align-items:center;justify-content:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    </div>
+    <span style="font-size:15px;font-weight:900;color:#fff;">KnowYouRole</span>
+  </div>
+  <span style="font-size:11px;font-weight:700;color:#7800FF;letter-spacing:0.12em;">STEP 3 OF 3</span>
+  <div style="width:40px;"></div>
+</header>
+<div class="prog"><div class="prog-fill"></div></div>
+
+<div class="page">
+  <h1>Mood Blend Results — Design Options</h1>
+  <p>3 ways to show how the two selected moods shape the personality result.</p>
+
+  <!-- NAV -->
+  <div class="tabs">
+    <button class="tab active" onclick="show('A')">Option A — Compact</button>
+    <button class="tab" onclick="show('B')">Option B — Side-by-Side</button>
+    <button class="tab" onclick="show('C')">Option C — Rich Lab</button>
+  </div>
+
+  <!-- ── OPTION A: Compact horizontal bars ── -->
+  <div class="opt-label">Option A</div>
+  <div class="mock opt-a" id="mockA">
+    <h2>Minimal + informative — trait bars directly below blend name</h2>
+    <div class="result-card">
+      <div class="mood-badges">
+        <div class="mood-badge f">🎯 Focused</div>
+        <div style="color:rgba(255,255,255,0.2);font-size:14px;align-self:center;">+</div>
+        <div class="mood-badge c">🌊 Calm</div>
+      </div>
+      <div class="blend-name">The Visionary Architect</div>
+      <div class="blend-sub">INTJ-A · Mood Blend</div>
+
+      <div class="divider"></div>
+
+      <div class="section-label">How your moods shape your result</div>
+
+      <div class="trait-bars">
+        <div class="trait-row">
+          <div class="trait-meta"><span class="trait-name">🎯 Focus Depth</span><span class="trait-pct">88%</span></div>
+          <div class="trait-bar"><div class="trait-fill" style="width:88%;background:linear-gradient(90deg,#7800FF,#c084fc)"></div></div>
+        </div>
+        <div class="trait-row">
+          <div class="trait-meta"><span class="trait-name">🌊 Emotional Stability</span><span class="trait-pct">81%</span></div>
+          <div class="trait-bar"><div class="trait-fill" style="width:81%;background:linear-gradient(90deg,#3b82f6,#93c5fd)"></div></div>
+        </div>
+        <div class="trait-row">
+          <div class="trait-meta"><span class="trait-name">⚡ Energy Balance</span><span class="trait-pct">64%</span></div>
+          <div class="trait-bar"><div class="trait-fill" style="width:64%;background:linear-gradient(90deg,#7800FF,#FF00E5)"></div></div>
+        </div>
+        <div class="trait-row">
+          <div class="trait-meta"><span class="trait-name">🤝 Social Adaptability</span><span class="trait-pct">57%</span></div>
+          <div class="trait-bar"><div class="trait-fill" style="width:57%;background:linear-gradient(90deg,#7800FF,#FF00E5)"></div></div>
+        </div>
+        <div class="trait-row">
+          <div class="trait-meta"><span class="trait-name">🔮 Curiosity Drive</span><span class="trait-pct">74%</span></div>
+          <div class="trait-bar"><div class="trait-fill" style="width:74%;background:linear-gradient(90deg,#7800FF,#FF00E5)"></div></div>
+        </div>
+      </div>
+
+      <button class="cta">Unlock Full Insight →</button>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-left">Mood Alchemy Lab</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);">KnowYouRole</div>
+    </div>
+  </div>
+
+  <!-- ── OPTION B: Mood cards side by side ── -->
+  <div class="opt-label">Option B</div>
+  <div class="mock opt-b" id="mockB" style="display:none;">
+    <h2>Rich + organized — mood cards side by side, then combined trait chart</h2>
+    <div class="result-card">
+      <div class="blend-name">The Visionary Architect</div>
+      <div class="blend-sub">Focused + Calm · INTJ-A</div>
+
+      <div class="divider"></div>
+
+      <div class="section-label">Your mood profiles</div>
+
+      <div class="mood-cards">
+        <div class="mood-card f">
+          <div class="mood-card-label">🎯 Focused</div>
+          <div class="mood-card-trait">The Precision Lens</div>
+          <div class="mood-card-desc">Your focused energy sharpens everything it touches. You see what others miss.</div>
+          <div class="mini-bars">
+            <div>
+              <div class="mini-row"><span>Focus</span><span>91%</span></div>
+              <div class="mini-bar"><div class="mini-fill" style="width:91%;background:#c084fc"></div></div>
+            </div>
+            <div>
+              <div class="mini-row"><span>Creativity</span><span>72%</span></div>
+              <div class="mini-bar"><div class="mini-fill" style="width:72%;background:#c084fc"></div></div>
+            </div>
+            <div>
+              <div class="mini-row"><span>Energy</span><span>58%</span></div>
+              <div class="mini-bar"><div class="mini-fill" style="width:58%;background:#c084fc"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mood-card c">
+          <div class="mood-card-label">🌊 Calm</div>
+          <div class="mood-card-trait">The Steady Core</div>
+          <div class="mood-card-desc">Your calm energy brings depth and stability to every interaction.</div>
+          <div class="mini-bars">
+            <div>
+              <div class="mini-row"><span>Stability</span><span>88%</span></div>
+              <div class="mini-bar"><div class="mini-fill" style="width:88%;background:#93c5fd"></div></div>
+            </div>
+            <div>
+              <div class="mini-row"><span>Focus</span><span>75%</span></div>
+              <div class="mini-bar"><div class="mini-fill" style="width:75%;background:#93c5fd"></div></div>
+            </div>
+            <div>
+              <div class="mini-row"><span>Energy</span><span>41%</span></div>
+              <div class="mini-bar"><div class="mini-fill" style="width:41%;background:#93c5fd"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">Combined influence on your result</div>
+      <div class="trait-bars">
+        <div class="trait-row">
+          <div class="trait-meta"><span class="trait-name">Focus Depth</span><span class="trait-pct">88%</span></div>
+          <div class="trait-bar"><div class="trait-fill" style="width:88%;background:linear-gradient(90deg,#7800FF,#c084fc)"></div></div>
+        </div>
+        <div class="trait-row">
+          <div class="trait-meta"><span class="trait-name">Emotional Stability</span><span class="trait-pct">81%</span></div>
+          <div class="trait-bar"><div class="trait-fill" style="width:81%;background:linear-gradient(90deg,#3b82f6,#93c5fd)"></div></div>
+        </div>
+        <div class="trait-row">
+          <div class="trait-meta"><span class="trait-name">Creative Vision</span><span class="trait-pct">74%</span></div>
+          <div class="trait-bar"><div class="trait-fill" style="width:74%;background:linear-gradient(90deg,#7800FF,#FF00E5)"></div></div>
+        </div>
+      </div>
+
+      <button class="cta">Unlock Full Insight →</button>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-left">Mood Alchemy Lab</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);">KnowYouRole</div>
+    </div>
+  </div>
+
+  <!-- ── OPTION C: Full MoodAlchemyLab style ── -->
+  <div class="opt-label">Option C</div>
+  <div class="mock opt-c" id="mockC" style="display:none;">
+    <h2>Most complete — original MoodAlchemyLab experience, blended into results</h2>
+    <div class="result-card">
+      <!-- Blend header -->
+      <div class="opt-c-header">
+        <div class="opt-c-icon">⚗️</div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#FF00E5;margin-bottom:4px;">Mood Blend Revealed</div>
+          <div class="blend-name">The Visionary Architect</div>
+          <div class="blend-sub">Focused + Calm · INTJ-A</div>
+        </div>
+      </div>
+
+      <!-- Mood badges -->
+      <div class="mood-badges" style="margin-bottom:20px;">
+        <div class="mood-badge f">🎯 Focused</div>
+        <div class="mood-badge c">🌊 Calm</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Mood blending description -->
+      <div class="opt-c-mood-desc">
+        "Your focused energy sharpens everything it touches while your calm energy brings depth and stability. Together they create a rare blend of precision and serenity."
+      </div>
+
+      <!-- Trait cards grid -->
+      <div class="opt-c-traits">
+        <div class="opt-c-trait">
+          <div class="opt-c-trait-label">Focus Depth</div>
+          <div class="opt-c-trait-value">88%</div>
+          <div class="opt-c-trait-bar"><div class="opt-c-trait-fill" style="width:88%;background:linear-gradient(90deg,#7800FF,#c084fc)"></div></div>
+        </div>
+        <div class="opt-c-trait">
+          <div class="opt-c-trait-label">Emotional Stability</div>
+          <div class="opt-c-trait-value">81%</div>
+          <div class="opt-c-trait-bar"><div class="opt-c-trait-fill" style="width:81%;background:linear-gradient(90deg,#3b82f6,#93c5fd)"></div></div>
+        </div>
+        <div class="opt-c-trait">
+          <div class="opt-c-trait-label">Creative Vision</div>
+          <div class="opt-c-trait-value">74%</div>
+          <div class="opt-c-trait-bar"><div class="opt-c-trait-fill" style="width:74%;background:linear-gradient(90deg,#7800FF,#FF00E5)"></div></div>
+        </div>
+        <div class="opt-c-trait">
+          <div class="opt-c-trait-label">Social Magnetism</div>
+          <div class="opt-c-trait-value">57%</div>
+          <div class="opt-c-trait-bar"><div class="opt-c-trait-fill" style="width:57%;background:linear-gradient(90deg,#7800FF,#FF00E5)"></div></div>
+        </div>
+      </div>
+
+      <!-- Individual mood trait breakdown -->
+      <div class="mood-cards" style="margin-bottom:24px;">
+        <div class="mood-card f">
+          <div class="mood-card-label">🎯 Focused</div>
+          <div class="mood-card-trait">The Precision Lens</div>
+          <div class="mood-card-desc">Sharp focus meets creative vision.</div>
+          <div class="mini-bars">
+            <div><div class="mini-row"><span>Focus</span><span>91%</span></div><div class="mini-bar"><div class="mini-fill" style="width:91%;background:#c084fc"></div></div></div>
+            <div><div class="mini-row"><span>Creativity</span><span>72%</span></div><div class="mini-bar"><div class="mini-fill" style="width:72%;background:#c084fc"></div></div></div>
+            <div><div class="mini-row"><span>Energy</span><span>58%</span></div><div class="mini-bar"><div class="mini-fill" style="width:58%;background:#c084fc"></div></div></div>
+          </div>
+        </div>
+        <div class="mood-card c">
+          <div class="mood-card-label">🌊 Calm</div>
+          <div class="mood-card-trait">The Steady Core</div>
+          <div class="mood-card-desc">Emotional depth and stability.</div>
+          <div class="mini-bars">
+            <div><div class="mini-row"><span>Stability</span><span>88%</span></div><div class="mini-bar"><div class="mini-fill" style="width:88%;background:#93c5fd"></div></div></div>
+            <div><div class="mini-row"><span>Focus</span><span>75%</span></div><div class="mini-bar"><div class="mini-fill" style="width:75%;background:#93c5fd"></div></div></div>
+            <div><div class="mini-row"><span>Energy</span><span>41%</span></div><div class="mini-bar"><div class="mini-fill" style="width:41%;background:#93c5fd"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="cta">Unlock Full Insight →</button>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-left">⚗️ Mood Alchemy Lab</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);">KnowYouRole</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function show(letter) {
+    document.querySelectorAll('.mock').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('mock' + letter).style.display = 'block';
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>
