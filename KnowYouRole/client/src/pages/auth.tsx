@@ -64,7 +64,7 @@ function SocialButtonInner({ provider, label, icon, bgColor, textColor = "#fff" 
 // -------------------------------------------------------------------
 // Page chrome — NO useAuth0 calls here. useState is safe.
 // -------------------------------------------------------------------
-function AuthPageChrome({ mode }: { mode: "signin" | "signup" }) {
+function AuthPageChrome({ mode, onModeChange }: { mode: "signin" | "signup"; onModeChange: (m: "signin" | "signup") => void }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
@@ -119,7 +119,7 @@ function AuthPageChrome({ mode }: { mode: "signin" | "signup" }) {
       )}
 
       {/* PAGE CONTENT */}
-      <AuthForm mode={mode} />
+      <AuthForm mode={mode} onModeChange={onModeChange} />
     </div>
   );
 }
@@ -128,7 +128,7 @@ function AuthPageChrome({ mode }: { mode: "signin" | "signup" }) {
 // Auth form — useAuth0 is called HERE in a leaf component.
 // If it throws, only this component crashes (caught by boundary).
 // -------------------------------------------------------------------
-function AuthForm({ mode }: { mode: "signin" | "signup" }) {
+function AuthForm({ mode, onModeChange }: { mode: "signin" | "signup"; onModeChange: (m: "signin" | "signup") => void }) {
   const { loginWithRedirect, isLoading, error: authError } = useAuth0();
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -214,6 +214,16 @@ function AuthForm({ mode }: { mode: "signin" | "signup" }) {
         {mode === "signin" && (
           <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#00C8FF", cursor: "pointer", fontFamily: "'Outfit',sans-serif" }}>Forgot password?</p>
         )}
+
+        <p style={{ marginTop: 16, fontSize: 13, color: "rgba(255,255,255,0.4)", textAlign: "center", fontFamily: "'Outfit',sans-serif" }}>
+          {mode === "signin" ? "Don't have an account? " : "Already have an account? "}
+          <span
+            onClick={() => onModeChange(mode === "signin" ? "signup" : "signin")}
+            style={{ color: "#00C8FF", cursor: "pointer", fontWeight: 600 }}
+          >
+            {mode === "signin" ? "Sign up" : "Sign in"}
+          </span>
+        </p>
       </div>
       <p style={{ marginTop: 24, fontSize: 13, color: "rgba(255,255,255,0.3)", textAlign: "center", fontFamily: "'Outfit',sans-serif" }}>
         By continuing, you agree to our <Link href="/terms" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>Terms</Link> and <Link href="/privacy" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>Privacy Policy</Link>
@@ -226,10 +236,10 @@ function AuthForm({ mode }: { mode: "signin" | "signup" }) {
 // Root — wraps everything in the error boundary
 // -------------------------------------------------------------------
 export default function AuthPage() {
-  const [mode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   return (
     <AuthErrorBoundary>
-      <AuthPageChrome mode={mode} />
+      <AuthPageChrome mode={mode} onModeChange={setMode} />
     </AuthErrorBoundary>
   );
 }
