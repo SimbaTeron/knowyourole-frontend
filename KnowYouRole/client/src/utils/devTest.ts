@@ -11,7 +11,13 @@ export function isDevTest(): boolean {
 }
 
 export function isTestMode(): boolean {
-  return isDevTest() && new URLSearchParams(window.location.search).get("test") === "true";
+  // Always show panel on localhost
+  if (isDevTest()) return true;
+  // Vercel preview deployments: client-*.vercel.app (dev site pattern)
+  const host = window.location.hostname;
+  if (host.includes('.vercel.app') && host.startsWith('client-')) return true;
+  // Require ?test=true on all other public URLs
+  return new URLSearchParams(window.location.search).get("test") === "true";
 }
 
 export function getTestTier(): string | null {
