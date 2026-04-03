@@ -46,11 +46,22 @@ function getArchetype(mbti: string) {
 const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#f59e0b", S: "#22c55e", C: "#3b82f6" };
 const DISC_LABELS: Record<string, string> = { D: "Dominance", I: "Influence", S: "Steadiness", C: "Conscientiousness" };
 
-// ─── Real scores from sessionStorage (written by handleQuizComplete) ───────
+// ─── Real scores from URL params or sessionStorage (written by handleQuizComplete) ───────
 function getStoredScores(): QuizScores | null {
   if (typeof window === "undefined") return null;
   try {
-    // Prefer real scores from completed quiz; fall back to dev panel fake scores
+    // FIRST: Check URL params — scores passed via ?scores=<base64> survive page refresh and new tabs
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedScores = urlParams.get("scores");
+    if (encodedScores) {
+      try {
+        const decoded = JSON.parse(atob(encodedScores)) as QuizScores;
+        if (decoded && typeof decoded === "object") return decoded;
+      } catch {
+        // Malformed scores param — fall through to sessionStorage
+      }
+    }
+    // SECOND: Fall back to sessionStorage (test mode, inline quiz completion)
     const raw = sessionStorage.getItem("kyr_real_scores")
       || sessionStorage.getItem("kyr_fake_scores");
     if (!raw) return null;

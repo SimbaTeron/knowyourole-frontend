@@ -64,11 +64,14 @@ export default function QuizPage() {
   };
 
   const handleQuizComplete = (scores: QuizScores) => {
-    // Always store full real scores in sessionStorage so ResultsPage can read them
+    // Always store full real scores in sessionStorage (fallback for test mode)
     sessionStorage.setItem("kyr_real_scores", JSON.stringify(scores));
     sessionStorage.setItem("kyr_tier", ageTier);
-    setQuizScores(scores);
-    setShowResults(true);
+
+    // Encode scores as base64 so they survive page refresh / direct URL access
+    const encoded = btoa(JSON.stringify(scores));
+    // Redirect to results page with scores in URL — survives refresh, works in new tabs
+    window.location.href = `/results?scores=${encoded}`;
   };
 
   const handleQuizExit = () => {
