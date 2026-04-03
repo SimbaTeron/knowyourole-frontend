@@ -1,0 +1,134 @@
+import openpyxl
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+import io
+import base64
+
+# Recreate the original structure from provided data (simplified for brevity; in full, paste all rows)
+# For demo, we'll create a new WB with key sheets updated
+
+wb = Workbook()
+
+# Sheet 0: Algorithm Docs - Add premium locality section
+ws0 = wb.active
+ws0.title = "Algorithm Docs"
+ws0['A1'] = "KNOWROLE ALGORITHM WORKFLOW DOCUMENTATION"
+ws0['A2'] = "Last Updated: 11/29/2025"
+# ... (append original rows 1-109 as per doc)
+# Add new section for premium locality
+ws0['A110'] = "=== PREMIUM LOCALITY INTEGRATION ==="
+ws0['A111'] = "For premium users with zip: Fetch metro via zippopotam.us API."
+ws0['A112'] = "Then BLS API (api.bls.gov) for role OCC_CODE (e.g., Electrician 47-2111)."
+ws0['A113'] = "Output: Local growth % (10yr), COL-adj wage vs national."
+ws0['A114'] = "Tailor: 'Your traits fit [Role]—[Metro] +8% growth (stay!). Alt: Austin +15% boom.'"
+ws0['A115'] = "Obscure zip → state/national fallback. Suggest 3 moves if local <5%."
+
+# Sheet 1: Questions - Add emojis, trim, new Qs
+ws1 = wb.create_sheet("Questions")
+ws1['A1'] = "id,prompt,leftDesc,rightDesc,optionLeft,optionRight,optionMetaLeft,optionMetaRight,psych,time,tier,version,paid,wildcard"
+# Original rows 2-129 with updates: e.g., row2 (id1): emojis
+ws1['A2'] = "1"
+ws1['B2'] = "Playground play? 🏃"  # Trimmed + emoji
+ws1['C2'] = "Jump in shouting 'You're it!' and lead the chase. 🎉"
+ws1['D2'] = "Sneak off to plan the perfect secret fort. 🏰"
+ws1['E2'] = "Lead tag! 🎉"
+ws1['F2'] = "Plan fort? 🏰"
+ws1['G2'] = "E"
+ws1['H2'] = "I"
+ws1['I2'] = "MBTI-EI"
+ws1['J2'] = "6"
+ws1['K2'] = "7-12"
+ws1['L2'] = "v1"
+ws1['M2'] = "FALSE"
+ws1['N2'] = "FALSE"
+# ... (apply pattern to first 10; for full, loop)
+# New Qs 130-141
+ws1['A130'] = "130"
+ws1['B130'] = "Routine fun? 🔄"
+ws1['C130'] = "Same game daily! 🔄"
+ws1['D130'] = "New twist daily? 🎲"
+ws1['E130'] = "Same game! 🔄"
+ws1['F130'] = "Twist it! 🎲"
+ws1['G130'] = "J"
+ws1['H130'] = "P"
+ws1['I130'] = "MBTI-JP"
+ws1['J130'] = "6"
+ws1['K130'] = "7-12"
+ws1['L130'] = "v1"
+ws1['M130'] = "FALSE"
+ws1['N130'] = "FALSE"
+# Repeat for 131-141 similarly...
+
+# Sheet 2: Roles - Unchanged for now
+
+# Sheet 3: Timeout Messages - Add 5 new
+ws3 = wb.create_sheet("Timeout Messages")
+ws3['A1'] = "id,quip,notes"
+ws3['A2'] = "1"
+ws3['B2'] = "Time flies when you're pondering! ⏰"
+ws3['C2'] = ""
+# ... original 2-17
+ws3['A18'] = "18"
+ws3['B18'] = "Adventure awaits—fate flipped the card! 🃏"
+ws3['C18'] = "Compass spin animation."
+
+# Sheet 5: Premium Questions - Add 3 new
+ws5 = wb.create_sheet("Premium Questions")
+ws5['A1'] = "id,type,prompt,subtitle,option1,option2,option3,path,traitA,traitB"
+# Original + new
+ws5['A16'] = "branch3-service"
+ws5['B16'] = "branch"
+ws5['C16'] = "Service spark? ✨"
+ws5['D16'] = "Service path vibe"
+ws5['E16'] = "Help hands-on 🛠️"
+ws5['F16'] = "Guide chats 💬"
+ws5['G16'] = "Care routines 🏥"
+ws5['H16'] = "Fix fast ⚡"
+ws5['I16'] = "service"
+ws5['J16'] = ""
+ws5['K16'] = ""
+
+# Sheet 6: City Color Themes - Fixes + 20 new
+ws6 = wb.create_sheet("City Color Themes")
+ws6['A1'] = "City Key,City Name,State,Major City in State,Team Name,Primary Color,Secondary Color,Accent Color"
+# Original with fixes, e.g., row for tucson
+# Assume row15: birmingham...
+# Fix Tucson (say row25)
+ws6['A25'] = "tucson"
+ws6['B25'] = "Tucson"
+ws6['C25'] = "AZ"
+ws6['D25'] = "Phoenix"
+ws6['E25'] = "Wildcats"
+ws6['F25'] = "#CC0033"
+ws6['G25'] = "#003366"
+ws6['H25'] = "#FFFFFF"
+# Add 20 new, e.g.,
+ws6['A115'] = "austin"
+ws6['B115'] = "Austin"
+ws6['C115'] = "TX"
+ws6['D115'] = "Houston"
+ws6['E115'] = "Longhorns"
+ws6['F115'] = "#BF5700"
+ws6['G115'] = "#333F48"
+ws6['H115'] = "#FFFFFF"
+# ... 19 more similarly (Miami, etc.)
+
+# New Sheet 7: Gamification - For Bursts & Teasers
+ws7 = wb.create_sheet("Gamification")
+ws7['A1'] = "Trait Bursts"
+ws7['A2'] = "Trait,Animation,Age Tie-In,Desc"
+ws7['A3'] = "E,energy sparkles 🎉,Kids: Crowd cheer!,Instant social boost"
+ws7['A4'] = "O,confetti rain 🌈,Adults: Idea power-up 💡,Creative explosion unlocked"
+# ... 10 more for all traits
+ws7['A14'] = "Role Teasers"
+ws7['A15'] = "Branch,Scenario,Mini-Game,Trigger (After Qs)"
+ws7['A16'] = "High D+J,Boss Mode: Delegate task! 👑,Drag-assign 3 icons,5-7"
+ws7['A17'] = "High O+N,Visionary Pitch: Wild idea? 🚀,Swipe to brainstorm,10-12"
+# ... 8 more
+
+# Save to bytes for base64 output
+output = io.BytesIO()
+wb.save(output)
+output.seek(0)
+b64 = base64.b64encode(output.read()).decode('utf-8')
+print("Base64 encoded XLSX:", b64[:100] + "..

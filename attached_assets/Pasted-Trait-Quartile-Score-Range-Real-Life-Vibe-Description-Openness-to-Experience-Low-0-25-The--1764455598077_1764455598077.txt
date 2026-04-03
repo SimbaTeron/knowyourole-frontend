@@ -1,0 +1,85 @@
+Trait
+Quartile
+Score Range
+Real-Life Vibe Description
+Openness (to Experience)
+Low
+0–25%
+The steady traditionalist who loves familiar routines and practical details—think the cozy librarian curating timeless classics, thriving in structured worlds where reliability trumps reinvention.
+Openness
+Low-Mid
+26–50%
+The balanced appreciator who enjoys a dash of novelty but sticks to proven paths—picture the weekend hobbyist tinkering with recipes from grandma's cookbook, blending comfort with occasional tweaks.
+Openness
+Mid-High
+51–75%
+The curious explorer dipping into ideas with enthusiasm—envision the book club enthusiast debating plot twists over coffee, weaving fresh perspectives into everyday chats without going full avant-garde.
+Openness
+High
+76–100%
+The boundless visionary chasing wild "what ifs" and abstract dreams—imagine the street artist turning urban walls into surreal stories, fueled by endless curiosity and a knack for reimagining the ordinary.
+Conscientiousness
+Low
+0–25%
+The free-spirited improviser who flows with the moment over checklists—think the spontaneous road-tripper packing light and letting detours dictate the adventure, embracing chaos as creative fuel.
+Conscientiousness
+Low-Mid
+26–50%
+The flexible doer who starts strong but adapts on the fly—picture the casual gardener planting intuitively, weeding when inspired rather than on schedule, balancing effort with easygoing vibes.
+Conscientiousness
+Mid-High
+51–75%
+The dependable achiever who plans just enough to deliver—envision the project coordinator juggling tasks with a trusty notebook, hitting milestones reliably while leaving room for inspired pivots.
+Conscientiousness
+High
+76–100%
+The meticulous mastermind with laser-focused discipline—imagine the elite chef prepping every ingredient hours ahead, orchestrating flawless meals through unwavering routines and precision.
+Extraversion
+Low
+0–25%
+The serene solo navigator recharging in quiet depths—think the midnight reader lost in novels by lamplight, savoring intimate connections over crowds, where silence sparks profound insights.
+Extraversion
+Low-Mid
+26–50%
+The selective socializer who shines in small circles—picture the coffee shop conversationalist trading stories with a few friends, drawing energy from meaningful exchanges without needing the spotlight.
+Extraversion
+Mid-High
+51–75%
+The engaging connector thriving in moderate mingles—envision the team brainstormer rallying ideas at lunch meetups, energizing groups with charm while retreating for solo recharge when needed.
+Extraversion
+High
+76–100%
+The magnetic energizer lighting up every room—imagine the festival host weaving through crowds with infectious laughs, fueling adventures and turning strangers into instant allies on a whim.
+Agreeableness
+Low
+0–25%
+The bold challenger who prioritizes truth over harmony—think the witty debater at dinner parties, cutting through fluff with sharp insights, unafraid to ruffle feathers for the greater good.
+Agreeableness
+Low-Mid
+26–50%
+The pragmatic peacemaker who compromises strategically—picture the negotiation-savvy colleague advocating firmly but fairly, blending empathy with a no-nonsense edge to keep things moving.
+Agreeableness
+Mid-High
+51–75%
+The warm collaborator fostering easy alliances—envision the community organizer smoothing group tensions with genuine smiles, building bridges through kindness without losing your voice.
+Agreeableness
+High
+76–100%
+The heartfelt harmonizer putting others first—imagine the devoted mentor cheering on dreams with unwavering support, creating ripple effects of positivity in every interaction.
+Neuroticism (Emotional Stability)
+Low
+0–25%
+The unflappable zen master rolling with life's punches—think the surfer riding waves without a flinch, channeling calm focus into steady progress amid any storm.
+Neuroticism
+Low-Mid
+26–50%
+The even-keeled responder who feels dips but bounces quick—picture the hiker pausing at tough trails for a breath, then pushing on with quiet resilience and a wry smile.
+Neuroticism
+Mid-High
+51–75%
+The attuned empath navigating emotions with depth—envision the journal-keeping friend processing worries into wisdom, turning inner turbulence into empathetic connections.
+Neuroticism
+High
+76–100%
+The passionate feeler whose intensity fuels profound change—imagine the activist pouring heart into causes, transforming raw sensitivity into powerful advocacy that moves mountains.
+

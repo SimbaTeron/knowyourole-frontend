@@ -1,0 +1,33 @@
+You are an expert full-stack developer building a personality-based career recommendation app. The app assesses users via 25-45 questions to derive scores for MBTI (4 dichotomies: E/I, S/N, T/F, J/P as percentages 0-100, where e.g., high E means extraverted), DISC (D, I, S, C percentages summing to 100), and Big Five (O, C, E, A, N as 0-100 scales, where low N indicates high emotional stability).
+
+The database has 150 job roles, each with pre-rated trait requirements on a 1-5 scale to reflect US job market diversity (white-collar majority ~55%, healthcare 15%, blue-collar 15%, service 10%, arts/side hustles 5%):
+
+- MBTI: E/I, S/N, T/F, J/P
+- DISC: D, I, S, C
+- Big Five: O, C, E, A, N (low N better for high-stress roles)
+
+Here is the full matrix data as CSV (copy into a file or DB table): 
+
+#,Job Role,MBTI E/I,MBTI S/N,MBTI T/F,MBTI J/P,DISC D,DISC I,DISC S,DISC C,Big5 O,Big5 C,Big5 E,Big5 A,Big5 N (low better)
+[PASTE THE ENTIRE TABLE ROWS HERE FROM THE MATRIX ABOVE]
+
+Your task: Implement a robust matching algorithm that promotes cross-collar recommendations (e.g., suggest blue-collar for office-haters with high sensing/conscientiousness).
+
+1. Normalize user scores to 1-5:
+   - MBTI: Bin percentages (0-20%=1 for low, up to 81-100%=5 for high; e.g., high E/I =5 if user is extraverted).
+   - DISC: Scale each % to 1-5 (e.g., 0-20%=1, etc.).
+   - Big Five: Scale 0-100 to 1-5; invert N (high user N = low score for jobs needing stability).
+
+2. Compute fit score per job:
+   - Use weighted cosine similarity or Euclidean distance across all 13 dimensions.
+   - Weights: Big Five 40%, MBTI 30%, DISC 30% (adjustable via config).
+   - Boost diversity: Add +10% to fit if job collar differs from user's stated current (if input), or for high-sensing users boost blue-collar/artistic if low openness.
+   - Filter/rank to ensure top matches include mix (e.g., at least 2 blue-collar, 1 artistic in top 10).
+
+3. Output: Top 10-15 matches with % fit, explanations (e.g., "This blue-collar role matches your high Sensing and Conscientiousness, ideal if you prefer hands-on over office work"), job details (education, salary from O*NET/BLS), and guidance for teens/career changers.
+
+4. Code in [your language, e.g., Python/JS], with DB integration (e.g., SQLite for matrix, store user profiles). Include quiz logic (questions to score traits).
+
+Make it inclusive/user-friendly: Disclaimers ("Traits suggest fits; consider skills, interests, values. Not a guarantee"), option for side hustles. Ensure algorithm strength by testing with sample profiles (e.g., introverted sensing type -> electrician).
+
+Generate clean, commented code with setup for Replit (e.g., web app with frontend for quiz/input).

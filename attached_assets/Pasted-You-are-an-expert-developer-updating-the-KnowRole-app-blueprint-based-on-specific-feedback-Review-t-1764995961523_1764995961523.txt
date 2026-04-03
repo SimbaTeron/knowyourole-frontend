@@ -1,0 +1,34 @@
+You are an expert developer updating the KnowRole app blueprint based on specific feedback. Review the current 'KnowRole Complete Blueprint (1).xlsx' and implement only the following missing enhancements exactly as described. Do not alter implemented features like mid-quiz recaps, adaptive Sharpen, or random event caps. Ensure all outputs feel personalized and non-generic, with specific narratives tied to user data.Question Count Sweet Spots:
+
+Update Sheet 9 ('9. Tier Configuration'): Change question counts to Mini: 20, Teen: 30, Young Adult: 35, Adult: 40.
+Adjust break flows proportionally: Mini: 6 → MC1 → 5 → Superpower → 5 → Mystery → 4 → MC2; Teen: 8 → MC1 → 7 → Superpower → 7 → Mystery → 6 → MC2; Young Adult: 9 → MC1 → 9 → Superpower → 9 → Mystery → 8 → MC2; Adult: 10 → MC1 → 10 → Superpower → 10 → Mystery → 9 → MC2.
+In Sheet 1 (App Overview), update row 10 to reflect these new counts.
+
+Pre-Quiz Flow Fixes:
+
+In Sheet 1 (row 30): Change to 'Pre-Quiz (/pre-quiz) → Animated 3-step walkthrough (Step 1: Swipe demo; Step 2: Timer explanation; Step 3: Mood/theme preview) with subtle gray 'Skip Instructions' button tappable from the start (no delay).'
+In Sheet 1 (row 40): Update to 'Skip Instructions - Subtle gray button appears immediately on pre-quiz page.'
+
+Post-Quiz Validation for Premium Cards:
+
+Add to Sheet 1 (App Overview features, after row 23): '15. Post-Quiz Validation - Gate premium cards behind 2-question prompts (e.g., "Does this MBTI type match you? (Yes/No/Somewhat)" and "Rate Big Five Openness accuracy (1-5)"); use responses to refine outputs (adjust thresholds/proxies by 5-10%) before unlocking.'
+In Sheet 12 (Premium Insights, after row 204): Add endpoint logic for validation in API response handling.
+
+Deeper Mood Incorporation - Question Wording:
+
+In Sheet 1 (row 11): Expand to '2. Mood Selection & Mood Mixer - Personalized journey based on emotional state, mood boosts applied to Big Five traits and proxies (e.g., +10% Critical Thinking for "Stuck", +10% First Principles for "Reflective", +10% engagement for "Energized"); dynamically adjust question wording (e.g., reflective moods get introspective prompts like "When alone, do you ponder life's big questions?").'
+Add to Sheet 4 (Algorithm, if needed) or Sheet 1 overview: Note mood blends combine effects.
+
+Core Assessment Refinements:
+
+In Sheet 3 (Database Schema, after row 83 in population_stats): Add notes or new columns if needed for dynamic quotas.
+In Sheet 4 (Algorithm Pipeline, add a new section): 'Proxy Refinements: Critical Thinking = (0.4 * MBTI_T %) + (0.4 * Big5_Openness) + (0.2 * DISC_C %); First Principles = (0.4 * MBTI_N %) + (0.4 * Big5_Openness) + (0.2 * DISC_I %). Dynamic Quotas: Shift from fixed 30/30/40% to adaptive based on tier/responses (e.g., more Big Five for adults). Implement IRT for adaptive questions: Start with 10 core, branch for ambiguous traits. Add consistency checks (Cronbach's alpha >0.7 per trait).'
+Ensure Sheet 1 (row 14) emphasizes non-generic results via these.
+
+Share Feature Enhancements:
+
+In Sheet 1 (row 22): Update to '13. PDF Share - Generate beautifully designed, well-organized PDF (sections with headings, bullets for insights, charts for traits) and allow email to address or SMS link to cell phone number via backend service.'
+Add to Sheet 2 (Technical Stack, after row 20): 'PDF Generation: jsPDF or pdf-lib for client-side creation; Email/SMS: Integrate Nodemailer for email, Twilio for SMS (add env vars if needed).'
+
+Update the 'Generated' dates in all sheets to today's date (December 05, 2025). Test for consistency across sheets. Output: Provide the full updated Excel content or a detailed change log with row-by-row instructions.
+

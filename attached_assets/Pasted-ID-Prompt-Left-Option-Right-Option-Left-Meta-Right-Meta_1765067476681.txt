@@ -1,0 +1,402 @@
+ID,Prompt,Left Option,Right Option,Left Meta,Right Meta,Psychology Type,Timer (s),Age Tier,Version,Paid,Wildcard
+401,New work project lands on desk:,Dive in immediately,Map it out first,D,C,DISC-DC,8,19+,v1,No,No
+402,Networking mixer tonight at venue:,Work the room,One real conversation,E,I,MBTI-EI,8,19+,v1,No,No
+403,Career crossroads decision time:,Corporate stable path,Startup risky bet,S,N,MBTI-SN,8,19+,v1,No,No
+404,Performance review hits hard emotionally:,Analyze feedback first,Feel it deeply,T,F,MBTI-TF,8,19+,v1,No,No
+405,Trip abroad booked finally:,Full detailed itinerary,Figure it out there,J,P,MBTI-JP,8,19+,v1,No,No
+406,Roommate tension brewing up:,Have awkward convo,Wait it out,D,S,DISC-DS,8,19+,v1,No,No
+407,Side hustle idea sparks suddenly:,Pursue wild idea,Stick with what works,O+,O-,Big5-O,8,19+,v1,No,No
+408,Friday night arrives after work:,FOMO outing with friends,Couch time recharge,E+,E-,Big5-E,8,19+,v1,No,No
+409,Your email inbox management:,Inbox zero daily,10k unread backlog,C+,C-,Big5-C,8,19+,v1,No,No
+410,Apartment rent negotiation time:,Haggle hard for deal,Accept listed price,D,S,DISC-DS,8,19+,v1,No,No
+411,Group dinner bill comes around:,Split equal easy,Calculate exact shares,A+,T,Big5-AT,8,19+,v1,No,No
+412,First day at new job:,Intro to everyone,Observe first quietly,E,I,MBTI-EI,8,19+,v1,No,No
+413,Investment decision weighs heavy:,Data research deep,Follow intuition,S,N,MBTI-SN,8,19+,v1,No,No
+414,Relationship disagreement escalates:,Debate with logic,Focus on feelings first,T,F,MBTI-TF,8,19+,v1,No,No
+415,Morning routine every day:,Same consistent routine,Varies daily based on mood,J,P,MBTI-JP,8,19+,v1,No,No
+416,Co-worker asks for feedback:,Give honest critique,Offer encouragement,D,S,DISC-DS,8,19+,v1,No,No
+417,Learning new skill online:,Something completely new,Get better at current,O+,O-,Big5-O,8,19+,v1,No,No
+418,Work from home day setup:,Dedicated desk space,Wherever works best,C+,C-,Big5-C,8,19+,v1,No,No
+419,Friend needs help moving house:,Show up to help,Check my schedule first,A+,A-,Big5-A,8,19+,v1,No,No
+420,Big deadline looming ahead:,Thrive under stress,Feel anxious buildup,N-,N+,Big5-N,8,19+,v1,No,No
+421,Team meeting dynamics at work:,Drive the agenda,Contribute value ideas,D,C,DISC-DC,8,19+,v1,No,No
+422,Grocery shopping style weekly:,List organized neatly,Wander and grab,J,P,MBTI-JP,8,19+,v1,No,No
+423,Salary negotiation at job:,Confident ask more,Nervous but try,D,S,DISC-DS,8,19+,v1,No,No
+424,Weekend plans fall through suddenly:,Find new activity,Enjoy free time,E,I,MBTI-EI,8,19+,v1,No,No
+425,Project brainstorm session starts:,Throw wild ideas,Analyze feasibility,I,C,DISC-IC,8,19+,v1,No,Yes
+426,Life philosophy at this stage:,Collect experiences,Build lasting legacy,P,J,MBTI-JP,9,19+,v1,No,No
+427,Workplace tension with leadership:,Formal meeting request,Casual coffee chat,D,S,DISC-DS,9,19+,v1,No,No
+428,Mid-career crossroads ahead:,Climb corporate ladder,Follow personal calling,S,N,MBTI-SN,9,19+,v1,No,No
+429,Unexpected bonus arrives in paycheck:,Add to retirement,Splurge on something,J,P,MBTI-JP,9,19+,v1,No,No
+430,Partner disagreement escalates strongly:,Logic first approach,Emotions first talk,T,F,MBTI-TF,9,19+,v1,No,No
+431,Major life decision ahead now:,Gut instincts guide,Research deep first,N,S,MBTI-SN,9,19+,v1,No,No
+432,Burnout signals appearing at work:,Power through it,Take health days,D,S,DISC-DS,9,19+,v1,No,No
+433,Want to learn something new:,YouTube self-pace,Proper structured course,O+,C+,Big5-OC,9,19+,v1,No,No
+434,Dinner party happening soon:,Host it yourself,Be a guest,E,I,MBTI-EI,9,19+,v1,No,No
+435,Life throws a major curveball:,Lean into change,Anchor down steady,O+,N-,Big5-ON,9,19+,v1,No,No
+436,Retirement planning discussion time:,Max savings now,Live in the now,C+,C-,Big5-C,9,19+,v1,No,No
+437,Family gathering coming up:,Big lively gathering,Small intimate talks,E+,E-,Big5-E,9,19+,v1,No,No
+438,Mentoring junior colleague at work:,Direct clear feedback,Gentle guiding approach,D,S,DISC-DS,9,19+,v1,No,No
+439,Health checkup reminder pops up:,Schedule it now,Put it off,C+,C-,Big5-C,9,19+,v1,No,No
+440,Old friend reaches out after years:,Excited to reconnect,Be cautious first,A+,A-,Big5-A,9,19+,v1,No,No
+441,Market downturn hits investments:,Stay calm hold,Stress and sell,N-,N+,Big5-N,9,19+,v1,No,No
+442,New technology emerges in field:,Curious explore it,Skeptical wait and see,O+,O-,Big5-O,9,19+,v1,No,No
+443,Career achievement unlocked finally:,Push to next goal,Pause to appreciate,D,S,DISC-DS,9,19+,v1,No,No
+444,Work meeting you organized:,Full prep slides,Trust your knowledge,C,I,DISC-CI,9,19+,v1,No,No
+445,Difficult conversation needed soon:,Be direct soon,Wait for right moment,T,F,MBTI-TF,9,19+,v1,No,No
+446,Morning routine on vacation days:,Keep same habits,No schedule relax,J,P,MBTI-JP,9,19+,v1,No,No
+447,Team conflict arises at work:,Mediate between them,Let them work out,I,S,DISC-IS,9,19+,v1,No,No
+448,Investment opportunity arises now:,Due diligence research,Trust your instinct,C,D,DISC-CD,9,19+,v1,No,No
+449,Hobby time carved out weekly:,Social group activity,Solo quiet pursuit,E,I,MBTI-EI,9,19+,v1,No,No
+450,Legacy thinking in life:,Wide impact on many,Deep connections few,E+,E-,Big5-E,9,19+,v1,No,No
+451,Sunday evening arrives after weekend:,Ready for week,Dread the Monday,N-,N+,Big5-N,9,19+,v1,No,No
+452,Colleague takes credit for your work:,Speak up assertively,Let it slide,D,S,DISC-DS,9,19+,v1,No,No
+453,Conference invitation arrives in email:,Go to network,Watch virtual session,E,I,MBTI-EI,9,19+,v1,No,No
+454,Reading preference for books:,How-to practical guides,Philosophy deep thoughts,S,N,MBTI-SN,9,19+,v1,No,No
+455,Friend's business idea sounds risky—you say:,Honest risk analysis,Encouragement support,T,F,MBTI-TF,9,19+,v1,No,No
+456,Vacation booking approach now:,Research all options,Spontaneous last-minute,J,P,MBTI-JP,9,19+,v1,No,No
+457,Leadership style in a crisis:,Take full charge,Gather team input,D,C,DISC-DC,9,19+,v1,No,No
+458,Coworker struggling with task:,Jump in to help,Quiet offer support,I,S,DISC-IS,9,19+,v1,No,No
+459,New restaurant opens nearby:,Try it immediately,Wait for reviews,O+,O-,Big5-O,9,19+,v1,No,No
+460,Work anniversary arrives quietly:,Seek public recognition,Private satisfaction,E+,E-,Big5-E,9,19+,v1,No,No
+461,Home project approach weekend:,Plan methodically,Wing it as go,C+,C-,Big5-C,9,19+,v1,No,No
+462,Someone needs a favor during busy time:,Help them anyway,Politely decline,A+,A-,Big5-A,9,19+,v1,No,No
+463,Major presentation tomorrow at work:,Practice and sleep,Can't stop rehearsing,N-,N+,Big5-N,9,19+,v1,No,No
+464,Professional development approach:,Formal training course,Self-directed learning,C,D,DISC-CD,9,19+,v1,No,No
+465,Work-life integration balance:,Clear set boundaries,Flexible daily blend,J,P,MBTI-JP,9,19+,v1,No,No
+466,Receiving criticism at job:,Analyze it first,Feel it first,T,F,MBTI-TF,9,19+,v1,No,No
+467,Weekend activity preference choice:,Busy social events,Quiet home recharge,E,I,MBTI-EI,9,19+,v1,No,No
+468,Problem-solving approach in work:,Proven standard frameworks,Novel creative approaches,S,N,MBTI-SN,9,19+,v1,No,No
+469,Team celebration happening soon:,Big party event,Individual recognition,I,S,DISC-IS,9,19+,v1,No,No
+470,Financial planning horizon long-term:,Long-term secure future,Enjoy the now,C+,C-,Big5-C,9,19+,v1,No,Yes
+471,Weekend morning vibes after week:,Early bird productive,Sleep in relaxed,E,I,MBTI-EI,8,19+,v2,No,No
+472,Friend needs advice on issue:,Listen without judging,Advise based on logic,I,E,MBTI-EI,8,19+,v2,No,No
+473,New recipe to cook at home:,Follow recipe precisely,Wing it with twists,S,N,MBTI-SN,8,19+,v2,No,No
+474,Partner conflict brewing up:,Chart rules logically,Heart-to-heart emotional talk,T,F,MBTI-TF,8,19+,v2,No,No
+475,Vacation planning style detailed:,Planned full itinerary,Spontaneous go-with-flow,J,P,MBTI-JP,8,19+,v2,No,No
+476,Group dinner bill arrives table:,Take charge of split,Go with group flow,D,S,DISC-DS,8,19+,v2,No,No
+477,Networking event invite:,Make big entrance,Find familiar face,I,S,DISC-IS,8,19+,v2,No,No
+478,Assemble new furniture:,Read all instructions,Figure it out hands-on,C,D,DISC-CD,8,19+,v2,No,No
+479,New music discovery online:,Weird experimental genre,Trusted favorite artist,O+,O-,Big5-O,8,19+,v2,No,No
+480,Deadline approaching at work:,Done early ahead,Last minute push,C+,C-,Big5-C,8,19+,v2,No,No
+481,Meeting new people at event:,Seek out new faces,Stick with old friends,E+,E-,Big5-E,8,19+,v2,No,No
+482,Someone cuts in line queue:,Speak up assertively,Let it go quietly,A-,A+,Big5-A,8,19+,v2,No,No
+483,Investment tip from friend:,Research thoroughly,Act on gut,S,N,MBTI-SN,8,19+,v1,No,No
+484,Bad review at work:,Defend position,Reflect on feedback,T,F,MBTI-TF,8,19+,v1,No,No
+485,Weekend getaway choice:,Adventure spot,Relax resort,J,P,MBTI-JP,8,19+,v1,No,No
+486,Office politics drama:,Engage strategically,Avoid involvement,D,S,DISC-DS,8,19+,v1,No,No
+487,Podcast listening time:,Varied topics,Favorite hosts,I,S,DISC-IS,8,19+,v1,No,No
+488,New gadget purchase:,Latest model,Proven reliable,O+,O-,Big5-O,8,19+,v1,No,No
+489,Team building event:,Lead activities,Participate casually,E+,E-,Big5-E,8,19+,v1,No,No
+490,Budget monthly finances:,Strict tracking,Loose spending,C+,C-,Big5-C,8,19+,v1,No,No
+491,Mentor younger coworker:,Guide directly,Encourage independently,A+,A-,Big5-A,8,19+,v1,No,No
+492,Job interview nerves:,Stay composed,Worry intensely,N-,N+,Big5-N,8,19+,v1,No,No
+493,Meeting facilitation style:,Structured agenda,Open discussion,D,C,DISC-DC,8,19+,v1,No,No
+494,Dress code at work:,Professional formal,Comfort casual,C,D,DISC-CD,8,19+,v1,No,No
+495,Favorite commute listen:,News updates,Music playlist,E,I,MBTI-EI,8,19+,v1,No,No
+496,Dream retirement plan:,Travel world,Settle home,S,N,MBTI-SN,8,19+,v1,No,No
+497,Client complaint handle:,Logic explain,Empathize first,T,F,MBTI-TF,8,19+,v1,No,No
+498,Daily work schedule:,Fixed hours,Flexible tasks,J,P,MBTI-JP,8,19+,v1,No,No
+499,Professional network build:,Attend events,Online connect,D,S,DISC-DS,8,19+,v1,No,No
+500,Social media presence:,Active posting,Passive scroll,I,S,DISC-IS,8,19+,v1,No,No
+501,New industry trend:,Adopt early,Observe impact,O+,O-,Big5-O,8,19+,v1,No,No
+502,Company party night:,Mingle everyone,Chat few,E+,E-,Big5-E,8,19+,v1,No,No
+503,Expense report filing:,Timely submit,Delay often,C+,C-,Big5-C,8,19+,v1,No,No
+504,Colleague favor ask:,Agree help,Check time,A+,A-,Big5-A,8,19+,v1,No,No
+505,High stakes meeting:,Confident present,Anxious prep,N-,N+,Big5-N,8,19+,v1,No,No
+506,Report writing style:,Detailed outline,Free flow,D,S,DISC-DS,8,19+,v1,No,No
+507,Data analysis task:,Standard method,Innovative angle,S,N,MBTI-SN,8,19+,v1,No,No
+508,Boss feedback give:,Direct honest,Gentle constructive,T,F,MBTI-TF,8,19+,v1,No,No
+509,Project timeline set:,Milestones strict,Adapt as needed,J,P,MBTI-JP,8,19+,v1,No,No
+510,Remote work day:,Video on,Text only,I,S,DISC-IS,8,19+,v1,No,No
+511,New software learn:,Tutorial follow,Hands-on trial,O+,O-,Big5-O,8,19+,v1,No,No
+512,Office lunch break:,Eat with team,Alone desk,E+,E-,Big5-E,8,19+,v1,No,No
+513,Daily task list:,Prioritize order,Random tackle,C+,C-,Big5-C,8,19+,v1,No,No
+514,Donate to cause:,Regular amount,One-time gift,A+,A-,Big5-A,8,19+,v1,No,No
+515,Unexpected overtime:,Handle calm,Get frustrated,N-,N+,Big5-N,8,19+,v1,No,No
+516,Strategy session lead:,Direct plan,Group brainstorm,D,C,DISC-DC,8,19+,v1,No,No
+517,Email response time:,Immediate reply,Thoughtful later,C,D,DISC-CD,8,19+,v1,No,No
+518,Favorite work break:,Social chat,Solo walk,E,I,MBTI-EI,8,19+,v1,No,No
+519,Ideal business venture:,Franchise safe,Startup unique,S,N,MBTI-SN,8,19+,v1,No,No
+520,Family event conflict:,Resolve logic,Share feelings,T,F,MBTI-TF,8,19+,v1,No,No
+521,Home organization system:,Labeled everything,Minimal clutter,J,P,MBTI-JP,8,19+,v1,No,No
+522,Peer review give:,Critical notes,Positive focus,D,S,DISC-DS,8,19+,v1,No,No
+523,Online course take:,Live sessions,Recorded videos,I,S,DISC-IS,8,19+,v1,No,No
+524,New fitness routine:,Intense challenge,Gentle yoga,O+,O-,Big5-O,8,19+,v1,No,No
+525,Networking lunch meet:,Talk business,Build rapport,E+,E-,Big5-E,8,19+,v1,No,No
+526,Tax filing approach:,Early submit,Last day,C+,C-,Big5-C,8,19+,v1,No,No
+527,Volunteer commitment:,Lead project,Support role,A+,A-,Big5-A,8,19+,v1,No,No
+528,Travel delay handle:,Stay patient,Get upset,N-,N+,Big5-N,8,19+,v1,No,No
+529,Contract negotiation:,Firm stance,Flexible terms,D,S,DISC-DS,8,19+,v1,No,No
+530,Market research do:,Survey data,Intuit trends,S,N,MBTI-SN,8,19+,v1,No,No
+531,Client pitch feedback:,Adjust strategy,Empathize concern,T,F,MBTI-TF,8,19+,v1,No,No
+532,Weekly meal prep:,Planned menu,Impromptu cook,J,P,MBTI-JP,8,19+,v1,No,No
+533,Team feedback session:,Open forum,Private chats,I,S,DISC-IS,8,19+,v1,No,No
+534,New book club:,Fiction wild,Nonfiction real,O+,O-,Big5-O,8,19+,v1,No,No
+535,Happy hour after work:,Join crowd,Head home,E+,E-,Big5-E,8,19+,v1,No,No
+536,Bill payment system:,Auto debit,Manual check,C+,C-,Big5-C,8,19+,v1,No,No
+537,Neighbor help need:,Offer assistance,Ask details,A+,A-,Big5-A,8,19+,v1,No,No
+538,Stock market dip:,Buy more,Panic sell,N-,N+,Big5-N,8,19+,v1,No,No
+539,Innovation workshop:,Lead ideas,Observe group,D,C,DISC-DC,8,19+,v1,No,No
+540,Resume update time:,Tailor each,Standard template,C,D,DISC-CD,8,19+,v1,No,No
+541,Favorite evening unwind:,Social drinks,Solo read,E,I,MBTI-EI,8,19+,v1,No,No
+542,Dream legacy leave:,Impact society,Family close,S,N,MBTI-SN,8,19+,v1,No,No
+543,Difficult family talk:,Direct confront,Soft approach,T,F,MBTI-TF,8,19+,v1,No,No
+544,Moving house plan:,Organized boxes,Pack quick,J,P,MBTI-JP,8,19+,v1,No,No
+545,Mentee advice give:,Push challenge,Support gentle,D,S,DISC-DS,8,19+,v1,No,No
+546,Online shopping cart:,Buy impulse,Review list,I,S,DISC-IS,8,19+,v1,No,No
+547,New diet try:,Trendy plan,Balanced eat,O+,O-,Big5-O,8,19+,v1,No,No
+548,Conference attend:,Front row,Back seat,E+,E-,Big5-E,8,19+,v1,No,No
+549,Goal review quarterly:,Track progress,Adjust loose,C+,C-,Big5-C,8,19+,v1,No,No
+550,Charity event host:,Organize big,Attend small,A+,A-,Big5-A,8,19+,v1,No,No
+551,Health scare minor:,Brush off,Worry deep,N-,N+,Big5-N,8,19+,v1,No,No
+552,Business plan draft:,Detailed forecast,Big picture,D,S,DISC-DS,8,19+,v1,No,No
+553,Tech upgrade buy:,Latest specs,Needed only,S,N,MBTI-SN,8,19+,v1,No,No
+554,Partner surprise plan:,Grand gesture,Simple note,T,F,MBTI-TF,8,19+,v1,No,No
+555,Daily commute route:,Same path,Alternate ways,J,P,MBTI-JP,8,19+,v1,No,No
+556,Work lunch break:,Desk eat,Walk out,I,S,DISC-IS,8,19+,v1,No,No
+557,New art hobby:,Abstract paint,Realistic draw,O+,O-,Big5-O,8,19+,v1,No,No
+558,Team outing join:,Active games,Quiet dinner,E+,E-,Big5-E,8,19+,v1,No,No
+559,Savings goal set:,Strict budget,Flexible save,C+,C-,Big5-C,8,19+,v1,No,No
+560,Lend money friend:,Yes trust,No risk,A+,A-,Big5-A,8,19+,v1,No,No
+561,Job loss sudden:,Plan next,Emotional low,N-,N+,Big5-N,8,19+,v1,No,No
+562,Proposal presentation:,Confident lead,Team support,D,C,DISC-DC,8,19+,v1,No,No
+563,Code debug task:,Systematic check,Trial error,C,D,DISC-CD,8,19+,v1,No,No
+564,Favorite travel companion:,Group friends,Solo trip,E,I,MBTI-EI,8,19+,v1,No,No
+565,Ideal work environment:,Open office,Quiet cubicle,S,N,MBTI-SN,8,19+,v1,No,No
+566,Performance bonus dispute:,Argue case,Accept offer,T,F,MBTI-TF,8,19+,v1,No,No
+567,Home decor style:,Minimal clean,Cozy clutter,J,P,MBTI-JP,8,19+,v1,No,No
+568,Client meeting prep:,Rehearse script,Ad lib,D,S,DISC-DS,8,19+,v1,No,No
+569,Social network app:,Frequent updates,Lurk only,I,S,DISC-IS,8,19+,v1,No,No
+570,New cuisine restaurant:,Exotic dish,Familiar meal,O+,O-,Big5-O,8,19+,v1,No,No
+571,Office holiday party:,Dance floor,Chat corner,E+,E-,Big5-E,8,19+,v1,No,No
+572,Weekly planner use:,Detailed entries,Basic notes,C+,C-,Big5-C,8,19+,v1,No,No
+573,Neighbor dispute resolve:,Talk direct,Mediate third,A+,A-,Big5-A,8,19+,v1,No,No
+574,Flight delay long:,Read book,Complain loud,N-,N+,Big5-N,8,19+,v1,No,No
+575,Marketing campaign idea:,Bold creative,Safe tested,D,S,DISC-DS,8,19+,v1,No,No
+576,Financial report analyze:,Numbers crunch,Trends spot,S,N,MBTI-SN,8,19+,v1,No,No
+577,Employee review give:,Objective metrics,Personal growth,T,F,MBTI-TF,8,19+,v1,No,No
+578,Weekend errands run:,List order,As remember,J,P,MBTI-JP,8,19+,v1,No,No
+579,Team happy hour:,Join laughs,Skip home,I,S,DISC-IS,8,19+,v1,No,No
+580,New podcast series:,True crime,Self help,O+,O-,Big5-O,8,19+,v1,No,No
+581,Gym session group:,Class join,Solo workout,E+,E-,Big5-E,8,19+,v1,No,No
+582,Debt payoff plan:,Aggressive pay,Slow steady,C+,C-,Big5-C,8,19+,v1,No,No
+583,Community event volunteer:,Lead booth,Hand flyers,A+,A-,Big5-A,8,19+,v1,No,No
+584,Car breakdown road:,Fix try,Panic call,N-,N+,Big5-N,8,19+,v1,No,No
+585,Sales pitch practice:,Mirror rehearse,Improv wing,D,C,DISC-DC,8,19+,v1,No,No
+586,Resume format choose:,Chronological,Skills based,C,D,DISC-CD,8,19+,v1,No,No
+587,Favorite evening event:,Concert live,Movie night,E,I,MBTI-EI,8,19+,v1,No,No
+588,Dream vacation type:,Cultural tour,Beach relax,S,N,MBTI-SN,8,19+,v1,No,No
+589,In-law visit plan:,Schedule activities,Go flow,T,F,MBTI-TF,8,19+,v1,No,No
+590,Apartment search criteria:,Location prime,Budget low,J,P,MBTI-JP,8,19+,v1,No,No
+591,Supervisor role take:,Direct orders,Delegate trust,D,S,DISC-DS,8,19+,v1,No,No
+592,LinkedIn profile:,Detailed posts,Basic info,I,S,DISC-IS,8,19+,v1,No,No
+593,New car model:,Sporty fast,Efficient eco,O+,O-,Big5-O,8,19+,v1,No,No
+594,Reunion attend:,Catch up all,Select few,E+,E-,Big5-E,8,19+,v1,No,No
+595,Meal prep Sunday:,Batch cook,Order out,C+,C-,Big5-C,8,19+,v1,No,No
+596,Gift for partner:,Practical item,Romantic surprise,A+,A-,Big5-A,8,19+,v1,No,No
+597,Dentist appointment:,Calm go,Fear delay,N-,N+,Big5-N,8,19+,v1,No,No
+598,Product launch event:,Host lead,Attend watch,D,S,DISC-DS,8,19+,v1,No,No
+599,Budget spreadsheet:,Monthly review,Yearly glance,S,N,MBTI-SN,8,19+,v1,No,No
+600,Difficult client handle:,Firm boundaries,Empathy listen,T,F,MBTI-TF,8,19+,v1,No,No
+601,Home workout routine:,Daily fixed,When motivated,J,P,MBTI-JP,8,19+,v1,No,No
+602,Book club discussion:,Debate ideas,Share thoughts,I,S,DISC-IS,8,19+,v1,No,No
+603,New streaming show:,Binge watch,Episode weekly,O+,O-,Big5-O,8,19+,v1,No,No
+604,Bar trivia night:,Compete team,Social drink,E+,E-,Big5-E,8,19+,v1,No,No
+605,Credit card use:,Pay full,Minimum due,C+,C-,Big5-C,8,19+,v1,No,No
+606,Community garden join:,Plant help,Harvest share,A+,A-,Big5-A,8,19+,v1,No,No
+607,Power outage home:,Candle read,Pace worry,N-,N+,Big5-N,8,19+,v1,No,No
+608,Team budget meet:,Cut costs,Invest growth,D,C,DISC-DC,8,19+,v1,No,No
+609,Job application form:,Tailor answers,Copy paste,C,D,DISC-CD,8,19+,v1,No,No
+610,Favorite podcast genre:,Business tips,True crime,E,I,MBTI-EI,8,19+,v1,No,No
+611,Ideal mentor type:,Industry expert,Life coach,S,N,MBTI-SN,8,19+,v1,No,No
+612,Promotion deny reaction:,Seek feedback,Feel rejected,T,F,MBTI-TF,8,19+,v1,No,No
+613,Freelance gig take:,Steady client,Varied projects,J,P,MBTI-JP,8,19+,v1,No,No
+614,Investor pitch prep:,Data slides,Story tell,D,S,DISC-DS,8,19+,v1,No,No
+615,Twitter feed check:,Engage debates,Read only,I,S,DISC-IS,8,19+,v1,No,No
+616,New coffee shop:,Fancy latte,Black basic,O+,O-,Big5-O,8,19+,v1,No,No
+617,Weekend hike group:,Lead trail,Follow pace,E+,E-,Big5-E,8,19+,v1,No,No
+618,Laundry routine:,Weekly load,When needed,C+,C-,Big5-C,8,19+,v1,No,No
+619,Neighbor party invite:,Attend mingle,Polite decline,A+,A-,Big5-A,8,19+,v1,No,No
+620,Flat tire drive:,Change self,Call help,N-,N+,Big5-N,8,19+,v1,No,No
+621,Everyone agrees on solution:,Follow consensus,Question assumption,CT0,CT1,Critical,8,19+,v1,No,Yes
+622,Facing a complex problem at work:,Accept surface explanation,Break to basics,FP0,FP1,FirstPrinciples,8,19+,v1,No,Yes
+623,Popular opinion contradicts data points:,Trust the data fully,Consider crowd wisdom,CT1,CT0,Critical,8,19+,v1,No,Yes
+624,Solving a stuck problem issue:,Rebuild from zero,Vary what works,FP1,FP0,FirstPrinciples,8,19+,v1,No,Yes
+625,Group decision seems off base:,Agree with all,Question the why,CT0,CT1,Critical,8,19+,v1,No,No
+626,Project fails midway through:,Start over fresh,Adjust current plan,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+627,Colleague shares wrong info:,Correct it immediately,Let it pass,CT1,CT0,Critical,8,19+,v1,No,No
+628,New company policy:,Think basics reason,Accept it quick,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+629,Report data confusing:,Ignore small gap,Figure the logic,CT0,CT1,Critical,8,19+,v1,No,No
+630,Budget overrun cause:,New allocation,Check root issue,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+631,Team idea is flawed clearly:,Follow anyway,Improve it better,CT1,CT0,Critical,8,19+,v1,No,No
+632,Workflow method stuck:,Disassemble steps,Vary the approach,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+633,All like one strategy:,Join the same,Why it popular,CT0,CT1,Critical,8,19+,v1,No,No
+634,Software bug appears:,Rebuild core code,Add quick fixes,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+635,Answer too simple obvious:,Trust it fully,Double check why,CT1,CT0,Critical,8,19+,v1,No,No
+636,Proposal structure new:,From basics build,Copy old template,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+637,Boss states a fact:,Believe it all,Ask for proof,CT0,CT1,Critical,8,19+,v1,No,No
+638,Business strategy fails:,New from zero,Tweak the old,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+639,Colleagues all agree:,Join in quick,Think alone first,CT1,CT0,Critical,8,19+,v1,No,No
+640,Deal term missing:,Add your own,Search more info,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+641,Industry myth common:,Accept as true,Verify the source,CT0,CT1,Critical,8,19+,v1,No,No
+642,I prefer working in teams over alone.,Strongly disagree,Strongly agree,I,E,MBTI-EI-Slider,8,19+,v1,No,No
+643,I value traditions more than new ideas.,Strongly disagree,Strongly agree,N,S,MBTI-SN-Slider,8,19+,v1,No,No
+644,I prioritize harmony over being right.,Strongly disagree,Strongly agree,T,F,MBTI-TF-Slider,8,19+,v1,No,No
+645,I need structure in my daily life.,Strongly disagree,Strongly agree,P,J,MBTI-JP-Slider,8,19+,v1,No,No
+646,I am driven to achieve goals quickly.,Strongly disagree,Strongly agree,S,D,DISC-DS-Slider,8,19+,v1,No,No
+647,I build rapport easily with others.,Strongly disagree,Strongly agree,D,I,DISC-IS-Slider,8,19+,v1,No,No
+648,I focus on details and accuracy.,Strongly disagree,Strongly agree,I,C,DISC-CD-Slider,8,19+,v1,No,No
+649,I seek adventure in my free time.,Strongly disagree,Strongly agree,O-,O+,Big5-O-Slider,8,19+,v1,No,No
+650,I thrive in social environments often.,Strongly disagree,Strongly agree,E-,E+,Big5-E-Slider,8,19+,v1,No,No
+651,I organize my space meticulously.,Strongly disagree,Strongly agree,C-,C+,Big5-C-Slider,8,19+,v1,No,No
+652,I compromise easily in disputes.,Strongly disagree,Strongly agree,A-,A+,Big5-A-Slider,8,19+,v1,No,No
+653,I remain calm under pressure.,Strongly disagree,Strongly agree,N+,N-,Big5-N-Slider,8,19+,v1,No,No
+654,New investment app:,Try beta version,Stick established,O+,O-,Big5-O,8,19+,v1,No,No
+655,After work unwind:,Happy hour group,Home alone,E+,E-,Big5-E,8,19+,v1,No,No
+656,Desk organization daily:,Neat arranged,Papers scattered,C+,C-,Big5-C,8,19+,v1,No,No
+657,See workplace bias:,Address it,Ignore quietly,A-,A+,Big5-A,8,19+,v1,No,No
+658,Life transition big:,Embrace change,Anxious resist,N-,N+,Big5-N,8,19+,v1,No,No
+659,Strategy meeting lead:,Direct outcomes,Collaborate ideas,D,S,DISC-DS,8,19+,v1,No,No
+660,Favorite read type:,Biographies real,Fiction imagined,S,N,MBTI-SN,8,19+,v1,No,No
+661,Manager unfair rule:,Challenge logic,Comply silent,T,F,MBTI-TF,8,19+,v1,No,No
+662,Annual vacation plan:,Book ahead,Last minute,J,P,MBTI-JP,8,19+,v1,No,No
+663,Share work success:,Post online,Tell close,I,S,DISC-IS,8,19+,v1,No,No
+664,New tech conference:,Attend live,Virtual watch,O+,O-,Big5-O,8,19+,v1,No,No
+665,Team collaboration tool:,Manage tasks,Chat casual,E+,E-,Big5-E,8,19+,v1,No,No
+666,Save bonus check:,Invest wise,Spend treat,C+,C-,Big5-C,8,19+,v1,No,No
+667,Comfort upset colleague:,Offer solutions,Listen empathize,A+,A-,Big5-A,8,19+,v1,No,No
+668,High pressure deadline:,Focus thrive,Stress overwhelm,N-,N+,Big5-N,8,19+,v1,No,No
+669,Board meeting dynamics:,Chair lead,Contribute key,D,C,DISC-DC,8,19+,v1,No,No
+670,Professional outfit:,Suit formal,Business casual,C,D,DISC-CD,8,19+,v1,No,No
+671,Favorite commute activity:,Podcast listen,People watch,E,I,MBTI-EI,8,19+,v1,No,No
+672,Dream second career:,Entrepreneur risk,Stable consult,S,N,MBTI-SN,8,19+,v1,No,No
+673,Vendor negotiation tough:,Push terms,Build relation,T,F,MBTI-TF,8,19+,v1,No,No
+674,Workday structure:,Timed blocks,Flow natural,J,P,MBTI-JP,8,19+,v1,No,No
+675,Industry event attend:,Network active,Learn sessions,D,S,DISC-DS,8,19+,v1,No,No
+676,Social profile manage:,Curate posts,Authentic share,I,S,DISC-IS,8,19+,v1,No,No
+677,New office perk:,Gym access,Remote days,O+,O-,Big5-O,8,19+,v1,No,No
+678,Company retreat:,Team games,Personal time,E+,E-,Big5-E,8,19+,v1,No,No
+679,Performance metrics track:,Daily review,Monthly check,C+,C-,Big5-C,8,19+,v1,No,No
+680,Team member conflict:,Intervene direct,Observe resolve,A+,A-,Big5-A,8,19+,v1,No,No
+681,Market crash news:,Analyze opportunity,Panic review,N-,N+,Big5-N,8,19+,v1,No,No
+682,Product dev lead:,Innovate features,Refine existing,D,S,DISC-DS,8,19+,v1,No,No
+683,Analytics dashboard:,Custom build,Standard tool,S,N,MBTI-SN,8,19+,v1,No,No
+684,Client loss handle:,Review mistakes,Empathize move,T,F,MBTI-TF,8,19+,v1,No,No
+685,Freelance schedule:,Fixed hours,Project based,J,P,MBTI-JP,8,19+,v1,No,No
+686,Virtual meeting join:,Camera on,Text chat,I,S,DISC-IS,8,19+,v1,No,No
+687,New industry cert:,Pursue advanced,Basic level,O+,O-,Big5-O,8,19+,v1,No,No
+688,Office coffee run:,Buy for all,Self only,E+,E-,Big5-E,8,19+,v1,No,No
+689,Quarterly report prep:,Data compile,Story craft,C+,C-,Big5-C,8,19+,v1,No,No
+690,Community outreach:,Event host,Donate funds,A+,A-,Big5-A,8,19+,v1,No,No
+691,Health insurance pick:,Low premium,Full coverage,N-,N+,Big5-N,8,19+,v1,No,No
+692,Sales team motivate:,Targets set,Team building,D,C,DISC-DC,8,19+,v1,No,No
+693,Resume skill list:,Technical hard,Soft interpersonal,C,D,DISC-CD,8,19+,v1,No,No
+694,Favorite work music:,Upbeat pop,Calm instrumental,E,I,MBTI-EI,8,19+,v1,No,No
+695,Dream office setup:,Standing desk,Cozy chair,S,N,MBTI-SN,8,19+,v1,No,No
+696,Annual review prep:,Data highlight,Personal story,T,F,MBTI-TF,8,19+,v1,No,No
+697,Side gig pursue:,Steady income,Passion project,J,P,MBTI-JP,8,19+,v1,No,No
+698,Board presentation:,Confident solo,Team backup,D,S,DISC-DS,8,19+,v1,No,No
+699,Email signature:,Professional title,Personal quote,I,S,DISC-IS,8,19+,v1,No,No
+700,New work laptop:,High spec,Budget model,O+,O-,Big5-O,8,19+,v1,No,Yes
+701,Promotion party celebrate:,Office toast,Private dinner,E+,E-,Big5-E,8,19+,v1,No,No
+702,Rent payment method:,Auto transfer,Manual pay,C+,C-,Big5-C,8,19+,v1,No,No
+703,Neighbor help move:,Lift boxes,Ask others,A+,A-,Big5-A,8,19+,v1,No,No
+704,Job search stress:,Organized apply,Overwhelm quit,N-,N+,Big5-N,8,19+,v1,No,No
+705,Marketing strategy:,Data driven,Creative campaign,D,S,DISC-DS,8,19+,v1,No,No
+706,Quarterly goals set:,Measurable targets,Big vision,S,N,MBTI-SN,8,19+,v1,No,No
+707,Team member praise:,Public shoutout,Private note,T,F,MBTI-TF,8,19+,v1,No,No
+708,Daily exercise routine:,Gym schedule,Home workout,J,P,MBTI-JP,8,19+,v1,No,No
+709,Conference networking:,Business cards,Deep chats,I,S,DISC-IS,8,19+,v1,No,No
+710,New streaming service:,Binge series,Episode savor,O+,O-,Big5-O,8,19+,v1,No,No
+711,Weekend social plan:,Party hop,Cozy night,E+,E-,Big5-E,8,19+,v1,No,No
+712,Grocery budget track:,App list,Estimate spend,C+,C-,Big5-C,8,19+,v1,No,No
+713,Family reunion attend:,Host event,Guest arrive,A+,A-,Big5-A,8,19+,v1,No,No
+714,Doctor visit delay:,Ignore symptom,Worry consult,N-,N+,Big5-N,8,19+,v1,No,No
+715,Product demo give:,Script follow,Improv engage,D,C,DISC-DC,8,19+,v1,No,No
+716,LinkedIn endorse:,Skills list,Personal rec,C,D,DISC-CD,8,19+,v1,No,No
+717,Favorite hobby time:,Group class,Solo practice,E,I,MBTI-EI,8,19+,v1,No,No
+718,Dream home buy:,Urban condo,Suburb house,S,N,MBTI-SN,8,19+,v1,No,No
+719,Spouse argument resolve:,Logic win,Emotional connect,T,F,MBTI-TF,8,19+,v1,No,No
+720,Pet care routine:,Daily walks,As needed,J,P,MBTI-JP,8,19+,v1,No,No
+721,Supervisor feedback seek:,Formal review,Casual chat,D,S,DISC-DS,8,19+,v1,No,No
+722,Instagram feed:,Curated aesthetic,Real moments,I,S,DISC-IS,8,19+,v1,No,No
+723,New phone upgrade:,Flagship latest,Budget smart,O+,O-,Big5-O,8,19+,v1,No,No
+724,Alumni meetup:,Network connect,Reminisce old,E+,E-,Big5-E,8,19+,v1,No,No
+725,Laundry day plan:,Sorted loads,Quick wash,C+,C-,Big5-C,8,19+,v1,No,No
+726,Birthday gift friend:,Useful item,Fun surprise,A+,A-,Big5-A,8,19+,v1,No,No
+727,Minor injury handle:,Bandage self,Doctor visit,N-,N+,Big5-N,8,19+,v1,No,No
+728,Team goal set:,Ambitious stretch,Realistic achieve,D,S,DISC-DS,8,19+,v1,No,No
+729,Excel data entry:,Formula automate,Manual input,S,N,MBTI-SN,8,19+,v1,No,No
+730,Colleague birthday:,Office cake,Card sign,T,F,MBTI-TF,8,19+,v1,No,No
+731,Commute time use:,Podcast learn,Daydream relax,J,P,MBTI-JP,8,19+,v1,No,No
+732,Happy hour skip:,Work late,Join fun,I,S,DISC-IS,8,19+,v1,No,No
+733,New wine try:,Exotic import,Familiar label,O+,O-,Big5-O,8,19+,v1,No,No
+734,Golf outing work:,Compete score,Social swing,E+,E-,Big5-E,8,19+,v1,No,No
+735,Utility bill pay:,Online auto,Check mail,C+,C-,Big5-C,8,19+,v1,No,No
+736,Community board join:,Lead meetings,Vote only,A+,A-,Big5-A,8,19+,v1,No,No
+737,Storm power out:,Generator prep,Candle worry,N-,N+,Big5-N,8,19+,v1,No,No
+738,Client contract sign:,Review fine print,Trust handshake,D,C,DISC-DC,8,19+,v1,No,No
+739,Job title change:,Negotiate raise,Accept as is,C,D,DISC-CD,8,19+,v1,No,No
+740,Favorite weekend brunch:,Crowd spot,Home cook,E,I,MBTI-EI,8,19+,v1,No,No
+741,Dream travel solo:,Backpack adventure,Guided tour,S,N,MBTI-SN,8,19+,v1,No,No
+742,Friend advice ignore:,Confront why,Let go,T,F,MBTI-TF,8,19+,v1,No,No
+743,Yoga class routine:,Weekly attend,When stressed,J,P,MBTI-JP,8,19+,v1,No,No
+744,Investor meet prep:,Data deck,Personal pitch,D,S,DISC-DS,8,19+,v1,No,No
+745,Facebook group manage:,Active mod,Passive member,I,S,DISC-IS,8,19+,v1,No,No
+746,New smart home:,Voice control,Manual switch,O+,O-,Big5-O,8,19+,v1,No,No
+747,High school reunion:,Organize it,Attend maybe,E+,E-,Big5-E,8,19+,v1,No,No
+748,Cleaning schedule home:,Daily tidy,Weekly deep,C+,C-,Big5-C,8,19+,v1,No,No
+749,Holiday card send:,To all contacts,Close family,A+,A-,Big5-A,8,19+,v1,No,No
+750,Vet pet visit:,Routine check,Emergency only,N-,N+,Big5-N,8,19+,v1,No,No
+751,Everyone follows company policy:,Comply fully,Question efficiency,CT0,CT1,Critical,8,19+,v1,No,No
+752,Facing business dilemma:,Accept standard practice,Break to core principles,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+753,Industry trend contradicts evidence:,Trust evidence,Follow trend,CT1,CT0,Critical,8,19+,v1,No,No
+754,Solving operational bottleneck:,Rebuild process,Vary existing,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+755,Team consensus wrong:,Agree group,Challenge basis,CT0,CT1,Critical,8,19+,v1,No,No
+756,Strategy pivot needed:,From ground up,Incremental change,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+757,Partner provides false data:,Correct public,Private note,CT1,CT0,Critical,8,19+,v1,No,No
+758,New regulation impact:,Core reason analyze,Surface comply,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+759,Financial report anomaly:,Ignore minor,Investigate root,CT0,CT1,Critical,8,19+,v1,No,No
+760,Cost overrun project:,New budget,Trace cause,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+761,Group plan inefficient:,Follow as is,Optimize better,CT1,CT0,Critical,8,19+,v1,No,No
+762,Workflow inefficiency:,Disassemble tasks,Vary methods,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+763,All adopt one tool:,Join adoption,Why chosen,CT0,CT1,Critical,8,19+,v1,No,No
+764,System failure debug:,Rebuild module,Patch quick,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+765,Solution overly simplistic:,Accept easy,Verify depth,CT1,CT0,Critical,8,19+,v1,No,No
+766,Contract clause new:,From basics draft,Template copy,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+767,Expert opinion given:,Believe authority,Seek evidence,CT0,CT1,Critical,8,19+,v1,No,No
+768,Market entry fails:,New approach zero,Refine old,FP1,FP0,FirstPrinciples,8,19+,v1,No,No
+769,Colleagues unanimous view:,Concur quick,Independent think,CT1,CT0,Critical,8,19+,v1,No,No
+770,Resource gap in plan:,Create alternative,Allocate more,FP0,FP1,FirstPrinciples,8,19+,v1,No,No
+771,Common practice myth:,Accept norm,Validate source,CT0,CT1,Critical,8,19+,v1,No,No
+772,I adapt quickly to changes at work.,Strongly disagree,Strongly agree,O-,O+,Big5-O-Slider,8,19+,v1,No,No
+773,I energize from team collaborations.,Strongly disagree,Strongly agree,E-,E+,Big5-E-Slider,8,19+,v1,No,No
+774,I follow through on commitments reliably.,Strongly disagree,Strongly agree,C-,C+,Big5-C-Slider,8,19+,v1,No,No
+775,I avoid conflicts whenever possible.,Strongly disagree,Strongly agree,A-,A+,Big5-A-Slider,8,19+,v1,No,No
+776,I handle stress well in crises.,Strongly disagree,Strongly agree,N+,N-,Big5-N-Slider,8,19+,v1,No,No
+777,I prefer independent work over groups.,Strongly disagree,Strongly agree,E,I,MBTI-EI-Slider,8,19+,v1,No,No
+778,I rely on intuition more than facts.,Strongly disagree,Strongly agree,S,N,MBTI-SN-Slider,8,19+,v1,No,No
+779,I value logic over people's feelings.,Strongly disagree,Strongly agree,F,T,MBTI-TF-Slider,8,19+,v1,No,No
+780,I thrive in unstructured environments.,Strongly disagree,Strongly agree,J,P,MBTI-JP-Slider,8,19+,v1,No,No
+781,I drive results in team settings.,Strongly disagree,Strongly agree,S,D,DISC-DS-Slider,8,19+,v1,No,No
+782,I persuade others effectively often.,Strongly disagree,Strongly agree,D,I,DISC-IS-Slider,8,19+,v1,No,No
+783,I ensure compliance with standards.,Strongly disagree,Strongly agree,I,C,DISC-CD-Slider,8,19+,v1,No,No
+784,New stock tip:,Buy hype,Sell safe,O+,O-,Big5-O,8,19+,v1,No,No
+785,After hours event:,Attend mingle,Skip recharge,E+,E-,Big5-E,8,19+,v1,No,No
+786,File system computer:,Folders labeled,Desktop clutter,C+,C-,Big5-C,8,19+,v1,No,No
+787,See ethical lapse:,Report up,Handle private,A-,A+,Big5-A,8,19+,v1,No,No
+788,Career shift major:,Excited pivot,Stressed stability,N-,N+,Big5-N,8,19+,v1,No,No
+789,Boardroom discussion:,Assert position,Listen weigh,D,S,DISC-DS,8,19+,v1,No,No
+790,Favorite article type:,News facts,Opinion pieces,S,N,MBTI-SN,8,19+,v1,No,No
+791,Policy unfair challenge:,Debate public,Private accept,T,F,MBTI-TF,8,19+,v1,No,No
+792,Fiscal year plan:,Budget early,Adapt quarterly,J,P,MBTI-JP,8,19+,v1,No,No
+793,Share promotion news:,Announce loud,Tell select,I,S,DISC-IS,8,19+,v1,No,No
+794,New startup expo:,Exhibit booth,Visitor browse,O+,O-,Big5-O,8,19+,v1,No,No
+795,Collaborative software:,Lead edits,Comment only,E+,E-,Big5-E,8,19+,v1,No,No
+796,Invest dividend check:,Reinvest smart,Spend luxury,C+,C-,Big5-C,8,19+,v1,No,No
+797,Console laid-off friend:,Job search help,Emotional support,A+,A-,Big5-A,8,19+,v1,No,No
+798,Intense negotiation session:,Composed firm,Emotional high,N-,N+,Big5-N,8,19+,v1,No,No
+799,Executive meeting style:,Agenda drive,Open forum,D,C,DISC-DC,8,19+,v1,No,No
+800,Business attire daily:,Suit tie,Casual jeans,C,D,DISC-CD,8,19+,v1,No,Yes
+

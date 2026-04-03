@@ -1,0 +1,69 @@
+You are now performing a full, safe overhaul of the KnowRole project (https://knowyourole.com). 
+Apply ALL the changes below in one coherent pass. 
+Before every file write, run a quick diff check and log what you're changing.
+After every major change, test the build locally (npm run dev or preview) and confirm nothing is broken.
+If anything fails, immediately revert and log the error.
+
+APPLY THESE CHANGES IN ORDER:
+
+1. **Fix Theme System (Critical)**
+   - Dark & Light themes must correctly apply to question answers, buttons, and results text.
+   - Fix Tailwind/CSS variables so `data-theme="dark"` / `data-theme="light"` properly affects foreground text, answer cards, and result summary.
+   - Ensure Random theme still cycles correctly and doesn't break text contrast.
+
+2. **Responsive Header Behavior**
+   - On homepage (`/`) → keep large centered header with compass icons (current behavior).
+   - On ALL other pages (`/quiz/*`, `/location`, `/results`, etc.) → shrink header to compact sticky bar (height ~60px), move "knowrole" logo left, add small back arrow left if needed, keep theme toggle right.
+   - Add smooth shrink animation on scroll or route change using Alpine.js or CSS.
+
+3. **Split Pre-Quiz Flow into 2 Pages**
+   - Create new route/page: `/mood` → only "How are you feeling today?" with 3 large mood buttons + huge "Continue →" button (skippable).
+   - Next page `/location` → Zip/postal input + "Personify my role" toggle + huge "Begin Journey →" button.
+   - Both pages optional — tapping Continue/Begin skips missing fields.
+
+4. **Mobile Portrait Fixes**
+   - Theme selector must be visible and usable in iPhone Safari portrait mode (currently hidden).
+   - Move theme button to bottom-right floating action button (FAB) on mobile portrait, or add it permanently below mood selection.
+   - Ensure 100% viewport usability on iPhone 12/13/14/15 screens.
+
+5. **Typography & CTA Overhaul**
+   - Question text: increase ~100% on mobile (from ~1.1rem → ~2–2.2rem), desktop ~1.8rem.
+   - Bottom summary words (e.g., "Curious → Bold → Grounded"): increase 200%+ (use text-6xl → text-8xl on mobile).
+   - "Unlock Deep Insights" section: 
+        • Hero-style headline ("Your Role is Waiting…")
+        • Larger price ($9 one-time)
+        • Glowing primary CTA button
+        • Subtext: "Lifetime access • No subscription • See your growth arc"
+   - Age tier buttons on homepage: make 2–3× larger, full-width cards, high contrast.
+
+6. **Begin Journey Page**
+   - Back arrow: increase size 1.8× and add padding for easier tap target.
+
+7. **PWA Manifest + Install Prompt**
+   - Add `/manifest.json` with 1024×1024 compass icon, name: "KnowRole", start_url: "/", display: "standalone"
+   - Add 192×192 and 512×512 PNGs in /public
+   - Add install prompt logic (beforeinstallprompt) with tasteful toast after quiz completion.
+
+8. **Add Critical Thinking & First-Principles Scales**
+   - Add 4 new binary wildcard questions (provide them if missing, otherwise use previous context).
+   - Score 0–5 for both scales → display as badges in results ("First-Principles Thinker: 4/5").
+
+9. **Finalize 150-Role JSON**
+   - Ensure roles.json has exactly 150 entries with fields: id, name, category, salary_range, growth_2025, why_mbti, why_disc, why_big5, arc_tip
+   - Fill any missing entries with realistic data (I will paste full JSON in next message if needed).
+
+10. **Minor Polish**
+    - Success screen after $9 payment (confetti, "Welcome, Trailblazer!" + premium badge)
+    - Premium badge on results share card
+    - Basic arc tracker stub (localStorage history + simple Chart.js line)
+
+After all changes:
+- Run full build and test on mobile + desktop
+- Confirm no console errors
+- Confirm themes work perfectly
+- Confirm header no longer blocks content
+- Confirm new 2-page flow works
+- Confirm typography is dramatically more impactful
+- Output final message: "KNOWROLE OVERHAUL COMPLETE – Ready for Beta Launch 🚀"
+
+Begin now.

@@ -1,0 +1,4 @@
+File len: 50869
+RESULT CARD found at: 32684
+Before: 'ΓöÇΓöÇΓöÇ '
+After: 'RESULT CARD ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ'

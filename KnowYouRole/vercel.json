@@ -1,0 +1,9 @@
+{
+  "framework": null,
+  "rootDirectory": "KnowYouRole/client",
+  "buildCommand": "cd KnowYouRole/client && npm install && npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "devCommand": "cd KnowYouRole/client && npm run dev",
+  "trailingSlash": true
+}

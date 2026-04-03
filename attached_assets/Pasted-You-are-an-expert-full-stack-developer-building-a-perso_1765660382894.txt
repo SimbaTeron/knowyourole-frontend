@@ -1,0 +1,178 @@
+You are an expert full-stack developer building a personality-based career recommendation app for me. You have done a thoughtful and excellent and beautiful design thus far.. The app assesses users via 25-40 questions to derive scores for MBTI, DISC, and Big Five .
+Below I have 150 job roles, each with pre-rated trait requirements on a 1-5 scale to reflect US job market diversity (white-collar majority ~55%, healthcare 15%, blue-collar 15%, service 10%, arts/side hustles 5%):
+- MBTI: E/I, S/N, T/F, J/P
+- DISC: D, I, S, C
+- Big Five: O, C, E, A, N (low N better for high-stress roles)
+Here is the full matrix data as CSV (copy into a file or DB table): 
+#,Job Role,MBTI E/I,MBTI S/N,MBTI T/F,MBTI J/P,DISC D,DISC I,DISC S,DISC C,Big5 O,Big5 C,Big5 E,Big5 A,Big5 N (low better)
+[PASTE THE ENTIRE TABLE ROWS HERE FROM THE MATRIX ABOVE]
+#	Job Role	MBTI E/I	MBTI S/N	MBTI T/F	MBTI J/P	DISC D	DISC I	DISC S	DISC C	Big5 O	Big5 C	Big5 E	Big5 A	Big5 N (low better)
+1	Software Developer	2	2	4	3	3	2	2	5	4	5	2	3	2
+2	Nurse Practitioner	4	4	3	4	4	4	5	4	3	5	4	5	3
+3	Physician Assistant	4	4	4	4	4	4	4	5	3	5	4	5	3
+4	Data Scientist	2	2	5	3	3	2	2	5	5	5	2	3	2
+5	Financial Manager	4	3	5	5	5	3	3	4	3	5	4	3	3
+6	Registered Nurse	4	4	3	4	3	4	5	4	3	5	4	5	3
+7	Dentist	3	4	4	5	4	3	4	5	3	5	3	4	3
+8	Lawyer	4	2	5	5	5	4	2	4	4	4	5	3	4
+9	Marketing Manager	5	2	4	4	5	5	3	3	5	4	5	4	3
+10	IT Manager	4	3	5	5	5	3	3	4	3	5	4	3	3
+11	Accountant	2	3	5	5	2	2	3	5	2	5	2	3	2
+12	Human Resources Manager	5	3	3	4	4	5	4	3	3	4	5	5	3
+13	Teacher (High School)	5	3	3	4	3	5	4	3	4	4	5	5	3
+14	Electrician	3	5	4	4	3	2	4	4	2	5	3	3	2
+15	Plumber	3	5	4	3	3	2	4	4	2	5	3	3	2
+16	Carpenter	3	5	4	3	3	2	4	4	3	5	3	3	2
+17	Truck Driver	2	5	4	3	3	2	5	3	2	5	2	3	2
+18	Construction Manager	4	4	5	5	5	3	3	4	3	5	4	3	3
+19	Mechanic (Automotive)	3	5	4	3	3	2	4	4	2	5	3	3	2
+20	Welder	2	5	4	3	3	2	4	4	3	5	2	3	2
+21	Retail Salesperson	5	4	3	3	3	5	4	3	3	4	5	4	3
+22	Customer Service Representative	5	4	3	4	3	5	5	3	3	4	5	5	3
+23	Fast Food Worker	4	5	3	3	2	4	5	3	2	4	4	4	3
+24	Home Health Aide	4	5	2	4	2	4	5	3	2	4	4	5	3
+25	Janitor/Cleaner	2	5	3	3	2	2	5	3	1	4	2	4	2
+26	Graphic Designer	3	2	3	2	3	4	2	4	5	4	3	4	2
+27	Writer/Author	2	2	3	2	3	3	2	4	5	4	2	3	2
+28	Actor	5	2	2	2	4	5	2	2	5	3	5	4	4
+29	Musician	4	2	2	2	4	5	2	3	5	4	4	4	3
+30	Photographer	3	3	3	2	3	4	2	3	5	4	3	4	3
+31	Chef	4	4	3	3	4	4	3	4	4	4	4	3	3
+32	Police Officer	4	4	4	5	5	3	4	4	3	5	4	4	4
+33	Firefighter	4	5	4	4	5	3	4	3	3	5	4	4	4
+34	Paramedic/EMT	4	5	4	4	4	3	5	4	3	5	4	5	4
+35	Physical Therapist	4	4	3	4	4	4	4	4	3	5	4	5	3
+36	Occupational Therapist	4	3	3	4	4	4	4	4	4	5	4	5	3
+37	Speech-Language Pathologist	4	3	3	4	3	4	4	4	4	5	4	5	3
+38	Psychologist	3	2	2	4	3	4	4	4	4	4	3	5	3
+39	Social Worker	5	3	2	4	3	5	5	3	4	4	5	5	3
+40	Counselor	4	2	2	4	3	5	5	3	4	4	4	5	3
+41	Sales Manager	5	3	4	4	5	5	3	3	4	4	5	4	3
+42	Real Estate Agent	5	3	3	3	4	5	3	3	4	4	5	4	3
+43	Insurance Agent	5	3	4	4	4	5	3	4	3	4	5	4	3
+44	Financial Advisor	4	2	4	5	4	4	3	4	3	5	4	4	3
+45	Project Manager	4	3	5	5	5	4	3	4	3	5	4	3	3
+46	Business Analyst	3	2	5	4	4	3	3	5	4	5	3	3	2
+47	Web Developer	2	2	4	3	3	2	2	5	4	5	2	3	2
+48	Cybersecurity Analyst	2	2	5	4	4	2	2	5	4	5	2	3	2
+49	Nurse Anesthetist	3	4	4	5	4	3	4	5	3	5	3	4	4
+50	Physician	3	3	4	5	5	3	3	5	4	5	3	4	4
+51	Pharmacist	3	4	4	5	3	3	4	5	3	5	3	4	3
+52	Veterinarian	3	4	4	4	4	3	4	4	3	5	3	5	3
+53	Architect	3	2	4	4	4	3	3	4	5	5	3	3	3
+54	Civil Engineer	3	3	5	5	4	2	3	5	3	5	3	3	2
+55	Mechanical Engineer	2	3	5	4	4	2	3	5	4	5	2	3	2
+56	Electrical Engineer	2	3	5	4	4	2	3	5	4	5	2	3	2
+57	HVAC Technician	3	5	4	3	3	2	4	4	2	5	3	3	2
+58	Landscaper/Groundskeeper	3	5	3	3	2	3	5	3	2	4	3	4	2
+59	Painter (Construction)	2	5	3	3	2	2	4	3	3	4	2	3	2
+60	Roofer	3	5	4	3	3	2	4	3	2	4	3	3	3
+61	Mason (Brick/Stone)	2	5	4	3	3	2	4	4	3	5	2	3	2
+62	Delivery Driver	3	5	4	3	3	3	5	3	2	4	3	4	2
+63	Warehouse Worker	3	5	3	3	2	3	5	3	2	4	3	4	2
+64	Factory Assembler	2	5	4	4	2	2	5	4	2	5	2	3	2
+65	Machinist	2	5	4	4	3	2	4	5	3	5	2	3	2
+66	Farmer/Rancher	3	5	4	3	4	2	4	3	3	5	3	3	3
+67	Fisherman	2	5	4	2	4	2	4	3	3	4	2	3	4
+68	Logger	2	5	4	3	4	2	4	3	2	4	2	3	4
+69	Flight Attendant	5	4	3	4	3	5	5	3	3	4	5	5	3
+70	Pilot	3	4	5	5	5	3	3	5	3	5	3	3	4
+71	Barista	4	5	3	3	2	4	5	3	2	4	4	5	3
+72	Bartender	5	4	3	2	3	5	4	3	3	4	5	4	3
+73	Server (Restaurant)	5	4	3	3	3	5	5	3	3	4	5	5	3
+74	Hair Stylist	5	4	2	2	3	5	4	3	4	4	5	5	3
+75	Fitness Trainer	5	4	3	3	4	5	4	3	4	4	5	5	3
+76	Freelance Writer (side hustle)	2	2	3	2	3	3	2	4	5	4	2	3	2
+77	Uber/Lyft Driver (side hustle)	4	5	3	2	3	4	4	3	3	4	4	4	3
+78	Content Creator/YouTuber	5	2	3	2	4	5	2	3	5	4	5	4	3
+79	Etsy Seller/Handcrafter (side hustle)	3	3	3	2	3	4	3	4	5	4	3	4	2
+80	Tutor (online/in-person)	4	3	3	4	3	5	4	4	4	4	4	5	3
+81	Event Planner	5	3	3	4	4	5	4	4	4	5	5	5	3
+82	Interior Designer	4	2	3	3	4	4	3	4	5	4	4	4	3
+83	Film Director	5	2	3	3	5	5	2	3	5	4	5	4	4
+84	Animator	2	2	3	2	3	3	2	4	5	5	2	3	2
+85	Journalist	4	2	4	3	4	4	2	4	5	4	4	3	3
+86	Public Relations Specialist	5	2	3	4	4	5	3	3	4	4	5	5	3
+87	Librarian	3	3	3	5	2	4	5	4	4	5	3	5	2
+88	Museum Curator	3	2	3	5	3	4	4	4	5	5	3	4	2
+89	Park Ranger	4	4	4	4	4	4	4	4	4	5	4	4	3
+90	Environmental Scientist	3	3	5	4	4	3	3	5	4	5	3	4	3
+91	Data Entry Clerk	2	4	4	5	2	2	5	5	1	5	2	3	1
+92	Administrative Assistant	4	4	3	5	3	4	5	4	2	5	4	5	2
+93	Executive Assistant	4	3	3	5	3	4	5	4	3	5	4	5	2
+94	Operations Manager	4	4	5	5	5	3	4	4	3	5	4	3	3
+95	Logistics Coordinator	3	4	4	5	4	3	4	4	3	5	3	3	2
+96	Supply Chain Analyst	3	3	5	4	4	3	3	5	3	5	3	3	2
+97	Dental Hygienist	4	5	3	4	3	4	5	4	2	5	4	5	3
+98	Radiologic Technologist	3	4	4	4	3	3	4	5	3	5	3	4	3
+99	Wind Turbine Technician	3	5	4	3	4	2	4	4	3	5	3	3	3
+100	Solar Photovoltaic Installer	3	5	4	4	3	2	4	4	2	5	3	3	2
+101	Cashier	4	5	3	3	2	4	5	3	2	4	4	4	2
+102	Stock Clerk/Order Filler	3	5	4	4	2	3	5	4	2	5	3	3	2
+103	General Office Clerk	3	4	3	5	2	3	5	4	2	5	3	4	2
+104	Bookkeeping Clerk	2	4	4	5	2	2	4	5	2	5	2	3	1
+105	Laborer (Construction)	3	5	4	3	2	3	5	3	2	4	3	4	2
+106	Heavy Equipment Operator	2	5	4	3	3	2	4	3	2	5	2	3	3
+107	Bus Driver	3	5	4	4	3	3	5	3	2	5	3	4	3
+108	Security Guard	3	5	4	4	4	3	5	4	2	5	3	4	3
+109	Correctional Officer	4	4	4	5	5	3	4	4	2	5	4	3	4
+110	Preschool Teacher	5	4	2	4	3	5	5	3	4	4	5	5	3
+111	Elementary School Teacher	5	3	2	4	3	5	5	3	4	5	5	5	3
+112	Postsecondary Teacher	4	2	3	4	4	5	3	4	5	4	4	4	3
+113	Medical Assistant	4	5	3	4	3	4	5	4	2	5	4	5	3
+114	Pharmacy Technician	3	5	4	5	2	3	5	5	2	5	3	4	2
+115	Licensed Practical Nurse	4	5	3	4	3	4	5	4	3	5	4	5	3
+116	Clinical Lab Technician	2	4	4	5	2	2	4	5	3	5	2	3	2
+117	Dancer	5	3	2	2	4	5	2	2	5	4	5	4	4
+118	Choreographer	5	2	2	3	5	5	2	3	5	4	5	4	3
+119	Fine Artist (Painter/Sculptor)	2	2	2	1	3	3	2	3	5	4	2	3	2
+120	Fashion Designer	4	2	3	2	4	4	2	4	5	4	4	4	3
+121	Editor	3	2	4	4	4	3	3	5	5	5	3	3	2
+122	Broadcast Technician	3	4	4	3	3	3	4	4	3	5	3	3	2
+123	Agricultural Worker	3	5	4	3	2	2	5	3	2	4	3	4	2
+124	Mining Worker	2	5	4	3	4	2	4	3	2	4	2	3	4
+125	Oil Rig Worker	3	5	4	3	4	3	4	3	2	4	3	3	4
+126	Computer Support Specialist	4	3	4	4	3	4	4	4	3	5	4	4	3
+127	Network Administrator	3	3	5	4	4	3	3	5	3	5	3	3	2
+128	Actuary	2	2	5	5	3	2	2	5	3	5	2	3	2
+129	Market Research Analyst	3	2	5	4	4	3	3	5	4	5	3	3	2
+130	Loan Officer	4	3	4	5	4	4	3	4	3	5	4	4	3
+131	Management Analyst	4	2	5	4	5	4	3	4	4	5	4	3	3
+132	Logisticians	3	3	5	5	4	3	4	5	3	5	3	3	2
+133	Substance Abuse Counselor	4	3	2	4	3	5	5	3	4	4	4	5	3
+134	Probation Officer	4	4	4	5	5	4	4	4	3	5	4	4	4
+135	Pest Control Worker	3	5	4	3	3	3	4	4	2	4	3	3	3
+136	Air Traffic Controller	3	4	5	5	5	3	3	5	3	5	3	3	5
+137	Aircraft Mechanic	2	5	4	4	3	2	4	5	3	5	2	3	3
+138	Boilermaker	2	5	4	3	4	2	4	4	2	5	2	3	3
+139	Elevator Installer/Repairer	3	5	4	4	3	2	4	4	2	5	3	3	3
+140	Sheet Metal Worker	2	5	4	3	3	2	4	4	3	5	2	3	2
+141	Power Plant Operator	2	5	4	5	4	2	4	5	2	5	2	3	3
+142	Water Treatment Operator	2	5	4	5	3	2	4	5	2	5	2	3	3
+143	Bakers	3	5	3	3	3	3	4	4	3	4	3	3	2
+144	Quality Control Inspector	2	5	5	5	3	2	4	5	2	5	2	3	2
+145	Dental Assistant	4	5	3	4	3	4	5	4	2	5	4	5	3
+146	Massage Therapist	4	4	2	3	3	4	5	3	4	4	4	5	3
+147	Recreation Worker	5	4	2	3	4	5	4	3	4	4	5	5	3
+148	Podcaster (side hustle)	4	2	3	2	4	5	2	3	5	4	4	4	3
+149	Blogger	3	2	3	2	3	4	2	4	5	4	3	4	2
+150	Interpreter/Translator	3	3	3	4	3	4	4	4	4	5	3	5	2
+
+Your task: Implement a robust matching algorithm that promotes cross-collar recommendations (e.g., suggest blue-collar for office-haters with high sensing/conscientiousness).
+
+1. Normalize user scores to 1-5:
+   - MBTI: Bin percentages (0-20%=1 for low, up to 81-100%=5 for high; e.g., high E/I =5 if user is extraverted).
+   - DISC: Scale each % to 1-5 (e.g., 0-20%=1, etc.).
+   - Big Five: Scale 0-100 to 1-5; invert N (high user N = low score for jobs needing stability).
+
+2. Compute fit score per job:
+   - Use weighted cosine similarity or Euclidean distance across all 13 dimensions.
+   - Weights: Big Five 40%, MBTI 30%, DISC 30% (adjustable via config).
+   - Boost diversity: Add +10% to fit if job collar differs from user's stated current (if input), or for high-sensing users boost blue-collar/artistic if low openness.
+   - Filter/rank to ensure top matches include mix (e.g., at least 2 blue-collar, 1 artistic in top 10).
+
+3. Output: Top 1 match for the basic results and a 3 sentence explanation why this role fits that users traits. Top 3 matches in the premium section for job role matches. Also with an explanation foreach role and why it matches the user traits. All must have explanations that are useful to the user
+ 
+the end goal is to expand the job role database, make sure that results are more unique and applicable to the user. This is all in an effort to optimize the algorithm that produces great results.
+
+also, keep in mind that the mini explorer, will not receive these job results in their basic results. They will still have the more kid friendly results. These job results will only be for the teen, young adult, and adult tiers. If you understand all of this, build an organized and thoughtful task to successfully implement this massive improvement

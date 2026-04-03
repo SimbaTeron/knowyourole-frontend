@@ -1,0 +1,685 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   GLASSNEON DESIGN TOKENS
+   Match KYR_Design_E_GlassNeon.html exactly
+   ============================================ */
+
+:root {
+  /* Backgrounds — mockup uses #050510 as base */
+  --bg-dark: #050510;
+  --bg-dark2: #020024;
+  --bg-dark3: #000000;
+  --bg-surface: rgba(255, 255, 255, 0.05);
+  --bg-surface-hover: rgba(255, 255, 255, 0.08);
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Neon Colors — exact mockup values */
+  --neon-blue: #00C8FF;
+  --neon-purple: #7800FF;
+  --neon-green: #39FF14;
+  --neon-pink: #FF00E5;
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-hover: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(0, 200, 255, 0.3);
+  --glass-blur: blur(20px);
+  --glass-radius: 20px;
+
+  /* Text */
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.4);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* Typography — Outfit throughout */
+  --font-body: 'Outfit', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+
+  /* Borders */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Shadows */
+  --shadow-glow-blue: 0 0 20px rgba(0, 200, 255, 0.4);
+  --shadow-glow-purple: 0 0 20px rgba(120, 0, 255, 0.4);
+  --shadow-glow-green: 0 0 20px rgba(57, 255, 20, 0.4);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-dark2) 50%, var(--bg-dark3) 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   ANIMATED BACKGROUND
+   ============================================ */
+
+.neon-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-dark2) 50%, var(--bg-dark3) 100%);
+}
+
+.neon-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.6;
+  animation: float 6s ease-in-out infinite;
+}
+
+.orb-blue {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0,200,255,0.4) 0%, transparent 70%);
+  top: -100px;
+  left: -100px;
+  animation-duration: 8s;
+}
+
+.orb-purple {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(120,0,255,0.4) 0%, transparent 70%);
+  top: 20%;
+  right: -150px;
+  animation: float 10s ease-in-out infinite reverse;
+  animation-delay: -3s;
+}
+
+.orb-pink {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,0,229,0.25) 0%, transparent 70%);
+  bottom: 20%;
+  left: 20%;
+  animation: float 7s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+.orb-green {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(57,255,20,0.3) 0%, transparent 70%);
+  bottom: 10%;
+  right: 10%;
+  animation: float 9s ease-in-out infinite;
+  animation-delay: -2s;
+}
+
+.orb-small {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(0,200,255,0.3) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  animation: float 12s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  25% { transform: translateY(-20px) translateX(10px); }
+  50% { transform: translateY(-10px) translateX(-10px); }
+  75% { transform: translateY(-30px) translateX(5px); }
+}
+
+/* ============================================
+   GLASS CARD
+   ============================================ */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-base);
+}
+
+.glass:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+}
+
+.glass-interactive {
+  cursor: pointer;
+}
+
+.glass-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-blue);
+}
+
+.glass-selected {
+  border-color: var(--neon-blue);
+  box-shadow: var(--shadow-glow-blue);
+}
+
+.glass-premium {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--glass-bg), var(--glass-bg)) padding-box,
+              linear-gradient(135deg, var(--neon-blue), var(--neon-purple)) border-box;
+}
+
+/* ============================================
+   NEON BUTTONS
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 12px 28px;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--neon-blue);
+  color: #000;
+  box-shadow: var(--shadow-glow-blue);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #00b8e6;
+  transform: translateY(-1px);
+  box-shadow: 0 0 30px rgba(0, 200, 255, 0.5);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--glass-bg-hover);
+  border-color: var(--neon-blue);
+}
+
+.btn-success {
+  background: var(--neon-green);
+  color: #000;
+  box-shadow: var(--shadow-glow-green);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #2ee612;
+  box-shadow: 0 0 30px rgba(57, 255, 20, 0.5);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--neon-blue);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(0, 200, 255, 0.1);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-lg {
+  padding: 16px 36px;
+  font-size: 16px;
+  border-radius: var(--radius-xl);
+}
+
+/* ============================================
+   NEON TEXT
+   ============================================ */
+
+.text-glow-blue {
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px rgba(0, 200, 255, 0.5), 0 0 20px rgba(0, 200, 255, 0.3);
+}
+
+.text-glow-purple {
+  color: var(--neon-purple);
+  text-shadow: 0 0 10px rgba(120, 0, 255, 0.5), 0 0 20px rgba(120, 0, 255, 0.3);
+}
+
+.text-glow-green {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5), 0 0 20px rgba(57, 255, 20, 0.3);
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-warm {
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   FORM INPUTS
+   ============================================ */
+
+.input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  transition: all var(--transition-base);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 0 3px rgba(0, 200, 255, 0.15);
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+  border-radius: var(--radius-full);
+  transition: width var(--transition-slow);
+}
+
+/* ============================================
+   BADGE
+   ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-blue {
+  background: rgba(0, 200, 255, 0.15);
+  color: var(--neon-blue);
+  border: 1px solid rgba(0, 200, 255, 0.3);
+}
+
+.badge-purple {
+  background: rgba(120, 0, 255, 0.15);
+  color: var(--neon-purple);
+  border: 1px solid rgba(120, 0, 255, 0.3);
+}
+
+.badge-green {
+  background: rgba(57, 255, 20, 0.15);
+  color: var(--neon-green);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+/* ============================================
+   NEON RADIO INDICATOR
+   ============================================ */
+
+.radio-outer {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-base);
+}
+
+.radio-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--neon-blue);
+  box-shadow: var(--shadow-glow-blue);
+  opacity: 0;
+  transform: scale(0);
+  transition: all var(--transition-base);
+}
+
+.answer-option.selected .radio-outer {
+  border-color: var(--neon-blue);
+}
+
+.answer-option.selected .radio-inner {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.answer-option.selected {
+  border-color: var(--neon-blue);
+  box-shadow: var(--shadow-glow-blue);
+}
+
+/* ============================================
+   TRAIT METER
+   ============================================ */
+
+.trait-meter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.trait-meter-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.trait-meter-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.trait-meter-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1s ease-out;
+}
+
+/* ============================================
+   TABS
+   ============================================ */
+
+.tab-list {
+  display: flex;
+  gap: var(--space-xs);
+  padding: 4px;
+  background: var(--glass-bg);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--glass-border);
+}
+
+.tab-item {
+  flex: 1;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-align: center;
+  border: none;
+  background: transparent;
+}
+
+.tab-item:hover {
+  color: var(--text-primary);
+}
+
+.tab-item.active {
+  background: var(--neon-blue);
+  color: #000;
+  font-weight: 600;
+}
+
+/* ============================================
+   LAYOUT UTILITIES
+   ============================================ */
+
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 100px 24px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.container-sm {
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .page {
+    padding: 80px 16px;
+  }
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   AURORA PREMIUM DESIGN TOKENS
+   New navy/cyan/purple glass aurora system
+   ============================================ */
+
+:root {
+  --bg: #080414;
+  --cyan: #22d3ee;
+  --cyan-dim: rgba(34, 211, 238, 0.6);
+  --cyan-glow: rgba(34, 211, 238, 0.3);
+  --purple: #a855f7;
+  --purple-dim: rgba(168, 85, 247, 0.6);
+  --purple-glow: rgba(168, 85, 247, 0.3);
+  --pink: #f472b6;
+  --gold: #f59e0b;
+  --gold-light: #fbbf24;
+  --teal: #06b6d4;
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-dim: rgba(255, 255, 255, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-hover: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-bright: rgba(255, 255, 255, 0.2);
+  --card-radius: 20px;
+}
+
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(ellipse 100% 60% at 50% -20%, rgba(168, 85, 247, 0.2) 0%, transparent 60%),
+              radial-gradient(ellipse 80% 50% at 80% 110%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+              radial-gradient(ellipse 60% 40% at 10% 80%, rgba(244, 114, 182, 0.08) 0%, transparent 50%),
+              var(--bg-dark, #050510);
+  overflow: hidden;
+}
+
+.aurora-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.15), transparent),
+    radial-gradient(1px 1px at 35% 65%, rgba(255,255,255,0.1), transparent),
+    radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,0.12), transparent),
+    radial-gradient(1px 1px at 75% 45%, rgba(255,255,255,0.1), transparent),
+    radial-gradient(1px 1px at 90% 75%, rgba(255,255,255,0.08), transparent),
+    radial-gradient(1px 1px at 25% 85%, rgba(255,255,255,0.1), transparent),
+    radial-gradient(1px 1px at 65% 35%, rgba(255,255,255,0.08), transparent);
+  animation: starDrift 20s ease-in-out infinite alternate;
+}
+
+@keyframes starDrift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-20px); }
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-bright {
+  background: var(--glass-bg-hover);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border-bright);
+}
