@@ -54,30 +54,30 @@ INSERT INTO public.job_roles (role_name, category, description, mbti_best, mbti_
 -- Trait Vibes (Big Five quartile descriptions)
 INSERT INTO public.trait_vibes (trait, quartile, score_min, score_max, vibe_title, vibe_desc) VALUES
 -- Openness
-('openness','low',0,25,'The Realist','Prefers the familiar over the novel. Comfortable with routine, concrete tasks, and practical outcomes. Focused on what works rather than what could be.',1),
-('openness','low_mid',26,50,'The Traditionalist','Balances practical experience with selective curiosity. Appreciates tradition but can adapt when needed.',2),
-('openness','mid_high',51,75,'The Explorer','Naturally curious and creative. Enjoys new ideas, art, and abstract thinking. Comfortable with complexity.',3),
-('openness','high',76,100,'The Visionary','Deeply imaginative and novelty-seeking. Highly creative, intellectually engaged, and drawn to unconventional ideas.',4),
+('openness','low',0,25,'The Realist','Prefers the familiar over the novel. Comfortable with routine, concrete tasks, and practical outcomes. Focused on what works rather than what could be.'),
+('openness','low_mid',26,50,'The Traditionalist','Balances practical experience with selective curiosity. Appreciates tradition but can adapt when needed.'),
+('openness','mid_high',51,75,'The Explorer','Naturally curious and creative. Enjoys new ideas, art, and abstract thinking. Comfortable with complexity.'),
+('openness','high',76,100,'The Visionary','Deeply imaginative and novelty-seeking. Highly creative, intellectually engaged, and drawn to unconventional ideas.'),
 -- Conscientiousness
-('conscientiousness','low',0,25,'The Free Spirit','Spontaneous and flexible. Prefers keeping options open rather than rigid scheduling. Comfortable with ambiguity.',5),
-('conscientiousness','low_mid',26,50,'The Adapter','Balances structure with flexibility. Can meet deadlines but doesn''t obsess over precision.',6),
-('conscientiousness','mid_high',51,75,'The Achiever','Organized and goal-oriented. Plans ahead and follows through reliably. Strong self-discipline.',7),
-('conscientiousness','high',76,100,'The perfectionist','Extremely organized and driven. Sets high standards and works until they''re met. Highly reliable and detail-focused.',8),
+('conscientiousness','low',0,25,'The Free Spirit','Spontaneous and flexible. Prefers keeping options open rather than rigid scheduling. Comfortable with ambiguity.'),
+('conscientiousness','low_mid',26,50,'The Adapter','Balances structure with flexibility. Can meet deadlines but doesn''t obsess over precision.'),
+('conscientiousness','mid_high',51,75,'The Achiever','Organized and goal-oriented. Plans ahead and follows through reliably. Strong self-discipline.'),
+('conscientiousness','high',76,100,'The perfectionist','Extremely organized and driven. Sets high standards and works until they''re met. Highly reliable and detail-focused.'),
 -- Extraversion
-('extraversion','low',0,25,'The Introvert','Draws energy from solitude. Prefers deep one-on-one connections over large groups. Deliberate and measured in social settings.',9),
-('extraversion','low_mid',26,50,'The Observer','Balances social energy with meaningful alone time. Can engage in groups but doesn''t need it to recharge.',10),
-('extraversion','mid_high',51,75,'The Connector','Outgoing and enthusiastic in social situations. Builds wide networks and thrives on interaction.',11),
-('extraversion','high',76,100,'The Energizer','Highly enthusiastic and talkative. Draws energy from being around others. Creates momentum wherever they go.',12),
+('extraversion','low',0,25,'The Introvert','Draws energy from solitude. Prefers deep one-on-one connections over large groups. Deliberate and measured in social settings.'),
+('extraversion','low_mid',26,50,'The Observer','Balances social energy with meaningful alone time. Can engage in groups but doesn''t need it to recharge.'),
+('extraversion','mid_high',51,75,'The Connector','Outgoing and enthusiastic in social situations. Builds wide networks and thrives on interaction.'),
+('extraversion','high',76,100,'The Energizer','Highly enthusiastic and talkative. Draws energy from being around others. Creates momentum wherever they go.'),
 -- Agreeableness
-('agreeableness','low',0,25,'The Challenger','Competitive and skeptical. Challenges authority and resists peer pressure. Prioritizes truth over harmony.',13),
-('agreeableness','low_mid',26,50,'The Pragmatist','Balances harmony with directness. Can be collaborative but won''t sacrifice results for consensus.',14),
-('agreeableness','mid_high',51,75,'The Collaborator','Warm and trusting. Values teamwork and avoids conflict. Good at building cooperative relationships.',15),
-('agreeableness','high',76,100,'The Empath','Deeply warm and considerate. Strongly prioritizes others'' needs and maintains close, supportive relationships.',16),
+('agreeableness','low',0,25,'The Challenger','Competitive and skeptical. Challenges authority and resists peer pressure. Prioritizes truth over harmony.'),
+('agreeableness','low_mid',26,50,'The Pragmatist','Balances harmony with directness. Can be collaborative but won''t sacrifice results for consensus.'),
+('agreeableness','mid_high',51,75,'The Collaborator','Warm and trusting. Values teamwork and avoids conflict. Good at building cooperative relationships.'),
+('agreeableness','high',76,100,'The Empath','Deeply warm and considerate. Strongly prioritizes others'' needs and maintains close, supportive relationships.'),
 -- Neuroticism
-('neuroticism','low',0,25,'The Steady','Emotionally stable and resilient. Handles stress well and maintains calm under pressure.',17),
-('neuroticism','low_mid',26,50,'The Balanced','Generally even-tempered with moderate emotional reactivity. Recovers quickly from setbacks.',18),
-('neuroticism','mid_high',51,75,'The Sensitive','Reactive to stress and emotionally intense. Highly empathetic but can be overwhelmed by conflict.',19),
-('neuroticism','high',76,100,'The Reactive','Experiences strong emotional responses. Highly sensitive to environment and social dynamics.',20);
+('neuroticism','low',0,25,'The Steady','Emotionally stable and resilient. Handles stress well and maintains calm under pressure.'),
+('neuroticism','low_mid',26,50,'The Balanced','Generally even-tempered with moderate emotional reactivity. Recovers quickly from setbacks.'),
+('neuroticism','mid_high',51,75,'The Sensitive','Reactive to stress and emotionally intense. Highly empathetic but can be overwhelmed by conflict.'),
+('neuroticism','high',76,100,'The Reactive','Experiences strong emotional responses. Highly sensitive to environment and social dynamics.');
 
 -- Trait Combinations
 INSERT INTO public.trait_combinations (trait_1, trait_1_level, trait_2, trait_2_level, combo_title, combo_desc) VALUES
