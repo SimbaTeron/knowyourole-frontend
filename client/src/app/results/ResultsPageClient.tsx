@@ -129,7 +129,7 @@ function useRealResults() {
 
   // No stored scores — in test or demo mode, generate fake scores inline
   if (!scores) {
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
     const inTestMode = urlParams.get("test") === "true";
     const inDemoMode = urlParams.get("demo") === "true";
     if (inTestMode || inDemoMode) {
