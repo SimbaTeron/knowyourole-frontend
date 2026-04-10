@@ -60,19 +60,19 @@ INSERT INTO public.trait_vibes (trait, quartile, score_min, score_max, vibe_titl
 ('openness','high',76,100,'The Visionary','Deeply imaginative and novelty-seeking. Highly creative, intellectually engaged, and drawn to unconventional ideas.',4),
 -- Conscientiousness
 ('conscientiousness','low',0,25,'The Free Spirit','Spontaneous and flexible. Prefers keeping options open rather than rigid scheduling. Comfortable with ambiguity.',5),
-('conscientiousness','low_mid',26,50,'The Adapter','Balances structure with flexibility. Can meet deadlines but doesn't obsess over precision.',6),
+('conscientiousness','low_mid',26,50,'The Adapter','Balances structure with flexibility. Can meet deadlines but doesn''t obsess over precision.',6),
 ('conscientiousness','mid_high',51,75,'The Achiever','Organized and goal-oriented. Plans ahead and follows through reliably. Strong self-discipline.',7),
-('conscientiousness','high',76,100,'The perfectionist','Extremely organized and driven. Sets high standards and works until they're met. Highly reliable and detail-focused.',8),
+('conscientiousness','high',76,100,'The perfectionist','Extremely organized and driven. Sets high standards and works until they''re met. Highly reliable and detail-focused.',8),
 -- Extraversion
 ('extraversion','low',0,25,'The Introvert','Draws energy from solitude. Prefers deep one-on-one connections over large groups. Deliberate and measured in social settings.',9),
-('extraversion','low_mid',26,50,'The Observer','Balances social energy with meaningful alone time. Can engage in groups but doesn't need it to recharge.',10),
+('extraversion','low_mid',26,50,'The Observer','Balances social energy with meaningful alone time. Can engage in groups but doesn''t need it to recharge.',10),
 ('extraversion','mid_high',51,75,'The Connector','Outgoing and enthusiastic in social situations. Builds wide networks and thrives on interaction.',11),
 ('extraversion','high',76,100,'The Energizer','Highly enthusiastic and talkative. Draws energy from being around others. Creates momentum wherever they go.',12),
 -- Agreeableness
 ('agreeableness','low',0,25,'The Challenger','Competitive and skeptical. Challenges authority and resists peer pressure. Prioritizes truth over harmony.',13),
-('agreeableness','low_mid',26,50,'The Pragmatist','Balances harmony with directness. Can be collaborative but won't sacrifice results for consensus.',14),
+('agreeableness','low_mid',26,50,'The Pragmatist','Balances harmony with directness. Can be collaborative but won''t sacrifice results for consensus.',14),
 ('agreeableness','mid_high',51,75,'The Collaborator','Warm and trusting. Values teamwork and avoids conflict. Good at building cooperative relationships.',15),
-('agreeableness','high',76,100,'The Empath','Deeply warm and considerate. Strongly prioritizes others' needs and maintains close, supportive relationships.',16),
+('agreeableness','high',76,100,'The Empath','Deeply warm and considerate. Strongly prioritizes others'' needs and maintains close, supportive relationships.',16),
 -- Neuroticism
 ('neuroticism','low',0,25,'The Steady','Emotionally stable and resilient. Handles stress well and maintains calm under pressure.',17),
 ('neuroticism','low_mid',26,50,'The Balanced','Generally even-tempered with moderate emotional reactivity. Recovers quickly from setbacks.',18),
