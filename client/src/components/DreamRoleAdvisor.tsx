@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -239,7 +241,7 @@ export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvi
                       className={`w-full text-left px-3 py-2 text-sm transition-colors ${
                         idx === highlightIndex 
                           ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-100' 
-                          : 'text-gray-800 dark:text-gray-200 hover-elevate'
+                          : 'text-gray-800 dark:text-gray-200 kyr-hover'
                       }`}
                       data-testid={`option-role-${suggestion.roleNumber}`}
                     >
@@ -270,7 +272,7 @@ export function DreamRoleAdvisor({ bigFive, mbtiType, discStyle }: DreamRoleAdvi
               key={role}
               onClick={() => handlePopularRole(role)}
               disabled={analyzeMutation.isPending}
-              className="px-3 py-1 text-xs rounded-full bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 border border-amber-200/60 dark:border-amber-700/40 hover-elevate transition-colors disabled:opacity-50"
+              className="px-3 py-1 text-xs rounded-full bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 border border-amber-200/60 dark:border-amber-700/40 kyr-hover transition-colors disabled:opacity-50"
               data-testid={`button-popular-role-${role.toLowerCase().replace(/[\s()\/]/g, '-')}`}
             >
               {role}

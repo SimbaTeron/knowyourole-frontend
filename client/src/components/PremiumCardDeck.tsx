@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { usePersistedSet, usePersistedState } from "@/hooks/usePersistedState";
 import { motion, AnimatePresence, useReducedMotion, PanInfo } from "framer-motion";

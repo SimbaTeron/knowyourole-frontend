@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Brain, Heart, Sparkles, Gift, Map, Wrench, BookOpen } from "lucide-react";

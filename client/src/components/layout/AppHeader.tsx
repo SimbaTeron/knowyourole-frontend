@@ -1,14 +1,16 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export function AppHeader() {
   const [scrolled, setScrolled] = useState(false);
 
-  if (typeof window !== 'undefined' && !scrolled) {
-    window.addEventListener('scroll', () => {
-      setScrolled(window.scrollY > 20);
-    }, { once: true });
-  }
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !scrolled) {
+      const handler = () => setScrolled(window.scrollY > 20);
+      window.addEventListener('scroll', handler, { once: true });
+      return () => window.removeEventListener('scroll', handler);
+    }
+  }, [scrolled]);
 
   return (
     <header style={{

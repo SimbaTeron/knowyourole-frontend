@@ -99,7 +99,7 @@ export default function UserMenu({ compact = false }: UserMenuProps) {
         <div className="py-1">
           <button
             onClick={handleProfile}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-warm-gray dark:text-[#F8FAFC] hover-elevate transition-colors"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-warm-gray dark:text-[#F8FAFC] kyr-hover transition-colors"
             data-testid="button-menu-profile"
           >
             <User className="w-4 h-4 text-warm-gray/60 dark:text-[#A78BFA]" />
@@ -107,7 +107,7 @@ export default function UserMenu({ compact = false }: UserMenuProps) {
           </button>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-warm-gray dark:text-[#F8FAFC] hover-elevate transition-colors"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-warm-gray dark:text-[#F8FAFC] kyr-hover transition-colors"
             data-testid="button-menu-sign-out"
           >
             <LogOut className="w-4 h-4 text-warm-gray/60 dark:text-[#A78BFA]" />

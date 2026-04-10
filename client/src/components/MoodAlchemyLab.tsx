@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw, Sparkles, Zap, Brain, Heart, Users, Target, Lightbulb, Flame, Info, X } from "lucide-react";
