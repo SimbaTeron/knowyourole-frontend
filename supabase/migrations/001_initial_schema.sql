@@ -1,6 +1,16 @@
 -- KnowYouRole — Initial Supabase Schema
 -- Run this in Supabase Dashboard → SQL Editor, or: supabase db push
 
+-- Drop existing tables first (safe to run even if they don't exist)
+DROP TABLE IF EXISTS quiz_sessions CASCADE;
+DROP TABLE IF EXISTS user_sessions CASCADE;
+DROP TABLE IF EXISTS user_badges CASCADE;
+DROP TABLE IF EXISTS user_feedback CASCADE;
+DROP TABLE IF EXISTS feedback CASCADE;
+DROP TABLE IF EXISTS job_roles CASCADE;
+DROP TABLE IF EXISTS premium_subscriptions CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
 -- Enable UUID generation
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
