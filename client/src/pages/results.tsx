@@ -18,15 +18,15 @@ interface EarnedBadge {
 
 // ─── Design Tokens (from mockups) ───────────────────────────────────────────
 const C = {
-  bg: "#080414",
-  cyan: "#22d3ee",
-  cyanDim: "rgba(34, 211, 238, 0.6)",
-  cyanGlow: "rgba(34, 211, 238, 0.3)",
-  purple: "#a855f7",
-  purpleDim: "rgba(168, 85, 247, 0.6)",
+  bg: "#050510",
+  cyan: "#00C8FF",
+  cyanDim: "rgba(0, 200, 255, 0.6)",
+  cyanGlow: "rgba(0, 200, 255, 0.3)",
+  purple: "#7800FF",
+  purpleDim: "rgba(120, 0, 255, 0.6)",
   pink: "#f472b6",
-  gold: "#f59e0b",
-  goldLight: "#fbbf24",
+  gold: "#fbbf24",
+  goldLight: "#fde68a",
   teal: "#06b6d4",
   text: "#ffffff",
   textMuted: "rgba(255, 255, 255, 0.5)",
@@ -51,7 +51,7 @@ function getArchetype(mbti: string) {
   return ARCHETYPES[mbti] || "The Architect";
 }
 
-const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#f59e0b", S: "#22c55e", C: "#3b82f6" };
+const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#fbbf24", S: "#22c55e", C: "#3b82f6" };
 const DISC_LABELS: Record<string, string> = { D: "Dominance", I: "Influence", S: "Steadiness", C: "Conscientiousness" };
 
 // ─── Real scores from URL params, sessionStorage, or localStorage (written by handleQuizComplete) ──
@@ -872,8 +872,8 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo,
 
   // Display real earned badges from API when available
   const displayBadges = earnedBadges && earnedBadges.length > 0 ? earnedBadges : [
-    { name: "First Principles", type: "thinking", icon: "🧩", color: "#a855f7" },
-    { name: "Deep Thinker", type: "mind", icon: "🧠", color: "#22d3ee" },
+    { name: "First Principles", type: "thinking", icon: "🧩", color: "#7800FF" },
+    { name: "Deep Thinker", type: "mind", icon: "🧠", color: "#00C8FF" },
   ];
   const displayHybrids = hybridTypes && hybridTypes.length > 0 ? hybridTypes : [`${mbtiType}-A`, arch];
 
@@ -1349,8 +1349,8 @@ export default function ResultsPage() {
   // Still loading or no results yet
   if (!realResults) {
     return (
-      <div style={{ background: "#080414", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, fontFamily: "Inter, sans-serif" }}>Loading your results…</div>
+      <div style={{ background: "#050510", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, fontFamily: "'Outfit', sans-serif" }}>Loading your results…</div>
       </div>
     );
   }

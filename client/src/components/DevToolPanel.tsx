@@ -49,7 +49,25 @@ export default function DevToolPanel() {
 
   const handleNavigate = (path: string) => {
     writeFakeData(selectedTier, selectedMBTI);
-    window.location.assign(path + "?test=true");
+
+    // Map DevToolPanel tier format to URL format
+    const tierMap: Record<string, string> = {
+      "25+": "25plus",
+      "19-25": "19-25",
+      "13-18": "13-18",
+      "7-12": "7-12",
+    };
+    const urlTier = tierMap[selectedTier] || selectedTier;
+
+    if (path === "/results") {
+      // Results reads ?tier= and ?page= from URL, plus kyr_fake_mbti from sessionStorage
+      window.location.assign(`${path}?test=true&tier=${encodeURIComponent(urlTier)}`);
+    } else if (path === "/quiz") {
+      // Quiz gateway reads ?tier= from URL
+      window.location.assign(`${path}?tier=${encodeURIComponent(selectedTier)}`);
+    } else {
+      window.location.assign(path + "?test=true");
+    }
   };
 
   const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
