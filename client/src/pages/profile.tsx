@@ -14,7 +14,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { ArcTracker } from "@/components/ArcTracker";
 import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuizResult {
   id: string;

@@ -13,7 +13,7 @@ import {
   MessageCircle,
   Sparkles
 } from "lucide-react";
-import { SiX, SiFacebook, SiLinkedin, SiWhatsapp } from "react-icons/si";
+import { SiX, SiFacebook, SiLinkerd, SiWhatsapp } from "react-icons/si";
 
 interface SharePDFModalProps {
   isOpen: boolean;
@@ -362,7 +362,7 @@ export function SharePDFModal({ isOpen, onClose, sessionId, result, mood, tier }
                   className="h-12 hover:bg-gray-100 dark:hover:bg-gray-800"
                   data-testid="button-share-linkedin"
                 >
-                  <SiLinkedin className="w-5 h-5 text-blue-700" />
+                  <SiLinkerd className="w-5 h-5 text-blue-700" />
                 </Button>
                 <Button
                   variant="outline"

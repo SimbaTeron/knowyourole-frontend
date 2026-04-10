@@ -1,7 +1,23 @@
 import { Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
+import randomThemesData from "@/data/random-themes.json";
 
-export type ThemeMode = "light" | "dark";
+export type ThemeMode = "light" | "dark" | "random";
+
+export interface RandomTheme {
+  id: string;
+  name: string;
+  description: string;
+  class: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+  };
+  motif: string;
+}
 
 interface ThemeToggleProps {
   currentTheme: ThemeMode;
@@ -24,20 +40,20 @@ export default function ThemeToggle({ currentTheme, onThemeChange }: ThemeToggle
   return (
     <motion.button
       onClick={handleToggle}
-      whileTap={{ scale: 0.95 }}
-      className="w-12 h-12 rounded-xl dark:bg-deep-cream/60 backdrop-blur-sm border border-terracotta/8 dark:border-sunset-amber/20 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-terracotta/20 dark:hover:border-sunset-amber/30 bg-[#12121acc]"
+      className="relative p-2 rounded-xl bg-secondary/20 hover:bg-secondary/30 transition-colors"
+      whileTap={{ scale: 0.92 }}
       aria-label={`Switch to ${currentTheme === "light" ? "dark" : "light"} mode`}
-      data-testid="button-theme-toggle"
     >
       <motion.div
         initial={false}
-        animate={{ rotate: currentTheme === "dark" ? 180 : 0 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        animate={{ rotate: currentTheme === "light" ? 0 : 180 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="relative w-5 h-5"
       >
-        {currentTheme === "dark" ? (
-          <Moon className="w-8 h-8 text-sunset-amber" />
+        {currentTheme === "light" ? (
+          <Sun className="w-5 h-5 text-amber-600" />
         ) : (
-          <Sun className="w-8 h-8 text-terracotta" />
+          <Moon className="w-5 h-5 text-violet-400" />
         )}
       </motion.div>
     </motion.button>

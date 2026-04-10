@@ -103,7 +103,7 @@ function useRealResults() {
       const fakeScores = getFakeScores(testTier, forcedMBTI);
       // Use calculateResult for consistent real scoring (MBTI, DISC, Big Five percentiles)
       // Pass forcedMBTI so calculateResult uses it instead of deriving from dimensions
-      const result = calculateResult(fakeScores as unknown as QuizScores, forcedMBTI);
+      const result = calculateResult(fakeScores as unknown as QuizScores);
       const primaryDisc = result.discStyle;
       const type = `${result.mbtiType}-${primaryDisc}`;
       const bigFive = result.bigFiveProfile;
