@@ -3,12 +3,16 @@ import type { NextRequest } from 'next/server';
 
 // ─── Environment ─────────────────────────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL!;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY!;
 
 // ─── Admin client (server-side only — bypasses RLS) ──────────────────────────
-export const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { persistSession: false },
-});
+// Falls back to anon key if service role key is not configured
+export const supabaseAdmin = createClient(
+  SUPABASE_URL,
+  SUPABASE_SERVICE_ROLE_KEY ?? SUPABASE_ANON_KEY,
+  { auth: { persistSession: false } }
+);
 
 // ─── User-scoped client (validates Auth0 token, applies RLS) ─────────────────
 // Note: Auth0 validation is applied per-route in handlers

@@ -137,12 +137,14 @@ export default function QuizPage() {
 
   const handleQuizComplete = async (scores: QuizScores) => {
     setQuizScores(scores);
-    
+
     let sessionId: string | null = null;
     let scales: APIScales | null = null;
     let badges: EarnedBadge[] = [];
     let hybrids: string[] = [];
-    
+    let mbtiType = '';
+    let discStyle = '';
+
     try {
       const response = await apiRequest("POST", "/api/score", {
         tier: ageTier,
@@ -153,47 +155,71 @@ export default function QuizPage() {
         scores,
       });
       const data = await response.json();
-      if (data.sessionId) {
-        sessionId = data.sessionId;
-        setQuizSessionId(data.sessionId);
+
+      // sessionId may come back as top-level or nested
+      sessionId = data.sessionId ?? data.id ?? null;
+      if (sessionId) {
+        setQuizSessionId(sessionId as string);
       }
-      if (data.result?.scales) {
-        scales = data.result.scales;
-        setApiScales(data.result.scales);
+
+      // API returns scales directly on data (not data.result)
+      if (data.scales) {
+        scales = data.scales;
+        setApiScales(data.scales);
       }
+
       // Phase 2.2: Extract badges and hybrid types from API response
-      if (data.result?.earnedBadges) {
-        badges = data.result.earnedBadges;
-        setEarnedBadges(data.result.earnedBadges);
+      if (data.earnedBadges) {
+        badges = data.earnedBadges;
+        setEarnedBadges(data.earnedBadges);
       }
-      if (data.result?.hybridTypes) {
-        hybrids = data.result.hybridTypes;
-        setHybridTypes(data.result.hybridTypes);
+      if (data.hybridTypes) {
+        hybrids = data.hybridTypes;
+        setHybridTypes(data.hybridTypes);
       }
-      
-      
+
+      // Type strings from API (preferred) — used for URL params below
+      if (data.mbtiType) mbtiType = data.mbtiType;
+      if (data.discStyle) discStyle = data.discStyle;
+
     } catch (error) {
       console.error("Failed to save quiz results:", error);
     }
 
-    // BUG-02 FIX: Write results to localStorage so Results.tsx can read them
-    // This is the canonical kyr_results payload
-    const submissionPayload = {
-      scores,
-      tier: ageTier,
-      mood,
-      funMode,
-      landmark: landmark?.landmark,
-      theme,
-      sessionId,
-      apiScales: apiScales || null,
-      earnedBadges: badges,
-      hybridTypes: hybrids,
-      completedAt: new Date().toISOString(),
-    };
-    localStorage.setItem('kyr_results', JSON.stringify(submissionPayload));
+    // ── Compute type strings from raw scores as fallback ──
+    if (!mbtiType) {
+      mbtiType = [
+        scores.mbti.E > scores.mbti.I ? "E" : "I",
+        scores.mbti.S > scores.mbti.N ? "S" : "N",
+        scores.mbti.T > scores.mbti.F ? "T" : "F",
+        scores.mbti.J > scores.mbti.P ? "J" : "P",
+      ].join("");
+    }
+    if (!discStyle) {
+      const discEntries = Object.entries(scores.disc) as [string, number][];
+      discStyle = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
+    }
 
-    setShowResults(true);
+    // ── Store real scores in sessionStorage so results.tsx can find them ──
+    // results.tsx reads kyr_real_scores (not kyr_results)
+    sessionStorage.setItem("kyr_real_scores", JSON.stringify(scores));
+
+    // ── Encode scores as URL param for shareable links ──
+    const scoresParam = btoa(JSON.stringify(scores));
+
+    // ── Redirect to results page with scores and API data in URL ──
+    // The scores param lets results.tsx reconstruct the quiz answers on refresh.
+    // API result data (scales, badges, etc.) are appended as separate params.
+    const resultParams = new URLSearchParams();
+    resultParams.set("scores", scoresParam);
+    if (sessionId) resultParams.set("sessionId", sessionId as string);
+    if (scales) resultParams.set("hasScales", "1");
+    if (badges.length) resultParams.set("badges", JSON.stringify(badges));
+    if (hybrids.length) resultParams.set("hybrids", JSON.stringify(hybrids));
+    resultParams.set("mbtiType", mbtiType);
+    resultParams.set("discStyle", discStyle);
+
+    setLocation(`/results?${resultParams.toString()}`);
   };
 
   const handleQuizExit = () => {

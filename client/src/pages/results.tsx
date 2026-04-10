@@ -8,6 +8,14 @@ import { useAuth0 } from "@auth0/auth0-react";
 import type { QuizScores } from "@/components/Quiz";
 import { AuthModal } from "@/components/AuthModal";
 
+// Phase 2.2: Badge interface for earned achievements
+interface EarnedBadge {
+  name: string;
+  type: string;
+  icon: string;
+  color: string;
+}
+
 // ─── Design Tokens (from mockups) ───────────────────────────────────────────
 const C = {
   bg: "#080414",
@@ -46,7 +54,7 @@ function getArchetype(mbti: string) {
 const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#f59e0b", S: "#22c55e", C: "#3b82f6" };
 const DISC_LABELS: Record<string, string> = { D: "Dominance", I: "Influence", S: "Steadiness", C: "Conscientiousness" };
 
-// ─── Real scores from URL params or sessionStorage (written by handleQuizComplete) ───────
+// ─── Real scores from URL params, sessionStorage, or localStorage (written by handleQuizComplete) ──
 function getStoredScores(): QuizScores | null {
   if (typeof window === "undefined") return null;
   try {
@@ -61,12 +69,37 @@ function getStoredScores(): QuizScores | null {
         // Malformed scores param — fall through to sessionStorage
       }
     }
-    // SECOND: Fall back to sessionStorage (test mode, inline quiz completion)
+    // SECOND: sessionStorage — written by quiz.tsx handleQuizComplete (kyr_real_scores)
+    // and by devTest fake score generation (kyr_fake_scores)
     const raw = sessionStorage.getItem("kyr_real_scores")
       || sessionStorage.getItem("kyr_fake_scores");
     if (!raw) return null;
     return JSON.parse(raw) as QuizScores;
   } catch { return null; }
+}
+
+// ─── API result metadata from URL params (written by quiz.tsx handleQuizComplete) ──
+function getApiResultFromUrl(): {
+  mbtiType?: string;
+  discStyle?: string;
+  sessionId?: string;
+  hasScales?: boolean;
+  badges?: EarnedBadge[];
+  hybrids?: string[];
+} {
+  if (typeof window === "undefined") return {};
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mbtiType = urlParams.get("mbtiType") || undefined;
+    const discStyle = urlParams.get("discStyle") || undefined;
+    const sessionId = urlParams.get("sessionId") || undefined;
+    const hasScales = urlParams.get("hasScales") === "1";
+    const badgesRaw = urlParams.get("badges");
+    const badges = badgesRaw ? (() => { try { return JSON.parse(badgesRaw) as EarnedBadge[]; } catch { return undefined; } })() : undefined;
+    const hybridsRaw = urlParams.get("hybrids");
+    const hybrids = hybridsRaw ? (() => { try { return JSON.parse(hybridsRaw) as string[]; } catch { return undefined; } })() : undefined;
+    return { mbtiType, discStyle, sessionId, hasScales, badges, hybrids };
+  } catch { return {}; }
 }
 
 function computeMBTIString(mbti: QuizScores["mbti"]): string {
@@ -89,6 +122,7 @@ function normalizeBigFive(raw: number): number {
 
 function useRealResults() {
   const scores = getStoredScores();
+  const apiResult = getApiResultFromUrl();
   const tier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
 
   // No stored scores — in test or demo mode, generate fake scores inline
@@ -123,8 +157,9 @@ function useRealResults() {
   }
 
   const result = calculateResult(scores);
-  const mbtiType = result.mbtiType;
-  const primaryDisc = result.discStyle;
+  // Prefer API-computed types from URL params if available (avoids any client/server scoring mismatch)
+  const mbtiType = apiResult.mbtiType ?? result.mbtiType;
+  const primaryDisc = apiResult.discStyle ?? result.discStyle;
   const type = `${mbtiType}-${primaryDisc}`;
   const bigFive = result.bigFiveProfile;
   const disc = {
@@ -137,7 +172,20 @@ function useRealResults() {
   const urlParams = new URLSearchParams(window.location.search);
   const isDemo = urlParams.get("demo") === "true";
 
-  return { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores: scores, isDemo };
+  return {
+    type,
+    tier,
+    bigFive,
+    disc,
+    mbtiType,
+    primaryDisc,
+    rawScores: scores,
+    isDemo,
+    sessionId: apiResult.sessionId,
+    hasScales: apiResult.hasScales ?? false,
+    badges: apiResult.badges,
+    hybrids: apiResult.hybrids,
+  };
 }
 
 // ─── MBTI → #1 Career Match mapping (mirrors backend scoring) ────────────────
@@ -351,7 +399,7 @@ function PrivacyStrip() {
 }
 
 // ─── PAGE 1: Quick Glimpse ───────────────────────────────────────────────────
-function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLoginFree, onPremium, onPremiumClick, premiumError }: {
+function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLoginFree, onPremium, onPremiumClick, premiumError, earnedBadges, hybridTypes }: {
   type: string; bigFive: { O: number; C: number; E: number; A: number; N: number };
   disc: { D: number; I: number; S: number; C: number };
   mbtiType: string; primaryDisc: string;
@@ -359,6 +407,8 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLogin
   onPremium: () => void;
   onPremiumClick?: () => void;
   premiumError?: string | null;
+  earnedBadges?: EarnedBadge[];
+  hybridTypes?: string[];
 }) {
   const base = type.split("-")[0];
   const arch = getArchetype(base);
@@ -806,17 +856,26 @@ const CONSTELLATION_ITEMS = [
   { id: "crossroads", icon: "🧭", name: "Crossroads" },
 ];
 
-function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo }: {
+function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo, earnedBadges, hybridTypes }: {
   type: string; bigFive: { O: number; C: number; E: number; A: number; N: number };
   disc: { D: number; I: number; S: number; C: number };
   mbtiType: string; primaryDisc: string;
   isDemo?: boolean;
+  earnedBadges?: EarnedBadge[];
+  hybridTypes?: string[];
 }) {
   const [activeCard, setActiveCard] = useState("deepdive");
   const stripRef = useRef<HTMLDivElement>(null);
   const base = type.split("-")[0];
   const arch = getArchetype(base);
   const primary = primaryDisc;
+
+  // Display real earned badges from API when available
+  const displayBadges = earnedBadges && earnedBadges.length > 0 ? earnedBadges : [
+    { name: "First Principles", type: "thinking", icon: "🧩", color: "#a855f7" },
+    { name: "Deep Thinker", type: "mind", icon: "🧠", color: "#22d3ee" },
+  ];
+  const displayHybrids = hybridTypes && hybridTypes.length > 0 ? hybridTypes : [`${mbtiType}-A`, arch];
 
   const FEATURE_CARDS: Record<string, React.ReactNode> = {
     deepdive: (
@@ -834,7 +893,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
             <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: C.glassBg, border: `1px solid ${C.glassBorder}`, color: C.purple }}>RARE</div>
           </div>
           <p style={{ fontSize: 13, color: C.textMuted, lineHeight: 1.7, marginBottom: 14 }}>
-            As an INTJ-A, you possess a rare combination of strategic vision and independent thinking. Your mind operates like a master architect — constantly building, refining, and optimizing mental models of how systems should work.
+            As an {mbtiType}, you possess a rare combination of strategic vision and independent thinking. Your mind operates like a master architect — constantly building, refining, and optimizing mental models of how systems should work.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
             {["🔮 Visionary", "⚡ Decisive", "📐 Systems Thinker", "🎯 Independent"].map(t => (
@@ -1296,7 +1355,7 @@ export default function ResultsPage() {
     );
   }
 
-  const { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores, isDemo } = realResults;
+  const { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores, isDemo, sessionId, hasScales, badges, hybrids } = realResults;
 
   // ─── Auth Guard for Page 2 ───────────────────────────────────────────────────
   // When ?page=2 is in the URL, check auth before rendering. If not authenticated,
@@ -1366,9 +1425,9 @@ export default function ResultsPage() {
       <AuroraBg />
       <AppHeader />
 
-      {page === 1 && <Page1QuickGlimpse type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} onLoginFree={handleLoginFree} onPremium={handlePremium} onPremiumClick={onPremiumClick} premiumError={premiumError} />}
+      {page === 1 && <Page1QuickGlimpse type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} onLoginFree={handleLoginFree} onPremium={handlePremium} onPremiumClick={onPremiumClick} premiumError={premiumError} earnedBadges={badges} hybridTypes={hybrids} />}
       {page === 2 && <Page2FullPortrait type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} onPremiumClick={onPremiumClick} />}
-      {page === 3 && <Page3PremiumNexus type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} isDemo={isDemo} />}
+      {page === 3 && <Page3PremiumNexus type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} isDemo={isDemo} earnedBadges={badges} hybridTypes={hybrids} />}
 
       <BottomBar
         active={bottomBarActive}
