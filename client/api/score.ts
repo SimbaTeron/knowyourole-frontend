@@ -432,7 +432,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const validation = validateInput(req.body);
   if (!validation.valid) {
-    res.status(400).json({ error: `Invalid quiz submission: ${validation.error}` });
+    const { error } = validation as { valid: false; error: string };
+    res.status(400).json({ error: `Invalid quiz submission: ${error}` });
     return;
   }
 
