@@ -23,13 +23,13 @@ export default function QuizGateway() {
     const normalizedTier = tier.trim();
     const matchedTier = TIERS.find(t => t.id === normalizedTier || t.id.startsWith(normalizedTier));
     if (matchedTier) {
-      sessionStorage.setItem("knowrole-tier", matchedTier.id);
+      sessionStorage.setItem("kyr_quiz_tier", matchedTier.id);
     }
   }, []);
 
   const handleContinue = () => {
     if (selected) {
-      sessionStorage.setItem("knowrole-tier", selected);
+      sessionStorage.setItem("kyr_quiz_tier", selected);
       window.location.href = "/mood-mixer";
     }
   };

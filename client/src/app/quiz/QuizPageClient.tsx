@@ -52,14 +52,25 @@ export default function QuizPage() {
   const [storedFunMode, setStoredFunMode] = useState<boolean | null>(null);
   const [storedLandmark, setStoredLandmark] = useState<string | null>(null);
 
-  const sessionTier = (typeof window !== 'undefined' ? sessionStorage.getItem("kyr_quiz_tier") : null) || "25plus";
+  const sessionTier = (typeof window !== 'undefined' ? sessionStorage.getItem("kyr_quiz_tier") : null);
   const sessionMood = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-mood") || "" : "";
   const sessionFunMode = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-funmode") === "true" : false;
   const landmarkData = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-landmark") : null;
   const sessionLandmark = landmarkData ? JSON.parse(landmarkData) : null;
 
+  // Redirect to quiz-gateway if no tier is set (user went directly to /quiz)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const tier = sessionStorage.getItem("kyr_quiz_tier");
+      if (!tier) {
+        router.replace("/quiz-gateway");
+        return;
+      }
+    }
+  }, [router]);
+
   // Use stored values if available, otherwise fall back to session values
-  const ageTier: TierValue = (storedTier ?? sessionTier) as TierValue;
+  const ageTier: TierValue = (storedTier ?? sessionTier ?? "25plus") as TierValue;
   const mood = storedMood ?? sessionMood;
   const funMode = storedFunMode ?? sessionFunMode;
   const landmark = storedLandmark ? { landmark: storedLandmark } : sessionLandmark;
