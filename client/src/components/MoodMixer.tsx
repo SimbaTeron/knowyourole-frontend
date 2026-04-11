@@ -1171,7 +1171,7 @@ export default function MoodMixerPage() {
       </div>
 
       {/* Page content */}
-      <div style={{ padding: "clamp(164px, 11vw, 190px) 24px 0", textAlign: "center", position: "relative", zIndex: 1 }}>
+      <div style={{ padding: "clamp(364px, 11vw, 390px) 24px 0", textAlign: "center", position: "relative", zIndex: 1 }}>
         <p
           style={{
             fontSize: 11,
