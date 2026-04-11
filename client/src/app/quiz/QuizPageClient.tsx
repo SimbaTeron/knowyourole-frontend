@@ -160,7 +160,7 @@ export default function QuizPage() {
     let discStyle = '';
 
     try {
-      const response = await apiRequest("POST", "/api/score", {
+      const response = await apiRequest("POST", "/api/quiz/score", {
         tier: ageTier,
         mood,
         funMode,
