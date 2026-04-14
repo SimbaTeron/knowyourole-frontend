@@ -89,7 +89,7 @@ function Router() {
         }
         return <Home />;
       }}</Route>
-      <Route path="/mood" component={MoodMixerPage} />
+      <Route path="/mood" component={MoodPage} />
       <Route path="/mood-mixer" component={MoodMixerPage} />
       <Route path="/location" component={LocationPage} />
       <Route path="/pre-quiz">{() => <Redirect to="/quiz" />}</Route>
