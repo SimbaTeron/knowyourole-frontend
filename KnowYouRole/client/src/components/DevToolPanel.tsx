@@ -233,12 +233,12 @@ export default function DevToolPanel() {
                 fontFamily: "'Courier New', monospace",
                 letterSpacing: "0.05em",
               }}
-          <button onClick={handleRandomize} className="dev-randomize-btn" title="Randomizes MBTI, DISC, Big Five, and career on the results pages — for dev preview only">
-            🎲 Randomize Results Pages Data
-          </button>
-          <div style={{ color: "#555", fontSize: 8, marginTop: 4, textAlign: "center" }}>
-            Randomizes MBTI, DISC, Big Five & career on results pages
-          </div>
+            >
+              🎲 Randomize Results Pages Data
+            </button>
+            <div style={{ color: "#555", fontSize: 8, marginTop: 4, textAlign: "center" }}>
+              Randomizes MBTI, DISC, Big Five & career on results pages
+            </div>
           </div>
 
           {/* QUICK JUMP */}
