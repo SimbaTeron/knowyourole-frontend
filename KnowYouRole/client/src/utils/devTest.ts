@@ -104,6 +104,7 @@ export function getFakeScores(tier: string, forceMBTI?: string | null) {
   const finalType = (forceMBTI && forceMBTI.length === 4) ? forceMBTI : selected.hybridTypes[0].split("-")[0];
 
   return {
+    __v: 1, // data version for cross-version validation
     mbti: finalMBTI,
     disc: base ? { ...base.disc } : { ...selected.disc },
     bigFive: base ? { ...base.bigFive } : { ...selected.bigFive },

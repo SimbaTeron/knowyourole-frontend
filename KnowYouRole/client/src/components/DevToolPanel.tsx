@@ -78,6 +78,9 @@ export default function DevToolPanel() {
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(fakeScores));
     sessionStorage.setItem("knowrole-randomized", "true");
 
+    // Notify all open tabs/windows that fake data changed (home page listens for this)
+    window.dispatchEvent(new Event("kyr_fake_update"));
+
     // Navigate to results page — always land on page 1
     setLocation("/results?test=true&page=1");
   };
