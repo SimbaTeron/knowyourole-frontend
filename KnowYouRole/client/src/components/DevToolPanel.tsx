@@ -78,9 +78,6 @@ export default function DevToolPanel() {
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(fakeScores));
     sessionStorage.setItem("knowrole-randomized", "true");
 
-    // Notify all open tabs/windows that fake data changed (home page listens for this)
-    window.dispatchEvent(new Event("kyr_fake_update"));
-
     // Navigate to results page — always land on page 1
     setLocation("/results?test=true&page=1");
   };
@@ -236,12 +233,12 @@ export default function DevToolPanel() {
                 fontFamily: "'Courier New', monospace",
                 letterSpacing: "0.05em",
               }}
-            >
-              🎲 RANDOMIZE ALL DATA
-            </button>
-            <div style={{ color: "#555", fontSize: 8, marginTop: 4, textAlign: "center" }}>
-              Picks a random MBTI type; DISC & Big Five are derived consistently
-            </div>
+          <button onClick={handleRandomize} className="dev-randomize-btn" title="Randomizes MBTI, DISC, Big Five, and career on the results pages — for dev preview only">
+            🎲 Randomize Results Pages Data
+          </button>
+          <div style={{ color: "#555", fontSize: 8, marginTop: 4, textAlign: "center" }}>
+            Randomizes MBTI, DISC, Big Five & career on results pages
+          </div>
           </div>
 
           {/* QUICK JUMP */}

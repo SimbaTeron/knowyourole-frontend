@@ -1,66 +1,5 @@
-import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { AppHeader } from "@/components/layout/AppHeader";
-
-const HOME_ARCHETYPES: Record<string, string> = {
-  INTJ: "The Architect", INTP: "The Thinker", ENTJ: "The Commander", ENTP: "The Debater",
-  INFJ: "The Advocate", INFP: "The Mediator", ENFJ: "The Protagonist", ENFP: "The Campaigner",
-  ISTJ: "The Logistician", ISFJ: "The Defender", ESTJ: "The Executive", ESFJ: "The Consul",
-  ISTP: "The Virtuoso", ISFP: "The Adventurer", ESTP: "The Entrepreneur", ESFP: "The Entertainer",
-};
-
-const DISC_LABELS: Record<string, string> = { D: "Dominance", I: "Influence", S: "Steadiness", C: "Conscientiousness" };
-
-interface HomeFakeData {
-  mbti: string;
-  archetype: string;
-  discStyle: string;
-  discLabel: string;
-  bigFive: { O: number; C: number; E: number; A: number; N: number };
-}
-
-function getHomeFakeData(): HomeFakeData {
-  if (typeof window === "undefined") return defaultHomeFakeData();
-  try {
-    const raw = sessionStorage.getItem("kyr_fake_scores");
-    if (!raw) return defaultHomeFakeData();
-    const scores = JSON.parse(raw);
-    // Validate it has a mbti object and disc object with D
-    if (!scores || !scores.mbti || typeof scores.disc?.D !== "number") {
-      return defaultHomeFakeData();
-    }
-    // Derive MBTI from the 8-dimension mbti object using the same pair-comparison logic
-    // as computeMBTIString in results.tsx: compare each bipolar pair, dominant wins on tie
-    const mbtiObj = scores.mbti || {};
-    const deriveMBTIStr = (m: Record<string, number>) => {
-      const E = m.E || 1, I = m.I || 1, S = m.S || 1, N = m.N || 1;
-      const T = m.T || 1, F = m.F || 1, J = m.J || 1, P = m.P || 1;
-      return `${I >= E ? "I" : "E"}${N >= S ? "N" : "S"}${T >= F ? "T" : "F"}${P >= J ? "P" : "J"}`;
-    };
-    // Use kyr_fake_mbti directly — it's written correctly by handleRandomize
-    // and always matches the stored scores. Deriving from mbti object can be
-    // wrong due to F/P dimension swap in stored data.
-    const mbtiStr = (sessionStorage.getItem("kyr_fake_mbti") || "INTJ").toUpperCase();
-    const arch = HOME_ARCHETYPES[mbtiStr] || "The Architect";
-    // Derive discStyle from the disc scores — highest wins, ties: D > I > S > C
-    const discScores = scores.disc || { D: 1, I: 1, S: 1, C: 1 };
-    const discOrder = [["D", discScores.D], ["I", discScores.I], ["S", discScores.S], ["C", discScores.C]] as const;
-    discOrder.sort((a, b) => b[1] - a[1] !== 0 ? b[1] - a[1] : a[0].localeCompare(b[0]));
-    const discStyle = discOrder[0][0];
-    const discLabel = DISC_LABELS[discStyle] || "Dominance";
-    const bigFive = scores.bigFive || { O: 78, C: 85, E: 42, A: 61, N: 28 };
-    return { mbti: mbtiStr, archetype: arch, discStyle, discLabel, bigFive };
-  } catch {
-    return defaultHomeFakeData();
-  }
-}
-
-function defaultHomeFakeData(): HomeFakeData {
-  return {
-    mbti: "INTJ", archetype: "The Architect", discStyle: "DC", discLabel: "Dominance",
-    bigFive: { O: 78, C: 85, E: 42, A: 61, N: 28 },
-  };
-}
 
 const FEATURES = [
   { emoji: "🎯", title: "Precision Insights", description: "Deep psychological analysis based on the Big Five model — the gold standard in personality science." },
@@ -94,16 +33,6 @@ const phoneCardStyle: React.CSSProperties = {
 };
 
 export default function Home() {
-  const [fakeData, setFakeData] = useState<HomeFakeData>(defaultHomeFakeData());
-
-  // Read sessionStorage on mount and listen for RANDOMIZE updates
-  useEffect(() => {
-    const load = () => setFakeData(getHomeFakeData());
-    load();
-    window.addEventListener("kyr_fake_update", load);
-    return () => window.removeEventListener("kyr_fake_update", load);
-  }, []);
-
   return (
     <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
 
@@ -177,23 +106,19 @@ export default function Home() {
             <div style={{ position: "relative", width: "min(280px, 80vw)", height: "min(560px, 150vw)" }}>
               <div style={{ ...phoneCardStyle, position: "absolute", width: "90%", top: 0, right: 0, zIndex: 3, transform: "rotate(3deg)" }}>
                 <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", marginBottom: 4 }}>Your Type</p>
-                <p style={{ fontSize: "clamp(1.4rem, 4vw, 2rem)", fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>{fakeData.mbti}-A</p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: "#00C8FF" }}>{fakeData.archetype}</p>
+                <p style={{ fontSize: "clamp(1.4rem, 4vw, 2rem)", fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>INTJ-A</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "#00C8FF" }}>The Architect</p>
                 <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>12.4% of population</p>
               </div>
               <div style={{ ...phoneCardStyle, position: "absolute", width: "85%", top: 20, right: 20, zIndex: 2, transform: "rotate(-2deg)" }}>
                 <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>Big Five</p>
-                <p style={{ fontSize: 14, fontWeight: 900, color: "#fff", lineHeight: 1.6 }}>
-                  O: {fakeData.bigFive.O}% C: {fakeData.bigFive.C}%<br />
-                  E: {fakeData.bigFive.E}% A: {fakeData.bigFive.A}%<br />
-                  N: {fakeData.bigFive.N}%
-                </p>
+                <p style={{ fontSize: 14, fontWeight: 900, color: "#fff", lineHeight: 1.6 }}>O: 78% C: 85%<br />E: 42% A: 61%<br />N: 28%</p>
                 <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 8, lineHeight: 1.4 }}>Openness · Conscientiousness<br />Extraversion · Agreeableness<br />Neuroticism</p>
               </div>
               <div style={{ ...phoneCardStyle, position: "absolute", width: "80%", top: 40, right: 40, zIndex: 1, transform: "rotate(1deg)" }}>
                 <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", marginBottom: 4 }}>DISC Profile</p>
-                <p style={{ fontSize: "clamp(1.2rem, 3vw, 1.8rem)", fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>{fakeData.discStyle}</p>
-                <p style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF" }}>{fakeData.discLabel}</p>
+                <p style={{ fontSize: "clamp(1.2rem, 3vw, 1.8rem)", fontWeight: 900, background: "linear-gradient(90deg, #00C8FF, #7800FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Outfit',sans-serif" }}>DC</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: "#00C8FF" }}>The Challenger</p>
                 <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>High dominance, high conscientiousness</p>
               </div>
             </div>
