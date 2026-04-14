@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useRef } from "react";
 import type { TouchEvent } from "react";
-import { Link } from "wouter";
+import { Link, useLocation, useSearchParams } from "wouter";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
@@ -77,10 +77,10 @@ function getStoredScores(): QuizScores | null {
 }
 
 function computeMBTIString(mbti: QuizScores["mbti"]): string {
-  const E = mbti.E > mbti.I ? "E" : "I";
-  const S = mbti.S > mbti.N ? "S" : "N";
-  const T = mbti.T > mbti.F ? "T" : "F";
-  const J = mbti.J > mbti.P ? "J" : "P";
+  const E = mbti.E >= mbti.I ? "E" : "I";
+  const S = mbti.S >= mbti.N ? "S" : "N";
+  const T = mbti.T >= mbti.F ? "T" : "F";
+  const J = mbti.J >= mbti.P ? "J" : "P";
   return E + S + T + J;
 }
 
@@ -819,6 +819,10 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
 
+  const base = type.split("-")[0];
+  const arch = getArchetype(base);
+  const primaryDiscStyle = primaryDisc;
+
   const CARD_WIDTH = 80; // 72px card + 8px gap
 
   const handleTouchStart = (e: TouchEvent) => {
@@ -875,7 +879,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
             <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: C.glassBg, border: `1px solid ${C.glassBorder}`, color: C.purple }}>RARE</div>
           </div>
           <p style={{ fontSize: 13, color: C.textMuted, lineHeight: 1.7, marginBottom: 14 }}>
-            As an INTJ-A, you possess a rare combination of strategic vision and independent thinking. Your mind operates like a master architect — constantly building, refining, and optimizing mental models of how systems should work.
+            As an {type}, your unique personality blend shapes how you experience the world and make decisions. Your {arch} archetype combined with your {primaryDisc} DISC style creates a distinctive approach to life, work, and relationships.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
             {["🔮 Visionary", "⚡ Decisive", "📐 Systems Thinker", "🎯 Independent"].map(t => (
@@ -1316,6 +1320,7 @@ export default function ResultsPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isAuthenticated, isLoading } = useAuth0();
   const realResults = useRealResults();
+  const [searchParams] = useSearchParams(); // Re-renders automatically when search params change
 
   // ─── TEMPORARY BYPASS: Skip Stripe, go directly to Page 3 ───────────────────
   // TODO (stripe-ready): Remove this bypass once Stripe Price ID is configured.
@@ -1324,14 +1329,16 @@ export default function ResultsPage() {
   // ─────────────────────────────────────────────────────────────────────────────
 
   // ─── Sync page state ↔ URL ─────────────────────────────────────────────────
-  // On mount: read ?page= from URL and set initial page state
+  // useSearchParams hook re-renders the component whenever search params change
+  // (including when wouter setLocation updates ?page= from the same page)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const pageParam = params.get("page");
+    const pageParam = searchParams.get("page");
     if (pageParam === "2" || pageParam === "3") {
       setPage(parseInt(pageParam) as 2 | 3);
+    } else {
+      setPage(1);
     }
-  }, []);
+  }, [searchParams]);
 
   // On page change: update URL without page reload
   useEffect(() => {
