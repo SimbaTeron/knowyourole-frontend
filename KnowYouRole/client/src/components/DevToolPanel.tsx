@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { isTestMode, getConsistentFakeScores, getFakeScores } from "@/utils/devTest";
 
 const TIER_OPTIONS = [
@@ -29,9 +30,16 @@ const MBTI_TYPES = ["INTJ", "ENTJ", "INTP", "ENTP", "INFJ", "ENFJ", "INFP", "ENF
 const DISC_TYPES = ["D", "I", "S", "C", "DI", "IS", "SC", "DS"];
 
 export default function DevToolPanel() {
-  const [selectedTier, setSelectedTier] = useState("25+");
-  const [selectedMBTI, setSelectedMBTI] = useState("INTJ");
+  // Read stored fake data on mount so the selector always matches what's loaded
+  // (survives full page reloads from window.location.assign)
+  const [selectedTier, setSelectedTier] = useState(
+    typeof window !== "undefined" ? (sessionStorage.getItem("kyr_tier") || "25+") : "25+"
+  );
+  const [selectedMBTI, setSelectedMBTI] = useState(
+    typeof window !== "undefined" ? (sessionStorage.getItem("kyr_fake_mbti") || "INTJ") : "INTJ"
+  );
   const [expanded, setExpanded] = useState(true);
+  const [, setLocation] = useLocation();
 
   // Only show on localhost test mode
   if (!isTestMode()) return null;
@@ -48,7 +56,7 @@ export default function DevToolPanel() {
 
   const handleNavigate = (path: string) => {
     writeFakeData(selectedTier, selectedMBTI);
-    window.location.assign(path);
+    setLocation(path);
   };
 
   const handleRandomize = () => {
@@ -57,9 +65,10 @@ export default function DevToolPanel() {
     setSelectedTier("25+");
     setSelectedMBTI(randomMBTI);
 
-    // MBTI is the single source of truth — DISC and Big Five are derived from it
-    // using personality research correlations. No impossible combos.
-    const fakeScores = getConsistentFakeScores(randomMBTI);
+    // Use getFakeScores so stored data exactly matches what useRealResults generates:
+    // getFakeScores now calls getConsistentFakeScores internally when MBTI is forced,
+    // ensuring stored scores and page-derived scores are always identical.
+    const fakeScores = getFakeScores("25+", randomMBTI);
 
     sessionStorage.setItem("kyr_tier", "25+");
     sessionStorage.setItem("kyr_fake_scores", JSON.stringify(fakeScores));
@@ -70,7 +79,7 @@ export default function DevToolPanel() {
     sessionStorage.setItem("knowrole-randomized", "true");
 
     // Navigate to results page — always land on page 1
-    window.location.assign("/results?test=true&page=1&_r=" + Date.now());
+    setLocation("/results?test=true&page=1");
   };
 
   const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
@@ -246,7 +255,7 @@ export default function DevToolPanel() {
               ].map(item => (
                 <button
                   key={item.label}
-                  onClick={() => { writeFakeData(selectedTier, selectedMBTI); window.location.assign(item.path); }}
+                  onClick={() => { writeFakeData(selectedTier, selectedMBTI); setLocation(item.path); }}
                   style={{
                     background: "rgba(255,255,255,0.05)",
                     border: "1px solid rgba(255,255,255,0.1)",

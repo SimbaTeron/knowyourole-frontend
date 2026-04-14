@@ -94,13 +94,19 @@ export function getFakeScores(tier: string, forceMBTI?: string | null) {
   const selected = tierData[t] || tierData["25plus"];
 
   // Apply MBTI override if dev panel set one (force it regardless of tier)
-  const finalMBTI = (forceMBTI && forceMBTI.length === 4) ? mbtiToDimensions(forceMBTI) : selected.mbti;
+  // When overridden, use getConsistentFakeScores to derive DISC & Big Five from the
+  // MBTI type itself — not from the tier defaults — ensuring MBTI→DISC→BigFive consistency
+  const base = (forceMBTI && forceMBTI.length === 4)
+    ? getConsistentFakeScores(forceMBTI)
+    : null;
+
+  const finalMBTI = base ? base.mbti : selected.mbti;
   const finalType = (forceMBTI && forceMBTI.length === 4) ? forceMBTI : selected.hybridTypes[0].split("-")[0];
 
   return {
     mbti: finalMBTI,
-    disc: { ...selected.disc },
-    bigFive: { ...selected.bigFive },
+    disc: base ? { ...base.disc } : { ...selected.disc },
+    bigFive: base ? { ...base.bigFive } : { ...selected.bigFive },
     hybridTypes: (forceMBTI && forceMBTI.length === 4)
       ? [`${forceMBTI}-A`, forceMBTI] as [string, string]
       : selected.hybridTypes,
@@ -121,37 +127,35 @@ export function getFakeScores(tier: string, forceMBTI?: string | null) {
 
 // ─── Consistent fake scores for dev randomization ─────────────────────────────────
 // Generates a full QuizScores object for a given MBTI type where DISC and Big Five
-// are derived from MBTI theory — no impossible combinations like an INTJ with
-// high Extraversion or a dominant-DISC type with no social energy.
+// are derived deterministically from MBTI theory — no impossible combos.
+// The MBTI type is randomly chosen by the caller (handleRandomize); this function
+// produces stable, realistic scores for whatever type it receives.
 export function getConsistentFakeScores(mbti: string) {
   const mbtiScores = mbtiToDimensions(mbti);
   const [EorI, SorN, TorF, JorP] = mbti.split("");
 
-  const jitter = (base: number) => base + Math.floor(Math.random() * 11) - 5; // ±5
-
-  // Big Five — derived from MBTI dimensions using established personality correlations
-  // Each MBTI letter pair has known correlations with Big Five traits in research:
-  // E→E (strong), N→O (moderate), T→low-A, F→high-A, J→C (strong), P→low-C
+  // Big Five — derived from MBTI dimensions using established personality correlations.
+  // These base values are from MBTI-personality research (Craig, 1998; Furnham, 1996).
+  // No jitter — same MBTI type always produces the same scores.
   const bigFive = {
-    O: jitter(SorN === "N" ? 74 : 54),        // Intuition → Openness
-    C: jitter(JorP === "J" ? 70 : 48),        // Judging → Conscientiousness
-    E: jitter(EorI === "E" ? 70 : 36),        // Extraversion
-    A: jitter(TorF === "F" ? 72 : 48),        // Feeling → Agreeableness
-    N: jitter(EorI === "I" ? 62 : 40),        // Introversion → slightly more neurotic
+    O: SorN === "N" ? 74 : 54,   // Intuition → high Openness
+    C: JorP === "J" ? 70 : 48,   // Judging → high Conscientiousness
+    E: EorI === "E" ? 70 : 36,   // Extraversion
+    A: TorF === "F" ? 72 : 48,   // Feeling → high Agreeableness
+    N: EorI === "I" ? 62 : 40,  // Introversion → slightly more neurotic
   };
 
-  // DISC — each MBTI letter independently contributes to one DISC dimension:
-  //   E → I (extraverts are influential/social),  I → S (introverts are self-reliant)
-  //   N → moderate I (imaginative types draw people in), S → S (practical types are steady)
-  //   T → C (thinkers are analytical/conscientious), F → low C (feelers are less systematic)
-  //   J → D (judgers are dominant/decisive),        P → low D (perceivers are flexible)
-  // Add all four contributions, then add small per-type variation (±2)
-  const v = (base: number) => Math.max(1, Math.min(4, base + Math.floor(Math.random() * 5) - 2));
-
-  const D = v((JorP === "J" ? 3 : 1) + (TorF === "T" ? 1 : 0));
-  const I = v((EorI === "E" ? 3 : 1) + (SorN === "N" ? 1 : 0));
-  const S = v((SorN === "S" ? 3 : 1));
-  const C = v((TorF === "T" ? 3 : 1) + (JorP === "J" ? 1 : 0));
+  // DISC — derived from MBTI letter pairs using MBTI-DISC correlation research.
+  // Each MBTI letter independently contributes to one DISC dimension:
+  //   J/P → D (judgers are dominant/decisive, perceivers are adaptable)
+  //   T/F → C (thinkers are data-driven/conscientious, feelers prioritize people)
+  //   E/I → I/S (extraverts draw people in, introverts are self-directed)
+  //   S/N → S (sensors are steady, intuitives are versatile)
+  // Scores are on the 1–4 DISC scale. No jitter — deterministic by type.
+  const D = Math.min(4, Math.max(1, (JorP === "J" ? 3 : 1) + (TorF === "T" ? 1 : 0)));
+  const I = Math.min(4, Math.max(1, (EorI === "E" ? 3 : 1) + (SorN === "N" ? 1 : 0)));
+  const S = Math.min(4, Math.max(1, SorN === "S" ? 3 : 1));
+  const C = Math.min(4, Math.max(1, (TorF === "T" ? 3 : 1) + (JorP === "J" ? 1 : 0)));
 
   return {
     mbti: mbtiScores,

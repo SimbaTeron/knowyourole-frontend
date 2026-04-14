@@ -66,7 +66,13 @@ function getStoredScores(): QuizScores | null {
     const raw = sessionStorage.getItem("kyr_real_scores")
       || sessionStorage.getItem("kyr_fake_scores");
     if (!raw) return null;
-    return JSON.parse(raw) as QuizScores;
+    const parsed = JSON.parse(raw) as QuizScores;
+    // Validate data shape — invalidate corrupted/old-format entries (missing DISC keys)
+    if (!parsed || !parsed.disc || parsed.disc.D === undefined || parsed.disc.C === undefined) {
+      sessionStorage.removeItem("kyr_fake_scores");
+      return null;
+    }
+    return parsed;
   } catch { return null; }
 }
 
