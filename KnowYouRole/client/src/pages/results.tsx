@@ -821,7 +821,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
 
   const base = type.split("-")[0];
   const arch = getArchetype(base);
-  const primaryDiscStyle = primaryDisc;
+  const primary = primaryDisc;
 
   const CARD_WIDTH = 80; // 72px card + 8px gap
 
@@ -859,9 +859,6 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
     setTouchStartX(null);
     setTouchDeltaX(0);
   };
-  const base = type.split("-")[0];
-  const arch = getArchetype(base);
-  const primary = primaryDisc;
 
   const FEATURE_CARDS: Record<string, React.ReactNode> = {
     deepdive: (
@@ -882,10 +879,24 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
             As an {type}, your unique personality blend shapes how you experience the world and make decisions. Your {arch} archetype combined with your {primaryDisc} DISC style creates a distinctive approach to life, work, and relationships.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            {["🔮 Visionary", "⚡ Decisive", "📐 Systems Thinker", "🎯 Independent"].map(t => (
-              <div key={t} style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.glassBorder}`, borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
-                <div style={{ fontSize: 16, marginBottom: 4 }}>{t.split(" ")[0]}</div>
-                <div style={{ fontSize: 10, fontWeight: 600, color: C.textMuted }}>{t.split(" ")[1]}</div>
+            {(mbtiType => {
+              const traits: Record<string, [string, string]> = {
+                ENFP: ["🔮 Creative", "⚡ Energetic"], INFP: ["💜 Idealist", "🌊 Empathetic"],
+                ENFJ: ["💚 Champion", "📣 Inspiring"], INFJ: ["🧠 Insightful", "🎯 Purposeful"],
+                ENTJ: ["⚡ Decisive", "🏆 Strategic"], INTJ: ["📐 Architect", "🎯 Independent"],
+                ENTP: ["💡 Innovator", "⚡ Curious"], INTP: ["🔬 Analytical", "🔍 Logical"],
+                ESFP: ["🎭 Energetic", "😊 Spontaneous"], ISFP: ["🎨 Adventurer", "💖 Creative"],
+                ESFJ: ["💛 Caring", "👐 Supportive"], ISFJ: ["🛡 Loyal", "📋 Practical"],
+                ESTJ: ["📌 Organized", "⚖️ Responsible"], ISTJ: ["✅ Reliable", "📋 Detailed"],
+                ESTP: ["⚡ Active", "🎯 Pragmatic"], ISTP: ["🔧 Practical", "🔍 Logical"],
+              };
+              const defaultTraits: [string, string] = ["⭐ Versatile", "💪 Adaptable"];
+              const [t1, t2] = traits[mbtiType] || defaultTraits;
+              return [t1, t2].map(t => ({ icon: t.split(" ")[0], label: t.split(" ").slice(1).join(" ") }));
+            })(mbtiType).map(({ icon, label }) => (
+              <div key={label} style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.glassBorder}`, borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
+                <div style={{ fontSize: 16, marginBottom: 4 }}>{icon}</div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: C.textMuted }}>{label}</div>
               </div>
             ))}
           </div>
