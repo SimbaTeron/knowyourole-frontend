@@ -116,16 +116,13 @@ function Router() {
 }
 
 function App() {
-  const [location] = useLocation();
-  const isResultsPage = location.startsWith("/results");
-
   return (
     <RootErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <ScrollToTop />
           <Toaster />
-          {!isResultsPage && <DevToolPanel />}
+          <DevToolPanel />
           <Router />
         </TooltipProvider>
       </QueryClientProvider>
