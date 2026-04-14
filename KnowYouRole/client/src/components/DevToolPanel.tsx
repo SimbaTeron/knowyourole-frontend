@@ -48,7 +48,7 @@ export default function DevToolPanel() {
 
   const handleNavigate = (path: string) => {
     writeFakeData(selectedTier, selectedMBTI);
-    window.location.assign(path + "?test=true");
+    window.location.assign(path);
   };
 
   const handleRandomize = () => {
