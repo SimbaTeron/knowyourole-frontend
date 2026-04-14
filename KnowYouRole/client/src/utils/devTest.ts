@@ -119,6 +119,60 @@ export function getFakeScores(tier: string, forceMBTI?: string | null) {
   };
 }
 
+// ─── Consistent fake scores for dev randomization ─────────────────────────────────
+// Generates a full QuizScores object for a given MBTI type where DISC and Big Five
+// are derived from MBTI theory — no impossible combinations like an INTJ with
+// high Extraversion or a dominant-DISC type with no social energy.
+export function getConsistentFakeScores(mbti: string) {
+  const mbtiScores = mbtiToDimensions(mbti);
+  const [EorI, SorN, TorF, JorP] = mbti.split("");
+
+  const jitter = (base: number) => base + Math.floor(Math.random() * 11) - 5; // ±5
+
+  // Big Five — derived from MBTI dimensions using established personality correlations
+  // Each MBTI letter pair has known correlations with Big Five traits in research:
+  // E→E (strong), N→O (moderate), T→low-A, F→high-A, J→C (strong), P→low-C
+  const bigFive = {
+    O: jitter(SorN === "N" ? 74 : 54),        // Intuition → Openness
+    C: jitter(JorP === "J" ? 70 : 48),        // Judging → Conscientiousness
+    E: jitter(EorI === "E" ? 70 : 36),        // Extraversion
+    A: jitter(TorF === "F" ? 72 : 48),        // Feeling → Agreeableness
+    N: jitter(EorI === "I" ? 62 : 40),        // Introversion → slightly more neurotic
+  };
+
+  // DISC — each MBTI letter independently contributes to one DISC dimension:
+  //   E → I (extraverts are influential/social),  I → S (introverts are self-reliant)
+  //   N → moderate I (imaginative types draw people in), S → S (practical types are steady)
+  //   T → C (thinkers are analytical/conscientious), F → low C (feelers are less systematic)
+  //   J → D (judgers are dominant/decisive),        P → low D (perceivers are flexible)
+  // Add all four contributions, then add small per-type variation (±2)
+  const v = (base: number) => Math.max(1, Math.min(4, base + Math.floor(Math.random() * 5) - 2));
+
+  const D = v((JorP === "J" ? 3 : 1) + (TorF === "T" ? 1 : 0));
+  const I = v((EorI === "E" ? 3 : 1) + (SorN === "N" ? 1 : 0));
+  const S = v((SorN === "S" ? 3 : 1));
+  const C = v((TorF === "T" ? 3 : 1) + (JorP === "J" ? 1 : 0));
+
+  return {
+    mbti: mbtiScores,
+    disc: { D, I, S, C },
+    bigFive,
+    hybridTypes: [`${mbti}-A`, mbti] as [string, string],
+    responses: Array.from({ length: 25 }, (_, i) => ({
+      questionId: i + 1,
+      response: i % 2 === 0 ? 0 : 1,
+      time: 4000 + Math.random() * 3000,
+    })),
+    swipeTimes: [],
+    averageSwipeTime: 4.2,
+    currentDifficulty: "medium",
+    engagement: 82,
+    wildcardBoost: true,
+    criticalWildcard: 3,
+    firstPrinciplesWildcard: 2,
+  };
+}
+
 export function getFakeMBTIType(scores: ReturnType<typeof getFakeScores>): string {
   const { mbti } = scores;
   const E = mbti.E >= mbti.I ? "E" : "I";

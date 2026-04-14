@@ -32,7 +32,7 @@ const C = {
   teal: "#06b6d4",
   text: "#ffffff",
   textMuted: "rgba(255, 255, 255, 0.5)",
-  textDim: "rgba(255, 255, 255, 0.3)",
+  textDim: "rgba(255, 255, 255, 0.48)",
   glassBg: "rgba(255, 255, 255, 0.04)",
   glassBgHover: "rgba(255, 255, 255, 0.08)",
   glassBorder: "rgba(255, 255, 255, 0.1)",
@@ -51,6 +51,18 @@ const ARCHETYPES: Record<string, string> = {
 
 function getArchetype(mbti: string) {
   return ARCHETYPES[mbti] || "The Architect";
+}
+
+// MBTI population frequencies (% of US population)
+const MBTI_POPULATION: Record<string, number> = {
+  ISTJ: 11.6, ISFJ: 13.8, INFJ: 1.5, INTJ: 2.1,
+  ISTP: 5.4, ISFP: 8.8, INFP: 4.4, INTP: 3.3,
+  ESTP: 4.3, ESFP: 8.5, ENFP: 8.1, ENTP: 3.2,
+  ESTJ: 8.7, ESFJ: 12.3, ENFJ: 2.5, ENTJ: 1.8,
+};
+
+function getPopulationPct(mbti: string) {
+  return MBTI_POPULATION[mbti] ?? 2.1;
 }
 
 const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#fbbf24", S: "#22c55e", C: "#3b82f6" };
@@ -401,7 +413,7 @@ function PrivacyStrip() {
 }
 
 // ─── PAGE 1: Quick Glimpse ───────────────────────────────────────────────────
-function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLoginFree, onPremium, onPremiumClick, premiumError, earnedBadges, hybridTypes }: {
+function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLoginFree, onPremium, onPremiumClick, premiumError, earnedBadges, hybridTypes, rawScores }: {
   type: string; bigFive: { O: number; C: number; E: number; A: number; N: number };
   disc: { D: number; I: number; S: number; C: number };
   mbtiType: string; primaryDisc: string;
@@ -411,6 +423,7 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLogin
   premiumError?: string | null;
   earnedBadges?: EarnedBadge[];
   hybridTypes?: string[];
+  rawScores?: { mbti: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number } } | null;
 }) {
   const base = type.split("-")[0];
   const arch = getArchetype(base);
@@ -490,24 +503,99 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLogin
             <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧠</div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{type.split("-")[0]} — {arch}</div>
-              <div style={{ fontSize: 10, color: C.textDim }}>16 Personalities · Strategist</div>
             </div>
           </div>
-          <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, color: C.purple }}>2.4%</div>
+          <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, color: C.purple }}>{getPopulationPct(mbtiType)}%</div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-          {[
-            { label: "Mind", val: 73 }, { label: "Energy", val: 78 },
-            { label: "Nature", val: 65 }, { label: "Tactics", val: 81 },
-          ].map(d => (
-            <div key={d.label} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${C.glassBorder}`, borderRadius: 10, padding: "8px 10px" }}>
-              <div style={{ fontSize: 8, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim, marginBottom: 2 }}>{d.label}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{d.val}%</div>
-              <div style={{ height: 3, background: "rgba(255,255,255,0.06)", borderRadius: 2, overflow: "hidden", marginTop: 5 }}>
-                <div style={{ width: `${d.val}%`, height: "100%", background: `linear-gradient(90deg, ${C.cyan}, ${C.purple})`, borderRadius: 2 }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          {/* Mind: E vs I */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: `1px solid ${C.glassBorder}` }}>
+            <div style={{ width: 56, flexShrink: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>Mind</div>
+            </div>
+            <div style={{ flex: "0 0 120px", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ width: `${rawScores ? Math.round((rawScores.mbti.E / (rawScores.mbti.E + rawScores.mbti.I)) * 100) : 50}%`, height: "100%", background: C.purple, borderRadius: 3 }} />
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.purple, width: 28, textAlign: "right", flexShrink: 0 }}>{rawScores ? Math.round((rawScores.mbti.E / (rawScores.mbti.E + rawScores.mbti.I)) * 100) : 50}%</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <div style={{ minWidth: 40, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[0] === "E" ? C.purple : C.textDim }}>E</div>
+                <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Extrovert</div>
+              </div>
+              <div style={{ minWidth: 40, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[0] === "I" ? C.purple : C.textDim }}>I</div>
+                <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Introvert</div>
               </div>
             </div>
-          ))}
+          </div>
+          {/* Energy: S vs N */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: `1px solid ${C.glassBorder}` }}>
+            <div style={{ width: 56, flexShrink: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>Energy</div>
+            </div>
+            <div style={{ flex: "0 0 120px", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ width: `${rawScores ? Math.round((rawScores.mbti.S / (rawScores.mbti.S + rawScores.mbti.N)) * 100) : 50}%`, height: "100%", background: C.cyan, borderRadius: 3 }} />
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.cyan, width: 28, textAlign: "right", flexShrink: 0 }}>{rawScores ? Math.round((rawScores.mbti.S / (rawScores.mbti.S + rawScores.mbti.N)) * 100) : 50}%</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <div style={{ minWidth: 40, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[1] === "S" ? C.cyan : C.textDim }}>S</div>
+                <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Observant</div>
+              </div>
+              <div style={{ minWidth: 40, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[1] === "N" ? C.cyan : C.textDim }}>N</div>
+                <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Intuitive</div>
+              </div>
+            </div>
+          </div>
+          {/* Nature: T vs F */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: `1px solid ${C.glassBorder}` }}>
+            <div style={{ width: 56, flexShrink: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>Nature</div>
+            </div>
+            <div style={{ flex: "0 0 120px", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ width: `${rawScores ? Math.round((rawScores.mbti.T / (rawScores.mbti.T + rawScores.mbti.F)) * 100) : 50}%`, height: "100%", background: C.pink, borderRadius: 3 }} />
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.pink, width: 28, textAlign: "right", flexShrink: 0 }}>{rawScores ? Math.round((rawScores.mbti.T / (rawScores.mbti.T + rawScores.mbti.F)) * 100) : 50}%</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <div style={{ minWidth: 40, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[2] === "T" ? C.pink : C.textDim }}>T</div>
+                <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Thinking</div>
+              </div>
+              <div style={{ minWidth: 40, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[2] === "F" ? C.pink : C.textDim }}>F</div>
+                <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Feeling</div>
+              </div>
+            </div>
+          </div>
+          {/* Tactics: J vs P */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0" }}>
+            <div style={{ width: 56, flexShrink: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>Tactics</div>
+            </div>
+            <div style={{ flex: "0 0 120px", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ width: `${rawScores ? Math.round((rawScores.mbti.J / (rawScores.mbti.J + rawScores.mbti.P)) * 100) : 50}%`, height: "100%", background: C.gold, borderRadius: 3 }} />
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, width: 28, textAlign: "right", flexShrink: 0 }}>{rawScores ? Math.round((rawScores.mbti.J / (rawScores.mbti.J + rawScores.mbti.P)) * 100) : 50}%</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <div style={{ minWidth: 40, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[3] === "J" ? C.gold : C.textDim }}>J</div>
+                <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Judging</div>
+              </div>
+              <div style={{ minWidth: 40, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[3] === "P" ? C.gold : C.textDim }}>P</div>
+                <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Prospecting</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -631,11 +719,12 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLogin
 }
 
 // ─── PAGE 2: Full Portrait ────────────────────────────────────────────────────
-function Page2FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, onPremiumClick }: {
+function Page2FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, onPremiumClick, rawScores }: {
   type: string; bigFive: { O: number; C: number; E: number; A: number; N: number };
   disc: { D: number; I: number; S: number; C: number };
   mbtiType: string; primaryDisc: string;
   onPremiumClick: () => void;
+  rawScores?: { mbti: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number } } | null;
 }) {
   const base = type.split("-")[0];
   const arch = getArchetype(base);
@@ -679,6 +768,108 @@ function Page2FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, onPremi
           <div style={{ fontSize: 40, fontWeight: 800, background: `linear-gradient(135deg, ${C.cyan}, #67e8f9, ${C.purple})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1, marginBottom: 4, letterSpacing: "-1px" }}>{type}</div>
           <div style={{ fontSize: 15, fontWeight: 600, color: C.cyan, marginBottom: 2 }}>{arch}</div>
           <div style={{ fontSize: 10, color: C.textDim }}>Only <strong style={{ color: C.textMuted }}>2.4%</strong> of the population shares this type</div>
+        </div>
+
+        {/* MBTI Dimension Breakdown */}
+        <div style={{ borderRadius: C.cardRadius, padding: 18, background: C.glassBg, backdropFilter: "blur(20px)", border: `1px solid ${C.glassBorder}`, position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${C.purple}, ${C.pink})`, margin: "-5px -5px 0", width: "calc(100% + 10px)", borderRadius: `${C.cardRadius} ${C.cardRadius} 0 0` }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧠</div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>Your 4 Dimensions</div>
+              <div style={{ fontSize: 10, color: C.textDim }}>Where you fall on each spectrum</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {/* Mind: E vs I */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: `1px solid ${C.glassBorder}` }}>
+              <div style={{ width: 56, flexShrink: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>Mind</div>
+              </div>
+              <div style={{ flex: "0 0 120px", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{ width: `${rawScores ? Math.round((rawScores.mbti.E / (rawScores.mbti.E + rawScores.mbti.I)) * 100) : 50}%`, height: "100%", background: C.purple, borderRadius: 3 }} />
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.purple, width: 28, textAlign: "right", flexShrink: 0 }}>{rawScores ? Math.round((rawScores.mbti.E / (rawScores.mbti.E + rawScores.mbti.I)) * 100) : 50}%</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                <div style={{ minWidth: 40, textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[0] === "E" ? C.purple : C.textDim }}>E</div>
+                  <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Extrovert</div>
+                </div>
+                <div style={{ minWidth: 40, textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[0] === "I" ? C.purple : C.textDim }}>I</div>
+                  <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Introvert</div>
+                </div>
+              </div>
+            </div>
+            {/* Energy: S vs N */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: `1px solid ${C.glassBorder}` }}>
+              <div style={{ width: 56, flexShrink: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>Energy</div>
+              </div>
+              <div style={{ flex: "0 0 120px", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{ width: `${rawScores ? Math.round((rawScores.mbti.S / (rawScores.mbti.S + rawScores.mbti.N)) * 100) : 50}%`, height: "100%", background: C.cyan, borderRadius: 3 }} />
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.cyan, width: 28, textAlign: "right", flexShrink: 0 }}>{rawScores ? Math.round((rawScores.mbti.S / (rawScores.mbti.S + rawScores.mbti.N)) * 100) : 50}%</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                <div style={{ minWidth: 40, textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[1] === "S" ? C.cyan : C.textDim }}>S</div>
+                  <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Observant</div>
+                </div>
+                <div style={{ minWidth: 40, textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[1] === "N" ? C.cyan : C.textDim }}>N</div>
+                  <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Intuitive</div>
+                </div>
+              </div>
+            </div>
+            {/* Nature: T vs F */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: `1px solid ${C.glassBorder}` }}>
+              <div style={{ width: 56, flexShrink: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>Nature</div>
+              </div>
+              <div style={{ flex: "0 0 120px", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{ width: `${rawScores ? Math.round((rawScores.mbti.T / (rawScores.mbti.T + rawScores.mbti.F)) * 100) : 50}%`, height: "100%", background: C.pink, borderRadius: 3 }} />
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.pink, width: 28, textAlign: "right", flexShrink: 0 }}>{rawScores ? Math.round((rawScores.mbti.T / (rawScores.mbti.T + rawScores.mbti.F)) * 100) : 50}%</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                <div style={{ minWidth: 40, textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[2] === "T" ? C.pink : C.textDim }}>T</div>
+                  <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Thinking</div>
+                </div>
+                <div style={{ minWidth: 40, textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[2] === "F" ? C.pink : C.textDim }}>F</div>
+                  <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Feeling</div>
+                </div>
+              </div>
+            </div>
+            {/* Tactics: J vs P */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0" }}>
+              <div style={{ width: 56, flexShrink: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>Tactics</div>
+              </div>
+              <div style={{ flex: "0 0 120px", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{ width: `${rawScores ? Math.round((rawScores.mbti.J / (rawScores.mbti.J + rawScores.mbti.P)) * 100) : 50}%`, height: "100%", background: C.gold, borderRadius: 3 }} />
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, width: 28, textAlign: "right", flexShrink: 0 }}>{rawScores ? Math.round((rawScores.mbti.J / (rawScores.mbti.J + rawScores.mbti.P)) * 100) : 50}%</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                <div style={{ minWidth: 40, textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[3] === "J" ? C.gold : C.textDim }}>J</div>
+                  <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Judging</div>
+                </div>
+                <div style={{ minWidth: 40, textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: mbtiType[3] === "P" ? C.gold : C.textDim }}>P</div>
+                  <div style={{ fontSize: 10, color: C.textDim, whiteSpace: "nowrap" }}>Prospecting</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         {/* Mini cards row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -1427,8 +1618,8 @@ export default function ResultsPage() {
       <AuroraBg />
       <AppHeader />
 
-      {page === 1 && <Page1QuickGlimpse type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} onLoginFree={handleLoginFree} onPremium={handlePremium} onPremiumClick={onPremiumClick} premiumError={premiumError} earnedBadges={badges} hybridTypes={hybrids} />}
-      {page === 2 && <Page2FullPortrait type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} onPremiumClick={onPremiumClick} />}
+      {page === 1 && <Page1QuickGlimpse type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} onLoginFree={handleLoginFree} onPremium={handlePremium} onPremiumClick={onPremiumClick} premiumError={premiumError} earnedBadges={badges} hybridTypes={hybrids} rawScores={rawScores} />}
+      {page === 2 && <Page2FullPortrait type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} onPremiumClick={onPremiumClick} rawScores={rawScores} />}
       {page === 3 && <Page3PremiumNexus type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} isDemo={isDemo} earnedBadges={badges} hybridTypes={hybrids} />}
 
       <BottomBar

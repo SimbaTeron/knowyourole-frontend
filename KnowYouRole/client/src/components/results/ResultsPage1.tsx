@@ -156,29 +156,134 @@ export function ResultsPage1({ s }: { s: ResultsState }) {
           </div>
         </div>
 
-        {/* 4-dimension grid */}
-        <div className="grid grid-cols-2 gap-2.5">
+        {/* MBTI bipolar bars — redesigned */}
+        <div className="space-y-5">
           {[
-            { label: "Mind",     A: s.scores.mbti.E, B: s.scores.mbti.I },
-            { label: "Energy",   A: s.scores.mbti.N, B: s.scores.mbti.S },
-            { label: "Nature",   A: s.scores.mbti.T, B: s.scores.mbti.F },
-            { label: "Tactics",  A: s.scores.mbti.J, B: s.scores.mbti.P },
+            {
+              label: "Mind",
+              A: s.scores.mbti.E, B: s.scores.mbti.I,
+              letterA: "E", nameA: "Extrovert",
+              letterB: "I", nameB: "Introvert",
+              descA: "Recharge socially",
+              descB: "Recharge alone",
+            },
+            {
+              label: "Energy",
+              A: s.scores.mbti.N, B: s.scores.mbti.S,
+              letterA: "N", nameA: "Intuitive",
+              letterB: "S", nameB: "Observant",
+              descA: "See patterns & futures",
+              descB: "Focus on real & practical",
+            },
+            {
+              label: "Nature",
+              A: s.scores.mbti.T, B: s.scores.mbti.F,
+              letterA: "T", nameA: "Thinking",
+              letterB: "F", nameB: "Feeling",
+              descA: "Lead with logic",
+              descB: "Lead with values",
+            },
+            {
+              label: "Tactics",
+              A: s.scores.mbti.J, B: s.scores.mbti.P,
+              letterA: "J", nameA: "Judging",
+              letterB: "P", nameB: "Prospecting",
+              descA: "Prefer structure",
+              descB: "Stay flexible",
+            },
           ].map((dim) => {
             const total = dim.A + dim.B || 1;
-            const value = Math.round((dim.A / total) * 100);
+            const pct = Math.round((dim.A / total) * 100);
+            const isADominant = dim.A >= dim.B;
+            // Gradient fills the dominant half proportionally
+            const dominantFill = (dim.A / total) * 50;
+            const mutedFill = 50 - dominantFill;
+
             return (
-              <div key={dim.label} className="rounded-xl p-3"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--glass-border)" }}>
-                <div className="text-xs font-bold uppercase tracking-wider mb-1.5"
-                  style={{ color: "var(--text-dim)" }}>{dim.label}</div>
-                <div className="text-sm font-bold text-white mb-1.5">{value}%</div>
-                <div className="h-1.5 rounded-full overflow-hidden"
-                  style={{ background: "rgba(255,255,255,0.06)" }}>
-                  <div className="h-full rounded-full"
-                    style={{
-                      width: `${value}%`,
-                      background: "linear-gradient(90deg, var(--cyan), var(--purple))",
-                    }}/>
+              <div key={dim.label} className="flex items-start gap-4">
+                {/* Left: label + % */}
+                <div className="flex flex-col items-center justify-start pt-0.5" style={{ minWidth: "52px" }}>
+                  <div className="text-[10px] font-bold uppercase tracking-widest leading-none"
+                    style={{ color: "var(--text-dim)" }}>{dim.label}</div>
+                  <div className="text-xl font-black leading-none mt-1"
+                    style={{ color: isADominant ? "var(--purple)" : "var(--cyan)" }}>
+                    {pct}%
+                  </div>
+                </div>
+
+                {/* Center: 3-section bar */}
+                <div className="flex-1 relative" style={{ height: "28px" }}>
+                  {/* Bar track */}
+                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-2.5 rounded-full overflow-hidden"
+                    style={{ background: "rgba(255,255,255,0.06)" }}>
+                    {/* Center divider */}
+                    <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px z-10"
+                      style={{ background: "rgba(255,255,255,0.2)" }}/>
+
+                    {/* E side (left half) */}
+                    <div className="absolute top-0 bottom-0 left-0 overflow-hidden"
+                      style={{ width: "50%" }}>
+                      <div className="absolute top-0 right-0 bottom-0 rounded-l-full overflow-hidden"
+                        style={{
+                          width: `${(dim.A / total) * 100}%`,
+                          background: "linear-gradient(90deg, var(--cyan), var(--purple))",
+                        }}/>
+                    </div>
+
+                    {/* I side (right half) */}
+                    <div className="absolute top-0 bottom-0 right-0 overflow-hidden"
+                      style={{ width: "50%" }}>
+                      <div className="absolute top-0 left-0 bottom-0 rounded-r-full overflow-hidden"
+                        style={{
+                          width: `${(dim.B / total) * 100}%`,
+                          background: "rgba(255,255,255,0.08)",
+                        }}/>
+                    </div>
+                  </div>
+
+                  {/* E / I letter badges — above the bar, right-aligned to their halves */}
+                  <div className="absolute inset-x-0 top-0 flex" style={{ height: "22px" }}>
+                    {/* E badge — above left half */}
+                    <div className="flex items-center justify-center"
+                      style={{ width: "50%", paddingRight: "2px" }}>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[11px] font-black"
+                          style={{ color: dim.A >= dim.B ? "var(--purple)" : "var(--text-dim)" }}>
+                          {dim.letterA}
+                        </span>
+                        <span className="text-[10px] font-medium leading-none"
+                          style={{ color: "var(--text-dim)" }}>
+                          {dim.nameA}
+                        </span>
+                      </div>
+                    </div>
+                    {/* I badge — above right half */}
+                    <div className="flex items-center justify-center"
+                      style={{ width: "50%", paddingLeft: "2px" }}>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[11px] font-black"
+                          style={{ color: dim.B > dim.A ? "var(--cyan)" : "var(--text-dim)" }}>
+                          {dim.letterB}
+                        </span>
+                        <span className="text-[10px] font-medium leading-none"
+                          style={{ color: "var(--text-dim)" }}>
+                          {dim.nameB}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Descriptions — below the bar, flanking the center line */}
+                  <div className="absolute inset-x-0 bottom-0 flex" style={{ height: "18px" }}>
+                    <div className="flex justify-end items-start pr-1" style={{ width: "50%" }}>
+                      <span className="text-[10px] leading-tight text-right"
+                        style={{ color: "var(--text-muted)" }}>{dim.descA}</span>
+                    </div>
+                    <div className="flex justify-start items-start pl-1" style={{ width: "50%" }}>
+                      <span className="text-[10px] leading-tight text-left"
+                        style={{ color: "var(--text-muted)" }}>{dim.descB}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             );

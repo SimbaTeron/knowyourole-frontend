@@ -1063,12 +1063,12 @@ export default function MoodMixerPage() {
     const label = getBlendLabel(mood1, mood2);
     localStorage.setItem("kyr_mood_blend", JSON.stringify({ mood1, mood2, label }));
     sessionStorage.setItem("knowrole-mood-blend", label);
-    window.location.href = "/quiz/questions";
+    window.location.href = "/quiz";
   };
 
   const handleSkip = () => {
     localStorage.removeItem("kyr_mood_blend");
-    window.location.href = "/quiz/questions";
+    window.location.href = "/quiz";
   };
 
   const handleReset = () => {
@@ -1094,6 +1094,8 @@ export default function MoodMixerPage() {
         color: "#fff",
         overflowX: "hidden",
         position: "relative",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <OrbBackground />
@@ -1356,6 +1358,38 @@ export default function MoodMixerPage() {
           <MoodTooltip mood={hoveredMood} onConfirm={confirmMood} onDismiss={dismissTooltip} />
         )}
       </AnimatePresence>
+
+      {/* Footer branding */}
+      <footer style={{
+        borderTop: "1px solid rgba(229,231,235,0.1)",
+        padding: "32px 24px 24px",
+        textAlign: "center",
+        marginTop: "auto",
+      }}>
+        <p style={{
+          fontFamily: "'Outfit', sans-serif",
+          fontWeight: 800,
+          fontSize: 16,
+          color: "#fff",
+          margin: "0 0 4px",
+          letterSpacing: "-0.01em",
+        }}>KnowYouRole</p>
+        <p style={{
+          fontFamily: "'Outfit', sans-serif",
+          fontSize: 12,
+          color: "rgba(255,255,255,0.45)",
+          margin: "0 0 8px",
+          maxWidth: 280,
+          marginInline: "auto",
+          lineHeight: 1.5,
+        }}>Personality science made accessible, fun, and genuinely useful.</p>
+        <p style={{
+          fontFamily: "'Outfit', sans-serif",
+          fontSize: 11,
+          color: "rgba(255,255,255,0.25)",
+          margin: 0,
+        }}>© 2026 KnowYouRole. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

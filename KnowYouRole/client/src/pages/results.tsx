@@ -1,8 +1,9 @@
 ﻿import { useState, useEffect, useRef } from "react";
+import type { TouchEvent } from "react";
 import { Link } from "wouter";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { AppHeader } from "@/components/layout/AppHeader";
-import { getFakeScores, getFakeMBTIType, isTestMode } from "@/utils/devTest";
+import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
 import { calculateResult } from "@/components/results/resultsData";
 import { useAuth0 } from "@auth0/auth0-react";
 import type { QuizScores } from "@/components/Quiz";
@@ -351,10 +352,11 @@ function PrivacyStrip() {
 }
 
 // ─── PAGE 1: Quick Glimpse ───────────────────────────────────────────────────
-function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLoginFree, onPremium, premiumError }: {
+function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScores, onLoginFree, onPremium, premiumError }: {
   type: string; bigFive: { O: number; C: number; E: number; A: number; N: number };
   disc: { D: number; I: number; S: number; C: number };
   mbtiType: string; primaryDisc: string;
+  rawScores?: QuizScores;
   onLoginFree: () => void;
   onPremium: () => void;
   premiumError?: string | null;
@@ -394,7 +396,7 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLogin
         <p style={{ fontSize: 13, color: C.textMuted }}>Free results · No login needed</p>
       </div>
 
-      {/* 💼 Career Card */}
+      {/* 💼 Career Card — job title only, no header */}
       <div style={{
         borderRadius: C.cardRadius, padding: 18, marginBottom: 12,
         background: `linear-gradient(135deg, rgba(245,158,11,0.07), rgba(168,85,247,0.04))`,
@@ -402,30 +404,11 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLogin
         position: "relative", overflow: "hidden",
       }}>
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${C.gold}, ${C.goldLight})`, borderRadius: `${C.cardRadius} ${C.cardRadius} 0 0`, margin: "-5px -5px 0", width: "calc(100% + 10px)" }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <div style={{
-            width: 38, height: 38, borderRadius: 11,
-            background: "rgba(245,158,11,0.1)", border: `1px solid rgba(245,158,11,0.25)`,
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-          }}>💼</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>#1 Career Match</div>
-            <div style={{ fontSize: 10, color: C.textDim, marginTop: 1 }}>{career.title}</div>
-          </div>
-          <div style={{
-            fontSize: 13, fontWeight: 800, color: C.goldLight,
-            background: "rgba(245,158,11,0.1)", padding: "4px 10px", borderRadius: 8,
-          }}>{career.salary}</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: C.text, lineHeight: 1.2 }}>
+          {career.title}
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-          {["🧠 Strategy", "💻 Tech", "📐 Architecture", "📈 18% growth"].map(t => (
-            <div key={t} style={{
-              fontSize: 9, fontWeight: 600, padding: "3px 8px",
-              background: "rgba(255,255,255,0.04)",
-              border: `1px solid ${C.glassBorder}`,
-              borderRadius: 100, color: C.textDim,
-            }}>{t}</div>
-          ))}
+        <div style={{ fontSize: 12, color: C.goldLight, marginTop: 4, fontWeight: 600 }}>
+          {career.salary}
         </div>
       </div>
 
@@ -443,18 +426,34 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, onLogin
           <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, color: C.purple }}>2.4%</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-          {[
-            { label: "Mind", val: 73 }, { label: "Energy", val: 78 },
-            { label: "Nature", val: 65 }, { label: "Tactics", val: 81 },
-          ].map(d => (
-            <div key={d.label} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${C.glassBorder}`, borderRadius: 10, padding: "8px 10px" }}>
-              <div style={{ fontSize: 8, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim, marginBottom: 2 }}>{d.label}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{d.val}%</div>
-              <div style={{ height: 3, background: "rgba(255,255,255,0.06)", borderRadius: 2, overflow: "hidden", marginTop: 5 }}>
-                <div style={{ width: `${d.val}%`, height: "100%", background: `linear-gradient(90deg, ${C.cyan}, ${C.purple})`, borderRadius: 2 }} />
+          {([
+            { label: "Mind",    A: mbtiType[0] === "E" ? rawScores?.mbti.E ?? 50 : rawScores?.mbti.I ?? 50, B: mbtiType[0] === "E" ? rawScores?.mbti.I ?? 50 : rawScores?.mbti.E ?? 50, leftLabel: "E", rightLabel: "I" },
+            { label: "Energy",  A: mbtiType[1] === "N" ? rawScores?.mbti.N ?? 50 : rawScores?.mbti.S ?? 50, B: mbtiType[1] === "N" ? rawScores?.mbti.S ?? 50 : rawScores?.mbti.N ?? 50, leftLabel: "N", rightLabel: "S" },
+            { label: "Nature",  A: mbtiType[2] === "T" ? rawScores?.mbti.T ?? 50 : rawScores?.mbti.F ?? 50, B: mbtiType[2] === "T" ? rawScores?.mbti.F ?? 50 : rawScores?.mbti.T ?? 50, leftLabel: "T", rightLabel: "F" },
+            { label: "Tactics", A: mbtiType[3] === "J" ? rawScores?.mbti.J ?? 50 : rawScores?.mbti.P ?? 50, B: mbtiType[3] === "J" ? rawScores?.mbti.P ?? 50 : rawScores?.mbti.J ?? 50, leftLabel: "J", rightLabel: "P" },
+          ] as { label: string; A: number; B: number; leftLabel: string; rightLabel: string }[]).map(d => {
+            const total = d.A + d.B || 1;
+            const leftPct = Math.round((d.A / total) * 100);
+            const rightPct = Math.round((d.B / total) * 100);
+            return (
+              <div key={d.label} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${C.glassBorder}`, borderRadius: 10, padding: "8px 10px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <div style={{ fontSize: 7, fontWeight: 700, color: C.cyan }}>{d.leftLabel}</div>
+                  <div style={{ fontSize: 8, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>{d.label}</div>
+                  <div style={{ fontSize: 7, fontWeight: 700, color: C.purpleDim }}>{d.rightLabel}</div>
+                </div>
+                <div style={{ height: 5, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden", position: "relative", marginBottom: 3 }}>
+                  <div style={{ position: "absolute", top: 0, bottom: 0, left: "50%", width: 1, background: "rgba(255,255,255,0.15)" }} />
+                  <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: `${leftPct}%`, background: `linear-gradient(90deg, ${C.cyan}88, ${C.cyan})`, borderRadius: "3px 0 0 3px" }} />
+                  <div style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: `${rightPct}%`, background: `linear-gradient(90deg, ${C.purple}, ${C.purple}88)`, borderRadius: "0 3px 3px 0" }} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 8, fontWeight: 600, color: C.cyan }}>{leftPct}%</div>
+                  <div style={{ fontSize: 8, fontWeight: 600, color: C.purpleDim }}>{rightPct}%</div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -612,7 +611,6 @@ function Page2FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc }: {
           marginBottom: 16, boxShadow: "0 0 20px rgba(34,211,238,0.1)",
         }}>📋 Full Portrait · Logged In</div>
         <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, fontWeight: 700, color: C.text, marginBottom: 4, letterSpacing: "-0.3px" }}>Your Complete Portrait</h1>
-        <p style={{ fontSize: 13, color: C.textMuted }}>Logged in as <span style={{ color: C.cyan, fontWeight: 600 }}>Sim Teron</span></p>
       </div>
 
       {/* Profile Stack */}
@@ -812,6 +810,45 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
 }) {
   const [activeCard, setActiveCard] = useState("deepdive");
   const stripRef = useRef<HTMLDivElement>(null);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchDeltaX, setTouchDeltaX] = useState(0);
+
+  const CARD_WIDTH = 80; // 72px card + 8px gap
+
+  const handleTouchStart = (e: TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchDeltaX(0);
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (touchStartX === null) return;
+    const delta = e.touches[0].clientX - touchStartX;
+    setTouchDeltaX(delta);
+    // Prevent native scroll when actively swiping
+    if (Math.abs(delta) > 5) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null) return;
+    // Snap: if swipe distance > 40px, advance/retreat one card
+    const moved = touchDeltaX;
+    const currentIndex = CONSTELLATION_ITEMS.findIndex(c => c.id === activeCard);
+    if (moved < -40 && currentIndex < CONSTELLATION_ITEMS.length - 1) {
+      setActiveCard(CONSTELLATION_ITEMS[currentIndex + 1].id);
+    } else if (moved > 40 && currentIndex > 0) {
+      setActiveCard(CONSTELLATION_ITEMS[currentIndex - 1].id);
+    }
+    // Scroll the newly active card into view
+    if (stripRef.current) {
+      const targetIndex = CONSTELLATION_ITEMS.findIndex(c => c.id === activeCard);
+      const scrollLeft = stripRef.current.scrollLeft + (moved < -40 ? CARD_WIDTH : moved > 40 ? -CARD_WIDTH : 0);
+      stripRef.current.scrollTo({ left: Math.max(0, scrollLeft), behavior: "smooth" });
+    }
+    setTouchStartX(null);
+    setTouchDeltaX(0);
+  };
   const base = type.split("-")[0];
   const arch = getArchetype(base);
   const primary = primaryDisc;
@@ -1104,9 +1141,21 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
       <div style={{ fontSize: 9, color: C.textDim, textAlign: "center", marginBottom: 4 }}>
         ← Swipe to explore ›
       </div>
-      <div style={{ overflowX: "auto", marginBottom: 10, scrollbarWidth: "none" as const }}
+      <div
         ref={stripRef}
-        onTouchStart={() => {}}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          overflowX: "auto",
+          marginBottom: 10,
+          scrollbarWidth: "none" as const,
+          transform: touchStartX !== null ? `translateX(${touchDeltaX}px)` : undefined,
+          transition: touchStartX !== null ? "none" : "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          cursor: touchStartX !== null ? "grabbing" : "grab",
+          userSelect: "none",
+          WebkitOverflowScrolling: "touch",
+        }}
       >
         <div style={{ display: "flex", gap: 8, padding: "8px 0 12px", minWidth: "max-content" }}>
           {CONSTELLATION_ITEMS.map(item => (
@@ -1358,7 +1407,7 @@ export default function ResultsPage() {
       <AuroraBg />
       <AppHeader />
 
-      {page === 1 && <Page1QuickGlimpse type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} onLoginFree={handleLoginFree} onPremium={handlePremium} premiumError={premiumError} />}
+      {page === 1 && <Page1QuickGlimpse type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} rawScores={rawScores} onLoginFree={handleLoginFree} onPremium={handlePremium} premiumError={premiumError} />}
       {page === 2 && <Page2FullPortrait type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} />}
       {page === 3 && <Page3PremiumNexus type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} isDemo={isDemo} />}
 

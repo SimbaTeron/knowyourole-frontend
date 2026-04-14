@@ -25,7 +25,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="dark" style={{ background: "#050510", minHeight: "100vh" }}>
+      <body className="dark" style={{ background: "linear-gradient(#050510 0%, #020024 50%, #000 100%)", minHeight: "100vh" }}>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
+import { isTestMode, getConsistentFakeScores, getFakeScores } from "@/utils/devTest";
 
 const TIER_OPTIONS = [
   { id: "25+", label: "Adults 25+" },
@@ -52,40 +52,24 @@ export default function DevToolPanel() {
   };
 
   const handleRandomize = () => {
-    const randomTier = TIER_OPTIONS[Math.floor(Math.random() * TIER_OPTIONS.length)].id;
     const randomMBTI = MBTI_TYPES[Math.floor(Math.random() * MBTI_TYPES.length)];
-    // Random 2-letter DISC: pick 2 distinct letters from D,I,S,C
-    const allDisc = ["D", "I", "S", "C"];
-    const disc1 = allDisc[Math.floor(Math.random() * 4)];
-    let disc2 = allDisc[Math.floor(Math.random() * 4)];
-    while (disc2 === disc1) disc2 = allDisc[Math.floor(Math.random() * 4)];
-    const randomDiscCombo = disc1 + disc2;
-    // Random Big Five — spread across range, vary enough to not all be same
-    const randomBigFive = {
-      O: Math.floor(Math.random() * 50) + 40,   // 40-89
-      C: Math.floor(Math.random() * 50) + 40,
-      E: Math.floor(Math.random() * 50) + 40,
-      A: Math.floor(Math.random() * 50) + 40,
-      N: Math.floor(Math.random() * 50) + 40,
-    };
 
-    setSelectedTier(randomTier);
+    setSelectedTier("25+");
     setSelectedMBTI(randomMBTI);
 
-    const fakeScores = getFakeScores(randomTier, randomMBTI);
-    // Override DISC with random 2-letter combo
-    fakeScores.disc = { D: randomDiscCombo[0] === "D" ? 3 : 1, I: randomDiscCombo[1] === "I" ? 3 : 1, S: randomDiscCombo.includes("S") ? 2 : 1, C: randomDiscCombo[1] === "C" ? 3 : 1 };
-    fakeScores.bigFive = randomBigFive;
+    // MBTI is the single source of truth — DISC and Big Five are derived from it
+    // using personality research correlations. No impossible combos.
+    const fakeScores = getConsistentFakeScores(randomMBTI);
 
-    sessionStorage.setItem("kyr_tier", randomTier);
+    sessionStorage.setItem("kyr_tier", "25+");
     sessionStorage.setItem("kyr_fake_scores", JSON.stringify(fakeScores));
     sessionStorage.setItem("kyr_fake_mbti", randomMBTI);
     sessionStorage.setItem("kyr_fake_type", randomMBTI + "-A");
-    sessionStorage.setItem("knowrole-tier", randomTier);
+    sessionStorage.setItem("knowrole-tier", "25+");
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(fakeScores));
     sessionStorage.setItem("knowrole-randomized", "true");
 
-    // Navigate to results page with fresh random data — always go to page 1
+    // Navigate to results page — always land on page 1
     window.location.assign("/results?test=true&page=1&_r=" + Date.now());
   };
 
@@ -244,7 +228,7 @@ export default function DevToolPanel() {
               🎲 RANDOMIZE ALL DATA
             </button>
             <div style={{ color: "#555", fontSize: 8, marginTop: 4, textAlign: "center" }}>
-              Picks random tier + MBTI + DISC + Big Five, then reloads page
+              Picks a random MBTI type; DISC & Big Five are derived consistently
             </div>
           </div>
 

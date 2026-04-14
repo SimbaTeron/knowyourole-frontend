@@ -93,6 +93,7 @@
   --opaque-button-border-intensity: 9;
   --elevate-1: rgba(167,139,250, .06);
   --elevate-2: rgba(167,139,250, .12);
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
   --background: 240 21% 4%;
   --foreground: 210 40% 98%;
   --border: 240 15% 15%;
