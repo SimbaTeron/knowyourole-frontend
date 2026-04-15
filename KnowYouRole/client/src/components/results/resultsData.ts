@@ -195,13 +195,14 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
   const primaryDisc = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
 
   const b5 = scores.bigFive;
-  const normalize = (val: number) => Math.round(Math.max(5, Math.min(95, 50 + val * 12)));
+  // Big Five raw values are already 0-100. Convert directly to percentile rank (1–99).
+  // Adding 1 avoids 0th-percentile edge cases and keeps the "nth%" label meaningful.
   const bigFiveProfile = {
-    O: normalize(b5.O),
-    C: normalize(b5.C),
-    E: normalize(b5.E),
-    A: normalize(b5.A),
-    N: normalize(b5.N),
+    O: Math.max(1, Math.min(99, Math.round(b5.O))),
+    C: Math.max(1, Math.min(99, Math.round(b5.C))),
+    E: Math.max(1, Math.min(99, Math.round(b5.E))),
+    A: Math.max(1, Math.min(99, Math.round(b5.A))),
+    N: Math.max(1, Math.min(99, Math.round(b5.N))),
   };
 
   const traits = rolesData.traitDescriptions;

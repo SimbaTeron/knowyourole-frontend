@@ -145,17 +145,17 @@ export function getConsistentFakeScores(mbti: string) {
     N: EorI === "I" ? 62 : 40,  // Introversion → slightly more neurotic
   };
 
-  // DISC — derived from MBTI letter pairs using MBTI-DISC correlation research.
-  // Each MBTI letter independently contributes to one DISC dimension:
-  //   J/P → D (judgers are dominant/decisive, perceivers are adaptable)
-  //   T/F → C (thinkers are data-driven/conscientious, feelers prioritize people)
-  //   E/I → I/S (extraverts draw people in, introverts are self-directed)
-  //   S/N → S (sensors are steady, intuitives are versatile)
-  // Scores are on the 1–4 DISC scale. No jitter — deterministic by type.
-  const D = Math.min(4, Math.max(1, (JorP === "J" ? 3 : 1) + (TorF === "T" ? 1 : 0)));
-  const I = Math.min(4, Math.max(1, (EorI === "E" ? 3 : 1) + (SorN === "N" ? 1 : 0)));
-  const S = Math.min(4, Math.max(1, SorN === "S" ? 3 : 1));
-  const C = Math.min(4, Math.max(1, (TorF === "T" ? 3 : 1) + (JorP === "J" ? 1 : 0)));
+  // DISC — each MBTI dichotomy maps to one DISC dimension on a 1–4 scale.
+  // J/P → D  (judging → decisive, controlled)
+  // T/F → C  (thinking → analytical, detail-oriented)
+  // E/I → I  (extraversion → influential, enthusiastic)
+  // S/N → S  (sensing → steady, reliable)
+  // Single-letter contribution avoids stacking (T+J both going to D/C was
+  // causing INTJ to hit 100/100 on both D and C simultaneously).
+  const D = JorP === "J" ? 3 : 1;
+  const C = TorF === "T" ? 3 : 1;
+  const I = EorI === "E" ? 3 : 1;
+  const S = SorN === "S" ? 3 : 1;
 
   return {
     mbti: mbtiScores,
