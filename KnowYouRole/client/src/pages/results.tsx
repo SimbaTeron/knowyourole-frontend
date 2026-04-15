@@ -4,7 +4,7 @@ import { Link, useLocation, useSearchParams } from "wouter";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
-import { calculateResult } from "@/components/results/resultsData";
+import { calculateResult, findBestRoleMatch } from "@/components/results/resultsData";
 import { useAuth0 } from "@auth0/auth0-react";
 import type { QuizScores } from "@/components/Quiz";
 import { AuthModal } from "@/components/AuthModal";
@@ -43,6 +43,116 @@ const ARCHETYPES: Record<string, string> = {
 function getArchetype(mbti: string) {
   return ARCHETYPES[mbti] || "The Architect";
 }
+
+// Population prevalence rates per MBTI type (% of population)
+const POPULATION_RATES: Record<string, string> = {
+  INTJ: "2.4%", INTP: "2.5%", ENTJ: "1.8%", ENTP: "3.2%",
+  INFJ: "1.5%", INFP: "4.4%", ENFJ: "2.5%", ENFP: "8.1%",
+  ISTJ: "11.6%", ISFJ: "13.8%", ESTJ: "8.7%", ESFJ: "12.3%",
+  ISTP: "5.2%", ISFP: "8.8%", ESTP: "4.3%", ESFP: "8.5%",
+};
+
+// Short descriptor per MBTI type
+const MBTI_TAGLINES: Record<string, string> = {
+  INTJ: "Strategic Planner", INTP: "Logical Analyzer", ENTJ: "Executive Leader", ENTP: "Debate Master",
+  INFJ: "Empathic Counselor", INFP: "Idealistic Mediator", ENFJ: "Inspirational Leader", ENFP: "Creative Catalyst",
+  ISTJ: "Reliable Duty-Fulfiller", ISFJ: "Devoted Protector", ESTJ: "Administrator", ESFJ: "Caring Diplomat",
+  ISTP: "Pragmatic Problem-Solver", ISFP: "Flexible Artist", ESTP: "Energetic Improviser", ESFP: "Spontaneous Entertainer",
+};
+
+// City suggestions by MBTI+primary DISC (placeholder — replace with real DB query)
+const CITY_MAP: Record<string, { city: string; openings: string; avgSalary: string }[]> = {
+  INTJ: [{ city: "San Francisco, CA", openings: "5,120", avgSalary: "$162K" }, { city: "Austin, TX", openings: "2,840", avgSalary: "$138K" }],
+  INTP: [{ city: "Boston, MA", openings: "3,200", avgSalary: "$145K" }, { city: "Seattle, WA", openings: "3,900", avgSalary: "$148K" }],
+  ENTJ: [{ city: "New York, NY", openings: "7,100", avgSalary: "$155K" }, { city: "San Francisco, CA", openings: "5,120", avgSalary: "$162K" }],
+  ENTP: [{ city: "Austin, TX", openings: "3,500", avgSalary: "$140K" }, { city: "Denver, CO", openings: "2,600", avgSalary: "$135K" }],
+  INFJ: [{ city: "Portland, OR", openings: "1,800", avgSalary: "$115K" }, { city: "Austin, TX", openings: "2,200", avgSalary: "$120K" }],
+  INFP: [{ city: "Denver, CO", openings: "2,100", avgSalary: "$118K" }, { city: "Portland, OR", openings: "1,900", avgSalary: "$112K" }],
+  ENFJ: [{ city: "Chicago, IL", openings: "4,300", avgSalary: "$125K" }, { city: "Miami, FL", openings: "2,800", avgSalary: "$118K" }],
+  ENFP: [{ city: "Los Angeles, CA", openings: "4,100", avgSalary: "$122K" }, { city: "Austin, TX", openings: "3,200", avgSalary: "$120K" }],
+  ISTJ: [{ city: "Dallas, TX", openings: "4,500", avgSalary: "$115K" }, { city: "Chicago, IL", openings: "5,100", avgSalary: "$118K" }],
+  ISFJ: [{ city: "Minneapolis, MN", openings: "3,100", avgSalary: "$108K" }, { city: "Phoenix, AZ", openings: "2,900", avgSalary: "$105K" }],
+  ESTJ: [{ city: "Houston, TX", openings: "5,200", avgSalary: "$120K" }, { city: "Dallas, TX", openings: "4,800", avgSalary: "$118K" }],
+  ESFJ: [{ city: "Atlanta, GA", openings: "3,800", avgSalary: "$110K" }, { city: "Chicago, IL", openings: "4,200", avgSalary: "$115K" }],
+  ISTP: [{ city: "Detroit, MI", openings: "2,700", avgSalary: "$108K" }, { city: "Seattle, WA", openings: "3,400", avgSalary: "$118K" }],
+  ISFP: [{ city: "Nashville, TN", openings: "1,900", avgSalary: "$98K" }, { city: "Portland, OR", openings: "2,100", avgSalary: "$102K" }],
+  ESTP: [{ city: "Las Vegas, NV", openings: "2,400", avgSalary: "$105K" }, { city: "Miami, FL", openings: "3,100", avgSalary: "$110K" }],
+  ESFP: [{ city: "Los Angeles, CA", openings: "4,300", avgSalary: "$108K" }, { city: "Orlando, FL", openings: "2,600", avgSalary: "$100K" }],
+};
+
+function getTopCities(mbtiType: string, count = 4): { rank: string; icon: string; name: string; jobs: string; salary: string }[] {
+  const cities = CITY_MAP[mbtiType] || [{ city: "Austin, TX", openings: "3,000", avgSalary: "$125K" }];
+  const icons: Record<string, string> = { "San Francisco, CA": "🌉", "Austin, TX": "🌵", "Seattle, WA": "🎸", "Denver, CO": "🏔️", "Boston, MA": "🏛️", "New York, NY": "🗽", "Portland, OR": "🌲", "Chicago, IL": "🌃", "Los Angeles, CA": "🌴", "Dallas, TX": "🤠", "Houston, TX": "🛢️", "Atlanta, GA": "🍑", "Miami, FL": "🌴", "Minneapolis, MN": "❄️", "Phoenix, AZ": "🌞", "Las Vegas, NV": "🎰", "Nashville, TN": "🎸", "Detroit, MI": "🚗", "Orlando, FL": "🎢" };
+  const allCities = [
+    { city: "Austin, TX", icon: "🌵", openings: "2,840", avgSalary: "$138K" },
+    { city: "San Francisco, CA", icon: "🌉", openings: "5,120", avgSalary: "$162K" },
+    { city: "Seattle, WA", icon: "🎸", openings: "3,900", avgSalary: "$148K" },
+    { city: "Denver, CO", icon: "🏔️", openings: "2,210", avgSalary: "$131K" },
+  ];
+  const base = cities.map(c => ({ icon: icons[c.city] || "🌍", name: c.city, jobs: `${c.openings} openings`, salary: c.avgSalary + " avg" }));
+  const result = base.slice(0, count);
+  // Pad with fallback cities
+  const fallback = allCities.filter(a => !base.find(b => b.name === a.city)).slice(0, count - result.length);
+  return [...result, ...fallback].slice(0, count).map((c, i) => ({ rank: `#${i + 1}`, ...c, jobs: c.jobs || "2,500 openings", salary: c.salary || "$125K avg" }));
+}
+
+// P3 premium content — MBTI-specific side hustles, learning styles, crossroads
+const SIDE_HUSTLES: Record<string, { title: string; income: string; desc: string; tags: string[] }> = {
+  INTJ: { title: "AI Strategy Consultant", income: "+$4.2K/mo", desc: "Build AI-powered productivity tools for strategic thinkers and fellow analysts.", tags: ["⏱ 8–10 hrs/wk", "📈 $3K–$6K/mo", "🎯 High fit"] },
+  INTP: { title: "Research Platform", income: "+$3.8K/mo", desc: "Create tools that help researchers and analysts organize complex information.", tags: ["⏱ 6–9 hrs/wk", "📈 $2K–$5K/mo", "🎯 High fit"] },
+  ENTJ: { title: "Executive Training", income: "+$5.1K/mo", desc: "Train ambitious professionals on leadership and decision-making frameworks.", tags: ["⏱ 5–8 hrs/wk", "📈 $4K–$7K/mo", "🎯 High fit"] },
+  ENTP: { title: "Startup Ideation Coach", income: "+$3.5K/mo", desc: "Help entrepreneurs stress-test business ideas and find product-market fit fast.", tags: ["⏱ 4–7 hrs/wk", "📈 $2K–$5K/mo", "🎯 High fit"] },
+  INFJ: { title: "Life Coaching Practice", income: "+$3.2K/mo", desc: "Offer deep, empathetic coaching for people navigating life transitions.", tags: ["⏱ 5–8 hrs/wk", "📈 $2K–$4K/mo", "🎯 High fit"] },
+  INFP: { title: "Creative Writing", income: "+$2.8K/mo", desc: "Write compelling content, stories, or copy that moves people emotionally.", tags: ["⏱ 4–6 hrs/wk", "📈 $1K–$4K/mo", "🎯 High fit"] },
+  ENFJ: { title: "Team Culture Consultant", income: "+$4.0K/mo", desc: "Help companies build authentic culture, mission, and team alignment.", tags: ["⏱ 6–9 hrs/wk", "📈 $3K–$5K/mo", "🎯 High fit"] },
+  ENFP: { title: "Creative Campaigns", income: "+$3.0K/mo", desc: "Design viral marketing campaigns and brand stories for startups.", tags: ["⏱ 5–8 hrs/wk", "📈 $2K–$4K/mo", "🎯 High fit"] },
+  ISTJ: { title: "Compliance Automation", income: "+$3.6K/mo", desc: "Automate tedious compliance workflows for small businesses and startups.", tags: ["⏱ 6–8 hrs/wk", "📈 $2K–$5K/mo", "🎯 High fit"] },
+  ISFJ: { title: "Client Care Systems", income: "+$2.5K/mo", desc: "Build loyal client management systems for service businesses.", tags: ["⏱ 5–7 hrs/wk", "📈 $1K–$4K/mo", "🎯 High fit"] },
+  ESTJ: { title: "Operations Consulting", income: "+$4.5K/mo", desc: "Streamline operations and processes for growing companies.", tags: ["⏱ 8–10 hrs/wk", "📈 $3K–$6K/mo", "🎯 High fit"] },
+  ESFJ: { title: "Community Building", income: "+$2.8K/mo", desc: "Build and monetize engaged communities around brands and causes.", tags: ["⏱ 5–8 hrs/wk", "📈 $1K–$4K/mo", "🎯 High fit"] },
+  ISTP: { title: "Technical Freelancing", income: "+$3.4K/mo", desc: "Offer debugging, prototyping, and technical problem-solving services.", tags: ["⏱ 6–9 hrs/wk", "📈 $2K–$5K/mo", "🎯 High fit"] },
+  ISFP: { title: "Portfolio Design", income: "+$2.6K/mo", desc: "Create stunning visual portfolios for creatives and professionals.", tags: ["⏱ 4–7 hrs/wk", "📈 $1K–$4K/mo", "🎯 High fit"] },
+  ESTP: { title: "Negotiation Coaching", income: "+$4.0K/mo", desc: "Coach professionals on high-stakes negotiation and deal-making tactics.", tags: ["⏱ 5–8 hrs/wk", "📈 $2K–$6K/mo", "🎯 High fit"] },
+  ESFP: { title: "Event Experiences", income: "+$3.0K/mo", desc: "Design and promote immersive events and experiences that people remember.", tags: ["⏱ 6–10 hrs/wk", "📈 $2K–$4K/mo", "🎯 High fit"] },
+};
+
+const LEARNING_STYLES: Record<string, { title: string; desc: string; tips: string[] }> = {
+  INTJ: { title: "Systems-Based Learning", desc: "You absorb information fastest when connected to a larger system. Abstract frameworks trump raw memorization.", tips: ["📐 Study system architectures, not features", "🎯 Learn through building real projects", "📖 Read case studies of failures + successes"] },
+  INTP: { title: "Concept-First Learning", desc: "You need the underlying theory before anything else. Details stick once the logic clicks.", tips: ["🔬 Start with first principles", "📝 Write explanations for concepts", "🤝 Test understanding through debate"] },
+  ENTJ: { title: "Results-Driven Learning", desc: "You learn fastest when it has direct business impact. Theory without application loses you quickly.", tips: ["🎯 Learn with a clear objective in mind", "📊 Apply to real problems immediately", "👥 Teach others to cement knowledge"] },
+  ENTP: { title: "Exploratory Learning", desc: "You thrive on mental sparring and exploring opposing ideas. Structured courses bore you fast.", tips: ["⚡ Follow intellectual rabbit holes", "💡 Learn through brainstorming with others", "🎮 Gamify your learning challenges"] },
+  INFJ: { title: "Meaning-Centered Learning", desc: "You internalize deeply when content connects to your values and sense of purpose.", tips: ["🧠 Connect ideas to personal meaning", "📖 Study transformative human stories", "🎯 Apply to help others"] },
+  INFP: { title: "Values-Driven Learning", desc: "Learning feels meaningless unless it aligns with your inner values and identity.", tips: ["💜 Explore topics through creative expression", "🌊 Learn in reflective, low-pressure settings", "📚 Find authors who share your worldview"] },
+  ENFJ: { title: "People-Centered Learning", desc: "You learn best by teaching and mentoring others. Community accelerates your growth.", tips: ["👥 Learn by explaining to others", "📣 Study through dialogue and feedback", "🌱 Apply knowledge to uplift people"] },
+  ENFP: { title: "Multipath Learning", desc: "You flit between topics, absorbing a little about everything until something sparks.", tips: ["⚡ Start many things, go deep where excited", "🎨 Learn through creative projects", "🤝 Explore with enthusiastic peers"] },
+  ISTJ: { title: "Practical-Routine Learning", desc: "You prefer structured, proven methods. Real-world application cements everything.", tips: ["📋 Follow structured study routines", "✅ Apply through real tasks and responsibilities", "📖 Learn from documented best practices"] },
+  ISFJ: { title: "Supportive Learning", desc: "You learn best when supporting others or fulfilling a responsibility you care about.", tips: ["🛡 Learn by helping a specific person", "📋 Build on what you already know works", "🏠 Apply in familiar, stable settings"] },
+  ESTJ: { title: "Action-Oriented Learning", desc: "You want the clearest path from A to B. Fuzzy courses frustrate you.", tips: ["📌 Get a clear roadmap and milestones", "⚡ Take action even when not fully ready", "📊 Measure results of your learning"] },
+  ESFJ: { title: "Harmony-Based Learning", desc: "You absorb best when the environment is warm and collaborative, not competitive.", tips: ["🤝 Learn with supportive friends or groups", "💛 Connect learning to relationships", "🏠 Apply to help your community"] },
+  ISTP: { title: "Hands-On Learning", desc: "You need to physically touch and manipulate systems. Reading about something is never enough.", tips: ["🔧 Learn by taking things apart", "⚡ Build and experiment immediately", "🎯 Solve concrete, specific problems"] },
+  ISFP: { title: "Experiential Learning", desc: "Beauty and aesthetic experience shape how deeply you absorb information.", tips: ["🎨 Learn through artistic and sensory projects", "🌅 Learn in beautiful, inspiring environments", "💖 Explore topics that feel personally meaningful"] },
+  ESTP: { title: "Real-World Learning", desc: "You bore of theory fast. If it doesn't have an immediate, tangible application, you check out.", tips: ["⚡ Learn by doing and experiencing", "🎮 Compete to stay engaged", "🌍 Seek high-energy, fast-paced learning environments"] },
+  ESFP: { title: "Immersive Learning", desc: "You absorb through living and experiencing, not sitting and reading. Adventures ARE education.", tips: ["🎭 Learn through role-play and simulation", "🌟 Surround yourself with energetic people", "📸 Document learning as a creative story"] },
+};
+
+const CROSSROADS: Record<string, { heading: string; desc: string; tags: string[] }> = {
+  INTJ: { heading: "The Vision vs. Execution Crossroads", desc: "INTJs who channel their strategic vision into building something real — even imperfectly — develop a rare form of wisdom that transforms every plan into an unfair advantage.", tags: ["Intuition", "Strategy", "Leadership", "Growth"] },
+  INTP: { heading: "The Logic vs. Connection Crossroads", desc: "INTPs who learn to connect their brilliant ideas to real human needs discover a rare ability to change the world without losing their soul.", tags: ["Analysis", "Empathy", "Clarity", "Impact"] },
+  ENTJ: { heading: "The Command vs. Empathy Crossroads", desc: "ENTJs who develop emotional intelligence alongside their natural command become unstoppable leaders who inspire loyalty, not just compliance.", tags: ["Power", "Empathy", "Vision", "Legacy"] },
+  ENTP: { heading: "The Debate vs. Commitment Crossroads", desc: "ENTPs who pick a path and commit — even when another shiny option beckons — discover a depth that turns their versatility into true mastery.", tags: ["Ideas", "Focus", "Depth", "Mastery"] },
+  INFJ: { heading: "The Vision vs. Visibility Crossroads", desc: "INFJs who share their quiet vision with the world — without waiting for perfect — find their deepest purpose amplified beyond what they imagined alone.", tags: ["Purpose", "Visibility", "Impact", "Authenticity"] },
+  INFP: { heading: "The Idealism vs. Action Crossroads", desc: "INFPs who bridge their beautiful inner world with decisive outer action create change that is both meaningful and lasting.", tags: ["Values", "Action", "Courage", "Purpose"] },
+  ENFJ: { heading: "The Inspire vs. Protect Crossroads", desc: "ENFJs who learn to set boundaries without losing their warmth become the kind of leaders who sustain their vision for decades.", tags: ["Vision", "Boundaries", "Endurance", "Leadership"] },
+  ENFP: { heading: "The Possibility vs. Priority Crossroads", desc: "ENFPs who develop the discipline to finish what they start — while keeping their spark — turn their many gifts into one remarkable legacy.", tags: ["Creativity", "Discipline", "Depth", "Finish"] },
+  ISTJ: { heading: "The Duty vs. Growth Crossroads", desc: "ISTJs who add personal growth to their duty — without abandoning their reliability — become the rare kind of steady force that changes everything.", tags: ["Reliability", "Growth", "Adaptation", "Legacy"] },
+  ISFJ: { heading: "The Protect vs. Empower Crossroads", desc: "ISFJs who empower others to stand on their own — while still being there — become a force for lasting, multiplicative impact.", tags: ["Care", "Empowerment", "Boundaries", "Impact"] },
+  ESTJ: { heading: "The Order vs. Innovation Crossroads", desc: "ESTJs who bring their structure to new, uncharted territory prove that strong foundations and bold innovation are not opposites.", tags: ["Structure", "Innovation", "Courage", "Legacy"] },
+  ESFJ: { heading: "The Harmony vs. Truth Crossroads", desc: "ESFJs who speak difficult truths while maintaining their natural warmth become trusted guides who lead people through any storm.", tags: ["Harmony", "Truth", "Courage", "Trust"] },
+  ISTP: { heading: "The Analysis vs. Action Crossroads", desc: "ISTPs who translate their deep analysis into decisive action discover that the gap between understanding and building is where real impact lives.", tags: ["Analysis", "Action", "Craft", "Impact"] },
+  ISFP: { heading: "The Beauty vs. Mission Crossroads", desc: "ISFPs who pair their natural aesthetic sense with a clear personal mission create work that is both beautiful and deeply meaningful.", tags: ["Beauty", "Purpose", "Authenticity", "Expression"] },
+  ESTP: { heading: "The Risk vs. Relationship Crossroads", desc: "ESTPs who temper their risk-taking with deep relationship investment build legacies that are both bold and profoundly human.", tags: ["Risk", "Relationships", "Impact", "Legacy"] },
+  ESFP: { heading: "The Experience vs. Depth Crossroads", desc: "ESFPs who add depth to their breadth of experience — finishing what they start — become remarkable guides to living fully.", tags: ["Energy", "Depth", "Finish", "Presence"] },
+};
 
 const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#f59e0b", S: "#22c55e", C: "#3b82f6" };
 const DISC_LABELS: Record<string, string> = { D: "Dominance", I: "Influence", S: "Steadiness", C: "Conscientiousness" };
@@ -426,10 +536,10 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧠</div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{type.split("-")[0]} — {arch}</div>
-              <div style={{ fontSize: 10, color: C.textDim }}>16 Personalities · Strategist</div>
+              <div style={{ fontSize: 10, color: C.textDim }}>16 Personalities · {MBTI_TAGLINES[mbtiType] || "Strategist"}</div>
             </div>
           </div>
-          <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, color: C.purple }}>2.4%</div>
+          <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, color: C.purple }}>{POPULATION_RATES[mbtiType] || "2.4%"}</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           {([
@@ -490,8 +600,8 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
           <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(34,211,238,0.1)", border: `1px solid rgba(34,211,238,0.3)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧬</div>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>Big Five · Openness Dominant</div>
-            <div style={{ fontSize: 10, color: C.textDim }}>87th percentile · US adults</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>Big Five · {(() => { const entries = Object.entries(bigFive) as [string, number][]; const top = entries.reduce((a, b) => a[1] > b[1] ? a : b); return `${top[0] === "O" ? "Openness" : top[0] === "C" ? "Conscientiousness" : top[0] === "E" ? "Extroversion" : top[0] === "A" ? "Agreeableness" : "Neuroticism"} Dominant`; })()}</div>
+            <div style={{ fontSize: 10, color: C.textDim }}>{(() => { const entries = Object.entries(bigFive) as [string, number][]; const top = entries.reduce((a, b) => a[1] > b[1] ? a : b); return `${top[1]}th percentile`; })()} · US adults</div>
           </div>
         </div>
         {bigFiveRows.map(r => (
@@ -628,7 +738,7 @@ function Page2FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc }: {
           <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, color: C.textDim, marginBottom: 8, display: "block" }}>Your Type</div>
           <div style={{ fontSize: 40, fontWeight: 800, background: `linear-gradient(135deg, ${C.cyan}, #67e8f9, ${C.purple})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1, marginBottom: 4, letterSpacing: "-1px" }}>{type}</div>
           <div style={{ fontSize: 15, fontWeight: 600, color: C.cyan, marginBottom: 2 }}>{arch}</div>
-          <div style={{ fontSize: 10, color: C.textDim }}>Only <strong style={{ color: C.textMuted }}>2.4%</strong> of the population shares this type</div>
+          <div style={{ fontSize: 10, color: C.textDim }}>Only <strong style={{ color: C.textMuted }}>{POPULATION_RATES[mbtiType] || "2.4%"}</strong> of the population shares this type</div>
         </div>
         {/* Mini cards row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -652,23 +762,31 @@ function Page2FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc }: {
             </div>
           ))}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          {[
-            { icon: "💼", value: "$142K", label: "Avg Salary", sub: "Systems Architect" },
-            { icon: "🌍", value: "Austin", label: "#1 City Match", sub: "2,840 openings" },
-          ].map((c, i) => (
-            <div key={i} style={{
-              borderRadius: 16, padding: "14px 16px",
-              background: c.icon === "💼" ? "rgba(245,158,11,0.06)" : "rgba(34,211,238,0.06)",
-              border: c.icon === "💼" ? `1px solid rgba(245,158,11,0.15)` : `1px solid rgba(34,211,238,0.15)`,
-            }}>
-              <div style={{ fontSize: 18, marginBottom: 8 }}>{c.icon}</div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 2, lineHeight: 1 }}>{c.value}</div>
-              <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>{c.label}</div>
-              <div style={{ fontSize: 9, color: C.textDim, marginTop: 3 }}>{c.sub}</div>
+        {(() => {
+          const cities = getTopCities(mbtiType, 2);
+          const topCity = cities[0] || { name: "Austin, TX", jobs: "2,500 openings" };
+          const career = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTJ;
+          const cards = [
+            { icon: "💼", value: career.salary, label: "Avg Salary", sub: career.title },
+            { icon: "🌍", value: topCity.name.split(",")[0], label: "#1 City Match", sub: topCity.jobs },
+          ];
+          return (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {cards.map((c, i) => (
+                <div key={i} style={{
+                  borderRadius: 16, padding: "14px 16px",
+                  background: c.icon === "💼" ? "rgba(245,158,11,0.06)" : "rgba(34,211,238,0.06)",
+                  border: c.icon === "💼" ? `1px solid rgba(245,158,11,0.15)` : `1px solid rgba(34,211,238,0.15)`,
+                }}>
+                  <div style={{ fontSize: 18, marginBottom: 8 }}>{c.icon}</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 2, lineHeight: 1 }}>{c.value}</div>
+                  <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>{c.label}</div>
+                  <div style={{ fontSize: 9, color: C.textDim, marginTop: 3 }}>{c.sub}</div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()}
       </div>
 
       {/* Career Radar */}
@@ -741,12 +859,7 @@ function Page2FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc }: {
           <div style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: C.glassBg, border: `1px solid ${C.glassBorder}`, color: C.textDim }}>🇺🇸 US</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          {[
-            { rank: "#1", icon: "🌵", name: "Austin, TX", jobs: "2,840 openings", salary: "$138K avg" },
-            { rank: "#2", icon: "🌉", name: "San Francisco", jobs: "5,120 openings", salary: "$162K avg" },
-            { rank: "#3", icon: "🎸", name: "Seattle, WA", jobs: "3,900 openings", salary: "$148K avg" },
-            { rank: "#4", icon: "🏔️", name: "Denver, CO", jobs: "2,210 openings", salary: "$131K avg" },
-          ].map(c => (
+          {getTopCities(mbtiType, 4).map(c => (
             <div key={c.rank} style={{
               background: "rgba(255,255,255,0.03)", border: `1px solid ${C.glassBorder}`,
               borderRadius: 14, padding: 12, textAlign: "center",
@@ -916,11 +1029,13 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
               </div>
             </div>
           </div>
-          {[
-            { rank: "#1", title: "Systems Architect", salary: "$120K–$180K", pct: 96, primary: true },
-            { rank: "#2", title: "Data Scientist", salary: "$100K–$160K", pct: 88, primary: false },
-            { rank: "#3", title: "Strategy Consultant", salary: "$90K–$150K", pct: 82, primary: false },
-          ].map(r => (
+          {(() => {
+            const match = findBestRoleMatch(mbtiType, primaryDisc, bigFive);
+            return [
+              { rank: "#1", title: match.primary.title, salary: match.primary.salary, pct: 96, primary: true },
+              { rank: "#2", title: match.secondary.title, salary: match.secondary.salary, pct: 80, primary: false },
+            ];
+          })().map(r => (
             <div key={r.rank} style={{
               background: r.primary ? `rgba(34,211,238,0.05)` : "rgba(255,255,255,0.03)",
               border: r.primary ? `1px solid rgba(34,211,238,0.2)` : `1px solid ${C.glassBorder}`,
@@ -983,13 +1098,13 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
         <div style={{ padding: 18 }}>
           <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid rgba(245,158,11,0.15)`, borderRadius: 16, padding: 16, marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>AI Side Hustle</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#4ade80", background: "rgba(74,222,128,0.1)", padding: "2px 8px", borderRadius: 8 }}>+$3.2K/mo</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{SIDE_HUSTLES[mbtiType]?.title || "AI Side Hustle"}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#4ade80", background: "rgba(74,222,128,0.1)", padding: "2px 8px", borderRadius: 8 }}>{SIDE_HUSTLES[mbtiType]?.income || "+$3K/mo"}</div>
             </div>
-            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, marginBottom: 12 }}>Build and sell AI-powered productivity tools for fellow INTJs and strategic thinkers.</div>
+            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, marginBottom: 12 }}>{SIDE_HUSTLES[mbtiType]?.desc || "Build and sell AI-powered productivity tools for strategic thinkers."}</div>
             <div style={{ display: "flex", gap: 14 }}>
-              {[{ label: "⏱ 6–8 hrs/wk" }, { label: "📈 $2K–$5K/mo" }, { label: "🎯 High fit" }].map(m => (
-                <div key={m.label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: C.textDim }}>{m.label}</div>
+              {(SIDE_HUSTLES[mbtiType]?.tags || ["⏱ 6–8 hrs/wk", "📈 $2K–$5K/mo", "🎯 High fit"]).map(m => (
+                <div key={m} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: C.textDim }}>{m}</div>
               ))}
             </div>
           </div>
@@ -1001,9 +1116,9 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
         <GradientTopBar colors={`linear-gradient(90deg, #14b8a6, ${C.cyan})`} />
         <div style={{ padding: 18 }}>
           <div style={{ background: "rgba(20,184,166,0.06)", border: `1px solid rgba(20,184,166,0.15)`, borderRadius: 16, padding: 14, marginBottom: 10 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 3 }}>🎓 Systems-Based Learning</div>
-            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, marginBottom: 12 }}>You absorb information fastest when it's connected to a larger system. Abstract frameworks trump raw memorization.</div>
-            {["📐 Study system architectures, not features", "🎯 Learn through building real projects", "📖 Read case studies of failures + successes"].map(tip => (
+            <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 3 }}>🎓 {LEARNING_STYLES[mbtiType]?.title || "Systems-Based Learning"}</div>
+            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, marginBottom: 12 }}>{LEARNING_STYLES[mbtiType]?.desc || "You absorb information fastest when connected to a larger system."}</div>
+            {(LEARNING_STYLES[mbtiType]?.tips || ["📐 Study systematically", "🎯 Apply what you learn", "📖 Read case studies"]).map(tip => (
               <div key={tip} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 10, marginBottom: 5, fontSize: 11, color: C.textMuted }}>
                 <span style={{ fontSize: 14 }}>{tip.split(" ")[0]}</span>{tip.substring(2)}
               </div>
@@ -1018,8 +1133,8 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
         <div style={{ padding: 18, textAlign: "center" }}>
           <div style={{ background: "rgba(99,102,241,0.08)", border: `1px solid rgba(99,102,241,0.15)`, borderRadius: 16, padding: 16, marginBottom: 10 }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>🧩</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>Systems Thinking Challenge</div>
-            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, marginBottom: 12 }}>Your brain is wired for complexity. Train it daily with strategic puzzles and system-design challenges.</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>{mbtiType} Thinking Challenge</div>
+            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, marginBottom: 12 }}>Your cognitive style shapes how you approach complexity. Train your specific strengths daily with tailored puzzles and pattern-recognition challenges.</div>
             <button style={{
               display: "inline-flex", alignItems: "center", gap: 6,
               padding: "8px 18px",
@@ -1042,10 +1157,10 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
             border: `1px solid rgba(168,85,247,0.15)`,
             borderRadius: 16, padding: 18,
           }}>
-            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 700, color: C.text, marginBottom: 4 }}>Crossroads Adventure</div>
-            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, marginBottom: 14 }}>Two paths diverge. INTJs who embrace ambiguity early develop a rare form of wisdom that transforms every pivot into an unfair advantage.</div>
+            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 700, color: C.text, marginBottom: 4 }}>{CROSSROADS[mbtiType]?.heading || "Crossroads Adventure"}</div>
+            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, marginBottom: 14 }}>{CROSSROADS[mbtiType]?.desc || "Every major decision shapes who you become. Your type shows you the paths worth taking."}</div>
             <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
-              {["Intuition", "Strategy", "Leadership", "Growth"].map(t => (
+              {(CROSSROADS[mbtiType]?.tags || ["Intuition", "Strategy", "Leadership", "Growth"]).map(t => (
                 <div key={t} style={{ fontSize: 9, fontWeight: 600, padding: "3px 8px", background: "rgba(255,255,255,0.05)", border: `1px solid ${C.glassBorder}`, borderRadius: 100, color: C.textMuted }}>{t}</div>
               ))}
             </div>
@@ -1327,7 +1442,12 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
 
 // ─── Main Results Page ───────────────────────────────────────────────────────
 export default function ResultsPage() {
-  const [page, setPage] = useState<1 | 2 | 3>(1);
+  const [page, setPage] = useState<1 | 2 | 3>(() => {
+    if (typeof window === 'undefined') return 1;
+    const params = new URLSearchParams(window.location.search);
+    const p = params.get('page');
+    return (p === '2' ? 2 : p === '3' ? 3 : 1) as 1 | 2 | 3;
+  });
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isAuthenticated, isLoading } = useAuth0();
   const realResults = useRealResults();

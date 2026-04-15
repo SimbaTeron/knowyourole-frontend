@@ -79,7 +79,8 @@ export default function DevToolPanel() {
     sessionStorage.setItem("knowrole-randomized", "true");
 
     // Navigate to results page — always land on page 1
-    setLocation("/results?test=true&page=1");
+    // Use cache-busting _=timestamp to force re-render when navigating to same URL
+    setLocation(`/results?test=true&page=1&_=${Date.now()}`);
   };
 
   const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
