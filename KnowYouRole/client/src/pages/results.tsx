@@ -92,8 +92,11 @@ function getTopCities(mbtiType: string, count = 4): { rank: string; icon: string
   const base = cities.map(c => ({ icon: icons[c.city] || "🌍", name: c.city, jobs: `${c.openings} openings`, salary: c.avgSalary + " avg" }));
   const result = base.slice(0, count);
   // Pad with fallback cities
-  const fallback = allCities.filter(a => !base.find(b => b.name === a.city)).slice(0, count - result.length);
-  return [...result, ...fallback].slice(0, count).map((c, i) => ({ rank: `#${i + 1}`, ...c, jobs: c.jobs || "2,500 openings", salary: c.salary || "$125K avg" }));
+  const fallback = allCities
+    .filter(a => !base.find(b => b.name === a.city))
+    .slice(0, count - result.length)
+    .map(c => ({ icon: c.icon, name: c.city, jobs: `${c.openings} openings`, salary: c.avgSalary + " avg" }));
+  return [...result, ...fallback].slice(0, count).map((c, i) => ({ rank: `#${i + 1}`, ...c }));
 }
 
 // P3 premium content — MBTI-specific side hustles, learning styles, crossroads
