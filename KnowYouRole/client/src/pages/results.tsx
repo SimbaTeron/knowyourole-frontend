@@ -546,34 +546,38 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
               <div style={{ fontSize: 10, color: C.textDim }}>16 Personalities · {MBTI_TAGLINES[mbtiType] || "Strategist"}</div>
             </div>
           </div>
-          <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, color: C.purple }}>{POPULATION_RATES[mbtiType] || "2.4%"}</div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1 }}>
+            <div style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "rgba(168,85,247,0.1)", border: `1px solid rgba(168,85,247,0.3)`, color: C.purple }}>{POPULATION_RATES[mbtiType] || "2.4%"}</div>
+            <div style={{ fontSize: 7, color: C.textDim }}>Population</div>
+          </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
           {([
-            { label: "Mind",    A: mbtiType[0] === "E" ? rawScores?.mbti.E ?? 50 : rawScores?.mbti.I ?? 50, B: mbtiType[0] === "E" ? rawScores?.mbti.I ?? 50 : rawScores?.mbti.E ?? 50, leftLabel: "E", rightLabel: "I" },
-            { label: "Energy",  A: mbtiType[1] === "N" ? rawScores?.mbti.N ?? 50 : rawScores?.mbti.S ?? 50, B: mbtiType[1] === "N" ? rawScores?.mbti.S ?? 50 : rawScores?.mbti.N ?? 50, leftLabel: "N", rightLabel: "S" },
-            { label: "Nature",  A: mbtiType[2] === "T" ? rawScores?.mbti.T ?? 50 : rawScores?.mbti.F ?? 50, B: mbtiType[2] === "T" ? rawScores?.mbti.F ?? 50 : rawScores?.mbti.T ?? 50, leftLabel: "T", rightLabel: "F" },
-            { label: "Tactics", A: mbtiType[3] === "J" ? rawScores?.mbti.J ?? 50 : rawScores?.mbti.P ?? 50, B: mbtiType[3] === "J" ? rawScores?.mbti.P ?? 50 : rawScores?.mbti.J ?? 50, leftLabel: "J", rightLabel: "P" },
-          ] as { label: string; A: number; B: number; leftLabel: string; rightLabel: string }[]).map(d => {
+            { label: "Mind",    A: mbtiType[0] === "E" ? rawScores?.mbti.E ?? 50 : rawScores?.mbti.I ?? 50, B: mbtiType[0] === "E" ? rawScores?.mbti.I ?? 50 : rawScores?.mbti.E ?? 50, leftLabel: "E", rightLabel: "I", desc: mbtiType[0] === "E" ? "You thrive in external, social environments and draw energy from interaction." : "You recharge through solitude and deep internal reflection." },
+            { label: "Energy",  A: mbtiType[1] === "N" ? rawScores?.mbti.N ?? 50 : rawScores?.mbti.S ?? 50, B: mbtiType[1] === "N" ? rawScores?.mbti.S ?? 50 : rawScores?.mbti.N ?? 50, leftLabel: "N", rightLabel: "S", desc: mbtiType[1] === "N" ? "You trust patterns, possibilities, and imagination over concrete details." : "You trust what you can see, touch, and verify — real-world facts ground you." },
+            { label: "Nature",  A: mbtiType[2] === "T" ? rawScores?.mbti.T ?? 50 : rawScores?.mbti.F ?? 50, B: mbtiType[2] === "T" ? rawScores?.mbti.F ?? 50 : rawScores?.mbti.T ?? 50, leftLabel: "T", rightLabel: "F", desc: mbtiType[2] === "T" ? "You weigh logic and consistency above sentiment and others' feelings." : "You weigh people and harmony alongside logic when making decisions." },
+            { label: "Tactics", A: mbtiType[3] === "J" ? rawScores?.mbti.J ?? 50 : rawScores?.mbti.P ?? 50, B: mbtiType[3] === "J" ? rawScores?.mbti.P ?? 50 : rawScores?.mbti.J ?? 50, leftLabel: "J", rightLabel: "P", desc: mbtiType[3] === "J" ? "You prefer clarity, structure, and closure — plans before possibilities." : "You prefer flexibility and keeping options open over rigid planning." },
+          ] as { label: string; A: number; B: number; leftLabel: string; rightLabel: string; desc: string }[]).map(d => {
             const total = d.A + d.B || 1;
             const leftPct = Math.round((d.A / total) * 100);
             const rightPct = Math.round((d.B / total) * 100);
             return (
-              <div key={d.label} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${C.glassBorder}`, borderRadius: 10, padding: "8px 10px" }}>
+              <div key={d.label} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${C.glassBorder}`, borderRadius: 10, padding: "7px 10px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                   <div style={{ fontSize: 7, fontWeight: 700, color: C.cyan }}>{d.leftLabel}</div>
                   <div style={{ fontSize: 8, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>{d.label}</div>
                   <div style={{ fontSize: 7, fontWeight: 700, color: C.purpleDim }}>{d.rightLabel}</div>
                 </div>
-                <div style={{ height: 5, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden", position: "relative", marginBottom: 3 }}>
+                <div style={{ height: 5, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden", position: "relative", marginBottom: 4 }}>
                   <div style={{ position: "absolute", top: 0, bottom: 0, left: "50%", width: 1, background: "rgba(255,255,255,0.15)" }} />
                   <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: `${leftPct}%`, background: `linear-gradient(90deg, ${C.cyan}88, ${C.cyan})`, borderRadius: "3px 0 0 3px" }} />
                   <div style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: `${rightPct}%`, background: `linear-gradient(90deg, ${C.purple}, ${C.purple}88)`, borderRadius: "0 3px 3px 0" }} />
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
                   <div style={{ fontSize: 8, fontWeight: 600, color: C.cyan }}>{leftPct}%</div>
                   <div style={{ fontSize: 8, fontWeight: 600, color: C.purpleDim }}>{rightPct}%</div>
                 </div>
+                <div style={{ fontSize: 8, lineHeight: 1.4, color: C.textDim }}>{d.desc}</div>
               </div>
             );
           })}
