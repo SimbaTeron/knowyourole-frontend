@@ -599,7 +599,7 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
       <div style={{ borderRadius: C.cardRadius, padding: 18, marginBottom: 12, background: C.glassBg, backdropFilter: "blur(20px)", border: `1px solid ${C.glassBorder}`, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: discColor, margin: "-5px -5px 0", width: "calc(100% + 10px)", borderRadius: `${C.cardRadius} ${C.cardRadius} 0 0` }} />
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 11, background: `${discColor}18`, border: `1px solid ${discColor}4d`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📊</div>
+          <div style={{ width: 38, height: 38, borderRadius: 11, background: `${discColor}18`, border: `1px solid ${discColor}4d`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{primary === "D" ? "🦅" : primary === "I" ? "🦜" : primary === "S" ? "🕊️" : "🦉"}</div>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{primary} — {DISC_LABELS[primary]}</div>
             <div style={{ fontSize: 10, color: C.textDim }}>DISC Profile · Primary Style</div>
