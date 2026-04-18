@@ -233,7 +233,7 @@ function useRealResults() {
         S: Math.round((fakeScores.disc.S / 4) * 100),
         C: Math.round((fakeScores.disc.C / 4) * 100),
       };
-      return { type, tier: testTier, bigFive, disc, mbtiType: result.mbtiType, primaryDisc, rawScores: fakeScores as unknown as QuizScores, isDemo: inDemoMode };
+      return { type, tier: testTier, bigFive, disc, mbtiType: result.mbtiType, primaryDisc, rawScores: fakeScores as unknown as QuizScores, isDemo: inDemoMode, discDesc: result.discDesc, secondaryDisc: result.secondaryDisc, secondaryDiscLabel: result.secondaryDiscLabel, secondaryDiscColor: result.secondaryDiscColor };
     }
     // Not test or demo mode — redirect to quiz
     if (typeof window !== "undefined") {
@@ -257,7 +257,7 @@ function useRealResults() {
   const urlParams = new URLSearchParams(window.location.search);
   const isDemo = urlParams.get("demo") === "true";
 
-  return { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores: scores, isDemo };
+  return { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores: scores, isDemo, discDesc: result.discDesc, secondaryDisc: result.secondaryDisc, secondaryDiscLabel: result.secondaryDiscLabel, secondaryDiscColor: result.secondaryDiscColor };
 }
 
 // ─── MBTI → #1 Career Match mapping (mirrors backend scoring) ────────────────
@@ -471,7 +471,7 @@ function PrivacyStrip() {
 }
 
 // ─── PAGE 1: Quick Glimpse ───────────────────────────────────────────────────
-function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScores, onLoginFree, onPremium, premiumError }: {
+function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScores, onLoginFree, onPremium, premiumError, discDesc, secondaryDisc, secondaryDiscLabel, secondaryDiscColor }: {
   type: string; bigFive: { O: number; C: number; E: number; A: number; N: number };
   disc: { D: number; I: number; S: number; C: number };
   mbtiType: string; primaryDisc: string;
@@ -479,6 +479,10 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
   onLoginFree: () => void;
   onPremium: () => void;
   premiumError?: string | null;
+  discDesc?: string;
+  secondaryDisc?: string;
+  secondaryDiscLabel?: string;
+  secondaryDiscColor?: string;
 }) {
   const base = type.split("-")[0];
   const arch = getArchetype(base);
@@ -578,7 +582,7 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
 
       {/* 📊 DISC Card */}
       <div style={{ borderRadius: C.cardRadius, padding: 18, marginBottom: 12, background: C.glassBg, backdropFilter: "blur(20px)", border: `1px solid ${C.glassBorder}`, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,#ef4444,#f59e0b,#22c55e,#3b82f6)`, margin: "-5px -5px 0", width: "calc(100% + 10px)", borderRadius: `${C.cardRadius} ${C.cardRadius} 0 0` }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: discColor, margin: "-5px -5px 0", width: "calc(100% + 10px)", borderRadius: `${C.cardRadius} ${C.cardRadius} 0 0` }} />
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
           <div style={{ width: 38, height: 38, borderRadius: 11, background: `${discColor}18`, border: `1px solid ${discColor}4d`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📊</div>
           <div>
@@ -586,15 +590,14 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             <div style={{ fontSize: 10, color: C.textDim }}>DISC Profile · Primary Style</div>
           </div>
         </div>
-        {(["D", "I", "S", "C"] as const).map(l => (
-          <div key={l} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, width: 14, textAlign: "center", color: DISC_COLORS[l] }}>{l}</div>
-            <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
-              <div style={{ width: `${disc[l]}%`, height: "100%", background: DISC_COLORS[l], borderRadius: 3 }} />
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, width: 28, textAlign: "right" }}>{disc[l]}%</div>
+        {discDesc && <p style={{ fontSize: 12, lineHeight: 1.6, color: C.textDim, marginBottom: 14 }}>{discDesc}</p>}
+        {secondaryDisc && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ fontSize: 14, fontWeight: 800, width: 18, textAlign: "center", color: secondaryDiscColor || discColor }}>{secondaryDisc}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: C.textDim }}>{secondaryDiscLabel}</div>
+            <div style={{ marginLeft: "auto", fontSize: 10, color: C.textDim }}>Secondary</div>
           </div>
-        ))}
+        )}
       </div>
 
       {/* 🧬 Big Five Card */}
@@ -1490,7 +1493,7 @@ export default function ResultsPage() {
     );
   }
 
-  const { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores, isDemo } = realResults;
+  const { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores, isDemo, discDesc, secondaryDisc, secondaryDiscLabel, secondaryDiscColor } = realResults;
 
   // ─── Auth Guard for Page 2 ───────────────────────────────────────────────────
   // When ?page=2 is in the URL, check auth before rendering. If not authenticated,
@@ -1554,7 +1557,7 @@ export default function ResultsPage() {
       <AuroraBg />
       <AppHeader />
 
-      {page === 1 && <Page1QuickGlimpse type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} rawScores={rawScores} onLoginFree={handleLoginFree} onPremium={handlePremium} premiumError={premiumError} />}
+      {page === 1 && <Page1QuickGlimpse type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} rawScores={rawScores} onLoginFree={handleLoginFree} onPremium={handlePremium} premiumError={premiumError} discDesc={discDesc} secondaryDisc={secondaryDisc} secondaryDiscLabel={secondaryDiscLabel} secondaryDiscColor={secondaryDiscColor} />}
       {page === 2 && <Page2FullPortrait type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} />}
       {page === 3 && <Page3PremiumNexus type={type} bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} isDemo={isDemo} />}
 
