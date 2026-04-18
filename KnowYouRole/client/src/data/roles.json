@@ -859,11 +859,36 @@
       "C": { "label": "Conscientiousness", "color": "dusty-blue", "desc": "You value accuracy and doing things the right way. You are detail-oriented, care about high-quality work, and focus on precision with analytical thoroughness. In conversation you slow down for precision — you ask what-the-data-says and why questions before accepting a conclusion, prefer written communication that lets you think before you respond, and would rather catch an error now than ship a mistake later." }
     },
     "bigFive": {
-      "O": { "label": "Openness", "desc": "Curiosity and creativity", "low": "Practical & consistent", "high": "Imaginative & curious" },
-      "C": { "label": "Conscientiousness", "desc": "Organization and reliability", "low": "Flexible & spontaneous", "high": "Organized & disciplined" },
-      "E": { "label": "Extraversion", "desc": "Social energy and assertiveness", "low": "Reserved & reflective", "high": "Outgoing & energetic" },
-      "A": { "label": "Agreeableness", "desc": "Cooperation and empathy", "low": "Competitive & direct", "high": "Cooperative & trusting" },
-      "N": { "label": "Neuroticism", "desc": "Emotional sensitivity", "low": "Calm & resilient", "high": "Sensitive & aware" }
+      "O": {
+        "label": "Openness",
+        "high": "You are driven by deep curiosity and find routine genuinely stifling. Your mind naturally seeks novelty, abstraction, and unconventional perspectives — you see possibilities where others see barriers. You thrive when exploring new ideas and experiences, and you process the world through imagination and possibility rather than convention.",
+        "medium": "You have a natural appreciation for novelty and creative thinking without feeling restless toward routine. You're open to new ideas and perspectives when they're presented clearly, and you balance imagination with a practical sense of what actually works.",
+        "low": "You are grounded in the concrete and the proven. You trust what has worked before, find abstract theorizing less compelling than practical results, and feel most at home with clear answers and stable structures. You value consistency and reliability over novelty for its own sake."
+      },
+      "C": {
+        "label": "Conscientiousness",
+        "high": "You are organized, disciplined, and deeply driven by a sense of duty. You naturally plan ahead, meet obligations without delay, and feel genuinely uncomfortable when commitments go unfulfilled. Others rely on you because you follow through — your word is your bond.",
+        "medium": "You balance structure with flexibility. You meet your obligations and appreciate organization, but you don't need rigid systems to function well. You can adapt your approach when circumstances change without losing sight of your goals.",
+        "low": "You prefer keeping your options open over locking into strict plans. You trust your ability to adapt in the moment rather than preparing extensively in advance. Schedules and to-do lists feel confining — you value freedom and spontaneity and perform best without rigid structure."
+      },
+      "E": {
+        "label": "Extraversion",
+        "high": "You draw energy from being around other people and find solitude draining rather than restorative. You think out loud, assert your ideas readily, and feel most alive in dynamic, fast-paced environments. Your natural inclination is toward action, discussion, and social engagement.",
+        "medium": "You move comfortably between social engagement and quiet time — neither strongly drawn to large gatherings nor averse to them. You can lead a meeting or enjoy a night in with equal ease, and you adapt your energy to fit the situation.",
+        "low": "You recharge through time alone and find large social gatherings draining even when you perform well in them. You prefer depth over breadth in conversations and tend toward thoughtful, measured communication. You process the world internally before engaging externally."
+      },
+      "A": {
+        "label": "Agreeableness",
+        "high": "You naturally prioritize harmony, trust, and generosity in your relationships. You go out of your way to accommodate others, avoid conflict instinctively, and find genuine satisfaction in cooperation and helping people. Others feel genuinely cared for in your presence.",
+        "medium": "You balance warmth with the ability to hold your ground when necessary. You prefer cooperation but can compete, collaborate, and disagree directly depending on what the situation demands. You read people accurately and adjust your approach accordingly.",
+        "low": "You prioritize directness and results over sentiment and group harmony. You are comfortable with confrontation, willing to push back without malice, and tend to lead with logic and outcomes rather than people's feelings. You are direct in a way that others may find blunt but always honest."
+      },
+      "N": {
+        "label": "Neuroticism",
+        "high": "You experience emotions with unusual depth and intensity. Stress and worry tend to stay with you longer than you'd like, and you often find yourself replaying negative events or anticipating worst-case scenarios. This emotional reactivity brings genuine sensitivity — you pick up on subtleties others miss — but it can also spiral into anxiety and rumination.",
+        "medium": "You experience emotions as they come without being overwhelmed by them. Stress affects you but doesn't immobilize you, and you generally bounce back from setbacks within a reasonable time. You feel things deeply enough to be empathetic while staying balanced enough to think clearly.",
+        "low": "You are remarkably steady under pressure and recover from setbacks quickly — negative events slide off you more easily than they do for most people. You tend toward calm rationality even in chaotic situations, which makes you a stabilizing presence for others around you."
+      }
     }
   }
 }

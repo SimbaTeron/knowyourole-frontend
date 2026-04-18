@@ -8,6 +8,7 @@ import { calculateResult, findBestRoleMatch } from "@/components/results/results
 import { useAuth0 } from "@auth0/auth0-react";
 import type { QuizScores } from "@/components/Quiz";
 import { AuthModal } from "@/components/AuthModal";
+import rolesData from "@/data/roles.json";
 
 // ─── Design Tokens (from mockups) ───────────────────────────────────────────
 const C = {
@@ -625,11 +626,21 @@ function Page1QuickGlimpse({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             <div style={{ fontSize: 10, color: C.textDim }}>{(() => { const entries = Object.entries(bigFive) as [string, number][]; const top = entries.reduce((a, b) => a[1] > b[1] ? a : b); return `${top[1]}th percentile`; })()} · US adults</div>
           </div>
         </div>
+        {(() => {
+          const entries = Object.entries(bigFive) as [string, number][];
+          const top = entries.reduce((a, b) => a[1] > b[1] ? a : b);
+          const topKey = top[0] as "O" | "C" | "E" | "A" | "N";
+          const topPct = top[1];
+          const tier = topPct >= 70 ? "high" : topPct <= 40 ? "low" : "medium";
+          const bfData = (rolesData as unknown as { traitDescriptions: { bigFive: Record<string, { label: string; high: string; medium: string; low: string }> } }).traitDescriptions.bigFive;
+          const desc = bfData[topKey]?.[tier];
+          return desc ? <p style={{ fontSize: 12, lineHeight: 1.6, color: C.textDim, marginBottom: 14 }}>{desc}</p> : null;
+        })()}
         {bigFiveRows.map(r => (
-          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: r.color, width: 100, flexShrink: 0 }}>{r.label}</div>
-            <div style={{ flex: 1, height: 8, background: "rgba(255,255,255,0.06)", borderRadius: 4, overflow: "hidden" }}>
-              <div style={{ width: `${r.value}%`, height: "100%", background: `linear-gradient(90deg, ${r.color}, ${r.color}88)`, borderRadius: 4 }} />
+            <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+              <div style={{ width: `${r.value}%`, height: "100%", background: `linear-gradient(90deg, ${r.color}, ${r.color}88)`, borderRadius: 3 }} />
             </div>
             <div style={{ fontSize: 11, fontWeight: 800, width: 34, textAlign: "right", color: r.color }}>
               <span style={{ fontSize: 9, fontWeight: 400, color: C.textDim }}>{r.sub}</span>
