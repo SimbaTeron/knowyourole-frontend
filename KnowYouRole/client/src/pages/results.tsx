@@ -1250,7 +1250,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
             <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, color: C.textDim, marginBottom: 8 }}>Your Type</div>
             <div style={{ fontSize: 36, fontWeight: 800, background: `linear-gradient(135deg, ${C.cyan}, #67e8f9, ${C.purple})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1, marginBottom: 4, letterSpacing: "-1px" }}>{type}</div>
             <div style={{ fontSize: 14, fontWeight: 600, color: C.cyan, marginBottom: 2 }}>{arch}</div>
-            <div style={{ fontSize: 10, color: C.textDim }}>Only <strong style={{ color: C.textMuted }}>2.4%</strong> of the population shares this type</div>
+            <div style={{ fontSize: 10, color: C.textDim }}>Only <strong style={{ color: C.textMuted }}>{POPULATION_RATES[mbtiType] || "2.4%"}</strong> of the population shares this type</div>
           </div>
         </GlassCard>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>

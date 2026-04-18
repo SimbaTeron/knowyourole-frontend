@@ -71,15 +71,20 @@ export default function DevToolPanel() {
     const fakeScores = getFakeScores("25+", randomMBTI);
 
     sessionStorage.setItem("kyr_tier", "25+");
-    sessionStorage.setItem("kyr_fake_scores", JSON.stringify(fakeScores));
     sessionStorage.setItem("kyr_fake_mbti", randomMBTI);
     sessionStorage.setItem("kyr_fake_type", randomMBTI + "-A");
     sessionStorage.setItem("knowrole-tier", "25+");
     sessionStorage.setItem("knowrole-fake-scores", JSON.stringify(fakeScores));
     sessionStorage.setItem("knowrole-randomized", "true");
 
+    // Clear kyr_fake_scores so getStoredScores() returns null on the results page.
+    // This is critical: it forces useRealResults() to take the fresh generation
+    // path (line: fakeScores = getFakeScores(...)) instead of reading stale data.
+    sessionStorage.removeItem("kyr_fake_scores");
+
     // Navigate to results page — always land on page 1
-    // Use cache-busting _=timestamp to force re-render when navigating to same URL
+    // Cache-busting _=timestamp forces wouter's useSearchParams() to update,
+    // which triggers useRealResults() re-run on the already-mounted results page.
     setLocation(`/results?test=true&page=1&_=${Date.now()}`);
   };
 

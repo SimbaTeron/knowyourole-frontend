@@ -4,6 +4,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TRAIT_LABELS, calculatePercentile } from "./resultsData";
 import type { ResultsState } from "./ResultsTypes";
 
+const POPULATION_RATES: Record<string, string> = {
+  INTJ: "2.4%", INTP: "2.5%", ENTJ: "1.8%", ENTP: "3.2%",
+  INFJ: "1.5%", INFP: "4.4%", ENFJ: "2.5%", ENFP: "8.1%",
+  ISTJ: "11.6%", ISFJ: "13.8%", ESTJ: "8.7%", ESFJ: "12.3%",
+  ISTP: "5.2%", ISFP: "8.8%", ESTP: "4.3%", ESFP: "8.5%",
+};
+
 export function ResultsPage2({ s }: { s: ResultsState }) {
   const {
     result, scores, shouldReduceMotion, isFull,
@@ -147,7 +154,7 @@ export function ResultsPage2({ s }: { s: ResultsState }) {
             {result.mbtiLabel}
           </div>
           <div className="text-xs" style={{ color: "var(--text-dim)" }}>
-            Only <strong style={{ color: "var(--text-muted)" }}>2.4%</strong> of the population shares this type
+            Only <strong style={{ color: "var(--text-muted)" }}>{POPULATION_RATES[result.mbtiType] || "2.4%"}</strong> of the population shares this type
           </div>
         </div>
 
