@@ -104,6 +104,9 @@ export interface PersonalityResult {
   discLabel: string;
   discColor: string;
   discDesc: string;
+  secondaryDisc: string;
+  secondaryDiscLabel: string;
+  secondaryDiscColor: string;
   bigFiveProfile: {
     O: number;
     C: number;
@@ -192,7 +195,9 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
 
   const disc = scores.disc;
   const discEntries = Object.entries(disc) as [string, number][];
-  const primaryDisc = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
+  const sortedDisc = discEntries.sort((a, b) => b[1] - a[1]);
+  const primaryDisc = sortedDisc[0][0];
+  const secondaryDisc = sortedDisc[1][0];
 
   const b5 = scores.bigFive;
   // Big Five raw values are already 0-100. Convert directly to percentile rank (1–99).
@@ -208,6 +213,7 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
   const traits = rolesData.traitDescriptions;
   const mbtiInfo = traits.mbti[mbtiType as keyof typeof traits.mbti] || traits.mbti.INTP;
   const discInfo = traits.disc[primaryDisc as keyof typeof traits.disc] || traits.disc.D;
+  const secondaryDiscInfo = traits.disc[secondaryDisc as keyof typeof traits.disc] || traits.disc.I;
 
   const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFiveProfile);
 
@@ -224,6 +230,9 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
     discLabel: discInfo.label,
     discColor: discInfo.color,
     discDesc: discInfo.desc,
+    secondaryDisc,
+    secondaryDiscLabel: secondaryDiscInfo.label,
+    secondaryDiscColor: secondaryDiscInfo.color,
     bigFiveProfile,
     bigFiveLabels,
     primaryRole: roleMatch.primary,

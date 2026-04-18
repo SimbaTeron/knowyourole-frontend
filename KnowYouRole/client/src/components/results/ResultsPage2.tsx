@@ -160,13 +160,13 @@ export function ResultsPage2({ s }: { s: ResultsState }) {
 
         {/* 2×2 mini grid */}
         <div className="grid grid-cols-2 gap-3">
-          {/* DISC */}
+          {/* DISC — primary style */}
           <div className="glass rounded-[16px] p-4">
             <div className="text-base mb-1">📊</div>
-            <div className="text-lg font-extrabold text-white">{scores.disc.D}%</div>
-            <div className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-dim)" }}>DISC · Dominant</div>
+            <div className="text-lg font-extrabold text-white">{result.discStyle}</div>
+            <div className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-dim)" }}>DISC · {result.discLabel}</div>
             <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
-              <div className="h-full rounded-full" style={{ width: `${scores.disc.D}%`, background: "#ef4444" }}/>
+              <div className="h-full rounded-full" style={{ width: `${discScoreMap[result.discStyle]}%`, background: discColorMap[result.discStyle] }}/>
             </div>
           </div>
           {/* Openness */}
@@ -415,43 +415,49 @@ export function ResultsPage2({ s }: { s: ResultsState }) {
         transition={{ delay: 0.7 }}
         className="glass rounded-[20px] p-5"
       >
+        {/* Top accent bar — uses primary DISC color */}
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, height: "2px",
-          background: "linear-gradient(90deg, #ef4444, #f59e0b, #22c55e, #3b82f6)",
+          background: discColorMap[result.discStyle] || "#ef4444",
         }}/>
-        <div className="flex items-center gap-3 mb-4">
+
+        {/* Primary DISC — letter, label, 3-sentence description */}
+        <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
-            style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)" }}>
-            <BarChart2 className="w-5 h-5" style={{ color: "#ef4444" }} />
+            style={{
+              background: `${discColorMap[result.discStyle]}18`,
+              border: `1px solid ${discColorMap[result.discStyle]}50`,
+            }}>
+            <BarChart2 className="w-5 h-5" style={{ color: discColorMap[result.discStyle] }} />
           </div>
           <div>
             <div className="text-base font-bold text-white">Your DISC Profile</div>
-            <div className="text-xs" style={{ color: "var(--text-dim)" }}>All 4 behavioral styles ranked</div>
+            <div className="text-xs" style={{ color: "var(--text-dim)" }}>DISC · Primary Style</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          {discEntries.map(([letter, score]) => {
-            const color = discColorMap[letter];
-            const discDesc: Record<string, string> = {
-              D: "Bold, decisive, direct.",
-              I: "Sociable, enthusiastic.",
-              S: "Patient, reliable.",
-              C: "Analytical, systematic.",
-            };
-            return (
-              <div key={letter} className="rounded-[14px] p-3 text-center"
-                style={{ background: `${color}08`, border: `1px solid ${color}30` }}>
-                <div className="text-xl font-extrabold mb-0.5" style={{ color }}>{letter}</div>
-                <div className="text-xs font-bold text-white mb-0.5">{discLabels[letter]}</div>
-                <div className="text-lg font-extrabold text-white mb-1">{score}%</div>
-                <div className="text-xs mb-2" style={{ color: "var(--text-dim)", lineHeight: 1.4 }}>{discDesc[letter]}</div>
-                <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                  <div className="h-full rounded-full" style={{ width: `${score}%`, background: color }}/>
-                </div>
-              </div>
-            );
-          })}
+        {/* Primary DISC letter + label */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="text-2xl font-extrabold" style={{ color: discColorMap[result.discStyle] }}>
+            {result.discStyle}
+          </div>
+          <div className="text-lg font-semibold text-white">{result.discLabel}</div>
+        </div>
+
+        {/* 3-sentence description of primary DISC */}
+        <p className="text-sm mb-5 leading-relaxed" style={{ color: "var(--text-dim)" }}>
+          {result.discDesc}
+        </p>
+
+        {/* Secondary DISC — letter + label, muted pill */}
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl"
+          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="text-base font-extrabold"
+            style={{ color: discColorMap[result.secondaryDisc] || "#f59e0b" }}>
+            {result.secondaryDisc}
+          </div>
+          <div className="text-sm font-semibold text-white">{result.secondaryDiscLabel}</div>
+          <div className="ml-auto text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-dim)" }}>Secondary</div>
         </div>
       </motion.div>
 
