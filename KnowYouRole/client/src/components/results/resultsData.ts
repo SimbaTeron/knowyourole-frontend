@@ -200,14 +200,22 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
   const secondaryDisc = sortedDisc[1][0];
 
   const b5 = scores.bigFive;
-  // Big Five raw values are already 0-100. Convert directly to percentile rank (1–99).
-  // Adding 1 avoids 0th-percentile edge cases and keeps the "nth%" label meaningful.
+  // Big Five: real quiz raw scores (~0-25) vs pre-normalized dev scores (30-90).
+  // Real quiz: ~14 Big5 questions × 0.7-1.0 weight each → max ~25 raw score.
+  // Dev fake scores: set as percentiles directly in getFakeScores (min ~30 for ENFP N).
+  // Detection: raw > 25 → dev score already normalized (pass through).
+  //             raw ≤ 25 → real quiz score → normalize to 1-99 range.
+  const BIG5_RAW_MAX = 14;
+  const normalizeB5 = (raw: number): number => {
+    if (raw > 25) return Math.max(1, Math.min(99, Math.round(raw))); // dev: already normalized
+    return Math.max(1, Math.min(99, Math.round((raw / BIG5_RAW_MAX) * 99))); // real: normalize
+  };
   const bigFiveProfile = {
-    O: Math.max(1, Math.min(99, Math.round(b5.O))),
-    C: Math.max(1, Math.min(99, Math.round(b5.C))),
-    E: Math.max(1, Math.min(99, Math.round(b5.E))),
-    A: Math.max(1, Math.min(99, Math.round(b5.A))),
-    N: Math.max(1, Math.min(99, Math.round(b5.N))),
+    O: normalizeB5(b5.O),
+    C: normalizeB5(b5.C),
+    E: normalizeB5(b5.E),
+    A: normalizeB5(b5.A),
+    N: normalizeB5(b5.N),
   };
 
   const traits = rolesData.traitDescriptions;
