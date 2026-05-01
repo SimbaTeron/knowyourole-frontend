@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
+import { adminCorsHeaders, requireAdminRequest } from '@/app/api/_lib/admin-guard';
 
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+const corsHeaders = adminCorsHeaders;
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
 
 // POST /api/admin/seed — Seed database with trait vibes, combinations, and archetypes
 export async function POST(req: NextRequest) {
-  if (req.method === 'OPTIONS') {
-    return new NextResponse(null, { status: 200, headers: corsHeaders });
-  }
+  const unauthorized = requireAdminRequest(req);
+  if (unauthorized) return unauthorized;
 
   try {
     const traitVibesData = [

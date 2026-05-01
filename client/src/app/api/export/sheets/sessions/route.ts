@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
+import { adminCorsHeaders, requireAdminRequest } from '@/app/api/_lib/admin-guard';
 
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+const corsHeaders = adminCorsHeaders;
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
 
 // POST /api/export/sheets/sessions
 export async function POST(req: NextRequest) {
-  if (req.method === 'OPTIONS') {
-    return new NextResponse(null, { status: 200, headers: corsHeaders });
-  }
+  const unauthorized = requireAdminRequest(req);
+  if (unauthorized) return unauthorized;
 
   // Check for Google Sheets credentials
   const googleClientEmail = process.env.GOOGLE_SHEETS_CLIENT_EMAIL;

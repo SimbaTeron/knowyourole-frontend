@@ -55,7 +55,6 @@ export const GET = requireAuth(async (req: NextRequest, ctx) => {
     return NextResponse.json(exportData, {
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
       },
     });
   } catch (error) {

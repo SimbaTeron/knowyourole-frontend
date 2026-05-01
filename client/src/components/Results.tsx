@@ -158,10 +158,23 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     const fetchJobMatches = async () => {
       setJobMatchLoading(true);
       try {
-        const requestBody = { mbti: { E: scores.mbti.E, I: scores.mbti.I, S: scores.mbti.S, N: scores.mbti.N, T: scores.mbti.T, F: scores.mbti.F, J: scores.mbti.J, P: scores.mbti.P }, disc: { D: scores.disc.D, I: scores.disc.I, S: scores.disc.S, C: scores.disc.C }, bigFive: { O: result.bigFiveProfile.O, C: result.bigFiveProfile.C, E: result.bigFiveProfile.E, A: result.bigFiveProfile.A, N: result.bigFiveProfile.N } };
-        const topResponse = await fetch('/api/job-match/top', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
+        // Build mbtiType string from scores (e.g. "INTJ")
+        const mbtiType =
+          (scores.mbti.E >= scores.mbti.I ? 'E' : 'I') +
+          (scores.mbti.S >= scores.mbti.N ? 'S' : 'N') +
+          (scores.mbti.T >= scores.mbti.F ? 'T' : 'F') +
+          (scores.mbti.J >= scores.mbti.P ? 'J' : 'P');
+        // Primary DISC letter
+        const discLetter = (['D', 'I', 'S', 'C'] as const).reduce((best, d) =>
+          scores.disc[d] > scores.disc[best] ? d : best, 'S' as keyof typeof scores.disc);
+        const requestBody = {
+          mbtiType,
+          discStyle: discLetter,
+          bigFive: { O: result.bigFiveProfile.O, C: result.bigFiveProfile.C, E: result.bigFiveProfile.E, A: result.bigFiveProfile.A, N: result.bigFiveProfile.N },
+        };
+        const topResponse = await fetch('/api/premium/job-match-top', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
         if (topResponse.ok) { const topData = await topResponse.json(); if (topData.success && topData.match) setTopJobMatch(topData.match); }
-        const matchesResponse = await fetch('/api/job-matches', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...requestBody, limit: 3, diversityBoost: true }) });
+        const matchesResponse = await fetch('/api/premium/job-matches', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...requestBody, limit: 3, diversityBoost: true }) });
         if (matchesResponse.ok) {
           const matchesData = await matchesResponse.json();
           if (matchesData.success && matchesData.matches) {
