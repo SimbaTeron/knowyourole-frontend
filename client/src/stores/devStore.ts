@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type DevTier = '7-12' | '13-18' | '19-25' | '25plus';
+export type DevTier = '13-18' | '19-25' | '25plus';
 export type DevMood = 'focused' | 'chill' | 'adventurous' | 'romantic' | 'reflective' | 'creative';
 export type DevArchetype = 'The Sage' | 'The Explorer' | 'The Hero' | 'The Rebel' | 'The Lover' | 'The Magician';
 
@@ -88,6 +88,14 @@ export const useDevStore = create<DevState>()(
         mockAuthEnabled: state.mockAuthEnabled,
         mockUserEmail: state.mockUserEmail,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<DevState> | undefined;
+        return {
+          ...currentState,
+          ...persisted,
+          tier: (persisted?.tier as unknown) === '7-12' ? '13-18' : persisted?.tier ?? currentState.tier,
+        };
+      },
     }
   )
 );

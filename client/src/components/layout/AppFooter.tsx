@@ -53,7 +53,7 @@ export function AppFooter() {
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 14, fontFamily: "'Outfit',sans-serif" }}>Product</h4>
             <div>
-              <Link href="/quiz" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Free Assessment</Link>
+              <Link href="/quiz-gateway" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Free Assessment</Link>
               <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>How It Works</Link>
               <Link href="/careers" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Career Matching</Link>
               <Link href="/results" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Premium Features</Link>

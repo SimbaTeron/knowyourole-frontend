@@ -106,7 +106,8 @@ interface Question {
   is2x?: boolean; // 2x scoring multiplier question
 }
 
-type TierValue = "7-12" | "13-18" | "19-25" | "25plus";
+type ActiveTierValue = "13-18" | "19-25" | "25+" | "25plus";
+type TierValue = ActiveTierValue | "7-12";
 
 interface QuizProps {
   tier: TierValue;
@@ -426,7 +427,7 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
           
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: buttonActive ? 1 : 0.4 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
             <Button
@@ -435,8 +436,8 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
               disabled={!buttonActive}
               className={`w-full transition-all duration-300 ${
                 buttonActive 
-                  ? "bg-terracotta hover:bg-terracotta/90 text-white" 
-                  : "bg-gray-300 dark:bg-[#1E1E2E] text-gray-500 dark:text-[#64748B] cursor-not-allowed"
+                  ? "!bg-green-500 hover:!bg-green-600 !text-white border border-green-400/40 shadow-[0_0_24px_rgba(34,197,94,0.22)] disabled:opacity-100"
+                  : "!bg-green-500/80 !text-white border border-green-400/25 cursor-not-allowed disabled:opacity-100"
               }`}
               data-testid="button-recap-continue"
             >
@@ -453,55 +454,19 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
   );
 }
 
-const getQuizConfig = (tier: string) => {
-  switch (tier) {
-    case "7-12":
-      // Youth 25: Q5 Superpower → Q10 Checkpoint → Q15 Energy → Q20 Mystery → Results
-      return { 
-        totalQuestions: 25, 
-        superpowerAfter: 5,
-        checkpoint1After: 10,
-        energyAfter: 15,
-        mysteryAfter: 20,
-        checkpoint2After: null,
-        hasMystery: true 
-      };
-    case "13-18":
-      // Teen 30: Q10 Checkpoint → Q15 Superpower → Q20 Energy → Q25 Mystery → Results
-      return { 
-        totalQuestions: 30, 
-        checkpoint1After: 10,
-        superpowerAfter: 15,
-        energyAfter: 20,
-        mysteryAfter: 25,
-        checkpoint2After: null,
-        hasMystery: true 
-      };
-    case "19-25":
-      // Young Adult 35: Q10 Checkpoint → Q15 Superpower → Q20 Checkpoint2 → Q25 Energy → Q30 Mystery → Results
-      return { 
-        totalQuestions: 35, 
-        checkpoint1After: 10,
-        superpowerAfter: 15,
-        checkpoint2After: 20,
-        energyAfter: 25,
-        mysteryAfter: 30,
-        hasMystery: true 
-      };
-    case "25+":
-    case "25plus":
-    default:
-      // Adult 40: Q10 Checkpoint → Q20 Checkpoint2 → Q25 Superpower → Q30 Energy → Q35 Mystery → Results
-      return { 
-        totalQuestions: 40, 
-        checkpoint1After: 10,
-        checkpoint2After: 20,
-        superpowerAfter: 25,
-        energyAfter: 30,
-        mysteryAfter: 35,
-        hasMystery: true 
-      };
-  }
+const getQuizConfig = (_tier: string) => {
+  // Unified quiz config for all active tiers:
+  // Q1-10 → checkpoint1 → Q11-20 → superpower → Q21-25 →
+  // checkpoint2 → Q26-30 → energy → Q31-35 → mystery → Q36-45
+  return {
+    totalQuestions: 45,
+    checkpoint1After: 10,
+    superpowerAfter: 20,
+    checkpoint2After: 25,
+    energyAfter: 30,
+    mysteryAfter: 35,
+    hasMystery: true,
+  };
 };
 
 // Dynamically adjust question wording based on mood tone
@@ -617,9 +582,20 @@ const getMoodEffects = (mood: string) => {
   return effects;
 };
 
-export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
+const getBrowserSessionItem = (key: string) => {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
+  const tier: ActiveTierValue = rawTier === "7-12" ? "13-18" : rawTier;
   const tierConfig = questionsData.tierConfig[tier as keyof typeof questionsData.tierConfig] || questionsData.tierConfig["19-25"];
   const quizConfig = getQuizConfig(tier);
+  const gameTier = tier === "25+" ? "25plus" : tier;
   const { teamName, isLocalitySet } = useLocalityTheme();
   const moodEffects = getMoodEffects(mood);
   const { toast } = useToast();
@@ -670,10 +646,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   const [timerResetKey, setTimerResetKey] = useState(0); // Forces timer reset when incremented
   
   const [showIntroOnboarding, setShowIntroOnboarding] = useState(() => {
-    return !sessionStorage.getItem("knowrole-onboarding-intro-done");
+    return !getBrowserSessionItem("knowrole-onboarding-intro-done");
   });
   const [showSliderOnboarding, setShowSliderOnboarding] = useState(false);
-  const hasShownSliderOnboarding = useRef(!!sessionStorage.getItem("knowrole-onboarding-slider-done"));
+  const hasShownSliderOnboarding = useRef(!!getBrowserSessionItem("knowrole-onboarding-slider-done"));
   
   // Use ref for processing lock - refs update synchronously, preventing race conditions
   const isProcessingAnswerRef = useRef(false);
@@ -700,21 +676,10 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   // Derived state: check if any popup is active to disable interactions
   const isAnyPopupActive = showPauseMenu || showQuip || showIntroOnboarding || showSliderOnboarding;
 
-  // Phase 1.2: Adaptive framework quotas based on tier
-  // Adults get more Big Five for nuanced percentiles, younger tiers get more MBTI for clarity
-  const getAdaptiveQuotas = (tier: string) => {
-    switch (tier) {
-      case "7-12": // Mini Explorer - simpler MBTI focus
-        return { MBTI: 0.40, DISC: 0.25, Big5: 0.25, Critical: 0.05, FirstPrinciples: 0.05 };
-      case "13-18": // Teen Navigator - balanced
-        return { MBTI: 0.35, DISC: 0.25, Big5: 0.30, Critical: 0.05, FirstPrinciples: 0.05 };
-      case "19-25": // Young Trailblazer - more nuance
-        return { MBTI: 0.30, DISC: 0.25, Big5: 0.35, Critical: 0.05, FirstPrinciples: 0.05 };
-      case "25+": // Adult Anchor - maximum Big Five for percentile accuracy
-        return { MBTI: 0.25, DISC: 0.20, Big5: 0.45, Critical: 0.05, FirstPrinciples: 0.05 };
-      default:
-        return { MBTI: 0.30, DISC: 0.25, Big5: 0.35, Critical: 0.05, FirstPrinciples: 0.05 };
-    }
+  // Phase 1.2: Adaptive framework quotas — unified for all active tiers.
+  // 45 questions total: Big5 ~46%, MBTI ~36%, DISC ~18%.
+  const getAdaptiveQuotas = (_tier: string) => {
+    return { MBTI: 0.36, DISC: 0.18, Big5: 0.46, Critical: 0, FirstPrinciples: 0 };
   };
   
   const FRAMEWORK_QUOTAS = getAdaptiveQuotas(tier);
@@ -1483,7 +1448,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   if (quizPhase === "superpower") {
     return (
       <SuperpowerGame
-        tier={tier}
+        tier={gameTier}
         onSelect={handleSuperpowerChoice}
       />
     );
@@ -1542,7 +1507,7 @@ export default function Quiz({ tier, mood, funMode, landmark, theme, onComplete,
   if (quizPhase === "mystery") {
     return (
       <MysteryBoxGame
-        tier={tier}
+        tier={gameTier}
         onSelect={handleMysteryChoice}
       />
     );

@@ -6,8 +6,7 @@ import { isTestMode } from "@/utils/devTest";
 const TIERS = [
   { id: "25+", emoji: "💼", title: "Adults (25+)", sub: "Full experience with premium features" },
   { id: "19-25", emoji: "🎓", title: "Young Adults (18-25)", sub: "College & early career matching" },
-  { id: "13-18", emoji: "🎒", title: "Youth (12-17)", sub: "High school quiz with career insights" },
-  { id: "7-12", emoji: "👶", title: "Kids (12 & under)", sub: "Fun strengths discovery for kids" },
+  { id: "13-18", emoji: "🎒", title: "Teens (13-17)", sub: "High school quiz with career insights" },
 ];
 
 export default function QuizGateway() {
@@ -30,6 +29,8 @@ export default function QuizGateway() {
   const handleContinue = () => {
     if (selected) {
       sessionStorage.setItem("kyr_quiz_tier", selected);
+      sessionStorage.removeItem("knowrole-onboarding-intro-done");
+      sessionStorage.removeItem("knowrole-onboarding-slider-done");
       window.location.href = "/mood-mixer";
     }
   };

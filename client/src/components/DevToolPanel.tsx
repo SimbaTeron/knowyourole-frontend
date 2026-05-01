@@ -154,7 +154,7 @@ export default function DevToolPanel() {
     const params = new URLSearchParams();
     params.set('test', 'true');
     if (store.tier) {
-      const tierMap: Record<string, string> = { '25plus': '25+', '19-25': '19-25', '13-18': '13-18', '7-12': '7-12' };
+      const tierMap: Record<string, string> = { '25plus': '25+', '19-25': '19-25', '13-18': '13-18' };
       params.set('tier', tierMap[store.tier] || store.tier);
     }
     window.location.href = `${path}?${params.toString()}`;
@@ -166,7 +166,6 @@ export default function DevToolPanel() {
     { value: '25plus', label: '25+ Adults' },
     { value: '19-25', label: '18-25 Young Adult' },
     { value: '13-18', label: '13-17 Teen' },
-    { value: '7-12', label: '7-12 Kids' },
   ];
 
   const MOOD_OPTIONS = [

@@ -1,4 +1,4 @@
-import { Check, Compass, Rocket, Zap, Anchor, ArrowRight } from "lucide-react";
+import { Check, Rocket, Zap, Anchor, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
@@ -7,14 +7,13 @@ interface AgeTier {
   label: string;
   sublabel: string;
   tagline: string;
-  Icon: typeof Compass;
+  Icon: typeof Rocket;
 }
 
 const ageTiers: AgeTier[] = [
   { id: "25+", label: "Adult Anchor", sublabel: "Ages 25+", tagline: "Career strategy & leadership insights", Icon: Anchor },
   { id: "19-25", label: "Young Trailblazer", sublabel: "Ages 19-25", tagline: "Find your path & unlock potential", Icon: Zap },
   { id: "13-18", label: "Teen Navigator", sublabel: "Ages 13-18", tagline: "Discover strengths & future direction", Icon: Rocket },
-  { id: "7-12", label: "Mini Explorer", sublabel: "Ages 12 and under", tagline: "Fun strengths discovery for kids", Icon: Compass },
 ];
 
 const triggerHaptic = (duration = 50) => {

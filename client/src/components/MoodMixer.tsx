@@ -374,7 +374,7 @@ function HandTapHint({ cx, cy }: { cx: number; cy: number }) {
         style={{
           position: "absolute",
           left: cx,
-          top: cy + 132,
+          top: cy,
           transform: "translate(-50%, -50%)",
           fontSize: "2rem",
           zIndex: 20,
@@ -1058,16 +1058,23 @@ export default function MoodMixerPage() {
     setTooltipMood(null);
   };
 
+  const resetQuizOnboardingForNewRun = () => {
+    sessionStorage.removeItem("knowrole-onboarding-intro-done");
+    sessionStorage.removeItem("knowrole-onboarding-slider-done");
+  };
+
   const handleContinue = () => {
     if (!mood1 || !mood2) return;
     const label = getBlendLabel(mood1, mood2);
     localStorage.setItem("kyr_mood_blend", JSON.stringify({ mood1, mood2, label }));
     sessionStorage.setItem("knowrole-mood-blend", label);
+    resetQuizOnboardingForNewRun();
     window.location.href = "/quiz";
   };
 
   const handleSkip = () => {
     localStorage.removeItem("kyr_mood_blend");
+    resetQuizOnboardingForNewRun();
     window.location.href = "/quiz";
   };
 
@@ -1173,7 +1180,14 @@ export default function MoodMixerPage() {
       </div>
 
       {/* Page content */}
-      <div style={{ padding: "clamp(364px, 11vw, 390px) 24px 0", textAlign: "center", position: "relative", zIndex: 1 }}>
+      <div
+        style={{
+          padding: "clamp(96px, 13vh, 128px) 24px 0",
+          textAlign: "center",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
         <p
           style={{
             fontSize: 11,
@@ -1212,7 +1226,7 @@ export default function MoodMixerPage() {
       </div>
 
       {/* Orb area */}
-      <div style={{ position: "relative", zIndex: 1, paddingBottom: 180 }}>
+      <div style={{ position: "relative", zIndex: 1, marginTop: 72, paddingBottom: 180 }}>
         <AnimatePresence mode="wait">
           {isSelecting && (
             <motion.div

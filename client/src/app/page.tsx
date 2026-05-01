@@ -90,7 +90,7 @@ export default function Home() {
               The Gen Z personality quiz. Combined Big Five, MBTI, and DISC into one wild ride. Know yourself. Own your energy.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <a href="/quiz" style={{ textDecoration: "none" }}>
+              <a href="/quiz-gateway" style={{ textDecoration: "none" }}>
                 <button style={{ background: "linear-gradient(90deg, #00C8FF, #7800FF)", padding: "14px 28px", borderRadius: 50, fontWeight: 700, fontSize: 14, color: "#fff", border: "none", cursor: "pointer", boxShadow: "0 0 30px rgba(0,200,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>
                   Take the Quiz — It's Free →
                 </button>
@@ -267,7 +267,7 @@ export default function Home() {
           <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(255,255,255,0.5)", marginBottom: 40, fontFamily: "'Outfit',sans-serif" }}>
             2.4 million people already know who they are. Your turn.
           </p>
-          <a href="/quiz" style={{ textDecoration: "none" }}>
+          <a href="/quiz-gateway" style={{ textDecoration: "none" }}>
             <button style={{ background: "linear-gradient(90deg, #00C8FF, #7800FF)", padding: "16px 36px", borderRadius: 16, fontWeight: 700, fontSize: 16, color: "#fff", border: "none", cursor: "pointer", boxShadow: "0 0 40px rgba(0,200,255,0.4)", fontFamily: "'Outfit',sans-serif" }}>
               Take the Free Quiz →
             </button>

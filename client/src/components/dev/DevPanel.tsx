@@ -173,7 +173,6 @@ export function DevPanel() {
   }
 
   const TIER_OPTIONS: { value: DevTier; label: string }[] = [
-    { value: '7-12', label: '7-12' },
     { value: '13-18', label: '13-18' },
     { value: '19-25', label: '19-25' },
     { value: '25plus', label: '25+' },

@@ -96,6 +96,18 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
   const Icon = currentStep.icon;
 
   const tooltipGap = 8;
+  const tooltipHorizontalMargin = 16;
+
+  const getAnchoredTooltipLeft = () => {
+    if (!spotlightRect) return "50%";
+
+    const tooltipWidth = Math.min(340, window.innerWidth - tooltipHorizontalMargin * 2);
+    const targetCenter = spotlightRect.left + spotlightRect.width / 2;
+    const preferredLeft = targetCenter - tooltipWidth / 2;
+    const maxLeft = window.innerWidth - tooltipWidth - tooltipHorizontalMargin;
+
+    return Math.max(tooltipHorizontalMargin, Math.min(preferredLeft, maxLeft));
+  };
 
   const getTooltipStyle = (): React.CSSProperties => {
     if (!spotlightRect) {
@@ -105,8 +117,9 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
     if (currentStep.position === "below") {
       return {
         top: spotlightRect.bottom + spotlightPadding + tooltipGap,
-        left: "50%",
-        transform: "translateX(-50%)",
+        left: getAnchoredTooltipLeft(),
+        transform: "none",
+        width: "min(340px, calc(100vw - 32px))",
         maxWidth: "min(340px, calc(100vw - 32px))",
       };
     }
@@ -114,8 +127,9 @@ export default function QuizOnboardingOverlay({ type, onComplete }: QuizOnboardi
     if (currentStep.position === "above") {
       return {
         bottom: window.innerHeight - spotlightRect.top + spotlightPadding + tooltipGap,
-        left: "50%",
-        transform: "translateX(-50%)",
+        left: getAnchoredTooltipLeft(),
+        transform: "none",
+        width: "min(340px, calc(100vw - 32px))",
         maxWidth: "min(340px, calc(100vw - 32px))",
       };
     }
