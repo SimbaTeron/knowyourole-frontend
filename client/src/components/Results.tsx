@@ -189,7 +189,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     fetchJobMatches();
   }, [result, isMiniExplorer, scores]);
 
-  const DEV_BYPASS_PAYMENT = import.meta.env.DEV;
+  const DEV_BYPASS_PAYMENT = process.env.NODE_ENV !== "production";
 
   const handleValidationSubmit = () => {
     if (!mbtiMatchAnswer || opennessRating === 0) return;
