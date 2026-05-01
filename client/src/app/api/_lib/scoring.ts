@@ -555,12 +555,14 @@ export function getTraitChangeInsight(trait: string, change: number): string {
 // =============================================================================
 
 export function analyzeRoleFitFromDB(roleData: any, bigFive: any, mbtiType: string, discStyle: string): any {
+  // Read from big_five_avg JSONB column (1-5 scale) and convert to 1-100
+  const b5 = roleData.big_five_avg || {};
   const idealTraits: Record<string, { ideal: number; weight: number }> = {
-    O: { ideal: roleData.big5O * 20, weight: 0.2 },
-    C: { ideal: roleData.big5C * 20, weight: 0.2 },
-    E: { ideal: roleData.big5E * 20, weight: 0.2 },
-    A: { ideal: roleData.big5A * 20, weight: 0.2 },
-    N: { ideal: roleData.big5N * 20, weight: 0.2 },
+    O: { ideal: (b5.O ?? 3) / 5 * 100, weight: 0.2 },
+    C: { ideal: (b5.C ?? 3) / 5 * 100, weight: 0.2 },
+    E: { ideal: (b5.E ?? 3) / 5 * 100, weight: 0.2 },
+    A: { ideal: (b5.A ?? 3) / 5 * 100, weight: 0.2 },
+    N: { ideal: (b5.N ?? 3) / 5 * 100, weight: 0.2 },
   };
 
   const pros: string[] = [];
@@ -576,7 +578,7 @@ export function analyzeRoleFitFromDB(roleData: any, bigFive: any, mbtiType: stri
     const label = traitLabels[trait];
 
     if (Math.abs(diff) <= 15) {
-      pros.push(`${label}: Well-aligned (${userVal}% vs ${config.ideal}% ideal)`);
+      pros.push(`${label}: Well-aligned (${userVal}% vs ${Math.round(config.ideal)}% ideal)`);
     } else if (diff > 15) {
       if (trait === 'N') {
         cons.push(`Sensitivity: May feel role stress more intensely`);
@@ -587,7 +589,7 @@ export function analyzeRoleFitFromDB(roleData: any, bigFive: any, mbtiType: stri
       if (trait === 'N') {
         pros.push(`Stress resilience: Natural calm under pressure`);
       } else {
-        cons.push(`${label}: May need development (${userVal}% vs ${config.ideal}% ideal)`);
+        cons.push(`${label}: May need development (${userVal}% vs ${Math.round(config.ideal)}% ideal)`);
       }
     }
   }
@@ -611,10 +613,12 @@ export function analyzeRoleFitFromDB(roleData: any, bigFive: any, mbtiType: stri
     'arts': ["Develop business and self-promotion skills", "Build a support network", "Create sustainable creative routines"],
   };
 
-  const tips = collarTips[roleData.jobCollar] || collarTips['white'];
+  // Use category as job collar proxy; default to 'white' collar tips
+  const collar = roleData.category || 'white';
+  const tips = collarTips[collar] || collarTips['white'];
 
   return {
-    dreamRole: roleData.roleName,
+    dreamRole: roleData.role_name,
     matchScore,
     pros: pros.slice(0, 4),
     cons: cons.slice(0, 3),

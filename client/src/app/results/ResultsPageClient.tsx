@@ -9,6 +9,7 @@ import { calculateResult } from "@/components/results/resultsData";
 import { useAuth0 } from "@auth0/auth0-react";
 import type { QuizScores } from "@/components/Quiz";
 import { AuthModal } from "@/components/AuthModal";
+import type { ResultDTO } from "@/lib/results/buildResultDTO";
 
 // Phase 2.2: Badge interface for earned achievements
 interface EarnedBadge {
@@ -129,12 +130,99 @@ function computePrimaryDisc(disc: QuizScores["disc"]): string {
   return entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
 }
 
+type ResultsViewModel = {
+  type: string;
+  tier: string;
+  bigFive: { O: number; C: number; E: number; A: number; N: number };
+  disc: { D: number; I: number; S: number; C: number };
+  mbtiType: string;
+  primaryDisc: string;
+  rawScores: QuizScores;
+  isDemo: boolean;
+  sessionId?: string;
+  hasScales?: boolean;
+  badges?: EarnedBadge[];
+  hybrids?: string[];
+};
+
+function isQuizScores(value: unknown): value is QuizScores {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const candidate = value as Partial<QuizScores>;
+  const mbti = candidate.mbti as Record<string, unknown> | undefined;
+  const disc = candidate.disc as Record<string, unknown> | undefined;
+  const bigFive = candidate.bigFive as Record<string, unknown> | undefined;
+  return !!mbti && !!disc && !!bigFive
+    && (["E", "I", "S", "N", "T", "F", "J", "P"] as const).every((key) => typeof mbti[key] === "number")
+    && (["D", "I", "S", "C"] as const).every((key) => typeof disc[key] === "number")
+    && (["O", "C", "E", "A", "N"] as const).every((key) => typeof bigFive[key] === "number");
+}
+
+function getResultDTOFromSessionStorage(): ResultDTO | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem("kyr_result_dto");
+    if (!raw) return null;
+    const dto = JSON.parse(raw) as ResultDTO;
+    const hasRequiredDTOShape = dto?.version?.schemaVersion === "1.0.0"
+      && typeof dto?.meta?.sessionId === "string"
+      && typeof dto?.scores?.mbti?.type === "string"
+      && typeof dto?.scores?.disc?.primary === "string"
+      && !!dto?.scores?.bigFive?.traits
+      && isQuizScores(dto.raw?.legacyScores);
+    return hasRequiredDTOShape ? dto : null;
+  } catch {
+    return null;
+  }
+}
+
+function mapResultDTOToViewModel(dto: ResultDTO): ResultsViewModel {
+  const mbtiType = dto.scores.mbti.type;
+  const primaryDisc = dto.scores.disc.primary === "Balanced" ? "C" : dto.scores.disc.primary;
+  const rawScores = dto.raw.legacyScores as QuizScores;
+
+  return {
+    type: `${mbtiType}-${primaryDisc}`,
+    tier: dto.raw.tier,
+    bigFive: {
+      O: dto.scores.bigFive.traits.O.normalized,
+      C: dto.scores.bigFive.traits.C.normalized,
+      E: dto.scores.bigFive.traits.E.normalized,
+      A: dto.scores.bigFive.traits.A.normalized,
+      N: dto.scores.bigFive.traits.N.normalized,
+    },
+    disc: {
+      D: Math.round(dto.scores.disc.scores.D.normalized),
+      I: Math.round(dto.scores.disc.scores.I.normalized),
+      S: Math.round(dto.scores.disc.scores.S.normalized),
+      C: Math.round(dto.scores.disc.scores.C.normalized),
+    },
+    mbtiType,
+    primaryDisc,
+    rawScores,
+    isDemo: false,
+    sessionId: dto.meta.sessionId,
+  };
+}
+
 // Big Five quiz scores are on 0-100 scale (percentile-like). Pass through directly.
 function normalizeBigFive(raw: number): number {
   return Math.round(Math.max(10, Math.min(99, raw)));
 }
 
 function useRealResults() {
+  const resultDTO = getResultDTOFromSessionStorage();
+  if (resultDTO) {
+    const viewModel = mapResultDTOToViewModel(resultDTO);
+    console.log("[Results] Loaded from ResultDTO", {
+      resultId: resultDTO.meta.resultId,
+      sessionId: resultDTO.meta.sessionId,
+      mbtiType: viewModel.mbtiType,
+      primaryDisc: viewModel.primaryDisc,
+    });
+    return viewModel;
+  }
+
+  console.log("[Results] Using legacy fallback");
   const scores = getStoredScores();
   const apiResult = getApiResultFromUrl();
   const tier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";

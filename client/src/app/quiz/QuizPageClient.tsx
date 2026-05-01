@@ -43,8 +43,14 @@ export default function QuizPage() {
   const { toast } = useToast();
   const { teamName, isLocalitySet } = useLocalityTheme();
 
-  // Type for age tiers
-  type TierValue = "7-12" | "13-18" | "19-25" | "25plus";
+  // Type for active age tiers. Stale 7-12 values are normalized to 13-18 below.
+  type TierValue = "13-18" | "19-25" | "25+" | "25plus";
+  const normalizeTier = (tier: string | null): TierValue | null => {
+    if (!tier) return null;
+    if (tier === "7-12") return "13-18";
+    if (tier === "25+" || tier === "25plus" || tier === "19-25" || tier === "13-18") return tier;
+    return null;
+  };
   
   // State for tier/mood/etc - can be overridden by stored results
   const [storedTier, setStoredTier] = useState<TierValue | null>(null);
@@ -52,7 +58,7 @@ export default function QuizPage() {
   const [storedFunMode, setStoredFunMode] = useState<boolean | null>(null);
   const [storedLandmark, setStoredLandmark] = useState<string | null>(null);
 
-  const sessionTier = (typeof window !== 'undefined' ? sessionStorage.getItem("kyr_quiz_tier") : null);
+  const sessionTier = normalizeTier(typeof window !== 'undefined' ? sessionStorage.getItem("kyr_quiz_tier") : null);
   const sessionMood = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-mood") || "" : "";
   const sessionFunMode = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-funmode") === "true" : false;
   const landmarkData = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-landmark") : null;
@@ -61,16 +67,19 @@ export default function QuizPage() {
   // Redirect to quiz-gateway if no tier is set (user went directly to /quiz)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const tier = sessionStorage.getItem("kyr_quiz_tier");
+      const tier = normalizeTier(sessionStorage.getItem("kyr_quiz_tier"));
       if (!tier) {
         router.replace("/quiz-gateway");
         return;
+      }
+      if (sessionStorage.getItem("kyr_quiz_tier") !== tier) {
+        sessionStorage.setItem("kyr_quiz_tier", tier);
       }
     }
   }, [router]);
 
   // Use stored values if available, otherwise fall back to session values
-  const ageTier: TierValue = (storedTier ?? sessionTier ?? "25plus") as TierValue;
+  const ageTier: TierValue = storedTier ?? sessionTier ?? "25+";
   const mood = storedMood ?? sessionMood;
   const funMode = storedFunMode ?? sessionFunMode;
   const landmark = storedLandmark ? { landmark: storedLandmark } : sessionLandmark;
@@ -93,7 +102,7 @@ export default function QuizPage() {
           if (stateAge < 3600000) {
             console.log('[Donation Return] Restoring saved state:', state);
             setQuizScores(state.scores);
-            setStoredTier(state.tier);
+            setStoredTier(normalizeTier(state.tier));
             setStoredMood(state.mood);
             setStoredFunMode(state.funMode);
             setStoredLandmark(state.landmark);
@@ -149,7 +158,67 @@ export default function QuizPage() {
     }
   };
 
+  const computeAndStoreResultDTO = async (scores: QuizScores, sessionId: string | null) => {
+    const payload = {
+      tier: ageTier,
+      mood,
+      moodBlend: typeof window !== "undefined" ? sessionStorage.getItem("kyr_mood_blend") || undefined : undefined,
+      funMode,
+      landmark: landmark?.landmark,
+      theme,
+      sessionId: sessionId || undefined,
+      source: "live_quiz",
+      scores,
+    };
+
+    console.log("[ResultDTO] POST /api/results/compute starting", {
+      tier: payload.tier,
+      mood: payload.mood,
+      sessionId: payload.sessionId,
+      responseCount: scores.responses.length,
+    });
+
+    try {
+      const response = await fetch("/api/results/compute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      console.log("[ResultDTO] /api/results/compute response", {
+        ok: response.ok,
+        success: data?.success,
+        requestId: data?.requestId,
+        resultId: data?.result?.meta?.resultId,
+        validation: data?.validation,
+      });
+
+      if (!response.ok || !data?.success || !data?.result) {
+        console.warn("[ResultDTO] Compute failed; keeping legacy results fallback", data);
+        return null;
+      }
+
+      sessionStorage.setItem("kyr_result_dto", JSON.stringify(data.result));
+      console.log("[ResultDTO] Stored canonical ResultDTO in sessionStorage:kyr_result_dto", {
+        resultId: data.result.meta?.resultId,
+        sessionId: data.result.meta?.sessionId,
+      });
+
+      return data.result;
+    } catch (error) {
+      console.error("[ResultDTO] Compute/persist error; keeping legacy results fallback", error);
+      return null;
+    }
+  };
+
   const handleQuizComplete = async (scores: QuizScores) => {
+    console.log("[QuizComplete] Received final scores from Quiz.tsx", {
+      responseCount: scores.responses.length,
+      mbti: scores.mbti,
+      disc: scores.disc,
+      bigFive: scores.bigFive,
+    });
     setQuizScores(scores);
 
     let sessionId: string | null = null;
@@ -196,8 +265,29 @@ export default function QuizPage() {
       if (data.mbtiType) mbtiType = data.mbtiType;
       if (data.discStyle) discStyle = data.discStyle;
 
+      console.log("[QuizComplete] Legacy /api/quiz/score finished", {
+        sessionId,
+        hasScales: Boolean(scales),
+        badgeCount: badges.length,
+        hybridCount: hybrids.length,
+        mbtiType,
+        discStyle,
+      });
+
     } catch (error) {
-      console.error("Failed to save quiz results:", error);
+      console.error("[QuizComplete] Legacy /api/quiz/score failed; continuing with local fallback", error);
+    }
+
+    const canonicalResult = await computeAndStoreResultDTO(scores, sessionId);
+    if (canonicalResult?.meta?.sessionId && !sessionId) {
+      sessionId = canonicalResult.meta.sessionId;
+      setQuizSessionId(sessionId);
+    }
+    if (canonicalResult?.scores?.mbti?.type && canonicalResult.scores.mbti.type !== "XXXX") {
+      mbtiType = canonicalResult.scores.mbti.type;
+    }
+    if (canonicalResult?.scores?.disc?.primary && canonicalResult.scores.disc.primary !== "Balanced") {
+      discStyle = canonicalResult.scores.disc.primary;
     }
 
     // ── Compute type strings from raw scores as fallback ──
@@ -215,8 +305,10 @@ export default function QuizPage() {
     }
 
     // ── Store real scores in sessionStorage so results.tsx can find them ──
-    // results.tsx reads kyr_real_scores (not kyr_results)
+    // results.tsx reads kyr_real_scores (not kyr_results). This remains the fallback
+    // while kyr_result_dto becomes the new canonical source in the next migration step.
     sessionStorage.setItem("kyr_real_scores", JSON.stringify(scores));
+    console.log("[QuizComplete] Stored legacy fallback scores in sessionStorage:kyr_real_scores");
 
     // ── Encode scores as URL param for shareable links ──
     const scoresParam = btoa(JSON.stringify(scores));
@@ -232,6 +324,13 @@ export default function QuizPage() {
     if (hybrids.length) resultParams.set("hybrids", JSON.stringify(hybrids));
     resultParams.set("mbtiType", mbtiType);
     resultParams.set("discStyle", discStyle);
+
+    console.log("[QuizComplete] Redirecting to legacy results route with ResultDTO available as optional canonical source", {
+      hasResultDTO: Boolean(sessionStorage.getItem("kyr_result_dto")),
+      sessionId,
+      mbtiType,
+      discStyle,
+    });
 
     router.push(`/results?${resultParams.toString()}`);
   };

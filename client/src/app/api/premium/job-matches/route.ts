@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
       bigFive,
     };
 
-    const matches = await getJobMatches(getSupabaseAdmin(), scores, Number(limit));
+    const diversityBoost = body.diversityBoost === true;
+    const matches = await getJobMatches(getSupabaseAdmin(), scores, Number(limit), diversityBoost);
 
     return NextResponse.json({ success: true, matches }, { headers: corsHeaders });
   } catch (error) {
