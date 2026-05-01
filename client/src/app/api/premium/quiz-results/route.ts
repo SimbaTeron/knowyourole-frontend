@@ -1,16 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
 import { requireAuth } from '@/app/api/_lib/auth';
+import { jsonResponse, noContentResponse } from '@/app/api/_lib/security';
 
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+export async function OPTIONS() {
+  return noContentResponse({
+    headers: {
+      Allow: 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
 
 // POST /api/premium/quiz-results — Save authenticated user's quiz result
-export const POST = requireAuth(async (req: Request, ctx: { user: { sub: string } }) => {
+export const POST = requireAuth(async (req: NextRequest, ctx: { user: { sub: string } }) => {
   try {
     const body = await req.json();
     const {
@@ -53,27 +57,27 @@ export const POST = requireAuth(async (req: Request, ctx: { user: { sub: string 
 
     if (error) {
       console.error('[POST /api/premium/quiz-results] Error:', error);
-      return NextResponse.json(
+      return jsonResponse(
         { error: 'Failed to save quiz result' },
-        { status: 500, headers: corsHeaders }
+        { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true, result: data }, { headers: corsHeaders });
+    return jsonResponse({ success: true, result: data });
   } catch (error) {
     console.error('[POST /api/premium/quiz-results] Error:', error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: 'Internal server error' },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 });
 
 // GET /api/premium/quiz-results — Get authenticated user's quiz results
-export const GET = requireAuth(async (req: Request, ctx: { user: { sub: string } }) => {
+export const GET = requireAuth(async (req: NextRequest, ctx: { user: { sub: string } }) => {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '20', 10) || 20, 1), 100);
 
     const { data, error } = await getSupabaseAdmin()
       .from('quiz_results')
@@ -84,18 +88,18 @@ export const GET = requireAuth(async (req: Request, ctx: { user: { sub: string }
 
     if (error) {
       console.error('[GET /api/premium/quiz-results] Error:', error);
-      return NextResponse.json(
+      return jsonResponse(
         { error: 'Failed to fetch quiz results' },
-        { status: 500, headers: corsHeaders }
+        { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true, results: data }, { headers: corsHeaders });
+    return jsonResponse({ success: true, results: data });
   } catch (error) {
     console.error('[GET /api/premium/quiz-results] Error:', error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: 'Internal server error' },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 });

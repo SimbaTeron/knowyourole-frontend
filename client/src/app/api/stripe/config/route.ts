@@ -1,22 +1,14 @@
-import { NextResponse } from 'next/server';
+import { jsonResponse } from '@/app/api/_lib/security';
 import { stripePublishableKey } from '@/app/api/_lib/stripe';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    return NextResponse.json(
-      { publishableKey: stripePublishableKey },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
-    );
+    return jsonResponse({ publishableKey: stripePublishableKey });
   } catch (error) {
     console.error('Stripe config error:', error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: 'Failed to get Stripe config' },
       { status: 500 }
     );

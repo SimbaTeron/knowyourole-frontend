@@ -35,7 +35,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
   const { teamName, cityName, stateName, isLocalitySet } = useLocalityTheme();
   const localeInsight = cityName ? getLocaleInsight(cityName, stateName || undefined) : null;
 
-  const isTestPremium = new URLSearchParams(window.location.search).get('test_premium') === 'true';
+  const isTestPremium = process.env.NODE_ENV !== "production" && new URLSearchParams(window.location.search).get('test_premium') === 'true';
   const [dashboardStage, setDashboardStage] = useState<"teaser" | "full">(isTestPremium ? "full" : "teaser");
   const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(isTestPremium || startOnPremiumPage);
 

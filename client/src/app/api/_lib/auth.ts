@@ -3,7 +3,6 @@ import { jwtVerify, createRemoteJWKSet, JWTPayload } from 'jose';
 
 const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN || '';
 const AUTH0_CLIENT_ID = process.env.AUTH0_CLIENT_ID || '';
-const AUTH0_CLIENT_SECRET = process.env.AUTH0_CLIENT_SECRET || '';
 const AUTH0_AUDIENCE = process.env.AUTH0_AUDIENCE || 'https://knowyourole.com/api';
 
 export interface AuthUser {
@@ -23,9 +22,9 @@ export interface TokenPayload extends JWTPayload {
  * Returns the decoded payload if valid, null if invalid
  */
 export async function validateAuth0Token(token: string): Promise<AuthUser | null> {
-  if (!AUTH0_DOMAIN || !AUTH0_CLIENT_ID || !AUTH0_CLIENT_SECRET) {
+  if (!AUTH0_DOMAIN || !AUTH0_AUDIENCE) {
     // Auth not configured - return null (caller should handle)
-    console.warn('Auth0 not configured: AUTH0_DOMAIN, AUTH0_CLIENT_ID, or AUTH0_CLIENT_SECRET missing');
+    console.warn('Auth0 not configured: AUTH0_DOMAIN or AUTH0_AUDIENCE missing');
     return null;
   }
 
@@ -134,4 +133,35 @@ export function extractBearerToken(req: NextRequest): string | null {
     return null;
   }
   return authHeader.slice(7).trim() || null;
+}
+
+export function isAuthRequiredInProduction(): boolean {
+  return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+}
+
+/**
+ * Production gate for routes that may remain open during local development.
+ * Returns null in non-production, otherwise returns a 401 response unless the
+ * request has a valid Auth0 bearer token.
+ */
+export async function requireAuthInProduction(req: NextRequest): Promise<NextResponse | null> {
+  if (!isAuthRequiredInProduction()) return null;
+
+  const token = extractBearerToken(req);
+  if (!token) {
+    return NextResponse.json(
+      { error: 'Missing authorization token' },
+      { status: 401 }
+    );
+  }
+
+  const user = await validateAuth0Token(token);
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Invalid or expired token' },
+      { status: 401 }
+    );
+  }
+
+  return null;
 }

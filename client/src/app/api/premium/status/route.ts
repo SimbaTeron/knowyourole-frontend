@@ -1,16 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
 import { requireAuth } from '@/app/api/_lib/auth';
+import { jsonResponse, noContentResponse } from '@/app/api/_lib/security';
 
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+export async function OPTIONS() {
+  return noContentResponse({
+    headers: {
+      Allow: 'GET, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
 
 // GET /api/premium/status — Get user's premium status
-export const GET = requireAuth(async (req: Request, ctx: { user: { sub: string } }) => {
+export const GET = requireAuth(async (_req: NextRequest, ctx: { user: { sub: string } }) => {
   try {
     const { data: user, error } = await getSupabaseAdmin()
       .from('users')
@@ -20,22 +24,22 @@ export const GET = requireAuth(async (req: Request, ctx: { user: { sub: string }
 
     if (error && error.code !== 'PGRST116') {
       console.error('[GET /api/premium/status] Error:', error);
-      return NextResponse.json(
+      return jsonResponse(
         { error: 'Failed to get premium status' },
-        { status: 500, headers: corsHeaders }
+        { status: 500 }
       );
     }
 
-    return NextResponse.json({
+    return jsonResponse({
       success: true,
       isPremium: user?.is_premium || false,
       premiumPurchasedAt: user?.premium_purchased_at || null,
-    }, { headers: corsHeaders });
+    });
   } catch (error) {
     console.error('[GET /api/premium/status] Error:', error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: 'Internal server error' },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 });

@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
 import { getStripe } from '@/app/api/_lib/stripe';
-import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
+import { jsonResponse } from '@/app/api/_lib/security';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,21 +7,22 @@ export async function GET() {
   try {
     const stripe = getStripe();
 
-    // Fetch active products with prices from Stripe
+    // Fetch active products with prices from Stripe.
     const productsResponse = await stripe.products.list({
       active: true,
       expand: ['data.default_price'],
     });
 
     const products = productsResponse.data.map((product) => {
-      const prices = 'prices' in product && Array.isArray(product.prices)
-        ? product.prices
-            .filter((p) => p.active)
-            .map((price) => ({
-              id: price.id,
-              unit_amount: price.unit_amount,
-              currency: price.currency,
-            }))
+      const defaultPrice = typeof product.default_price === 'object' && product.default_price
+        ? product.default_price
+        : null;
+      const prices = defaultPrice && defaultPrice.active
+        ? [{
+            id: defaultPrice.id,
+            unit_amount: defaultPrice.unit_amount,
+            currency: defaultPrice.currency,
+          }]
         : [];
 
       return {
@@ -35,18 +35,10 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(
-      { products },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
-    );
+    return jsonResponse({ products });
   } catch (error) {
     console.error('Products fetch error:', error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: 'Failed to fetch products' },
       { status: 500 }
     );

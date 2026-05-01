@@ -1604,11 +1604,9 @@ export default function ResultsPage() {
   const { isAuthenticated, isLoading } = useAuth0();
   const realResults = useRealResults();
 
-  // ─── TEMPORARY BYPASS: Skip Stripe, go directly to Page 3 ───────────────────
-  // TODO (stripe-ready): Remove this bypass once Stripe Price ID is configured.
-  // When Stripe is live, set VITE_STRIPE_BYPASS=false or remove this block.
-  const VITE_STRIPE_BYPASS = true; // TEMP: true = bypass Stripe, go straight to page 3
-  // ─────────────────────────────────────────────────────────────────────────────
+  // Dev/local preview can skip Stripe/auth while Sim iterates on results pages.
+  // Production must always use the real auth/payment path.
+  const STRIPE_BYPASS = process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ENABLE_PREMIUM_BYPASS !== "false";
 
   // ─── Sync page state ↔ URL ─────────────────────────────────────────────────
   // On mount: read ?page= from URL and set initial page state
@@ -1642,7 +1640,7 @@ export default function ResultsPage() {
   // When ?page=2 is in the URL, check auth before rendering. If not authenticated,
   // open the auth modal and reset to page 1 so unauthenticated users can't bypass login.
   useEffect(() => {
-    if (VITE_STRIPE_BYPASS) return; // Skip auth guard in bypass mode
+    if (STRIPE_BYPASS) return; // Skip auth guard in bypass mode
     if (isLoading) return;
     const params = new URLSearchParams(window.location.search);
     const pageParam = params.get("page");
@@ -1659,7 +1657,7 @@ export default function ResultsPage() {
   // Opens the glass auth modal (Google one-click + email fallback)
   // Bypass modal in dev/preview mode — go directly to page 2
   const handleLoginFree = () => {
-    if (VITE_STRIPE_BYPASS) {
+    if (STRIPE_BYPASS) {
       setPage(2);
     } else {
       setShowAuthModal(true);
@@ -1675,7 +1673,7 @@ export default function ResultsPage() {
   // Bottom bar "Full Portrait" click — auth check before navigating to page 2
   const handleFullPortraitClick = () => {
     // Bypass auth in dev/preview mode — go directly to page 2
-    if (VITE_STRIPE_BYPASS || isAuthenticated) {
+    if (STRIPE_BYPASS || isAuthenticated) {
       setPage(2);
     } else {
       setShowAuthModal(true); // open auth modal; on success → page 2 via handleAuthSuccess
@@ -1684,9 +1682,44 @@ export default function ResultsPage() {
 
   const [premiumError, setPremiumError] = useState<string | null>(null);
 
-  // Premium button - bypass Stripe, go directly to page 3
-  // TODO (stripe-ready): Re-add Stripe checkout flow here when premium payments are enabled.
-  const handlePremium = () => { setPage(3); };
+  // Premium button — dev/local can preview Page 3; production must go through Stripe.
+  const handlePremium = async () => {
+    setPremiumError(null);
+
+    if (STRIPE_BYPASS) {
+      setPage(3);
+      return;
+    }
+
+    try {
+      const productsRes = await fetch("/api/stripe/products", { cache: "no-store" });
+      const productsData = await productsRes.json();
+      const proProduct = productsData.products?.find((p: { metadata?: { tier?: string }; name?: string; prices?: Array<{ id: string }> }) =>
+        p.metadata?.tier === "pro" || p.name?.toLowerCase().includes("pro") || p.name?.toLowerCase().includes("premium")
+      );
+      const priceId = proProduct?.prices?.[0]?.id;
+
+      if (!productsRes.ok || !priceId) {
+        throw new Error("Premium price is not configured");
+      }
+
+      const checkoutRes = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId, sessionId }),
+      });
+      const checkoutData = await checkoutRes.json();
+
+      if (!checkoutRes.ok || !checkoutData.url) {
+        throw new Error(checkoutData.error || "Checkout failed");
+      }
+
+      window.location.href = checkoutData.url;
+    } catch (error) {
+      console.error("[Premium] Checkout failed", error);
+      setPremiumError(error instanceof Error ? error.message : "Unable to start premium checkout");
+    }
+  };
 
   // Bottom bar "Premium" click — delegates to handlePremium for Stripe checkout
   const handleBottomBarPremiumClick = () => {

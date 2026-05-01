@@ -1,24 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
 import { requireAuth } from '@/app/api/_lib/auth';
+import { jsonResponse, noContentResponse } from '@/app/api/_lib/security';
 
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+export async function OPTIONS() {
+  return noContentResponse({
+    headers: {
+      Allow: 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
 
 // POST /api/premium/insights — requires auth (premium feature)
-export const POST = requireAuth(async (req: Request, ctx: { user: { sub: string } }) => {
+export const POST = requireAuth(async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { mbtiType, discStyle, bigFive, tier } = body;
+    const { mbtiType, bigFive } = body;
 
     if (!mbtiType || !bigFive) {
-      return NextResponse.json(
+      return jsonResponse(
         { error: 'mbtiType and bigFive are required' },
-        { status: 400, headers: corsHeaders }
+        { status: 400 }
       );
     }
 
@@ -30,7 +34,7 @@ export const POST = requireAuth(async (req: Request, ctx: { user: { sub: string 
       .limit(1);
 
     // Placeholder response until real data is seeded
-    return NextResponse.json({
+    return jsonResponse({
       success: true,
       insights: insights?.[0] || {
         archetype: mbtiType,
@@ -44,12 +48,12 @@ export const POST = requireAuth(async (req: Request, ctx: { user: { sub: string 
         relationships: [{ title: 'Seek feedback', description: 'Your introversion can blur blind spots' }],
       },
       message: 'Using placeholder insights. Seed premium_insights table to activate.',
-    }, { headers: corsHeaders });
+    });
   } catch (error) {
     console.error('[POST /api/premium/insights] Error:', error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: 'Failed to get insights' },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 });

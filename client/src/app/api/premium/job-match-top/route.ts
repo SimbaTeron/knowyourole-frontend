@@ -1,28 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
 import { getJobMatches } from '@/app/api/_lib/job-matching';
+import { requireAuthInProduction } from '@/app/api/_lib/auth';
+import { jsonResponse, noContentResponse } from '@/app/api/_lib/security';
 
+export async function OPTIONS() {
+  return noContentResponse({
+    headers: {
+      Allow: 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
-
-// POST /api/premium/job-match/top
+// POST /api/premium/job-match-top
+// Local/dev remains open for preview. Production requires a valid Auth0 bearer token.
 export async function POST(req: NextRequest) {
-  if (req.method === 'OPTIONS') {
-    return new NextResponse(null, { status: 200, headers: corsHeaders });
-  }
+  const authError = await requireAuthInProduction(req);
+  if (authError) return authError;
 
   try {
     const body = await req.json();
     const { mbtiType, discStyle, bigFive } = body;
 
     if (!mbtiType || !discStyle || !bigFive) {
-      return NextResponse.json(
+      return jsonResponse(
         { error: 'mbtiType, discStyle, and bigFive are required' },
-        { status: 400, headers: corsHeaders }
+        { status: 400 }
       );
     }
 
@@ -34,12 +39,12 @@ export async function POST(req: NextRequest) {
 
     const matches = await getJobMatches(getSupabaseAdmin(), scores, 1);
 
-    return NextResponse.json({ success: true, match: matches[0] || null }, { headers: corsHeaders });
+    return jsonResponse({ success: true, match: matches[0] || null });
   } catch (error) {
-    console.error('[POST /api/premium/job-match/top] Error:', error);
-    return NextResponse.json(
+    console.error('[POST /api/premium/job-match-top] Error:', error);
+    return jsonResponse(
       { error: 'Failed to get top job match' },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 }
