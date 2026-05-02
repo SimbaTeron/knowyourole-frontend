@@ -1645,23 +1645,23 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
           
           <div className="flex items-center gap-3">
             {(() => {
-              const remainingQuestions = questions.length - (currentIndex + 1);
-              const avgTimePerQuestion = scores.swipeTimes.length >= 3
-                ? scores.averageSwipeTime
-                : tierConfig.maxTime * 0.6;
-              const estimatedSecondsLeft = remainingQuestions * avgTimePerQuestion;
-              const estimatedMinutes = Math.max(1, Math.ceil(estimatedSecondsLeft / 60));
-              if (remainingQuestions > 0) {
-                return (
-                  <div className="flex items-center gap-1 text-warm-gray/60 dark:text-[#94A3B8]" data-testid="text-time-estimate">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span className="text-xs font-medium">
-                      ~{estimatedMinutes} min left
-                    </span>
-                  </div>
-                );
-              }
-              return null;
+              const currentQuestionNumber = currentIndex + 1;
+              const estimatedMinutes = currentQuestionNumber <= 10
+                ? 8
+                : currentQuestionNumber <= 20
+                  ? 6
+                  : currentQuestionNumber <= 30
+                    ? 4
+                    : 2;
+
+              return (
+                <div className="flex items-center gap-1 text-warm-gray/60 dark:text-[#94A3B8]" data-testid="text-time-estimate">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span className="text-xs font-medium">
+                    ~{estimatedMinutes} min left
+                  </span>
+                </div>
+              );
             })()}
             {canGoBack && !hasUsedBack && currentIndex > 0 && (
               <Button
