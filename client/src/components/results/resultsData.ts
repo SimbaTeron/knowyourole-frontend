@@ -104,6 +104,9 @@ export interface PersonalityResult {
   discLabel: string;
   discColor: string;
   discDesc: string;
+  secondaryDisc: string;
+  secondaryDiscLabel: string;
+  secondaryDiscColor: string;
   bigFiveProfile: {
     O: number;
     C: number;
@@ -178,32 +181,47 @@ export function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: 
   return roles.default;
 }
 
-export function calculateResult(scores: QuizScores): PersonalityResult {
+export function calculateResult(scores: QuizScores, forceMBTI?: string | null): PersonalityResult {
   const mbti = scores.mbti;
-  const mbtiType = [
-    mbti.E > mbti.I ? "E" : "I",
-    mbti.S > mbti.N ? "S" : "N",
-    mbti.T > mbti.F ? "T" : "F",
-    mbti.J > mbti.P ? "J" : "P",
-  ].join("");
+  // Allow dev panel to force a specific MBTI type — use it directly, don't derive from dimensions
+  const mbtiType: string = (forceMBTI && forceMBTI.length === 4)
+    ? forceMBTI
+    : [
+        mbti.E > mbti.I ? "E" : "I",
+        mbti.S > mbti.N ? "S" : "N",
+        mbti.T > mbti.F ? "T" : "F",
+        mbti.J > mbti.P ? "J" : "P",
+      ].join("");
 
   const disc = scores.disc;
   const discEntries = Object.entries(disc) as [string, number][];
-  const primaryDisc = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
+  const sortedDisc = discEntries.sort((a, b) => b[1] - a[1]);
+  const primaryDisc = sortedDisc[0][0];
+  const secondaryDisc = sortedDisc[1][0];
 
   const b5 = scores.bigFive;
-  const normalize = (val: number) => Math.round(Math.max(5, Math.min(95, 50 + val * 12)));
+  // Big Five inputs can arrive in two shapes during the ResultDTO migration:
+  // 1. Dev/randomized previews already use percentile-like 0-100 values.
+  // 2. Real 45-question quizzes use signed net evidence, where positive answers add
+  //    weight and reverse-keyed answers subtract weight. Signed real scores are centered
+  //    at 0, not raw totals out of 14. Mapping signed values from 0 would create fake
+  //    extremes like 1%; keep 0 neutral and move gradually away from 50.
+  const normalizeB5 = (raw: number): number => {
+    if (raw > 25) return Math.max(1, Math.min(99, Math.round(raw))); // dev: already normalized
+    return Math.max(5, Math.min(95, Math.round(50 + raw * 8))); // real: signed score around neutral
+  };
   const bigFiveProfile = {
-    O: normalize(b5.O),
-    C: normalize(b5.C),
-    E: normalize(b5.E),
-    A: normalize(b5.A),
-    N: normalize(b5.N),
+    O: normalizeB5(b5.O),
+    C: normalizeB5(b5.C),
+    E: normalizeB5(b5.E),
+    A: normalizeB5(b5.A),
+    N: normalizeB5(b5.N),
   };
 
   const traits = rolesData.traitDescriptions;
   const mbtiInfo = traits.mbti[mbtiType as keyof typeof traits.mbti] || traits.mbti.INTP;
   const discInfo = traits.disc[primaryDisc as keyof typeof traits.disc] || traits.disc.D;
+  const secondaryDiscInfo = traits.disc[secondaryDisc as keyof typeof traits.disc] || traits.disc.I;
 
   const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFiveProfile);
 
@@ -220,6 +238,9 @@ export function calculateResult(scores: QuizScores): PersonalityResult {
     discLabel: discInfo.label,
     discColor: discInfo.color,
     discDesc: discInfo.desc,
+    secondaryDisc,
+    secondaryDiscLabel: secondaryDiscInfo.label,
+    secondaryDiscColor: secondaryDiscInfo.color,
     bigFiveProfile,
     bigFiveLabels,
     primaryRole: roleMatch.primary,

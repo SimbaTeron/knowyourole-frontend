@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useDevStore } from '@/stores/devStore';
-import { getFakeScores } from '@/utils/devTest';
+import { useEffect, useState } from 'react';
+import { useDevStore, type DevMood, type DevTier } from '@/stores/devStore';
+import { getFakeDiscStyle, getFakeMBTIType, getFakeScores } from '@/utils/devTest';
 
 // ── Control primitives ───────────────────────────────────────────────────────
 
@@ -95,19 +95,80 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 // ── Write fake data to sessionStorage ─────────────────────────────────────────
 
-function writeFakeDataToSession(tier: string, mbti: string, mood: string, forcePremium: boolean) {
-  const fakeScores = getFakeScores(tier, mbti || null);
+const RANDOM_TIERS: DevTier[] = ['13-18', '19-25', '25plus'];
+const RANDOM_MOODS: DevMood[] = ['focused', 'chill', 'adventurous', 'romantic', 'reflective', 'creative'];
+const RANDOM_MBTI = [
+  'INTJ', 'INTP', 'ENTJ', 'ENTP',
+  'INFJ', 'INFP', 'ENFJ', 'ENFP',
+  'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ',
+  'ISTP', 'ISFP', 'ESTP', 'ESFP',
+];
+
+function pickRandom<T>(items: T[]): T {
+  return items[Math.floor(Math.random() * items.length)] ?? items[0];
+}
+
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function buildRandomizedScores(tier: DevTier, mbti: string) {
+  const scores = getFakeScores(tier, mbti);
+  const primaryDisc = pickRandom(['D', 'I', 'S', 'C'] as const);
+
+  scores.disc = {
+    D: primaryDisc === 'D' ? 4 : randomInt(1, 3),
+    I: primaryDisc === 'I' ? 4 : randomInt(1, 3),
+    S: primaryDisc === 'S' ? 4 : randomInt(1, 3),
+    C: primaryDisc === 'C' ? 4 : randomInt(1, 3),
+  };
+
+  scores.bigFive = {
+    O: randomInt(35, 95),
+    C: randomInt(35, 95),
+    E: randomInt(35, 95),
+    A: randomInt(35, 95),
+    N: randomInt(20, 80),
+  };
+
+  scores.responses = Array.from({ length: randomInt(24, 32) }, (_, i) => ({
+    questionId: i + 1,
+    response: randomInt(0, 1),
+    time: randomInt(1800, 7600),
+  }));
+  scores.averageSwipeTime = Math.round((randomInt(22, 68) / 10) * 10) / 10;
+  scores.engagement = randomInt(62, 98);
+  scores.criticalWildcard = randomInt(0, 4);
+  scores.firstPrinciplesWildcard = randomInt(0, 4);
+
+  return scores;
+}
+
+function writeFakeDataToSession(
+  tier: string,
+  mbti: string,
+  mood: string,
+  forcePremium: boolean,
+  injectedScores?: ReturnType<typeof getFakeScores>,
+) {
+  const fakeScores = injectedScores ?? getFakeScores(tier, mbti || null);
   const tierKey = tier === '25plus' ? '25+' : tier;
+  const resolvedMBTI = mbti || getFakeMBTIType(fakeScores);
+  const resolvedDisc = getFakeDiscStyle(fakeScores);
 
   sessionStorage.setItem('kyr_tier', tierKey);
+  sessionStorage.setItem('kyr_quiz_tier', tierKey);
   sessionStorage.setItem('kyr_fake_scores', JSON.stringify(fakeScores));
-  sessionStorage.setItem('kyr_fake_mbti', mbti || 'INTJ');
-  sessionStorage.setItem('kyr_fake_type', (mbti || 'INTJ') + '-A');
+  sessionStorage.setItem('kyr_real_scores', JSON.stringify(fakeScores));
+  sessionStorage.setItem('kyr_fake_mbti', resolvedMBTI);
+  sessionStorage.setItem('kyr_fake_type', `${resolvedMBTI}-${resolvedDisc}`);
   sessionStorage.setItem('knowrole-tier', tierKey);
   sessionStorage.setItem('knowrole-mood', mood);
 
   if (forcePremium) {
     sessionStorage.setItem('kyr_premium_unlocked', 'true');
+  } else {
+    sessionStorage.removeItem('kyr_premium_unlocked');
   }
 
   return fakeScores;
@@ -117,22 +178,29 @@ function writeFakeDataToSession(tier: string, mbti: string, mood: string, forceP
 
 export default function DevToolPanel() {
   const store = useDevStore();
+  const [mounted, setMounted] = useState(false);
+  const [randomStatus, setRandomStatus] = useState<string>('');
 
-  // Always visible on localhost — check hostname
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Always visible on localhost — check hostname after hydration.
   const isLocalhost =
-    typeof window !== 'undefined' &&
+    mounted &&
     (window.location.hostname === 'localhost' ||
      window.location.hostname === '127.0.0.1' ||
      window.location.hostname.startsWith('192.168.'));
 
-  if (!isLocalhost) return null;
-
   // Sync fake data to sessionStorage whenever dev store changes
   useEffect(() => {
+    if (!mounted || !isLocalhost) return;
     if (store.devMode && store.fakeDataEnabled) {
       writeFakeDataToSession(store.tier, store.mbtiOverride, store.mood, store.forcePremium);
     }
-  }, [store.devMode, store.fakeDataEnabled, store.tier, store.mbtiOverride, store.mood, store.forcePremium]);
+  }, [mounted, isLocalhost, store.devMode, store.fakeDataEnabled, store.tier, store.mbtiOverride, store.mood, store.forcePremium]);
+
+  if (!mounted || !isLocalhost) return null;
 
   const NAV_PATHS = [
     { path: '/', label: 'Landing' },
@@ -158,6 +226,66 @@ export default function DevToolPanel() {
       params.set('tier', tierMap[store.tier] || store.tier);
     }
     window.location.href = `${path}?${params.toString()}`;
+  };
+
+  const handleRandomResults = async () => {
+    const tier = pickRandom(RANDOM_TIERS);
+    const mood = pickRandom(RANDOM_MOODS);
+    const mbti = pickRandom(RANDOM_MBTI);
+    const scores = buildRandomizedScores(tier, mbti);
+    const discStyle = getFakeDiscStyle(scores);
+    const sessionId = `dev-random-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const tierParam = tier === '25plus' ? '25+' : tier;
+
+    setRandomStatus('Saving random result…');
+    store.setDevMode(true);
+    store.setFakeDataEnabled(true);
+    store.setForcePremium(true);
+    store.setTier(tier);
+    store.setMood(mood);
+    store.setMbtiOverride(mbti);
+    writeFakeDataToSession(tier, mbti, mood, true, scores);
+
+    try {
+      const response = await fetch('/api/results/compute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tier: tierParam,
+          mood,
+          sessionId,
+          source: 'randomized_preview',
+          visibility: 'anonymous',
+          scores,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data?.success || !data?.result) {
+        throw new Error(data?.error || data?.validation?.errors?.join(', ') || 'Result persistence failed');
+      }
+
+      sessionStorage.setItem('kyr_result_dto', JSON.stringify(data.result));
+      setRandomStatus(`Saved ${mbti}-${discStyle}; opening results…`);
+
+      const params = new URLSearchParams({
+        test: 'true',
+        random: 'true',
+        tier: tierParam,
+        page: '1',
+        force: 'true',
+        sessionId: data.result?.meta?.sessionId || sessionId,
+        mbtiType: mbti,
+        discStyle,
+        scores: btoa(JSON.stringify(scores)),
+      });
+      window.location.href = `/results?${params.toString()}`;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[DevPanel] Random results failed', error);
+      setRandomStatus(`Random result failed: ${message}`);
+      window.alert(`Random result failed to save. Not opening results.\n\n${message}`);
+    }
   };
 
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
@@ -289,6 +417,35 @@ export default function DevToolPanel() {
             value={store.mockUserEmail}
             onChange={store.setMockUserEmail}
           />
+        </Section>
+
+        {/* Results shortcut */}
+        <Section title="Results Shortcut">
+          <button
+            onClick={handleRandomResults}
+            disabled={randomStatus === 'Saving random result…'}
+            style={{
+              background: 'linear-gradient(135deg, #00c8ff, #7800ff)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              borderRadius: 7,
+              color: '#fff',
+              cursor: randomStatus === 'Saving random result…' ? 'wait' : 'pointer',
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              padding: '8px 9px',
+              textAlign: 'center',
+              width: '100%',
+              opacity: randomStatus === 'Saving random result…' ? 0.7 : 1,
+              boxShadow: '0 0 16px rgba(0,200,255,0.20)',
+            }}
+          >
+            🎲 Random Results
+          </button>
+          <div style={{ color: randomStatus.startsWith('Random result failed') ? '#f87171' : '#64748b', fontSize: 10, minHeight: 14 }}>
+            {randomStatus || 'Creates, saves, injects, and opens a random results page.'}
+          </div>
         </Section>
 
         {/* Navigation */}

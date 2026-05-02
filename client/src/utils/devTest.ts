@@ -39,9 +39,9 @@ function mbtiToDimensions(mbti: string): { E: number; I: number; S: number; N: n
     S: SorN === "S" ? 3 : 1,
     N: SorN === "N" ? 3 : 1,
     T: TorF === "T" ? 3 : 1,
-    F: TorF === "F" ? 1 : 3,
+    F: TorF === "F" ? 3 : 1,
     J: JorP === "J" ? 3 : 1,
-    P: JorP === "P" ? 1 : 3,
+    P: JorP === "P" ? 3 : 1,
   };
 }
 
