@@ -425,29 +425,31 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
             </motion.div>
           </div>
           
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Button
-              size="lg"
-              onClick={onContinue}
-              disabled={!buttonActive}
-              className={`w-full transition-all duration-300 ${
-                buttonActive 
-                  ? "!bg-green-500 hover:!bg-green-600 !text-white border border-green-400/40 shadow-[0_0_24px_rgba(34,197,94,0.22)] disabled:opacity-100"
-                  : "!bg-green-500/80 !text-white border border-green-400/25 cursor-not-allowed disabled:opacity-100"
-              }`}
-              data-testid="button-recap-continue"
-            >
-              Keep Going
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </Button>
+          <div>
+            <AnimatePresence>
+              {buttonActive && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <Button
+                    size="lg"
+                    onClick={onContinue}
+                    className="w-full transition-all duration-300 !bg-green-500 hover:!bg-green-600 !text-white border border-green-400/40 shadow-[0_0_24px_rgba(34,197,94,0.22)]"
+                    data-testid="button-recap-continue"
+                  >
+                    Keep Going
+                    <ChevronRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <p className="text-xs text-warm-gray/50 dark:text-[#64748B] mt-3">
               {questionsRemaining} questions remaining
             </p>
-          </motion.div>
+          </div>
         </motion.div>
       </main>
     </div>
