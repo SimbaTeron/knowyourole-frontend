@@ -41,7 +41,7 @@ interface DevState {
 }
 
 const defaultState = {
-  isOpen: false,
+  isOpen: true,
   devMode: true,
   fakeDataEnabled: true,
   skipToResults: false,
@@ -78,6 +78,7 @@ export const useDevStore = create<DevState>()(
       name: 'kyr-dev-store',
       // Only persist in browser
       partialize: (state) => ({
+        isOpen: state.isOpen,
         devMode: state.devMode,
         fakeDataEnabled: state.fakeDataEnabled,
         tier: state.tier,

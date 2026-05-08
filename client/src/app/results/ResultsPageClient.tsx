@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
-import type { PointerEvent, TouchEvent } from "react";
+import { useState, useEffect } from "react";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
@@ -846,16 +845,9 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
   const [thinkingAnswer, setThinkingAnswer] = useState<string | null>(null);
   const [thinkingStreak, setThinkingStreak] = useState(0);
   const [crossroadsChoice, setCrossroadsChoice] = useState<string | null>(null);
-  const [dreamRoleInput, setDreamRoleInput] = useState("");
+  const [dreamRoleInput, setDreamRoleInput] = useState("AI Product Founder");
   const [dreamRoleSelected, setDreamRoleSelected] = useState("AI Product Founder");
   const [dreamRoleSubmitted, setDreamRoleSubmitted] = useState("AI Product Founder");
-  const stripRef = useRef<HTMLDivElement>(null);
-  const dragStartXRef = useRef<number | null>(null);
-  const dragScrollLeftRef = useRef(0);
-  const dragMovedRef = useRef(false);
-  const pendingInsightIdRef = useRef<string | null>(null);
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
-  const [touchDeltaX, setTouchDeltaX] = useState(0);
 
   const base = type.split("-")[0];
   const arch = getArchetype(base);
@@ -864,80 +856,6 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
   const hustle = SIDE_HUSTLES[mbtiType] || { title: "AI Side Hustle", income: "+$3K/mo", desc: "Build and sell AI-powered productivity tools for strategic thinkers.", tags: ["⏱ 6–8 hrs/wk", "📈 $2K–$5K/mo", "🎯 High fit"] };
   const learningStyle = LEARNING_STYLES[mbtiType] || { title: "Systems-Based Learning", desc: "You absorb information fastest when connected to a larger system.", tips: ["📐 Study systematically", "🎯 Apply what you learn", "📖 Read case studies"] };
   const crossroad = CROSSROADS[mbtiType] || { heading: "Crossroads Adventure", desc: "Every major decision shapes who you become. Your type shows you the paths worth taking.", tags: ["Intuition", "Strategy", "Leadership", "Growth"] };
-
-  const CARD_WIDTH = 80; // 72px card + 8px gap
-
-  const advanceInsight = (direction: 1 | -1) => {
-    const currentIndex = CONSTELLATION_ITEMS.findIndex(c => c.id === activeCard);
-    const nextIndex = Math.max(0, Math.min(CONSTELLATION_ITEMS.length - 1, currentIndex + direction));
-    setActiveCard(CONSTELLATION_ITEMS[nextIndex].id);
-  };
-
-  const handleTouchStart = (e: TouchEvent) => {
-    setTouchStartX(e.touches[0].clientX);
-    setTouchDeltaX(0);
-  };
-
-  const handleTouchMove = (e: TouchEvent) => {
-    if (touchStartX === null) return;
-    const delta = e.touches[0].clientX - touchStartX;
-    setTouchDeltaX(delta);
-    if (Math.abs(delta) > 5) e.preventDefault();
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStartX === null) return;
-    const moved = touchDeltaX;
-    if (moved < -40) advanceInsight(1);
-    if (moved > 40) advanceInsight(-1);
-    if (stripRef.current) {
-      const scrollLeft = stripRef.current.scrollLeft + (moved < -40 ? CARD_WIDTH : moved > 40 ? -CARD_WIDTH : 0);
-      stripRef.current.scrollTo({ left: Math.max(0, scrollLeft), behavior: "smooth" });
-    }
-    setTouchStartX(null);
-    setTouchDeltaX(0);
-  };
-
-  const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType === "touch") return;
-    const target = e.target as HTMLElement;
-    pendingInsightIdRef.current = target.closest<HTMLElement>("[data-insight-id]")?.dataset.insightId || null;
-    dragStartXRef.current = e.clientX;
-    dragScrollLeftRef.current = stripRef.current?.scrollLeft ?? 0;
-    dragMovedRef.current = false;
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (dragStartXRef.current === null || !stripRef.current) return;
-    const delta = e.clientX - dragStartXRef.current;
-    if (Math.abs(delta) > 10) dragMovedRef.current = true;
-    stripRef.current.scrollLeft = dragScrollLeftRef.current - delta;
-  };
-
-  const handlePointerUp = (e: PointerEvent<HTMLDivElement>) => {
-    if (dragStartXRef.current === null) return;
-    const moved = e.clientX - dragStartXRef.current;
-    const tappedInsightId = pendingInsightIdRef.current;
-
-    if (Math.abs(moved) <= 10 && tappedInsightId) {
-      setActiveCard(tappedInsightId);
-    } else {
-      if (moved < -40) advanceInsight(1);
-      if (moved > 40) advanceInsight(-1);
-    }
-
-    dragStartXRef.current = null;
-    pendingInsightIdRef.current = null;
-    window.setTimeout(() => {
-      dragMovedRef.current = false;
-    }, 50);
-  };
-
-  const handleInsightClick = (itemId: string) => {
-    if (dragMovedRef.current) return;
-    setActiveCard(itemId);
-  };
 
   const ActionButton = ({ children, active, onClick, title }: { children: React.ReactNode; active?: boolean; onClick: () => void; title?: string }) => (
     <button
@@ -1454,93 +1372,85 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
 
       {/* Constellation Section */}
       <SectionLabel>Explore Insights</SectionLabel>
-      <div style={{ fontSize: 9, color: C.textDim, textAlign: "center", marginBottom: 4 }}>
-        ← Drag or swipe to explore ›
+      <div style={{ fontSize: 9, color: C.textDim, textAlign: "center", marginBottom: 6 }}>
+        Tap any insight circle
       </div>
       <div
-        ref={stripRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
         style={{
-          overflowX: "auto",
-          marginBottom: 10,
-          scrollbarWidth: "none" as const,
-          transform: touchStartX !== null ? `translateX(${touchDeltaX}px)` : undefined,
-          transition: touchStartX !== null ? "none" : "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-          cursor: touchStartX !== null ? "grabbing" : "grab",
+          display: "grid",
+          gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+          gap: 4,
+          alignItems: "start",
+          margin: "0 auto 12px",
+          maxWidth: 420,
+          width: "100%",
           userSelect: "none",
-          WebkitOverflowScrolling: "touch",
         }}
       >
-        <div style={{ display: "flex", gap: 8, padding: "8px 0 12px", minWidth: "max-content" }}>
-          {CONSTELLATION_ITEMS.map(item => (
-            <button
-              key={item.id}
-              type="button"
-              data-insight-id={item.id}
-              aria-pressed={activeCard === item.id}
-              onPointerUp={(e) => {
-                if (e.pointerType !== "touch" && !dragMovedRef.current) setActiveCard(item.id);
-              }}
-              onMouseUp={() => {
-                if (!dragMovedRef.current) setActiveCard(item.id);
-              }}
-              onClick={() => handleInsightClick(item.id)}
-              style={{
-                flex: "0 0 auto",
-                width: 72,
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-                cursor: "pointer",
-                background: "transparent",
-                border: "none",
-                padding: 0,
-                fontFamily: "Inter, sans-serif",
-                touchAction: "pan-x",
-              }}
-            >
+        {CONSTELLATION_ITEMS.map((item, index) => (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={activeCard === item.id}
+            onClick={() => setActiveCard(item.id)}
+            style={{
+              minWidth: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 5,
+              cursor: "pointer",
+              background: "transparent",
+              border: "none",
+              padding: index % 2 === 0 ? "0 0 2px" : "10px 0 2px",
+              fontFamily: "Inter, sans-serif",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            <div style={{
+              width: 42, height: 42, borderRadius: "50%",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 18, position: "relative", transition: "all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              background: activeCard === item.id ? "rgba(34,211,238,0.14)" : C.glassBg,
+              border: activeCard === item.id ? `1.5px solid ${C.cyan}` : `1.5px solid ${C.glassBorder}`,
+              boxShadow: activeCard === item.id ? `0 0 18px rgba(34,211,238,0.28), 0 0 34px rgba(34,211,238,0.1)` : "none",
+              transform: activeCard === item.id ? "scale(1.08)" : "scale(1)",
+            }}>
+              <style>{`
+                @keyframes orbitSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+              `}</style>
               <div style={{
-                width: 56, height: 56, borderRadius: "50%",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 22, position: "relative", transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                background: activeCard === item.id ? "rgba(34,211,238,0.12)" : C.glassBg,
-                border: activeCard === item.id ? `1.5px solid ${C.cyan}` : `1.5px solid ${C.glassBorder}`,
-                boxShadow: activeCard === item.id ? `0 0 20px rgba(34,211,238,0.25), 0 0 40px rgba(34,211,238,0.1)` : "none",
-                transform: activeCard === item.id ? "scale(1.12)" : "scale(1)",
-              }}>
-                <style>{`
-                  @keyframes orbitSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-                `}</style>
-                <div style={{
-                  position: "absolute", inset: -4, borderRadius: "50%",
-                  border: "1px dashed rgba(255,255,255,0.08)",
-                  animation: "orbitSpin 12s linear infinite",
-                  pointerEvents: "none",
-                }} />
-                <div style={{
-                  position: "absolute", inset: 0, borderRadius: "50%",
-                  background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.15), transparent 60%)",
-                  pointerEvents: "none",
-                }} />
-                {item.icon}
-              </div>
-              <div style={{
-                fontSize: 8, fontWeight: 600, color: activeCard === item.id ? C.cyan : C.textMuted,
-                textAlign: "center", lineHeight: 1.3, maxWidth: 64, transition: "color 0.2s",
-              }}>{item.name}</div>
-              <div style={{
-                width: 5, height: 5, borderRadius: "50%",
-                background: activeCard === item.id ? C.cyan : C.textDim,
-                boxShadow: activeCard === item.id ? `0 0 6px ${C.cyan}` : "none",
-                transition: "all 0.2s",
+                position: "absolute", inset: -3, borderRadius: "50%",
+                border: "1px dashed rgba(255,255,255,0.08)",
+                animation: "orbitSpin 12s linear infinite",
+                pointerEvents: "none",
               }} />
-            </button>
-          ))}
-        </div>
+              <div style={{
+                position: "absolute", inset: 0, borderRadius: "50%",
+                background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.15), transparent 60%)",
+                pointerEvents: "none",
+              }} />
+              {item.icon}
+            </div>
+            <div style={{
+              fontSize: 7,
+              fontWeight: 700,
+              color: activeCard === item.id ? C.cyan : C.textMuted,
+              textAlign: "center",
+              lineHeight: 1.12,
+              width: "100%",
+              minHeight: 16,
+              transition: "color 0.2s",
+            }}>{item.name}</div>
+            <div style={{
+              width: 5, height: 5, borderRadius: "50%",
+              background: activeCard === item.id ? C.cyan : C.textDim,
+              boxShadow: activeCard === item.id ? `0 0 6px ${C.cyan}` : "none",
+              transition: "all 0.2s",
+            }} />
+          </button>
+        ))}
       </div>
 
       {/* Feature Card */}

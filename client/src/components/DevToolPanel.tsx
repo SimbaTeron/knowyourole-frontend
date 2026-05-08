@@ -4,112 +4,56 @@ import { useEffect, useState } from 'react';
 import { useDevStore, type DevMood, type DevTier } from '@/stores/devStore';
 import { getFakeDiscStyle, getFakeMBTIType, getFakeScores } from '@/utils/devTest';
 
-// ── Control primitives ───────────────────────────────────────────────────────
-
-function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '2px 0' }}>
-      <span style={{ color: '#94a3b8', fontSize: 11, flex: 1 }}>{label}</span>
-      <div
-        onClick={() => onChange(!value)}
-        style={{
-          width: 32, height: 18, borderRadius: 9,
-          background: value ? '#00c8ff' : '#334155',
-          position: 'relative', transition: 'background 0.2s', cursor: 'pointer',
-          flexShrink: 0,
-        }}
-      >
-        <div style={{
-          width: 14, height: 14, borderRadius: '50%', background: '#fff',
-          position: 'absolute', top: 2, left: value ? 14 : 2,
-          transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
-        }} />
-      </div>
-    </label>
-  );
-}
-
-function Select({ label, value, options, onChange }: {
-  label: string; value: string;
-  options: { value: string; label: string }[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <span style={{ color: '#475569', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-        {label}
-      </span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{
-          background: '#0d0d1a', border: '1px solid #1e293b',
-          borderRadius: 5, color: '#e2e8f0', padding: '4px 6px',
-          fontSize: 11, cursor: 'pointer', outline: 'none', width: '100%',
-        }}
-      >
-        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
-    </div>
-  );
-}
-
-function TextInput({ label, value, onChange, placeholder }: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string;
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <span style={{ color: '#475569', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-        {label}
-      </span>
-      <input
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        style={{
-          background: '#0d0d1a', border: '1px solid #1e293b', borderRadius: 5,
-          color: '#e2e8f0', padding: '4px 6px', fontSize: 11, outline: 'none',
-          width: '100%', boxSizing: 'border-box',
-        }}
-      />
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginBottom: 12 }}>
-      <div style={{
-        color: '#00c8ff', fontSize: 9, textTransform: 'uppercase',
-        letterSpacing: '0.1em', fontWeight: 700, marginBottom: 8,
-        paddingBottom: 4, borderBottom: '1px solid #1e293b',
-      }}>
-        {title}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-// ── Write fake data to sessionStorage ─────────────────────────────────────────
-
-const RANDOM_TIERS: DevTier[] = ['13-18', '19-25', '25plus'];
-const RANDOM_MOODS: DevMood[] = ['focused', 'chill', 'adventurous', 'romantic', 'reflective', 'creative'];
-const RANDOM_MBTI = [
+const MBTI_OPTIONS = [
+  'Auto',
   'INTJ', 'INTP', 'ENTJ', 'ENTP',
   'INFJ', 'INFP', 'ENFJ', 'ENFP',
   'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ',
   'ISTP', 'ISFP', 'ESTP', 'ESFP',
+] as const;
+
+const TIER_OPTIONS: { value: DevTier; label: string }[] = [
+  { value: '25plus', label: '25+ Adults' },
+  { value: '19-25', label: '18-25 Young Adult' },
+  { value: '13-18', label: '13-17 Teen' },
 ];
 
-function pickRandom<T>(items: T[]): T {
+const MOOD_OPTIONS: { value: DevMood; label: string }[] = [
+  { value: 'focused', label: '🎯 Focused' },
+  { value: 'chill', label: '😌 Chill' },
+  { value: 'adventurous', label: '🚀 Adventurous' },
+  { value: 'romantic', label: '💕 Romantic' },
+  { value: 'reflective', label: '🤔 Reflective' },
+  { value: 'creative', label: '🎨 Creative' },
+];
+
+const RANDOM_TIERS: DevTier[] = ['13-18', '19-25', '25plus'];
+const RANDOM_MOODS: DevMood[] = ['focused', 'chill', 'adventurous', 'romantic', 'reflective', 'creative'];
+const RANDOM_MBTI = MBTI_OPTIONS.filter((type) => type !== 'Auto');
+
+const PREVIEW_STORAGE_KEYS = [
+  'kyr_tier',
+  'kyr_quiz_tier',
+  'kyr_fake_scores',
+  'kyr_real_scores',
+  'kyr_fake_mbti',
+  'kyr_fake_type',
+  'kyr_result_dto',
+  'kyr_premium_unlocked',
+  'knowrole-tier',
+  'knowrole-mood',
+];
+
+function pickRandom<T>(items: readonly T[]): T {
   return items[Math.floor(Math.random() * items.length)] ?? items[0];
 }
 
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function tierToParam(tier: string) {
+  return tier === '25plus' ? '25+' : tier;
 }
 
 function buildRandomizedScores(tier: DevTier, mbti: string) {
@@ -145,24 +89,24 @@ function buildRandomizedScores(tier: DevTier, mbti: string) {
 }
 
 function writeFakeDataToSession(
-  tier: string,
-  mbti: string,
-  mood: string,
+  tier: DevTier,
+  mbtiOverride: string,
+  mood: DevMood,
   forcePremium: boolean,
   injectedScores?: ReturnType<typeof getFakeScores>,
 ) {
-  const fakeScores = injectedScores ?? getFakeScores(tier, mbti || null);
-  const tierKey = tier === '25plus' ? '25+' : tier;
-  const resolvedMBTI = mbti || getFakeMBTIType(fakeScores);
+  const fakeScores = injectedScores ?? getFakeScores(tier, mbtiOverride || null);
+  const resolvedMBTI = mbtiOverride || getFakeMBTIType(fakeScores);
   const resolvedDisc = getFakeDiscStyle(fakeScores);
+  const tierParam = tierToParam(tier);
 
-  sessionStorage.setItem('kyr_tier', tierKey);
-  sessionStorage.setItem('kyr_quiz_tier', tierKey);
+  sessionStorage.setItem('kyr_tier', tierParam);
+  sessionStorage.setItem('kyr_quiz_tier', tierParam);
   sessionStorage.setItem('kyr_fake_scores', JSON.stringify(fakeScores));
   sessionStorage.setItem('kyr_real_scores', JSON.stringify(fakeScores));
   sessionStorage.setItem('kyr_fake_mbti', resolvedMBTI);
   sessionStorage.setItem('kyr_fake_type', `${resolvedMBTI}-${resolvedDisc}`);
-  sessionStorage.setItem('knowrole-tier', tierKey);
+  sessionStorage.setItem('knowrole-tier', tierParam);
   sessionStorage.setItem('knowrole-mood', mood);
 
   if (forcePremium) {
@@ -171,73 +115,185 @@ function writeFakeDataToSession(
     sessionStorage.removeItem('kyr_premium_unlocked');
   }
 
-  return fakeScores;
+  return { scores: fakeScores, mbtiType: resolvedMBTI, discStyle: resolvedDisc, tierParam };
 }
 
-// ── Main DevToolPanel ────────────────────────────────────────────────────────
+function clearPreviewStorage() {
+  PREVIEW_STORAGE_KEYS.forEach((key) => {
+    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
+  });
+}
+
+function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!value)}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+        width: '100%', background: 'rgba(255,255,255,0.035)', border: '1px solid #1e293b',
+        borderRadius: 8, color: '#cbd5e1', padding: '7px 8px', cursor: 'pointer',
+        fontFamily: "'Outfit', sans-serif", fontSize: 11,
+      }}
+    >
+      <span>{label}</span>
+      <span style={{
+        width: 34, height: 18, borderRadius: 999, background: value ? '#00c8ff' : '#334155',
+        position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+      }}>
+        <span style={{
+          width: 14, height: 14, borderRadius: '50%', background: '#fff', position: 'absolute',
+          top: 2, left: value ? 18 : 2, transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.45)',
+        }} />
+      </span>
+    </button>
+  );
+}
+
+function Select<T extends string>({ label, value, options, onChange }: {
+  label: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (v: T) => void;
+}) {
+  return (
+    <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <span style={{ color: '#64748b', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as T)}
+        style={{
+          background: '#0d0d1a', border: '1px solid #1e293b', borderRadius: 7,
+          color: '#e2e8f0', padding: '7px 8px', fontSize: 11, cursor: 'pointer', outline: 'none', width: '100%',
+        }}
+      >
+        {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+      </select>
+    </label>
+  );
+}
+
+function Button({ children, onClick, variant = 'secondary', disabled = false }: {
+  children: React.ReactNode;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary' | 'danger';
+  disabled?: boolean;
+}) {
+  const bg = variant === 'primary'
+    ? 'linear-gradient(135deg, #00c8ff, #7800ff)'
+    : variant === 'danger'
+      ? 'rgba(248,113,113,0.12)'
+      : 'rgba(255,255,255,0.045)';
+  const border = variant === 'primary'
+    ? '1px solid rgba(255,255,255,0.18)'
+    : variant === 'danger'
+      ? '1px solid rgba(248,113,113,0.35)'
+      : '1px solid rgba(255,255,255,0.08)';
+  const color = variant === 'danger' ? '#fca5a5' : '#e2e8f0';
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        background: bg, border, borderRadius: 8, color, cursor: disabled ? 'wait' : 'pointer',
+        fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 800, padding: '8px 9px',
+        width: '100%', opacity: disabled ? 0.65 : 1, textAlign: 'center',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 13 }}>
+      <div style={{
+        color: '#00c8ff', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.1em',
+        fontWeight: 900, paddingBottom: 4, borderBottom: '1px solid #1e293b',
+      }}>
+        {title}
+      </div>
+      {children}
+    </section>
+  );
+}
 
 export default function DevToolPanel() {
   const store = useDevStore();
   const [mounted, setMounted] = useState(false);
-  const [randomStatus, setRandomStatus] = useState<string>('');
+  const [status, setStatus] = useState('Ready');
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Always visible on localhost — check hostname after hydration.
-  const isLocalhost =
-    mounted &&
-    (window.location.hostname === 'localhost' ||
-     window.location.hostname === '127.0.0.1' ||
-     window.location.hostname.startsWith('192.168.'));
+  const isLocalhost = mounted && (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.startsWith('192.168.')
+  );
 
-  // Sync fake data to sessionStorage whenever dev store changes
+  useEffect(() => {
+    if (!mounted || !isLocalhost) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'd') {
+        event.preventDefault();
+        store.toggleOpen();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mounted, isLocalhost, store]);
+
   useEffect(() => {
     if (!mounted || !isLocalhost) return;
     if (store.devMode && store.fakeDataEnabled) {
       writeFakeDataToSession(store.tier, store.mbtiOverride, store.mood, store.forcePremium);
+      setStatus(`Preview active · ${store.mbtiOverride || 'Auto'} · ${store.forcePremium ? 'Premium' : 'Free'}`);
     }
   }, [mounted, isLocalhost, store.devMode, store.fakeDataEnabled, store.tier, store.mbtiOverride, store.mood, store.forcePremium]);
 
   if (!mounted || !isLocalhost) return null;
 
-  const NAV_PATHS = [
-    { path: '/', label: 'Landing' },
-    { path: '/crossroads', label: 'Crossroads' },
-    { path: '/mood', label: 'Mood Selector' },
-    { path: '/quiz', label: 'Quiz' },
-    { path: '/results', label: 'Results' },
-    { path: '/checkout-success', label: 'Checkout ✓' },
-    { path: '/auth', label: 'Auth' },
-    { path: '/profile', label: 'Profile' },
-    { path: '/about', label: 'About' },
-    { path: '/faq', label: 'FAQ' },
-  ];
+  const currentPath = window.location.pathname;
+  const busy = status === 'Saving random result…';
 
-  const handleNavigate = (path: string) => {
+  const openPath = (path: string, extraParams?: Record<string, string>) => {
     if (store.devMode && store.fakeDataEnabled) {
       writeFakeDataToSession(store.tier, store.mbtiOverride, store.mood, store.forcePremium);
     }
-    const params = new URLSearchParams();
-    params.set('test', 'true');
-    if (store.tier) {
-      const tierMap: Record<string, string> = { '25plus': '25+', '19-25': '19-25', '13-18': '13-18' };
-      params.set('tier', tierMap[store.tier] || store.tier);
-    }
+    const params = new URLSearchParams({ test: 'true', tier: tierToParam(store.tier), ...extraParams });
     window.location.href = `${path}?${params.toString()}`;
   };
 
-  const handleRandomResults = async () => {
+  const openResultsPage = (page: '1' | '3') => {
+    const preview = writeFakeDataToSession(store.tier, store.mbtiOverride, store.mood, page === '3' || store.forcePremium);
+    const params = new URLSearchParams({
+      test: 'true',
+      force: 'true',
+      page,
+      tier: preview.tierParam,
+      mbtiType: preview.mbtiType,
+      discStyle: preview.discStyle,
+      scores: btoa(JSON.stringify(preview.scores)),
+    });
+    window.location.href = `/results?${params.toString()}`;
+  };
+
+  const handleRandomizeResults = async () => {
     const tier = pickRandom(RANDOM_TIERS);
     const mood = pickRandom(RANDOM_MOODS);
     const mbti = pickRandom(RANDOM_MBTI);
     const scores = buildRandomizedScores(tier, mbti);
     const discStyle = getFakeDiscStyle(scores);
     const sessionId = `dev-random-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const tierParam = tier === '25plus' ? '25+' : tier;
+    const tierParam = tierToParam(tier);
 
-    setRandomStatus('Saving random result…');
+    setStatus('Saving random result…');
     store.setDevMode(true);
     store.setFakeDataEnabled(true);
     store.setForcePremium(true);
@@ -266,8 +322,7 @@ export default function DevToolPanel() {
       }
 
       sessionStorage.setItem('kyr_result_dto', JSON.stringify(data.result));
-      setRandomStatus(`Saved ${mbti}-${discStyle}; opening results…`);
-
+      setStatus(`Saved ${mbti}-${discStyle}; opening Full Portrait…`);
       const params = new URLSearchParams({
         test: 'true',
         random: 'true',
@@ -282,224 +337,129 @@ export default function DevToolPanel() {
       window.location.href = `/results?${params.toString()}`;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-      console.error('[DevPanel] Random results failed', error);
-      setRandomStatus(`Random result failed: ${message}`);
-      window.alert(`Random result failed to save. Not opening results.\n\n${message}`);
+      console.error('[DevPanel] Randomize results failed', error);
+      setStatus(`Randomize failed: ${message}`);
+      window.alert(`Randomize Results Pages Data failed.\n\n${message}`);
     }
   };
 
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const handleClearPreview = () => {
+    clearPreviewStorage();
+    setStatus('Preview storage cleared');
+  };
 
-  const TIER_OPTIONS = [
-    { value: '25plus', label: '25+ Adults' },
-    { value: '19-25', label: '18-25 Young Adult' },
-    { value: '13-18', label: '13-17 Teen' },
-  ];
+  const handleReset = () => {
+    store.reset();
+    clearPreviewStorage();
+    setStatus('Panel reset + preview storage cleared');
+  };
 
-  const MOOD_OPTIONS = [
-    { value: 'focused', label: '🎯 Focused' },
-    { value: 'chill', label: '😌 Chill' },
-    { value: 'adventurous', label: '🚀 Adventurous' },
-    { value: 'romantic', label: '💕 Romantic' },
-    { value: 'reflective', label: '🤔 Reflective' },
-    { value: 'creative', label: '🎨 Creative' },
-  ];
-
-  const ARCHETYPE_OPTIONS = [
-    { value: 'The Sage', label: 'The Sage' },
-    { value: 'The Explorer', label: 'The Explorer' },
-    { value: 'The Hero', label: 'The Hero' },
-    { value: 'The Rebel', label: 'The Rebel' },
-    { value: 'The Lover', label: 'The Lover' },
-    { value: 'The Magician', label: 'The Magician' },
-  ];
+  if (!store.isOpen) {
+    return (
+      <button
+        type="button"
+        onClick={store.toggleOpen}
+        title="Show Dev Panel (Ctrl+Shift+D)"
+        style={{
+          position: 'fixed', top: 10, left: 10, zIndex: 99999,
+          background: 'linear-gradient(135deg, #00c8ff, #7800ff)', color: '#fff',
+          border: '1px solid rgba(255,255,255,0.22)', borderRadius: 999, padding: '8px 11px',
+          fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 900, cursor: 'pointer',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.45), 0 0 20px rgba(0,200,255,0.22)',
+        }}
+      >
+        DEV
+      </button>
+    );
+  }
 
   return (
-    <div
+    <aside
+      aria-label="Local development panel"
       style={{
         position: 'fixed', top: 10, left: 10, zIndex: 99999,
-        width: 260, background: 'rgba(10, 10, 25, 0.97)',
-        border: '1.5px solid #00c8ff55',
-        borderRadius: 10,
-        boxShadow: '0 0 30px rgba(0, 200, 255, 0.12), 0 8px 32px rgba(0,0,0,0.6)',
-        fontFamily: "'Outfit', sans-serif",
-        fontSize: 12, color: '#e2e8f0',
-        maxHeight: '94vh', overflowY: 'auto',
-        backdropFilter: 'blur(20px)',
+        width: 260, background: 'rgba(10, 10, 25, 0.97)', border: '1.5px solid #00c8ff55',
+        borderRadius: 12, boxShadow: '0 0 30px rgba(0, 200, 255, 0.12), 0 8px 32px rgba(0,0,0,0.6)',
+        fontFamily: "'Outfit', sans-serif", fontSize: 12, color: '#e2e8f0', maxHeight: '94vh',
+        overflowY: 'auto', backdropFilter: 'blur(20px)',
       }}
     >
-      {/* Header */}
       <div style={{
-        padding: '8px 12px',
-        background: 'linear-gradient(90deg, #00c8ff15, #7800ff10)',
-        borderBottom: '1px solid #1e293b',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        position: 'sticky', top: 0, zIndex: 1,
-        borderRadius: '9px 9px 0 0',
+        padding: '9px 11px', background: 'linear-gradient(90deg, #00c8ff15, #7800ff10)',
+        borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        position: 'sticky', top: 0, zIndex: 1, borderRadius: '11px 11px 0 0',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{
-            width: 7, height: 7, borderRadius: '50%', background: '#00c8ff',
-            boxShadow: '0 0 6px #00c8ff',
-          }} />
-          <span style={{ color: '#00c8ff', fontWeight: 900, fontSize: 11, letterSpacing: '0.08em' }}>
-            DEV PANEL
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#00c8ff', boxShadow: '0 0 6px #00c8ff' }} />
+          <span style={{ color: '#00c8ff', fontWeight: 900, fontSize: 11, letterSpacing: '0.08em' }}>DEV PANEL</span>
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button
-            onClick={store.reset}
-            title="Reset all"
-            style={{
-              background: 'transparent', border: '1px solid #334155',
-              borderRadius: 4, color: '#64748b', fontSize: 9,
-              padding: '2px 5px', cursor: 'pointer', letterSpacing: '0.05em',
-            }}
-          >
-            RESET
-          </button>
-          <span style={{ color: '#334155', fontSize: 10, alignSelf: 'center' }}>
-            Ctrl+Shift+D
-          </span>
+        <div style={{ display: 'flex', gap: 5 }}>
+          <button type="button" onClick={handleReset} title="Reset panel and clear preview data" style={{ background: 'transparent', border: '1px solid #334155', borderRadius: 5, color: '#64748b', fontSize: 9, padding: '3px 5px', cursor: 'pointer' }}>RESET</button>
+          <button type="button" onClick={store.toggleOpen} title="Hide Dev Panel" style={{ background: 'rgba(0,200,255,0.12)', border: '1px solid #00c8ff55', borderRadius: 5, color: '#00c8ff', fontSize: 9, padding: '3px 6px', cursor: 'pointer', fontWeight: 900 }}>HIDE</button>
         </div>
       </div>
 
-      {/* Body */}
       <div style={{ padding: 12 }}>
-
-        {/* Current page indicator */}
-        <div style={{
-          background: '#0d0d1a', borderRadius: 6, padding: '5px 8px', marginBottom: 12,
-          border: '1px solid #1e293b',
-        }}>
-          <div style={{ color: '#475569', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            Current Page
-          </div>
-          <div style={{ color: '#00c8ff', fontWeight: 700, fontSize: 12 }}>{currentPath}</div>
+        <div style={{ background: '#0d0d1a', borderRadius: 8, padding: '7px 8px', marginBottom: 12, border: '1px solid #1e293b' }}>
+          <div style={{ color: '#64748b', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Current Page</div>
+          <div style={{ color: '#00c8ff', fontWeight: 800, fontSize: 12 }}>{currentPath}</div>
+          <div style={{ color: status.startsWith('Randomize failed') ? '#fca5a5' : '#94a3b8', fontSize: 10, marginTop: 4 }}>{status}</div>
         </div>
 
-        {/* Global toggles */}
-        <Section title="Global">
-          <Toggle label="Dev Mode" value={store.devMode} onChange={store.setDevMode} />
+        <Section title="Results Preview">
+          <Button variant="primary" onClick={handleRandomizeResults} disabled={busy}>🎲 Randomize Results Pages Data</Button>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <Button onClick={() => openResultsPage('1')}>Full Portrait</Button>
+            <Button onClick={() => openResultsPage('3')}>Premium Nexus</Button>
+          </div>
+          <Toggle label="Premium Preview" value={store.forcePremium} onChange={store.setForcePremium} />
           <Toggle label="Inject Fake Data" value={store.fakeDataEnabled} onChange={store.setFakeDataEnabled} />
-          <Toggle label="Skip Quiz → Results" value={store.skipToResults} onChange={store.setSkipToResults} />
-          <Toggle label="Mock Auth (auto-login)" value={store.mockAuthEnabled} onChange={store.setMockAuthEnabled} />
-          <Toggle label="Force Premium (no paywall)" value={store.forcePremium} onChange={store.setForcePremium} />
         </Section>
 
-        {/* Quiz config */}
-        <Section title="Quiz Config">
-          <Select label="Tier" value={store.tier} options={TIER_OPTIONS} onChange={(v) => store.setTier(v as any)} />
-          <Select label="Mood" value={store.mood} options={MOOD_OPTIONS} onChange={(v) => store.setMood(v as any)} />
-        </Section>
-
-        {/* Results config */}
-        <Section title="Results Config">
-          <TextInput
-            label="MBTI Override (e.g. ENTJ)"
-            value={store.mbtiOverride}
-            onChange={store.setMbtiOverride}
-            placeholder="Auto"
-          />
+        <Section title="Overrides">
+          <Select label="Tier" value={store.tier} options={TIER_OPTIONS} onChange={store.setTier} />
+          <Select label="Mood" value={store.mood} options={MOOD_OPTIONS} onChange={store.setMood} />
           <Select
-            label="Archetype"
-            value={store.archetype}
-            options={ARCHETYPE_OPTIONS}
-            onChange={(v) => store.setArchetype(v as any)}
+            label="MBTI"
+            value={(store.mbtiOverride || 'Auto') as (typeof MBTI_OPTIONS)[number]}
+            options={MBTI_OPTIONS.map((type) => ({ value: type, label: type }))}
+            onChange={(type) => store.setMbtiOverride(type === 'Auto' ? '' : type)}
           />
         </Section>
 
-        {/* Auth mock */}
-        <Section title="Auth Mock">
-          <Toggle label="Auto-login Test User" value={store.mockAuthEnabled} onChange={store.setMockAuthEnabled} />
-          <TextInput
-            label="Mock Email"
-            value={store.mockUserEmail}
-            onChange={store.setMockUserEmail}
-          />
-        </Section>
-
-        {/* Results shortcut */}
-        <Section title="Results Shortcut">
-          <button
-            onClick={handleRandomResults}
-            disabled={randomStatus === 'Saving random result…'}
-            style={{
-              background: 'linear-gradient(135deg, #00c8ff, #7800ff)',
-              border: '1px solid rgba(255,255,255,0.18)',
-              borderRadius: 7,
-              color: '#fff',
-              cursor: randomStatus === 'Saving random result…' ? 'wait' : 'pointer',
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.04em',
-              padding: '8px 9px',
-              textAlign: 'center',
-              width: '100%',
-              opacity: randomStatus === 'Saving random result…' ? 0.7 : 1,
-              boxShadow: '0 0 16px rgba(0,200,255,0.20)',
-            }}
-          >
-            🎲 Random Results
-          </button>
-          <div style={{ color: randomStatus.startsWith('Random result failed') ? '#f87171' : '#64748b', fontSize: 10, minHeight: 14 }}>
-            {randomStatus || 'Creates, saves, injects, and opens a random results page.'}
+        <Section title="Real Flow Navigation">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <Button onClick={() => openPath('/quiz-gateway')}>Gateway</Button>
+            <Button onClick={() => openPath('/mood-mixer')}>Mood Mixer</Button>
+            <Button onClick={() => openPath('/quiz')}>Quiz</Button>
+            <Button onClick={() => openPath('/checkout-success')}>Checkout ✓</Button>
           </div>
         </Section>
 
-        {/* Navigation */}
-        <Section title="Navigate">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-            {NAV_PATHS.map((np) => (
-              <button
-                key={np.path}
-                onClick={() => handleNavigate(np.path)}
-                style={{
-                  background: currentPath === np.path ? 'rgba(0,200,255,0.12)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${currentPath === np.path ? '#00c8ff66' : 'rgba(255,255,255,0.08)'}`,
-                  borderRadius: 5, padding: '4px 7px',
-                  color: currentPath === np.path ? '#00c8ff' : '#94a3b8',
-                  cursor: 'pointer', textAlign: 'left', fontSize: 10,
-                  fontFamily: "'Outfit', sans-serif",
-                  transition: 'all 0.15s',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = '#00c8ff66';
-                  (e.currentTarget as HTMLElement).style.color = '#00c8ff';
-                }}
-                onMouseLeave={(e) => {
-                  if (currentPath !== np.path) {
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)';
-                    (e.currentTarget as HTMLElement).style.color = '#94a3b8';
-                  }
-                }}
-              >
-                → {np.label}
-              </button>
-            ))}
-          </div>
+        <Section title="Maintenance">
+          <Button onClick={handleClearPreview}>Clear Preview Data</Button>
+          <Button variant="danger" onClick={handleReset}>Reset Panel + Storage</Button>
         </Section>
 
-        {/* Status bar */}
         <div style={{
-          padding: '6px 8px', background: '#0d0d1a', borderRadius: 6,
-          border: '1px solid #1e293b', fontSize: 10, color: '#475569',
-          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 12px',
+          padding: '7px 8px', background: '#0d0d1a', borderRadius: 8, border: '1px solid #1e293b',
+          fontSize: 10, color: '#64748b', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 10px',
         }}>
-          <div><span style={{ color: '#00c8ff' }}>Tier</span> {store.tier === '25plus' ? '25+' : store.tier}</div>
+          <div><span style={{ color: '#00c8ff' }}>Tier</span> {tierToParam(store.tier)}</div>
           <div><span style={{ color: '#00c8ff' }}>Mood</span> {store.mood}</div>
-          <div><span style={{ color: '#00c8ff' }}>MBTI</span> {store.mbtiOverride || 'auto'}</div>
-          <div><span style={{ color: '#00c8ff' }}>Prem</span> {store.forcePremium ? '✓' : '✗'}</div>
+          <div><span style={{ color: '#00c8ff' }}>MBTI</span> {store.mbtiOverride || 'Auto'}</div>
+          <div><span style={{ color: '#00c8ff' }}>Premium</span> {store.forcePremium ? '✓' : '✗'}</div>
         </div>
+
+        <div style={{ color: '#334155', fontSize: 9, marginTop: 8, textAlign: 'center' }}>Hide/show: button or Ctrl+Shift+D</div>
       </div>
 
       <style>{`
-        div::-webkit-scrollbar { width: 3px; }
-        div::-webkit-scrollbar-track { background: transparent; }
-        div::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
+        aside::-webkit-scrollbar { width: 3px; }
+        aside::-webkit-scrollbar-track { background: transparent; }
+        aside::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
         select option { background: #0d0d1a; color: #e2e8f0; }
       `}</style>
-    </div>
+    </aside>
   );
 }
