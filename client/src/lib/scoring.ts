@@ -112,47 +112,68 @@ export interface InputData {
   [key: string]: unknown;
 }
 
-export function calculateCronbachAlpha(responses: ResponseEntry[], traitGroup: string): number {
-  const traitResponses = responses.filter(r => r.psych?.includes(traitGroup));
-
-  if (traitResponses.length < 2) return 1;
-
-  const n = traitResponses.length;
-  const items = traitResponses.map(r => r.sliderValue !== undefined ? r.sliderValue : r.choice);
-
-  const totalScores = items;
-  const totalMean = totalScores.reduce((a, b) => a + b, 0) / n;
-  const totalVariance = totalScores.reduce((sum, val) => sum + Math.pow(val - totalMean, 2), 0) / (n - 1) || 1;
-
-  const itemVariances = items.map(item => {
-    const mean = (item + (n > 1 ? items.reduce((a, b) => a + b, 0) / n : item)) / 2;
-    return Math.pow(item - mean, 2);
-  });
-  const sumItemVariance = itemVariances.reduce((a, b) => a + b, 0) / (n - 1) || 1;
-
-  const alpha = (n / (n - 1)) * (1 - sumItemVariance / totalVariance);
-  return Math.max(0, Math.min(1, alpha));
-}
-
-export function calculateTraitConsistency(responses: ResponseEntry[]) {
-  const traitGroups = ["MBTI", "DISC", "Big5", "Critical", "FirstPrinciples"];
-  const alphas: Record<string, number> = {};
+export function calculateResponseConfidence(responses: ResponseEntry[]) {
+  const frameworks = ["MBTI", "DISC", "Big5", "Critical", "FirstPrinciples"];
+  const targetCounts: Record<string, number> = { MBTI: 14, DISC: 8, Big5: 18, Critical: 1, FirstPrinciples: 1 };
+  const confidenceByFramework: Record<string, number> = {};
   const lowConsistencyFlags: string[] = [];
-  const ALPHA_THRESHOLD = 0.7;
 
-  for (const trait of traitGroups) {
-    const alpha = calculateCronbachAlpha(responses, trait);
-    alphas[trait] = Math.round(alpha * 100) / 100;
-    if (alpha < ALPHA_THRESHOLD) lowConsistencyFlags.push(trait);
+  const frameworkFor = (psych?: string) => {
+    if (!psych || psych === "Unknown") return "Unknown";
+    if (psych.startsWith("MBTI")) return "MBTI";
+    if (psych.startsWith("DISC")) return "DISC";
+    if (psych.startsWith("Big5")) return "Big5";
+    if (psych === "Critical") return "Critical";
+    if (psych === "FirstPrinciples") return "FirstPrinciples";
+    return "Unknown";
+  };
+
+  const responseValueStrength = (r: ResponseEntry) => {
+    if (typeof r.sliderValue === "number") return Math.min(1, Math.abs(r.sliderValue) / 2);
+    return 0.75;
+  };
+
+  const timeQuality = (time?: number) => {
+    if (!Number.isFinite(time ?? NaN)) return 0.75;
+    const t = Number(time);
+    if (t < 1) return 0.4;
+    if (t < 2) return 0.7;
+    if (t <= 12) return 1;
+    if (t <= 15) return 0.85;
+    return 0.65;
+  };
+
+  for (const framework of frameworks) {
+    const group = responses.filter((r) => frameworkFor(r.psych) === framework);
+    const target = targetCounts[framework] || 1;
+    const coverage = Math.min(1, group.length / target);
+    const metadataCompleteness = group.length === 0 ? 0 : group.filter((r) => Boolean(r.psych) && r.psych !== "Unknown").length / group.length;
+    const avgTimeQuality = group.length === 0 ? 0 : group.reduce((sum, r) => sum + timeQuality(r.timeSpent), 0) / group.length;
+    const avgResponseStrength = group.length === 0 ? 0 : group.reduce((sum, r) => sum + responseValueStrength(r), 0) / group.length;
+    const confidence = Math.round((coverage * 0.45 + metadataCompleteness * 0.25 + avgTimeQuality * 0.2 + avgResponseStrength * 0.1) * 100);
+
+    confidenceByFramework[framework] = Math.max(0, Math.min(100, confidence));
+    if (confidenceByFramework[framework] < 55) lowConsistencyFlags.push(framework);
   }
 
-  const validAlphas = Object.values(alphas).filter(a => a > 0 && a <= 1);
-  const overallAlpha = validAlphas.length > 0
-    ? validAlphas.reduce((a, b) => a + b, 0) / validAlphas.length
-    : 0.7;
+  const overallConfidence = Math.round(
+    frameworks.reduce((sum, framework) => sum + confidenceByFramework[framework], 0) / frameworks.length,
+  );
+  const confidenceLevel = overallConfidence >= 75 ? "high" : overallConfidence >= 55 ? "medium" : "low";
 
-  return { alphas, lowConsistencyFlags, overallAlpha };
+  return {
+    confidenceByFramework,
+    lowConsistencyFlags,
+    overallConfidence,
+    confidenceLevel,
+    // Compatibility for older consumers: these are confidence ratios now, not Cronbach alpha.
+    alphas: Object.fromEntries(Object.entries(confidenceByFramework).map(([key, value]) => [key, Math.round((value / 100) * 100) / 100])),
+    overallAlpha: Math.round((overallConfidence / 100) * 100) / 100,
+  };
 }
+
+export const calculateCronbachAlpha = (_responses: ResponseEntry[], _traitGroup: string): number => 0;
+export const calculateTraitConsistency = calculateResponseConfidence;
 
 export function calculatePersonality(data: InputData) {
   const scores = (data.scores || data) as ScoresData;
@@ -229,7 +250,8 @@ export function calculatePersonality(data: InputData) {
 
   const criticalWildcardBoost = (scores.criticalWildcard || 0) * 20;
   const firstPrinciplesWildcardBoost = (scores.firstPrinciplesWildcard || 0) * 20;
-  const moodBoosts = scores.moodBoosts || { critical: 0, firstPrinciples: 0 };
+  // Mood Mixer is context only; it must not alter final scoring math.
+  const moodBoosts = { critical: 0, firstPrinciples: 0 };
 
   const criticalProxy = (mbtiT_pct * PROXY_WEIGHTS.critical.mbtiT) +
     (big5O_pct * PROXY_WEIGHTS.critical.big5O) +
@@ -281,13 +303,20 @@ export function calculatePersonality(data: InputData) {
   const responsesWithPsych = scores.responses.map((r) => ({
     questionId: r.questionId,
     choice: r.choice,
+    timeSpent: r.timeSpent,
     sliderValue: r.sliderValue,
     psych: r.psych || "Unknown",
+    optionMeta: r.optionMeta as [string, string] | undefined,
+    selectedOptionMeta: typeof r.selectedOptionMeta === "string" ? r.selectedOptionMeta : undefined,
+    selectedOptionLabel: typeof r.selectedOptionLabel === "string" ? r.selectedOptionLabel : undefined,
+    wildcard: typeof r.wildcard === "boolean" ? r.wildcard : undefined,
+    boostRange: r.boostRange as [number, number] | undefined,
+    is2x: typeof r.is2x === "boolean" ? r.is2x : undefined,
   }));
 
   const consistency = calculateTraitConsistency(responsesWithPsych);
   const consistencyWarning = consistency.lowConsistencyFlags.length > 0
-    ? `Balanced View - Retake for clarity on: ${consistency.lowConsistencyFlags.join(", ")}`
+    ? `Lower confidence signals: ${consistency.lowConsistencyFlags.join(", ")}`
     : null;
 
   const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
@@ -339,6 +368,10 @@ export function calculatePersonality(data: InputData) {
       slowCount: Array.isArray((scores as any).swipeTimes) ? (scores as any).swipeTimes.filter((t: number) => t > 6).length : 0,
     },
     consistency: {
+      confidenceByFramework: consistency.confidenceByFramework,
+      overallConfidence: consistency.overallConfidence,
+      confidenceLevel: consistency.confidenceLevel,
+      // Compatibility for older consumers. These values now mirror confidence, not Cronbach alpha.
       alphas: consistency.alphas,
       overallAlpha: consistency.overallAlpha,
       lowConsistencyFlags: consistency.lowConsistencyFlags,

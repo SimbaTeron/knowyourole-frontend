@@ -451,9 +451,9 @@
       ],
       "optionMeta": [
         "A+",
-        "D"
+        "A-"
       ],
-      "psych": "Big5-AD",
+      "psych": "Big5-A",
       "time": 6,
       "tier": "7-12",
       "version": "v1",
@@ -6950,7 +6950,7 @@
         "D",
         "I"
       ],
-      "psych": "DISC-IS",
+      "psych": "DISC-DI",
       "time": 7,
       "tier": "13-18",
       "version": "v1",
@@ -6971,7 +6971,7 @@
         "I",
         "C"
       ],
-      "psych": "DISC-CD",
+      "psych": "DISC-IC",
       "time": 7,
       "tier": "13-18",
       "version": "v1",
@@ -8235,9 +8235,9 @@
       ],
       "optionMeta": [
         "A+",
-        "T"
+        "A-"
       ],
-      "psych": "Big5-AT",
+      "psych": "Big5-A",
       "time": 8,
       "tier": "19-25",
       "version": "v1",
@@ -12962,7 +12962,7 @@
         "D",
         "I"
       ],
-      "psych": "DISC-IS",
+      "psych": "DISC-DI",
       "time": 8,
       "tier": "19-25",
       "version": "v1",
@@ -12983,7 +12983,7 @@
         "I",
         "C"
       ],
-      "psych": "DISC-CD",
+      "psych": "DISC-IC",
       "time": 8,
       "tier": "19-25",
       "version": "v1",
@@ -15679,7 +15679,7 @@
         "D",
         "I"
       ],
-      "psych": "DISC-IS",
+      "psych": "DISC-DI",
       "time": 8,
       "tier": "19-25",
       "version": "v1",
@@ -15700,7 +15700,7 @@
         "I",
         "C"
       ],
-      "psych": "DISC-CD",
+      "psych": "DISC-IC",
       "time": 8,
       "tier": "19-25",
       "version": "v1",
@@ -16259,9 +16259,9 @@
       ],
       "optionMeta": [
         "A+",
-        "T"
+        "A-"
       ],
-      "psych": "Big5-AT",
+      "psych": "Big5-A",
       "time": 8,
       "tier": "25+",
       "version": "v1",
@@ -20986,7 +20986,7 @@
         "D",
         "I"
       ],
-      "psych": "DISC-IS",
+      "psych": "DISC-DI",
       "time": 8,
       "tier": "25+",
       "version": "v1",
@@ -21007,7 +21007,7 @@
         "I",
         "C"
       ],
-      "psych": "DISC-CD",
+      "psych": "DISC-IC",
       "time": 8,
       "tier": "25+",
       "version": "v1",
@@ -23703,7 +23703,7 @@
         "D",
         "I"
       ],
-      "psych": "DISC-IS",
+      "psych": "DISC-DI",
       "time": 8,
       "tier": "25+",
       "version": "v1",
@@ -23724,7 +23724,7 @@
         "I",
         "C"
       ],
-      "psych": "DISC-CD",
+      "psych": "DISC-IC",
       "time": 8,
       "tier": "25+",
       "version": "v1",
@@ -24076,27 +24076,27 @@
   "tierConfig": {
     "7-12": {
       "minTime": 1,
-      "maxTime": 16,
+      "maxTime": 15,
       "totalQuestions": 25
     },
     "13-18": {
       "minTime": 1,
-      "maxTime": 14,
+      "maxTime": 15,
       "totalQuestions": 30
     },
     "19-25": {
       "minTime": 1,
-      "maxTime": 12,
+      "maxTime": 15,
       "totalQuestions": 35
     },
     "25+": {
       "minTime": 1,
-      "maxTime": 10,
+      "maxTime": 15,
       "totalQuestions": 40
     },
     "25plus": {
       "minTime": 1,
-      "maxTime": 10,
+      "maxTime": 15,
       "totalQuestions": 40
     }
   }

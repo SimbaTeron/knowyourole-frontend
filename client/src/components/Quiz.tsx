@@ -139,6 +139,13 @@ export interface QuizScores {
     swipeDirection: "left" | "right";
     sliderValue?: number; // Phase 1.1: -2 to +2 for slider questions
     responseType?: "binary" | "slider";
+    psych?: string;
+    optionMeta?: [string, string];
+    selectedOptionMeta?: string;
+    selectedOptionLabel?: string;
+    wildcard?: boolean;
+    boostRange?: [number, number];
+    is2x?: boolean;
   }>;
   swipeTimes: number[]; // Phase 2.1: Track all swipe times for dynamic difficulty
   averageSwipeTime: number; // Phase 2.1: Running average for difficulty scaling
@@ -152,6 +159,9 @@ export interface QuizScores {
 
 const SWIPE_THRESHOLD = 100;
 const ROTATION_RANGE = 15;
+const QUESTION_TIME_SECONDS = 15;
+const BREAK_QUESTION_TIME_SECONDS = 15;
+
 
 const TIMEOUT_QUIPS = [
   { quip: "Take a breath! No rush here" },
@@ -595,7 +605,6 @@ const getBrowserSessionItem = (key: string) => {
 
 export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
   const tier: ActiveTierValue = rawTier === "7-12" ? "13-18" : rawTier;
-  const tierConfig = questionsData.tierConfig[tier as keyof typeof questionsData.tierConfig] || questionsData.tierConfig["19-25"];
   const quizConfig = getQuizConfig(tier);
   const gameTier = tier === "25+" ? "25plus" : tier;
   const { teamName, isLocalitySet } = useLocalityTheme();
@@ -778,9 +787,8 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     if (questions.length > 0 && currentIndex < questions.length) {
       const currentQ = questions[currentIndex];
       
-      // Give slider questions 3 extra seconds since they're more complex
-      const extraTime = currentQ?.responseType === "slider" ? 3 : 0;
-      setTimeRemaining(tierConfig.maxTime + extraTime);
+      // Lock every quiz question to the product-standard 15 second window.
+      setTimeRemaining(QUESTION_TIME_SECONDS);
       setQuestionStartTime(Date.now());
       
       setVibrantColorIndex(Math.floor(Math.random() * READABLE_RANDOM_COLORS.length));
@@ -788,7 +796,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
       setShowQuip(false);
       setSliderValue(0); // Reset slider for new question
     }
-  }, [currentIndex, questions, tierConfig.maxTime, timerResetKey]);
+  }, [currentIndex, questions, timerResetKey]);
 
   // FIX: Backup quiz state to localStorage periodically and on beforeunload
   // This provides a fallback if sessionStorage is cleared mid-quiz
@@ -903,12 +911,12 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   const processScore = useCallback((question: Question, choiceIndex: 0 | 1, sliderValue?: number) => {
     const meta = question.optionMeta[choiceIndex];
     
-    // Phase 1.4: Variable boost range (10-30%) instead of fixed 80%
+    // Deterministic wildcard boost: identical answers must produce identical scores.
     const boostRange = question.boostRange || [0.7, 0.9];
-    const variableBoost = boostRange[0] + Math.random() * (boostRange[1] - boostRange[0]);
+    const deterministicBoost = (boostRange[0] + boostRange[1]) / 2;
     // Apply 2x multiplier for special 2x questions
     const multiplier = question.is2x ? 2 : 1;
-    const baseWeight = (question.wildcard ? variableBoost : 1) * multiplier;
+    const baseWeight = (question.wildcard ? deterministicBoost : 1) * multiplier;
     
     // Phase 1.1: Apply slider multiplier (-2 to +2) if slider response
     const sliderMultiplier = sliderValue !== undefined ? sliderValue / 2 : 1; // Normalize to -1 to +1
@@ -1056,14 +1064,12 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     }
     // Reset timer to full when returning to quiz from countdown
     // Use currentIndex + 1 since we just advanced
-    const nextQ = questions[currentIndex + 1];
-    const extraTime = nextQ?.responseType === "slider" ? 3 : 0;
-    setTimeRemaining(tierConfig.maxTime + extraTime);
+    setTimeRemaining(QUESTION_TIME_SECONDS);
     setQuestionStartTime(Date.now());
     isProcessingAnswerRef.current = false; // Reset processing lock when returning from break
     console.log(`[Quiz] Returning from break, advancing to Q${currentIndex + 2}`);
     setQuizPhase("quiz");
-  }, [questions, currentIndex, tierConfig.maxTime]);
+  }, [questions, currentIndex]);
 
   // Phase 2.1: Dynamic difficulty calculation based on swipe speed
   const calculateDifficulty = (swipeTimes: number[], avgTime: number): "easy" | "medium" | "hard" => {
@@ -1126,7 +1132,14 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
       timeSpent,
       swipeDirection: direction,
       sliderValue: sliderVal, // Phase 1.1
-      responseType: question.responseType || "binary" as const
+      responseType: question.responseType || "binary" as const,
+      psych: question.psych,
+      optionMeta: question.optionMeta,
+      selectedOptionMeta: question.optionMeta[choiceIndex],
+      selectedOptionLabel: question.options[choiceIndex],
+      wildcard: question.wildcard,
+      boostRange: question.boostRange,
+      is2x: question.is2x
     };
     
     const nextQuestionNumber = currentIndex + 2; // 1-based question number after this answer
@@ -1175,25 +1188,21 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
       
       if (currentIndex >= questions.length - 1) {
         console.log(`[Quiz] Last question answered (Q${currentIndex + 1}/${questions.length}), completing quiz...`);
-        // Apply mood-based boosts to Big Five before completing
-        const moodBoostedScores = {
+        // Mood Mixer stays as context/copy only; it must not mutate final trait scoring.
+        const finalScores = {
           ...updatedScores,
-          bigFive: {
-            O: updatedScores.bigFive.O + (moodEffects.opennessBoost * 0.1),
-            C: updatedScores.bigFive.C + (moodEffects.conscientiousnessBoost * 0.1),
-            E: updatedScores.bigFive.E + (moodEffects.extraversionBoost * 0.1),
-            A: updatedScores.bigFive.A + (moodEffects.agreeablenessBoost * 0.1),
-            N: updatedScores.bigFive.N + (moodEffects.neuroticismBoost * 0.1),
+          moodContext: {
+            mood,
+            questionTone: moodEffects.questionTone,
           },
-          // Store mood boosts for proxy calculations
           moodBoosts: {
-            critical: moodEffects.criticalBoost,
-            firstPrinciples: moodEffects.firstPrinciplesBoost,
+            critical: 0,
+            firstPrinciples: 0,
           }
         };
         setTimeout(() => {
           console.log(`[Quiz] Calling onComplete with scores`);
-          onComplete(moodBoostedScores);
+          onComplete(finalScores);
         }, 300);
       }
       
@@ -1227,7 +1236,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
         isProcessingAnswerRef.current = false;
       }, 400);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, tierConfig.maxTime, moodEffects, scores]);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, moodEffects, mood, scores]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut || isProcessingAnswerRef.current || isPaused) return;
@@ -1268,14 +1277,14 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
 
   const currentQuestion = questions[currentIndex];
   
-  const [mcBreakTimer, setMcBreakTimer] = useState(20);
+  const [mcBreakTimer, setMcBreakTimer] = useState(BREAK_QUESTION_TIME_SECONDS);
   const [mcBreakTimerActive, setMcBreakTimerActive] = useState(false);
   const [mcBreakVisible, setMcBreakVisible] = useState(false);
   
   useEffect(() => {
     if (quizPhase === "energy") {
       setMcBreakVisible(false);
-      setMcBreakTimer(20);
+      setMcBreakTimer(BREAK_QUESTION_TIME_SECONDS);
       setMcBreakTimerActive(false);
       const fadeInTimeout = setTimeout(() => {
         setMcBreakVisible(true);
@@ -1305,7 +1314,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     isOpening: boolean
   ) => {
     const mcQuestionNum = getMcBreakQuestionNumber();
-    const mcTimerProgress = (mcBreakTimer / 20) * 100;
+    const mcTimerProgress = (mcBreakTimer / BREAK_QUESTION_TIME_SECONDS) * 100;
     
     return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0F]">
@@ -1567,7 +1576,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   }
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
-  const timerProgress = (timeRemaining / tierConfig.maxTime) * 100;
+  const timerProgress = (timeRemaining / QUESTION_TIME_SECONDS) * 100;
   
   const randomColor = READABLE_RANDOM_COLORS[vibrantColorIndex];
   const promptColor = useLocalityColors 
@@ -1780,7 +1789,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                           times: [0, 0.3, 1],
                           ease: "easeOut"
                         }}
-                        className={`text-3xl md:text-4xl font-bold quiz-question-text leading-tight ${promptColor}`}
+                        className={`text-2xl md:text-3xl font-bold quiz-question-text leading-tight ${promptColor}`}
                         data-testid="text-prompt"
                       >
                         {adjustQuestionWording(currentQuestion.prompt, moodEffects.questionTone)}
@@ -1794,12 +1803,12 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                           {/* Slider labels - larger text */}
                           <div className="flex justify-between gap-4">
                             <div className="flex-1 text-left">
-                              <span className="text-base sm:text-lg font-semibold text-sage-green dark:text-sage-green/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                              <span className="text-sm sm:text-base font-semibold text-sage-green dark:text-sage-green/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
                                 {currentQuestion.leftDesc}
                               </span>
                             </div>
                             <div className="flex-1 text-right">
-                              <span className="text-base sm:text-lg font-semibold text-terracotta dark:text-terracotta/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                              <span className="text-sm sm:text-base font-semibold text-terracotta dark:text-terracotta/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
                                 {currentQuestion.rightDesc}
                               </span>
                             </div>
@@ -1835,7 +1844,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                           </div>
                           {/* Current value display - larger text */}
                           <motion.div 
-                            className={`text-center py-4 px-6 rounded-2xl font-bold text-xl sm:text-2xl ${
+                            className={`text-center py-4 px-6 rounded-2xl font-bold text-lg sm:text-xl ${
                               sliderValue < -1 ? 'bg-sage-green/20 text-sage-green' :
                               sliderValue < 0 ? 'bg-sage-green/10 text-sage-green/80' :
                               sliderValue > 1 ? 'bg-terracotta/20 text-terracotta' :
@@ -1891,7 +1900,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                             role="button"
                           >
                             <ChevronLeft className="w-6 h-6 text-sage-green/60 flex-shrink-0" />
-                            <p className="text-xl md:text-2xl font-bold text-sage-green dark:text-sage-green leading-snug text-center flex-1">
+                            <p className="text-lg md:text-xl font-bold text-sage-green dark:text-sage-green leading-snug text-center flex-1">
                               {currentQuestion.leftDesc}
                             </p>
                           </motion.button>
@@ -1912,7 +1921,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                             tabIndex={0}
                             role="button"
                           >
-                            <p className="text-xl md:text-2xl font-bold text-terracotta dark:text-terracotta leading-snug text-center flex-1">
+                            <p className="text-lg md:text-xl font-bold text-terracotta dark:text-terracotta leading-snug text-center flex-1">
                               {currentQuestion.rightDesc}
                             </p>
                             <ChevronRight className="w-6 h-6 text-terracotta/60 flex-shrink-0" />
