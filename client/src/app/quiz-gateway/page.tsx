@@ -36,7 +36,7 @@ export default function QuizGateway() {
   };
 
   return (
-    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
+    <div className="kyr-page" style={{ background: "#050510", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
       {/* Header */}
       <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.08)", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ width: 20 }} />
@@ -50,7 +50,7 @@ export default function QuizGateway() {
       </div>
 
       {/* Content */}
-      <div style={{ paddingTop: 80, padding: "clamp(80px, 12vw, 100px) clamp(16px, 4vw, 48px)", display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh", boxSizing: "border-box" }}>
+      <div style={{ paddingTop: 80, padding: "clamp(80px, 12vw, 100px) clamp(16px, 4vw, 48px)", display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100dvh", boxSizing: "border-box" }}>
         <div style={{ maxWidth: 520, width: "100%" }}>
           <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#7800FF", textAlign: "center", marginBottom: 10 }}>Before We Start</p>
           <h1 style={{ fontSize: "clamp(2rem, 7vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.03em", textAlign: "center", marginBottom: 10 }}>Who are you?</h1>

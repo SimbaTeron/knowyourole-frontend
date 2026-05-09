@@ -9,6 +9,7 @@ import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
+import { Brain, Sparkles, Target } from "lucide-react";
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -39,6 +40,7 @@ export default function QuizPage() {
   const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>([]);
   const [hybridTypes, setHybridTypes] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [isAnalyzingResults, setIsAnalyzingResults] = useState(false);
   const [isDonationReturn, setIsDonationReturn] = useState(false);
   const { toast } = useToast();
   const { teamName, isLocalitySet } = useLocalityTheme();
@@ -213,6 +215,9 @@ export default function QuizPage() {
   };
 
   const handleQuizComplete = async (scores: QuizScores) => {
+    const minimumAnalysisTime = new Promise((resolve) => setTimeout(resolve, 3000));
+    setIsAnalyzingResults(true);
+
     console.log("[QuizComplete] Received final scores from Quiz.tsx", {
       responseCount: scores.responses.length,
       mbti: scores.mbti,
@@ -332,6 +337,7 @@ export default function QuizPage() {
       discStyle,
     });
 
+    await minimumAnalysisTime;
     router.push(`/results?${resultParams.toString()}`);
   };
 
@@ -341,6 +347,7 @@ export default function QuizPage() {
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
+    setIsAnalyzingResults(false);
     router.push("/");
   };
 
@@ -349,6 +356,7 @@ export default function QuizPage() {
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
+    setIsAnalyzingResults(false);
     router.push("/");
   };
 
@@ -892,6 +900,80 @@ export default function QuizPage() {
   const getThemeClass = () => {
     return theme === "dark" ? "dark-mysterious" : "light-clinical";
   };
+
+  if (isAnalyzingResults) {
+    return (
+      <div className={`min-h-screen relative overflow-hidden ${getThemeClass()}`} data-testid="quiz-analysis-screen">
+        <PathCanvas />
+        <main className="relative z-10 min-h-screen flex items-center justify-center px-5 py-10">
+          <section className="w-full max-w-md rounded-[32px] border border-white/15 bg-black/55 px-6 py-8 text-center text-white shadow-2xl backdrop-blur-xl">
+            <div className="relative mx-auto mb-6 flex h-28 w-28 items-center justify-center">
+              <div className="absolute inset-0 rounded-full border border-cyan-300/30 animate-ping" />
+              <div className="absolute inset-3 rounded-full border border-purple-300/30 animate-pulse" />
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-amber-300 shadow-[0_0_40px_rgba(34,211,238,0.45)]">
+                <Brain className="h-10 w-10 text-white" aria-hidden="true" />
+              </div>
+            </div>
+
+            <div className="mb-2 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.32em] text-cyan-200">
+              <Sparkles className="h-4 w-4 animate-pulse" aria-hidden="true" />
+              Building your Full Portrait
+            </div>
+            <h1 className="mb-3 text-3xl font-black tracking-tight">Analyzing<span className="analysis-dots" aria-hidden="true" /></h1>
+            <p className="mx-auto mb-7 max-w-xs text-sm leading-6 text-white/72">
+              Scoring your personality pattern, career fit, and role signals. Tiny robots are pretending this is very hard.
+            </p>
+
+            <div className="mb-5 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10" aria-label="Results analysis progress">
+              <div className="analysis-progress h-full rounded-full bg-gradient-to-r from-cyan-300 via-purple-400 to-amber-300" />
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-2 py-3">
+                <Target className="mx-auto mb-1 h-4 w-4 text-amber-200" aria-hidden="true" />
+                Traits
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-2 py-3">
+                <Brain className="mx-auto mb-1 h-4 w-4 text-cyan-200" aria-hidden="true" />
+                Roles
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-2 py-3">
+                <Sparkles className="mx-auto mb-1 h-4 w-4 text-purple-200" aria-hidden="true" />
+                Insights
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <style jsx>{`
+          .analysis-progress {
+            width: 100%;
+            transform-origin: left;
+            animation: analysis-fill 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          }
+
+          .analysis-dots::after {
+            content: "";
+            animation: analysis-dots 1.15s steps(4, end) infinite;
+          }
+
+          @keyframes analysis-fill {
+            0% { transform: scaleX(0.06); }
+            45% { transform: scaleX(0.58); }
+            78% { transform: scaleX(0.86); }
+            100% { transform: scaleX(1); }
+          }
+
+          @keyframes analysis-dots {
+            0% { content: ""; }
+            25% { content: "."; }
+            50% { content: ".."; }
+            75%, 100% { content: "..."; }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   if (showResults && quizScores) {
     return (

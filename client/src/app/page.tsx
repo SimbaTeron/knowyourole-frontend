@@ -36,7 +36,7 @@ const phoneCardStyle: React.CSSProperties = {
 
 export default function Home() {
   return (
-    <div style={{ background: "#050510", minHeight: "100vh", fontFamily: "'Outfit',sans-serif", color: "#fff", overflowX: "hidden" }}>
+    <div className="kyr-page" style={{ background: "#050510", fontFamily: "'Outfit',sans-serif", color: "#fff" }}>
 
       <style>{`
         .hero-gradient {
@@ -70,7 +70,7 @@ export default function Home() {
 
       {/* HERO */}
       <section style={{
-        position: "relative", minHeight: "100vh",
+        position: "relative", minHeight: "100dvh",
         display: "flex", alignItems: "center",
         padding: "clamp(60px, 10vw, 120px) clamp(16px, 4vw, 64px)",
         background: "radial-gradient(ellipse at 30% 20%, rgba(120,0,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(0,200,255,0.1) 0%, transparent 50%)",

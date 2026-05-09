@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { Timer, Pause, Play, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search, ChevronLeft, ChevronRight, Clock, Undo2 } from "lucide-react";
+import { Timer, Pause, Play, RotateCcw, MapPin, Sparkles, Lightbulb, Users, Book, Wrench, Brain, MessageCircle, Search, ChevronLeft, ChevronRight, Clock, Undo2, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
@@ -642,6 +642,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   
   const [canGoBack, setCanGoBack] = useState(false);
   const [hasUsedBack, setHasUsedBack] = useState(false);
+  const [isFinalizingResults, setIsFinalizingResults] = useState(false);
   const [previousScoresSnapshot, setPreviousScoresSnapshot] = useState<QuizScores | null>(null);
   
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -1187,6 +1188,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
       };
       
       if (currentIndex >= questions.length - 1) {
+        setIsFinalizingResults(true);
         console.log(`[Quiz] Last question answered (Q${currentIndex + 1}/${questions.length}), completing quiz...`);
         // Mood Mixer stays as context/copy only; it must not mutate final trait scoring.
         const finalScores = {
@@ -1533,6 +1535,66 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   }
 
   
+  if (isFinalizingResults) {
+    return (
+      <div className="min-h-screen flex items-center justify-center overflow-hidden bg-[#080812] px-5 py-10 text-white" data-testid="quiz-analysis-screen">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.22),_transparent_34%),radial-gradient(circle_at_bottom,_rgba(168,85,247,0.18),_transparent_38%)]" />
+        <section className="relative w-full max-w-md rounded-[32px] border border-white/15 bg-black/50 px-6 py-8 text-center shadow-2xl backdrop-blur-xl">
+          <div className="relative mx-auto mb-6 flex h-28 w-28 items-center justify-center">
+            <motion.div
+              className="absolute inset-0 rounded-full border border-cyan-300/30"
+              animate={{ scale: [1, 1.25, 1], opacity: [0.4, 0.08, 0.4] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="absolute inset-3 rounded-full border border-purple-300/30"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+            />
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-amber-300 shadow-[0_0_40px_rgba(34,211,238,0.45)]">
+              <Brain className="h-10 w-10 text-white" aria-hidden="true" />
+            </div>
+          </div>
+
+          <div className="mb-2 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.32em] text-cyan-200">
+            <Sparkles className="h-4 w-4 animate-pulse" aria-hidden="true" />
+            Building your Full Portrait
+          </div>
+          <h1 className="mb-3 text-3xl font-black tracking-tight">
+            Analyzing<span className="animate-pulse">...</span>
+          </h1>
+          <p className="mx-auto mb-7 max-w-xs text-sm leading-6 text-white/72">
+            Scoring your personality pattern, career fit, and role signals. Tiny robots are pretending this is very hard.
+          </p>
+
+          <div className="mb-5 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10" aria-label="Results analysis progress">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-purple-400 to-amber-300"
+              initial={{ width: "8%" }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 3, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-2 py-3">
+              <Target className="mx-auto mb-1 h-4 w-4 text-amber-200" aria-hidden="true" />
+              Traits
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-2 py-3">
+              <Brain className="mx-auto mb-1 h-4 w-4 text-cyan-200" aria-hidden="true" />
+              Roles
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-2 py-3">
+              <Sparkles className="mx-auto mb-1 h-4 w-4 text-purple-200" aria-hidden="true" />
+              Insights
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   if (questions.length === 0 || !currentQuestion) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-white dark:bg-[#0A0A0F]">
@@ -1721,8 +1783,8 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
           />
         </div>
       </header>
-      <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-32 overflow-y-auto">
-        <div className="relative w-full max-w-sm h-[min(480px,calc(100vh-220px))] min-h-[380px]">
+      <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] overflow-y-auto">
+        <div className="relative w-full max-w-sm h-[min(480px,calc(100dvh-220px))] min-h-[380px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentQuestion.id}

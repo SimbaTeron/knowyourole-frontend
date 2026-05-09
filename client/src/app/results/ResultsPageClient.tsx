@@ -615,7 +615,7 @@ function BottomBar({ active = "p1", onNavigate, onPremiumClick }: {
       backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
       borderTop: `1px solid ${C.glassBorder}`,
       padding: "12px 20px",
-      paddingBottom: "max(12px, env(safe-area-inset-bottom))",
+      paddingBottom: "calc(12px + env(safe-area-inset-bottom, 0px))",
       display: "flex", justifyContent: "space-around",
       pointerEvents: "none",
     }}>
@@ -670,7 +670,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
   ];
 
   return (
-    <div style={{ position: "relative", zIndex: 1, maxWidth: 480, margin: "0 auto", padding: "0 16px 100px" }}>
+    <div style={{ position: "relative", zIndex: 1, maxWidth: 480, margin: "0 auto", padding: "0 16px calc(100px + env(safe-area-inset-bottom, 0px))" }}>
       {/* Hero */}
       <div style={{ padding: "28px 0 20px", textAlign: "center" }}>
         <div style={{
@@ -1280,7 +1280,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
   // Demo mode: show banner at top, then full premium content
   if (isDemo) {
     return (
-      <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "Inter, sans-serif", color: C.text, overflowX: "hidden" }}>
+      <div style={{ background: C.bg, minHeight: "100dvh", fontFamily: "Inter, sans-serif", color: C.text, overflowX: "hidden" }}>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
         <AuroraBg />
         <TopNav premium={true} />
@@ -1289,7 +1289,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
             🎨 Demo Mode — Premium content preview (payment not required)
           </div>
         </div>
-        <div style={{ position: "relative", zIndex: 1, maxWidth: 480, margin: "0 auto", padding: "0 16px 100px" }}>
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 480, margin: "0 auto", padding: "0 16px calc(100px + env(safe-area-inset-bottom, 0px))" }}>
           <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
             <div style={{ fontSize: 42, marginBottom: 8 }}>🔮</div>
             <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Your Premium Results</div>
@@ -1317,7 +1317,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
   }
 
   return (
-    <div style={{ position: "relative", zIndex: 1, maxWidth: 480, margin: "0 auto", padding: "0 16px 100px" }}>
+    <div style={{ position: "relative", zIndex: 1, maxWidth: 480, margin: "0 auto", padding: "0 16px calc(100px + env(safe-area-inset-bottom, 0px))" }}>
       {/* Premium Hero */}
       <div style={{ padding: "28px 0 20px", textAlign: "center" }}>
         <div style={{
@@ -1607,7 +1607,7 @@ export default function ResultsPage() {
   // Still loading or no results yet
   if (!realResults) {
     return (
-      <div style={{ background: "#080414", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: "#080414", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, fontFamily: "Inter, sans-serif" }}>Loading your results…</div>
       </div>
     );
@@ -1629,7 +1629,7 @@ export default function ResultsPage() {
   };
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "Inter, sans-serif", color: C.text, overflowX: "hidden" }}>
+    <div style={{ background: C.bg, minHeight: "100dvh", fontFamily: "Inter, sans-serif", color: C.text, overflowX: "hidden" }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
 
       <AuroraBg />

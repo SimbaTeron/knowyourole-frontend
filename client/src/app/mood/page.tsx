@@ -83,7 +83,7 @@ export default function MoodPage() {
         currentTheme={theme}
         onThemeChange={handleThemeChange}
       />
-      <main className="relative z-10 pt-16 pb-32 px-4 min-h-screen flex flex-col">
+      <main className="relative z-10 pt-16 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] px-4 min-h-screen flex flex-col">
         <div className="max-w-md mx-auto w-full flex-1 flex flex-col">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

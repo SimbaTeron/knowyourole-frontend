@@ -1096,7 +1096,7 @@ export default function MoodMixerPage() {
     <div
       style={{
         background: "#050510",
-        minHeight: "100vh",
+        minHeight: "100dvh",
         fontFamily: "'Outfit', sans-serif",
         color: "#fff",
         overflowX: "hidden",
@@ -1311,7 +1311,7 @@ export default function MoodMixerPage() {
               bottom: 0,
               left: 0,
               right: 0,
-              padding: "16px clamp(16px, 5vw, 48px) 28px",
+              padding: "16px clamp(16px, 5vw, 48px) calc(28px + env(safe-area-inset-bottom, 0px))",
               background: "rgba(5,5,16,0.97)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",

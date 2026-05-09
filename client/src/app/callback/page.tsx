@@ -33,7 +33,7 @@ export default function Callback() {
 
   if (error) {
     return (
-      <div style={{ background: "#050510", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Outfit',sans-serif" }}>
+      <div style={{ background: "#050510", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Outfit',sans-serif" }}>
         <div style={{ textAlign: "center", maxWidth: 400, padding: 24 }}>
           <div style={{ background: "rgba(255,59,48,0.1)", border: "1px solid rgba(255,59,48,0.3)", borderRadius: 20, padding: "24px 32px" }}>
             <p style={{ color: "#ff3b30", fontSize: 14, marginBottom: 8, fontWeight: 600 }}>Sign-in failed</p>
@@ -51,7 +51,7 @@ export default function Callback() {
   }
 
   return (
-    <div style={{ background: "#050510", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Outfit',sans-serif" }}>
+    <div style={{ background: "#050510", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Outfit',sans-serif" }}>
       <div style={{ textAlign: "center" }}>
         <div style={{
           width: 40, height: 40,
