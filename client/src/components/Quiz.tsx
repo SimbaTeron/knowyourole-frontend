@@ -10,24 +10,32 @@ import CelestialProgressTracker from "./CelestialProgressTracker";
 import QuizOnboardingOverlay from "./QuizOnboarding";
 import questionsData from "@/data/questions.json";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
-import { 
-  SuperpowerGame, 
-  MysteryBoxGame, 
-  TimedCountdown, 
-  SpinningWheel,
-  StackedCards,
-  type SuperpowerChoice, 
-  type MysteryBoxChoice,
-  type AgeTier,
-  type MultiChoiceOption as GameMultiChoiceOption
-} from "./QuizGames";
 
-type IconKey = "creative" | "analytical" | "people" | "learning" | "hands" | "mind" | "discuss" | "research";
+type IconKey =
+  | "creative"
+  | "analytical"
+  | "people"
+  | "learning"
+  | "hands"
+  | "mind"
+  | "discuss"
+  | "research"
+  | "captain"
+  | "zen"
+  | "alchemist"
+  | "scanner"
+  | "compass"
+  | "signal"
+  | "future";
+
+type BreakQuestionId = "checkpoint-one" | "superpower" | "checkpoint-two" | "pressure-avatar" | "mystery";
 
 interface LocalMultiChoiceOption {
   id: string;
   label: string;
+  description?: string;
   icon: IconKey;
+  accent?: string;
   weights: {
     mbti?: Partial<Record<"E" | "I" | "S" | "N" | "T" | "F" | "J" | "P", number>>;
     disc?: Partial<Record<"D" | "I" | "S" | "C", number>>;
@@ -36,42 +44,220 @@ interface LocalMultiChoiceOption {
 }
 
 interface MultiChoiceQuestion {
-  id: string;
+  id: BreakQuestionId;
   prompt: string;
   subtitle: string;
+  eyebrow: string;
+  footer: string;
   options: LocalMultiChoiceOption[];
 }
 
-const MID1_QUESTION: MultiChoiceQuestion = {
-  id: "mid1",
-  prompt: "What energizes you most right now?",
-  subtitle: "Quick break! Pick the one that feels most like you",
-  options: [
-    {
-      id: "creative",
-      label: "Creating something new",
-      icon: "creative",
-      weights: { mbti: { N: 2, P: 1 }, disc: { I: 1 }, bigFive: { O: 3 } }
-    },
-    {
-      id: "analytical",
-      label: "Solving practical problems",
-      icon: "analytical",
-      weights: { mbti: { T: 2, S: 1 }, disc: { D: 1, C: 1 }, bigFive: { C: 2 } }
-    },
-    {
-      id: "people",
-      label: "Connecting with people",
-      icon: "people",
-      weights: { mbti: { E: 2, F: 1 }, disc: { I: 2 }, bigFive: { E: 3, A: 1 } }
-    },
-    {
-      id: "learning",
-      label: "Understanding how things work",
-      icon: "learning",
-      weights: { mbti: { I: 1, N: 1, T: 1 }, disc: { C: 2 }, bigFive: { O: 2, C: 1 } }
-    }
-  ]
+const INTERLUDE_QUESTIONS: Record<BreakQuestionId, MultiChoiceQuestion> = {
+  "checkpoint-one": {
+    id: "checkpoint-one",
+    eyebrow: "Signal Scan",
+    prompt: "Your brain opens a new tab. What is it searching for?",
+    subtitle: "Pick the curiosity trail you naturally follow.",
+    footer: "Tiny detour. Useful data. No stopwatch breathing down your neck.",
+    options: [
+      {
+        id: "people-patterns",
+        label: "People Patterns",
+        description: "What everyone really means underneath the words.",
+        icon: "people",
+        accent: "from-pink-300 via-fuchsia-500 to-violet-500",
+        weights: { mbti: { F: 1, N: 1, E: 1 }, disc: { I: 2 }, bigFive: { A: 2, E: 1 } }
+      },
+      {
+        id: "hidden-rules",
+        label: "Hidden Rules",
+        description: "The system, loophole, or logic behind the mess.",
+        icon: "analytical",
+        accent: "from-cyan-300 via-blue-500 to-indigo-500",
+        weights: { mbti: { T: 1, N: 1, J: 1 }, disc: { C: 2 }, bigFive: { C: 1, O: 1 } }
+      },
+      {
+        id: "next-adventure",
+        label: "Next Adventure",
+        description: "The exciting door nobody else has noticed yet.",
+        icon: "compass",
+        accent: "from-amber-300 via-orange-500 to-rose-500",
+        weights: { mbti: { E: 1, N: 1, P: 2 }, disc: { I: 1, D: 1 }, bigFive: { O: 2, E: 1 } }
+      },
+      {
+        id: "better-system",
+        label: "Better System",
+        description: "A cleaner workflow that saves everyone future pain.",
+        icon: "hands",
+        accent: "from-emerald-300 via-teal-500 to-cyan-500",
+        weights: { mbti: { S: 1, T: 1, J: 2 }, disc: { C: 1, S: 1 }, bigFive: { C: 2 } }
+      }
+    ]
+  },
+  superpower: {
+    id: "superpower",
+    eyebrow: "Power Source",
+    prompt: "If your talent had a secret power-up, what would it be?",
+    subtitle: "Choose the upgrade your inner operating system wants first.",
+    footer: "Yes, this is scoring career energy. No, it will not ask for a spreadsheet.",
+    options: [
+      {
+        id: "spotlight-surge",
+        label: "Spotlight Surge",
+        description: "Turn ideas into momentum by getting people fired up.",
+        icon: "creative",
+        accent: "from-fuchsia-400 via-pink-500 to-orange-400",
+        weights: { mbti: { E: 2, N: 1 }, disc: { I: 2 }, bigFive: { E: 2, O: 1 } }
+      },
+      {
+        id: "precision-mode",
+        label: "Precision Mode",
+        description: "See the cleanest path and execute without drama.",
+        icon: "captain",
+        accent: "from-cyan-300 via-sky-500 to-blue-600",
+        weights: { mbti: { T: 1, J: 2, S: 1 }, disc: { C: 2 }, bigFive: { C: 2, N: -1 } }
+      },
+      {
+        id: "deep-focus",
+        label: "Deep Focus",
+        description: "Disappear into the zone and build something excellent.",
+        icon: "mind",
+        accent: "from-violet-300 via-purple-500 to-indigo-600",
+        weights: { mbti: { I: 2, T: 1, J: 1 }, disc: { C: 1 }, bigFive: { C: 2, O: 1 } }
+      },
+      {
+        id: "team-spark",
+        label: "Team Spark",
+        description: "Make the room lighter, smarter, and more connected.",
+        icon: "discuss",
+        accent: "from-emerald-300 via-lime-400 to-cyan-400",
+        weights: { mbti: { E: 1, F: 2 }, disc: { I: 1, S: 1 }, bigFive: { A: 2, E: 1 } }
+      }
+    ]
+  },
+  "checkpoint-two": {
+    id: "checkpoint-two",
+    eyebrow: "Decision Compass",
+    prompt: "Your inner dashboard lights up. Which signal do you trust first?",
+    subtitle: "Pick the alert your brain checks before making a move.",
+    footer: "This calibrates decision style. The dashboard is imaginary. Mostly.",
+    options: [
+      {
+        id: "gut-spark",
+        label: "Gut Spark",
+        description: "The instant yes/no feeling before the logic catches up.",
+        icon: "signal",
+        accent: "from-amber-300 via-orange-500 to-red-500",
+        weights: { mbti: { N: 1, P: 1, F: 1 }, disc: { I: 1 }, bigFive: { O: 1, E: 1 } }
+      },
+      {
+        id: "receipts-first",
+        label: "Receipts First",
+        description: "Proof, data, and clean reasoning before the leap.",
+        icon: "research",
+        accent: "from-cyan-300 via-blue-500 to-indigo-500",
+        weights: { mbti: { S: 1, T: 2, J: 1 }, disc: { C: 2 }, bigFive: { C: 2 } }
+      },
+      {
+        id: "room-read",
+        label: "Room Read",
+        description: "How people feel, what they need, and who is affected.",
+        icon: "people",
+        accent: "from-rose-300 via-pink-500 to-fuchsia-500",
+        weights: { mbti: { F: 2, E: 1 }, disc: { I: 1, S: 1 }, bigFive: { A: 2 } }
+      },
+      {
+        id: "long-game",
+        label: "Long Game",
+        description: "The future consequence hiding behind the obvious choice.",
+        icon: "compass",
+        accent: "from-emerald-300 via-teal-500 to-sky-500",
+        weights: { mbti: { N: 1, T: 1, J: 2 }, disc: { C: 1, D: 1 }, bigFive: { C: 1, O: 1 } }
+      }
+    ]
+  },
+  "pressure-avatar": {
+    id: "pressure-avatar",
+    eyebrow: "Pressure Avatar Calibration",
+    prompt: "When chaos enters the room, what character do you become?",
+    subtitle: "Pick your inner operating system under pressure.",
+    footer: "No wrong answers. Just vibes with consequences.",
+    options: [
+      {
+        id: "fire-captain",
+        label: "The Fire Captain",
+        description: "Takes command, makes the call, gets everyone moving.",
+        icon: "captain",
+        accent: "from-amber-300 via-orange-500 to-rose-500",
+        weights: { mbti: { E: 1, T: 1, J: 2 }, disc: { D: 3 }, bigFive: { C: 2, E: 1, N: -1 } }
+      },
+      {
+        id: "zen-strategist",
+        label: "The Zen Strategist",
+        description: "Slows the room down, finds the pattern, makes the plan.",
+        icon: "zen",
+        accent: "from-cyan-300 via-sky-500 to-violet-500",
+        weights: { mbti: { I: 1, N: 1, J: 2 }, disc: { C: 2, S: 1 }, bigFive: { C: 2, A: 1, N: -2 } }
+      },
+      {
+        id: "chaos-alchemist",
+        label: "The Chaos Alchemist",
+        description: "Improvises, jokes, pivots fast, somehow makes it work.",
+        icon: "alchemist",
+        accent: "from-fuchsia-400 via-purple-500 to-cyan-300",
+        weights: { mbti: { E: 1, N: 1, P: 2 }, disc: { I: 2 }, bigFive: { O: 2, E: 1, N: -1 } }
+      },
+      {
+        id: "signal-scanner",
+        label: "The Signal Scanner",
+        description: "Reads the room, spots the risk, protects the next move.",
+        icon: "scanner",
+        accent: "from-emerald-300 via-cyan-500 to-indigo-500",
+        weights: { mbti: { I: 1, S: 1, T: 1 }, disc: { C: 2, S: 1 }, bigFive: { C: 1, A: 1, N: 1 } }
+      }
+    ]
+  },
+  mystery: {
+    id: "mystery",
+    eyebrow: "Future Self Upgrade",
+    prompt: "The final boss is your future self. What upgrade are you unlocking?",
+    subtitle: "Pick the version of you trying to come online.",
+    footer: "Last calibration detour. Your future self is being dramatic but helpful.",
+    options: [
+      {
+        id: "bold-move",
+        label: "Bold Move",
+        description: "Bigger swings, clearer asks, less hiding in the lobby.",
+        icon: "captain",
+        accent: "from-red-300 via-orange-500 to-amber-400",
+        weights: { mbti: { E: 1, T: 1, P: 1 }, disc: { D: 2 }, bigFive: { E: 1, O: 1, N: -1 } }
+      },
+      {
+        id: "deep-craft",
+        label: "Deep Craft",
+        description: "Mastery, precision, and work that quietly becomes undeniable.",
+        icon: "mind",
+        accent: "from-indigo-300 via-violet-500 to-purple-600",
+        weights: { mbti: { I: 1, S: 1, J: 2 }, disc: { C: 2 }, bigFive: { C: 2, O: 1 } }
+      },
+      {
+        id: "real-allies",
+        label: "Real Allies",
+        description: "Better rooms, stronger trust, people who sharpen your edge.",
+        icon: "people",
+        accent: "from-emerald-300 via-cyan-400 to-blue-500",
+        weights: { mbti: { E: 1, F: 2 }, disc: { I: 1, S: 1 }, bigFive: { A: 2, E: 1 } }
+      },
+      {
+        id: "freer-map",
+        label: "Freer Map",
+        description: "More autonomy, more experiments, more room to reinvent.",
+        icon: "future",
+        accent: "from-fuchsia-300 via-purple-500 to-cyan-400",
+        weights: { mbti: { N: 1, P: 2 }, disc: { I: 1, D: 1 }, bigFive: { O: 3 } }
+      }
+    ]
+  }
 };
 
 const MULTI_CHOICE_ICONS: Record<IconKey, typeof Sparkles> = {
@@ -82,7 +268,14 @@ const MULTI_CHOICE_ICONS: Record<IconKey, typeof Sparkles> = {
   hands: Wrench,
   mind: Brain,
   discuss: MessageCircle,
-  research: Search
+  research: Search,
+  captain: Target,
+  zen: Brain,
+  alchemist: Sparkles,
+  scanner: Search,
+  compass: MapPin,
+  signal: Lightbulb,
+  future: Sparkles
 };
 
 interface Question {
@@ -160,7 +353,6 @@ export interface QuizScores {
 const SWIPE_THRESHOLD = 100;
 const ROTATION_RANGE = 15;
 const QUESTION_TIME_SECONDS = 15;
-const BREAK_QUESTION_TIME_SECONDS = 15;
 
 
 const TIMEOUT_QUIPS = [
@@ -211,7 +403,7 @@ const RANDOM_EVENTS: RandomEvent[] = [
 const RANDOM_EVENT_BASE_CHANCE = 0.03; // 3% base chance per question (reduced from 8%)
 const RANDOM_EVENT_MAX_CHANCE = 0.06; // 6% max chance cap (reduced from 15%)
 
-type QuizPhase = "quiz" | "superpower" | "superpower-countdown" | "energy" | "energy-countdown" | "mystery" | "mystery-countdown" | "checkpoint";
+type QuizPhase = "quiz" | "superpower" | "energy" | "mystery" | "checkpoint";
 
 // Spin wheel recap component - cycles through insights then settles on accurate ones
 interface RecapSpinWheelProps {
@@ -303,7 +495,7 @@ const INSIGHT_POOL: Record<string, string[]> = {
 };
 
 function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, shownInsights, onInsightShown }: RecapSpinWheelProps) {
-  const recapMilestone = Math.floor((currentIndex + 1) / 10) * 10;
+  const recapMilestone = currentIndex + 1;
   
   const allInsights = Object.values(INSIGHT_POOL).flat();
   
@@ -468,8 +660,8 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
 
 const getQuizConfig = (_tier: string) => {
   // Unified quiz config for all active tiers:
-  // Q1-10 → checkpoint1 → Q11-20 → superpower → Q21-25 →
-  // checkpoint2 → Q26-30 → energy → Q31-35 → mystery → Q36-45
+  // Q1-10 → calibration1 → Q11-20 → calibration2 → Q21-25 →
+  // calibration3 → Q26-30 → pressure-avatar → Q31-35 → calibration5 → Q36-45
   return {
     totalQuestions: 45,
     checkpoint1After: 10,
@@ -606,19 +798,21 @@ const getBrowserSessionItem = (key: string) => {
 export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
   const tier: ActiveTierValue = rawTier === "7-12" ? "13-18" : rawTier;
   const quizConfig = getQuizConfig(tier);
-  const gameTier = tier === "25+" ? "25plus" : tier;
   const { teamName, isLocalitySet } = useLocalityTheme();
   const moodEffects = getMoodEffects(mood);
   const { toast } = useToast();
   
   const [quizPhase, setQuizPhase] = useState<QuizPhase>("quiz");
+  const [checkpointOneChoice, setCheckpointOneChoice] = useState<string | null>(null);
+  const [superpowerChoice, setSuperpowerChoice] = useState<string | null>(null);
+  const [checkpointTwoChoice, setCheckpointTwoChoice] = useState<string | null>(null);
   const [energyChoice, setEnergyChoice] = useState<string | null>(null);
+  const [mysteryChoice, setMysteryChoice] = useState<string | null>(null);
   const [completedEnergy, setCompletedEnergy] = useState(false);
   const [completedSuperpower, setCompletedSuperpower] = useState(false);
   const [completedMystery, setCompletedMystery] = useState(false);
   const [completedCheckpoint1, setCompletedCheckpoint1] = useState(false);
   const [completedCheckpoint2, setCompletedCheckpoint2] = useState(false);
-  const [shownInsights, setShownInsights] = useState<Set<string>>(new Set()); // Track shown insights to prevent repeats
   
   // Phase 1.1: Slider state for slider-type questions
   const [sliderValue, setSliderValue] = useState(0);
@@ -870,8 +1064,8 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   }, [missCount]);
 
   useEffect(() => {
-    // Pause timer during paused state or other conditions
-    if (isPaused || questions.length === 0 || isTimingOut) return;
+    // Only the 45 standard quiz questions are timed. Interlude calibration screens are untimed.
+    if (isPaused || questions.length === 0 || isTimingOut || quizPhase !== "quiz") return;
     
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
@@ -886,7 +1080,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, currentIndex, questions.length, isTimingOut, handleTimeout]);
+  }, [isPaused, currentIndex, questions.length, isTimingOut, quizPhase, handleTimeout]);
 
   useEffect(() => {
     if (showIntroOnboarding && currentIndex === 0 && questions.length > 0 && quizPhase === "quiz") {
@@ -1024,53 +1218,45 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     });
   }, []);
 
-  const handleSuperpowerChoice = useCallback((choice: SuperpowerChoice) => {
-    if (navigator.vibrate) navigator.vibrate(50);
-    applyMultiChoiceWeights({ weights: choice.weights });
-    setCompletedSuperpower(true);
-    
-    setTimeout(() => {
-      setQuizPhase("superpower-countdown");
-    }, 600);
-  }, [applyMultiChoiceWeights]);
-
-  const handleMysteryChoice = useCallback((choice: MysteryBoxChoice) => {
-    if (navigator.vibrate) navigator.vibrate(50);
-    applyMultiChoiceWeights({ weights: choice.weights });
-    setCompletedMystery(true);
-    
-    setTimeout(() => {
-      setQuizPhase("mystery-countdown");
-    }, 600);
-  }, [applyMultiChoiceWeights]);
-
-  const handleEnergyChoice = useCallback((optionId: string) => {
-    const option = MID1_QUESTION.options.find(o => o.id === optionId);
-    if (!option) return;
-    
-    if (navigator.vibrate) navigator.vibrate(50);
-    setEnergyChoice(optionId);
-    applyMultiChoiceWeights(option);
-    setCompletedEnergy(true);
-    
-    setTimeout(() => {
-      setQuizPhase("energy-countdown");
-    }, 400);
-  }, [applyMultiChoiceWeights]);
-
-  const handleCountdownComplete = useCallback(() => {
-    // Advance to next question when returning from break
+  const completeInterlude = useCallback(() => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-    // Reset timer to full when returning to quiz from countdown
-    // Use currentIndex + 1 since we just advanced
     setTimeRemaining(QUESTION_TIME_SECONDS);
     setQuestionStartTime(Date.now());
-    isProcessingAnswerRef.current = false; // Reset processing lock when returning from break
-    console.log(`[Quiz] Returning from break, advancing to Q${currentIndex + 2}`);
+    setTimerResetKey(prev => prev + 1);
+    isProcessingAnswerRef.current = false;
+    console.log(`[Quiz] Returning from untimed interlude, advancing to Q${currentIndex + 2}`);
     setQuizPhase("quiz");
-  }, [questions, currentIndex]);
+  }, [questions.length, currentIndex]);
+
+  const handleInterludeChoice = useCallback((questionId: BreakQuestionId, optionId: string) => {
+    const question = INTERLUDE_QUESTIONS[questionId];
+    const option = question.options.find(o => o.id === optionId);
+    if (!option) return;
+
+    if (navigator.vibrate) navigator.vibrate(50);
+
+    if (questionId === "checkpoint-one") {
+      setCheckpointOneChoice(optionId);
+      setCompletedCheckpoint1(true);
+    } else if (questionId === "superpower") {
+      setSuperpowerChoice(optionId);
+      setCompletedSuperpower(true);
+    } else if (questionId === "checkpoint-two") {
+      setCheckpointTwoChoice(optionId);
+      setCompletedCheckpoint2(true);
+    } else if (questionId === "pressure-avatar") {
+      setEnergyChoice(optionId);
+      setCompletedEnergy(true);
+    } else if (questionId === "mystery") {
+      setMysteryChoice(optionId);
+      setCompletedMystery(true);
+    }
+
+    applyMultiChoiceWeights(option);
+    setTimeout(completeInterlude, 450);
+  }, [applyMultiChoiceWeights, completeInterlude]);
 
   // Phase 2.1: Dynamic difficulty calculation based on swipe speed
   const calculateDifficulty = (swipeTimes: number[], avgTime: number): "easy" | "medium" | "hard" => {
@@ -1278,35 +1464,29 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   };
 
   const currentQuestion = questions[currentIndex];
-  
-  const [mcBreakTimer, setMcBreakTimer] = useState(BREAK_QUESTION_TIME_SECONDS);
-  const [mcBreakTimerActive, setMcBreakTimerActive] = useState(false);
   const [mcBreakVisible, setMcBreakVisible] = useState(false);
   
   useEffect(() => {
-    if (quizPhase === "energy") {
+    const isInterlude = ["checkpoint", "superpower", "energy", "mystery"].includes(quizPhase);
+    if (isInterlude) {
       setMcBreakVisible(false);
-      setMcBreakTimer(BREAK_QUESTION_TIME_SECONDS);
-      setMcBreakTimerActive(false);
-      const fadeInTimeout = setTimeout(() => {
-        setMcBreakVisible(true);
-        setMcBreakTimerActive(true);
-      }, 100);
+      const fadeInTimeout = setTimeout(() => setMcBreakVisible(true), 100);
       return () => clearTimeout(fadeInTimeout);
     }
   }, [quizPhase]);
-  
-  useEffect(() => {
-    if (!mcBreakTimerActive || mcBreakTimer <= 0) return;
-    const interval = setInterval(() => {
-      setMcBreakTimer(prev => Math.max(0, prev - 0.1));
-    }, 100);
-    return () => clearInterval(interval);
-  }, [mcBreakTimerActive, mcBreakTimer]);
 
-  const getMcBreakQuestionNumber = () => {
-    if (quizPhase === "energy") return (quizConfig.energyAfter || 0) + 1;
+  const getInterludeQuestionNumber = (questionId: BreakQuestionId) => {
+    if (questionId === "checkpoint-one") return quizConfig.checkpoint1After || 10;
+    if (questionId === "superpower") return quizConfig.superpowerAfter || 20;
+    if (questionId === "checkpoint-two") return quizConfig.checkpoint2After || 25;
+    if (questionId === "pressure-avatar") return quizConfig.energyAfter || 30;
+    if (questionId === "mystery") return quizConfig.mysteryAfter || 35;
     return currentIndex + 1;
+  };
+
+  const getInterludeStep = (questionId: BreakQuestionId) => {
+    const order: BreakQuestionId[] = ["checkpoint-one", "superpower", "checkpoint-two", "pressure-avatar", "mystery"];
+    return order.indexOf(questionId) + 1;
   };
 
   const renderMultiChoiceQuestion = (
@@ -1315,126 +1495,130 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     onSelect: (id: string) => void,
     isOpening: boolean
   ) => {
-    const mcQuestionNum = getMcBreakQuestionNumber();
-    const mcTimerProgress = (mcBreakTimer / BREAK_QUESTION_TIME_SECONDS) * 100;
+    const completedQuestionNum = getInterludeQuestionNumber(question.id);
+    const interludeStep = getInterludeStep(question.id);
     
     return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0F]">
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/90 dark:bg-[#0A0A0F]/90 backdrop-blur-md border-b border-gray-100 dark:border-[#A78BFA]/20">
+    <div className="relative min-h-screen overflow-hidden bg-[#050510] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(0,200,255,0.22),transparent_30%),radial-gradient(circle_at_82%_20%,rgba(255,0,229,0.16),transparent_28%),radial-gradient(circle_at_50%_86%,rgba(120,0,255,0.18),transparent_38%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),transparent_40%,rgba(0,0,0,0.35))]" />
+
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-[#050510]/82 backdrop-blur-xl border-b border-white/10">
         <div className="flex items-center justify-between max-w-md mx-auto">
-          <div className="flex items-center gap-2">
-            <Timer className={`w-5 h-5 ${mcBreakTimer < 5 ? "text-red-500" : "text-terracotta"}`} />
-            <span className={`text-lg font-mono font-bold ${mcBreakTimer < 5 ? "text-red-500" : "text-warm-gray dark:text-[#F8FAFC]"}`}>
-              {mcBreakTimer.toFixed(1)}s
+          <div className="flex items-center gap-2 text-cyan-200">
+            <Sparkles className="w-5 h-5" />
+            <span className="text-[11px] font-black uppercase tracking-[0.22em]">
+              Untimed Calibration
             </span>
           </div>
-          <span className="text-lg font-bold text-warm-gray dark:text-[#F8FAFC]">
-            {mcQuestionNum}/{quizConfig.totalQuestions}
+          <span className="text-[11px] font-black uppercase tracking-[0.22em] text-white/62">
+            {completedQuestionNum}/45 · {interludeStep}/5
           </span>
         </div>
-        <div className="max-w-md mx-auto mt-2 h-2 bg-gray-200 dark:bg-[#1E1E2E] rounded-full overflow-hidden">
+        <div className="max-w-md mx-auto mt-2 h-2 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10">
           <motion.div
-            className={`h-full ${mcBreakTimer < 5 ? "bg-red-500" : "bg-gradient-to-r from-terracotta to-dusty-blue"}`}
-            initial={{ width: "100%" }}
-            animate={{ width: `${mcTimerProgress}%` }}
-            transition={{ duration: 0.1 }}
+            className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-violet-400 to-fuchsia-400"
+            initial={{ width: "0%" }}
+            animate={{ width: `${(interludeStep / 5) * 100}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           />
         </div>
       </header>
       
-      <main className="flex-1 flex items-center justify-center px-4 py-8 pt-24">
+      <main className="relative z-10 flex min-h-screen items-center justify-center px-4 pb-8 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: mcBreakVisible ? 1 : 0, y: mcBreakVisible ? 0 : 20 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="w-full max-w-md"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full max-w-[560px]"
         >
-          <div className="text-center mb-8">
+          <div className="mb-5 text-center">
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: mcBreakVisible ? 1 : 0 }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
-              className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-                isOpening 
-                  ? "bg-gradient-to-br from-terracotta to-dusty-blue" 
-                  : "bg-gradient-to-br from-sage-green to-dusty-blue"
-              }`}
+              initial={{ scale: 0, rotate: -12 }}
+              animate={{ scale: mcBreakVisible ? 1 : 0, rotate: mcBreakVisible ? 0 : -12 }}
+              transition={{ type: "spring", stiffness: 220, delay: 0.2 }}
+              className="relative mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-[28px] border border-white/15 bg-white/10 shadow-[0_0_52px_rgba(0,200,255,0.28)] backdrop-blur-xl"
             >
+              <div className="absolute inset-2 rounded-[22px] bg-gradient-to-br from-cyan-300 via-violet-500 to-fuchsia-400 opacity-90" />
               {isOpening ? (
-                <Sparkles className="w-8 h-8 text-white" />
+                <Sparkles className="relative z-10 h-9 w-9 text-white" />
               ) : (
-                <Lightbulb className="w-8 h-8 text-white" />
+                <Lightbulb className="relative z-10 h-9 w-9 text-white" />
               )}
             </motion.div>
             
             <motion.p 
               initial={{ opacity: 0 }}
               animate={{ opacity: mcBreakVisible ? 1 : 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="text-warm-gray/60 dark:text-[#64748B] mb-2 text-[16px]"
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mb-2 text-[11px] font-black uppercase tracking-[0.28em] text-cyan-200"
             >
-              {question.subtitle}
+              {question.eyebrow}
             </motion.p>
             <motion.h2 
               initial={{ opacity: 0 }}
               animate={{ opacity: mcBreakVisible ? 1 : 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              className="text-2xl font-bold text-warm-gray dark:text-[#F8FAFC]"
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="mx-auto max-w-[520px] text-balance text-[clamp(1.75rem,7vw,2.85rem)] font-black leading-[0.95] tracking-[-0.055em] text-white"
             >
               {question.prompt}
             </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: mcBreakVisible ? 1 : 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="mx-auto mt-3 max-w-sm text-sm font-semibold text-white/62"
+            >
+              {question.subtitle}
+            </motion.p>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {question.options.map((option, idx) => {
               const Icon = MULTI_CHOICE_ICONS[option.icon];
               const isSelected = selectedChoice === option.id;
+              const accent = option.accent || "from-cyan-300 via-violet-500 to-fuchsia-400";
               
               return (
                 <motion.button
                   key={option.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.92, y: 14 }}
                   animate={{ 
-                    opacity: mcBreakVisible ? (isSelected || !selectedChoice ? 1 : 0.5) : 0, 
-                    scale: isSelected ? 1.05 : 1 
+                    opacity: mcBreakVisible ? (isSelected || !selectedChoice ? 1 : 0.42) : 0,
+                    scale: isSelected ? 1.035 : 1,
+                    y: mcBreakVisible ? 0 : 14
                   }}
-                  transition={{ delay: mcBreakVisible ? 0.7 + idx * 0.1 : 0, duration: 0.3 }}
-                  onClick={() => {
-                    onSelect(option.id);
-                    setMcBreakTimerActive(false);
-                  }}
+                  whileHover={!selectedChoice ? { y: -4, scale: 1.02 } : undefined}
+                  whileTap={!selectedChoice ? { scale: 0.98 } : undefined}
+                  transition={{ delay: mcBreakVisible ? 0.65 + idx * 0.08 : 0, duration: 0.28 }}
+                  onClick={() => onSelect(option.id)}
                   disabled={!!selectedChoice}
-                  className={`
-                    relative p-6 rounded-2xl border-2 transition-all duration-300
-                    flex flex-col items-center justify-center gap-3 text-center
-                    min-h-[140px]
-                    ${isSelected 
-                      ? "border-terracotta bg-terracotta/10 dark:bg-terracotta/20 scale-105" 
-                      : "border-terracotta/20 dark:border-terracotta/30 bg-soft-cream/50 dark:bg-[#12121A] hover:border-terracotta/50 hover:bg-terracotta/5"
-                    }
-                    ${selectedChoice && !isSelected ? "opacity-50" : ""}
-                  `}
+                  className={`group relative min-h-[172px] overflow-hidden rounded-[28px] border p-4 text-left transition-all duration-300 sm:min-h-[184px] sm:p-5 ${
+                    isSelected
+                      ? "border-cyan-200/80 bg-white/[0.14] shadow-[0_0_42px_rgba(0,200,255,0.32)]"
+                      : "border-white/12 bg-white/[0.07] shadow-[0_18px_60px_rgba(0,0,0,0.24)] hover:border-cyan-200/45 hover:bg-white/[0.11]"
+                  } ${selectedChoice && !isSelected ? "grayscale" : ""}`}
                   data-testid={`button-choice-${option.id}`}
                 >
-                  <div className={`
-                    w-12 h-12 rounded-full flex items-center justify-center
-                    ${isSelected 
-                      ? "bg-terracotta text-white" 
-                      : "bg-terracotta/10 dark:bg-terracotta/20 text-terracotta"
-                    }
-                  `}>
-                    <Icon className="w-6 h-6" />
+                  <div className={`absolute -right-10 -top-10 h-28 w-28 rounded-full bg-gradient-to-br ${accent} opacity-20 blur-2xl transition-opacity group-hover:opacity-35`} />
+                  <div className="relative z-10 flex h-full flex-col">
+                    <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${accent} text-white shadow-[0_0_28px_rgba(255,255,255,0.12)]`}>
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <span className="mb-2 block text-[17px] font-black leading-tight tracking-[-0.03em] text-white sm:text-[19px]">
+                      {option.label}
+                    </span>
+                    <span className="block text-[12px] font-semibold leading-5 text-white/62 sm:text-[13px]">
+                      {option.description}
+                    </span>
                   </div>
-                  <span className="font-medium text-warm-gray dark:text-[#F8FAFC] text-[18px]">
-                    {option.label}
-                  </span>
                   {isSelected && (
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-terracotta text-white flex items-center justify-center"
+                      initial={{ scale: 0, rotate: -20 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      className="absolute right-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-cyan-200 text-[#050510] shadow-[0_0_24px_rgba(103,232,249,0.55)]"
                     >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
                     </motion.div>
@@ -1447,10 +1631,10 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: mcBreakVisible ? 1 : 0 }}
-            transition={{ delay: 1.2 }}
-            className="text-center text-xs text-warm-gray/50 dark:text-[#64748B] mt-6"
+            transition={{ delay: 1.05 }}
+            className="mx-auto mt-5 max-w-sm text-center text-xs font-bold leading-5 text-white/42"
           >
-            Your answers shape your personalized results
+            {question.footer}
           </motion.p>
         </motion.div>
       </main>
@@ -1458,83 +1642,45 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   );
   };
 
-  if (quizPhase === "superpower") {
-    return (
-      <SuperpowerGame
-        tier={gameTier}
-        onSelect={handleSuperpowerChoice}
-      />
+  if (quizPhase === "checkpoint") {
+    const isFirstCheckpoint = quizConfig.checkpoint1After && currentIndex + 1 <= quizConfig.checkpoint1After && !completedCheckpoint1;
+    const question = isFirstCheckpoint ? INTERLUDE_QUESTIONS["checkpoint-one"] : INTERLUDE_QUESTIONS["checkpoint-two"];
+    const selectedChoice = question.id === "checkpoint-one" ? checkpointOneChoice : checkpointTwoChoice;
+    return renderMultiChoiceQuestion(
+      question,
+      selectedChoice,
+      (id) => handleInterludeChoice(question.id, id),
+      false
     );
   }
 
-  if (quizPhase === "superpower-countdown") {
-    return (
-      <TimedCountdown
-        onComplete={handleCountdownComplete}
-      />
+  if (quizPhase === "superpower") {
+    return renderMultiChoiceQuestion(
+      INTERLUDE_QUESTIONS.superpower,
+      superpowerChoice,
+      (id) => handleInterludeChoice("superpower", id),
+      true
     );
   }
 
   if (quizPhase === "energy") {
-    return renderMultiChoiceQuestion(MID1_QUESTION, energyChoice, handleEnergyChoice, true);
-  }
-
-  if (quizPhase === "energy-countdown") {
-    return (
-      <TimedCountdown
-        onComplete={handleCountdownComplete}
-      />
-    );
-  }
-
-  if (quizPhase === "checkpoint") {
-    return (
-      <RecapSpinWheel
-        currentIndex={currentIndex}
-        scores={scores}
-        questionsRemaining={questions.length - currentIndex - 1}
-        shownInsights={shownInsights}
-        onInsightShown={(insight) => {
-          setShownInsights(prev => new Set(Array.from(prev).concat(insight)));
-        }}
-        onContinue={() => {
-          // Mark appropriate checkpoint as completed
-          if (quizConfig.checkpoint1After && currentIndex + 1 >= quizConfig.checkpoint1After && !completedCheckpoint1) {
-            setCompletedCheckpoint1(true);
-          } else if (quizConfig.checkpoint2After && currentIndex + 1 >= quizConfig.checkpoint2After && !completedCheckpoint2) {
-            setCompletedCheckpoint2(true);
-          }
-          // Advance to next question when returning from checkpoint break
-          if (currentIndex < questions.length - 1) {
-            setCurrentIndex(prev => prev + 1);
-          }
-          isProcessingAnswerRef.current = false; // Reset processing lock when returning from break
-          console.log(`[Quiz] Returning from checkpoint, advancing to Q${currentIndex + 2}`);
-          setQuizPhase("quiz");
-          setTimerResetKey(prev => prev + 1);
-        }}
-      />
+    return renderMultiChoiceQuestion(
+      INTERLUDE_QUESTIONS["pressure-avatar"],
+      energyChoice,
+      (id) => handleInterludeChoice("pressure-avatar", id),
+      true
     );
   }
 
   if (quizPhase === "mystery") {
-    return (
-      <MysteryBoxGame
-        tier={gameTier}
-        onSelect={handleMysteryChoice}
-      />
+    return renderMultiChoiceQuestion(
+      INTERLUDE_QUESTIONS.mystery,
+      mysteryChoice,
+      (id) => handleInterludeChoice("mystery", id),
+      true
     );
   }
 
-  if (quizPhase === "mystery-countdown") {
-    return (
-      <TimedCountdown
-        onComplete={handleCountdownComplete}
-      />
-    );
-  }
-
-  
   if (isFinalizingResults) {
     return (
       <div className="min-h-screen flex items-center justify-center overflow-hidden bg-[#080812] px-5 py-10 text-white" data-testid="quiz-analysis-screen">
@@ -1785,23 +1931,23 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
       </header>
       <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] overflow-y-auto">
         <div className="relative w-full max-w-sm h-[min(480px,calc(100dvh-220px))] min-h-[380px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentQuestion.id}
+          <motion.div
+              key={`${currentIndex}-${currentQuestion.id}`}
               className="absolute inset-0"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ 
-                scale: isTimingOut ? 0.85 : 1, 
-                opacity: isTimingOut ? 0 : 1,
-                filter: isTimingOut ? "blur(4px)" : "blur(0px)"
+              initial={{ scale: 0.98, opacity: 0 }}
+              animate={{
+                scale: isTimingOut ? 0.96 : 1,
+                opacity: 1,
+                filter: isTimingOut ? "blur(3px)" : "blur(0px)",
+                transition: isTimingOut
+                  ? { type: "tween", duration: 0.2, ease: "easeOut" }
+                  : { type: "spring", stiffness: 300, damping: 25 }
               }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ 
-                type: isTimingOut ? "tween" : "spring",
-                duration: isTimingOut ? 2 : undefined,
-                ease: isTimingOut ? "easeOut" : undefined,
-                stiffness: isTimingOut ? undefined : 300, 
-                damping: isTimingOut ? undefined : 25 
+              exit={{
+                scale: 0.98,
+                opacity: 0,
+                filter: "blur(0px)",
+                transition: { duration: 0.16, ease: "easeOut" }
               }}
             >
               <motion.div
@@ -2005,7 +2151,6 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                 </div>
               </motion.div>
             </motion.div>
-          </AnimatePresence>
 
           <AnimatePresence>
             {showQuip && (

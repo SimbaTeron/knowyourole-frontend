@@ -17,6 +17,11 @@ const MOOD_OPTIONS = [
   { id: "reflective", emoji: "🌙", label: "Reflective", color: "#818CF8", glow: "rgba(129,140,248,0.7)", desc: "Thoughtful and inward" },
 ];
 
+const MOOD_ORDER = MOOD_OPTIONS.reduce<Record<string, number>>((order, mood, index) => {
+  order[mood.id] = index;
+  return order;
+}, {});
+
 const BLEND_LABELS: Record<string, string> = {
   "focused+creative": "The Visionary Architect",
   "focused+calm": "The Strategic Mind",
@@ -210,8 +215,14 @@ const BLEND_DESCRIPTIONS: Record<string, string[]> = {
   ],
 };
 
+function getBlendKey(mood1: string, mood2: string): string {
+  return [mood1, mood2]
+    .sort((a, b) => (MOOD_ORDER[a] ?? Number.MAX_SAFE_INTEGER) - (MOOD_ORDER[b] ?? Number.MAX_SAFE_INTEGER))
+    .join("+");
+}
+
 function getBlendLabel(mood1: string, mood2: string): string {
-  const key = [mood1, mood2].sort().join("+");
+  const key = getBlendKey(mood1, mood2);
   return BLEND_LABELS[key] || `${mood1.charAt(0).toUpperCase() + mood1.slice(1)} ${mood2.charAt(0).toUpperCase() + mood2.slice(1)} Blend`;
 }
 
@@ -232,9 +243,9 @@ function getTraitDeltas(mood1: string, mood2: string) {
 }
 
 function getBlendDescription(mood1: string, mood2: string): string {
-  const key = [mood1, mood2].sort().join("+");
+  const key = getBlendKey(mood1, mood2);
   const descs = BLEND_DESCRIPTIONS[key];
-  if (!descs) return `A unique blend of ${mood1} and ${mood2} energy that shapes your personality in distinct ways.`;
+  if (!descs) return "This mix gives today’s answers a bit of emotional context — useful, but not part of your final score.";
   return descs[Math.floor(Math.random() * descs.length)];
 }
 
@@ -704,6 +715,102 @@ function deltaLabel(direction: string) {
   return "↹ Dampens";
 }
 
+function CurrentVibeSnapshot({
+  mood1,
+  mood2,
+}: {
+  mood1?: (typeof MOOD_OPTIONS)[0];
+  mood2?: (typeof MOOD_OPTIONS)[0];
+}) {
+  const selectedCount = Number(Boolean(mood1)) + Number(Boolean(mood2));
+  const slots = [mood1, mood2];
+
+  return (
+    <motion.div
+      layout
+      animate={{
+        borderColor: selectedCount ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)",
+        boxShadow: selectedCount ? "0 0 18px rgba(120,0,255,0.14)" : "none",
+      }}
+      transition={{ duration: 0.25 }}
+      style={{
+        flex: 1,
+        minWidth: 0,
+        maxWidth: 360,
+        padding: "5px 7px",
+        borderRadius: 999,
+        background: "rgba(255,255,255,0.052)",
+        border: "1px solid rgba(255,255,255,0.09)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+      }}
+    >
+      <span
+        style={{
+          color: "rgba(255,255,255,0.36)",
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          flexShrink: 0,
+        }}
+      >
+        Vibe
+      </span>
+      <span
+        style={{
+          color: selectedCount ? "#FF00E5" : "rgba(255,255,255,0.28)",
+          fontSize: 10,
+          fontWeight: 800,
+          whiteSpace: "nowrap",
+          flexShrink: 0,
+        }}
+      >
+        {selectedCount}/2
+      </span>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, flex: 1, minWidth: 0 }}>
+        {slots.map((mood, index) => (
+          <div
+            key={mood?.id ?? `empty-${index}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+              minHeight: 24,
+              padding: "3px 6px",
+              borderRadius: 999,
+              background: mood ? `${mood.color}16` : "rgba(255,255,255,0.04)",
+              border: mood ? `1px solid ${mood.color}3a` : "1px dashed rgba(255,255,255,0.1)",
+              color: mood ? mood.color : "rgba(255,255,255,0.32)",
+              minWidth: 0,
+            }}
+          >
+            <span style={{ fontSize: "0.8rem", lineHeight: 1 }}>{mood?.emoji ?? "＋"}</span>
+            <span
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                fontSize: 10,
+                fontWeight: 800,
+                minWidth: 0,
+              }}
+            >
+              {mood?.label ?? (index === 0 ? "First" : "Second")}
+            </span>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 function BlendResultCard({
   mood1,
   mood2,
@@ -716,7 +823,6 @@ function BlendResultCard({
   onReset: () => void;
 }) {
   const label = getBlendLabel(mood1.id, mood2.id);
-  const deltas = getTraitDeltas(mood1.id, mood2.id);
   const desc = getBlendDescription(mood1.id, mood2.id);
 
   return (
@@ -801,115 +907,53 @@ function BlendResultCard({
         {label}
       </div>
 
-      {/* Mood labels */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 22 }}>
-        <span
-          style={{
-            background: `${mood1.color}16`,
-            border: `1px solid ${mood1.color}42`,
-            borderRadius: 50,
-            padding: "5px 16px",
-            fontSize: 12,
-            fontWeight: 700,
-            color: mood1.color,
-            fontFamily: "'Outfit', sans-serif",
-          }}
-        >
-          {mood1.label}
-        </span>
-        <span style={{ color: "rgba(255,255,255,0.26)", fontSize: "0.8rem" }}>✦</span>
-        <span
-          style={{
-            background: `${mood2.color}16`,
-            border: `1px solid ${mood2.color}42`,
-            borderRadius: 50,
-            padding: "5px 16px",
-            fontSize: 12,
-            fontWeight: 700,
-            color: mood2.color,
-            fontFamily: "'Outfit', sans-serif",
-          }}
-        >
-          {mood2.label}
-        </span>
-      </div>
-
       {/* Blend description */}
       <p
         style={{
           fontSize: 14,
-          color: "rgba(255,255,255,0.47)",
+          color: "rgba(255,255,255,0.52)",
           fontFamily: "'Outfit', sans-serif",
-          maxWidth: 330,
-          margin: "0 auto 26px",
-          lineHeight: 1.65,
+          maxWidth: 340,
+          margin: "0 auto 16px",
+          lineHeight: 1.55,
         }}
       >
         {desc}
       </p>
 
-      {/* Trait deltas */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", marginBottom: 28 }}>
-        {deltas.map(({ key, label: tLabel, emoji: tEmoji, delta, direction }) => (
-          <div
-            key={key}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              width: "100%",
-              maxWidth: 320,
-            }}
-          >
-            <span style={{ fontSize: "1rem" }}>{tEmoji}</span>
-            <div style={{ flex: 1, textAlign: "left" }}>
-              <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)", fontFamily: "'Outfit', sans-serif" }}>
-                {tLabel}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <div
-                  style={{
-                    flex: 1,
-                    height: 4,
-                    borderRadius: 2,
-                    background: "rgba(255,255,255,0.08)",
-                    overflow: "hidden",
-                  }}
-                >
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.min(100, (Math.abs(delta) / 10) * 100)}%` }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
-                    style={{
-                      height: "100%",
-                      borderRadius: 2,
-                      background: direction === "boost" ? "#4ade80" : direction === "nudge" ? "#fbbf24" : "#f87171",
-                    }}
-                  />
-                </div>
-                <span
-                  style={{
-                    width: 44,
-                    textAlign: "right",
-                    fontSize: 11,
-                    fontWeight: 800,
-                    flexShrink: 0,
-                    color: direction === "boost" ? "#4ade80" : direction === "nudge" ? "#fbbf24" : "rgba(255,255,255,0.3)",
-                  }}
-                >
-                  {delta > 0 ? "+" : ""}
-                  {delta}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div
+        style={{
+          maxWidth: 340,
+          margin: "0 auto 22px",
+          padding: "12px 14px",
+          borderRadius: 18,
+          background: "rgba(255,255,255,0.055)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          textAlign: "left",
+        }}
+      >
+        <div
+          style={{
+            color: "rgba(255,255,255,0.38)",
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            marginBottom: 6,
+          }}
+        >
+          Use this as context
+        </div>
+        <div
+          style={{
+            color: "rgba(255,255,255,0.68)",
+            fontSize: 13,
+            lineHeight: 1.45,
+            fontFamily: "'Outfit', sans-serif",
+          }}
+        >
+          Your mood may color today’s answers. The full quiz is what builds your actual profile.
+        </div>
       </div>
 
       {/* CTA buttons */}
@@ -1090,8 +1134,6 @@ export default function MoodMixerPage() {
   const isBrewing = phase === "brewing" && selectedMood1 && selectedMood2;
   const isBrewed = phase === "brewed" && selectedMood1 && selectedMood2;
 
-  const buttonLabel = !mood1 ? "Select 2 moods" : !mood2 ? "Select 1 more mood" : "Blend Ready";
-
   return (
     <div
       style={{
@@ -1225,8 +1267,8 @@ export default function MoodMixerPage() {
         </p>
       </div>
 
-      {/* Orb area */}
-      <div style={{ position: "relative", zIndex: 1, marginTop: 72, paddingBottom: 180 }}>
+      {/* Orb/result area */}
+      <div style={{ position: "relative", zIndex: 1, marginTop: isBrewed ? 10 : 72, paddingBottom: 180 }}>
         <AnimatePresence mode="wait">
           {isSelecting && (
             <motion.div
@@ -1283,7 +1325,7 @@ export default function MoodMixerPage() {
         </AnimatePresence>
 
         {/* Brewed result card */}
-        <div style={{ padding: "0 clamp(16px, 5vw, 48px)", marginTop: 28 }}>
+        <div style={{ padding: "0 clamp(16px, 5vw, 48px)", marginTop: isBrewed ? 0 : 28 }}>
           <AnimatePresence>
             {isBrewed && (
               <BlendResultCard
@@ -1311,7 +1353,7 @@ export default function MoodMixerPage() {
               bottom: 0,
               left: 0,
               right: 0,
-              padding: "16px clamp(16px, 5vw, 48px) calc(28px + env(safe-area-inset-bottom, 0px))",
+              padding: "5px clamp(10px, 3vw, 22px) calc(8px + env(safe-area-inset-bottom, 0px))",
               background: "rgba(5,5,16,0.97)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
@@ -1332,36 +1374,16 @@ export default function MoodMixerPage() {
                 border: "none",
                 color: "rgba(255,255,255,0.28)",
                 fontWeight: 600,
-                fontSize: 13,
+                fontSize: 12,
                 cursor: "pointer",
                 fontFamily: "'Outfit', sans-serif",
-                padding: "10px 4px",
+                padding: "6px 2px",
                 transition: "color 0.2s",
               }}
             >
               Skip this step →
             </button>
-            <motion.div
-              animate={{
-                background: bothSelected
-                  ? "linear-gradient(90deg, #00C8FF, #7800FF)"
-                  : "rgba(255,255,255,0.08)",
-                boxShadow: bothSelected ? "0 0 32px rgba(0,200,255,0.42)" : "none",
-              }}
-              transition={{ duration: 0.3 }}
-              style={{
-                padding: "14px 30px",
-                borderRadius: 50,
-                color: bothSelected ? "#fff" : "rgba(255,255,255,0.3)",
-                fontWeight: 700,
-                fontSize: 14,
-                fontFamily: "'Outfit', sans-serif",
-                minWidth: 162,
-                textAlign: "center",
-              }}
-            >
-              {buttonLabel}
-            </motion.div>
+            <CurrentVibeSnapshot mood1={selectedMood1} mood2={selectedMood2} />
           </motion.div>
         )}
       </AnimatePresence>

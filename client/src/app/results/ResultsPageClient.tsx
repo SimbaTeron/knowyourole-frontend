@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { isTestMode, getFakeScores, getFakeMBTIType } from "@/utils/devTest";
@@ -492,7 +493,7 @@ function AuroraBg() {
   );
 }
 
-function TopNav({ premium = false, left = null as React.ReactNode, right = null as React.ReactNode }) {
+function TopNav({ premium = false, left = null as ReactNode, right = null as ReactNode }) {
   return (
     <nav style={{
       position: "sticky", top: 0, zIndex: 100,
@@ -542,8 +543,8 @@ function TopNav({ premium = false, left = null as React.ReactNode, right = null 
   );
 }
 
-function GlassCard({ children, style = {} as React.CSSProperties, glow = false }: {
-  children: React.ReactNode; style?: React.CSSProperties; glow?: boolean;
+function GlassCard({ children, style = {} as CSSProperties, glow = false }: {
+  children: ReactNode; style?: CSSProperties; glow?: boolean;
 }) {
   return (
     <div style={{
@@ -569,7 +570,7 @@ function GradientTopBar({ colors }: { colors: string }) {
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({ children }: { children: ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
       <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${C.glassBorder}, transparent)` }} />
@@ -579,25 +580,169 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function BottomBar({ active = "p1", onNavigate, onPremiumClick }: {
+type ShareReportPayload = {
+  sessionId?: string;
+  title: string;
+  subtitle: string;
+  mbtiType: string;
+  archetype: string;
+  primaryDisc: string;
+  population: string;
+  career: { title: string; salary: string; summary: string };
+  bigFive: BigFiveProfile;
+  disc: DiscProfile;
+  sections: { title: string; subtitle?: string; body?: string; items?: { label: string; value: string; detail?: string }[] }[];
+};
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: () => void; report: ShareReportPayload }) {
+  const [busyAction, setBusyAction] = useState<"pdf" | "native" | null>(null);
+  const [copied, setCopied] = useState(false);
+  if (!open) return null;
+
+  const fileName = `KnowYouRole-Full-Portrait-${report.mbtiType}-${report.sessionId?.slice(-6) || "Report"}.pdf`;
+  const shareUrl = typeof window !== "undefined" ? window.location.origin : "https://ummout.com";
+  const shareText = `I just discovered my KnowYouRole Full Portrait: ${report.mbtiType} — ${report.archetype}, ${report.primaryDisc} DISC, with ${report.career.title} as a top career direction. Take the quiz: ${shareUrl}`;
+  const emailSubject = encodeURIComponent(`My KnowYouRole Full Portrait: ${report.mbtiType} — ${report.archetype}`);
+  const emailBody = encodeURIComponent(`${shareText}\n\nTip: I can also attach the PDF report from the share sheet/download.`);
+  const smsBody = encodeURIComponent(shareText);
+
+  const generatePDF = async () => {
+    const response = await fetch("/api/generate-pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ report }),
+    });
+    if (!response.ok) throw new Error("PDF generation failed");
+    return response.blob();
+  };
+
+  const handleDownload = async () => {
+    setBusyAction("pdf");
+    try {
+      downloadBlob(await generatePDF(), fileName);
+    } finally {
+      setBusyAction(null);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    setBusyAction("native");
+    try {
+      const pdfBlob = await generatePDF();
+      const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
+      if (navigator.canShare?.({ files: [pdfFile] })) {
+        await navigator.share({ title: report.title, text: shareText, files: [pdfFile] });
+      } else if (navigator.share) {
+        await navigator.share({ title: report.title, text: shareText, url: shareUrl });
+        downloadBlob(pdfBlob, fileName);
+      } else {
+        downloadBlob(pdfBlob, fileName);
+      }
+    } finally {
+      setBusyAction(null);
+    }
+  };
+
+  const copyMessage = async () => {
+    await navigator.clipboard.writeText(shareText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
+
+  const optionStyle: CSSProperties = {
+    width: "100%",
+    border: `1px solid ${C.glassBorderBright}`,
+    background: "rgba(255,255,255,0.055)",
+    color: C.text,
+    borderRadius: 16,
+    padding: "13px 14px",
+    textAlign: "left",
+    fontFamily: "Inter, sans-serif",
+    cursor: "pointer",
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Share results"
+      onClick={(event) => event.target === event.currentTarget && onClose()}
+      style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(3, 2, 10, 0.78)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", padding: 18, display: "flex", alignItems: "center", justifyContent: "center" }}
+    >
+      <div style={{ width: "min(520px, 100%)", maxHeight: "88dvh", overflowY: "auto", borderRadius: 24, background: `linear-gradient(145deg, rgba(14,8,32,0.98), rgba(8,4,20,0.98))`, border: `1px solid ${C.glassBorderBright}`, boxShadow: "0 28px 90px rgba(0,0,0,0.55)", color: C.text }}>
+        <div style={{ padding: 20, borderBottom: `1px solid ${C.glassBorder}`, position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at top left, ${C.cyanGlow}, transparent 42%), radial-gradient(circle at top right, rgba(168,85,247,0.28), transparent 42%)`, pointerEvents: "none" }} />
+          <button type="button" onClick={onClose} aria-label="Close share options" style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: 999, border: `1px solid ${C.glassBorder}`, background: "rgba(255,255,255,0.06)", color: C.text, cursor: "pointer" }}>×</button>
+          <div style={{ position: "relative" }}>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.6, color: C.cyan, textTransform: "uppercase", marginBottom: 8 }}>Share your Full Portrait</div>
+            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, fontWeight: 800, marginBottom: 5 }}>Beautiful PDF Report</div>
+            <div style={{ fontSize: 12, lineHeight: 1.55, color: C.textMuted }}>Save, email, text, or use your phone's native share sheet. On iPhone, the PDF can go straight to Messages, Mail, Files, AirDrop — the whole civilized menu.</div>
+          </div>
+        </div>
+
+        <div style={{ padding: 18, display: "grid", gap: 10 }}>
+          <div style={{ border: `1px solid rgba(34,211,238,0.24)`, background: "rgba(34,211,238,0.07)", borderRadius: 18, padding: 14 }}>
+            <div style={{ fontSize: 11, color: C.textDim, textTransform: "uppercase", letterSpacing: 1, fontWeight: 800, marginBottom: 6 }}>Included in the PDF</div>
+            <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6 }}>Career direction, MBTI breakdown, DISC style, Big Five scores, role matches, blindspots, learning style, side-hustle direction, crossroads guidance, and next moves.</div>
+          </div>
+
+          <button type="button" onClick={handleNativeShare} disabled={Boolean(busyAction)} style={{ ...optionStyle, borderColor: "rgba(34,211,238,0.35)", background: `linear-gradient(135deg, rgba(34,211,238,0.16), rgba(168,85,247,0.12))` }}>
+            <strong>{busyAction === "native" ? "Preparing PDF…" : "Share PDF"}</strong>
+            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>Best for iPhone/Android: opens native share sheet with the PDF attached when supported.</div>
+          </button>
+
+          <button type="button" onClick={handleDownload} disabled={Boolean(busyAction)} style={optionStyle}>
+            <strong>{busyAction === "pdf" ? "Generating PDF…" : "Save / Download PDF"}</strong>
+            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>Saves a polished multi-page Full Portrait report.</div>
+          </button>
+
+          <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} style={{ ...optionStyle, textDecoration: "none", display: "block" }}>
+            <strong>Email results</strong>
+            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>Opens a pre-written email. Attach the saved PDF if the browser does not attach it automatically.</div>
+          </a>
+
+          <a href={`sms:?&body=${smsBody}`} style={{ ...optionStyle, textDecoration: "none", display: "block" }}>
+            <strong>Text results</strong>
+            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>Opens Messages/SMS with a concise personality summary and quiz link.</div>
+          </a>
+
+          <button type="button" onClick={copyMessage} style={optionStyle}>
+            <strong>{copied ? "Copied!" : "Copy share message"}</strong>
+            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>Useful for Instagram, Discord, Telegram, or wherever people are oversharing today.</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BottomBar({ active = "p1", onNavigate, onPremiumClick, onShare }: {
   active?: string;
   onNavigate?: (page: 1 | 3) => void;
   onPremiumClick?: () => void;
+  onShare?: () => void;
 }) {
-  const [copied, setCopied] = useState(false);
-
   const btns = [
     { id: "p1", icon: "🏆", label: "Full Portrait" },
     { id: "p3", icon: "🔮", label: "Premium" },
-    { id: "share", icon: copied ? "✓" : "↗", label: copied ? "Copied!" : "Share" },
+    { id: "share", icon: "↗", label: "Share" },
     { id: "restart", icon: "↺", label: "Restart" },
   ];
 
   const handleClick = (id: string) => {
     if (id === "share") {
-      navigator.clipboard.writeText(window.location.href).catch(() => {});
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      onShare?.();
     } else if (id === "restart") {
       sessionStorage.clear();
       window.location.href = "/";
@@ -857,7 +1002,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
   const learningStyle = LEARNING_STYLES[mbtiType] || { title: "Systems-Based Learning", desc: "You absorb information fastest when connected to a larger system.", tips: ["📐 Study systematically", "🎯 Apply what you learn", "📖 Read case studies"] };
   const crossroad = CROSSROADS[mbtiType] || { heading: "Crossroads Adventure", desc: "Every major decision shapes who you become. Your type shows you the paths worth taking.", tags: ["Intuition", "Strategy", "Leadership", "Growth"] };
 
-  const ActionButton = ({ children, active, onClick, title }: { children: React.ReactNode; active?: boolean; onClick: () => void; title?: string }) => (
+  const ActionButton = ({ children, active, onClick, title }: { children: ReactNode; active?: boolean; onClick: () => void; title?: string }) => (
     <button
       type="button"
       title={title}
@@ -1004,7 +1149,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
     { id: "growth", label: "Growth Move", title: "Choose the scarier useful path", body: "Messier at first, but it expands your range and forces your strengths to mature under real pressure." },
   ];
 
-  const FEATURE_CARDS: Record<string, React.ReactNode> = {
+  const FEATURE_CARDS: Record<string, ReactNode> = {
     deepdive: (
       <GlassCard style={{ overflow: "hidden", marginBottom: 12 }}>
         <GradientTopBar colors={`linear-gradient(90deg, ${C.cyan}, ${C.purple})`} />
@@ -1306,7 +1451,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
               </div>
             ))}
           </div>
-          <div style={{ animation: "cardEnter 0.4s ease-out" } as React.CSSProperties}>
+          <div style={{ animation: "cardEnter 0.4s ease-out" } as CSSProperties}>
             <style>{`@keyframes cardEnter { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
             {FEATURE_CARDS.deepdive}
           </div>
@@ -1454,7 +1599,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo 
       </div>
 
       {/* Feature Card */}
-      <div style={{ animation: "cardEnter 0.4s ease-out" } as React.CSSProperties}>
+      <div style={{ animation: "cardEnter 0.4s ease-out" } as CSSProperties}>
         <style>{`
           @keyframes cardEnter {
             from { opacity: 0; transform: translateY(16px) scale(0.98); }
@@ -1584,6 +1729,7 @@ export default function ResultsPage() {
     const p = params.get('page');
     return p === '3' ? 3 : 1;
   });
+  const [shareOpen, setShareOpen] = useState(false);
   const realResults = useRealResults(mounted);
   useEffect(() => {
     setMounted(true);
@@ -1614,6 +1760,99 @@ export default function ResultsPage() {
   }
 
   const { type, bigFive, disc, mbtiType, primaryDisc, rawScores, isDemo, discDesc } = realResults;
+  const arch = getArchetype(mbtiType);
+  const career = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
+  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive);
+  const hustle = SIDE_HUSTLES[mbtiType] || SIDE_HUSTLES.INTP;
+  const learningStyle = LEARNING_STYLES[mbtiType] || LEARNING_STYLES.INTP;
+  const crossroad = CROSSROADS[mbtiType] || CROSSROADS.INTP;
+  const topBigFive = (Object.entries(bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
+  const bigFiveData = (rolesData as unknown as { traitDescriptions: { bigFive: Record<string, { label: string; high: string; medium: string; low: string }> } }).traitDescriptions.bigFive;
+  const topBigFiveTier = topBigFive[1] >= 70 ? "high" : topBigFive[1] <= 40 ? "low" : "medium";
+  const topBigFiveLabel = bigFiveData[topBigFive[0]]?.label || topBigFive[0];
+  const topBigFiveDescription = bigFiveData[topBigFive[0]]?.[topBigFiveTier] || "Your strongest trait shapes how you naturally approach decisions, pressure, and opportunity.";
+  const sessionId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("sessionId") || undefined : undefined;
+  const mbtiDimensions = ([
+    { label: "Mind", pair: "E/I", dominant: mbtiType[0], detail: mbtiType[0] === "E" ? "You draw energy from interaction and external motion." : "You recharge through solitude, reflection, and depth." },
+    { label: "Energy", pair: "N/S", dominant: mbtiType[1], detail: mbtiType[1] === "N" ? "You trust patterns, possibilities, and future signals." : "You trust concrete details, direct evidence, and practical realities." },
+    { label: "Nature", pair: "T/F", dominant: mbtiType[2], detail: mbtiType[2] === "T" ? "You prioritize logic, consistency, and clean decision rules." : "You weigh human impact, harmony, and values alongside logic." },
+    { label: "Tactics", pair: "J/P", dominant: mbtiType[3], detail: mbtiType[3] === "J" ? "You prefer structure, clarity, and decisions that close loops." : "You prefer flexibility, options, and adaptive movement." },
+  ]);
+  const reportPayload: ShareReportPayload = {
+    sessionId,
+    title: `KnowYouRole Full Portrait — ${mbtiType}`,
+    subtitle: `${mbtiType} — ${arch}`,
+    mbtiType,
+    archetype: arch,
+    primaryDisc,
+    population: POPULATION_RATES[mbtiType] || "2.4%",
+    career: {
+      title: career.title,
+      salary: career.salary,
+      summary: `Your top career signal is ${career.title}, with strong overlap across ${mbtiType} decision patterns, ${primaryDisc} work style, and your dominant Big Five trait: ${topBigFiveLabel}.`,
+    },
+    bigFive,
+    disc,
+    sections: [
+      {
+        title: "MBTI Full Portrait",
+        subtitle: `${mbtiType} — ${arch} · ${MBTI_TAGLINES[mbtiType] || "Personality pattern"}`,
+        body: `Only ${POPULATION_RATES[mbtiType] || "2.4%"} of the population shares this type. Your type points to how you gather energy, process information, make decisions, and organize your life.`,
+        items: mbtiDimensions.map(d => ({ label: `${d.label} · ${d.pair}`, value: `${d.dominant} is dominant`, detail: d.detail })),
+      },
+      {
+        title: "DISC Operating Style",
+        subtitle: `${primaryDisc} — ${DISC_LABELS[primaryDisc] || "Primary Style"}`,
+        body: discDesc || `Your primary DISC style is ${primaryDisc}, which describes your default operating rhythm under pressure and around other people.`,
+        items: [
+          { label: "Dominance", value: `${disc.D}%`, detail: "Drive, urgency, directness, and comfort taking charge." },
+          { label: "Influence", value: `${disc.I}%`, detail: "Expressiveness, persuasion, enthusiasm, and social momentum." },
+          { label: "Steadiness", value: `${disc.S}%`, detail: "Patience, dependability, consistency, and support energy." },
+          { label: "Conscientiousness", value: `${disc.C}%`, detail: "Precision, analysis, standards, and quality control." },
+        ],
+      },
+      {
+        title: "Big Five Signature",
+        subtitle: `${topBigFiveLabel} dominant · ${topBigFive[1]}%`,
+        body: topBigFiveDescription,
+        items: [
+          { label: "Openness", value: `${bigFive.O}%`, detail: "Creativity, curiosity, abstraction, and novelty tolerance." },
+          { label: "Conscientiousness", value: `${bigFive.C}%`, detail: "Organization, follow-through, discipline, and reliability." },
+          { label: "Extroversion", value: `${bigFive.E}%`, detail: "Social energy, assertiveness, and external engagement." },
+          { label: "Agreeableness", value: `${bigFive.A}%`, detail: "Cooperation, warmth, empathy, and trust orientation." },
+          { label: "Neuroticism", value: `${bigFive.N}%`, detail: "Stress sensitivity, vigilance, and emotional reactivity." },
+        ],
+      },
+      {
+        title: "Career Direction",
+        subtitle: `${career.title} · ${career.salary}`,
+        body: `Your role fit is not a random job list. It blends type, DISC style, Big Five intensity, and role-family signals into practical career direction.`,
+        items: [
+          { label: "Top match", value: `${roleMatch.primary.title} · ${roleMatch.primary.salary}`, detail: `Strong match for ${mbtiType} decision patterns, ${primaryDisc} work style, and your current trait stack.` },
+          { label: "Second match", value: `${roleMatch.secondary.title} · ${roleMatch.secondary.salary}`, detail: "Adjacent fit with enough overlap to explore without forcing a full identity costume change." },
+          { label: "First move", value: "Interview 2 people in the role", detail: "Collect their real day-to-day tasks, what drains them, and what gets rewarded." },
+        ],
+      },
+      {
+        title: "Blindspots & Growth Levers",
+        body: `Your ${primaryDisc} style can overuse its favorite weapon. Add one pause before big reactions: clarify the goal, then choose the tool.`,
+        items: [
+          { label: "Emotional blindspot", value: "Solving before people feel understood", detail: "Name the feeling first, then ask whether they want support, a solution, or space." },
+          { label: "Efficiency blindspot", value: "High standards can outrun collaboration", detail: "Explain the standard and next smallest useful step instead of taking the work back." },
+        ],
+      },
+      {
+        title: "Learning, Side Hustle & Crossroads",
+        subtitle: learningStyle.title,
+        body: learningStyle.desc,
+        items: [
+          { label: "Learning tactic", value: learningStyle.tips[0], detail: learningStyle.tips[1] || "Apply the insight through one small visible artifact." },
+          { label: "Side hustle fit", value: `${hustle.title} · ${hustle.income}`, detail: hustle.desc },
+          { label: "Crossroads", value: crossroad.heading, detail: crossroad.desc },
+        ],
+      },
+    ],
+  };
 
   const bottomBarActive = page === 1 ? "p1" : "p3";
 
@@ -1642,7 +1881,10 @@ export default function ResultsPage() {
         active={bottomBarActive}
         onNavigate={setPage}
         onPremiumClick={handleBottomBarPremiumClick}
+        onShare={() => setShareOpen(true)}
       />
+
+      <ShareResultsModal open={shareOpen} onClose={() => setShareOpen(false)} report={reportPayload} />
 
 
       {/* Site footer — consistent with rest of site */}

@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import Link from 'next/link';
 
 export function AppFooter() {
   const linkStyle: React.CSSProperties = {
@@ -66,6 +66,7 @@ export function AppFooter() {
             <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 14, fontFamily: "'Outfit',sans-serif" }}>Company</h4>
             <div>
               <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>About</Link>
+              <Link href="/faq" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>FAQ</Link>
               <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Science</Link>
             </div>
           </div>
