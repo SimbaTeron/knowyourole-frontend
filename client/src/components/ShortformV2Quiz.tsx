@@ -261,13 +261,21 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
           grid-template-columns: 8fr 8fr 5fr 5fr 2fr;
         }
         .shortform-v2-question-title {
-          max-width: 14ch;
-          font-size: 1.9rem;
-          line-height: 1.02;
-          letter-spacing: -0.055em;
+          max-width: 18ch;
+          font-size: clamp(1.36rem, 7vw, 1.75rem);
+          line-height: 1;
+          letter-spacing: -0.052em;
+        }
+        .shortform-v2-answer-grid { grid-template-columns: 1fr; }
+        .shortform-v2-answer-button { min-height: 74px; }
+        @media (max-height: 740px) and (max-width: 640px) {
+          .shortform-v2-question-title { font-size: 1.27rem; }
+          .shortform-v2-answer-button { min-height: 68px; }
         }
         @media (min-width: 640px) {
           .shortform-v2-question-title { font-size: 2.22rem; }
+          .shortform-v2-answer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .shortform-v2-answer-button { min-height: 170px; }
         }
         @media (min-width: 1024px) {
           .shortform-v2-layout { grid-template-columns: minmax(0, 43fr) minmax(0, 57fr); }
@@ -317,37 +325,37 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
         </button>
       </div>
 
-      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl items-center px-3 py-3 sm:px-5 sm:py-5 lg:px-6">
+      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl items-start px-3 pb-[calc(28px+env(safe-area-inset-bottom))] pt-14 sm:items-center sm:px-5 sm:py-5 lg:px-6">
         <AnimatePresence mode="wait">
           <motion.section
             key={currentQuestion.id}
-            initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
+            initial={false}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: -12, filter: "blur(8px)" }}
             transition={{ duration: 0.28, ease: "easeOut" }}
-            className="shortform-v2-layout grid w-full gap-3 lg:items-stretch xl:gap-4"
+            className="shortform-v2-layout grid w-full gap-2.5 lg:items-stretch xl:gap-4"
           >
-            <section className="relative min-h-[292px] overflow-hidden rounded-[24px] border border-cyan-100/10 bg-[#070c18]/92 p-4 shadow-[0_24px_78px_rgba(0,0,0,0.46)] ring-1 ring-white/[0.04] backdrop-blur-2xl sm:min-h-[360px] sm:rounded-[28px] sm:p-5 lg:min-h-[430px] lg:p-6 xl:min-h-[470px]">
-              <div className="absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(34,211,238,0.08),transparent)]" />
-              <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.09)_1px,transparent_1px)] [background-size:34px_34px]" />
+            <section className="relative min-h-[214px] overflow-hidden rounded-[24px] border border-cyan-100/10 bg-[#070c18]/92 p-3.5 shadow-[0_24px_78px_rgba(0,0,0,0.46)] ring-1 ring-white/[0.04] backdrop-blur-2xl sm:min-h-[360px] sm:rounded-[28px] sm:p-5 lg:min-h-[430px] lg:p-6 xl:min-h-[470px]">
+              <div className="absolute inset-x-0 top-0 h-16 bg-[linear-gradient(180deg,rgba(34,211,238,0.08),transparent)] sm:h-24" />
+              <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.09)_1px,transparent_1px)] [background-size:34px_34px]" />
 
-              <div className="relative z-10 flex h-full min-h-[260px] flex-col pt-1 sm:min-h-[320px] lg:min-h-[378px] xl:min-h-[418px]">
-                <div className={`mb-5 inline-flex h-8 max-w-full items-center gap-2 self-start rounded-full bg-gradient-to-r ${accent} px-3.5 text-[9px] font-black uppercase tracking-[0.18em] text-[#050510] shadow-[0_0_38px_rgba(34,211,238,0.18)] sm:mb-7 sm:h-9 sm:px-4 sm:text-[10px] lg:mb-8`}>
+              <div className="relative z-10 flex h-full min-h-[186px] flex-col pt-1 sm:min-h-[320px] lg:min-h-[378px] xl:min-h-[418px]">
+                <div className={`mb-3 inline-flex h-7 max-w-full items-center gap-2 self-start rounded-full bg-gradient-to-r ${accent} px-3 text-[8.5px] font-black uppercase tracking-[0.16em] text-[#050510] shadow-[0_0_38px_rgba(34,211,238,0.18)] sm:mb-7 sm:h-9 sm:px-4 sm:text-[10px] lg:mb-8`}>
                   <Sparkles className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
                   <span className="truncate">{currentQuestion.group}</span>
                 </div>
 
-                <div className="mt-auto pb-1">
-                  <p className="mb-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-white/82 sm:mb-3 sm:text-[11px]">{currentQuestion.signal}</p>
+                <div className="mt-auto pb-0.5">
+                  <p className="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-white/76 sm:mb-3 sm:text-[11px]">{currentQuestion.signal}</p>
                   <h1 className="shortform-v2-question-title text-balance font-black text-white drop-shadow-[0_14px_38px_rgba(0,0,0,0.45)]">
                     {currentQuestion.prompt}
                   </h1>
-                  <p className="mt-3 max-w-md text-[0.82rem] font-extrabold leading-5 text-white/84 sm:mt-4 sm:text-[0.9rem] sm:leading-6">{currentQuestion.guidance}</p>
+                  <p className="mt-2 max-w-md text-[0.75rem] font-bold leading-4 text-white/72 sm:mt-4 sm:text-[0.9rem] sm:font-extrabold sm:leading-6">{currentQuestion.guidance}</p>
                 </div>
               </div>
             </section>
 
-            <section className="grid gap-2.5 sm:grid-cols-2 lg:gap-3 lg:auto-rows-fr">
+            <section className="shortform-v2-answer-grid grid gap-2 lg:gap-3 lg:auto-rows-fr">
               {currentQuestion.answers.map((answer, index) => {
                 const isSelected = selectedAnswer === answer.id;
                 const isDimmed = Boolean(selectedAnswer && !isSelected);
@@ -357,26 +365,25 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
                     type="button"
                     onClick={() => handleAnswer(answer, index)}
                     disabled={Boolean(selectedAnswer)}
-                    initial={{ opacity: 0, y: 12 }}
+                    initial={false}
                     animate={{ opacity: isDimmed ? 0.42 : 1, y: 0, scale: isSelected ? 1.025 : 1 }}
                     transition={{ delay: index * 0.045, duration: 0.22 }}
                     whileHover={!selectedAnswer ? { y: -4, scale: 1.012 } : undefined}
                     whileTap={!selectedAnswer ? { scale: 0.98 } : undefined}
-                    className={`group relative min-h-[126px] overflow-hidden rounded-[20px] border p-3.5 text-left transition-all duration-300 sm:min-h-[170px] sm:rounded-[22px] lg:min-h-0 lg:p-4 ${isSelected ? "border-cyan-200/95 bg-[#17233a] shadow-[0_0_0_1px_rgba(125,211,252,0.45),0_0_50px_rgba(34,211,238,0.30)]" : "border-white/12 bg-[#0d1324]/94 shadow-[0_18px_54px_rgba(0,0,0,0.30)] hover:border-cyan-200/55 hover:bg-[#131c31]"}`}
+                    className={`shortform-v2-answer-button group relative overflow-hidden rounded-[19px] border p-2.5 text-left transition-all duration-300 sm:rounded-[22px] sm:p-3.5 lg:min-h-0 lg:p-4 ${isSelected ? "border-cyan-200/95 bg-[#17233a] shadow-[0_0_0_1px_rgba(125,211,252,0.45),0_0_50px_rgba(34,211,238,0.30)]" : "border-white/12 bg-[#0d1324]/94 shadow-[0_18px_54px_rgba(0,0,0,0.30)] hover:border-cyan-200/55 hover:bg-[#131c31]"}`}
                     data-testid={`button-v2-answer-${answer.id}`}
                   >
-                    <div className={`absolute -right-10 -top-12 h-32 w-32 rounded-full bg-gradient-to-br ${accent} opacity-15 blur-2xl transition-opacity group-hover:opacity-25`} />
-                    <div className="absolute inset-x-5 top-0 h-1 rounded-b-full bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent" />
-                    <div className="relative z-10 flex h-full flex-col">
-                      <div className="mb-3 flex items-center gap-2.5 sm:mb-4 sm:gap-3">
-                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${accent} text-[11px] font-black text-[#050510] shadow-[0_12px_30px_rgba(0,0,0,0.35)] sm:h-8 sm:w-8 sm:text-xs`}>{answer.id}</span>
-                        <span className="min-w-0 truncate text-[9px] font-black uppercase tracking-[0.18em] text-white/62 sm:text-[10px] sm:tracking-[0.2em]">{answer.resultSignal}</span>
-                        {isSelected && <span className="ml-auto rounded-full bg-cyan-200 px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[#050510]">Selected</span>}
-                      </div>
-                      <h2 className="max-w-[23ch] text-[1rem] font-black leading-[1.17] tracking-[-0.03em] text-white sm:text-[1.13rem] lg:text-[1.2rem]">{answer.text}</h2>
-                      <div className="mt-auto pt-3">
-                        <div className="h-1.5 w-full rounded-sm bg-black/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]" />
-                      </div>
+                    <div className={`absolute -right-10 -top-12 h-28 w-28 rounded-full bg-gradient-to-br ${accent} opacity-12 blur-2xl transition-opacity group-hover:opacity-24 sm:h-32 sm:w-32`} />
+                    <div className="absolute inset-x-5 top-0 h-1 rounded-b-full bg-gradient-to-r from-transparent via-cyan-200/35 to-transparent" />
+                    <div className="relative z-10 grid h-full grid-cols-[34px_minmax(0,1fr)] items-center gap-2.5 sm:flex sm:flex-col sm:items-stretch sm:gap-0">
+                      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[13px] bg-gradient-to-br ${accent} text-[11px] font-black text-[#050510] shadow-[0_12px_30px_rgba(0,0,0,0.35)] sm:mb-4 sm:h-8 sm:w-8 sm:rounded-full sm:text-xs`}>{answer.id}</span>
+                      <span className="min-w-0">
+                        <span className="hidden text-[9px] font-black uppercase tracking-[0.18em] text-white/50 sm:block sm:text-[10px] sm:tracking-[0.2em]">{answer.resultSignal}</span>
+                        <h2 className="text-[0.92rem] font-black leading-[1.16] tracking-[-0.025em] text-white sm:mt-2 sm:max-w-[23ch] sm:text-[1.13rem] lg:text-[1.2rem]">{answer.text}</h2>
+                        <span className="mt-1 block truncate text-[10px] font-bold uppercase tracking-[0.12em] text-white/45 sm:hidden">{answer.resultSignal}</span>
+                      </span>
+                      {isSelected && <span className="absolute right-2 top-2 rounded-full bg-cyan-200 px-2 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-[#050510] sm:text-[9px]">Selected</span>}
+                      <div className="mt-auto hidden pt-3 sm:block"><div className="h-1.5 w-full rounded-sm bg-black/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]" /></div>
                     </div>
                   </motion.button>
                 );
