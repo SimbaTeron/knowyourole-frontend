@@ -4786,6 +4786,13 @@ function OrbitalGlassV2Results({
     topTraitLabel: topTraitMeta.label,
   });
   const shareLine = resultSummaryLine;
+  const identityWordCount = identity.trim().split(/\s+/).filter(Boolean).length;
+  const identityScale: CSSProperties = identity.length >= 22
+    ? { fontSize: "clamp(34px, 10vw, 58px)", lineHeight: 0.92, letterSpacing: "-0.068em" }
+    : identity.length >= 17
+      ? { fontSize: "clamp(38px, 11vw, 64px)", lineHeight: 0.9, letterSpacing: "-0.072em" }
+      : { fontSize: "clamp(42px, 13vw, 74px)" };
+  const identityWords = identity.trim().split(/\s+/).filter(Boolean);
   const mbtiScoreMap: Record<string, number> = {
     E: rawScores?.mbti.E ?? 50,
     I: rawScores?.mbti.I ?? 50,
@@ -4844,7 +4851,8 @@ function OrbitalGlassV2Results({
         .glass-tile { border-radius:28px; padding:19px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.075); box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 16px 44px rgba(0,0,0,.22); }
         .type-chip { display:inline-flex; align-items:center; gap:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.10); border-radius:999px; padding:9px 11px; font-size:13px; font-weight:950; }
         .type-chip small { color:var(--muted); font-size:11px; font-weight:800; }
-        .orb-h1 { margin:20px 0 0; font-size:clamp(42px,13vw,74px); line-height:.86; letter-spacing:-.078em; overflow-wrap:break-word; text-wrap:balance; }
+        .orb-h1 { margin:20px 0 0; font-size:clamp(42px,13vw,74px); line-height:.86; letter-spacing:-.078em; overflow-wrap:break-word; text-wrap:balance; max-width:100%; }
+        .orb-h1 span { display:block; max-width:100%; }
         .shareline { margin:19px 0 15px; } .shareline b { color:#ffd581; font-size:10px; letter-spacing:.18em; text-transform:uppercase; } .shareline p { margin:8px 0 0; font-size:clamp(17px,5vw,23px); line-height:1.12; letter-spacing:-.045em; font-weight:900; text-wrap:balance; }
         .role-card { margin-top:15px; border-radius:25px; padding:18px; background:linear-gradient(145deg,#fff8e8,#f4dfb4); color:#15110c; box-shadow:0 18px 48px rgba(0,0,0,.26); }
         .role-card small { display:block; color:rgba(74,54,28,.62); font-size:10px; font-weight:950; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px; } .role-card h2 { margin:0 0 6px; font-size:25px; letter-spacing:-.055em; line-height:1.03; text-wrap:balance; } .role-card p { margin:0; color:rgba(20,14,7,.74); font-size:13px; line-height:1.48; font-weight:650; text-wrap:pretty; }
@@ -4874,7 +4882,7 @@ function OrbitalGlassV2Results({
           <section>
             <article className="portrait-card">
               <div className="card-head"><div className="eyebrow">Instant Portrait</div><div className="avatar">{emoji}</div></div>
-              <div className="glass-tile"><div className="type-chip">{emoji} {mbtiType} <small>{stripLeadingThe(arch)}</small></div><h1 className="orb-h1">{identity}</h1></div>
+              <div className="glass-tile"><div className="type-chip">{emoji} {mbtiType} <small>{stripLeadingThe(arch)}</small></div><h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1></div>
               <div className="shareline"><b>Result summary</b><p>“{shareLine}”</p></div>
               <div className="role-card"><small>Best-fit role direction</small><h2>{primaryRole.title}</h2><p>{primaryRole.why}</p></div>
               <div className="mini-stats"><div className="stat"><small>MBTI</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>DISC</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>Trait</small><strong>{topTrait[1]}%</strong><span>{topTraitMeta.label}</span></div></div>
