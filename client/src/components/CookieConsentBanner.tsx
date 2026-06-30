@@ -1,217 +1,250 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const COOKIE_CONSENT_KEY = "kyr_cookie_consent";
+export const COOKIE_CONSENT_KEY = "kyr_cookie_consent";
+export const COOKIE_CONSENT_EVENT = "kyr-cookie-consent-updated";
+export const COOKIE_PREFERENCES_EVENT = "kyr-open-cookie-preferences";
 
-interface CookieConsentState {
-  necessary: boolean;
+export type CookieConsentState = {
+  necessary: true;
   analytics: boolean;
   marketing: boolean;
   timestamp: string;
+  version: 1;
+};
+
+const defaultConsent: CookieConsentState = {
+  necessary: true,
+  analytics: false,
+  marketing: false,
+  timestamp: "",
+  version: 1,
+};
+
+export function readCookieConsent(): CookieConsentState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = window.localStorage.getItem(COOKIE_CONSENT_KEY);
+    if (!stored) return null;
+    const parsed = JSON.parse(stored) as Partial<CookieConsentState>;
+    return {
+      necessary: true,
+      analytics: Boolean(parsed.analytics),
+      marketing: Boolean(parsed.marketing),
+      timestamp: typeof parsed.timestamp === "string" ? parsed.timestamp : "",
+      version: 1,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function hasAnalyticsConsent() {
+  return readCookieConsent()?.analytics ?? false;
+}
+
+export function hasMarketingConsent() {
+  return readCookieConsent()?.marketing ?? false;
+}
+
+function persistConsent(nextConsent: CookieConsentState) {
+  window.localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(nextConsent));
+  window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: nextConsent }));
+}
+
+function buildConsent(values: Pick<CookieConsentState, "analytics" | "marketing">): CookieConsentState {
+  return {
+    necessary: true,
+    analytics: values.analytics,
+    marketing: values.marketing,
+    timestamp: new Date().toISOString(),
+    version: 1,
+  };
 }
 
 export function CookieConsentBanner() {
   const [showBanner, setShowBanner] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
-  const [consent, setConsent] = useState<CookieConsentState>({
-    necessary: true,
-    analytics: false,
-    marketing: false,
-    timestamp: "",
-  });
+  const [consent, setConsent] = useState<CookieConsentState>(defaultConsent);
+  const [isResultsRoute, setIsResultsRoute] = useState(false);
+  const [isQuizRoute, setIsQuizRoute] = useState(false);
+  const [isQuizOnboardingActive, setIsQuizOnboardingActive] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(COOKIE_CONSENT_KEY);
-    if (!stored) {
-      // Small delay so it doesn't flash on page load
-      const timer = setTimeout(() => setShowBanner(true), 800);
-      return () => clearTimeout(timer);
+    setIsResultsRoute(window.location.pathname.startsWith("/results"));
+    setIsQuizRoute(window.location.pathname.startsWith("/quiz"));
+
+    const openPreferences = () => {
+      setConsent(readCookieConsent() ?? defaultConsent);
+      setShowPreferences(true);
+      setShowBanner(true);
+    };
+
+    const stored = readCookieConsent();
+    if (stored) {
+      setConsent(stored);
+    } else {
+      const timer = window.setTimeout(() => setShowBanner(true), 700);
+      return () => window.clearTimeout(timer);
     }
   }, []);
 
-  const handleAcceptAll = () => {
-    const fullConsent: CookieConsentState = {
-      necessary: true,
-      analytics: true,
-      marketing: true,
-      timestamp: new Date().toISOString(),
+  useEffect(() => {
+    const openPreferences = () => {
+      setConsent(readCookieConsent() ?? defaultConsent);
+      setShowPreferences(true);
+      setShowBanner(true);
     };
-    setConsent(fullConsent);
-    localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(fullConsent));
-    setShowBanner(false);
-  };
 
-  const handleRejectAll = () => {
-    const minimalConsent: CookieConsentState = {
-      necessary: true,
-      analytics: false,
-      marketing: false,
-      timestamp: new Date().toISOString(),
+    const handleHashChange = () => {
+      if (window.location.hash === "#cookie-preferences") openPreferences();
     };
-    setConsent(minimalConsent);
-    localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(minimalConsent));
-    setShowBanner(false);
-  };
 
-  const handleSavePreferences = () => {
-    const prefConsent: CookieConsentState = {
-      necessary: true,
-      analytics: consent.analytics,
-      marketing: consent.marketing,
-      timestamp: new Date().toISOString(),
+    window.addEventListener(COOKIE_PREFERENCES_EVENT, openPreferences);
+    window.addEventListener("hashchange", handleHashChange);
+    handleHashChange();
+
+    return () => {
+      window.removeEventListener(COOKIE_PREFERENCES_EVENT, openPreferences);
+      window.removeEventListener("hashchange", handleHashChange);
     };
-    setConsent(prefConsent);
-    localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(prefConsent));
+  }, []);
+
+  useEffect(() => {
+    const updateOnboardingState = () => {
+      setIsQuizOnboardingActive(Boolean(document.querySelector("[data-testid='quiz-onboarding-overlay']")));
+    };
+
+    updateOnboardingState();
+    const observer = new MutationObserver(updateOnboardingState);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const summary = useMemo(() => {
+    if (consent.analytics && consent.marketing) return "All optional cookies enabled";
+    if (!consent.analytics && !consent.marketing) return "Only essential cookies enabled";
+    return "Some optional cookies enabled";
+  }, [consent.analytics, consent.marketing]);
+
+  const save = (nextConsent: CookieConsentState) => {
+    setConsent(nextConsent);
+    persistConsent(nextConsent);
     setShowBanner(false);
     setShowPreferences(false);
   };
 
-  const handlePreferenceChange = (key: keyof Pick<CookieConsentState, "analytics" | "marketing">) => {
-    setConsent((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  const shellClassName = isResultsRoute
+    ? "fixed bottom-0 left-0 right-0 z-[9000] px-3 pb-[calc(10px+env(safe-area-inset-bottom,0px))] pt-2 pointer-events-none sm:p-4"
+    : "fixed bottom-0 left-0 right-0 z-[9000] p-4 pointer-events-none";
 
-  const getConsentSummary = () => {
-    if (consent.analytics && consent.marketing) return "all";
-    if (!consent.analytics && !consent.marketing) return "necessary";
-    return "some";
-  };
+  const panelClassName = isResultsRoute
+    ? "mx-auto max-w-md rounded-2xl border border-white/15 bg-[#111122]/95 p-3 text-white shadow-2xl backdrop-blur-xl pointer-events-auto max-h-[42dvh] overflow-y-auto sm:max-h-[min(72dvh,420px)] sm:p-5"
+    : "mx-auto max-w-2xl rounded-2xl border border-white/15 bg-[#111122]/95 p-5 text-white shadow-2xl backdrop-blur-xl pointer-events-auto";
+
+  const primaryActionsClassName = isResultsRoute
+    ? "grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-end"
+    : "flex flex-wrap justify-end gap-2";
+
+  const buttonClassName = "min-h-11 text-xs";
 
   return (
     <AnimatePresence>
-      {showBanner && (
+      {showBanner && !isQuizRoute && !isQuizOnboardingActive && (
         <motion.div
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed bottom-0 left-0 right-0 z-[9999] p-4 pointer-events-none"
+          transition={{ duration: 0.25 }}
+          className={shellClassName}
+          role="region"
+          aria-label="Cookie consent"
         >
-          <div className="max-w-2xl mx-auto bg-white dark:bg-[#1A1A2E] border border-gray-200 dark:border-[#A78BFA]/30 rounded-2xl shadow-2xl p-6 pointer-events-auto">
+          <div className={panelClassName}>
             {!showPreferences ? (
               <>
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-terracotta/10 dark:bg-[#A78BFA]/10 flex items-center justify-center flex-shrink-0">
-                    <ShieldCheck className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
+                <div className="mb-3 flex items-start gap-3 sm:mb-4">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#00C8FF]/15 text-[#00C8FF] sm:h-10 sm:w-10">
+                    <ShieldCheck className="h-5 w-5" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-warm-gray dark:text-[#F8FAFC] mb-1">
-                      We value your privacy
-                    </h3>
-                    <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed">
-                      We use cookies to improve your experience. By continuing, you agree to our{" "}
-                      <Link href="/privacy" className="text-terracotta dark:text-[#A78BFA] underline underline-offset-2">
-                        Privacy Policy
-                      </Link>
-                      .
+                  <div>
+                    <h2 className="mb-1 text-base font-semibold">Cookie choices</h2>
+                    <p className="text-xs leading-relaxed text-white/70 sm:text-sm">
+                      KnowYouRole uses essential storage for the quiz and optional cookies for analytics or future advertising only if you allow them. You can change this later from the Privacy page.
                     </p>
+                    <Link href="/privacy" className="mt-2 inline-block text-xs text-[#00C8FF] underline underline-offset-4 sm:text-sm">
+                      Read the Privacy Policy
+                    </Link>
                   </div>
                 </div>
-
-                <div className="flex flex-wrap gap-2 justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowPreferences(true)}
-                    className="text-xs"
-                  >
-                    Manage Preferences
+                <div className={primaryActionsClassName}>
+                  <Button variant="outline" size="sm" onClick={() => setShowPreferences(true)} className={buttonClassName}>
+                    Manage preferences
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleRejectAll}
-                    className="text-xs"
-                  >
-                    Reject All
+                  <Button variant="outline" size="sm" onClick={() => save(buildConsent({ analytics: false, marketing: false }))} className={buttonClassName}>
+                    Reject non-essential
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleAcceptAll}
-                    className="text-xs bg-terracotta hover:bg-terracotta/90 dark:bg-[#A78BFA] dark:hover:bg-[#A78BFA]/90"
-                  >
-                    Accept All
+                  <Button size="sm" onClick={() => save(buildConsent({ analytics: true, marketing: true }))} className={`bg-[#00C8FF] text-black hover:bg-[#00C8FF]/90 ${buttonClassName}`}>
+                    Accept all
                   </Button>
                 </div>
               </>
             ) : (
               <>
-                <h3 className="font-semibold text-warm-gray dark:text-[#F8FAFC] mb-4">
-                  Cookie Preferences
-                </h3>
-
-                <div className="space-y-3 mb-4">
-                  {/* Necessary - always on, can't toggle */}
-                  <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                    <div>
-                      <p className="font-medium text-sm text-warm-gray dark:text-[#F8FAFC]">Necessary</p>
-                      <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8]">
-                        Required for the quiz to function. Cannot be disabled.
-                      </p>
-                    </div>
-                    <div className="w-10 h-6 rounded-full bg-terracotta dark:bg-[#A78BFA] flex items-center justify-end p-1">
-                      <div className="w-4 h-4 rounded-full bg-white" />
-                    </div>
-                  </div>
-
-                  {/* Analytics */}
-                  <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                    <div>
-                      <p className="font-medium text-sm text-warm-gray dark:text-[#F8FAFC]">Analytics</p>
-                      <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8]">
-                        Help us understand how visitors use our site.
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handlePreferenceChange("analytics")}
-                      className={`w-10 h-6 rounded-full p-1 transition-colors flex items-center ${
-                        consent.analytics
-                          ? "bg-terracotta dark:bg-[#A78BFA] justify-end"
-                          : "bg-gray-300 dark:bg-gray-600 justify-start"
-                      }`}
-                    >
-                      <div className="w-4 h-4 rounded-full bg-white shadow" />
-                    </button>
-                  </div>
-
-                  {/* Marketing */}
-                  <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                    <div>
-                      <p className="font-medium text-sm text-warm-gray dark:text-[#F8FAFC]">Marketing</p>
-                      <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8]">
-                        Used to deliver relevant ads (we don't run ads now, but may in the future).
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handlePreferenceChange("marketing")}
-                      className={`w-10 h-6 rounded-full p-1 transition-colors flex items-center ${
-                        consent.marketing
-                          ? "bg-terracotta dark:bg-[#A78BFA] justify-end"
-                          : "bg-gray-300 dark:bg-gray-600 justify-start"
-                      }`}
-                    >
-                      <div className="w-4 h-4 rounded-full bg-white shadow" />
-                    </button>
-                  </div>
+                <div className="mb-4">
+                  <h2 className="text-base font-semibold">Manage cookie preferences</h2>
+                  <p className="mt-1 text-xs text-white/55">{summary}</p>
                 </div>
 
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowPreferences(false)}
-                    className="text-xs"
-                  >
+                <div className="mb-4 space-y-3">
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-semibold">Essential</p>
+                        <p className="text-xs text-white/60">Required for quiz state, consent storage, and basic site functionality.</p>
+                      </div>
+                      <span className="rounded-full bg-[#00C8FF]/20 px-3 py-1 text-xs font-semibold text-[#00C8FF]">Always on</span>
+                    </div>
+                  </div>
+
+                  {([
+                    ["analytics", "Analytics", "Helps us understand pages visited, quiz start/completion flow, and site performance."],
+                    ["marketing", "Advertising", "Reserved for future ad partners such as Google AdSense, including personalized or non-personalized ads."],
+                  ] as const).map(([key, label, description]) => (
+                    <div key={key} className="rounded-xl border border-white/10 bg-white/5 p-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-sm font-semibold">{label}</p>
+                          <p className="text-xs text-white/60">{description}</p>
+                        </div>
+                        <button
+                          type="button"
+                          aria-pressed={consent[key]}
+                          onClick={() => setConsent((prev) => ({ ...prev, [key]: !prev[key] }))}
+                          className={`flex h-7 w-12 items-center rounded-full p-1 transition-colors ${consent[key] ? "justify-end bg-[#00C8FF]" : "justify-start bg-white/20"}`}
+                        >
+                          <span className="h-5 w-5 rounded-full bg-white shadow" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className={primaryActionsClassName}>
+                  <Button variant="outline" size="sm" onClick={() => setShowPreferences(false)} className={buttonClassName}>
                     Back
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleSavePreferences}
-                    className="text-xs bg-terracotta hover:bg-terracotta/90 dark:bg-[#A78BFA] dark:hover:bg-[#A78BFA]/90"
-                  >
-                    Save Preferences
+                  <Button variant="outline" size="sm" onClick={() => save(buildConsent({ analytics: false, marketing: false }))} className={buttonClassName}>
+                    Reject non-essential
+                  </Button>
+                  <Button size="sm" onClick={() => save(buildConsent({ analytics: consent.analytics, marketing: consent.marketing }))} className={`bg-[#00C8FF] text-black hover:bg-[#00C8FF]/90 ${buttonClassName}`}>
+                    Save choices
                   </Button>
                 </div>
               </>
@@ -224,25 +257,5 @@ export function CookieConsentBanner() {
 }
 
 export function useCookieConsent() {
-  const getConsent = (): CookieConsentState | null => {
-    const stored = localStorage.getItem(COOKIE_CONSENT_KEY);
-    if (!stored) return null;
-    try {
-      return JSON.parse(stored) as CookieConsentState;
-    } catch {
-      return null;
-    }
-  };
-
-  const hasAnalyticsConsent = () => {
-    const consent = getConsent();
-    return consent?.analytics ?? false;
-  };
-
-  const hasMarketingConsent = () => {
-    const consent = getConsent();
-    return consent?.marketing ?? false;
-  };
-
-  return { getConsent, hasAnalyticsConsent, hasMarketingConsent };
+  return { getConsent: readCookieConsent, hasAnalyticsConsent, hasMarketingConsent };
 }

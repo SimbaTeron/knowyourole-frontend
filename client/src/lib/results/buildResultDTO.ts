@@ -71,7 +71,7 @@ export interface RawQuizAnswer {
   /** Raw selected value: binary, slider, multi-choice, or adaptive answer. */
   value?: unknown;
   /** Current binary/swipe choice. */
-  choice?: 0 | 1;
+  choice?: 0 | 1 | 2 | 3;
   /** Slider response value where present. */
   sliderValue?: number;
   /** Time spent answering. Used for confidence and analytics. */
@@ -319,17 +319,17 @@ const MBTI_PAIRS: Array<{ dimension: MBTIDimensionKey; left: MBTILetter; right: 
 
 const BIG_FIVE_LABELS: Record<BigFiveTrait, string> = {
   O: "Openness",
-  C: "Conscientiousness",
+  C: "Structure / Follow-through",
   E: "Extraversion",
   A: "Agreeableness",
-  N: "Neuroticism",
+  N: "Stress Reactivity",
 };
 
 const DISC_TITLES: Record<DISCStyle, string> = {
-  D: "Direct Driver",
-  I: "Inspiring Influencer",
-  S: "Steady Supporter",
-  C: "Careful Analyst",
+  D: "Dominant",
+  I: "Influential",
+  S: "Steady",
+  C: "Conscientious",
   Balanced: "Balanced Style",
 };
 
@@ -390,6 +390,26 @@ function buildDisc(scores: ScoresData, legacy: PersonalityResult): DISCResult {
   return { primary, title: legacy.discLabel || DISC_TITLES[primary], summary: legacy.discDesc || DISC_TITLES[primary], scores: scoreMap, confidence: scoreMap[primary].normalized };
 }
 
+function getCalibratedBigFiveTraitOrder(traits: Record<BigFiveTrait, BigFiveTraitResult>, mbti: Record<string, number>, discStyle: string): BigFiveTrait[] {
+  const sorted = (Object.keys(traits) as BigFiveTrait[]).sort((a, b) => traits[b].normalized - traits[a].normalized);
+  const close = (trait: BigFiveTrait, gap = 12) => traits[sorted[0]].normalized - traits[trait].normalized <= gap;
+  const socialFeeling = (mbti.E ?? 0) >= (mbti.I ?? 0) && (mbti.F ?? 0) > (mbti.T ?? 0);
+  const creativeNP = (mbti.N ?? 0) >= (mbti.S ?? 0) && (mbti.P ?? 0) >= (mbti.J ?? 0);
+  const actionDriver = discStyle === "D" && (mbti.E ?? 0) > (mbti.I ?? 0);
+  let calibratedTop = sorted[0];
+
+  if (creativeNP && traits.O.normalized >= 62 && close("O", 20)) {
+    calibratedTop = "O";
+  } else if (socialFeeling && ["S", "I"].includes(discStyle)) {
+    const socialCandidates = (["A", "E"] as BigFiveTrait[]).filter((trait) => close(trait, 26) && traits[trait].normalized >= 62);
+    if (socialCandidates.length) calibratedTop = socialCandidates.sort((a, b) => traits[b].normalized - traits[a].normalized)[0];
+  } else if (actionDriver && traits.E.normalized >= 62 && close("E", 20)) {
+    calibratedTop = "E";
+  }
+
+  return [calibratedTop, ...sorted.filter((trait) => trait !== calibratedTop)];
+}
+
 function buildBigFive(scores: ScoresData, legacy: PersonalityResult): BigFiveResult {
   const raw = scores.bigFive as Record<BigFiveTrait, number>;
   const normalized = legacy.bigFiveProfile;
@@ -400,7 +420,7 @@ function buildBigFive(scores: ScoresData, legacy: PersonalityResult): BigFiveRes
     const tier: BigFiveTraitResult["tier"] = value >= 67 ? "high" : value <= 33 ? "low" : "medium";
     return [code, { ...frameworkScore(code, raw[code] ?? value, value, Math.max(45, Math.abs(value - 50) * 1.5)), label: BIG_FIVE_LABELS[code], tier, summary: legacy.bigFiveLabels?.[code]?.[tier === "low" ? "low" : "high"] || `${BIG_FIVE_LABELS[code]} is ${tier}.` }];
   })) as Record<BigFiveTrait, BigFiveTraitResult>;
-  const topTraits = (Object.keys(traits) as BigFiveTrait[]).sort((a, b) => traits[b].normalized - traits[a].normalized);
+  const topTraits = getCalibratedBigFiveTraitOrder(traits, scores.mbti as Record<string, number>, legacy.discStyle);
   return { traits, dominantTrait: topTraits[0], topTraits, confidence: pct(topTraits.reduce((sum, code) => sum + traits[code].confidence, 0) / topTraits.length) };
 }
 

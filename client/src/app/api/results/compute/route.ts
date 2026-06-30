@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const persistence = await persistResultDTO(result);
+    const persistence = await persistResultDTOSafely(result);
     const persistedResult: ResultDTO = {
       ...result,
       meta: {
@@ -58,6 +58,10 @@ export async function POST(req: NextRequest) {
       },
       audit: {
         ...result.audit,
+        recoverableErrors: [
+          ...(result.audit.recoverableErrors ?? []),
+          ...(persistence.ok ? [] : [`Persistence skipped: ${persistence.error}`]),
+        ],
         trace: {
           ...result.audit.trace,
           persistenceAttemptId: persistence.persistenceAttemptId,
@@ -112,8 +116,25 @@ function normalizeComputeInput(body: unknown, req: NextRequest, requestId: strin
   };
 }
 
-async function persistResultDTO(result: ResultDTO): Promise<{ ok: true; resultId: string; persistenceAttemptId: string }> {
+
+async function persistResultDTOSafely(result: ResultDTO): Promise<
+  | { ok: true; resultId: string; persistenceAttemptId: string }
+  | { ok: false; resultId: null; persistenceAttemptId: string; error: string }
+> {
   const persistenceAttemptId = `persist-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  try {
+    return await persistResultDTO(result, persistenceAttemptId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown persistence error";
+    console.warn("[POST /api/results/compute] persistence unavailable; returning deterministic DTO fallback", {
+      persistenceAttemptId,
+      error: message,
+    });
+    return { ok: false, resultId: null, persistenceAttemptId, error: message };
+  }
+}
+
+async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string): Promise<{ ok: true; resultId: string; persistenceAttemptId: string }> {
   const supabase = getSupabaseAdmin();
 
   // Maintain the existing schema contract first: create/ensure quiz_sessions,
@@ -136,6 +157,7 @@ async function persistResultDTO(result: ResultDTO): Promise<{ ok: true; resultId
     throw new Error(`Failed to persist quiz session: ${sessionError.message}`);
   }
 
+  const now = new Date().toISOString();
   const primary = result.careerMatches[0];
   const secondary = result.careerMatches[1];
   const { error: resultError } = await supabase
@@ -163,6 +185,9 @@ async function persistResultDTO(result: ResultDTO): Promise<{ ok: true; resultId
       total_questions: result.audit.scoringAudit?.totalQuestions ?? result.raw.responses.length,
       avg_response_time: result.scores.adaptive.averageResponseTime ?? null,
       engagement_score: readNumericExtension(result, "engagement"),
+      created_at: result.meta.createdAt,
+      updated_at: now,
+      deleted: false,
       responses: {
         raw: result.raw.responses,
         dto: result,

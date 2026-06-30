@@ -221,7 +221,7 @@ export function ResultsOverlays({ s }: { s: OverlayState }) {
                 <Heart className="w-10 h-10 text-white fill-current" />
               </motion.div>
 
-              <p className="text-xl font-bold text-amber-700 dark:text-amber-200 mb-2">Support KnowRole</p>
+              <p className="text-xl font-bold text-amber-700 dark:text-amber-200 mb-2">Support KnowYouRole</p>
               <p className="text-sm text-amber-600/80 dark:text-amber-300/70 mb-6">Your donation helps us keep building and improving!</p>
 
               <div className="space-y-3">

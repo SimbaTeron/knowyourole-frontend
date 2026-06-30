@@ -339,7 +339,7 @@ export default function CrossroadsAdventure() {
   
   const handleShare = async () => {
     const topTraits = traitSnapshots.slice(0, 3).map(t => t.label).join(", ");
-    const shareText = `I just completed the Crossroads Adventure on KnowRole! My top traits: ${topTraits}. Discover yours!`;
+    const shareText = `I just completed the Crossroads Adventure on KnowYouRole! My top traits: ${topTraits}. Discover yours!`;
     
     if (navigator.share) {
       try {

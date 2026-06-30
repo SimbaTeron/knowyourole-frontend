@@ -88,7 +88,7 @@ export function FeedbackOverlay({ s }: { s: FeedbackState }) {
                 <MessageCircle className="w-8 h-8 text-white" />
               </motion.div>
               <h3 className="text-xl font-bold text-warm-gray dark:text-[#F8FAFC] mb-1">Quick Feedback</h3>
-              <p className="text-sm text-warm-gray/60 dark:text-[#64748B]">Help us improve KnowRole in 30 seconds</p>
+              <p className="text-sm text-warm-gray/60 dark:text-[#64748B]">Help us improve KnowYouRole in 30 seconds</p>
             </div>
 
             <div className="space-y-4">

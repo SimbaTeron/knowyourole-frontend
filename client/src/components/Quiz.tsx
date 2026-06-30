@@ -10,6 +10,8 @@ import CelestialProgressTracker from "./CelestialProgressTracker";
 import QuizOnboardingOverlay from "./QuizOnboarding";
 import questionsData from "@/data/questions.json";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
+import { trackKyrEvent } from "@/lib/analytics";
+import ShortformV2Quiz from "./ShortformV2Quiz";
 
 type IconKey =
   | "creative"
@@ -327,18 +329,19 @@ export interface QuizScores {
   };
   responses: Array<{
     questionId: number;
-    choice: 0 | 1;
+    choice: 0 | 1 | 2 | 3;
     timeSpent: number;
     swipeDirection: "left" | "right";
     sliderValue?: number; // Phase 1.1: -2 to +2 for slider questions
-    responseType?: "binary" | "slider";
+    responseType?: "binary" | "slider" | "multiChoice";
     psych?: string;
-    optionMeta?: [string, string];
+    optionMeta?: [string, string] | string[];
     selectedOptionMeta?: string;
     selectedOptionLabel?: string;
     wildcard?: boolean;
     boostRange?: [number, number];
     is2x?: boolean;
+    [key: string]: unknown;
   }>;
   swipeTimes: number[]; // Phase 2.1: Track all swipe times for dynamic difficulty
   averageSwipeTime: number; // Phase 2.1: Running average for difficulty scaling
@@ -348,6 +351,11 @@ export interface QuizScores {
   criticalWildcard: number;
   firstPrinciplesWildcard: number;
   hybridTypes: string[]; // Phase 1.4: Detected hybrid types like "Ambivert"
+  career?: Record<string, number>;
+  quizVersion?: string;
+  questionDatabase?: string;
+  deterministicResult?: boolean;
+  moodContext?: unknown;
 }
 
 const SWIPE_THRESHOLD = 100;
@@ -659,16 +667,17 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
 }
 
 const getQuizConfig = (_tier: string) => {
-  // Unified quiz config for all active tiers:
-  // Q1-10 → calibration1 → Q11-20 → calibration2 → Q21-25 →
-  // calibration3 → Q26-30 → pressure-avatar → Q31-35 → calibration5 → Q36-45
+  // Controlled short-form quiz config:
+  // 28 scored core questions + lightweight calibration interludes.
+  // This is the local-dev implementation of the short-form direction; the
+  // deeper 3–5 adaptive tie-breaker engine still needs a dedicated v2 item bank.
   return {
-    totalQuestions: 45,
-    checkpoint1After: 10,
-    superpowerAfter: 20,
-    checkpoint2After: 25,
-    energyAfter: 30,
-    mysteryAfter: 35,
+    totalQuestions: 28,
+    checkpoint1After: 7,
+    superpowerAfter: 12,
+    checkpoint2After: 17,
+    energyAfter: 22,
+    mysteryAfter: 26,
     hasMystery: true,
   };
 };
@@ -796,7 +805,8 @@ const getBrowserSessionItem = (key: string) => {
 };
 
 export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
-  const tier: ActiveTierValue = rawTier === "7-12" ? "13-18" : rawTier;
+  return <ShortformV2Quiz tier={rawTier} mood={mood} funMode={funMode} landmark={landmark} theme={theme} onComplete={onComplete} onExit={onExit} />;
+  const tier: ActiveTierValue = rawTier === "7-12" ? "13-18" : (rawTier as ActiveTierValue);
   const quizConfig = getQuizConfig(tier);
   const { teamName, isLocalitySet } = useLocalityTheme();
   const moodEffects = getMoodEffects(mood);
@@ -857,8 +867,10 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   const [showSliderOnboarding, setShowSliderOnboarding] = useState(false);
   const hasShownSliderOnboarding = useRef(!!getBrowserSessionItem("knowrole-onboarding-slider-done"));
   
-  // Use ref for processing lock - refs update synchronously, preventing race conditions
   const isProcessingAnswerRef = useRef(false);
+  const quizStartedTrackedRef = useRef(false);
+  const quizCompletedTrackedRef = useRef(false);
+  const progressMilestonesTrackedRef = useRef<Set<number>>(new Set());
 
   // BUG-08 FIX: Reset processing lock on component unmount
   // This prevents the lock from staying true if user navigates away mid-quiz
@@ -881,6 +893,12 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   
   // Derived state: check if any popup is active to disable interactions
   const isAnyPopupActive = showPauseMenu || showQuip || showIntroOnboarding || showSliderOnboarding;
+
+  useEffect(() => {
+    if (showIntroOnboarding || showSliderOnboarding) {
+      setIsPaused(true);
+    }
+  }, [showIntroOnboarding, showSliderOnboarding]);
 
   // Phase 1.2: Adaptive framework quotas — unified for all active tiers.
   // 45 questions total: Big5 ~46%, MBTI ~36%, DISC ~18%.
@@ -977,6 +995,65 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     // Final shuffle
     setQuestions(quotaSelection.sort(() => Math.random() - 0.5));
   }, [tier, quizConfig.totalQuestions]);
+
+  useEffect(() => {
+    if (quizStartedTrackedRef.current || questions.length === 0) return;
+    quizStartedTrackedRef.current = true;
+    trackKyrEvent("quiz_started", {
+      tier,
+      mood: mood || "unset",
+      fun_mode: funMode,
+      total_questions: questions.length,
+      source: "quiz_page",
+    });
+  }, [funMode, mood, questions.length, tier]);
+
+  useEffect(() => {
+    if (questions.length === 0 || currentIndex === 0 || quizCompletedTrackedRef.current) return;
+
+    const completedQuestions = Math.min(currentIndex, questions.length);
+    const milestones = [1, 5, 10, 15, 30, questions.length];
+    const nextMilestone = milestones.find(
+      milestone => completedQuestions >= milestone && !progressMilestonesTrackedRef.current.has(milestone),
+    );
+
+    if (!nextMilestone) return;
+    progressMilestonesTrackedRef.current.add(nextMilestone);
+    trackKyrEvent("quiz_progress_milestone", {
+      tier,
+      completed_questions: completedQuestions,
+      milestone: nextMilestone,
+      total_questions: questions.length,
+      percent_complete: Math.round((completedQuestions / questions.length) * 100),
+      current_phase: quizPhase,
+    });
+  }, [currentIndex, questions.length, quizPhase, tier]);
+
+  useEffect(() => {
+    if (questions.length === 0) return;
+
+    const trackAbandonment = () => {
+      if (quizCompletedTrackedRef.current || currentIndex <= 0 || currentIndex >= questions.length) return;
+      trackKyrEvent("quiz_abandoned", {
+        tier,
+        completed_questions: currentIndex,
+        total_questions: questions.length,
+        percent_complete: Math.round((currentIndex / questions.length) * 100),
+        current_phase: quizPhase,
+      });
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") trackAbandonment();
+    };
+
+    window.addEventListener("beforeunload", trackAbandonment);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.removeEventListener("beforeunload", trackAbandonment);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [currentIndex, questions.length, quizPhase, tier]);
 
   useEffect(() => {
     if (questions.length > 0 && currentIndex < questions.length) {
@@ -1375,6 +1452,16 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
       
       if (currentIndex >= questions.length - 1) {
         setIsFinalizingResults(true);
+        quizCompletedTrackedRef.current = true;
+        trackKyrEvent("quiz_completed", {
+          tier,
+          mood: mood || "unset",
+          total_questions: questions.length,
+          completed_questions: questions.length,
+          average_response_time: Math.round(newAvgTime * 10) / 10,
+          timed_out_answers: missCount,
+          final_phase: quizPhase,
+        });
         console.log(`[Quiz] Last question answered (Q${currentIndex + 1}/${questions.length}), completing quiz...`);
         // Mood Mixer stays as context/copy only; it must not mutate final trait scoring.
         const finalScores = {
@@ -1424,7 +1511,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
         isProcessingAnswerRef.current = false;
       }, 400);
     }
-  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, moodEffects, mood, scores]);
+  }, [currentIndex, questions, questionStartTime, processScore, x, completedSuperpower, completedMystery, completedEnergy, completedCheckpoint1, completedCheckpoint2, quizConfig, onComplete, hasInteracted, moodEffects, mood, scores, tier, missCount, quizPhase]);
 
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isTimingOut || isProcessingAnswerRef.current || isPaused) return;
@@ -1643,7 +1730,10 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   };
 
   if (quizPhase === "checkpoint") {
-    const isFirstCheckpoint = quizConfig.checkpoint1After && currentIndex + 1 <= quizConfig.checkpoint1After && !completedCheckpoint1;
+    // Pick the checkpoint from the current quiz position, not completion flags.
+    // The completion flag flips immediately after selection; using it here made
+    // checkpoint one briefly render checkpoint two before returning to the quiz.
+    const isFirstCheckpoint = !!quizConfig.checkpoint1After && currentIndex + 1 <= quizConfig.checkpoint1After;
     const question = isFirstCheckpoint ? INTERLUDE_QUESTIONS["checkpoint-one"] : INTERLUDE_QUESTIONS["checkpoint-two"];
     const selectedChoice = question.id === "checkpoint-one" ? checkpointOneChoice : checkpointTwoChoice;
     return renderMultiChoiceQuestion(
@@ -1783,8 +1873,13 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     );
   }
 
-  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const currentQuestionNumber = currentIndex + 1;
+  const totalQuestions = questions.length;
+  const progress = (currentQuestionNumber / totalQuestions) * 100;
+  const roundedProgress = Math.min(100, Math.max(1, Math.round(progress)));
   const timerProgress = (timeRemaining / QUESTION_TIME_SECONDS) * 100;
+  const completedQuestions = currentQuestionNumber - 1;
+  const estimatedMinutes = Math.max(1, 10 - Math.floor(completedQuestions / 5));
   
   const randomColor = READABLE_RANDOM_COLORS[vibrantColorIndex];
   const promptColor = useLocalityColors 
@@ -1794,8 +1889,8 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0F]">
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/95 dark:bg-[#0A0A0F]/95 backdrop-blur-md">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2" data-onboarding="timer">
+        <div className="max-w-md mx-auto flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2" data-onboarding="timer" aria-label="Question timer">
             <AnimatePresence mode="wait">
               {timeRemaining <= 3 && timeRemaining > 0 ? (
                 <motion.div
@@ -1862,38 +1957,30 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
             </AnimatePresence>
           </div>
           
-          <div className="flex items-center gap-3">
-            {(() => {
-              const currentQuestionNumber = currentIndex + 1;
-              const estimatedMinutes = currentQuestionNumber <= 10
-                ? 8
-                : currentQuestionNumber <= 20
-                  ? 6
-                  : currentQuestionNumber <= 30
-                    ? 4
-                    : 2;
-
-              return (
-                <div className="flex items-center gap-1 text-warm-gray/60 dark:text-[#94A3B8]" data-testid="text-time-estimate">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span className="text-xs font-medium">
-                    ~{estimatedMinutes} min left
-                  </span>
-                </div>
-              );
-            })()}
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-3 text-right">
+            <div className="hidden min-[360px]:flex items-center gap-1 text-warm-gray/60 dark:text-[#94A3B8]" data-testid="text-time-estimate">
+              <Clock className="w-3.5 h-3.5" />
+              <span className="text-xs font-medium">
+                ~{estimatedMinutes} min left
+              </span>
+            </div>
             {canGoBack && !hasUsedBack && currentIndex > 0 && (
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={handleGoBack}
                 data-testid="button-go-back"
+                aria-label="Go back one question"
               >
                 <Undo2 className="w-5 h-5" />
               </Button>
             )}
-            <span className="text-xl font-bold text-warm-gray dark:text-[#F8FAFC]">
-              {currentIndex + 1}/{questions.length}
+            <span
+              className="text-sm sm:text-base font-bold text-warm-gray dark:text-[#F8FAFC] whitespace-nowrap"
+              data-testid="text-question-progress"
+              aria-label={`Question ${currentQuestionNumber} of ${totalQuestions}`}
+            >
+              Question {currentQuestionNumber} of {totalQuestions}
             </span>
             {useLocalityColors && isLocalitySet && (
               <motion.div
@@ -1908,8 +1995,8 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
         </div>
         
         <CelestialProgressTracker
-          currentQuestion={currentIndex + 1}
-          totalQuestions={questions.length}
+          currentQuestion={currentQuestionNumber}
+          totalQuestions={totalQuestions}
           tier={tier}
           completedPhases={{
             energy: completedEnergy,
@@ -1920,7 +2007,22 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
           }}
         />
         
-        <div className="max-w-md mx-auto mt-2 h-3 bg-gray-200 dark:bg-[#1E1E2E] rounded-full overflow-hidden shadow-inner">
+        <div className="max-w-md mx-auto mt-2 space-y-1.5" aria-label={`Quiz progress ${roundedProgress}% complete`}>
+          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.16em] text-warm-gray/55 dark:text-[#94A3B8]">
+            <span>Quiz progress</span>
+            <span>{roundedProgress}%</span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-[#1E1E2E] shadow-inner">
+            <motion.div
+              className="h-full bg-gradient-to-r from-sage-green via-dusty-blue to-terracotta"
+              initial={false}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+
+        <div className="max-w-md mx-auto mt-2 h-2 bg-gray-200 dark:bg-[#1E1E2E] rounded-full overflow-hidden shadow-inner" aria-label="Question timer progress">
           <motion.div
             className={`h-full ${timerProgress < 30 ? "bg-red-500" : "bg-gradient-to-r from-terracotta to-dusty-blue"}`}
             initial={{ width: "100%" }}
@@ -1929,8 +2031,8 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
           />
         </div>
       </header>
-      <main className="flex-1 flex items-center justify-center px-4 pt-28 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] overflow-y-auto">
-        <div className="relative w-full max-w-sm h-[min(480px,calc(100dvh-220px))] min-h-[380px]">
+      <main className={`flex-1 flex items-center justify-center px-4 ${currentQuestion.responseType === "slider" ? "pt-36 pb-[calc(10rem+env(safe-area-inset-bottom,0px))]" : "pt-40 pb-[calc(9rem+env(safe-area-inset-bottom,0px))]"} overflow-y-auto`}>
+        <div className={`relative w-full max-w-sm ${currentQuestion.responseType === "slider" ? "h-[min(390px,calc(100dvh-205px))] min-h-[370px]" : "h-[min(430px,calc(100dvh-300px))] min-h-[340px]"}`}>
           <motion.div
               key={`${currentIndex}-${currentQuestion.id}`}
               className="absolute inset-0"
@@ -1974,8 +2076,8 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                     style={{ opacity: rightOpacity }}
                   />
                   
-                  <div className="relative z-10 flex flex-col h-full p-5">
-                    <div className="text-center mb-4">
+                  <div className={`relative z-10 flex flex-col h-full ${currentQuestion.responseType === "slider" ? "p-4 sm:p-5" : "p-5"}`}>
+                    <div className={`text-center ${currentQuestion.responseType === "slider" ? "mb-2" : "mb-4"}`}>
                       {currentQuestion.wildcard && (
                         <motion.div
                           initial={{ y: -10, opacity: 0 }}
@@ -1997,32 +2099,32 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                           times: [0, 0.3, 1],
                           ease: "easeOut"
                         }}
-                        className={`text-2xl md:text-3xl font-bold quiz-question-text leading-tight ${promptColor}`}
+                        className={`${currentQuestion.responseType === "slider" ? "text-[1.35rem] sm:text-2xl md:text-3xl" : "text-2xl md:text-3xl"} font-bold quiz-question-text leading-tight ${promptColor}`}
                         data-testid="text-prompt"
                       >
                         {adjustQuestionWording(currentQuestion.prompt, moodEffects.questionTone)}
                       </motion.h2>
                     </div>
                     
-                    <div className="flex-1 flex flex-col justify-center gap-4">
+                    <div className={`flex-1 flex flex-col justify-center ${currentQuestion.responseType === "slider" ? "gap-2" : "gap-4"}`}>
                       {currentQuestion.responseType === "slider" ? (
-                        /* Slider UI for nuanced responses - improved readability */
-                        (<div className="flex flex-col gap-5 px-2" data-onboarding="slider">
-                          {/* Slider labels - larger text */}
-                          <div className="flex justify-between gap-4">
+                        /* Slider UI for nuanced responses - compact to keep confirm action visible */
+                        (<div className="flex flex-col gap-1.5 px-1" data-onboarding="slider">
+                          {/* Slider labels */}
+                          <div className="flex justify-between gap-3">
                             <div className="flex-1 text-left">
-                              <span className="text-sm sm:text-base font-semibold text-sage-green dark:text-sage-green/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                              <span className="text-xs sm:text-sm font-semibold text-sage-green dark:text-sage-green/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
                                 {currentQuestion.leftDesc}
                               </span>
                             </div>
                             <div className="flex-1 text-right">
-                              <span className="text-sm sm:text-base font-semibold text-terracotta dark:text-terracotta/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                              <span className="text-xs sm:text-sm font-semibold text-terracotta dark:text-terracotta/90 leading-tight block" style={{ fontFamily: 'Nunito, sans-serif' }}>
                                 {currentQuestion.rightDesc}
                               </span>
                             </div>
                           </div>
-                          {/* Slider track - larger thumb */}
-                          <div className="relative py-2">
+                          {/* Slider track */}
+                          <div className="relative py-1">
                             <input
                               type="range"
                               min="-2"
@@ -2031,9 +2133,9 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                               value={sliderValue}
                               onChange={(e) => setSliderValue(parseInt(e.target.value))}
                               disabled={isTimingOut || isAnyPopupActive}
-                              className="w-full h-4 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta
-                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-10 [&::-webkit-slider-thumb]:h-10 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-xl [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing
-                                [&::-moz-range-thumb]:w-10 [&::-moz-range-thumb]:h-10 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-xl [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing
+                              className="w-full h-3 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-sage-green via-warm-gray/30 to-terracotta
+                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-9 [&::-webkit-slider-thumb]:h-9 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-xl [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing
+                                [&::-moz-range-thumb]:w-9 [&::-moz-range-thumb]:h-9 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-xl [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:active:cursor-grabbing
                                 disabled:opacity-50"
                               style={{
                                 '--thumb-border-color': sliderValue < 0 ? '#7c9885' : sliderValue > 0 ? '#c97c5d' : '#9ca3af'
@@ -2042,7 +2144,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                             />
                             
                             {/* Value indicator labels */}
-                            <div className="flex justify-between mt-3 text-xs sm:text-sm font-medium text-warm-gray/70 dark:text-[#94A3B8]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                            <div className="flex justify-between mt-2 text-[11px] sm:text-xs font-medium text-warm-gray/70 dark:text-[#94A3B8]" style={{ fontFamily: 'Nunito, sans-serif' }}>
                               <span>Strong</span>
                               <span>Slight</span>
                               <span>Neutral</span>
@@ -2050,9 +2152,9 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                               <span>Strong</span>
                             </div>
                           </div>
-                          {/* Current value display - larger text */}
+                          {/* Current value display */}
                           <motion.div 
-                            className={`text-center py-4 px-6 rounded-2xl font-bold text-lg sm:text-xl ${
+                            className={`text-center py-1.5 px-3 rounded-xl font-bold text-[15px] sm:text-base leading-tight ${
                               sliderValue < -1 ? 'bg-sage-green/20 text-sage-green' :
                               sliderValue < 0 ? 'bg-sage-green/10 text-sage-green/80' :
                               sliderValue > 1 ? 'bg-terracotta/20 text-terracotta' :
@@ -2070,7 +2172,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                             {sliderValue === 1 && `Slightly: ${currentQuestion.options[1]}`}
                             {sliderValue === 2 && `Strongly: ${currentQuestion.options[1]}`}
                           </motion.div>
-                          {/* Confirm button for slider - larger */}
+                          {/* Confirm button for slider */}
                           <Button
                             onClick={() => {
                               if (!isTimingOut && !isAnyPopupActive && sliderValue !== 0) {
@@ -2079,7 +2181,7 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
                               }
                             }}
                             disabled={isTimingOut || isAnyPopupActive || sliderValue === 0}
-                            className="w-full py-5 text-xl font-bold rounded-2xl disabled:opacity-40"
+                            className="w-full min-h-11 py-2 text-base font-bold rounded-xl leading-tight disabled:opacity-40"
                             style={{ fontFamily: 'Nunito, sans-serif' }}
                             variant={sliderValue !== 0 ? "default" : "outline"}
                             data-testid="button-slider-confirm"

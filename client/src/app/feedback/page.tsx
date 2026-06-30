@@ -472,7 +472,7 @@ export default function FeedbackPage() {
           </button>
 
           <p className="text-center text-xs text-gray-500">
-            Your answers are completely anonymous. We never sell your data. · <a href="/privacy" className="underline hover:text-gray-400">Privacy Policy</a> · KnowYouRole — Science-backed personality insights for every age.
+            Do not include sensitive personal details. We never sell your quiz results. · <a href="/privacy" className="underline hover:text-gray-400">Privacy Policy</a> · KnowYouRole — practical personality and career-fit insight for self-reflection.
           </p>
         </form>
       </div>

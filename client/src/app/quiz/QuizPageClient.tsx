@@ -9,6 +9,7 @@ import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
+import { trackKyrEvent } from "@/lib/analytics";
 import { Brain, Sparkles, Target } from "lucide-react";
 
 interface APIScales {
@@ -66,12 +67,12 @@ export default function QuizPage() {
   const landmarkData = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-landmark") : null;
   const sessionLandmark = landmarkData ? JSON.parse(landmarkData) : null;
 
-  // Redirect to quiz-gateway if no tier is set (user went directly to /quiz)
+  // Direct-start quiz: age/mood setup screens are hidden. Default to adult tier when missing.
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const tier = normalizeTier(sessionStorage.getItem("kyr_quiz_tier"));
       if (!tier) {
-        router.replace("/quiz-gateway");
+        sessionStorage.setItem("kyr_quiz_tier", "25+");
         return;
       }
       if (sessionStorage.getItem("kyr_quiz_tier") !== tier) {
@@ -197,11 +198,25 @@ export default function QuizPage() {
       });
 
       if (!response.ok || !data?.success || !data?.result) {
+        trackKyrEvent("quiz_result_persist_failed", {
+          tier: ageTier,
+          response_count: scores.responses.length,
+          status: response.status,
+          reason: data?.error || "compute_unsuccessful",
+        });
         console.warn("[ResultDTO] Compute failed; keeping legacy results fallback", data);
         return null;
       }
 
       sessionStorage.setItem("kyr_result_dto", JSON.stringify(data.result));
+      trackKyrEvent("quiz_result_persisted", {
+        tier: ageTier,
+        response_count: scores.responses.length,
+        result_id_present: Boolean(data.result.meta?.resultId),
+        session_id_present: Boolean(data.result.meta?.sessionId),
+        mbti_type: data.result.scores?.mbti?.type,
+        primary_disc: data.result.scores?.disc?.primary,
+      });
       console.log("[ResultDTO] Stored canonical ResultDTO in sessionStorage:kyr_result_dto", {
         resultId: data.result.meta?.resultId,
         sessionId: data.result.meta?.sessionId,
@@ -209,6 +224,11 @@ export default function QuizPage() {
 
       return data.result;
     } catch (error) {
+      trackKyrEvent("quiz_result_persist_failed", {
+        tier: ageTier,
+        response_count: scores.responses.length,
+        reason: "network_or_runtime_error",
+      });
       console.error("[ResultDTO] Compute/persist error; keeping legacy results fallback", error);
       return null;
     }
@@ -217,6 +237,12 @@ export default function QuizPage() {
   const handleQuizComplete = async (scores: QuizScores) => {
     const minimumAnalysisTime = new Promise((resolve) => setTimeout(resolve, 3000));
     setIsAnalyzingResults(true);
+    trackKyrEvent("quiz_completion_processing_started", {
+      tier: ageTier,
+      response_count: scores.responses.length,
+      mood: mood || "unset",
+      fun_mode: funMode,
+    });
 
     console.log("[QuizComplete] Received final scores from Quiz.tsx", {
       responseCount: scores.responses.length,
@@ -337,6 +363,15 @@ export default function QuizPage() {
       discStyle,
     });
 
+    trackKyrEvent("conversion_results_handoff", {
+      tier: ageTier,
+      response_count: scores.responses.length,
+      has_result_dto: Boolean(sessionStorage.getItem("kyr_result_dto")),
+      session_id_present: Boolean(sessionId),
+      mbti_type: mbtiType,
+      primary_disc: discStyle,
+    });
+
     await minimumAnalysisTime;
     router.push(`/results?${resultParams.toString()}`);
   };
@@ -370,12 +405,12 @@ export default function QuizPage() {
       quizScores.mbti.J > quizScores.mbti.P ? "J" : "P",
     ].join("");
 
-    const shareText = `I discovered my personality path! I'm a ${mbtiType} on KnowRole`;
+    const shareText = `I discovered my personality path! I'm a ${mbtiType} on KnowYouRole`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "My KnowRole Result",
+          title: "My KnowYouRole Result",
           text: shareText,
           url: window.location.origin,
         });
@@ -527,7 +562,7 @@ export default function QuizPage() {
         <!DOCTYPE html>
         <html>
         <head>
-          <title>My KnowRole Personality Profile - ${mbtiType}</title>
+          <title>My KnowYouRole Personality Profile - ${mbtiType}</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
             
@@ -827,7 +862,7 @@ export default function QuizPage() {
         </head>
         <body>
           <div class="header">
-            <div class="logo">KnowRole</div>
+            <div class="logo">KnowYouRole</div>
             <div class="tagline">Your Everyday Compass to Self-Discovery</div>
             ${locationHtml}
           </div>
@@ -877,9 +912,9 @@ export default function QuizPage() {
           ${scalesHtml}
           
           <div class="footer">
-            <p class="footer-text">This personality profile was generated by KnowRole</p>
+            <p class="footer-text">This personality profile was generated by KnowYouRole</p>
             <p class="footer-date">${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-            <div class="footer-cta">Retake the quiz at knowrole.app</div>
+            <div class="footer-cta">Retake the quiz at knowyourole.com</div>
           </div>
         </body>
         </html>

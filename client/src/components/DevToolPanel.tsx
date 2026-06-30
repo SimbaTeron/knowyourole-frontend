@@ -17,7 +17,8 @@ type MbtiOption = (typeof MBTI_OPTIONS)[number];
 type DiscOption = 'Auto' | 'D' | 'I' | 'S' | 'C';
 type BigFiveKey = 'O' | 'C' | 'E' | 'A' | 'N';
 type PresetKey = 'balanced' | 'founder' | 'creative' | 'analyst' | 'helper' | 'overachiever';
-type ResultPage = '1' | '3';
+type ResultPage = 'main' | 'role' | 'mbti' | 'disc' | 'bigfive';
+type ResultDestination = ResultPage | 'share';
 
 const TIER_OPTIONS: { value: DevTier; label: string }[] = [
   { value: '25plus', label: '25+ Adult' },
@@ -39,6 +40,23 @@ const RANDOM_TIERS: DevTier[] = ['13-18', '19-25', '25plus'];
 const RANDOM_MOODS: DevMood[] = ['focused', 'chill', 'adventurous', 'romantic', 'reflective', 'creative'];
 const RANDOM_MBTI = MBTI_OPTIONS.filter((type) => type !== 'Auto');
 const BIG_FIVE_KEYS: BigFiveKey[] = ['O', 'C', 'E', 'A', 'N'];
+
+const RESULT_DESTINATIONS: { page: ResultDestination; label: string }[] = [
+  { page: 'main', label: 'Portrait' },
+  { page: 'role', label: 'Role' },
+  { page: 'mbti', label: 'MBTI' },
+  { page: 'disc', label: 'DISC' },
+  { page: 'bigfive', label: 'Big 5' },
+  { page: 'share', label: 'Share' },
+];
+
+const RESULT_PAGE_LABELS: Record<ResultPage, string> = {
+  main: 'Portrait',
+  role: 'Role',
+  mbti: 'MBTI',
+  disc: 'DISC',
+  bigfive: 'Big 5',
+};
 
 const PREVIEW_STORAGE_KEYS = [
   'kyr_tier',
@@ -429,8 +447,9 @@ export default function DevToolPanel() {
     window.location.href = `${path}?${params.toString()}`;
   };
 
-  const openResultsPage = (page: ResultPage) => {
-    const preview = writeScoresToSession(store.tier, store.mood, store.mbtiOverride, discOverride, bigFive, page === '3' || store.forcePremium);
+  const openResultsPage = (destination: ResultDestination) => {
+    const page: ResultPage = destination === 'share' ? 'share' as ResultPage : destination;
+    const preview = writeScoresToSession(store.tier, store.mood, store.mbtiOverride, discOverride, bigFive, store.forcePremium);
     const params = new URLSearchParams({
       test: 'true', force: 'true', page, tier: preview.tierParam,
       mbtiType: preview.mbtiType, discStyle: preview.discStyle,
@@ -454,7 +473,7 @@ export default function DevToolPanel() {
     const tierParam = tierToParam(tier);
 
     setStatus('Saving ResultDTO…');
-    writeScoresToSession(tier, mood, mbti, disc, b5, page === '3' || store.forcePremium);
+    writeScoresToSession(tier, mood, mbti, disc, b5, store.forcePremium);
 
     try {
       const response = await fetch('/api/results/compute', {
@@ -469,9 +488,9 @@ export default function DevToolPanel() {
 
       sessionStorage.setItem('kyr_result_dto', JSON.stringify(data.result));
       setResultSummary(readResultSummary());
-      setStatus(`Saved ${mbtiType}-${discStyle}; opening ${page === '3' ? 'Premium' : 'Portrait'}…`);
+      setStatus(`Saved ${mbtiType}-${discStyle}; opening ${RESULT_PAGE_LABELS[page]}…`);
       const params = new URLSearchParams({
-        test: 'true', random: randomize ? 'true' : 'false', tier: tierParam, page, force: page === '3' || store.forcePremium ? 'true' : 'false',
+        test: 'true', random: randomize ? 'true' : 'false', tier: tierParam, page, force: store.forcePremium ? 'true' : 'false',
         sessionId: data.result?.meta?.sessionId || sessionId, mbtiType, discStyle, scores: btoa(JSON.stringify(scores)),
       });
       window.location.href = `/results?${params.toString()}`;
@@ -605,24 +624,24 @@ export default function DevToolPanel() {
 
         <Section title="Flow">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            <TinyButton onClick={() => openPath('/quiz-gateway', true)}>Gateway</TinyButton>
-            <TinyButton onClick={() => openPath('/mood-mixer', true)}>Mood</TinyButton>
-            <TinyButton onClick={() => openPath('/quiz', true)}>Clean Quiz</TinyButton>
+            <TinyButton onClick={() => openPath('/quiz', true)}>Quiz</TinyButton>
+            <TinyButton onClick={() => openPath('/', true)}>Home</TinyButton>
+            <TinyButton onClick={() => openPath('/results', true)}>Results</TinyButton>
             <TinyButton onClick={() => openPath('/checkout-success')}>Checkout</TinyButton>
           </div>
         </Section>
 
         <Section title="Results">
-          <TinyButton tone="primary" onClick={() => saveAndOpen('1', true)} disabled={busy}>Random + Save</TinyButton>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            <TinyButton onClick={() => openResultsPage('1')}>Portrait</TinyButton>
-            <TinyButton onClick={() => openResultsPage('3')}>Premium</TinyButton>
+          <TinyButton tone="primary" onClick={() => saveAndOpen('main', true)} disabled={busy}>Random + Save</TinyButton>
+          <TinyButton onClick={() => saveAndOpen('main')} disabled={busy}>Save Current</TinyButton>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+            {RESULT_DESTINATIONS.map((destination) => (
+              <TinyButton key={destination.page} onClick={() => openResultsPage(destination.page)}>
+                {destination.label}
+              </TinyButton>
+            ))}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            <TinyButton onClick={() => saveAndOpen('1')} disabled={busy}>Save P1</TinyButton>
-            <TinyButton onClick={() => saveAndOpen('3')} disabled={busy}>Save P3</TinyButton>
-          </div>
-          <MiniToggle label="Premium Preview" value={store.forcePremium} onChange={store.setForcePremium} />
+          <MiniToggle label="Unlock Preview" value={store.forcePremium} onChange={store.setForcePremium} />
           <MiniToggle label="Inject Fake Data" value={store.fakeDataEnabled} onChange={store.setFakeDataEnabled} />
         </Section>
 

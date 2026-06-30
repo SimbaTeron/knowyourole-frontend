@@ -59,7 +59,7 @@ export function getPopulationPct(mbti: string) {
 }
 
 export const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#fbbf24", S: "#22c55e", C: "#3b82f6" };
-export const DISC_LABELS: Record<string, string> = { D: "Dominance", I: "Influence", S: "Steadiness", C: "Conscientiousness" };
+export const DISC_LABELS: Record<string, string> = { D: "Dominant", I: "Influential", S: "Steady", C: "Conscientious" };
 
 // ─── Real scores from URL params, sessionStorage, or localStorage (written by handleQuizComplete) ──
 function getStoredScores(): QuizScores | null {

@@ -183,7 +183,7 @@ export default function PostalInput({ onLandmarkFound, onSkip }: PostalInputProp
       </div>
 
       <p className="text-center text-micro text-warm-gray/30 dark:text-soft-cream/20">
-        Anonymous only — no data stored
+        Used for local context — not sold
       </p>
     </div>
   );

@@ -193,7 +193,7 @@ export function UnlockInsightsModal({
                     >
                       <Heart className="w-8 h-8 fill-current" />
                     </motion.div>
-                    <h2 className="text-2xl font-bold mb-2">Support KnowRole</h2>
+                    <h2 className="text-2xl font-bold mb-2">Support KnowYouRole</h2>
                     <p className="text-white/80 text-sm">
                       Your donation helps us keep building and improving!
                     </p>

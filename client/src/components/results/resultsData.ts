@@ -96,6 +96,20 @@ export interface ScaleData {
   quest: string;
 }
 
+export interface CareerRole {
+  title: string;
+  salary: string;
+  desc: string;
+}
+
+export interface CareerRoleMatch {
+  primary: CareerRole;
+  secondary: CareerRole;
+  whyThisFits?: string;
+  starterPath?: string;
+  mayNotFit?: string;
+}
+
 export interface PersonalityResult {
   mbtiType: string;
   mbtiLabel: string;
@@ -115,8 +129,8 @@ export interface PersonalityResult {
     N: number;
   };
   bigFiveLabels: Record<string, { high: string; low: string }>;
-  primaryRole: { title: string; salary: string; desc: string };
-  secondaryRole: { title: string; salary: string; desc: string };
+  primaryRole: CareerRole;
+  secondaryRole: CareerRole;
   spark: string;
   proxyNudge?: string;
   scales?: {
@@ -125,12 +139,32 @@ export interface PersonalityResult {
   };
 }
 
-export function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: { O: number; C: number; E: number; A: number; N: number }): { primary: { title: string; salary: string; desc: string }; secondary: { title: string; salary: string; desc: string } } {
-  const roles = rolesData.roles as Record<string, { primary: { title: string; salary: string; desc: string }; secondary: { title: string; salary: string; desc: string } }>;
+function getCalibratedBigFiveTraitOrder(bigFive: { O: number; C: number; E: number; A: number; N: number }, mbti: Record<string, number>, discStyle: string) {
+  const sorted = Object.entries(bigFive).sort((a, b) => b[1] - a[1]);
+  const close = (trait: string, gap = 12) => (sorted[0]?.[1] ?? 0) - (bigFive[trait as keyof typeof bigFive] ?? 0) <= gap;
+  const socialFeeling = (mbti.E ?? 0) >= (mbti.I ?? 0) && (mbti.F ?? 0) > (mbti.T ?? 0);
+  const creativeNP = (mbti.N ?? 0) >= (mbti.S ?? 0) && (mbti.P ?? 0) >= (mbti.J ?? 0);
+  const actionDriver = discStyle === "D" && (mbti.E ?? 0) > (mbti.I ?? 0);
+  let calibratedTop = sorted[0]?.[0] || "O";
+
+  if (creativeNP && (bigFive.O ?? 0) >= 62 && close("O", 20)) {
+    calibratedTop = "O";
+  } else if (socialFeeling && ["S", "I"].includes(discStyle)) {
+    const socialCandidates = ["A", "E"].filter((trait) => close(trait, 26) && (bigFive[trait as keyof typeof bigFive] ?? 0) >= 62);
+    if (socialCandidates.length) calibratedTop = socialCandidates.sort((a, b) => (bigFive[b as keyof typeof bigFive] ?? 0) - (bigFive[a as keyof typeof bigFive] ?? 0))[0];
+  } else if (actionDriver && (bigFive.E ?? 0) >= 62 && close("E", 20)) {
+    calibratedTop = "E";
+  }
+
+  return [calibratedTop, ...sorted.map(([trait]) => trait).filter((trait) => trait !== calibratedTop)];
+}
+
+export function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: { O: number; C: number; E: number; A: number; N: number }, mbtiScores: Record<string, number> = {}): CareerRoleMatch {
+  const roles = rolesData.roles as Record<string, CareerRoleMatch>;
   
-  const sortedTraits = Object.entries(bigFive).sort((a, b) => b[1] - a[1]);
-  const highestTrait = sortedTraits[0][0].toLowerCase();
-  const secondTrait = sortedTraits[1][0].toLowerCase();
+  const sortedTraits = getCalibratedBigFiveTraitOrder(bigFive, mbtiScores, discStyle);
+  const highestTrait = sortedTraits[0].toLowerCase();
+  const secondTrait = sortedTraits[1].toLowerCase();
   
   const roleKeys = [
     `${mbtiType.toLowerCase()}-${discStyle.toLowerCase()}-${highestTrait}-high`,
@@ -181,6 +215,26 @@ export function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: 
   return roles.default;
 }
 
+function resolvePrimaryDisc(disc: Record<string, number>, mbti: Record<string, number>, bigFiveProfile: Record<string, number>): string {
+  const sorted = (Object.entries(disc) as [string, number][]).sort((a, b) => b[1] - a[1]);
+  const [topKey, topValue] = sorted[0] || ["D", 0];
+  const closeToTop = (key: string, gap = 2) => topValue - (disc[key] ?? 0) <= gap;
+  const analyticalShape = (mbti.I ?? 0) >= (mbti.E ?? 0) && ((mbti.T ?? 0) >= (mbti.F ?? 0) || (bigFiveProfile.C ?? 50) >= 68);
+  const creativeShape = (mbti.N ?? 0) >= (mbti.S ?? 0) && (mbti.P ?? 0) >= (mbti.J ?? 0) && (bigFiveProfile.O ?? 50) >= 62;
+  const peopleShape = (mbti.F ?? 0) > (mbti.T ?? 0) && ((bigFiveProfile.A ?? 50) >= 62 || (bigFiveProfile.E ?? 50) >= 62);
+  const actionShape = (mbti.E ?? 0) > (mbti.I ?? 0) && (mbti.T ?? 0) >= (mbti.F ?? 0) && ((disc.D ?? 0) >= (disc.I ?? 0) - 1);
+
+  if (topKey === "D") {
+    if (closeToTop("C", 2.5) && analyticalShape && (bigFiveProfile.E ?? 50) <= 58) return "C";
+    if (closeToTop("I", 4) && creativeShape && (bigFiveProfile.C ?? 50) <= 62) return "I";
+    if ((closeToTop("S", 3) || closeToTop("I", 3)) && peopleShape && !actionShape) return closeToTop("S", 3) ? "S" : "I";
+  }
+  if (topKey === "S" && closeToTop("C", 3) && analyticalShape && (bigFiveProfile.E ?? 50) <= 58) return "C";
+  if (topKey === "I" && closeToTop("D", 3) && actionShape) return "D";
+  if (topKey === "I" && closeToTop("S", 3) && (mbti.I ?? 0) > (mbti.E ?? 0) && (bigFiveProfile.C ?? 50) >= 68) return "S";
+  return topKey;
+}
+
 export function calculateResult(scores: QuizScores, forceMBTI?: string | null): PersonalityResult {
   const mbti = scores.mbti;
   // Allow dev panel to force a specific MBTI type — use it directly, don't derive from dimensions
@@ -194,10 +248,6 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
       ].join("");
 
   const disc = scores.disc;
-  const discEntries = Object.entries(disc) as [string, number][];
-  const sortedDisc = discEntries.sort((a, b) => b[1] - a[1]);
-  const primaryDisc = sortedDisc[0][0];
-  const secondaryDisc = sortedDisc[1][0];
 
   const b5 = scores.bigFive;
   // Big Five inputs can arrive in two shapes during the ResultDTO migration:
@@ -208,7 +258,8 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
   //    extremes like 1%; keep 0 neutral and move gradually away from 50.
   const normalizeB5 = (raw: number): number => {
     if (raw > 25) return Math.max(1, Math.min(99, Math.round(raw))); // dev: already normalized
-    return Math.max(5, Math.min(95, Math.round(50 + raw * 8))); // real: signed score around neutral
+    const signed = Math.max(-7, Math.min(7, raw));
+    return Math.max(8, Math.min(92, Math.round(50 + signed * 6))); // real: signed score around neutral, softened to avoid ceiling saturation
   };
   const bigFiveProfile = {
     O: normalizeB5(b5.O),
@@ -218,12 +269,16 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
     N: normalizeB5(b5.N),
   };
 
+  const sortedDisc = (Object.entries(disc) as [string, number][]).sort((a, b) => b[1] - a[1]);
+  const primaryDisc = resolvePrimaryDisc(disc, mbti, bigFiveProfile);
+  const secondaryDisc = sortedDisc.find(([key]) => key !== primaryDisc)?.[0] || sortedDisc[1]?.[0] || "I";
+
   const traits = rolesData.traitDescriptions;
   const mbtiInfo = traits.mbti[mbtiType as keyof typeof traits.mbti] || traits.mbti.INTP;
   const discInfo = traits.disc[primaryDisc as keyof typeof traits.disc] || traits.disc.D;
   const secondaryDiscInfo = traits.disc[secondaryDisc as keyof typeof traits.disc] || traits.disc.I;
 
-  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFiveProfile);
+  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFiveProfile, mbti);
 
   const bigFiveLabels: Record<string, { high: string; low: string }> = {};
   Object.entries(traits.bigFive).forEach(([key, value]) => {
@@ -267,10 +322,10 @@ export const TRAIT_ICONS = {
 
 export const TRAIT_LABELS = {
   O: "Openness",
-  C: "Conscientiousness", 
+  C: "Structure / Follow-through",
   E: "Extraversion",
   A: "Agreeableness",
-  N: "Neuroticism",
+  N: "Stress Reactivity",
 };
 
 export const TRAIT_QUARTILE_DESCRIPTIONS: Record<string, Record<string, { vibe: string; description: string }>> = {

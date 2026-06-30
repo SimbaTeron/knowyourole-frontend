@@ -143,7 +143,7 @@ export default function CheckoutSuccess() {
             transition={{ delay: 0.2 }}
           >
             <h1 className="text-2xl font-bold text-warm-gray dark:text-soft-cream mb-2">
-              Welcome to KnowRole Pro!
+              Welcome to KnowYouRole Pro!
             </h1>
             <p className="text-warm-gray/70 dark:text-soft-cream/60 mb-6">
               Thank you for supporting indie development. Your upgrade is now active.
@@ -175,7 +175,7 @@ export default function CheckoutSuccess() {
               className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold"
               data-testid="button-continue-home"
             >
-              Continue to KnowRole
+              Continue to KnowYouRole
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import "../index.css";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "KnowYouRole",
-  description: "Discover your personality path — science-backed quiz combining MBTI, DISC, and Big Five into one powerful personality profile.",
+  description: "Discover your personality path — a practical self-reflection quiz combining Big Five traits, MBTI-style patterns, DISC-style communication, and career-fit guidance.",
   icons: {
     icon: "/favicon.svg",
   },
@@ -26,7 +28,9 @@ export default function RootLayout({
         />
       </head>
       <body className="dark kyr-page" style={{ background: "linear-gradient(#050510 0%, #020024 50%, #000 100%)" }}>
+        <GoogleAnalytics />
         <Providers>{children}</Providers>
+        <CookieConsentBanner />
       </body>
     </html>
   );

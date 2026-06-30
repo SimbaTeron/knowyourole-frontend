@@ -9,8 +9,8 @@ export default function About() {
       <header className="sticky top-0 z-50 px-6 py-4 bg-soft-cream/90 dark:bg-[#0A0A12]/90 backdrop-blur-sm border-b border-warm-gray/10 dark:border-[#A78BFA]/10">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 text-sm text-warm-gray/70 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-back-home">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
           </Link>
         </div>
       </header>
@@ -20,88 +20,90 @@ export default function About() {
 
         <section className="space-y-4 mb-10">
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            KnowYouRole was built to make personality science accessible, fun, and genuinely useful. Whether you're a teenager exploring who you are, a young adult choosing a career path, or someone looking for deeper self-understanding, our platform delivers personalized insights grounded in well-established psychological frameworks.
+            KnowYouRole helps people turn personality quiz results into clearer self-understanding, communication language, and career reflection. The goal is not to trap anyone inside a label; it is to give people a sharper mirror and better next questions.
           </p>
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            We believe everyone deserves to understand their strengths, tendencies, and potential — without jargon, paywalls, or guesswork.
+            The site combines Big Five traits, MBTI-style patterns, DISC-style communication insights, and career-fit recommendations in a plain-English experience built for real people, not research jargon.
           </p>
         </section>
 
-        <section className="mb-10">
+        <section className="mb-10 rounded-2xl border border-[#A78BFA]/15 bg-[#A78BFA]/5 p-5">
           <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <Heart className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Why We Built This
+            <Users className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
+            Founder
           </h2>
-          <div className="space-y-4 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
+          <div className="space-y-3 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             <p>
-              KnowYouRole started from a simple frustration: most personality tools online are either oversimplified clickbait or locked behind expensive paywalls. The good science exists — Big Five, MBTI, DISC — but it's scattered across academic papers that most people will never read. We wanted to change that.
+              <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of KnowYouRole, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person.
             </p>
-            <p>
-              We noticed something else, too. A 10-year-old and a 35-year-old shouldn't get the same quiz. The questions that spark self-reflection for a teenager are different from the ones that resonate with a career-changer in their thirties. So we built age-tiered assessments from the ground up — questions written for where you actually are in life, not a one-size-fits-all template.
-            </p>
-            <p>
-              The career matching came from watching too many people feel stuck. When you can see that your unique blend of traits — say, high Openness combined with Steadiness — maps naturally to roles you may never have considered, it opens doors. We've mapped 150+ careers across industries, from creative arts to healthcare to skilled trades, because every personality type has work that fits.
-            </p>
-            <p>
-              This project is a labor of love. We keep the core experience completely free because we believe everyone — especially young people just starting to figure things out — deserves access to genuine self-insight. If this tool helps even one person see themselves more clearly, it's worth every line of code.
+            <p className="text-sm">
+              No stock headshot, fake team photo, or placeholder bio is shown here. Founder imagery can be added later if a real image is provided.
             </p>
           </div>
         </section>
 
         <section className="mb-10">
           <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <Brain className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Our Science
+            <Heart className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
+            Why this exists
           </h2>
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
-              <h3 className="font-semibold mb-1">Big Five (OCEAN)</h3>
-              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
-                The most widely validated personality model in academic psychology, measuring Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism. Used in thousands of peer-reviewed studies worldwide.
-              </p>
-            </div>
-            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
-              <h3 className="font-semibold mb-1">MBTI-Inspired</h3>
-              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
-                Based on Jungian cognitive function theory, our MBTI-style assessment helps you understand how you process information, make decisions, and interact with the world through 16 personality types.
-              </p>
-            </div>
-            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
-              <h3 className="font-semibold mb-1">DISC</h3>
-              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
-                A behavioral assessment focusing on Dominance, Influence, Steadiness, and Conscientiousness — widely used in professional development and career coaching contexts.
-              </p>
-            </div>
+          <div className="space-y-4 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
+            <p>
+              Many personality sites are either shallow entertainment, vague corporate language, or overly confident claims wrapped in pseudo-science. KnowYouRole exists to make self-discovery more practical: what energizes you, how you communicate, what environments fit you, and what career paths are worth exploring.
+            </p>
+            <p>
+              The product is intentionally plain about its limits. A personality quiz can support reflection; it cannot diagnose you, choose your career for you, or replace judgment from qualified professionals.
+            </p>
           </div>
         </section>
 
         <section className="mb-10">
           <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
             <Target className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Our Mission
+            Mission
           </h2>
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            We're on a mission to help people of all ages discover what makes them unique — and use that knowledge to make better decisions about careers, relationships, and personal growth. Our age-tiered approach ensures the experience is appropriate and engaging for every stage of life.
+            KnowYouRole's mission is to help people understand their strengths, friction points, communication style, and career-fit themes earlier — so they can make better decisions with more self-awareness and less guesswork.
           </p>
         </section>
 
         <section className="mb-10">
           <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <Users className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Who We Are
+            <Brain className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
+            Our approach
           </h2>
-          <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            KnowYouRole was created by a team passionate about making personality psychology practical and fun. We combine expertise in behavioral science, education, and technology to deliver an experience that's both scientifically informed and genuinely enjoyable.
-          </p>
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
+              <h3 className="font-semibold mb-1">Big Five backbone</h3>
+              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
+                The Big Five is used as the strongest research-backed trait layer in the product.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
+              <h3 className="font-semibold mb-1">MBTI-style language</h3>
+              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
+                Type-style language is used as an interpretive layer for self-reflection, not as a claim that everyone fits a fixed box.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
+              <h3 className="font-semibold mb-1">DISC-style communication insights</h3>
+              <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
+                DISC-style output helps explain work and communication tendencies in a way people can use in teams, school, and career planning.
+              </p>
+            </div>
+          </div>
+          <Link href="/methodology" className="mt-4 inline-block text-sm font-semibold text-terracotta dark:text-[#A78BFA] underline underline-offset-4">
+            Read the methodology
+          </Link>
         </section>
 
-        <section>
-          <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            Research-Informed
+        <section className="mb-10 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5">
+          <h2 className="text-xl font-display font-semibold mb-3 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-amber-500" />
+            Important disclaimer
           </h2>
-          <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            Our assessments draw on decades of published research in personality psychology. While no online quiz can replace a clinical evaluation, our tools are designed to give you meaningful, research-informed insights that can guide your self-discovery journey.
+          <p className="text-sm text-warm-gray/80 dark:text-[#FDE68A] leading-relaxed">
+            KnowYouRole is for self-discovery and career reflection. It is not a medical, clinical, psychiatric, legal, financial, or employment-selection evaluation. Use it as a starting point for reflection, not as a final verdict on who you are or what you should do.
           </p>
         </section>
       </main>

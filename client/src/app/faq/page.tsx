@@ -7,7 +7,7 @@ import { useState } from "react";
 const FAQ_ITEMS = [
   {
     question: "What is KnowYouRole?",
-    answer: "KnowYouRole is a free personality assessment platform that uses three well-established frameworks — Big Five (OCEAN), MBTI, and DISC — to help you discover your personality traits and match them to potential career paths. It's designed for all ages, with tailored experiences for kids, teens, young adults, and adults."
+    answer: "KnowYouRole is a free personality and career-reflection platform that combines a Big Five trait backbone with MBTI-style patterns and DISC-style communication language. It helps you understand your tendencies and explore possible career directions without pretending a quiz can define your whole identity. It is currently tailored for teens, young adults, and adults."
   },
   {
     question: "Is KnowYouRole really free?",
@@ -15,19 +15,19 @@ const FAQ_ITEMS = [
   },
   {
     question: "How long does the assessment take?",
-    answer: "Most users complete the assessment in 5-10 minutes. The questions are designed to be quick and intuitive — just pick what feels right. There are no trick questions or wrong answers."
+    answer: "Most users complete the assessment in ~5 minutes. The questions are designed to be quick and intuitive — just pick what feels most true most often. There are no trick questions or wrong answers."
   },
   {
     question: "How accurate is the assessment?",
-    answer: "Our assessment uses validated psychological frameworks and research-backed scoring methods including z-score normalization, internal consistency checks (Cronbach's Alpha), and weighted proxy calculations. Your results reflect genuine patterns in your responses. While no online tool replaces a clinical evaluation, our assessments are grounded in the same science used in academic research and professional settings worldwide. Taking the quiz when you're in a typical mood (not extremely stressed or excited) tends to produce the most representative results."
+    answer: "Your result reflects patterns in your answers, not a perfect measurement of your identity. Big Five gives the strongest research-backed trait layer; MBTI-style and DISC-style outputs are used as practical language for reflection and communication. Taking the quiz when you're in a typical mood, not extremely stressed or excited, tends to produce the most useful result."
   },
   {
-    question: "Is it really safe for kids ages 7-12?",
-    answer: "Yes. The Mini Explorer tier is specifically designed for children. Questions use age-appropriate language and scenarios that kids can relate to (school, friendships, hobbies). We don't collect any personal information from children under 13 without parental consent. Results are presented in a positive, encouraging way focused on discovering strengths — never labeling or limiting. We recommend that a parent or guardian be present when younger children take the assessment, though it's not required."
+    question: "Is it safe for teens?",
+    answer: "Yes. The teen experience uses age-appropriate language and positive framing focused on strengths, communication, and self-understanding. We do not knowingly collect personal information from children under 13 without parental consent."
   },
   {
     question: "What personality frameworks do you use?",
-    answer: "We use three complementary frameworks: the Big Five (OCEAN) model — the gold standard in academic personality research; MBTI-inspired typing for understanding cognitive preferences; and DISC for behavioral and workplace insights. Together, they give you a well-rounded view of your personality."
+    answer: "We use three complementary layers: Big Five traits as the research-backed backbone; MBTI-style patterns as memorable personality language; and DISC-style categories for communication and work-style reflection. The point is useful self-understanding, not forcing you into a permanent box."
   },
   {
     question: "Can I retake the assessment?",
@@ -35,15 +35,15 @@ const FAQ_ITEMS = [
   },
   {
     question: "Do I need to create an account?",
-    answer: "No account is needed to take the assessment and view your basic results. Creating a free account lets you save your results, access premium insights, and track changes over time."
+    answer: "Quiz completion data is saved securely so we can generate, recover, and improve results. You can still take the quiz without creating an account. Creating an account, when enabled, can add long-term history and comparison features."
   },
   {
     question: "How is my data handled?",
-    answer: "We take privacy seriously. Your assessment responses are processed to generate results and are not shared with third parties. See our Privacy Policy for full details on how we handle your information."
+    answer: "Quiz completions are saved securely so your result can be generated, recovered, and improved. We do not sell your quiz results. Optional analytics and future advertising settings are controlled through cookie preferences where practical. See our Privacy Policy for details."
   },
   {
     question: "What are the career matches based on?",
-    answer: "Career matches are generated by mapping your personality traits across all three frameworks to career profiles based on research into which personality types tend to thrive in specific roles. We match you with 150+ career paths across professional, healthcare, service, skilled trades, and creative fields."
+    answer: "Career matches are generated by mapping your Big Five trait shape, MBTI-style pattern, DISC-style work style, and answer evidence to role profiles. Treat them as directions to test with projects, shadowing, classes, or interviews — not as a hiring prediction or life sentence."
   },
   {
     question: "Why do my results change when I retake the quiz?",
@@ -51,7 +51,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "What happens to my results if I don't create an account?",
-    answer: "Your results are generated in your browser and displayed immediately. Without an account, they're stored temporarily in your browser's session storage. Once you close the tab, they're gone. If you want to keep your results long-term or compare them over time, creating a free account lets you save them."
+    answer: "Your results are saved securely after quiz completion so your profile can be generated, recovered, and improved. If you want long-term history or comparison features, create an account when that option is available."
   },
 ];
 

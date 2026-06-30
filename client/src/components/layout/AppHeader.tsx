@@ -113,17 +113,18 @@ export function AppHeader() {
         </Link>
 
         <Link
-          href="/quiz-gateway"
+          href="/quiz"
           aria-label="Start the free KnowYouRole quiz"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            minHeight: 40,
-            padding: '10px clamp(14px, 4vw, 22px)',
+            minWidth: 168,
+            minHeight: 44,
+            padding: '11px clamp(20px, 4.4vw, 30px)',
             borderRadius: 999,
-            fontWeight: 800,
-            fontSize: 14,
+            fontWeight: 900,
+            fontSize: 15,
             letterSpacing: '-0.01em',
             background: 'linear-gradient(90deg, #00C8FF, #7800FF)',
             color: '#fff',
@@ -136,7 +137,7 @@ export function AppHeader() {
             transition: 'box-shadow 260ms ease, transform 180ms ease',
           }}
         >
-          Take Quiz
+          Take Free Quiz
         </Link>
       </div>
     </header>

@@ -31,7 +31,7 @@ function AuthPageChrome() {
       <header className='site-header' style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className='header-inner'>
           <a href='/' className='header-logo-link'>
-            <div className='logo-text'>KnowYourRole<span className='logo-dot'>.</span></div>
+            <div className='logo-text'>KnowYouRole<span className='logo-dot'>.</span></div>
           </a>
           <nav className='header-nav'>
             <a href='/' className='nav-link'>Home</a>

@@ -282,7 +282,7 @@ export default function MoodSelector({ mood, onMoodChange, onLandmarkChange, lan
                 )}
 
                 <p className="text-center text-[10px] text-warm-gray/30 dark:text-soft-cream/20">
-                  Anon aggregate only — no data stored
+                  Used for mood context — not sold
                 </p>
               </div>
             </motion.div>

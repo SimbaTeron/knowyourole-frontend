@@ -169,7 +169,7 @@ export default function LocationPage() {
   };
 
   const handleBack = () => {
-    router.push("/mood-mixer");
+    router.push("/quiz");
   };
 
   const getThemeClass = () => {

@@ -19,13 +19,13 @@ export const quizScoresSchema = z.object({
   }),
   responses: z.array(z.object({
     questionId: z.number(),
-    choice: z.union([z.literal(0), z.literal(1)]),
+    choice: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
     timeSpent: z.number(),
     swipeDirection: z.enum(['left', 'right']),
     sliderValue: z.number().optional(),
-    responseType: z.enum(['binary', 'slider']).optional(),
+    responseType: z.enum(['binary', 'slider', 'multiChoice']).optional(),
     psych: z.string().optional(),
-    optionMeta: z.tuple([z.string(), z.string()]).optional(),
+    optionMeta: z.union([z.tuple([z.string(), z.string()]), z.array(z.string())]).optional(),
     selectedOptionMeta: z.string().optional(),
     selectedOptionLabel: z.string().optional(),
     wildcard: z.boolean().optional(),
@@ -88,6 +88,84 @@ export function zNormalize(rawScore: number, mean: number, std: number): number 
   return Math.max(0, Math.min(100, 50 + zScore * 15));
 }
 
+export function normalizeBigFiveEvidence(rawScore: number): number {
+  if (rawScore > 25) return Math.max(1, Math.min(99, Math.round(rawScore)));
+  const signed = Math.max(-7, Math.min(7, rawScore));
+  return Math.max(8, Math.min(92, Math.round(50 + signed * 6)));
+}
+
+function resolvePrimaryDisc(disc: Record<string, number>, mbti: Record<string, number>, bigFiveProfile: { openness: number; conscientiousness: number; extraversion: number; agreeableness: number; neuroticism: number }): string {
+  const sorted = (Object.entries(disc) as [string, number][]).sort((a, b) => b[1] - a[1]);
+  const [topKey, topValue] = sorted[0] || ["D", 0];
+  const closeToTop = (key: string, gap = 2) => topValue - (disc[key] ?? 0) <= gap;
+  const analyticalShape = (mbti.I ?? 0) >= (mbti.E ?? 0) && ((mbti.T ?? 0) >= (mbti.F ?? 0) || bigFiveProfile.conscientiousness >= 68);
+  const creativeShape = (mbti.N ?? 0) >= (mbti.S ?? 0) && (mbti.P ?? 0) >= (mbti.J ?? 0) && bigFiveProfile.openness >= 62;
+  const peopleShape = (mbti.F ?? 0) > (mbti.T ?? 0) && (bigFiveProfile.agreeableness >= 62 || bigFiveProfile.extraversion >= 62);
+  const actionShape = (mbti.E ?? 0) > (mbti.I ?? 0) && (mbti.T ?? 0) >= (mbti.F ?? 0) && ((disc.D ?? 0) >= (disc.I ?? 0) - 1);
+
+  if (topKey === "D") {
+    if (closeToTop("C", 2.5) && analyticalShape && bigFiveProfile.extraversion <= 58) return "C";
+    if (closeToTop("I", 4) && creativeShape && bigFiveProfile.conscientiousness <= 62) return "I";
+    if ((closeToTop("S", 3) || closeToTop("I", 3)) && peopleShape && !actionShape) return closeToTop("S", 3) ? "S" : "I";
+  }
+  if (topKey === "S" && closeToTop("C", 3) && analyticalShape && bigFiveProfile.extraversion <= 58) return "C";
+  if (topKey === "I" && closeToTop("D", 3) && actionShape) return "D";
+  if (topKey === "I" && closeToTop("S", 3) && (mbti.I ?? 0) > (mbti.E ?? 0) && bigFiveProfile.conscientiousness >= 68) return "S";
+  return topKey;
+}
+
+type AxisConfidenceLabel = "strong" | "clear" | "directional" | "close-call";
+
+const MBTI_AXIS_PAIRS = [
+  { key: "EI", left: "E", right: "I", label: "Extraversion / Introversion" },
+  { key: "SN", left: "S", right: "N", label: "Sensing / Intuition" },
+  { key: "TF", left: "T", right: "F", label: "Thinking / Feeling" },
+  { key: "JP", left: "J", right: "P", label: "Judging / Perceiving" },
+] as const;
+
+export function resultConfidenceLabel(score: number): "Strong pattern" | "Clear pattern" | "Directional pattern" | "Close-call pattern" {
+  if (score >= 78) return "Strong pattern";
+  if (score >= 64) return "Clear pattern";
+  if (score >= 52) return "Directional pattern";
+  return "Close-call pattern";
+}
+
+export function explainMbtiAxisConfidence(label: AxisConfidenceLabel): string {
+  if (label === "strong") return "Strong signal: this side showed up repeatedly and should be treated as stable.";
+  if (label === "clear") return "Clear signal: this side leads, while the opposite side still matters.";
+  if (label === "directional") return "Directional signal: this is useful, but another setting could pull out the opposite side.";
+  return "Close call: both sides are active, so the letter should be read as flexible instead of fixed.";
+}
+
+export function calculateMbtiAxisConfidence(mbti: Record<string, number>) {
+  return MBTI_AXIS_PAIRS.map((axis) => {
+    const leftScore = Number(mbti[axis.left] ?? 0);
+    const rightScore = Number(mbti[axis.right] ?? 0);
+    const total = Math.max(1, Math.abs(leftScore) + Math.abs(rightScore));
+    const dominant = leftScore >= rightScore ? axis.left : axis.right;
+    const dominantScore = dominant === axis.left ? leftScore : rightScore;
+    const leadPct = Math.round((Math.abs(dominantScore) / total) * 100);
+    const gap = Math.abs(leftScore - rightScore);
+    const confidenceScore = Math.max(35, Math.min(95, leadPct));
+    const confidenceLabel: AxisConfidenceLabel = leadPct >= 75 ? "strong" : leadPct >= 64 ? "clear" : leadPct >= 58 ? "directional" : "close-call";
+    return {
+      key: axis.key,
+      label: axis.label,
+      left: axis.left,
+      right: axis.right,
+      leftScore,
+      rightScore,
+      dominant,
+      leadPct,
+      gap,
+      confidenceScore,
+      confidenceLabel,
+      isCloseCall: confidenceLabel === "close-call",
+      note: explainMbtiAxisConfidence(confidenceLabel),
+    };
+  });
+}
+
 // =============================================================================
 // Rate Limiting (In-Memory)
 // =============================================================================
@@ -122,11 +200,11 @@ export function checkRateLimit(identifier: string, limit: number, windowMs: numb
 
 export interface ResponseItem {
   questionId: number;
-  choice: 0 | 1;
+  choice: 0 | 1 | 2 | 3;
   timeSpent?: number;
   sliderValue?: number;
   psych?: string;
-  optionMeta?: [string, string];
+  optionMeta?: [string, string] | string[];
   selectedOptionMeta?: string;
   selectedOptionLabel?: string;
   wildcard?: boolean;
@@ -256,7 +334,7 @@ interface ScoresData {
 
 interface ResponseEntry {
   questionId: number;
-  choice: 0 | 1;
+  choice: 0 | 1 | 2 | 3;
   timeSpent?: number;
   sliderValue?: number;
   psych?: string;
@@ -295,30 +373,27 @@ export function calculatePersonality(data: Record<string, unknown>) {
       return mbti[pair[0] as keyof typeof mbti] >= mbti[pair[1] as keyof typeof mbti] ? pair[0] : pair[1];
     });
 
-  const discEntries = Object.entries(disc) as [string, number][];
-  const primaryDisc = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
+  const mbtiAxisConfidence = calculateMbtiAxisConfidence(mbti);
+  const closeCallDimensions = mbtiAxisConfidence.filter((axis) => axis.isCloseCall).map((axis) => axis.key);
+  const mbtiAxisAverageConfidence = Math.round(
+    mbtiAxisConfidence.reduce((sum, axis) => sum + axis.confidenceScore, 0) / mbtiAxisConfidence.length,
+  );
   const discStyles: Record<string, string> = {
-    D: "Direct Driver",
-    I: "Inspiring Influencer",
-    S: "Steady Supporter",
-    C: "Careful Analyst",
-  };
-
-  const rawBigFive = {
-    openness: bigFive.O,
-    conscientiousness: bigFive.C,
-    extraversion: bigFive.E,
-    agreeableness: bigFive.A,
-    neuroticism: bigFive.N,
+    D: "Dominant",
+    I: "Influential",
+    S: "Steady",
+    C: "Conscientious",
   };
 
   const bigFiveProfile = {
-    openness: zNormalize(rawBigFive.openness, RESEARCH_NORMS.bigFive.openness.mean / 10, RESEARCH_NORMS.bigFive.openness.std / 10),
-    conscientiousness: zNormalize(rawBigFive.conscientiousness, RESEARCH_NORMS.bigFive.conscientiousness.mean / 10, RESEARCH_NORMS.bigFive.conscientiousness.std / 10),
-    extraversion: zNormalize(rawBigFive.extraversion, RESEARCH_NORMS.bigFive.extraversion.mean / 10, RESEARCH_NORMS.bigFive.extraversion.std / 10),
-    agreeableness: zNormalize(rawBigFive.agreeableness, RESEARCH_NORMS.bigFive.agreeableness.mean / 10, RESEARCH_NORMS.bigFive.agreeableness.std / 10),
-    neuroticism: zNormalize(rawBigFive.neuroticism, RESEARCH_NORMS.bigFive.neuroticism.mean / 10, RESEARCH_NORMS.bigFive.neuroticism.std / 10),
+    openness: normalizeBigFiveEvidence(bigFive.O),
+    conscientiousness: normalizeBigFiveEvidence(bigFive.C),
+    extraversion: normalizeBigFiveEvidence(bigFive.E),
+    agreeableness: normalizeBigFiveEvidence(bigFive.A),
+    neuroticism: normalizeBigFiveEvidence(bigFive.N),
   };
+  const discEntries = Object.entries(disc) as [string, number][];
+  const primaryDisc = resolvePrimaryDisc(disc, mbti, bigFiveProfile);
 
   let proxyNudge = "";
   if ((data.theme || scores.theme) === "random") {
@@ -416,13 +491,31 @@ export function calculatePersonality(data: Record<string, unknown>) {
   const consistencyWarning = consistency.lowConsistencyFlags.length > 0
     ? `Lower confidence signals: ${consistency.lowConsistencyFlags.join(', ')}`
     : null;
+  const discScoresSorted = [...discEntries].sort((a, b) => b[1] - a[1]);
+  const discLeadGap = Math.max(0, (discScoresSorted[0]?.[1] ?? 0) - (discScoresSorted[1]?.[1] ?? 0));
+  const bigFiveValues = Object.values(bigFiveProfile).map((value) => Math.round(value));
+  const bigFiveSpread = Math.max(...bigFiveValues) - Math.min(...bigFiveValues);
+  const modelConfidence = {
+    mbti: mbtiAxisAverageConfidence,
+    disc: Math.max(35, Math.min(95, Math.round(50 + discLeadGap * 8))),
+    bigFive: Math.max(45, Math.min(95, Math.round(55 + bigFiveSpread * 0.55))),
+    overall: 0,
+  };
+  modelConfidence.overall = Math.round((modelConfidence.mbti + modelConfidence.disc + modelConfidence.bigFive + consistency.overallConfidence) / 4);
+  const modelConfidenceLabels = {
+    mbti: resultConfidenceLabel(modelConfidence.mbti),
+    disc: resultConfidenceLabel(modelConfidence.disc),
+    bigFive: resultConfidenceLabel(modelConfidence.bigFive),
+    overall: resultConfidenceLabel(modelConfidence.overall),
+  };
 
   const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
   return {
     sessionId,
-    mbtiType,
-    mbtiBlend: `${mbtiType}-${primaryDisc}`,
+    mbtiType: cleanMbti,
+    mbtiRawType: mbtiType,
+    mbtiBlend: `${cleanMbti}-${primaryDisc}`,
     discStyle: discStyles[primaryDisc] || "Balanced",
     bigFive: {
       O: Math.round(bigFiveProfile.openness),
@@ -457,6 +550,11 @@ export function calculatePersonality(data: Record<string, unknown>) {
       },
     },
     hybridTypes,
+    mbtiAxisConfidence,
+    closeCallDimensions,
+    modelConfidence,
+    modelConfidenceLabels,
+    resultConfidenceLabel: modelConfidenceLabels.overall,
     earnedBadges,
     traitConsistency: consistency,
     swipeAnalytics: {
@@ -510,8 +608,8 @@ export function calculateArcEvolution(results: any[]): any {
 
   const traitNames = ['O', 'C', 'E', 'A', 'N'];
   const traitLabels: Record<string, string> = {
-    O: 'Openness', C: 'Conscientiousness', E: 'Extraversion',
-    A: 'Agreeableness', N: 'Neuroticism'
+    O: 'Openness', C: 'Structure / Follow-through', E: 'Extraversion',
+    A: 'Agreeableness', N: 'Stress Reactivity'
   };
 
   const changes: Array<{ trait: string; label: string; change: number; direction: string; insight: string }> = [];

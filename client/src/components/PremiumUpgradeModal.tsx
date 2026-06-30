@@ -112,7 +112,7 @@ export function PremiumUpgradeModal({
               <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4">
                 <Crown className="w-8 h-8" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">Unlock KnowRole Pro</h2>
+              <h2 className="text-2xl font-bold mb-2">Unlock KnowYouRole Pro</h2>
               <p className="text-white/80 text-sm">
                 Get personalized insights to level up your life
               </p>

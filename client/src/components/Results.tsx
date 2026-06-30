@@ -217,7 +217,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
     try {
       const productsRes = await fetch('/api/stripe/products');
       const productsData = await productsRes.json();
-      const proProduct = productsData.products?.find((p: { metadata?: { tier?: string }; name?: string }) => p.metadata?.tier === 'pro' || p.name === 'KnowRole Pro');
+      const proProduct = productsData.products?.find((p: { metadata?: { tier?: string }; name?: string }) => p.metadata?.tier === 'pro' || p.name === 'KnowYouRole Pro' || p.name === 'KnowRole Pro');
       if (!proProduct || !proProduct.prices?.length) throw new Error('Pro product not found');
       const checkoutRes = await fetch('/api/stripe/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ priceId: proProduct.prices[0].id, sessionId: sessionId || undefined }) });
       const checkoutData = await checkoutRes.json();
@@ -375,7 +375,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       <div className="fixed bottom-[68px] left-0 right-0 z-30 flex justify-center pointer-events-none" data-testid="privacy-badge">
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/80 dark:bg-[#0A0A0F]/80 backdrop-blur-sm border border-gray-200 dark:border-[#A78BFA]/10 text-xs text-muted-foreground">
           <Shield className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>Your results are processed locally and not stored on our servers</span>
+          <span>Your profile is saved securely. We never sell your results.</span>
         </div>
       </div>
 

@@ -272,7 +272,12 @@ function MoodOrb({
   onTap: () => void;
 }) {
   return isSelected ? (
-    <div
+    <button
+      type="button"
+      aria-label={`Remove ${mood.label} mood`}
+      aria-pressed="true"
+      onClick={onTap}
+      title={`Remove ${mood.label}`}
       style={{
         position: "absolute",
         left: pos.x,
@@ -284,7 +289,7 @@ function MoodOrb({
         background: `radial-gradient(circle at 35% 35%, ${mood.color}55, ${mood.color}28)`,
         border: `2.5px solid ${mood.color}`,
         boxShadow: `0 0 38px ${mood.glow}, 0 0 72px ${mood.color}30`,
-        cursor: "not-allowed",
+        cursor: "pointer",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -294,8 +299,10 @@ function MoodOrb({
         zIndex: 10,
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
-        pointerEvents: "none",
+        pointerEvents: "auto",
         userSelect: "none",
+        padding: 0,
+        appearance: "none",
       }}
     >
       <span style={{ fontSize: "2.5rem", filter: `drop-shadow(0 0 11px ${mood.color})`, lineHeight: 1 }}>
@@ -311,9 +318,13 @@ function MoodOrb({
       >
         {mood.label}
       </span>
-    </div>
+    </button>
   ) : (
-    <div
+    <button
+      type="button"
+      aria-label={`Select ${mood.label} mood — ${mood.desc}`}
+      aria-pressed="false"
+      title={`${mood.label}: ${mood.desc}`}
       onClick={onTap}
       onMouseEnter={(e) => {
         const s = e.currentTarget;
@@ -350,13 +361,15 @@ function MoodOrb({
         WebkitBackdropFilter: "blur(14px)",
         transition: "transform 0.18s ease, border 0.18s ease, box-shadow 0.18s ease",
         touchAction: "manipulation",
+        padding: 0,
+        appearance: "none",
       }}
     >
       <span style={{ fontSize: "2.5rem", lineHeight: 1 }}>{mood.emoji}</span>
       <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "rgba(255,255,255,0.52)", letterSpacing: "0.05em" }}>
         {mood.label}
       </span>
-    </div>
+    </button>
   );
 }
 
@@ -1054,11 +1067,11 @@ export default function MoodMixerPage() {
   const cy = radius;
   const positions = getOrbitalPositions(cx, cy, radius);
 
-  // Auto-select tier from sessionStorage if not set
+  // Keep legacy and canonical tier keys aligned before entering the quiz.
   useEffect(() => {
-    if (!sessionStorage.getItem("knowrole-tier")) {
-      sessionStorage.setItem("knowrole-tier", "25+");
-    }
+    const existingTier = sessionStorage.getItem("kyr_quiz_tier") || sessionStorage.getItem("knowrole-tier") || "25+";
+    sessionStorage.setItem("kyr_quiz_tier", existingTier);
+    sessionStorage.setItem("knowrole-tier", existingTier);
   }, []);
 
   // Brewing timer
@@ -1083,9 +1096,31 @@ export default function MoodMixerPage() {
   }, [bothSelected, phase]);
 
   const handleOrbTap = (id: string) => {
-    if (phase === "brewing" || phase === "brewed" || tooltipMood) return;
-    if (mood1 === id || mood2 === id) return;
-    setTooltipMood(id);
+    if (phase === "brewing" || phase === "brewed") return;
+
+    if (mood1 === id) {
+      setMood1(mood2);
+      setMood2(null);
+      setTooltipMood(null);
+      return;
+    }
+
+    if (mood2 === id) {
+      setMood2(null);
+      setTooltipMood(null);
+      return;
+    }
+
+    if (mood1 === null) {
+      setMood1(id);
+      setTooltipMood(null);
+      return;
+    }
+
+    if (mood2 === null) {
+      setMood2(id);
+      setTooltipMood(null);
+    }
   };
 
   const confirmMood = () => {
@@ -1263,12 +1298,14 @@ export default function MoodMixerPage() {
         >
           {isBrewed
             ? "Your blend is ready. Time to discover who you are."
-            : "Tap two moods to brew your unique blend."}
+            : oneSelected
+              ? "First mood locked. Tap one more to brew your blend."
+              : "Tap two moods. No dragging, no hidden trick."}
         </p>
       </div>
 
       {/* Orb/result area */}
-      <div style={{ position: "relative", zIndex: 1, marginTop: isBrewed ? 10 : 72, paddingBottom: 180 }}>
+      <div style={{ position: "relative", zIndex: 1, marginTop: isBrewed ? 10 : 80, paddingBottom: isSelecting ? 12 : 180 }}>
         <AnimatePresence mode="wait">
           {isSelecting && (
             <motion.div
@@ -1278,7 +1315,7 @@ export default function MoodMixerPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               ref={containerRef}
-              style={{ position: "relative", width: "100%", height: radius + 100 }}
+              style={{ position: "relative", width: "100%", height: radius * 2 + 118 }}
             >
               {/* Hand tap hint — only shows when nothing selected */}
               {!oneSelected && !bothSelected && <HandTapHint cx={cx} cy={cy} />}
@@ -1349,7 +1386,7 @@ export default function MoodMixerPage() {
             exit={{ opacity: 0, y: 24 }}
             transition={{ duration: 0.3 }}
             style={{
-              position: "fixed",
+              position: "sticky",
               bottom: 0,
               left: 0,
               right: 0,
@@ -1377,11 +1414,12 @@ export default function MoodMixerPage() {
                 fontSize: 12,
                 cursor: "pointer",
                 fontFamily: "'Outfit', sans-serif",
-                padding: "6px 2px",
+                minHeight: 44,
+                padding: "10px 8px",
                 transition: "color 0.2s",
               }}
             >
-              Skip this step →
+              Skip to quiz →
             </button>
             <CurrentVibeSnapshot mood1={selectedMood1} mood2={selectedMood2} />
           </motion.div>
@@ -1418,7 +1456,7 @@ export default function MoodMixerPage() {
           maxWidth: 280,
           marginInline: "auto",
           lineHeight: 1.5,
-        }}>Personality science made accessible, fun, and genuinely useful.</p>
+        }}>Personality reflection made accessible, fun, and genuinely useful.</p>
         <p style={{
           fontFamily: "'Outfit', sans-serif",
           fontSize: 11,

@@ -1,5 +1,5 @@
-import MoodMixer from "@/components/MoodMixer";
+import { redirect } from "next/navigation";
 
 export default function MoodMixerPage() {
-  return <MoodMixer />;
+  redirect("/quiz");
 }

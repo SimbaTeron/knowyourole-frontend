@@ -1,5 +1,5 @@
 /**
- * Weighted Proxy Calculations for KnowRole
+ * Weighted Proxy Calculations for KnowYouRole
  * Phase 3.1: Enhanced empirical validity with weighted averages
  * 
  * Critical Thinking = 0.4*MBTI_T + 0.4*Big5_O + 0.2*DISC_C
