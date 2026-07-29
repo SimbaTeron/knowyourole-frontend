@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { ArcTracker } from "@/components/ArcTracker";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
 
 interface QuizResult {
   id: string;
@@ -57,7 +58,8 @@ const MBTI_COLORS: Record<string, string> = {
 };
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, isLoading: isAuthLoading, isPremium } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading, isPremium, logout } = useAuth();
+  const authenticatedFetch = useAuthenticatedApi();
   const router = useRouter();
   const [showAllHistory, setShowAllHistory] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -69,8 +71,8 @@ export default function ProfilePage() {
   });
 
   const handleLogout = () => {
-    queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-    window.location.href = '/api/logout';
+    queryClient.clear();
+    logout({ logoutParams: { returnTo: window.location.origin } });
   };
 
   if (isAuthLoading) {
@@ -385,12 +387,21 @@ export default function ProfilePage() {
               <Button
                 variant="outline"
                 className="w-full justify-start gap-3"
-                onClick={() => {
-                  window.open('/api/user/export', '_blank');
-                  toast({
-                    title: "Export started",
-                    description: "Your data download will begin shortly.",
-                  });
+                onClick={async () => {
+                  try {
+                    const response = await authenticatedFetch('/api/user/export');
+                    if (!response.ok) throw new Error('Export failed');
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'knowyourrole-data-export.json';
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    toast({ title: "Export ready", description: "Your JSON download has started." });
+                  } catch {
+                    toast({ title: "Export failed", description: "We could not export your data. Please sign in again and retry.", variant: "destructive" });
+                  }
                 }}
               >
                 <Download className="w-4 h-4 text-emerald-500" />
@@ -449,14 +460,15 @@ export default function ProfilePage() {
                       className="flex-1 bg-red-600 hover:bg-red-700 text-white border-0"
                       onClick={async () => {
                         try {
-                          const res = await fetch('/api/user/delete', { method: 'POST' });
+                          const res = await authenticatedFetch('/api/user/delete', { method: 'POST' });
                           if (res.ok) {
                             toast({
                               title: "Account deleted",
                               description: "All your data has been permanently removed.",
                             });
                             setTimeout(() => {
-                              window.location.href = '/api/logout';
+                              queryClient.clear();
+                              logout({ logoutParams: { returnTo: window.location.origin } });
                             }, 1500);
                           } else {
                             toast({

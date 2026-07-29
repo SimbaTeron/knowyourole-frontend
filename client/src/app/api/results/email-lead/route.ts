@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
+import { getOptionalAuthUser } from "@/app/api/_lib/auth";
 import {
   isResultEmailDeliveryConfigured,
   sendResultSummaryEmail,
@@ -9,7 +10,6 @@ import {
 export const dynamic = "force-dynamic";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
 
     const lead = parsed.data;
     const normalizedEmail = lead.email.trim().toLowerCase();
+    const authUser = await getOptionalAuthUser(req);
     const deliveryConfigured = isResultEmailDeliveryConfigured();
     const supabase = getSupabaseAdmin();
 
@@ -81,6 +82,7 @@ export async function POST(req: NextRequest) {
       .insert({
         email: lead.email.trim(),
         normalized_email: normalizedEmail,
+        user_id: authUser?.sub ?? null,
         session_id: lead.sessionId,
         result_id: lead.resultId,
         mbti_type: lead.mbtiType,

@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
+import { getOptionalAuthUser } from "@/app/api/_lib/auth";
+import { createAnonymousCapability } from "@/app/api/_lib/anonymous-result-capability";
 import { buildResultDTO, type BuildResultDTOInput, type ResultDTO } from "@/lib/results/buildResultDTO";
+import type { ScoresData } from "@/lib/scoring";
+import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
+import {
+  getShortformV2Question,
+  recomputeShortformV2ScoreMaps,
+  validateShortformV2Responses,
+} from "@/lib/quiz/shortformV2Scoring";
 
 export const dynamic = "force-dynamic";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
-
-export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
-}
+// This endpoint returns personal quiz material. It is intentionally same-origin:
+// do not reintroduce wildcard CORS without an authenticated cross-origin contract.
+const responseHeaders = { "Cache-Control": "no-store" };
 
 /**
  * POST /api/results/compute
@@ -33,22 +36,33 @@ export async function POST(req: NextRequest) {
     } catch {
       return NextResponse.json(
         { success: false, requestId, error: "Invalid JSON body" },
-        { status: 400, headers: corsHeaders },
+        { status: 400, headers: responseHeaders },
       );
     }
 
-    const input = normalizeComputeInput(body, req, requestId);
+    let input: BuildResultDTOInput;
+    try {
+      input = await normalizeComputeInput(body, req, requestId);
+    } catch (error) {
+      return NextResponse.json(
+        { success: false, requestId, error: error instanceof Error ? error.message : "Invalid compute payload" },
+        { status: 400, headers: responseHeaders },
+      );
+    }
     const { result, validation } = buildResultDTO(input);
 
     if (!validation.ok) {
       console.warn("[POST /api/results/compute] validation failed", { requestId, errors: validation.errors });
       return NextResponse.json(
         { success: false, requestId, validation },
-        { status: 422, headers: corsHeaders },
+        { status: 422, headers: responseHeaders },
       );
     }
 
     const persistence = await persistResultDTOSafely(result);
+    const anonymousCapability = persistence.ok && !result.meta.userId && persistence.created
+      ? await issueAnonymousCapability(result.meta.sessionId)
+      : null;
     const persistedResult: ResultDTO = {
       ...result,
       meta: {
@@ -70,29 +84,42 @@ export async function POST(req: NextRequest) {
     };
 
     return NextResponse.json(
-      { success: true, requestId, result: persistedResult, validation, persistence },
-      { status: 200, headers: corsHeaders },
+      {
+        success: true,
+        requestId,
+        result: persistedResult,
+        validation,
+        persistence,
+        anonymousDeletionCapability: anonymousCapability?.token ?? null,
+        anonymousDeletionCapabilityExpiresAt: anonymousCapability?.expiresAt ?? null,
+      },
+      { status: 200, headers: responseHeaders },
     );
   } catch (error) {
     console.error("[POST /api/results/compute] fatal error", { requestId, error });
     return NextResponse.json(
       { success: false, requestId, error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500, headers: corsHeaders },
+      { status: 500, headers: responseHeaders },
     );
   }
 }
 
-function normalizeComputeInput(body: unknown, req: NextRequest, requestId: string): BuildResultDTOInput {
+async function normalizeComputeInput(body: unknown, req: NextRequest, requestId: string): Promise<BuildResultDTOInput> {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new Error("Request body must be an object");
   }
 
   const b = body as Record<string, unknown>;
-  const scores = (b.scores ?? b) as BuildResultDTOInput["scores"];
-
-  if (!scores || typeof scores !== "object" || Array.isArray(scores)) {
+  const submittedScores = (b.scores ?? b) as Record<string, unknown>;
+  if (!submittedScores || typeof submittedScores !== "object" || Array.isArray(submittedScores)) {
     throw new Error("scores object is required");
   }
+
+  // Scores supplied by a browser are presentation data, not evidence. Rebuild
+  // every framework and career vector from the fixed, versioned answer bank.
+  const scores = recomputeAuthoritativeShortformScores(submittedScores.responses);
+  const verifiedUser = await getOptionalAuthUser(req);
+  const verifiedUserId = verifiedUser?.sub ?? null;
 
   return {
     scores,
@@ -103,9 +130,9 @@ function normalizeComputeInput(body: unknown, req: NextRequest, requestId: strin
     landmark: typeof b.landmark === "string" ? b.landmark : undefined,
     theme: typeof b.theme === "string" ? b.theme : undefined,
     sessionId: typeof b.sessionId === "string" ? b.sessionId : undefined,
-    userId: typeof b.userId === "string" ? b.userId : null,
+    userId: verifiedUserId,
     source: normalizeSource(b.source),
-    visibility: normalizeVisibility(b.visibility, b.userId),
+    visibility: normalizeVisibility(b.visibility, verifiedUserId),
     requestId,
     runtime: {
       environment: process.env.VERCEL_ENV === "production" ? "production" : process.env.VERCEL_ENV === "preview" ? "preview" : "local",
@@ -116,10 +143,49 @@ function normalizeComputeInput(body: unknown, req: NextRequest, requestId: strin
   };
 }
 
+function recomputeAuthoritativeShortformScores(rawResponses: unknown): BuildResultDTOInput["scores"] {
+  const responses = validateShortformV2Responses(rawResponses);
+  const rawScoreMaps = recomputeShortformV2ScoreMaps(responses);
+  const swipeTimes = responses.map((response) => response.timeSpent ?? 0);
+  const averageSwipeTime = swipeTimes.reduce((sum, value) => sum + value, 0) / Math.max(1, swipeTimes.length);
+  const canonicalResponses = responses.map((response) => {
+    const question = getShortformV2Question(response.questionId);
+    const answer = question.answers[response.choice];
+    return {
+      questionId: response.questionId,
+      choice: response.choice,
+      timeSpent: response.timeSpent ?? 0,
+      swipeDirection: response.swipeDirection ?? (response.choice < 2 ? "left" : "right"),
+      responseType: "multiChoice" as const,
+      psych: question.group,
+      selectedOptionMeta: answer.resultSignal,
+      selectedOptionLabel: answer.text,
+      answerId: answer.id,
+    };
+  });
+
+  const scoreInput = {
+    ...rawScoreMaps,
+    responses: canonicalResponses,
+    swipeTimes,
+    averageSwipeTime,
+    currentDifficulty: averageSwipeTime < 2 ? "hard" as const : averageSwipeTime < 5 ? "medium" as const : "easy" as const,
+    engagement: canonicalResponses.length,
+    wildcardBoost: false,
+    criticalWildcard: rawScoreMaps.mbti.T >= rawScoreMaps.mbti.F && rawScoreMaps.bigFive.O > 0 ? 1 : 0,
+    firstPrinciplesWildcard: rawScoreMaps.mbti.N >= rawScoreMaps.mbti.S && rawScoreMaps.bigFive.O > 0 ? 1 : 0,
+    hybridTypes: [],
+    quizVersion: "shortform-v2-fixed-28",
+    questionDatabase: "shortformV2Questions.ts",
+    deterministicResult: true,
+  };
+
+  return calibrateShortformV2Scores(scoreInput) as ScoresData;
+}
 
 async function persistResultDTOSafely(result: ResultDTO): Promise<
-  | { ok: true; resultId: string; persistenceAttemptId: string }
-  | { ok: false; resultId: null; persistenceAttemptId: string; error: string }
+  | { ok: true; resultId: string; persistenceAttemptId: string; created: boolean }
+  | { ok: false; resultId: null; persistenceAttemptId: string; error: string; created: false }
 > {
   const persistenceAttemptId = `persist-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   try {
@@ -130,11 +196,11 @@ async function persistResultDTOSafely(result: ResultDTO): Promise<
       persistenceAttemptId,
       error: message,
     });
-    return { ok: false, resultId: null, persistenceAttemptId, error: message };
+    return { ok: false, resultId: null, persistenceAttemptId, error: message, created: false };
   }
 }
 
-async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string): Promise<{ ok: true; resultId: string; persistenceAttemptId: string }> {
+async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string): Promise<{ ok: true; resultId: string; persistenceAttemptId: string; created: boolean }> {
   const supabase = getSupabaseAdmin();
 
   // Maintain the existing schema contract first: create/ensure quiz_sessions,
@@ -155,6 +221,23 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
   if (sessionError) {
     console.error("[POST /api/results/compute] quiz_sessions upsert failed", { persistenceAttemptId, error: sessionError });
     throw new Error(`Failed to persist quiz session: ${sessionError.message}`);
+  }
+
+  // Idempotency guard: a browser retry must not create another result for the
+  // same completion session. The database still needs a unique session_id
+  // constraint to close the concurrent-write race; keep this server guard in
+  // place regardless so ordinary retries are safe.
+  const { data: existingResult, error: existingResultError } = await supabase
+    .from("quiz_results")
+    .select("id")
+    .eq("session_id", result.meta.sessionId)
+    .maybeSingle();
+
+  if (existingResultError) {
+    throw new Error(`Failed to check existing quiz result: ${existingResultError.message}`);
+  }
+  if (existingResult) {
+    return { ok: true, resultId: existingResult.id, persistenceAttemptId, created: false };
   }
 
   const now = new Date().toISOString();
@@ -196,11 +279,45 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
     });
 
   if (resultError) {
+    // Two canonical completion requests can both pass the pre-insert lookup.
+    // The unique partial index is the final arbiter; if it selects another
+    // request as the winner, return that canonical result instead of exposing
+    // a misleading persistence fallback to the losing caller.
+    const lostConcurrentInsertRace = resultError.code === "23505"
+      && resultError.message.includes("quiz_results_one_result_per_session_idx");
+
+    if (lostConcurrentInsertRace) {
+      const { data: racedResult, error: racedResultError } = await supabase
+        .from("quiz_results")
+        .select("id")
+        .eq("session_id", result.meta.sessionId)
+        .maybeSingle();
+
+      if (racedResultError) {
+        throw new Error(`Failed to retrieve concurrently persisted quiz result: ${racedResultError.message}`);
+      }
+      if (racedResult) {
+        return { ok: true, resultId: racedResult.id, persistenceAttemptId, created: false };
+      }
+    }
+
     console.error("[POST /api/results/compute] quiz_results insert failed", { persistenceAttemptId, error: resultError });
     throw new Error(`Failed to persist quiz result: ${resultError.message}`);
   }
 
-  return { ok: true, resultId: result.meta.resultId, persistenceAttemptId };
+  return { ok: true, resultId: result.meta.resultId, persistenceAttemptId, created: true };
+}
+
+async function issueAnonymousCapability(sessionId: string): Promise<{ token: string; expiresAt: string } | null> {
+  const capability = createAnonymousCapability();
+  const { error } = await getSupabaseAdmin()
+    .from("anonymous_result_capabilities")
+    .insert({ session_id: sessionId, token_hash: capability.tokenHash, expires_at: capability.expiresAt });
+  if (!error) return capability;
+  // A concurrent retry can win result creation but lose capability creation; the
+  // original response already received the only raw capability, so never rotate it.
+  if (error.code === "23505") return null;
+  throw new Error(`Failed to issue anonymous deletion capability: ${error.message}`);
 }
 
 function normalizeSource(value: unknown): BuildResultDTOInput["source"] {

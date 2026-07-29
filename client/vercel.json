@@ -3,5 +3,11 @@
   "buildCommand": "npm install --include=dev && npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install --include=dev",
-  "devCommand": "npm run dev"
+  "devCommand": "npm run dev",
+  "crons": [
+    {
+      "path": "/api/internal/privacy/purge",
+      "schedule": "17 3 * * *"
+    }
+  ]
 }
