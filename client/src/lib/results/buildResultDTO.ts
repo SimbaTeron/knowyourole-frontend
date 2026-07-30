@@ -1,5 +1,5 @@
 import { calculatePersonality, validateInput, type ScoresData } from "@/lib/scoring";
-import { calculateResult, type PersonalityResult } from "@/components/results/resultsData";
+import { calculateResult, findBestRoleMatch, type PersonalityResult } from "@/components/results/resultsData";
 
 /**
  * Canonical Autonomous Results Engine DTO builder.
@@ -220,6 +220,13 @@ export interface NarrativeCopyDTO {
   aiSections?: Array<{ id: string; title: string; body: string; model?: string; promptVersion?: string }>;
 }
 
+export interface CareerDirectionDTO {
+  laneKey: string;
+  title: string;
+  examples: CareerMatchDTO[];
+  rationale: string;
+}
+
 export interface CareerMatchDTO {
   roleId: string;
   title: string;
@@ -277,6 +284,7 @@ export interface ResultDTO {
   raw: ResultRawInputs;
   scores: PersonalityScoresDTO;
   narrative: NarrativeCopyDTO;
+  careerDirection: CareerDirectionDTO;
   careerMatches: CareerMatchDTO[];
   premiumInsights: PremiumInsightDTO[];
   growthPlan: GrowthPlanDTO;
@@ -439,6 +447,35 @@ function buildAdaptive(scores: ScoresData, mbti: MBTIResult, disc: DISCResult, b
   };
 }
 
+function buildCareerDirection(legacy: PersonalityResult, scores: ScoresData): CareerDirectionDTO {
+  const roleMatch = findBestRoleMatch(
+    legacy.mbtiType,
+    legacy.discStyle,
+    legacy.bigFiveProfile,
+    scores.mbti as Record<string, number>,
+    scores.career as Partial<Record<import("@/data/shortformV2Questions").CareerKey, number>>,
+  );
+  const direction = roleMatch.direction ?? {
+    laneKey: "legacy",
+    title: roleMatch.primary.title,
+    examples: [roleMatch.primary, roleMatch.secondary, ...(roleMatch.alternatives ?? [])].slice(0, 3),
+    rationale: roleMatch.whyThisFits || roleMatch.primary.desc,
+  };
+  return {
+    laneKey: direction.laneKey,
+    title: direction.title,
+    rationale: direction.rationale,
+    examples: direction.examples.map((role, index) => ({
+      roleId: slugify(role.title),
+      title: role.title,
+      matchPercent: pct(Math.max(60, 88 - index * 8)),
+      reasoning: role.desc,
+      drivers: roleMatch.careerSignals ?? [],
+      marketData: { salaryRange: role.salary },
+    })),
+  };
+}
+
 function buildCareerMatches(legacy: PersonalityResult, scores: PersonalityScoresDTO): CareerMatchDTO[] {
   const primaryTitle = legacy.primaryRole?.title || "Personalized Career Match";
   const secondaryTitle = legacy.secondaryRole?.title || "Secondary Career Match";
@@ -458,7 +495,8 @@ function normalizeDISC(value: unknown): DISCStyle {
 }
 
 function normalizeTier(value: unknown): AgeTier {
-  return value === "7-12" || value === "13-18" || value === "19-25" || value === "25plus" ? value : "unknown";
+  if (value === "25+" || value === "25plus") return "25plus";
+  return value === "7-12" || value === "13-18" || value === "19-25" ? value : "unknown";
 }
 
 function slugify(value: string): string {
@@ -472,6 +510,7 @@ export function validateResultDTO(value: unknown): ResultDTOValidationResult {
   const isPercent = (v: unknown) => typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 100;
   if (!isObject(value)) return { ok: false, errors: ["ResultDTO must be an object"] };
   for (const key of ["version", "meta", "raw", "scores", "narrative", "growthPlan", "audit"] as const) if (!isObject(value[key])) errors.push(`Missing object: ${key}`);
+  if (!isObject(value.careerDirection) || typeof value.careerDirection.title !== "string" || !Array.isArray(value.careerDirection.examples)) errors.push("careerDirection must include title and examples");
   if (!Array.isArray(value.careerMatches)) errors.push("careerMatches must be an array");
   if (!Array.isArray(value.premiumInsights)) errors.push("premiumInsights must be an array");
   if (isObject(value.version) && value.version.schemaVersion !== RESULT_DTO_SCHEMA_VERSION) errors.push(`Unsupported schemaVersion: ${String(value.version.schemaVersion)}`);
@@ -514,6 +553,7 @@ export function buildResultDTO(input: BuildResultDTOInput): BuildResultDTOOutput
   const bigFive = buildBigFive(input.scores, legacy);
   const bipolarBars = buildBipolarBars(mbti);
   const adaptive = buildAdaptive(input.scores, mbti, disc, bigFive, advanced);
+  const careerDirection = buildCareerDirection(legacy, input.scores);
   const scores: PersonalityScoresDTO = { mbti, disc, bigFive, bipolarBars, adaptive, extensions: { legacyAdvanced: advanced } };
   const overallConfidence = pct((mbti.confidence + disc.confidence + bigFive.confidence + adaptive.completionConfidence) / 4);
 
@@ -532,6 +572,7 @@ export function buildResultDTO(input: BuildResultDTOInput): BuildResultDTOOutput
       workStyle: legacy.primaryRole?.desc,
       confidenceNote: overallConfidence < 55 ? "Some signals were close or low-confidence; adaptive follow-up questions would improve precision." : undefined,
     },
+    careerDirection,
     careerMatches: buildCareerMatches(legacy, scores),
     premiumInsights: [
       { id: "growth-start", kind: "growth", title: "Growth starting point", body: `Start with actions that use your ${BIG_FIVE_LABELS[bigFive.dominantTrait]} strength without over-relying on it.`, action: "Pick one recommended action and test it this week.", relevance: pct(82), gated: false },

@@ -76,7 +76,7 @@ export default function About() {
             <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
               <h3 className="font-semibold mb-1">Big Five backbone</h3>
               <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
-                The Big Five is used as the strongest research-backed trait layer in the product.
+                The Big Five provides the most research-informed trait language in the product. That research does not validate every KYR score or career suggestion.
               </p>
             </div>
             <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">

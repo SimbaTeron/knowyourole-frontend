@@ -3,7 +3,6 @@ import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
 
 export async function POST(req: NextRequest) {
   const headers = {
-    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };

@@ -1,0 +1,348 @@
+/* KnowYouRole — Workday production visual system.
+   This is intentionally structural: the live application retains its routes, scoring,
+   and data flow while every route inherits one warm editorial language. */
+
+html.kyr-workday {
+  --workday-paper: #f8f3e8;
+  --workday-surface: #fffdf8;
+  --workday-ink: #12263a;
+  --workday-muted: #536e82;
+  --workday-line: rgba(18, 38, 58, 0.17);
+  --workday-sky: #9ed8e6;
+  --workday-sun: #ffca42;
+  --workday-coral: #e98268;
+  --workday-shadow: 8px 8px 0 rgba(18, 38, 58, 0.09);
+  --background: 43 48% 95%;
+  --foreground: 209 53% 15%;
+  --card: 43 64% 98%;
+  --card-foreground: 209 53% 15%;
+  --border: 209 26% 78%;
+  --primary: 209 53% 15%;
+  --primary-foreground: 43 48% 95%;
+  --secondary: 43 55% 88%;
+  --secondary-foreground: 209 53% 15%;
+  --muted: 43 28% 89%;
+  --muted-foreground: 209 18% 37%;
+  --accent: 43 100% 63%;
+  --accent-foreground: 209 53% 15%;
+  --ring: 43 100% 63%;
+  --font-sans: "Manrope", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --radius: 0.9rem;
+  color-scheme: light;
+}
+
+html.kyr-workday body,
+html.kyr-workday .kyr-page {
+  background: var(--workday-paper) !important;
+  color: var(--workday-ink) !important;
+  font-family: var(--font-sans) !important;
+}
+
+html.kyr-workday ::selection { background: var(--workday-sun); color: var(--workday-ink); }
+html.kyr-workday a { text-underline-offset: 0.22em; }
+html.kyr-workday :focus-visible { outline: 3px solid var(--workday-sun); outline-offset: 3px; }
+
+/* Homepage — retain the information architecture while replacing the dark/glass skin. */
+html.kyr-workday .kyr-home-page {
+  background: var(--workday-paper) !important;
+  color: var(--workday-ink) !important;
+  font-family: var(--font-sans) !important;
+}
+html.kyr-workday .kyr-home-page .hero-section::before {
+  background: radial-gradient(circle at 76% 35%, #ffca42 0 10%, transparent 10.3%), linear-gradient(130deg, #9ed8e6 0 49%, #f8f3e8 49% 67%, #e98268 67% 100%) !important;
+}
+html.kyr-workday .kyr-home-page .hero-section::after {
+  opacity: .38 !important;
+  background-image: linear-gradient(rgba(18,38,58,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(18,38,58,.14) 1px, transparent 1px) !important;
+  background-size: 42px 42px !important;
+}
+html.kyr-workday .kyr-home-page .hero-title,
+html.kyr-workday .kyr-home-page .section-title,
+html.kyr-workday .kyr-home-page .sample-title,
+html.kyr-workday .kyr-home-page .role-preview,
+html.kyr-workday .kyr-home-page .testimonial-quote {
+  color: var(--workday-ink) !important;
+  font-family: var(--font-serif) !important;
+}
+html.kyr-workday .kyr-home-page .hero-subtitle,
+html.kyr-workday .kyr-home-page .section-copy,
+html.kyr-workday .kyr-home-page .model-description,
+html.kyr-workday .kyr-home-page .step-copy,
+html.kyr-workday .kyr-home-page .testimonial-person,
+html.kyr-workday .kyr-home-page .person-role,
+html.kyr-workday .kyr-home-page .full-results-note,
+html.kyr-workday .kyr-home-page .footer-links,
+html.kyr-workday .kyr-home-page .home-footer { color: var(--workday-muted) !important; }
+html.kyr-workday .kyr-home-page .primary-cta {
+  background: var(--workday-ink) !important;
+  color: var(--workday-paper) !important;
+  border-color: var(--workday-ink) !important;
+  box-shadow: 4px 4px 0 var(--workday-sun) !important;
+}
+html.kyr-workday .kyr-home-page .secondary-cta,
+html.kyr-workday .kyr-home-page .sample-card,
+html.kyr-workday .kyr-home-page .model-card,
+html.kyr-workday .kyr-home-page .how-card,
+html.kyr-workday .kyr-home-page .testimonial-card,
+html.kyr-workday .kyr-home-page .section-break-card {
+  background: var(--workday-surface) !important;
+  border-color: var(--workday-line) !important;
+  box-shadow: var(--workday-shadow) !important;
+}
+html.kyr-workday .kyr-home-page .model-card *,
+html.kyr-workday .kyr-home-page .how-card *,
+html.kyr-workday .kyr-home-page .testimonial-card * { color: var(--workday-ink) !important; }
+html.kyr-workday .kyr-home-page .model-card:nth-child(2) { background: var(--workday-ink) !important; }
+html.kyr-workday .kyr-home-page .model-card:nth-child(2) * { color: var(--workday-paper) !important; }
+html.kyr-workday .kyr-home-page .model-card:nth-child(2) .model-eyebrow { color: var(--workday-sun) !important; }
+html.kyr-workday .kyr-home-page .model-section,
+html.kyr-workday .kyr-home-page .testimonial-section,
+html.kyr-workday .kyr-home-page .home-footer { background: var(--workday-paper) !important; }
+html.kyr-workday .kyr-home-page .sample-title-box { background: #12263a !important; }
+html.kyr-workday .kyr-home-page .sample-title-box *,
+html.kyr-workday .kyr-home-page .mini-type-pill { color: #f8f3e8 !important; }
+html.kyr-workday .kyr-home-page .mini-type-pill { background: rgba(255,255,255,.13) !important; border-color: rgba(255,255,255,.24) !important; }
+html.kyr-workday .kyr-home-page .metric-box { background: #e8edf0 !important; border-color: rgba(18,38,58,.12) !important; }
+html.kyr-workday .kyr-home-page .metric-box *,
+html.kyr-workday .kyr-home-page .full-results-note * { color: #12263a !important; }
+html.kyr-workday .kyr-home-page .full-results-note { background: #f8f3e8 !important; }
+html.kyr-workday .kyr-home-page .home-footer a { color: var(--workday-muted) !important; }
+
+/* Standard application pages: remove every inherited night-mode surface without
+   rewriting their functional JSX. */
+html.kyr-workday .dark-mysterious,
+html.kyr-workday [class*="bg-[#050"],
+html.kyr-workday [class*="bg-[#0A0A"],
+html.kyr-workday [class*="bg-[#0a0a"],
+html.kyr-workday [class*="bg-[#05050d"] {
+  background: var(--workday-paper) !important;
+  background-image: none !important;
+  color: var(--workday-ink) !important;
+}
+html.kyr-workday .dark-mysterious [class*="bg-"],
+html.kyr-workday .dark-mysterious [style*="background"] {
+  background: var(--workday-surface) !important;
+  background-image: none !important;
+  border-color: var(--workday-line) !important;
+  box-shadow: var(--workday-shadow) !important;
+}
+html.kyr-workday .dark-mysterious [class*="text-"],
+html.kyr-workday .dark-mysterious h1,
+html.kyr-workday .dark-mysterious h2,
+html.kyr-workday .dark-mysterious h3,
+html.kyr-workday .dark-mysterious p,
+html.kyr-workday .dark-mysterious span { color: var(--workday-ink) !important; }
+
+/* Shared page heads, simple reference pages, and forms. */
+html.kyr-workday header[class*="sticky"] {
+  background: color-mix(in srgb, var(--workday-paper) 92%, transparent) !important;
+  border-color: var(--workday-line) !important;
+}
+html.kyr-workday header[class*="sticky"] a,
+html.kyr-workday .text-warm-gray,
+html.kyr-workday [class*="text-warm-gray"] { color: var(--workday-ink) !important; }
+html.kyr-workday [class*="dark:text-"] { color: var(--workday-muted) !important; }
+html.kyr-workday [class*="bg-warm-gray"],
+html.kyr-workday [class*="bg-white/"],
+html.kyr-workday [class*="bg-black"] {
+  background-color: var(--workday-surface) !important;
+  border-color: var(--workday-line) !important;
+}
+html.kyr-workday [class*="text-white"],
+html.kyr-workday [class*="text-slate-"] { color: var(--workday-ink) !important; }
+html.kyr-workday [class*="text-white/"] { color: var(--workday-muted) !important; }
+html.kyr-workday [class*="border-warm"],
+html.kyr-workday [class*="border-white"] { border-color: var(--workday-line) !important; }
+html.kyr-workday input,
+html.kyr-workday textarea,
+html.kyr-workday select {
+  background: var(--workday-surface) !important;
+  color: var(--workday-ink) !important;
+  border-color: var(--workday-line) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+
+/* Results retain their existing report components but inherit the same paper, ink,
+   and evidence-card treatment. */
+html.kyr-workday .orb-page,
+html.kyr-workday .results-page,
+html.kyr-workday [class*="results"] { --ink: var(--workday-ink); }
+html.kyr-workday .orb-page,
+html.kyr-workday .orb-page::before { background: var(--workday-paper) !important; }
+html.kyr-workday .orb-card,
+html.kyr-workday .report-card,
+html.kyr-workday .result-card { background: var(--workday-surface) !important; border-color: var(--workday-line) !important; box-shadow: var(--workday-shadow) !important; }
+
+/* Homepage source markup still carries several old dark-surface declarations.
+   Override every foreground/background pair explicitly rather than relying on
+   inherited tokens; a theme that only works on its hero is not a theme. */
+html.kyr-workday .kyr-home-page .selected-pill {
+  background: rgba(255,253,248,.84) !important;
+  border-color: rgba(18,38,58,.18) !important;
+  color: #12263a !important;
+}
+html.kyr-workday .kyr-home-page .hero-fact {
+  background: rgba(255,253,248,.82) !important;
+  border-color: rgba(18,38,58,.2) !important;
+  color: #12263a !important;
+}
+html.kyr-workday .kyr-home-page .how-step {
+  background: #fffdf8 !important;
+  border-color: rgba(18,38,58,.16) !important;
+}
+html.kyr-workday .kyr-home-page .how-step *,
+html.kyr-workday .kyr-home-page .step-copy strong { color: #12263a !important; }
+html.kyr-workday .kyr-home-page .step-copy span { color: #456174 !important; }
+html.kyr-workday .kyr-home-page .eyebrow,
+html.kyr-workday .kyr-home-page .share-line-label { color: #315f74 !important; }
+html.kyr-workday .kyr-home-page .share-line-text { color: #29495c !important; }
+html.kyr-workday .kyr-home-page .mini-type-pill {
+  background: #12263a !important;
+  border-color: #12263a !important;
+  color: #fffdf8 !important;
+}
+html.kyr-workday .kyr-home-page .model-number {
+  background: #dcedf0 !important;
+  border-color: #83afba !important;
+  color: #12263a !important;
+}
+
+html.kyr-workday .kyr-home-page .mock-labels span {
+  padding: 4px 7px;
+  background: rgba(255,253,248,.92) !important;
+  color: #12263a !important;
+  border: 1px solid rgba(18,38,58,.14);
+}
+html.kyr-workday .kyr-home-page .model-card .model-number,
+html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
+  color: #12263a !important;
+}
+
+/* Empty results are a deliberate inviting state rather than an infinite blank loader. */
+.workday-empty-result { min-height: 100dvh; display: grid; place-items: center; padding: 108px 20px 48px; background: linear-gradient(130deg, #9ed8e6 0 48%, #f8f3e8 48% 68%, #e98268 68% 100%); }
+.workday-empty-result section { width: min(620px, 100%); padding: clamp(30px, 6vw, 64px); border: 1px solid rgba(18,38,58,.18); background: rgba(255,253,248,.91); box-shadow: 10px 10px 0 rgba(18,38,58,.11); }
+.workday-empty-result p { margin: 0; color: #536e82; font: 800 11px/1 "Manrope", sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+.workday-empty-result h1 { margin: 18px 0; color: #12263a; font: 700 clamp(2.7rem, 6vw, 5rem)/.9 "Fraunces", Georgia, serif; letter-spacing: -.07em; }
+.workday-empty-result span { display: block; max-width: 460px; color: #405f72; font: 600 16px/1.6 "Manrope", sans-serif; }
+.workday-empty-result a { display: inline-flex; align-items: center; gap: 10px; margin-top: 27px; padding: 14px 17px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "Manrope", sans-serif; box-shadow: 4px 4px 0 #ffca42; }
+
+/* Shared editorial pages: /learn, /resources, /compare, careers/[slug], and result types. */
+.workday-content-page { min-height: 100vh; background: #f8f3e8; color: #12263a; padding-top: 1px; }
+.workday-content-wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+.workday-content-hero { position: relative; overflow: hidden; padding: clamp(132px, 15vw, 184px) 0 clamp(58px, 9vw, 106px); background: linear-gradient(127deg, #9ed8e6 0 46%, #f8f3e8 46% 65%, #e98268 65% 100%); }
+.workday-content-hero::after { content: ""; position: absolute; inset: 0; opacity: .23; pointer-events: none; background-image: linear-gradient(rgba(18,38,58,.22) 1px, transparent 1px), linear-gradient(90deg, rgba(18,38,58,.22) 1px, transparent 1px); background-size: 44px 44px; }
+.workday-content-hero .workday-content-wrap { position: relative; z-index: 1; }
+.workday-content-kicker { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 10px/1 "Manrope", sans-serif; letter-spacing: .11em; text-transform: uppercase; }
+.workday-content-eyebrow, .workday-content-count { margin: 24px 0 0; color: #12263a; font: 800 11px/1 "Manrope", sans-serif; letter-spacing: .18em; text-transform: uppercase; }
+.workday-content-hero h1 { max-width: 900px; margin: 16px 0 0; font: 700 clamp(3rem, 7vw, 6.8rem)/.88 "Fraunces", Georgia, serif; letter-spacing: -.075em; }
+.workday-content-intro { max-width: 680px; margin: 24px 0 0; color: #28475d; font: 600 clamp(1rem, 1.5vw, 1.18rem)/1.55 "Manrope", sans-serif; }
+.workday-content-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.workday-content-primary, .workday-content-secondary { min-height: 46px; display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; text-decoration: none; font: 800 12px/1 "Manrope", sans-serif; }
+.workday-content-primary { background: #12263a; color: #f8f3e8; box-shadow: 4px 4px 0 #ffca42; }
+.workday-content-secondary { border: 1px solid rgba(18,38,58,.28); color: #12263a; background: rgba(255,253,248,.6); }
+.workday-content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 292px; gap: clamp(28px, 6vw, 84px); padding-top: clamp(48px, 8vw, 96px); padding-bottom: clamp(70px, 10vw, 130px); }
+.workday-content-body { min-width: 0; display: grid; gap: 18px; }
+.workday-content-section { position: relative; padding: clamp(25px, 4vw, 42px); border: 1px solid rgba(18,38,58,.16); background: #fffdf8; box-shadow: 8px 8px 0 rgba(18,38,58,.08); }
+.workday-content-section h2 { max-width: 760px; margin: 12px 0 0; font: 700 clamp(1.8rem, 3vw, 3rem)/.98 "Fraunces", Georgia, serif; letter-spacing: -.055em; }
+.workday-content-section > p:not(.workday-content-count) { max-width: 760px; margin: 20px 0 0; color: #405f72; font: 500 15px/1.75 "Manrope", sans-serif; }
+.workday-content-section ul { display: grid; gap: 9px; margin: 22px 0 0; padding: 0; list-style: none; }
+.workday-content-section li { padding: 13px 15px 13px 34px; border-left: 3px solid #ffca42; background: #f8f3e8; color: #28475d; font: 700 13px/1.55 "Manrope", sans-serif; }
+.workday-content-library { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
+.workday-content-library a { min-height: 150px; padding: 17px; border: 1px solid rgba(18,38,58,.16); color: #12263a; text-decoration: none; background: #f8f3e8; }
+.workday-content-library a:hover { background: #ffca42; transform: translate(-2px,-2px); box-shadow: 4px 4px 0 #12263a; }
+.workday-content-library span, .workday-content-related p { display: block; color: #536e82; font: 800 10px/1 "Manrope", sans-serif; letter-spacing: .13em; text-transform: uppercase; }
+.workday-content-library strong { display: block; margin-top: 12px; font: 700 20px/1.05 "Fraunces", Georgia, serif; letter-spacing: -.04em; }
+.workday-content-library em { display: block; margin-top: 10px; color: #536e82; font: 500 12px/1.45 "Manrope", sans-serif; font-style: normal; }
+.workday-content-faq { display: grid; gap: 8px; margin-top: 22px; }
+.workday-content-faq details { border-top: 1px solid rgba(18,38,58,.16); padding: 16px 0; }
+.workday-content-faq summary { cursor: pointer; font: 800 15px/1.35 "Manrope", sans-serif; }
+.workday-content-faq p { margin: 12px 0 0; color: #536e82; font: 500 14px/1.6 "Manrope", sans-serif; }
+.workday-content-aside { align-self: start; display: grid; gap: 14px; position: sticky; top: 88px; }
+.workday-content-next { padding: 23px; background: #12263a; color: #f8f3e8; box-shadow: 6px 6px 0 #ffca42; }
+.workday-content-next p, .workday-content-next span { color: #c5d8dc; font: 800 10px/1.4 "Manrope", sans-serif; letter-spacing: .11em; text-transform: uppercase; }
+.workday-content-next h2 { margin: 16px 0; font: 700 30px/.98 "Fraunces", Georgia, serif; letter-spacing: -.055em; }
+.workday-content-next a { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding: 13px 14px; background: #ffca42; color: #12263a; text-decoration: none; font: 800 12px/1 "Manrope", sans-serif; }
+.workday-content-related { padding: 20px; border: 1px solid rgba(18,38,58,.16); background: #fffdf8; }
+.workday-content-related a { display: flex; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(18,38,58,.12); color: #28475d; text-decoration: none; font: 750 12px/1.35 "Manrope", sans-serif; text-transform: capitalize; }
+.workday-content-trust { margin: 0; padding: 15px; border-left: 3px solid #e98268; color: #536e82; font: 600 12px/1.5 "Manrope", sans-serif; }
+
+/* Shared Workday navigation. */
+.workday-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) clamp(14px, 4vw, 28px) 0;
+  transform: translateY(0);
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+.workday-header.is-hidden { transform: translateY(calc(-100% - 20px)); opacity: 0; pointer-events: none; }
+.workday-header__bar {
+  width: min(1180px, 100%);
+  min-height: 56px;
+  margin: 0 auto;
+  padding: 8px 10px 8px 15px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid rgba(18,38,58,.13);
+  border-radius: 22px;
+  background: color-mix(in srgb, #f8f3e8 78%, transparent);
+  box-shadow: 0 12px 34px rgba(18,38,58,.11);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: border-radius 220ms ease, min-height 220ms ease, background 220ms ease;
+}
+.workday-header.is-scrolled .workday-header__bar { min-height: 50px; border-radius: 999px; background: color-mix(in srgb, #fffdf8 92%, transparent); }
+.workday-header__brand { display: inline-flex; align-items: center; gap: 9px; color: #12263a; text-decoration: none; font: 800 clamp(15px, 1.6vw, 18px)/1 "Manrope", sans-serif; letter-spacing: -.045em; white-space: nowrap; }
+.workday-header__mark { width: 33px; height: 33px; display: grid; place-items: center; border-radius: 10px; color: #12263a; background: #ffca42; box-shadow: 3px 3px 0 rgba(18,38,58,.14); }
+.workday-header__mark svg { width: 20px; height: 20px; }
+.workday-header__links { display: flex; align-items: center; gap: 18px; margin-left: auto; }
+.workday-header__links a { color: #536e82; text-decoration: none; font: 750 12px/1 "Manrope", sans-serif; letter-spacing: -.015em; }
+.workday-header__links a:hover { color: #12263a; }
+.workday-header__cta { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 15px; border-radius: 999px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "Manrope", sans-serif; letter-spacing: -.02em; box-shadow: 3px 3px 0 #ffca42; }
+.workday-header__cta:hover { transform: translate(-1px, -1px); }
+
+@media (max-width: 760px) {
+  .workday-content-wrap { width: min(100% - 28px, 1120px); }
+  .workday-content-hero { padding: 106px 0 52px; background: linear-gradient(155deg, #9ed8e6 0 50%, #f8f3e8 50% 72%, #e98268 72% 100%); }
+  .workday-content-hero h1 { font-size: clamp(2.75rem, 14vw, 4.5rem); }
+  .workday-content-grid { grid-template-columns: 1fr; padding-top: 32px; }
+  .workday-content-aside { position: static; }
+  .workday-content-section { padding: 23px 19px; }
+  .workday-content-library { grid-template-columns: 1fr; }
+  .workday-header { padding-inline: 12px; }
+  .workday-header__bar { min-height: 50px; padding: 7px 8px 7px 11px; gap: 8px; border-radius: 17px; }
+  .workday-header__links { display: none; }
+  .workday-header__mark { width: 29px; height: 29px; border-radius: 8px; }
+  .workday-header__cta { min-height: 34px; padding-inline: 11px; font-size: 11px; }
+  html.kyr-workday .kyr-home-page .hero-section { min-height: auto; }
+  html.kyr-workday .kyr-home-page .hero-grid { padding-top: 42px; }
+  html.kyr-workday .kyr-home-page .sample-card { transform: none !important; }
+}
+
+/* Phase 5 semantic bridge: use these names for active shared surfaces; legacy
+   Tailwind values remain isolated until their owning route is deliberately migrated. */
+html.kyr-workday {
+  --kyr-color-paper: var(--workday-paper);
+  --kyr-color-surface: var(--workday-surface);
+  --kyr-color-ink: var(--workday-ink);
+  --kyr-color-muted: var(--workday-muted);
+  --kyr-color-line: var(--workday-line);
+  --kyr-color-role: #315f74;
+  --kyr-color-mbti: #6a4c93;
+  --kyr-color-disc: #b64d35;
+  --kyr-color-big-five: #2f7b87;
+  --kyr-color-evidence: #315f74;
+  --kyr-color-success: #2f7b87;
+  --kyr-color-warning: #9b650d;
+  --kyr-color-error: #a94635;
+  --kyr-color-focus: var(--workday-sun);
+}
+.workday-footer { position: relative; z-index: 10; padding: clamp(42px, 7vw, 72px) clamp(18px, 4vw, 48px) 24px; color: #f8f3e8; background: #12263a; border-top: 5px solid #ffca42; }
+.workday-footer__grid { width: min(1120px, 100%); margin: 0 auto; display: grid; grid-template-columns: minmax(220px, 1.6fr) repeat(3, minmax(130px, 1fr)); gap: clamp(26px, 5vw, 64px); }
+.workday-footer__brand { display: inline-flex; gap: 8px; align-items: center; color: #f8f3e8; text-decoration: none; font: 800 21px/1 "Manrope", sans-serif; letter-spacing: -.055em; }
+.workday-footer__brand span { color: #ffca42; font-size: 25px; }.workday-footer p { max-width: 310px; margin: 15px 0 0; color: #c5d8dc; font: 500 13px/1.6 "Manrope", sans-serif; }
+.workday-footer h2 { margin: 3px 0 14px; color: #ffca42; font: 800 10px/1 "Manrope", sans-serif; letter-spacing: .13em; text-transform: uppercase; }.workday-footer ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }.workday-footer a:not(.workday-footer__brand) { color: #f8f3e8; text-decoration-color: rgba(255,202,66,.5); font: 600 13px/1.4 "Manrope", sans-serif; }.workday-footer a:hover { color: #ffca42; }.workday-footer__bottom { width: min(1120px,100%); margin: 40px auto 0; padding-top: 18px; border-top: 1px solid rgba(255,253,248,.18); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; color: #c5d8dc; font: 700 10px/1.4 "Manrope",sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+@media (max-width: 760px) { .workday-footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }.workday-footer__intro { grid-column: 1 / -1; }.workday-footer__bottom { margin-top: 30px; } }
+@media (prefers-reduced-motion: reduce) { .workday-header, .workday-header__bar, .workday-header__cta { transition: none !important; } }

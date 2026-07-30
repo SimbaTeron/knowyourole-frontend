@@ -1,0 +1,222 @@
+export type SeoFaq = { q: string; a: string };
+
+export type SeoPage = {
+  path: string;
+  slug: string;
+  phase: "landing" | "framework" | "comparison" | "result" | "career" | "learn" | "resource" | "trust";
+  title: string;
+  description: string;
+  h1: string;
+  eyebrow: string;
+  intro: string;
+  primaryCta?: string;
+  sections: { heading: string; body: string; bullets?: string[] }[];
+  faqs?: SeoFaq[];
+  related?: string[];
+  priority?: number;
+  changeFrequency?: "weekly" | "monthly" | "yearly";
+};
+
+const standardFaqs: SeoFaq[] = [
+  { q: "Is KnowYouRole free?", a: "Yes. The core KnowYouRole personality quiz is free and gives a practical result focused on personality, work style, communication, and career-fit direction." },
+  { q: "Is this an official MBTI or DISC test?", a: "No. KnowYouRole uses MBTI-style and DISC-style language for clarity, then combines those signals with Big Five-informed trait patterns and role-fit guidance." },
+  { q: "Is this clinical or diagnostic?", a: "No. KnowYouRole is a self-reflection and career-fit tool, not a clinical assessment, diagnosis, hiring screen, or medical instrument." },
+  { q: "How long does the quiz take?", a: "The current short-form quiz uses 28 focused prompts designed to be fast while still collecting useful personality, work-style, and role-fit signals." },
+];
+
+export const landingPages: SeoPage[] = [
+  {
+    path: "/personality-quiz", slug: "personality-quiz", phase: "landing",
+    title: "Free Personality Quiz for Work, Strengths & Career Fit | KnowYouRole",
+    description: "Take a free personality quiz that blends Big Five traits, MBTI-style patterns, DISC work behavior, strengths, communication, and career-fit guidance.",
+    h1: "Free Personality Quiz for Work Style and Self-Understanding",
+    eyebrow: "Core personality quiz",
+    intro: "KnowYouRole is a free personality quiz built for people who want more than a vague type label. It turns your answers into a practical read on how you think, decide, communicate, handle pressure, and fit into different roles.",
+    sections: [
+      { heading: "What this personality quiz measures", body: "The quiz combines several useful lenses instead of pretending one framework explains everything. Big Five-informed signals describe steady trait patterns, MBTI-style language makes preferences easier to read, and DISC-style behavior explains how you tend to move through work, pressure, persuasion, and collaboration.", bullets: ["Big Five-informed traits: openness, follow-through, social energy, cooperation, and stress reactivity", "MBTI-style patterns: energy, information, decisions, and structure", "DISC-style behavior: pace, influence, steadiness, and precision", "Career-fit clues: role direction, team fit, strengths, and blind spots"] },
+      { heading: "Why KnowYouRole is different", body: "Most personality tests stop at a label. KnowYouRole uses the label as a starting point, then translates it into usable language: what energizes you, where you may overdo it, how others may experience your style, and which role directions are worth exploring next." },
+      { heading: "Who should take it", body: "This free personality quiz is useful for students choosing a direction, young adults comparing career paths, adults rethinking work fit, founders understanding their operating style, and teams that need better language for communication differences." },
+      { heading: "Sample result outputs", body: "A KnowYouRole result can include a role direction, a personality pattern, a work-style read, a DISC-style behavior profile, a strongest Big Five trait, communication notes, pressure behavior, and practical next steps." },
+    ], faqs: standardFaqs, related: ["/quiz", "/career-personality-quiz", "/work-style-quiz", "/big-five-personality-test"]
+  },
+  {
+    path: "/career-personality-quiz", slug: "career-personality-quiz", phase: "landing",
+    title: "Career Personality Quiz for Role Fit & Work Style | KnowYouRole",
+    description: "Use a career personality quiz to understand role fit, strengths, work style, communication patterns, Big Five traits, MBTI-style preferences, and DISC behavior.",
+    h1: "Career Personality Quiz for Practical Role Direction",
+    eyebrow: "Career fit",
+    intro: "A career personality quiz should not magically choose your life for you. It should give sharper language for what kind of work fits your energy, attention, decision style, collaboration patterns, and pressure response.",
+    sections: [
+      { heading: "Career fit starts with work behavior", body: "A role can look appealing on paper and still drain you in practice. KnowYouRole looks at how you operate: whether you prefer structure or exploration, fast decisions or careful analysis, independent focus or social momentum, and steady systems or new possibilities." },
+      { heading: "What you get", body: "Your result connects personality signals to role-fit direction. That can include starter-safe career examples, strengths to lean into, environments that may suit you, and blind spots that may make certain jobs feel harder than expected.", bullets: ["Role direction and adjacent role examples", "Work environment fit", "Communication and collaboration style", "Pressure behavior and friction points"] },
+      { heading: "Use it as a compass, not a cage", body: "The point is not to lock yourself into one job title. The point is to notice patterns that make career decisions less random: what you repeatedly enjoy, what you avoid, how you contribute, and where your strengths are most likely to compound." },
+    ], faqs: standardFaqs, related: ["/quiz", "/personality-test-for-career", "/careers/personality-types", "/learn/how-to-use-personality-tests-for-career-direction"]
+  },
+  {
+    path: "/work-style-quiz", slug: "work-style-quiz", phase: "landing",
+    title: "Work Style Quiz for Communication, Focus & Team Fit | KnowYouRole",
+    description: "Take a work style quiz that explains communication, focus, decision style, pressure behavior, team fit, Big Five traits, MBTI-style patterns, and DISC behavior.",
+    h1: "Work Style Quiz for Communication, Focus, and Team Fit",
+    eyebrow: "Work style",
+    intro: "Your work style is the practical side of personality: how you make decisions, handle pressure, communicate, focus, collaborate, and recover energy. KnowYouRole turns those patterns into language you can actually use.",
+    sections: [
+      { heading: "What is a work style?", body: "A work style is not one trait. It is the combination of pace, attention, communication, decision-making, follow-through, and response to stress. Two people can share a personality type and still behave very differently on a team." },
+      { heading: "How KnowYouRole reads work behavior", body: "The quiz blends Big Five trait tendencies, MBTI-style preferences, and DISC-style observable behavior. That combination helps separate internal preference from external team behavior." },
+      { heading: "Useful for teams and solo decisions", body: "Work-style language helps people explain why they prefer certain roles, where they create value, how they handle ambiguity, and what kind of collaboration makes them better instead of merely busier." },
+    ], faqs: standardFaqs, related: ["/quiz", "/team-personality-test", "/disc-personality-test", "/learn/what-is-a-work-style"]
+  },
+  {
+    path: "/personality-test-for-career", slug: "personality-test-for-career", phase: "landing",
+    title: "Personality Test for Career Fit & Role Direction | KnowYouRole",
+    description: "A practical personality test for career reflection, role fit, strengths, work style, communication patterns, Big Five traits, and DISC-style behavior.",
+    h1: "Personality Test for Career Fit and Role Direction",
+    eyebrow: "Career decisions",
+    intro: "If a personality test for career planning only gives you a four-letter label, it is underperforming. KnowYouRole turns personality patterns into role direction, work habits, team behavior, and practical self-understanding.",
+    sections: [
+      { heading: "What career personality tests can and cannot do", body: "They can clarify patterns, vocabulary, and role hypotheses. They cannot guarantee a perfect job, replace experience, or diagnose ability. The useful version narrows the noise and gives you better questions to ask." },
+      { heading: "The KnowYouRole approach", body: "KnowYouRole combines Big Five-informed traits, MBTI-style preferences, DISC-style behavior, and career-fit clues. That mix gives more context than a single framework because career satisfaction depends on both inner preference and daily work behavior." },
+      { heading: "Better questions after the quiz", body: "The result should help you ask: what kind of pace do I need, how much autonomy helps me, what communication style fits me, what kind of problems energize me, and what role directions deserve a closer look?" },
+    ], faqs: standardFaqs, related: ["/quiz", "/career-personality-quiz", "/careers/software-engineer-personality-type", "/careers/product-manager-personality-type"]
+  },
+  {
+    path: "/free-personality-test", slug: "free-personality-test", phase: "landing",
+    title: "Free Personality Test for Work Style & Self-Discovery | KnowYouRole",
+    description: "Take a free personality test for work style, strengths, communication, Big Five traits, MBTI-style preferences, DISC behavior, and career-fit guidance.",
+    h1: "Free Personality Test for Work Style and Self-Discovery",
+    eyebrow: "Free personality test",
+    intro: "KnowYouRole gives you a free personality test experience designed for real-world use: self-understanding, role direction, communication clarity, and a better read on how you operate under normal conditions and pressure.",
+    sections: [
+      { heading: "Free should not mean shallow", body: "The quiz is designed to be quick, but it still gathers signals across multiple personality and work-style dimensions. The result is meant to be understandable without becoming childish or fake-scientific." },
+      { heading: "What the result includes", body: "Expect a practical read on personality pattern, work style, communication behavior, role-fit direction, and blind spots. The language is designed to be shareable and useful, not merely decorative." },
+      { heading: "Privacy and trust", body: "Quiz completion data can be saved to generate and recover a result. KnowYouRole does not sell quiz results, and the quiz is not a clinical or diagnostic test." },
+    ], faqs: standardFaqs, related: ["/quiz", "/personality-quiz", "/privacy", "/methodology"]
+  },
+  {
+    path: "/team-personality-test", slug: "team-personality-test", phase: "landing",
+    title: "Team Personality Test for Work Style & Communication | KnowYouRole",
+    description: "Use a team personality test to discuss work style, communication, strengths, pressure behavior, DISC-style patterns, and role fit without reducing people to labels.",
+    h1: "Team Personality Test for Work Style and Communication",
+    eyebrow: "Teams",
+    intro: "Teams do not need more labels. They need clearer language for how people prefer to decide, communicate, focus, move under pressure, and contribute without stepping on each other.",
+    sections: [
+      { heading: "Why teams use personality language", body: "Good personality language makes differences discussable. It helps a fast-moving teammate understand a careful analyst, helps a quiet strategist explain focus needs, and helps relational communicators show why trust matters before speed." },
+      { heading: "What KnowYouRole can clarify", body: "KnowYouRole can surface communication style, pressure patterns, role direction, and collaboration preferences using Big Five-informed, MBTI-style, and DISC-style signals." },
+      { heading: "Use it carefully", body: "A team personality test should never become a hiring screen or stereotype machine. Use it as a conversation starter for better collaboration, not a permanent box." },
+    ], faqs: standardFaqs, related: ["/quiz", "/work-style-quiz", "/learn/how-personality-affects-team-communication", "/resources/disc-at-work-cheat-sheet"]
+  },
+  {
+    path: "/personality-quiz-for-students", slug: "personality-quiz-for-students", phase: "landing",
+    title: "Personality Quiz for Students Choosing Career Direction | KnowYouRole",
+    description: "A personality quiz for students exploring strengths, work style, communication, Big Five traits, MBTI-style patterns, DISC behavior, and career-fit clues.",
+    h1: "Personality Quiz for Students Choosing Direction",
+    eyebrow: "Students",
+    intro: "Students are often asked to choose majors, activities, internships, and early career paths before they have much real-world data. KnowYouRole helps translate personality and work-style clues into better questions and clearer next steps.",
+    sections: [
+      { heading: "Useful before the big decisions", body: "The quiz can help students notice what kind of problems energize them, whether they prefer structure or exploration, how they communicate, and what kind of roles may be worth testing through classes, projects, internships, or clubs." },
+      { heading: "Not a destiny machine", body: "The result should not decide a major for you. It gives a pattern map: strengths to test, environments to notice, and role directions that may deserve more exploration." },
+      { heading: "Built for practical self-language", body: "Students can use the result to talk with counselors, mentors, parents, teachers, and peers about work style without needing a psychology textbook." },
+    ], faqs: standardFaqs, related: ["/quiz", "/career-personality-quiz", "/learn/choosing-a-career-based-on-strengths"]
+  }
+];
+
+export const frameworkPages: SeoPage[] = [
+  { path: "/big-five-personality-test", slug: "big-five-personality-test", phase: "framework", title: "Big Five Personality Test Guide for Work & Career Fit | KnowYouRole", description: "Learn how Big Five personality traits explain work style, strengths, stress patterns, communication, and career-fit direction in KnowYouRole.", h1: "Big Five Personality Test Guide for Work and Career Fit", eyebrow: "Big Five", intro: "The Big Five is one of the most widely used trait models in personality psychology. KnowYouRole uses Big Five-informed signals to ground its practical read on work style and career fit.", sections: [ {heading:"The five traits", body:"Big Five models usually describe openness, conscientiousness, extraversion, agreeableness, and neuroticism or emotional stability. KnowYouRole translates those into user-friendly work-language instead of dumping academic labels on the result.", bullets:["Openness: curiosity, imagination, appetite for new ideas", "Conscientiousness: organization, follow-through, reliability", "Extraversion: social energy and outward momentum", "Agreeableness: cooperation, warmth, and relational trust", "Stress reactivity: how strongly pressure affects the system"]}, {heading:"Why Big Five helps career fit", body:"Career fit is partly about trait-environment match. A high-openness person may need novelty, a high-conscientiousness person may prefer clear standards, and a high-extraversion person may get more energy from people-facing work."}, {heading:"How KnowYouRole combines it", body:"Big Five gives the stable baseline. MBTI-style patterns explain preference language. DISC-style behavior shows how those preferences appear in collaboration and pressure."}], faqs: standardFaqs, related:["/quiz","/compare/big-five-vs-mbti","/resources/big-five-vs-mbti-vs-disc","/methodology"] },
+  { path: "/mbti-style-test", slug: "mbti-style-test", phase: "framework", title: "MBTI-Style Test for Work Preferences & Career Fit | KnowYouRole", description: "Understand MBTI-style personality patterns for energy, information, decisions, structure, work style, communication, and career-fit reflection.", h1: "MBTI-Style Test for Work Preferences and Career Fit", eyebrow: "MBTI-style", intro: "KnowYouRole uses MBTI-style language because people understand it quickly. It does not claim to be the official MBTI assessment. The useful part is preference language: energy, information, decisions, and structure.", sections: [ {heading:"What MBTI-style language explains", body:"The four preference pairs can help describe whether someone leans toward social or internal energy, concrete or conceptual information, logical or values-based decisions, and structured or open-ended planning."}, {heading:"The limits", body:"A four-letter type is not a full person. It can oversimplify, especially when traits are close. KnowYouRole treats the type as one lens, not the whole answer."}, {heading:"How it works with other models", body:"Big Five helps anchor trait intensity. DISC-style behavior shows how preferences appear at work. Career-fit guidance translates the pattern into practical role hypotheses."}], faqs: standardFaqs, related:["/quiz","/compare/big-five-vs-mbti","/compare/mbti-vs-disc","/methodology"] },
+  { path: "/disc-personality-test", slug: "disc-personality-test", phase: "framework", title: "DISC Personality Test Guide for Work Style | KnowYouRole", description: "Learn how DISC-style behavior explains work pace, communication, pressure response, influence, steadiness, precision, and team fit.", h1: "DISC Personality Test Guide for Work Style", eyebrow: "DISC", intro: "DISC-style language is useful because it describes observable work behavior: how people move, communicate, handle pressure, influence others, stabilize teams, or protect quality.", sections: [ {heading:"The four DISC-style signals", body:"DISC usually describes Dominant, Influential, Steady, and Conscientious behavior patterns. KnowYouRole uses those as work-style signals, not as permanent personality boxes.", bullets:["Dominant: direct, fast-moving, challenge-oriented", "Influential: expressive, persuasive, energizing", "Steady: supportive, patient, stabilizing", "Conscientious: precise, analytical, quality-focused"]}, {heading:"Why DISC helps teams", body:"DISC-style behavior is often visible in meetings, conflict, deadlines, and collaboration. It helps explain why one person pushes for speed while another protects process or harmony."}, {heading:"How KnowYouRole uses DISC", body:"KnowYouRole combines DISC-style work behavior with MBTI-style preferences, Big Five-informed traits, and career-fit signals for a more complete result."}], faqs: standardFaqs, related:["/quiz","/compare/mbti-vs-disc","/compare/disc-vs-big-five","/resources/disc-at-work-cheat-sheet"] }
+];
+
+export const comparisonPages: SeoPage[] = [
+  { path:"/compare/big-five-vs-mbti", slug:"big-five-vs-mbti", phase:"comparison", title:"Big Five vs MBTI: Which Personality Model Is More Useful? | KnowYouRole", description:"Compare Big Five and MBTI-style personality models for traits, preferences, work style, communication, and career-fit reflection.", h1:"Big Five vs MBTI: Traits, Preferences, and Work Fit", eyebrow:"Comparison", intro:"Big Five and MBTI answer different questions. The mistake is treating them as enemies when they are better understood as different lenses.", sections:[{heading:"Quick comparison", body:"Big Five is trait-based and usually better for describing degree. MBTI-style language is preference-based and easier for many people to discuss casually. KnowYouRole uses both carefully.", bullets:["Big Five: measures trait intensity", "MBTI-style: describes preference patterns", "Best use together: trait depth plus readable self-language"]},{heading:"Which is better for career fit?", body:"Big Five is stronger for broad trait-environment fit. MBTI-style language is often easier for conversations about energy, decisions, and structure. Career decisions benefit from both."},{heading:"KnowYouRole's position", body:"Use Big Five for grounding, MBTI-style for pattern language, and role-fit guidance for practical application."}], faqs:standardFaqs, related:["/quiz","/big-five-personality-test","/mbti-style-test"] },
+  { path:"/compare/mbti-vs-disc", slug:"mbti-vs-disc", phase:"comparison", title:"MBTI vs DISC: Personality Type or Work Behavior? | KnowYouRole", description:"Compare MBTI-style personality preferences and DISC-style work behavior for communication, team fit, pressure, and career direction.", h1:"MBTI vs DISC: Preference Pattern or Work Behavior?", eyebrow:"Comparison", intro:"MBTI-style language describes preference patterns. DISC-style language describes observable behavior. Confusing those two is how personality content becomes mush.", sections:[{heading:"The core difference", body:"MBTI-style patterns describe how someone prefers to process energy, information, decisions, and structure. DISC-style patterns describe how someone tends to act in work situations: direct, expressive, steady, or precise."},{heading:"Which helps teams more?", body:"DISC is often more immediately useful for team communication because it describes visible behavior. MBTI-style language can add depth by explaining why the behavior may happen."},{heading:"How KnowYouRole uses both", body:"KnowYouRole combines MBTI-style patterns and DISC-style behavior so your result has both inner preference language and external work-style language."}], faqs:standardFaqs, related:["/quiz","/mbti-style-test","/disc-personality-test"] },
+  { path:"/compare/disc-vs-big-five", slug:"disc-vs-big-five", phase:"comparison", title:"DISC vs Big Five: Work Behavior vs Personality Traits | KnowYouRole", description:"Compare DISC-style work behavior with Big Five personality traits for team communication, career fit, pressure behavior, and self-understanding.", h1:"DISC vs Big Five: Work Behavior and Trait Depth", eyebrow:"Comparison", intro:"DISC and Big Five are not interchangeable. DISC is easiest for observable workplace behavior; Big Five is stronger for trait depth and broad personality tendencies.", sections:[{heading:"What DISC does well", body:"DISC gives fast language for communication, pace, pressure, and collaboration. It is useful in teams because behavior is easier to discuss than hidden motives."},{heading:"What Big Five does well", body:"Big Five gives a more trait-based read of personality: curiosity, organization, social energy, cooperation, and stress reactivity."},{heading:"Why KnowYouRole combines them", body:"Work style needs both. Traits help explain tendencies; DISC-style behavior helps explain what other people may actually experience from you."}], faqs:standardFaqs, related:["/quiz","/disc-personality-test","/big-five-personality-test"] },
+  { path:"/compare/personality-quiz-vs-career-quiz", slug:"personality-quiz-vs-career-quiz", phase:"comparison", title:"Personality Quiz vs Career Quiz: What Should You Take? | KnowYouRole", description:"Compare personality quizzes and career quizzes, and learn why KnowYouRole combines personality, work style, communication, and role-fit guidance.", h1:"Personality Quiz vs Career Quiz: What Should You Take?", eyebrow:"Comparison", intro:"A personality quiz explains patterns. A career quiz points toward roles. KnowYouRole sits in the useful middle: personality signals translated into role-fit direction.", sections:[{heading:"Personality quiz", body:"A personality quiz helps you understand traits, preferences, communication patterns, and behavior under pressure."},{heading:"Career quiz", body:"A career quiz helps generate possible paths, role categories, and practical next steps. It is more useful when the underlying personality logic is clear."},{heading:"The KnowYouRole blend", body:"KnowYouRole combines personality, work style, and career-fit clues so the result feels practical without pretending one quiz can choose your entire future."}], faqs:standardFaqs, related:["/quiz","/personality-quiz","/career-personality-quiz"] },
+  { path:"/compare/16personalities-alternative", slug:"16personalities-alternative", phase:"comparison", title:"16Personalities Alternative for Work Style & Career Fit | KnowYouRole", description:"Looking for a practical 16Personalities alternative? KnowYouRole blends MBTI-style patterns, Big Five-informed traits, DISC-style behavior, and career fit.", h1:"A Practical 16Personalities Alternative for Work and Career Fit", eyebrow:"Alternative", intro:"16Personalities is popular because it is easy to understand. KnowYouRole is built for people who want that readability plus more practical work-style and role-fit guidance.", sections:[{heading:"What KnowYouRole emphasizes", body:"KnowYouRole focuses on practical output: role direction, work behavior, communication, strengths, blind spots, and pressure patterns."},{heading:"Precise language", body:"KnowYouRole uses MBTI-style language but does not claim to be the official MBTI assessment or a clone of another product."},{heading:"Best fit", body:"Use KnowYouRole when you want a result that connects type-like language with Big Five-informed traits, DISC-style behavior, and career-fit reflection."}], faqs:standardFaqs, related:["/quiz","/mbti-style-test","/personality-quiz"] },
+  { path:"/compare/truity-alternative", slug:"truity-alternative", phase:"comparison", title:"Truity Alternative for Personality, Work Style & Career Fit | KnowYouRole", description:"Explore KnowYouRole as a practical Truity alternative for personality patterns, Big Five-informed traits, DISC-style behavior, work style, and career fit.", h1:"A Practical Truity Alternative for Role Fit and Work Style", eyebrow:"Alternative", intro:"If you like personality tools but want a cleaner, more consolidated work-style result, KnowYouRole gives a practical alternative focused on role direction and self-language.", sections:[{heading:"The practical angle", body:"KnowYouRole is less about collecting separate labels and more about combining signals into one usable profile."},{heading:"What the result can include", body:"Your result can include personality pattern, DISC-style work behavior, Big Five-informed trait shape, communication style, pressure behavior, and possible role directions."},{heading:"Clean use case", body:"Use KnowYouRole when you want a quick, free personality quiz for self-understanding and career-fit reflection."}], faqs:standardFaqs, related:["/quiz","/free-personality-test","/work-style-quiz"] }
+];
+
+const resultNames = ["Systems Builder","Creative Strategist","Momentum Commander","Strategic Analyst","Insight Architect","People Catalyst","Precision Operator","Adaptive Diplomat","Vision Mapper","Grounded Executor","Pattern Strategist","Culture Builder","Focused Specialist","Inventive Analyst","Steady Coordinator","Opportunity Scout","Mission Organizer","Independent Problem Solver","Relational Strategist","Practical Innovator"];
+export const resultTypePages: SeoPage[] = resultNames.map((name, i) => {
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const traits = ["strategic clarity", "creative problem-solving", "steady execution", "communication range", "role-fit awareness"];
+  return { path:`/results/types/${slug}`, slug, phase:"result", title:`${name} Personality Type Meaning, Careers & Work Style | KnowYouRole`, description:`Learn what the ${name} KnowYouRole result means, including strengths, blind spots, work style, communication patterns, related traits, and career-fit direction.`, h1:`${name} Personality Type`, eyebrow:"Result type", intro:`The ${name} is a KnowYouRole result pattern that describes a practical blend of personality signals, work style, communication behavior, and career-fit tendencies.`, sections:[{heading:"What this result means", body:`A ${name} typically reflects a recognizable way of turning energy, attention, decisions, and pressure into action. The label is not a diagnosis; it is a practical shorthand for self-understanding and career reflection.`},{heading:"Likely strengths", body:`This result often points toward ${traits[i%traits.length]}, clearer pattern recognition, and a useful way of contributing when the environment matches the person's operating style.`, bullets:["Clearer self-language", "Useful team contribution pattern", "Recognizable pressure behavior", "Practical career-fit clues"]},{heading:"Possible blind spots", body:"Every useful strength has a shadow. This result may overuse its preferred style when tired, rushed, unsupported, or placed in a poorly matched role environment."},{heading:"Career and team fit", body:`${name} profiles often benefit from roles where their preferred pace, communication style, autonomy needs, and problem-solving rhythm can create visible value. The best role fit depends on the full Big Five, MBTI-style, and DISC-style pattern.`},{heading:"Related personality signals", body:"KnowYouRole connects each result type to MBTI-style patterns, DISC-style behavior, Big Five-informed traits, communication notes, and pressure response so the result is more useful than a single nickname."}], faqs:standardFaqs, related:["/quiz","/results/types","/career-personality-quiz","/work-style-quiz"], priority:0.55, changeFrequency:"monthly" };
+});
+
+export const resultTypeIndex: SeoPage = { path:"/results/types", slug:"types", phase:"result", title:"KnowYouRole Personality Types & Result Meanings", description:"Browse KnowYouRole personality type meanings, result patterns, strengths, blind spots, work styles, communication patterns, and career-fit guidance.", h1:"KnowYouRole Personality Types and Result Meanings", eyebrow:"Result library", intro:"These are privacy-safe, generic result pages. They explain KnowYouRole result patterns without exposing any user-specific quiz answers or private result URLs.", sections:[{heading:"How to use this library", body:"Use these pages to understand the language behind KnowYouRole result types: strengths, blind spots, collaboration style, career-fit themes, and related personality signals."}], faqs:standardFaqs, related:["/quiz","/personality-quiz","/career-personality-quiz"], priority:0.7, changeFrequency:"weekly" };
+
+const careerSeeds = [
+  ["personality-types","Personality Types and Career Fit","career personality types","how personality patterns connect to career direction, role fit, strengths, and work environments"],
+  ["best-careers-for-intj","Best Careers for INTJ-Style Personalities","INTJ careers","strategic, independent, systems-oriented work that rewards long-range thinking"],
+  ["best-careers-for-enfp","Best Careers for ENFP-Style Personalities","ENFP careers","creative, people-oriented, possibility-driven work with room for variety"],
+  ["best-careers-for-disc-d","Best Careers for DISC D-Style Personalities","DISC D careers","direct, challenge-oriented roles with ownership, speed, and visible outcomes"],
+  ["best-careers-for-high-openness","Best Careers for High Openness","high openness careers","creative, conceptual, exploratory, and innovation-heavy work"],
+  ["best-careers-for-introverts","Best Careers for Introverts","introvert careers","focused roles with autonomy, depth, and lower forced-social drain"],
+  ["analytical-personality-careers","Analytical Personality Careers","analytical careers","structured problem-solving, research, systems, strategy, and precision-heavy roles"],
+  ["creative-personality-careers","Creative Personality Careers","creative careers","original thinking, communication, design, storytelling, and innovation"],
+  ["software-engineer-personality-type","Software Engineer Personality Type","software engineer personality","systems thinking, focus, abstraction, debugging patience, and structured problem-solving"],
+  ["product-manager-personality-type","Product Manager Personality Type","product manager personality","prioritization, communication, ambiguity tolerance, user empathy, and decision-making"],
+  ["designer-personality-type","Designer Personality Type","designer personality","visual judgment, empathy, iteration, originality, and user-centered problem solving"],
+  ["teacher-personality-type","Teacher Personality Type","teacher personality","communication, patience, structure, empathy, and adaptive explanation"],
+  ["entrepreneur-personality-type","Entrepreneur Personality Type","entrepreneur personality","risk tolerance, initiative, persuasion, resilience, and opportunity recognition"],
+  ["marketing-manager-personality-type","Marketing Manager Personality Type","marketing manager personality","audience insight, creativity, persuasion, planning, and measurement"],
+  ["data-analyst-personality-type","Data Analyst Personality Type","data analyst personality","pattern recognition, precision, curiosity, and evidence-based decisions"],
+  ["nurse-personality-type","Nurse Personality Type","nurse personality","empathy, steadiness, practical judgment, stress tolerance, and service orientation"],
+  ["project-manager-personality-type","Project Manager Personality Type","project manager personality","organization, communication, follow-through, conflict navigation, and planning"],
+  ["sales-personality-type","Sales Personality Type","sales personality","social energy, persuasion, resilience, listening, and opportunity creation"],
+  ["writer-personality-type","Writer Personality Type","writer personality","language sensitivity, focus, curiosity, imagination, and tolerance for revision"],
+  ["therapist-personality-type","Therapist Personality Type","therapist personality","listening, empathy, boundaries, pattern recognition, and emotional steadiness"],
+  ["operations-manager-personality-type","Operations Manager Personality Type","operations manager personality","systems, reliability, coordination, process improvement, and calm execution"],
+  ["financial-analyst-personality-type","Financial Analyst Personality Type","financial analyst personality","detail orientation, numerical reasoning, skepticism, and structured judgment"],
+  ["human-resources-personality-type","Human Resources Personality Type","HR personality","people judgment, fairness, discretion, communication, and conflict navigation"],
+  ["ux-researcher-personality-type","UX Researcher Personality Type","UX researcher personality","curiosity, empathy, analysis, synthesis, and user-centered evidence gathering"],
+  ["career-fit-by-personality","Career Fit by Personality Type","career fit personality","matching work environments, problem types, pace, autonomy, and collaboration style"]
+];
+export const careerPages: SeoPage[] = careerSeeds.map(([slug,h1,kw,angle]) => ({ path:`/careers/${slug}`, slug, phase:"career", title:`${h1} | Work Style & Role Fit | KnowYouRole`, description:`Explore ${kw}: ${angle}. See Big Five, MBTI-style, DISC-style, strengths, blind spots, and career-fit guidance.`, h1, eyebrow:"Career fit", intro:`This guide explains ${kw} through the KnowYouRole lens: Big Five-informed traits, MBTI-style patterns, DISC-style behavior, work style, and practical role fit.`, sections:[{heading:"Who this path may fit", body:`This path often fits people who are energized by ${angle}. The best match depends on the full personality pattern, not one isolated trait.`},{heading:"Helpful personality signals", body:"Useful signals include motivation style, preferred pace, tolerance for ambiguity, social energy, decision habits, follow-through, and response to pressure.", bullets:["Big Five-informed trait pattern", "MBTI-style preferences", "DISC-style work behavior", "Communication and team fit", "Stress and pressure response"]},{heading:"Where it may drain people", body:"A career can look good by title and still be a poor daily fit. Watch for mismatch between the role's pace, social load, structure, autonomy, and your actual operating style."},{heading:"Use the quiz for sharper fit", body:"Take the KnowYouRole quiz to compare your personality pattern with role-fit clues instead of guessing from job titles alone."}], faqs:standardFaqs, related:["/quiz","/career-personality-quiz","/personality-test-for-career","/results/types"], priority:0.55, changeFrequency:"monthly" }));
+
+const learnSeeds = [
+  ["what-is-a-personality-quiz","What Is a Personality Quiz?","A personality quiz is a structured way to surface patterns in traits, preferences, work behavior, communication, and self-perception."],
+  ["personality-quiz-vs-personality-test","Personality Quiz vs Personality Test","The difference is partly rigor and partly expectation. A good quiz can still be useful if it is honest about limits and practical about output."],
+  ["are-personality-quizzes-accurate","Are Personality Quizzes Accurate?","Accuracy depends on question quality, scoring logic, user honesty, stable constructs, and whether the result makes appropriately limited claims."],
+  ["big-five-personality-traits-explained","Big Five Personality Traits Explained","The Big Five explains broad trait patterns: openness, conscientiousness, extraversion, agreeableness, and stress reactivity."],
+  ["disc-personality-types-explained","DISC Personality Types Explained","DISC-style types describe observable work behavior: directness, influence, steadiness, and precision."],
+  ["mbti-style-personality-patterns-explained","MBTI-Style Personality Patterns Explained","MBTI-style patterns give readable language for energy, information, decisions, and structure."],
+  ["how-to-use-personality-tests-for-career-direction","How to Use Personality Tests for Career Direction","Personality tests help career decisions when they clarify fit signals, not when they pretend to choose your future for you."],
+  ["what-is-a-work-style","What Is a Work Style?","Work style is the practical expression of personality in focus, communication, pace, collaboration, decisions, and pressure."],
+  ["best-personality-quizzes-for-career-clarity","Best Personality Quizzes for Career Clarity","The best career personality quizzes combine self-understanding with practical role-fit language and clear limitations."],
+  ["how-personality-affects-team-communication","How Personality Affects Team Communication","Personality affects how people frame problems, make decisions, handle conflict, build trust, and communicate under pressure."],
+  ["choosing-a-career-based-on-strengths","Choosing a Career Based on Strengths","Strength-based career decisions work best when strengths are matched to daily tasks, environments, and incentives."],
+];
+export const learnPages: SeoPage[] = learnSeeds.map(([slug,h1,intro]) => ({ path:`/learn/${slug}`, slug, phase:"learn", title:`${h1} | KnowYouRole Learn`, description:`${intro} Learn how KnowYouRole connects personality, work style, Big Five, MBTI-style, DISC, and career fit.`, h1, eyebrow:"Learn", intro, sections:[{heading:"The practical takeaway", body:"The useful question is not 'which label am I?' but 'what pattern keeps showing up, and how does it affect my choices, relationships, and work?'"},{heading:"How KnowYouRole thinks about it", body:"KnowYouRole combines multiple lenses because personality at work is multi-dimensional. Big Five-informed traits, MBTI-style preferences, DISC-style behavior, and career-fit clues each explain a different part of the picture."},{heading:"Use with humility", body:"Personality language is valuable when it improves decisions and conversations. It becomes harmful when it turns into a stereotype, excuse, or fake scientific certainty."}], faqs:standardFaqs, related:["/quiz","/personality-quiz","/methodology"], priority:0.5, changeFrequency:"monthly" }));
+export const learnIndex: SeoPage = { path:"/learn", slug:"learn", phase:"learn", title:"Personality at Work Learning Hub | KnowYouRole", description:"Learn about personality quizzes, Big Five traits, MBTI-style patterns, DISC behavior, work style, team communication, and career-fit decisions.", h1:"Personality at Work Learning Hub", eyebrow:"Learn", intro:"A structured library for understanding personality quizzes, work style, Big Five, MBTI-style language, DISC-style behavior, team communication, and career-fit decisions.", sections:[{heading:"Topical authority, not blog spam", body:"This hub organizes practical explanations around the questions people actually ask before and after taking a personality quiz."}], faqs:standardFaqs, related:["/quiz","/personality-quiz","/career-personality-quiz"], priority:0.65, changeFrequency:"weekly" };
+
+const resourceSeeds = [
+  ["big-five-vs-mbti-vs-disc","Big Five vs MBTI vs DISC Comparison Chart","A reference chart comparing what Big Five, MBTI-style, and DISC-style models each explain and where each model is weakest."],
+  ["work-style-types","Work Style Types Glossary","A glossary of practical work-style patterns, including communication, pace, focus, decisions, collaboration, and pressure behavior."],
+  ["personality-quiz-accuracy","Personality Quiz Accuracy Guide","A guide to what makes personality quizzes more or less accurate, including question quality, scoring, self-report bias, and claim limits."],
+  ["disc-at-work-cheat-sheet","DISC at Work Cheat Sheet","A practical DISC-style reference for communication, pressure behavior, collaboration, and team friction."],
+  ["personality-career-fit-chart","Personality Career Fit Chart","A reference chart connecting personality signals to role environments, strengths, possible drains, and career exploration questions."],
+];
+export const resourcePages: SeoPage[] = resourceSeeds.map(([slug,h1,intro]) => ({ path:`/resources/${slug}`, slug, phase:"resource", title:`${h1} | KnowYouRole Resources`, description:`${intro} Use this resource for personality quiz, work style, communication, and career-fit decisions.`, h1, eyebrow:"Resource", intro, sections:[{heading:"Reference summary", body:"Use this page as a practical reference, not a rigid rulebook. Personality frameworks are most useful when they create better questions, cleaner conversations, and sharper self-observation."},{heading:"How to apply it", body:"Compare the model or pattern against real behavior: what energizes you, what drains you, how you communicate under pressure, and what role environments make your strengths more visible."},{heading:"Next step", body:"Take the KnowYouRole quiz to translate these concepts into a personal result that combines personality, work style, and career-fit guidance."}], faqs:standardFaqs, related:["/quiz","/learn","/methodology"], priority:0.55, changeFrequency:"monthly" }));
+export const resourcesIndex: SeoPage = { path:"/resources", slug:"resources", phase:"resource", title:"Personality Quiz Resources, Charts & Guides | KnowYouRole", description:"Reference guides and charts for Big Five, MBTI-style patterns, DISC behavior, work style, personality quiz accuracy, and career fit.", h1:"Personality Quiz Resources, Charts, and Guides", eyebrow:"Resources", intro:"Reference-quality resources for people comparing personality frameworks, evaluating quiz accuracy, and turning personality patterns into better work and career decisions.", sections:[{heading:"Built to be linkable", body:"These resources are designed as clear reference pages for students, writers, teams, coaches, and curious humans who need a sane comparison without a psychology landfill."}], faqs:standardFaqs, related:["/quiz","/learn","/personality-quiz"], priority:0.65, changeFrequency:"weekly" };
+
+export const allSeoPages: SeoPage[] = [
+  ...landingPages,
+  ...frameworkPages,
+  ...comparisonPages,
+  resultTypeIndex,
+  ...resultTypePages,
+  ...careerPages,
+  learnIndex,
+  ...learnPages,
+  resourcesIndex,
+  ...resourcePages,
+];
+
+export function getSeoPage(path: string) {
+  return allSeoPages.find((page) => page.path === path);
+}
+
+export function getSeoPageBySlug(list: SeoPage[], slug: string) {
+  const page = list.find((item) => item.slug === slug);
+  if (!page) throw new Error(`Missing SEO content for ${slug}`);
+  return page;
+}

@@ -17,7 +17,7 @@ export default function Terms() {
 
       <main className="max-w-2xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-terms-title">Terms of Service</h1>
-        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last updated: March 2026</p>
+        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last reviewed: July 27, 2026</p>
 
         <div className="space-y-8 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
           <section>
@@ -30,7 +30,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Description of Service</h2>
             <p>
-              KnowYouRole provides personality assessments based on established psychological frameworks (Big Five, MBTI, and DISC), along with career matching recommendations. The Service is available for users of all ages, with age-appropriate content tiers.
+              KnowYouRole provides a 28-question self-reflection experience that uses Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-exploration guidance. It is not the official MBTI assessment, a clinical instrument, or a selection tool. The Service includes age-tiered copy where available.
             </p>
           </section>
 
@@ -49,7 +49,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Assessment Results Disclaimer</h2>
             <p>
-              The personality assessments and career recommendations provided by KnowYouRole are for informational and educational purposes only. They are not a substitute for professional psychological evaluation, career counseling, or medical advice. Results should be considered as one of many inputs in your self-discovery journey, not as definitive classifications.
+              KnowYouRole results are for informational, educational, self-reflection, and career-exploration purposes only. They are not a psychological evaluation, medical advice, career counseling, hiring or admissions screen, job-performance prediction, or guarantee of satisfaction. Treat results as one input among skills, values, experience, opportunity, constraints, and qualified human advice—not as a definitive classification.
             </p>
           </section>
 

@@ -26,12 +26,12 @@ export default function Privacy() {
 
       <main className="max-w-2xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-privacy-title">Privacy Policy</h1>
-        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last updated: June 2026</p>
+        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last reviewed: July 27, 2026</p>
 
         <div className="p-4 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 mb-8" data-testid="section-data-promise">
           <h2 className={headingClass}>Plain-English summary</h2>
           <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
-            KnowYouRole saves quiz completions so your result can be generated, recovered, improved, and audited for quality. We do not sell your quiz results. Optional analytics and future advertising tools are controlled by your cookie choices where practical.
+            KnowYouRole saves quiz completions so your result can be generated and recovered. We do not sell quiz results. Analytics is optional; advertising technology is not active today.
           </p>
         </div>
 
@@ -50,8 +50,8 @@ export default function Privacy() {
               <li>Age tier selection so quiz copy and experience can be age-appropriate.</li>
               <li>Email address and related delivery metadata if you request report delivery, updates, or account access.</li>
               <li>Feedback you submit voluntarily.</li>
-              <li>Device, browser, approximate usage, referral, and performance data.</li>
-              <li>Cookies, local storage, and session storage used for quiz state, consent preferences, analytics, and future advertising settings.</li>
+              <li>Device, browser, referral, and performance data when analytics is enabled through cookie preferences.</li>
+              <li>Browser storage used for quiz state, consent preferences, and session continuity.</li>
             </ul>
           </section>
 
@@ -60,29 +60,28 @@ export default function Privacy() {
             <ul className={listClass}>
               <li>Generate and save your personality profile and career-fit recommendations.</li>
               <li>Deliver results or account/report links if you provide an email address.</li>
-              <li>Improve quiz quality, scoring reliability, accessibility, and product usability.</li>
+              <li>Maintain and improve quiz quality, accessibility, and product usability.</li>
               <li>Monitor site performance, abuse prevention, and basic security.</li>
-              <li>Measure aggregate usage such as quiz starts, quiz completions, page views, and share clicks.</li>
-              <li>Prepare for future optional advertising or partner monetization without claiming that all such systems are active today.</li>
+              <li>Measure aggregate usage, such as quiz starts, completions, page views, and share clicks, only when analytics consent is enabled.</li>
             </ul>
           </section>
 
           <section className={sectionClass}>
             <h2 className={headingClass}>Analytics tools</h2>
             <p>
-              We may use Google Analytics or similar analytics tools to understand aggregate site behavior, such as which pages are visited, whether visitors start or complete the quiz, and whether pages load correctly. Analytics may use cookies or similar technologies. We avoid intentionally sending quiz answers, medical data, or direct identifiers to analytics tools.
+              KnowYouRole supports Google Analytics to understand aggregate site behavior, such as pages visited, quiz starts or completions, and page performance. The Google Analytics script is loaded only after you enable Analytics in cookie preferences. We do not intentionally send quiz answers, email addresses, medical data, or direct identifiers to Google Analytics.
             </p>
           </section>
 
           <section className={sectionClass}>
             <h2 className={headingClass}>Cookies, local storage, and third-party cookies</h2>
             <p>
-              Essential storage is used for quiz progress, consent choices, session continuity, and basic functionality. Optional analytics or advertising cookies may be set by third-party providers only when enabled by your preference or where otherwise permitted by law and browser settings.
+              Essential local or session storage keeps quiz state, consent choices, and session continuity available in your browser. Google Analytics may set or read its own technologies only after analytics consent. No advertising cookies, pixels, or ad partners are active in the current product.
             </p>
             <ul className={listClass}>
               <li><span className="font-medium">Essential:</span> required for the site and quiz to function.</li>
               <li><span className="font-medium">Analytics:</span> helps us understand aggregate usage and improve the product.</li>
-              <li><span className="font-medium">Advertising:</span> reserved for future ad partners and ad measurement.</li>
+              <li><span className="font-medium">Advertising:</span> no advertising technology is active today; the preference remains off by default.</li>
             </ul>
             <button
               id="cookie-preferences"
@@ -95,16 +94,16 @@ export default function Privacy() {
           </section>
 
           <section className={sectionClass}>
-            <h2 className={headingClass}>Future ads and ad partners</h2>
+            <h2 className={headingClass}>Advertising status</h2>
             <p>
-              KnowYouRole does not currently need ads to run the quiz experience, but we may later use Google AdSense or similar ad partners. If enabled, ads may be personalized based on signals from cookies or ad identifiers, or non-personalized based on context such as page content and general location. You will be able to reject non-essential advertising cookies through the consent tools where practical.
+              KnowYouRole does not currently run advertising technology, advertising pixels, or ad-partner cookies. If that changes, we will update this policy and consent controls before activating it.
             </p>
           </section>
 
           <section className={sectionClass}>
             <h2 className={headingClass}>Email capture and report delivery</h2>
             <p>
-              If you provide your email, we may use it to send your report, account access links, product updates you requested, or important service messages. We do not treat email capture as permission to sell your result. You can unsubscribe from marketing emails if marketing emails are introduced.
+              If you choose “Email this result,” we store your email, result/session identifiers, displayed summary fields (such as the MBTI-style pattern, DISC-style result, and primary role title), consent to send the summary, and delivery status. We use that record to send or queue the requested summary. A separate optional marketing consent exists in the data model, but this current result form submits it as false and does not sign you up for marketing.
             </p>
           </section>
 

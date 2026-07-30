@@ -375,7 +375,7 @@ export default function Results({ scores, tier, mood, funMode, landmark, theme, 
       <div className="fixed bottom-[68px] left-0 right-0 z-30 flex justify-center pointer-events-none" data-testid="privacy-badge">
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/80 dark:bg-[#0A0A0F]/80 backdrop-blur-sm border border-gray-200 dark:border-[#A78BFA]/10 text-xs text-muted-foreground">
           <Shield className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>Your profile is saved securely. We never sell your results.</span>
+          <span>Quiz completion data may be saved to generate and recover your result. We do not sell quiz results.</span>
         </div>
       </div>
 

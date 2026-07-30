@@ -1,4 +1,6 @@
 import rolesData from "@/data/roles.json";
+import { CAREER_SCORE_KEYS, SHORTFORM_V2_QUESTIONS, type CareerKey } from "@/data/shortformV2Questions";
+import { deriveWorkDirection, deriveWorkLaneScores, getRoleWorkProfile, MIXED_WORK_LANE_MARGIN, qualifyingWorkLanes, scoreRoleWorkProfile, WORK_LANE_LABELS, type WorkLaneKey } from "@/lib/results/workLanes";
 import type { QuizScores } from "../Quiz";
 import { Sparkles, Target, Users, Heart, Brain } from "lucide-react";
 
@@ -102,12 +104,26 @@ export interface CareerRole {
   desc: string;
 }
 
+export interface CareerDirection {
+  laneKey: WorkLaneKey;
+  title: string;
+  examples: CareerRole[];
+  rationale: string;
+}
+
 export interface CareerRoleMatch {
   primary: CareerRole;
   secondary: CareerRole;
+  alternatives?: CareerRole[];
+  direction?: CareerDirection;
   whyThisFits?: string;
   starterPath?: string;
   mayNotFit?: string;
+  matchScore?: number;
+  matchSource?: "career-vector" | "legacy-key";
+  careerSignals?: CareerKey[];
+  workLanes?: Array<{ key: WorkLaneKey; label: string; score: number; mixed?: boolean }>;
+  laneExamples?: Array<{ key: WorkLaneKey; label: string; score: number; mixed: boolean; roles: CareerRole[] }>;
 }
 
 export interface PersonalityResult {
@@ -159,8 +175,236 @@ function getCalibratedBigFiveTraitOrder(bigFive: { O: number; C: number; E: numb
   return [calibratedTop, ...sorted.map(([trait]) => trait).filter((trait) => trait !== calibratedTop)];
 }
 
-export function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: { O: number; C: number; E: number; A: number; N: number }, mbtiScores: Record<string, number> = {}): CareerRoleMatch {
+type CareerVector = Partial<Record<CareerKey, number>>;
+type RoleCareerCategory = "technical" | "leadership" | "creative" | "care" | "operations" | "influence" | "handsOn" | "generalist";
+
+const CAREER_SIGNAL_LABELS: Record<CareerKey, string> = {
+  analysis: "analysis",
+  systems: "systems thinking",
+  people: "people-centered work",
+  leadership: "leadership",
+  operations: "execution",
+  creative: "creative work",
+  handsOn: "hands-on problem solving",
+  service: "service",
+  entrepreneurship: "entrepreneurship",
+  stability: "stability",
+  autonomy: "autonomy",
+  deepFocus: "deep focus",
+  pace: "fast-paced work",
+};
+
+// Raw career totals are not comparable because some signals appear in more answer
+// options than others. Normalize against each signal's attainable maximum in the
+// active 28-question shortform before using the vector for role selection.
+const CAREER_OPPORTUNITY_MAX = CAREER_SCORE_KEYS.reduce((totals, key) => {
+  totals[key] = SHORTFORM_V2_QUESTIONS.reduce((sum, question) => {
+    const bestAnswer = Math.max(0, ...question.answers.map(answer => answer.scores.career?.[key] ?? 0));
+    return sum + bestAnswer;
+  }, 0);
+  return totals;
+}, {} as Record<CareerKey, number>);
+
+const ROLE_CATEGORY_PATTERNS: Array<[RoleCareerCategory, RegExp]> = [
+  ["handsOn", /(mechanic|technician|electrician|plumber|welder|carpenter|construction|trades|chef|field service|repair|machinist|installer|firefighter|paramedic|pilot|equipment operator)/i],
+  ["care", /(therap|counsel|psycholog|\bcoach|teacher|nurse|medical|healthcare|health care|social worker|community|advocate|patient|\bcare\b|human resources|people operations)/i],
+  ["influence", /(sales|business development|recruit|partnership|public relations|account executive|fundrais|event|media relations|negotiat)/i],
+  ["creative", /(design|designer|creative|writer|artist|film|photo|content|brand|marketing|game|producer|podcast|interior|animation|motion)/i],
+  ["operations", /(operations|project|program|logistics|compliance|audit|quality|administrat|coordinator|process|supply chain|finance|accountant|actuar)/i],
+  ["technical", /(engineer|architect|developer|software|research|scientist|data|analyst|analytics|cyber|security|quant|algorithm|systems|forensic|policy evaluat)/i],
+  ["leadership", /(founder|chief|director|executive|manager|management|lead|leader|entrepreneur|venture|strategist|strategy|consultant|product owner|product manager)/i],
+];
+
+const ROLE_SIGNAL_PATTERNS: Array<[RegExp, CareerKey[]]> = [
+  [/(research|scientist|policy|data|analyst|analytics|forensic|intelligence)/i, ["analysis", "deepFocus", "systems"]],
+  [/(engineer|developer|software|architect|cyber|security|algorithm|technical)/i, ["systems", "analysis", "deepFocus"]],
+  [/(mechanic|technician|electrician|plumber|welder|carpenter|repair|installer|machinist)/i, ["handsOn", "operations", "autonomy"]],
+  [/(chef|culinary|food)/i, ["handsOn", "pace", "creative"]],
+  [/(nurse|medical|health|paramedic|patient|care coordination)/i, ["service", "people", "handsOn", "stability"]],
+  [/(therap|counsel|psycholog|social worker|coach)/i, ["service", "people", "deepFocus"]],
+  [/(teacher|education|curriculum|training)/i, ["service", "people", "creative"]],
+  [/(writer|content|film|photo|artist|animation|motion|podcast|brand|creative director)/i, ["creative", "autonomy", "deepFocus"]],
+  [/(designer|design|ux|interior|game)/i, ["creative", "systems", "autonomy"]],
+  [/(sales|account executive|business development|partnership|recruit|fundrais|public relations)/i, ["people", "pace", "entrepreneurship", "leadership"]],
+  [/(event|community growth|community program)/i, ["people", "operations", "pace"]],
+  [/(operations|logistics|compliance|audit|quality|administrat|coordinator|process|supply chain)/i, ["operations", "stability", "systems"]],
+  [/(founder|entrepreneur|venture)/i, ["entrepreneurship", "leadership", "autonomy", "pace"]],
+  [/(director|executive|manager|management|lead|leader|strategist|strategy|consultant|product manager)/i, ["leadership", "systems", "people"]],
+];
+
+const CATEGORY_SIGNAL_WEIGHTS: Record<RoleCareerCategory, Partial<Record<CareerKey, number>>> = {
+  technical: { analysis: 0.34, systems: 0.29, deepFocus: 0.2, autonomy: 0.1, handsOn: 0.07 },
+  leadership: { leadership: 0.31, entrepreneurship: 0.24, autonomy: 0.17, pace: 0.15, people: 0.13 },
+  creative: { creative: 0.38, autonomy: 0.2, entrepreneurship: 0.14, people: 0.11, deepFocus: 0.09, pace: 0.08 },
+  care: { service: 0.35, people: 0.3, stability: 0.14, leadership: 0.08, handsOn: 0.08, deepFocus: 0.05 },
+  operations: { operations: 0.34, systems: 0.22, stability: 0.18, leadership: 0.1, analysis: 0.09, pace: 0.07 },
+  influence: { people: 0.3, leadership: 0.21, pace: 0.18, entrepreneurship: 0.18, creative: 0.08, autonomy: 0.05 },
+  handsOn: { handsOn: 0.43, operations: 0.2, pace: 0.15, stability: 0.1, autonomy: 0.07, service: 0.05 },
+  generalist: { analysis: 0.08, systems: 0.08, people: 0.08, leadership: 0.08, operations: 0.08, creative: 0.08, handsOn: 0.08, service: 0.08, entrepreneurship: 0.08, stability: 0.08, autonomy: 0.08, deepFocus: 0.06, pace: 0.06 },
+};
+
+function normalizeCareerVector(career?: CareerVector): Record<CareerKey, number> | null {
+  if (!career) return null;
+  const hasEvidence = CAREER_SCORE_KEYS.some(key => Number.isFinite(career[key]) && (career[key] ?? 0) !== 0);
+  if (!hasEvidence) return null;
+  return CAREER_SCORE_KEYS.reduce((normalized, key) => {
+    const raw = Number.isFinite(career[key]) ? Number(career[key]) : 0;
+    normalized[key] = Math.max(0, Math.min(100, Math.round((raw / Math.max(1, CAREER_OPPORTUNITY_MAX[key])) * 100)));
+    return normalized;
+  }, {} as Record<CareerKey, number>);
+}
+
+function roleCareerCategory(role: CareerRole): RoleCareerCategory {
+  const text = `${role.title} ${role.desc}`;
+  return ROLE_CATEGORY_PATTERNS.find(([, pattern]) => pattern.test(text))?.[0] ?? "generalist";
+}
+
+function scoreCareerCategory(career: Record<CareerKey, number>, category: RoleCareerCategory): number {
+  return Object.entries(CATEGORY_SIGNAL_WEIGHTS[category]).reduce(
+    (sum, [key, weight]) => sum + (career[key as CareerKey] ?? 0) * Number(weight),
+    0,
+  );
+}
+
+function scoreRoleSpecificSignals(career: Record<CareerKey, number>, role: CareerRole, categoryScore: number): number {
+  const text = `${role.title} ${role.desc}`;
+  const signals = ROLE_SIGNAL_PATTERNS.find(([pattern]) => pattern.test(text))?.[1];
+  if (!signals?.length) return categoryScore;
+  return signals.reduce((sum, key) => sum + (career[key] ?? 0), 0) / signals.length;
+}
+
+function humanList(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "your work preferences";
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+function findCareerVectorRoleMatch(
+  roles: Record<string, CareerRoleMatch>,
+  mbtiType: string,
+  discStyle: string,
+  bigFive: { O: number; C: number; E: number; A: number; N: number },
+  career: CareerVector,
+): CareerRoleMatch | null {
+  const normalizedCareer = normalizeCareerVector(career);
+  if (!normalizedCareer) return null;
+  const workLanes = deriveWorkLaneScores(normalizedCareer);
+  if (!workLanes) return null;
+  const mbti = mbtiType.toLowerCase();
+  const disc = discStyle.toLowerCase();
+  const rankedTraits = (Object.entries(bigFive) as [keyof typeof bigFive, number][]).sort((a, b) => b[1] - a[1]);
+  const topSignals = (Object.entries(normalizedCareer) as [CareerKey, number][])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([key]) => key);
+
+  const candidates = Object.entries(roles)
+    .filter(([key, match]) => key !== "default" && Boolean(match?.primary?.title))
+    .map(([key, match]) => {
+      const workProfile = getRoleWorkProfile(match.primary.title, match.primary.desc);
+      const category = (workProfile.category as RoleCareerCategory | undefined) ?? roleCareerCategory(match.primary);
+      const categoryFit = scoreCareerCategory(normalizedCareer, category);
+      const roleSignals = workProfile.careerSignals ?? ROLE_SIGNAL_PATTERNS.find(([pattern]) => pattern.test(`${match.primary.title} ${match.primary.desc}`))?.[1];
+      const specificFit = roleSignals?.length
+        ? roleSignals.reduce((sum, signal) => sum + (normalizedCareer[signal] ?? 0), 0) / roleSignals.length
+        : categoryFit;
+      const careerFit = categoryFit * 0.55 + specificFit * 0.45;
+      const workLaneFit = scoreRoleWorkProfile(workLanes, workProfile);
+      const keyParts = key.toLowerCase().split("-");
+      const mbtiFit = keyParts[0] === mbti ? 100 : 62;
+      const discFit = keyParts.includes(disc) ? 100 : 58;
+      const traitKey = (["o", "c", "e", "a", "n"] as const).find(trait => keyParts.includes(trait));
+      const traitFit = traitKey ? bigFive[traitKey.toUpperCase() as keyof typeof bigFive] : 55;
+      const exactBonus = key === `${mbti}-${disc}-${rankedTraits[0][0].toLowerCase()}-high` ? 4 : 0;
+      // Direct work-material and environment evidence drives the score. The older
+      // personality-key matcher remains a stabilizer, not a career oracle.
+      const score = workLaneFit * 0.38 + categoryFit * 0.14 + specificFit * 0.3 + traitFit * 0.08 + discFit * 0.06 + mbtiFit * 0.04 + exactBonus;
+      return { match, category, workProfile, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const winner = candidates[0];
+  if (!winner) return null;
+  const seenRoleTitles = new Set([winner.match.primary.title.toLowerCase(), winner.match.secondary.title.toLowerCase()]);
+  const alternatives = candidates
+    .flatMap(candidate => [candidate.match.primary, candidate.match.secondary])
+    .filter(role => {
+      const title = role.title.toLowerCase();
+      if (seenRoleTitles.has(title)) return false;
+      seenRoleTitles.add(title);
+      return true;
+    })
+    .slice(0, 2);
+  const displayedLanes = qualifyingWorkLanes(workLanes, 2, winner.workProfile.displayPriority);
+  // A mixed state describes the relationship between the two displayed lanes.
+  // Do not compare a lane to itself: that would label every primary lane "Mixed evidence".
+  const hasMixedWorkLaneEvidence = displayedLanes.length > 1
+    && Math.abs(workLanes[displayedLanes[0]] - workLanes[displayedLanes[1]]) <= MIXED_WORK_LANE_MARGIN;
+  const laneExamples = displayedLanes.map((lane) => {
+    const seenTitles = new Set<string>();
+    const sameProfileCandidates = candidates.filter(candidate => candidate.workProfile === winner.workProfile);
+    const familyCandidates = candidates.filter(candidate => candidate.category === winner.category);
+    const laneCandidates = [...sameProfileCandidates, ...familyCandidates.filter(candidate => !sameProfileCandidates.includes(candidate))]
+      .filter(candidate => Number(candidate.workProfile.targets[lane] ?? 50) >= 50);
+    const roles = laneCandidates
+      .sort((a, b) => {
+        const aProfileBonus = a.workProfile === winner.workProfile ? 18 : 0;
+        const bProfileBonus = b.workProfile === winner.workProfile ? 18 : 0;
+        const aLaneScore = aProfileBonus + Number(a.workProfile.targets[lane] ?? 50) * 0.3 + a.score * 0.7;
+        const bLaneScore = bProfileBonus + Number(b.workProfile.targets[lane] ?? 50) * 0.3 + b.score * 0.7;
+        return bLaneScore - aLaneScore;
+      })
+      .flatMap(candidate => [candidate.match.primary, candidate.match.secondary])
+      .filter(role => {
+        const title = role.title.toLowerCase();
+        if (seenTitles.has(title)) return false;
+        seenTitles.add(title);
+        return true;
+      })
+      .slice(0, 3);
+    return {
+      key: lane,
+      label: WORK_LANE_LABELS[lane],
+      score: workLanes[lane],
+      mixed: hasMixedWorkLaneEvidence,
+      roles,
+    };
+  });
+  const signalText = humanList(topSignals.map(key => CAREER_SIGNAL_LABELS[key]));
+  const directionDefinition = deriveWorkDirection(normalizedCareer, workLanes);
+  const direction = {
+    laneKey: directionDefinition.laneKey,
+    title: directionDefinition.title,
+    examples: directionDefinition.examples.map(title => ({ title, salary: "", desc: "" })),
+    rationale: `Your direct work-preference answers emphasized ${signalText}. That is stronger evidence for this work direction than any one job title.`,
+  };
+  const whyThisFits = winner.match.whyThisFits
+    ? `${winner.match.whyThisFits} Your strongest direct work-interest signals were ${signalText}.`
+    : `Your strongest direct work-interest signals were ${signalText}, which align with ${winner.match.primary.title}.`;
+
+  return {
+    ...winner.match,
+    direction,
+    alternatives,
+    whyThisFits,
+    starterPath: winner.match.starterPath || `Run one small ${winner.category === "generalist" ? "proof project" : winner.category} experiment, then ask someone in the field what beginner evidence matters most.`,
+    mayNotFit: winner.match.mayNotFit || "Treat this as a direction to test, not a permanent label; compare the daily work with your real energy and constraints.",
+    matchScore: Math.round(winner.score),
+    matchSource: "career-vector",
+    careerSignals: topSignals,
+    workLanes: displayedLanes.map(key => ({
+      key,
+      label: WORK_LANE_LABELS[key],
+      score: workLanes[key],
+      mixed: hasMixedWorkLaneEvidence,
+    })),
+    laneExamples,
+  };
+}
+
+export function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: { O: number; C: number; E: number; A: number; N: number }, mbtiScores: Record<string, number> = {}, career?: CareerVector): CareerRoleMatch {
   const roles = rolesData.roles as Record<string, CareerRoleMatch>;
+  const careerVectorMatch = findCareerVectorRoleMatch(roles, mbtiType, discStyle, bigFive, career ?? {});
+  if (careerVectorMatch) return careerVectorMatch;
   
   const sortedTraits = getCalibratedBigFiveTraitOrder(bigFive, mbtiScores, discStyle);
   const highestTrait = sortedTraits[0].toLowerCase();
@@ -250,16 +494,17 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
   const disc = scores.disc;
 
   const b5 = scores.bigFive;
-  // Big Five inputs can arrive in two shapes during the ResultDTO migration:
-  // 1. Dev/randomized previews already use percentile-like 0-100 values.
-  // 2. Real 45-question quizzes use signed net evidence, where positive answers add
-  //    weight and reverse-keyed answers subtract weight. Signed real scores are centered
-  //    at 0, not raw totals out of 14. Mapping signed values from 0 would create fake
-  //    extremes like 1%; keep 0 neutral and move gradually away from 50.
+  const isCalibratedShortformV2 = scores.quizVersion === "shortform-v2-fixed-28"
+    || (Boolean(scores.career) && scores.responses?.length === SHORTFORM_V2_QUESTIONS.length);
+  // Big Five inputs can arrive in three shapes during the ResultDTO migration:
+  // 1. Fixed-28 shortform scores are explicitly opportunity/variance calibrated.
+  // 2. Dev/randomized previews already use percentile-like 0-100 values.
+  // 3. Legacy quizzes use signed net evidence centered at 0.
   const normalizeB5 = (raw: number): number => {
+    if (isCalibratedShortformV2) return Math.max(15, Math.min(85, Math.round(raw)));
     if (raw > 25) return Math.max(1, Math.min(99, Math.round(raw))); // dev: already normalized
     const signed = Math.max(-7, Math.min(7, raw));
-    return Math.max(8, Math.min(92, Math.round(50 + signed * 6))); // real: signed score around neutral, softened to avoid ceiling saturation
+    return Math.max(8, Math.min(92, Math.round(50 + signed * 6))); // legacy signed evidence
   };
   const bigFiveProfile = {
     O: normalizeB5(b5.O),
@@ -278,7 +523,7 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
   const discInfo = traits.disc[primaryDisc as keyof typeof traits.disc] || traits.disc.D;
   const secondaryDiscInfo = traits.disc[secondaryDisc as keyof typeof traits.disc] || traits.disc.I;
 
-  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFiveProfile, mbti);
+  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFiveProfile, mbti, scores.career);
 
   const bigFiveLabels: Record<string, { high: string; low: string }> = {};
   Object.entries(traits.bigFive).forEach(([key, value]) => {

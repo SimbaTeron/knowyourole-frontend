@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
 import { requireAdminRequest } from '@/app/api/_lib/admin-guard';
 
+const feedbackRequestSchema = z
+  .object({})
+  .catchall(z.union([z.string().trim().max(1_000), z.number().finite().min(0).max(10), z.boolean(), z.null()]))
+  .superRefine((value, context) => {
+    if (Object.keys(value).length > 32) {
+      context.addIssue({ code: z.ZodIssueCode.custom, message: 'Too many feedback fields' });
+    }
+  });
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-admin-secret',
 };
@@ -16,7 +24,15 @@ export async function OPTIONS() {
 // POST /api/feedback — Save feedback entry
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const contentLength = Number(req.headers.get('content-length') || 0);
+    if (Number.isFinite(contentLength) && contentLength > 16_384) {
+      return NextResponse.json({ error: 'Feedback payload is too large' }, { status: 413, headers: corsHeaders });
+    }
+    const parsed = feedbackRequestSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid feedback payload' }, { status: 400, headers: corsHeaders });
+    }
+    const body = parsed.data;
     const session_id = body.session_id ?? body.sessionId ?? null;
     // Legacy fields (kept for backward compat) — accept both DB snake_case and current client camelCase.
     const useful_app = body.useful_app ?? body.usefulApp ?? null;

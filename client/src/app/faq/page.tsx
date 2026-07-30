@@ -15,11 +15,11 @@ const FAQ_ITEMS = [
   },
   {
     question: "How long does the assessment take?",
-    answer: "Most users complete the assessment in ~5 minutes. The questions are designed to be quick and intuitive — just pick what feels most true most often. There are no trick questions or wrong answers."
+    answer: "The current assessment has 28 focused prompts. Completion time depends on your pace; answer for your usual work pattern rather than racing through it. There are no trick questions or right answers."
   },
   {
     question: "How accurate is the assessment?",
-    answer: "Your result reflects patterns in your answers, not a perfect measurement of your identity. Big Five gives the strongest research-backed trait layer; MBTI-style and DISC-style outputs are used as practical language for reflection and communication. Taking the quiz when you're in a typical mood, not extremely stressed or excited, tends to produce the most useful result."
+    answer: "We do not publish an accuracy percentage. Your result summarizes patterns in your answers, not a perfect measurement of identity or career fit. Big Five research informs KYR's trait language; MBTI-style and DISC-style outputs are used as practical reflection and communication lenses. Close scores should be read as flexible, not final."
   },
   {
     question: "Is it safe for teens?",
@@ -27,7 +27,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "What personality frameworks do you use?",
-    answer: "We use three complementary layers: Big Five traits as the research-backed backbone; MBTI-style patterns as memorable personality language; and DISC-style categories for communication and work-style reflection. The point is useful self-understanding, not forcing you into a permanent box."
+    answer: "We use three complementary lenses: Big Five-informed traits, MBTI-style patterns as memorable preference language, and DISC-style categories for communication and work-style reflection. The point is useful self-understanding, not forcing you into a permanent box."
   },
   {
     question: "Can I retake the assessment?",
@@ -35,11 +35,11 @@ const FAQ_ITEMS = [
   },
   {
     question: "Do I need to create an account?",
-    answer: "Quiz completion data is saved securely so we can generate, recover, and improve results. You can still take the quiz without creating an account. Creating an account, when enabled, can add long-term history and comparison features."
+    answer: "Quiz completion data can be saved so a result can be generated and recovered. You can take the quiz without an account. Account creation, when enabled, may add history and comparison features; see the Privacy Policy for what is stored and how to request deletion or export."
   },
   {
     question: "How is my data handled?",
-    answer: "Quiz completions are saved securely so your result can be generated, recovered, and improved. We do not sell your quiz results. Optional analytics and future advertising settings are controlled through cookie preferences where practical. See our Privacy Policy for details."
+    answer: "Quiz completion data can be saved to generate and recover a result. We do not sell quiz results. Google Analytics loads only if you opt in through cookie preferences, and no advertising technology is active today. See the Privacy Policy for the current details."
   },
   {
     question: "What are the career matches based on?",
@@ -51,7 +51,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "What happens to my results if I don't create an account?",
-    answer: "Your results are saved securely after quiz completion so your profile can be generated, recovered, and improved. If you want long-term history or comparison features, create an account when that option is available."
+    answer: "A completion may be saved with its result so the report can be generated and recovered. You do not need an account to take the quiz. If you use “Email this result,” the email-request record stores your email, result/session identifiers, summary fields, consent, and delivery status; it does not opt you into marketing from this form."
   },
 ];
 

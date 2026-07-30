@@ -1,112 +1,23 @@
-'use client';
+import Link from "next/link";
 
-import Link from 'next/link';
+const groups = [
+  { title: "Explore", links: [["Take the quiz", "/quiz"], ["Career paths", "/careers"], ["Learn", "/learn"], ["Method", "/methodology"]] },
+  { title: "About", links: [["About KnowYouRole", "/about"], ["Questions", "/faq"], ["Contact", "/contact"]] },
+  { title: "Your choices", links: [["Privacy", "/privacy"], ["Cookie settings", "/privacy#cookie-preferences"], ["Terms", "/terms"]] },
+] as const;
 
 export function AppFooter() {
-  const linkStyle: React.CSSProperties = {
-    display: 'block',
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 14,
-    marginBottom: 12,
-    textDecoration: 'none',
-    fontFamily: "'Outfit',sans-serif",
-    transition: 'color 0.2s',
-  };
-
-  const hoverLinkStyle: React.CSSProperties = {
-    ...linkStyle,
-    color: 'rgba(255,255,255,0.9)',
-  };
-
-  return (
-    <footer style={{
-      position: 'relative', zIndex: 10,
-      background: 'rgba(0,0,0,0.4)',
-      borderTop: '1px solid rgba(255,255,255,0.06)',
-      padding: 'clamp(40px, 8vw, 64px) clamp(16px, 4vw, 48px)',
-    }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-          gap: 48,
-          marginBottom: 48,
-        }}>
-          {/* Logo & Tagline */}
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <div style={{
-                width: 32, height: 32, borderRadius: 8,
-                background: 'linear-gradient(135deg, #00C8FF, #7800FF)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round">
-                  <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-                </svg>
-              </div>
-              <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', fontFamily: "'Outfit',sans-serif" }}>KnowYouRole</span>
-            </div>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', lineHeight: 1.6, fontFamily: "'Outfit',sans-serif" }}>
-              Personality reflection made accessible, fun, and genuinely useful.
-            </p>
-          </div>
-
-          {/* Product */}
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 14, fontFamily: "'Outfit',sans-serif" }}>Product</h4>
-            <div>
-              <Link href="/quiz" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Free Assessment</Link>
-              <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>How It Works</Link>
-              <Link href="/methodology" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Methodology</Link>
-              <Link href="/careers" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Career Matching</Link>
-              <Link href="/results" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Premium Features</Link>
-              <a href="https://knowyourole-feedback.vercel.app" target="_blank" rel="noopener noreferrer" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Feedback</a>
-            </div>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 14, fontFamily: "'Outfit',sans-serif" }}>Company</h4>
-            <div>
-              <Link href="/about" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>About</Link>
-              <Link href="/faq" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>FAQ</Link>
-              <Link href="/methodology" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Methodology</Link>
-            </div>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 14, fontFamily: "'Outfit',sans-serif" }}>Legal</h4>
-            <div>
-              <Link href="/privacy" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Privacy Policy</Link>
-              <Link href="/privacy#cookie-preferences" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Cookie Settings</Link>
-              <Link href="/terms" style={linkStyle} onMouseEnter={e => Object.assign((e.target as HTMLElement).style, hoverLinkStyle)} onMouseLeave={e => Object.assign((e.target as HTMLElement).style, linkStyle)}>Terms of Service</Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          paddingTop: 32,
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 16,
-        }}>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', fontFamily: "'Outfit',sans-serif" }}>© 2026 KnowYouRole. All rights reserved.</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <a href="#" style={{ color: 'rgba(255,255,255,0.4)', transition: 'color 0.2s', display: 'flex' }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.9)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </a>
-          </div>
-        </div>
+  return <footer className="workday-footer" aria-label="Site footer">
+    <div className="workday-footer__grid">
+      <div className="workday-footer__intro">
+        <Link href="/" className="workday-footer__brand" aria-label="KnowYouRole home"><span aria-hidden="true">◈</span> KnowYouRole</Link>
+        <p>Practical work-style reflection and career exploration. A useful starting point, not a verdict.</p>
       </div>
-    </footer>
-  );
+      {groups.map((group) => <section key={group.title}>
+        <h2>{group.title}</h2>
+        <ul>{group.links.map(([label, href]) => <li key={href}><Link href={href}>{label}</Link></li>)}</ul>
+      </section>)}
+    </div>
+    <div className="workday-footer__bottom"><span>© 2026 KnowYouRole</span><span>Built for reflection, not selection.</span></div>
+  </footer>;
 }
