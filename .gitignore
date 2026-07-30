@@ -2,8 +2,16 @@
 node_modules/
 
 # Build outputs
+.next/
 dist/
 .vercel/
+
+# Test and local evidence output
+client/playwright-report/
+client/test-results/
+client/tmp/
+client/KnowYouRole_Quiz_Algorithm_Audit.xlsx
+dogfood-output/
 
 # OS files
 .DS_Store
@@ -26,7 +34,7 @@ npm-debug.log*
 
 .vercel
 
-# KnowYourRole specifics
+# KnowYouRole specifics
 server/public
 vite.config.ts.*
 *.tar.gz
