@@ -4,12 +4,8 @@ import Link from "next/link";
 import { ArrowLeft, Briefcase, Palette, Wrench, HeartPulse, HandHelping, Building2, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-
-interface JobRole {
-  id: string;
-  roleName: string;
-  jobCollar: string;
-}
+import { apiRequest } from "@/lib/queryClient";
+import { CareerCatalogRole, parseJobRolesResponse } from "@/lib/job-role-catalog";
 
 const CATEGORY_META: Record<string, { label: string; icon: typeof Briefcase; color: string }> = {
   white: { label: "Professional & Office", icon: Building2, color: "text-dusty-blue dark:text-[#67E8F9]" },
@@ -21,21 +17,25 @@ const CATEGORY_META: Record<string, { label: string; icon: typeof Briefcase; col
 
 export default function Careers() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: roles = [], isLoading } = useQuery<JobRole[]>({
+  const { data, isLoading, isError } = useQuery<CareerCatalogRole[]>({
     queryKey: ["/api/job-roles"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/job-roles");
+      return parseJobRolesResponse(await response.json());
+    },
   });
+  const roles = data ?? [];
 
   const grouped: Record<string, string[]> = {};
   for (const role of roles) {
-    if (!grouped[role.jobCollar]) grouped[role.jobCollar] = [];
-    grouped[role.jobCollar].push(role.roleName);
+    if (!grouped[role.category]) grouped[role.category] = [];
+    grouped[role.category].push(role.roleName);
   }
   for (const key of Object.keys(grouped)) {
     grouped[key].sort((a, b) => a.localeCompare(b));
   }
 
-  const categoryOrder = ["white", "healthcare", "blue", "service", "arts"];
-  const filteredCategories = categoryOrder.filter(cat => grouped[cat]);
+  const filteredCategories = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
 
   const lowerSearch = searchTerm.toLowerCase().trim();
   const filteredGrouped: Record<string, string[]> = {};
@@ -46,6 +46,12 @@ export default function Careers() {
 
   const totalRoles = roles.length;
   const totalFiltered = Object.values(filteredGrouped).reduce((sum, arr) => sum + arr.length, 0);
+  const hasRoles = totalRoles > 0;
+  const catalogIntro = isError
+    ? "Career paths are temporarily unavailable. Please try again soon."
+    : hasRoles
+      ? `Explore the ${totalRoles} career roles we match against your personality profile. Take the quiz to see which ones fit you best.`
+      : "Explore career paths matched to your work style.";
 
   return (
     <div className="min-h-screen bg-soft-cream dark:bg-[#0A0A12] text-warm-gray dark:text-[#F8FAFC]">
@@ -65,29 +71,31 @@ export default function Careers() {
             <h1 className="text-3xl font-display font-bold" data-testid="text-careers-title">Career Paths</h1>
           </div>
           <p className="text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed">
-            Explore the {totalRoles}+ career roles we match against your personality profile. Take the quiz to see which ones fit you best.
+            {catalogIntro}
           </p>
         </div>
 
-        <div className="relative mb-8">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-warm-gray/40 dark:text-[#64748B]" />
-          <input
-            type="text"
-            placeholder="Search careers..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10 text-warm-gray dark:text-[#F8FAFC] placeholder:text-warm-gray/40 dark:placeholder:text-[#64748B] focus:outline-none focus:border-terracotta dark:focus:border-[#A78BFA] transition-colors"
-            data-testid="input-career-search"
-          />
-          {searchTerm && (
-            <p className="text-xs text-warm-gray/50 dark:text-[#64748B] mt-2">
-              Showing {totalFiltered} of {totalRoles} careers
-            </p>
-          )}
-        </div>
+        {!isLoading && !isError && hasRoles && (
+          <div className="relative mb-8">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-warm-gray/40 dark:text-[#64748B]" />
+            <input
+              type="text"
+              placeholder="Search careers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10 text-warm-gray dark:text-[#F8FAFC] placeholder:text-warm-gray/40 dark:placeholder:text-[#64748B] focus:outline-none focus:border-terracotta dark:focus:border-[#A78BFA] transition-colors"
+              data-testid="input-career-search"
+            />
+            {searchTerm && (
+              <p className="text-xs text-warm-gray/50 dark:text-[#64748B] mt-2">
+                Showing {totalFiltered} of {totalRoles} careers
+              </p>
+            )}
+          </div>
+        )}
 
         {isLoading ? (
-          <div className="space-y-6">
+          <div className="space-y-6" aria-label="Loading career paths">
             {[1, 2, 3].map(i => (
               <div key={i} className="animate-pulse">
                 <div className="h-6 w-48 bg-warm-gray/10 dark:bg-white/10 rounded mb-3" />
@@ -99,6 +107,14 @@ export default function Careers() {
               </div>
             ))}
           </div>
+        ) : isError ? (
+          <p className="text-center text-warm-gray/60 dark:text-[#94A3B8] py-8" role="alert" data-testid="text-careers-unavailable">
+            The career catalog is temporarily unavailable. Please try again soon.
+          </p>
+        ) : !hasRoles ? (
+          <p className="text-center text-warm-gray/60 dark:text-[#94A3B8] py-8" data-testid="text-careers-pending">
+            Career paths are being curated. Take the quiz to start exploring your work style.
+          </p>
         ) : Object.keys(filteredGrouped).length === 0 ? (
           <p className="text-center text-warm-gray/50 dark:text-[#64748B] py-8" data-testid="text-no-results">
             No careers match "{searchTerm}"
@@ -140,7 +156,9 @@ export default function Careers() {
         <div className="mt-12 p-5 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 text-center">
           <h3 className="font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Find Your Best Match</h3>
           <p className="text-sm text-warm-gray/60 dark:text-[#94A3B8] mb-4">
-            Take the personality quiz to discover which of these {totalRoles}+ careers align with your unique trait blend.
+            {hasRoles
+              ? `Take the personality quiz to discover which of these ${totalRoles} careers align with your unique trait blend.`
+              : "Take the personality quiz to start exploring career directions matched to your work style."}
           </p>
           <Link
             href="/"
