@@ -13,6 +13,36 @@ const CATEGORY_META: Record<string, { label: string; icon: typeof Briefcase; col
   arts: { label: "Creative & Arts", icon: Palette, color: "text-purple-600 dark:text-[#A78BFA]" },
 };
 
+type CatalogPresentation =
+  | { state: "ready"; roleCount: number; intro: string; cta: string }
+  | { state: "empty"; intro: string; cta: string }
+  | { state: "unavailable"; intro: string; cta: string };
+
+function getCatalogPresentation(roleCount: number, loadError: boolean): CatalogPresentation {
+  if (loadError) {
+    return {
+      state: "unavailable",
+      intro: "Career paths are temporarily unavailable. Please try again soon.",
+      cta: "Take the personality quiz to start exploring career directions matched to your work style.",
+    };
+  }
+
+  if (roleCount === 0) {
+    return {
+      state: "empty",
+      intro: "Explore career paths matched to your work style.",
+      cta: "Take the personality quiz to start exploring career directions matched to your work style.",
+    };
+  }
+
+  return {
+    state: "ready",
+    roleCount,
+    intro: `Explore the ${roleCount} career roles we match against your personality profile. Take the quiz to see which ones fit you best.`,
+    cta: `Take the personality quiz to discover which of these ${roleCount} careers align with your unique trait blend.`,
+  };
+}
+
 type CareersClientProps = {
   roles: CareerCatalogRole[];
   loadError: boolean;
@@ -20,7 +50,6 @@ type CareersClientProps = {
 
 export default function CareersClient({ roles, loadError }: CareersClientProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const isError = loadError;
 
   const grouped: Record<string, string[]> = {};
   for (const role of roles) {
@@ -41,13 +70,9 @@ export default function CareersClient({ roles, loadError }: CareersClientProps) 
   }
 
   const totalRoles = roles.length;
+  const presentation = getCatalogPresentation(totalRoles, loadError);
+  const isReady = presentation.state === "ready";
   const totalFiltered = Object.values(filteredGrouped).reduce((sum, arr) => sum + arr.length, 0);
-  const hasRoles = totalRoles > 0;
-  const catalogIntro = isError
-    ? "Career paths are temporarily unavailable. Please try again soon."
-    : hasRoles
-      ? `Explore the ${totalRoles} career roles we match against your personality profile. Take the quiz to see which ones fit you best.`
-      : "Explore career paths matched to your work style.";
 
   return (
     <div className="min-h-screen bg-soft-cream dark:bg-[#0A0A12] text-warm-gray dark:text-[#F8FAFC]">
@@ -67,11 +92,11 @@ export default function CareersClient({ roles, loadError }: CareersClientProps) 
             <h1 className="text-3xl font-display font-bold" data-testid="text-careers-title">Career Paths</h1>
           </div>
           <p className="text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed">
-            {catalogIntro}
+            {presentation.intro}
           </p>
         </div>
 
-        {!isError && hasRoles && (
+        {isReady && (
           <div className="relative mb-8">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-warm-gray/40 dark:text-[#64748B]" />
             <input
@@ -90,11 +115,11 @@ export default function CareersClient({ roles, loadError }: CareersClientProps) 
           </div>
         )}
 
-        {isError ? (
+        {presentation.state === "unavailable" ? (
           <p className="text-center text-warm-gray/60 dark:text-[#94A3B8] py-8" role="alert" data-testid="text-careers-unavailable">
             The career catalog is temporarily unavailable. Please try again soon.
           </p>
-        ) : !hasRoles ? (
+        ) : presentation.state === "empty" ? (
           <p className="text-center text-warm-gray/60 dark:text-[#94A3B8] py-8" data-testid="text-careers-pending">
             Career paths are being curated. Take the quiz to start exploring your work style.
           </p>
@@ -139,9 +164,7 @@ export default function CareersClient({ roles, loadError }: CareersClientProps) 
         <div className="mt-12 p-5 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 text-center">
           <h3 className="font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Find Your Best Match</h3>
           <p className="text-sm text-warm-gray/60 dark:text-[#94A3B8] mb-4">
-            {hasRoles
-              ? `Take the personality quiz to discover which of these ${totalRoles} careers align with your unique trait blend.`
-              : "Take the personality quiz to start exploring career directions matched to your work style."}
+            {presentation.cta}
           </p>
           <Link
             href="/"
