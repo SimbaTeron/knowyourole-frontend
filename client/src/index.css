@@ -120,8 +120,8 @@ canvas {
   --chart-3: 340 70% 50%;
   --chart-4: 35 80% 55%;
   --chart-5: 160 65% 45%;
-  --font-sans: 'Nunito', 'Inter', sans-serif;
-  --font-serif: 'Lora', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', Arial, sans-serif;
+  --font-serif: 'Space Grotesk', Arial, sans-serif;
   --font-mono: Menlo, monospace;
   --radius: .5rem;
   --shadow-2xs: 0px 2px 0px 0px hsl(220 8% 50% / 0.00);
@@ -170,7 +170,7 @@ canvas {
   --opaque-button-border-intensity: 9;
   --elevate-1: rgba(167,139,250, .06);
   --elevate-2: rgba(167,139,250, .12);
-  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'IBM Plex Sans', Arial, sans-serif;
   --background: 240 21% 4%;
   --foreground: 210 40% 98%;
   --border: 240 15% 15%;
@@ -373,7 +373,7 @@ canvas {
 
 /* KnowYouRole Premium Design System */
 :root {
-  --font-display: 'Playfair Display', Georgia, serif;
+  --font-display: 'Space Grotesk', Arial, sans-serif;
   --section-gap: 1.5rem;
   --card-radius: 1.5rem;
   --spring-ease: cubic-bezier(0.22, 1, 0.36, 1);

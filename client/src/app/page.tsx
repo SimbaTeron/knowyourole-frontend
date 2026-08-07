@@ -2,80 +2,52 @@
 
 import { AppHeader } from "@/components/layout/AppHeader";
 
-const MODEL_CARDS = [
-  {
-    eyebrow: "Trait backbone",
-    title: "Big Five",
-    description:
-      "Shows your underlying tendencies across openness, follow-through, social energy, cooperativeness, and emotional steadiness.",
-    bullets: ["Stable trait language", "Strengths and watchouts", "Plain-English percentages"],
-    accent: "#46d8ff",
-  },
-  {
-    eyebrow: "Pattern lens",
-    title: "MBTI-style",
-    description:
-      "Turns your preferences into a familiar personality pattern without pretending a four-letter type explains your whole life.",
-    bullets: ["Thinking and decision style", "Energy and attention patterns", "Useful type-style summary"],
-    accent: "#8b5cff",
-  },
-  {
-    eyebrow: "Behavior lens",
-    title: "DISC",
-    description:
-      "Highlights how you tend to communicate, move, lead, collaborate, and respond when the work gets messy.",
-    bullets: ["Work-style signal", "Team communication clues", "Practical role fit"],
-    accent: "#ff5de4",
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    quote:
-      "The report gave me language for how I work without boxing me into a cartoon personality type.",
-    name: "Maya R.",
-    role: "Product team lead",
-  },
-  {
-    quote:
-      "I liked that it connected traits to roles and team behavior. It felt practical instead of mystical.",
-    name: "Jordan K.",
-    role: "Career switcher",
-  },
-  {
-    quote:
-      "The result was easy to share with my team because it explained strengths, friction points, and next moves clearly.",
-    name: "Ari S.",
-    role: "Founder",
-  },
-];
-
 export default function Home() {
   return (
     <div className="kyr-home-page">
       <style>{`
         .kyr-home-page {
           min-height: 100vh;
+          overflow-x: hidden;
           background: #03040d;
           color: #f8fbff;
-          font-family: 'Outfit', sans-serif;
-          overflow-x: hidden;
+          font-family: 'IBM Plex Sans', Arial, sans-serif;
         }
 
         .kyr-home-page * { box-sizing: border-box; }
 
-        .home-shell {
-          width: min(1180px, calc(100% - 40px));
-          margin: 0 auto;
+        /* Reuse the deployed Workday production palette when its theme layer is active. */
+        html.kyr-workday .kyr-home-page .trust-section,
+        html.kyr-workday .kyr-home-page .final-section {
+          background: var(--workday-paper) !important;
+          border-color: var(--workday-line) !important;
         }
+        html.kyr-workday .kyr-home-page .trust-title,
+        html.kyr-workday .kyr-home-page .final-title {
+          color: var(--workday-ink) !important;
+          font-family: var(--font-serif) !important;
+        }
+        html.kyr-workday .kyr-home-page .trust-copy,
+        html.kyr-workday .kyr-home-page .final-copy,
+        html.kyr-workday .kyr-home-page .quiz-facts,
+        html.kyr-workday .kyr-home-page .method-link {
+          color: var(--workday-muted) !important;
+        }
+        html.kyr-workday .kyr-home-page .final-panel {
+          background: var(--workday-surface) !important;
+          border-color: var(--workday-line) !important;
+          box-shadow: var(--workday-shadow) !important;
+        }
+        html.kyr-workday .kyr-home-page .final-panel .primary-cta {
+          color: var(--workday-paper) !important;
+        }
+
+        .home-shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
 
         .hero-section {
           position: relative;
-          min-height: min(820px, 90svh);
-          padding: clamp(82px, 8vw, 104px) 0 clamp(32px, 5vw, 58px);
-          display: flex;
-          align-items: center;
           isolation: isolate;
+          padding: clamp(96px, 10vw, 132px) 0 clamp(54px, 7vw, 86px);
         }
 
         .hero-section::before {
@@ -85,9 +57,8 @@ export default function Home() {
           z-index: -2;
           background:
             radial-gradient(circle at 16% 18%, rgba(70, 216, 255, 0.18), transparent 31%),
-            radial-gradient(circle at 78% 22%, rgba(139, 92, 255, 0.22), transparent 34%),
-            radial-gradient(circle at 78% 82%, rgba(255, 93, 228, 0.10), transparent 30%),
-            linear-gradient(135deg, #06131b 0%, #050712 42%, #10051a 100%);
+            radial-gradient(circle at 78% 22%, rgba(139, 92, 255, 0.20), transparent 34%),
+            linear-gradient(135deg, #06131b 0%, #050712 45%, #10051a 100%);
         }
 
         .hero-section::after {
@@ -95,76 +66,57 @@ export default function Home() {
           position: absolute;
           inset: 0;
           z-index: -1;
-          opacity: 0.34;
+          opacity: 0.28;
           background-image:
             linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-          background-size: 72px 72px;
-          mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.68) 70%, transparent 100%);
+          background-size: 76px 76px;
+          mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.65) 72%, transparent 100%);
         }
 
         .hero-grid {
           display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(330px, 0.76fr);
-          gap: clamp(24px, 4vw, 52px);
+          grid-template-columns: minmax(0, 1fr) minmax(320px, 0.78fr);
           align-items: center;
+          gap: clamp(32px, 6vw, 74px);
         }
 
-        .selected-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 7px;
-          color: #bdeeff;
+        .eyebrow {
+          margin: 0 0 14px;
+          color: #aeefff;
           font-size: 11px;
           font-weight: 900;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          margin-bottom: 14px;
-        }
-
-        .selected-pill::before {
-          content: '';
-          width: 7px;
-          height: 7px;
-          border-radius: 999px;
-          background: linear-gradient(135deg, #46d8ff, #8b5cff);
-          box-shadow: 0 0 22px rgba(70,216,255,0.8);
         }
 
         .hero-title {
+          max-width: 690px;
           margin: 0;
-          max-width: 670px;
-          font-size: clamp(3rem, 5.8vw, 5.15rem);
-          line-height: 0.91;
-          letter-spacing: -0.072em;
+          color: #f8fbff !important;
+          font-size: clamp(3.15rem, 6vw, 5.55rem);
+          line-height: 0.9;
+          letter-spacing: -0.076em;
           font-weight: 950;
         }
 
         .hero-subtitle {
-          max-width: 610px;
-          margin: 16px 0 0;
-          color: rgba(248,251,255,0.74);
-          font-size: clamp(1rem, 1.55vw, 1.18rem);
-          line-height: 1.5;
-          font-weight: 650;
+          max-width: 580px;
+          margin: 20px 0 0;
+          color: rgba(248,251,255,0.76);
+          font-size: clamp(1rem, 1.5vw, 1.15rem);
+          line-height: 1.52;
+          font-weight: 620;
           letter-spacing: -0.018em;
-        }
-
-        .hero-actions {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 14px;
-          margin-top: 16px;
         }
 
         .primary-cta {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-width: 230px;
-          min-height: 50px;
-          padding: 0 32px;
+          min-height: 52px;
+          margin-top: 24px;
+          padding: 0 30px;
           border-radius: 999px;
           background: linear-gradient(135deg, #48dcff, #7657ff 58%, #ff5de4);
           color: #fff;
@@ -172,605 +124,162 @@ export default function Home() {
           font-size: 15.5px;
           font-weight: 950;
           letter-spacing: -0.01em;
-          box-shadow: 0 18px 48px rgba(70, 216, 255, 0.22), inset 0 1px 0 rgba(255,255,255,0.4);
+          box-shadow: 0 18px 48px rgba(70,216,255,0.22), inset 0 1px 0 rgba(255,255,255,0.4);
           transition: transform 180ms ease, box-shadow 180ms ease;
         }
 
-        .primary-cta:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 22px 58px rgba(139, 92, 255, 0.32), inset 0 1px 0 rgba(255,255,255,0.44);
+        .primary-cta:hover { transform: translateY(-2px); box-shadow: 0 22px 58px rgba(139,92,255,0.32), inset 0 1px 0 rgba(255,255,255,0.44); }
+        .primary-cta:focus-visible, .method-link:focus-visible, .footer-links a:focus-visible { outline: 3px solid #8deaff; outline-offset: 4px; }
+
+        .quiz-facts {
+          margin: 14px 0 0;
+          color: rgba(248,251,255,0.62);
+          font-size: 13px;
+          font-weight: 750;
+          letter-spacing: -0.01em;
         }
 
-        .hero-facts {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin-top: 12px;
-        }
-
-        .hero-fact {
-          display: inline-flex;
-          align-items: center;
-          min-height: 31px;
-          padding: 0 12px;
-          border: 1px solid rgba(255,255,255,0.13);
-          border-radius: 999px;
-          background: rgba(255,255,255,0.055);
-          color: rgba(248,251,255,0.78);
-          font-size: 12px;
-          font-weight: 850;
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-        }
-
-        .how-card {
-          margin-top: 26px;
-          width: min(620px, 100%);
-        }
-
-        .section-break-card {
-          margin: 0 0 12px;
-          padding: 15px;
-          border: 1px solid rgba(255,255,255,0.14);
-          border-radius: 24px;
-          background: linear-gradient(135deg, rgba(70,216,255,0.13), rgba(139,92,255,0.08), rgba(255,93,228,0.08));
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 18px 46px rgba(0,0,0,0.16);
-        }
-
-        .section-break-card strong { display: block; color: #fff; font-size: 20px; line-height: 1.02; letter-spacing: -0.045em; font-weight: 950; }
-        .section-break-card span { display: block; margin-top: 6px; color: rgba(248,251,255,0.66); font-size: 12.5px; line-height: 1.38; font-weight: 650; }
-
-        .section-kicker {
+        .result-preview { min-width: 0; }
+        .preview-label {
+          display: block;
           margin: 0 0 10px;
-          color: rgba(248,251,255,0.82);
-          font-size: 12px;
-          font-weight: 950;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-        }
-
-        .how-list {
-          display: grid;
-          gap: 0;
-          margin: 0;
-          padding: 0;
-          list-style: none;
-          border-radius: 22px;
-          overflow: hidden;
-          border: 1px solid rgba(255,255,255,0.10);
-          background: rgba(5,8,18,0.36);
-        }
-
-        .how-step {
-          display: grid;
-          grid-template-columns: 34px minmax(0, 1fr);
-          align-items: flex-start;
-          gap: 11px;
-          min-height: 58px;
-          padding: 12px;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
-          color: rgba(248,251,255,0.82);
-          font-size: 13px;
-          font-weight: 850;
-          backdrop-filter: blur(18px);
-        }
-
-        .how-step:last-child { border-bottom: 0; }
-        .step-copy strong { display: block; color: #fff; font-size: 13.5px; line-height: 1.12; letter-spacing: -0.02em; font-weight: 900; }
-        .step-copy span { display: block; margin-top: 4px; color: rgba(248,251,255,0.56); font-size: 12px; line-height: 1.34; font-weight: 650; }
-
-        .step-number {
-          width: 34px;
-          height: 34px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          flex: 0 0 auto;
-          border-radius: 14px;
-          border: 1px solid rgba(70,216,255,0.25);
-          background: rgba(70,216,255,0.13);
-          color: #c7f8ff;
-          font-size: 12px;
-          font-weight: 950;
-          box-shadow: 0 0 18px rgba(70,216,255,0.18);
-        }
-
-        .result-wrap {
-          position: relative;
-          min-height: 458px;
-        }
-
-        .mock-labels {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          margin: 0 0 12px;
-          color: rgba(159,238,255,0.88);
+          color: rgba(174,239,255,0.88);
           font-size: 10px;
-          font-weight: 950;
-          letter-spacing: 0.17em;
-          text-transform: uppercase;
-        }
-        .mock-labels span:last-child { padding: 6px 9px; border: 1px solid rgba(255,255,255,0.13); border-radius: 999px; background: rgba(255,255,255,0.06); color: rgba(248,251,255,0.60); }
-
-        .sample-card {
-          position: relative;
-          width: 100%;
-          min-height: 438px;
-          padding: clamp(14px, 2.2vw, 18px);
-          border: 1px solid rgba(255,255,255,0.16);
-          border-radius: 30px;
-          background:
-            radial-gradient(circle at 84% 8%, rgba(70,216,255,0.20), transparent 32%),
-            radial-gradient(circle at 4% 92%, rgba(255,214,130,0.13), transparent 35%),
-            linear-gradient(150deg, rgba(255,255,255,0.105), rgba(255,255,255,0.04));
-          box-shadow: 0 34px 120px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.16);
-          backdrop-filter: blur(26px);
-          overflow: hidden;
-        }
-
-        .sample-card::before {
-          content: '';
-          position: absolute;
-          inset: -32% -22% auto auto;
-          width: 340px;
-          height: 340px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(70,216,255,0.24), transparent 62%);
-          filter: blur(6px);
-        }
-
-        .sample-card::after {
-          content: '';
-          position: absolute;
-          inset: auto auto -34% -24%;
-          width: 360px;
-          height: 360px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(255,93,228,0.15), transparent 64%);
-          filter: blur(8px);
-        }
-
-        .sample-inner { position: relative; z-index: 1; }
-
-        .mini-type-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          height: 28px;
-          padding: 0 12px;
-          border-radius: 999px;
-          border: 1px solid rgba(255,255,255,0.14);
-          background: rgba(255,255,255,0.07);
-          color: rgba(248,251,255,0.68);
-          font-size: 11px;
           font-weight: 900;
-        }
-
-        .sample-title-box {
-          margin-top: 14px;
-          padding: clamp(15px, 2.4vw, 20px);
-          min-height: 104px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          border: 1px solid rgba(255,255,255,0.12);
-          border-radius: 24px;
-          background: rgba(5,8,18,0.56);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.11);
-        }
-
-        .sample-title {
-          margin: 8px 0 0;
-          font-size: clamp(2.25rem, 4.8vw, 3.35rem);
-          line-height: 0.88;
-          letter-spacing: -0.075em;
-          font-weight: 950;
-          color: rgba(255,255,255,0.92);
-        }
-
-        .share-line { margin: 12px 0 10px; }
-        .share-line-label { display: block; margin-bottom: 5px; color: #ffd66b; font-size: 9.5px; font-weight: 950; letter-spacing: 0.17em; text-transform: uppercase; }
-        .share-line-text { margin: 0; color: rgba(255,255,255,0.78); font-size: clamp(0.9rem, 1.5vw, 1.02rem); line-height: 1.38; font-weight: 650; letter-spacing: -0.018em; }
-
-        .role-preview {
-          padding: 12px;
-          border-radius: 20px;
-          background: rgba(246, 227, 198, 0.82);
-          color: #15100d;
-        }
-
-        .role-preview h3 {
-          margin: 4px 0 6px;
-          color: #15100d;
-          font-size: clamp(1.12rem, 1.9vw, 1.35rem);
-          line-height: 1;
-          letter-spacing: -0.04em;
-          font-weight: 950;
-        }
-        .role-preview small { display: block; color: rgba(74,54,28,0.62); font-size: 9px; font-weight: 950; letter-spacing: 0.16em; text-transform: uppercase; }
-
-        .role-preview p {
-          margin: 0;
-          color: rgba(21,16,13,0.72);
-          font-size: 11px;
-          line-height: 1.32;
-          font-weight: 750;
-        }
-
-        .sample-metrics {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 8px;
-          margin-top: 12px;
-        }
-
-        .metric-box {
-          min-height: 58px;
-          padding: 9px;
-          border: 1px solid rgba(255,255,255,0.11);
-          border-radius: 17px;
-          background: rgba(4,5,14,0.34);
-        }
-
-        .metric-label {
-          display: block;
-          color: #8deaff;
-          font-size: 9px;
-          font-weight: 950;
-          letter-spacing: 0.17em;
-          text-transform: uppercase;
-        }
-
-        .metric-value {
-          display: block;
-          margin-top: 4px;
-          color: rgba(255,255,255,0.9);
-          font-size: 17px;
-          font-weight: 950;
-          line-height: 1;
-        }
-
-        .metric-detail {
-          display: block;
-          margin-top: 4px;
-          color: rgba(255,255,255,0.48);
-          font-size: 10px;
-          font-weight: 800;
-        }
-
-        .full-results-note {
-          margin-top: 12px;
-          padding: 10px;
-          border: 1px solid rgba(255,255,255,0.12);
-          border-radius: 22px;
-          background: rgba(255,255,255,0.055);
-          backdrop-filter: blur(22px);
-        }
-
-        .note-title {
-          margin: 0 0 6px;
-          color: rgba(255,255,255,0.86);
-          font-size: 12px;
-          font-weight: 950;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-        }
-
-        .note-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 6px;
-        }
-
-        .note-item {
-          display: flex;
-          gap: 8px;
-          align-items: flex-start;
-          color: rgba(255,255,255,0.68);
-          font-size: 11px;
-          line-height: 1.18;
-          font-weight: 750;
-        }
-
-        .model-section,
-        .testimonial-section {
-          padding: clamp(38px, 5.5vw, 64px) 0;
-          position: relative;
-        }
-
-        .model-section {
-          background:
-            linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.055), rgba(255,255,255,0.012)),
-            radial-gradient(circle at 50% 0%, rgba(70,216,255,0.075), transparent 34%),
-            linear-gradient(180deg, #03040d, #060713 48%, #03040d);
-          border-top: 1px solid rgba(255,255,255,0.08);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .section-heading {
-          display: grid;
-          grid-template-columns: minmax(0, 0.78fr) minmax(280px, 0.72fr);
-          gap: clamp(20px, 4vw, 46px);
-          align-items: end;
-          margin-bottom: clamp(20px, 4vw, 30px);
-        }
-
-        .eyebrow {
-          margin: 0 0 12px;
-          color: #8deaff;
-          font-size: 11px;
-          font-weight: 950;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-        }
-
-        .section-title {
-          margin: 0;
-          color: #fff;
-          font-size: clamp(1.9rem, 3.6vw, 3.45rem);
-          line-height: 0.94;
-          letter-spacing: -0.06em;
-          font-weight: 950;
-        }
-
-        .section-copy {
-          margin: 0;
-          color: rgba(248,251,255,0.58);
-          font-size: 15px;
-          line-height: 1.5;
-          font-weight: 700;
-        }
-
-        .model-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 16px;
-        }
-
-        .model-card,
-        .testimonial-card {
-          border: 1px solid rgba(255,255,255,0.10);
-          background: rgba(255,255,255,0.045);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-          backdrop-filter: blur(22px);
-        }
-
-        .model-card {
-          position: relative;
-          min-height: 268px;
-          padding: clamp(18px, 2.4vw, 24px);
-          border-radius: 24px;
-          overflow: hidden;
-        }
-
-        .model-card::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: radial-gradient(circle at 22% 0%, var(--accent-glow), transparent 45%);
-          pointer-events: none;
-        }
-
-        .model-content { position: relative; z-index: 1; }
-
-        .model-number {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 42px;
-          height: 42px;
-          margin-bottom: 12px;
-          border-radius: 14px;
-          border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
-          background: color-mix(in srgb, var(--accent) 17%, transparent);
-          color: var(--accent);
-          font-size: 13px;
-          font-weight: 950;
-        }
-
-        .model-eyebrow {
-          margin: 0 0 8px;
-          color: var(--accent);
-          font-size: 10px;
-          font-weight: 950;
           letter-spacing: 0.16em;
           text-transform: uppercase;
         }
 
-        .model-title {
-          margin: 0 0 12px;
+        .sample-card {
+          position: relative;
+          overflow: hidden;
+          padding: clamp(18px, 2.6vw, 26px);
+          border: 1px solid rgba(255,255,255,0.17);
+          border-radius: 30px;
+          background:
+            radial-gradient(circle at 88% 8%, rgba(70,216,255,0.22), transparent 31%),
+            radial-gradient(circle at 2% 96%, rgba(255,93,228,0.14), transparent 37%),
+            linear-gradient(150deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045));
+          box-shadow: 0 30px 100px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16);
+          backdrop-filter: blur(26px);
+        }
+
+        .sample-card > * { position: relative; z-index: 1; }
+        .sample-type {
+          display: inline-flex;
+          padding: 7px 11px;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 999px;
+          background: rgba(255,255,255,0.07);
+          color: rgba(248,251,255,0.72);
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.06em;
+        }
+
+        .sample-title {
+          margin: 16px 0 18px;
           color: #fff;
-          font-size: 27px;
-          line-height: 0.98;
-          letter-spacing: -0.045em;
+          font-size: clamp(2.5rem, 4.8vw, 3.65rem);
+          line-height: 0.88;
+          letter-spacing: -0.075em;
           font-weight: 950;
         }
 
-        .model-description {
-          margin: 0 0 16px;
-          color: rgba(248,251,255,0.60);
-          font-size: 14px;
-          line-height: 1.55;
-          font-weight: 700;
+        .role-preview {
+          padding: 16px;
+          border-radius: 20px;
+          background: rgba(246,227,198,0.92);
+          color: #15100d;
         }
 
-        .model-bullets {
+        .role-preview small {
+          display: block;
+          color: rgba(74,54,28,0.64);
+          font-size: 9px;
+          font-weight: 950;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+        }
+        .role-preview h3 { margin: 5px 0 7px; color: #15100d; font-size: clamp(1.2rem, 2vw, 1.45rem); line-height: 1; letter-spacing: -0.04em; font-weight: 950; }
+        .role-preview p { margin: 0; color: rgba(21,16,13,0.72); font-size: 12px; line-height: 1.4; font-weight: 720; }
+
+        .result-list {
           display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 8px;
-          margin: 0;
+          margin: 14px 0 0;
           padding: 0;
           list-style: none;
         }
-
-        .model-bullets li {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: rgba(248,251,255,0.74);
-          font-size: 12px;
-          font-weight: 850;
+        .result-list li {
+          padding: 9px 10px;
+          border: 1px solid rgba(255,255,255,0.10);
+          border-radius: 14px;
+          background: rgba(3,4,13,0.28);
+          color: rgba(248,251,255,0.78);
+          font-size: 11px;
+          line-height: 1.28;
+          font-weight: 760;
         }
 
-        .model-bullets li::before {
-          content: '';
-          width: 6px;
-          height: 6px;
-          flex: 0 0 auto;
-          border-radius: 999px;
-          background: var(--accent);
-          box-shadow: 0 0 16px var(--accent);
-        }
-
-        .testimonial-section {
-          background: linear-gradient(180deg, #03040d, #080611 70%, #03040d);
-        }
-
-        .testimonial-header {
-          max-width: 760px;
-          margin-bottom: clamp(20px, 4vw, 30px);
-        }
-
-        .testimonial-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 16px;
-        }
-
-        .testimonial-card {
-          min-height: 208px;
-          padding: clamp(18px, 2.4vw, 24px);
-          border-radius: 24px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .stars {
-          color: #ffd66b;
-          font-size: 14px;
-          letter-spacing: 0.12em;
-          margin-bottom: 18px;
-        }
-
-        .testimonial-quote {
-          margin: 0;
-          color: rgba(248,251,255,0.84);
-          font-size: clamp(1.02rem, 1.5vw, 1.22rem);
-          line-height: 1.44;
-          letter-spacing: -0.02em;
-          font-weight: 850;
-        }
-
-        .testimonial-person {
-          margin-top: 28px;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .avatar {
-          width: 42px;
-          height: 42px;
-          flex: 0 0 auto;
-          border-radius: 999px;
-          background: linear-gradient(135deg, #46d8ff, #8b5cff 52%, #ff5de4);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #fff;
-          font-size: 12px;
-          font-weight: 950;
-          box-shadow: 0 0 28px rgba(139,92,255,0.24);
-        }
-
-        .person-name {
-          margin: 0;
-          color: #fff;
-          font-size: 14px;
-          font-weight: 950;
-        }
-
-        .person-role {
-          margin: 2px 0 0;
-          color: rgba(248,251,255,0.42);
-          font-size: 12px;
-          font-weight: 700;
-        }
-
-        .home-footer {
-          padding: 24px 0;
+        .trust-section {
+          padding: clamp(48px, 7vw, 84px) 0;
           border-top: 1px solid rgba(255,255,255,0.08);
-          color: rgba(248,251,255,0.46);
-          font-size: 12px;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+          background: linear-gradient(180deg, #03040d, #070817 52%, #03040d);
         }
+        .trust-panel {
+          display: grid;
+          grid-template-columns: minmax(0, 0.82fr) minmax(260px, 0.58fr);
+          gap: clamp(28px, 6vw, 76px);
+          align-items: end;
+        }
+        .trust-title { max-width: 620px; margin: 0; color: #fff; font-size: clamp(2rem, 4vw, 3.65rem); line-height: 0.94; letter-spacing: -0.06em; font-weight: 950; }
+        .trust-copy { margin: 0; color: rgba(248,251,255,0.66); font-size: 15px; line-height: 1.58; font-weight: 650; }
+        .method-link { display: inline-flex; margin-top: 16px; color: #aeefff; font-size: 14px; font-weight: 900; text-underline-offset: 4px; }
 
-        .footer-row {
+        .final-section { padding: clamp(48px, 7vw, 82px) 0; background: #03040d; }
+        .final-panel {
           display: flex;
           flex-wrap: wrap;
-          gap: 14px 18px;
           align-items: center;
           justify-content: space-between;
+          gap: 24px;
+          padding: clamp(24px, 4vw, 42px);
+          border: 1px solid rgba(255,255,255,0.13);
+          border-radius: 28px;
+          background: linear-gradient(135deg, rgba(70,216,255,0.12), rgba(139,92,255,0.10), rgba(255,93,228,0.10));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
         }
+        .final-title { margin: 0; color: #fff; font-size: clamp(1.75rem, 3.5vw, 3rem); line-height: 0.96; letter-spacing: -0.06em; font-weight: 950; }
+        .final-copy { margin: 9px 0 0; color: rgba(248,251,255,0.67); font-size: 14px; line-height: 1.45; font-weight: 650; }
+        .final-panel .primary-cta { margin: 0; flex: 0 0 auto; }
 
-        .footer-links {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 14px;
-        }
-
-        .footer-links a {
-          color: rgba(248,251,255,0.46);
-          text-decoration: none;
-        }
-
+        .home-footer { padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.08); color: rgba(248,251,255,0.46); font-size: 12px; }
+        .footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 18px; }
+        .footer-links { display: flex; flex-wrap: wrap; gap: 14px; }
+        .footer-links a { color: rgba(248,251,255,0.52); text-decoration: none; }
         .footer-links a:hover { color: #8deaff; }
 
-        @media (max-width: 980px) {
-          .hero-section { align-items: flex-start; min-height: auto; }
-          .hero-grid,
-          .section-heading {
-            grid-template-columns: 1fr;
-          }
-          .result-wrap { min-height: auto; }
-          .model-grid,
-          .testimonial-grid {
-            grid-template-columns: 1fr;
-          }
-          .model-card,
-          .testimonial-card { min-height: auto; }
+        @media (max-width: 860px) {
+          .hero-grid, .trust-panel { grid-template-columns: 1fr; }
+          .hero-section { padding-top: 94px; }
+          .result-preview { max-width: 560px; }
         }
 
         @media (max-width: 640px) {
-          .home-shell { width: min(100% - 28px, 1180px); }
-          .hero-section { padding-top: 86px; padding-bottom: 34px; }
-          .hero-title { font-size: clamp(2.72rem, 13.6vw, 3.82rem); }
-          .hero-subtitle { font-size: 0.98rem; font-weight: 620; }
+          .home-shell { width: min(100% - 28px, 1120px); }
+          .hero-section { padding: 86px 0 48px; }
+          .hero-title { font-size: clamp(2.78rem, 13.5vw, 3.8rem); }
+          .hero-subtitle { font-size: 0.98rem; }
           .primary-cta { width: 100%; }
-          .hero-facts { width: 100%; }
-          .hero-fact { flex: 1 1 auto; justify-content: center; }
-          .sample-card { min-height: auto; border-radius: 28px; }
-          .sample-title-box { min-height: 118px; }
-          .sample-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-          .metric-box { min-height: 60px; padding: 8px; }
-          .metric-value { font-size: 14px; }
-          .metric-detail { font-size: 9px; }
-          .model-section,
-          .testimonial-section { padding: 34px 0; }
-          .section-heading { gap: 12px; margin-bottom: 16px; }
-          .section-title { font-size: clamp(1.85rem, 9vw, 2.55rem); }
-          .section-copy { font-size: 13.5px; font-weight: 620; }
-          .model-grid { gap: 9px; }
-          .model-card { display: grid; grid-template-columns: 42px minmax(0,1fr); gap: 10px; padding: 12px; border-radius: 20px; min-height: auto; }
-          .model-content { display: contents; }
-          .model-number { margin: 0; }
-          .model-eyebrow { margin: 0 0 4px; font-size: 9px; }
-          .model-title { margin: 0 0 5px; font-size: 17px; }
-          .model-description { margin: 0; font-size: 12px; line-height: 1.35; font-weight: 620; }
-          .model-bullets { display: none; }
-          .note-grid { grid-template-columns: 1fr; }
-          .mock-labels { font-size: 9px; }
-          .how-step { align-items: flex-start; padding: 10px; }
+          .quiz-facts { line-height: 1.55; }
+          .sample-card { border-radius: 24px; }
+          .result-list { grid-template-columns: 1fr; }
+          .trust-section, .final-section { padding: 46px 0; }
+          .final-panel { align-items: stretch; border-radius: 24px; }
+          .final-panel .primary-cta { width: 100%; }
         }
       `}</style>
 
@@ -780,159 +289,61 @@ export default function Home() {
         <section className="hero-section" aria-labelledby="home-hero-title">
           <div className="home-shell hero-grid">
             <div>
-              <div className="selected-pill">Results Plus / selected direction</div>
+              <p className="eyebrow">Free personality quiz for work style &amp; career fit</p>
               <h1 id="home-hero-title" className="hero-title">
-                A personality quiz built for real decisions.
+                Find the work patterns—and career directions—worth testing next.
               </h1>
               <p className="hero-subtitle">
-                A short quiz that combines Big Five, MBTI-style patterns, and DISC into one practical result.
+                A private, 28-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.
               </p>
-
-              <div className="hero-actions">
-                <a className="primary-cta" href="/quiz">Take the free quiz</a>
-              </div>
-
-              <div className="hero-facts" aria-label="Quiz facts">
-                <span className="hero-fact">28 questions</span>
-                <span className="hero-fact">Private by default</span>
-                <span className="hero-fact">Trait + role report</span>
-              </div>
-
-              <div className="how-card" aria-labelledby="how-it-works-title">
-                <div className="section-break-card">
-                  <h2 id="how-it-works-title" className="section-kicker">How it works</h2>
-                  <strong>Three steps. No personality cosplay.</strong>
-                  <span>A quieter separator gives the homepage clear chapters instead of one endless glass-card pile.</span>
-                </div>
-                <ol className="how-list">
-                  <li className="how-step"><span className="step-number">1</span><span className="step-copy"><strong>Answer grounded questions</strong><span>Compact prompts around choices, pressure, and work preferences.</span></span></li>
-                  <li className="how-step"><span className="step-number">2</span><span className="step-copy"><strong>Score the trait signals</strong><span>Personality, behavior, and career-fit vectors are scored together.</span></span></li>
-                  <li className="how-step"><span className="step-number">3</span><span className="step-copy"><strong>Use the result</strong><span>Get role direction, communication clues, and practical next moves.</span></span></li>
-                </ol>
-              </div>
+              <a className="primary-cta" href="/quiz">Take the free quiz</a>
+              <p className="quiz-facts">28 questions · Private by default · No account required</p>
             </div>
 
-            <div className="result-wrap" aria-label="Generic sample result preview">
-              <div className="mock-labels">
-                <span>Sample result</span>
-                <span>Preview only</span>
-              </div>
-
+            <aside className="result-preview" aria-label="Example KnowYouRole result">
+              <span className="preview-label">An example of your result</span>
               <div className="sample-card">
-                <div className="sample-inner">
-                  <div className="sample-title-box">
-                    <span className="mini-type-pill">✦ INTJ-style pattern</span>
-                    <h2 className="sample-title">Systems<br />Builder</h2>
-                  </div>
-
-                  <div className="share-line">
-                    <span className="share-line-label">What you’ll learn</span>
-                    <p className="share-line-text">Your answers become a plain-English portrait: work style, role direction, strengths, and friction points.</p>
-                  </div>
-
-                  <div className="role-preview">
-                    <small>Best-fit role direction</small>
-                    <h3>Strategic Analyst</h3>
-                    <p>
-                      A quick snapshot of the kinds of environments, problems, and work patterns that may fit you best.
-                    </p>
-                  </div>
-
-                  <div className="sample-metrics">
-                    <div className="metric-box">
-                      <span className="metric-label">Trait lens</span>
-                      <span className="metric-value">INTJ</span>
-                      <span className="metric-detail">Pattern</span>
-                    </div>
-                    <div className="metric-box">
-                      <span className="metric-label">Work style</span>
-                      <span className="metric-value">C/D</span>
-                      <span className="metric-detail">Precise + direct</span>
-                    </div>
-                    <div className="metric-box">
-                      <span className="metric-label">Top trait</span>
-                      <span className="metric-value">85%</span>
-                      <span className="metric-detail">Follow-through</span>
-                    </div>
-                  </div>
-
-                  <aside className="full-results-note" aria-label="Full result features">
-                    <p className="note-title">Also inside the full result</p>
-                    <div className="note-grid">
-                      <div className="note-item"><span>🧠</span><span>Trait breakdowns with plain-English meaning</span></div>
-                      <div className="note-item"><span>💼</span><span>Role-fit suggestions and career direction</span></div>
-                      <div className="note-item"><span>🤝</span><span>Team communication and friction points</span></div>
-                      <div className="note-item"><span>⚡</span><span>Action tips for better decisions</span></div>
-                    </div>
-                  </aside>
+                <span className="sample-type">INTJ-style pattern</span>
+                <h2 className="sample-title">Systems<br />Builder</h2>
+                <div className="role-preview">
+                  <small>Best-fit role direction</small>
+                  <h3>Strategic Analyst</h3>
+                  <p>Explore the environments, problems, and working patterns that may fit you best.</p>
                 </div>
+                <ul className="result-list" aria-label="Result contents">
+                  <li>Your work style and strengths</li>
+                  <li>Likely friction points</li>
+                  <li>Roles and environments to explore</li>
+                  <li>One next experiment to try</li>
+                </ul>
               </div>
-            </div>
+            </aside>
           </div>
         </section>
 
-        <section className="model-section" aria-labelledby="models-title">
-          <div className="home-shell">
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow">The three lenses</p>
-                <h2 id="models-title" className="section-title">Big Five depth, MBTI-style patterns, DISC behavior.</h2>
-              </div>
-              <p className="section-copy">
-                One model alone can be too narrow. KnowYouRole blends trait depth, familiar pattern language, and work-style behavior so the result is easier to understand and more useful in real decisions.
+        <section className="trust-section model-section" aria-labelledby="trust-title">
+          <div className="home-shell trust-panel">
+            <div>
+              <p className="eyebrow">Grounded in multiple lenses</p>
+              <h2 id="trust-title" className="trust-title section-title">A practical read, not a verdict on who you are.</h2>
+            </div>
+            <div>
+              <p className="trust-copy section-copy">
+                KnowYouRole brings together Big Five trait language, familiar MBTI-style patterns, and DISC-style work behavior. It is built for reflection and role exploration—not diagnosis, hiring, or predicting your future.
               </p>
-            </div>
-
-            <div className="model-grid">
-              {MODEL_CARDS.map((model, index) => (
-                <article
-                  key={model.title}
-                  className="model-card"
-                  style={{
-                    "--accent": model.accent,
-                    "--accent-glow": `${model.accent}25`,
-                  } as React.CSSProperties}
-                >
-                  <div className="model-content">
-                    <span className="model-number">0{index + 1}</span>
-                    <p className="model-eyebrow">{model.eyebrow}</p>
-                    <h3 className="model-title">{model.title}</h3>
-                    <p className="model-description">{model.description}</p>
-                    <ul className="model-bullets">
-                      {model.bullets.map((bullet) => (
-                        <li key={bullet}>{bullet}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </article>
-              ))}
+              <a className="method-link" href="/methodology">Read the methodology</a>
             </div>
           </div>
         </section>
 
-        <section className="testimonial-section" aria-labelledby="testimonials-title">
+        <section className="final-section testimonial-section" aria-labelledby="final-title">
           <div className="home-shell">
-            <div className="testimonial-header">
-              <p className="eyebrow">What people notice</p>
-              <h2 id="testimonials-title" className="section-title">Useful enough to actually talk about.</h2>
-            </div>
-
-            <div className="testimonial-grid">
-              {TESTIMONIALS.map((item) => (
-                <figure key={item.name} className="testimonial-card">
-                  <div>
-                    <div className="stars" aria-label="Five star rating">★★★★★</div>
-                    <blockquote className="testimonial-quote">“{item.quote}”</blockquote>
-                  </div>
-                  <figcaption className="testimonial-person">
-                    <span className="avatar">{item.name.split(" ").map((part) => part[0]).join("")}</span>
-                    <span>
-                      <p className="person-name">{item.name}</p>
-                      <p className="person-role">{item.role}</p>
-                    </span>
-                  </figcaption>
-                </figure>
-              ))}
+            <div className="final-panel testimonial-card">
+              <div>
+                <h2 id="final-title" className="final-title section-title">Get a useful starting point in 28 questions.</h2>
+                <p className="final-copy section-copy">Private by default. No account required.</p>
+              </div>
+              <a className="primary-cta" href="/quiz">Take the free quiz</a>
             </div>
           </div>
         </section>

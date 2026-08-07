@@ -26,8 +26,8 @@ html.kyr-workday {
   --accent: 43 100% 63%;
   --accent-foreground: 209 53% 15%;
   --ring: 43 100% 63%;
-  --font-sans: "Manrope", "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "IBM Plex Sans", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Space Grotesk", Arial, sans-serif;
   --radius: 0.9rem;
   color-scheme: light;
 }
@@ -222,10 +222,10 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
 /* Empty results are a deliberate inviting state rather than an infinite blank loader. */
 .workday-empty-result { min-height: 100dvh; display: grid; place-items: center; padding: 108px 20px 48px; background: linear-gradient(130deg, #9ed8e6 0 48%, #f8f3e8 48% 68%, #e98268 68% 100%); }
 .workday-empty-result section { width: min(620px, 100%); padding: clamp(30px, 6vw, 64px); border: 1px solid rgba(18,38,58,.18); background: rgba(255,253,248,.91); box-shadow: 10px 10px 0 rgba(18,38,58,.11); }
-.workday-empty-result p { margin: 0; color: #536e82; font: 800 11px/1 "Manrope", sans-serif; letter-spacing: .16em; text-transform: uppercase; }
-.workday-empty-result h1 { margin: 18px 0; color: #12263a; font: 700 clamp(2.7rem, 6vw, 5rem)/.9 "Fraunces", Georgia, serif; letter-spacing: -.07em; }
-.workday-empty-result span { display: block; max-width: 460px; color: #405f72; font: 600 16px/1.6 "Manrope", sans-serif; }
-.workday-empty-result a { display: inline-flex; align-items: center; gap: 10px; margin-top: 27px; padding: 14px 17px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "Manrope", sans-serif; box-shadow: 4px 4px 0 #ffca42; }
+.workday-empty-result p { margin: 0; color: #536e82; font: 800 11px/1 "IBM Plex Sans", sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+.workday-empty-result h1 { margin: 18px 0; color: #12263a; font: 700 clamp(2.7rem, 6vw, 5rem)/.9 "Space Grotesk", Arial, sans-serif; letter-spacing: -.07em; }
+.workday-empty-result span { display: block; max-width: 460px; color: #405f72; font: 600 16px/1.6 "IBM Plex Sans", sans-serif; }
+.workday-empty-result a { display: inline-flex; align-items: center; gap: 10px; margin-top: 27px; padding: 14px 17px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "IBM Plex Sans", sans-serif; box-shadow: 4px 4px 0 #ffca42; }
 
 /* Shared editorial pages: /learn, /resources, /compare, careers/[slug], and result types. */
 .workday-content-page { min-height: 100vh; background: #f8f3e8; color: #12263a; padding-top: 1px; }
@@ -233,39 +233,39 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
 .workday-content-hero { position: relative; overflow: hidden; padding: clamp(132px, 15vw, 184px) 0 clamp(58px, 9vw, 106px); background: linear-gradient(127deg, #9ed8e6 0 46%, #f8f3e8 46% 65%, #e98268 65% 100%); }
 .workday-content-hero::after { content: ""; position: absolute; inset: 0; opacity: .23; pointer-events: none; background-image: linear-gradient(rgba(18,38,58,.22) 1px, transparent 1px), linear-gradient(90deg, rgba(18,38,58,.22) 1px, transparent 1px); background-size: 44px 44px; }
 .workday-content-hero .workday-content-wrap { position: relative; z-index: 1; }
-.workday-content-kicker { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 10px/1 "Manrope", sans-serif; letter-spacing: .11em; text-transform: uppercase; }
-.workday-content-eyebrow, .workday-content-count { margin: 24px 0 0; color: #12263a; font: 800 11px/1 "Manrope", sans-serif; letter-spacing: .18em; text-transform: uppercase; }
-.workday-content-hero h1 { max-width: 900px; margin: 16px 0 0; font: 700 clamp(3rem, 7vw, 6.8rem)/.88 "Fraunces", Georgia, serif; letter-spacing: -.075em; }
-.workday-content-intro { max-width: 680px; margin: 24px 0 0; color: #28475d; font: 600 clamp(1rem, 1.5vw, 1.18rem)/1.55 "Manrope", sans-serif; }
+.workday-content-kicker { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 10px/1 "IBM Plex Sans", sans-serif; letter-spacing: .11em; text-transform: uppercase; }
+.workday-content-eyebrow, .workday-content-count { margin: 24px 0 0; color: #12263a; font: 800 11px/1 "IBM Plex Sans", sans-serif; letter-spacing: .18em; text-transform: uppercase; }
+.workday-content-hero h1 { max-width: 900px; margin: 16px 0 0; font: 700 clamp(3rem, 7vw, 6.8rem)/.88 "Space Grotesk", Arial, sans-serif; letter-spacing: -.075em; }
+.workday-content-intro { max-width: 680px; margin: 24px 0 0; color: #28475d; font: 600 clamp(1rem, 1.5vw, 1.18rem)/1.55 "IBM Plex Sans", sans-serif; }
 .workday-content-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
-.workday-content-primary, .workday-content-secondary { min-height: 46px; display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; text-decoration: none; font: 800 12px/1 "Manrope", sans-serif; }
+.workday-content-primary, .workday-content-secondary { min-height: 46px; display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; text-decoration: none; font: 800 12px/1 "IBM Plex Sans", sans-serif; }
 .workday-content-primary { background: #12263a; color: #f8f3e8; box-shadow: 4px 4px 0 #ffca42; }
 .workday-content-secondary { border: 1px solid rgba(18,38,58,.28); color: #12263a; background: rgba(255,253,248,.6); }
 .workday-content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 292px; gap: clamp(28px, 6vw, 84px); padding-top: clamp(48px, 8vw, 96px); padding-bottom: clamp(70px, 10vw, 130px); }
 .workday-content-body { min-width: 0; display: grid; gap: 18px; }
 .workday-content-section { position: relative; padding: clamp(25px, 4vw, 42px); border: 1px solid rgba(18,38,58,.16); background: #fffdf8; box-shadow: 8px 8px 0 rgba(18,38,58,.08); }
-.workday-content-section h2 { max-width: 760px; margin: 12px 0 0; font: 700 clamp(1.8rem, 3vw, 3rem)/.98 "Fraunces", Georgia, serif; letter-spacing: -.055em; }
-.workday-content-section > p:not(.workday-content-count) { max-width: 760px; margin: 20px 0 0; color: #405f72; font: 500 15px/1.75 "Manrope", sans-serif; }
+.workday-content-section h2 { max-width: 760px; margin: 12px 0 0; font: 700 clamp(1.8rem, 3vw, 3rem)/.98 "Space Grotesk", Arial, sans-serif; letter-spacing: -.055em; }
+.workday-content-section > p:not(.workday-content-count) { max-width: 760px; margin: 20px 0 0; color: #405f72; font: 500 15px/1.75 "IBM Plex Sans", sans-serif; }
 .workday-content-section ul { display: grid; gap: 9px; margin: 22px 0 0; padding: 0; list-style: none; }
-.workday-content-section li { padding: 13px 15px 13px 34px; border-left: 3px solid #ffca42; background: #f8f3e8; color: #28475d; font: 700 13px/1.55 "Manrope", sans-serif; }
+.workday-content-section li { padding: 13px 15px 13px 34px; border-left: 3px solid #ffca42; background: #f8f3e8; color: #28475d; font: 700 13px/1.55 "IBM Plex Sans", sans-serif; }
 .workday-content-library { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
 .workday-content-library a { min-height: 150px; padding: 17px; border: 1px solid rgba(18,38,58,.16); color: #12263a; text-decoration: none; background: #f8f3e8; }
 .workday-content-library a:hover { background: #ffca42; transform: translate(-2px,-2px); box-shadow: 4px 4px 0 #12263a; }
-.workday-content-library span, .workday-content-related p { display: block; color: #536e82; font: 800 10px/1 "Manrope", sans-serif; letter-spacing: .13em; text-transform: uppercase; }
-.workday-content-library strong { display: block; margin-top: 12px; font: 700 20px/1.05 "Fraunces", Georgia, serif; letter-spacing: -.04em; }
-.workday-content-library em { display: block; margin-top: 10px; color: #536e82; font: 500 12px/1.45 "Manrope", sans-serif; font-style: normal; }
+.workday-content-library span, .workday-content-related p { display: block; color: #536e82; font: 800 10px/1 "IBM Plex Sans", sans-serif; letter-spacing: .13em; text-transform: uppercase; }
+.workday-content-library strong { display: block; margin-top: 12px; font: 700 20px/1.05 "Space Grotesk", Arial, sans-serif; letter-spacing: -.04em; }
+.workday-content-library em { display: block; margin-top: 10px; color: #536e82; font: 500 12px/1.45 "IBM Plex Sans", sans-serif; font-style: normal; }
 .workday-content-faq { display: grid; gap: 8px; margin-top: 22px; }
 .workday-content-faq details { border-top: 1px solid rgba(18,38,58,.16); padding: 16px 0; }
-.workday-content-faq summary { cursor: pointer; font: 800 15px/1.35 "Manrope", sans-serif; }
-.workday-content-faq p { margin: 12px 0 0; color: #536e82; font: 500 14px/1.6 "Manrope", sans-serif; }
+.workday-content-faq summary { cursor: pointer; font: 800 15px/1.35 "IBM Plex Sans", sans-serif; }
+.workday-content-faq p { margin: 12px 0 0; color: #536e82; font: 500 14px/1.6 "IBM Plex Sans", sans-serif; }
 .workday-content-aside { align-self: start; display: grid; gap: 14px; position: sticky; top: 88px; }
 .workday-content-next { padding: 23px; background: #12263a; color: #f8f3e8; box-shadow: 6px 6px 0 #ffca42; }
-.workday-content-next p, .workday-content-next span { color: #c5d8dc; font: 800 10px/1.4 "Manrope", sans-serif; letter-spacing: .11em; text-transform: uppercase; }
-.workday-content-next h2 { margin: 16px 0; font: 700 30px/.98 "Fraunces", Georgia, serif; letter-spacing: -.055em; }
-.workday-content-next a { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding: 13px 14px; background: #ffca42; color: #12263a; text-decoration: none; font: 800 12px/1 "Manrope", sans-serif; }
+.workday-content-next p, .workday-content-next span { color: #c5d8dc; font: 800 10px/1.4 "IBM Plex Sans", sans-serif; letter-spacing: .11em; text-transform: uppercase; }
+.workday-content-next h2 { margin: 16px 0; font: 700 30px/.98 "Space Grotesk", Arial, sans-serif; letter-spacing: -.055em; }
+.workday-content-next a { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding: 13px 14px; background: #ffca42; color: #12263a; text-decoration: none; font: 800 12px/1 "IBM Plex Sans", sans-serif; }
 .workday-content-related { padding: 20px; border: 1px solid rgba(18,38,58,.16); background: #fffdf8; }
-.workday-content-related a { display: flex; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(18,38,58,.12); color: #28475d; text-decoration: none; font: 750 12px/1.35 "Manrope", sans-serif; text-transform: capitalize; }
-.workday-content-trust { margin: 0; padding: 15px; border-left: 3px solid #e98268; color: #536e82; font: 600 12px/1.5 "Manrope", sans-serif; }
+.workday-content-related a { display: flex; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(18,38,58,.12); color: #28475d; text-decoration: none; font: 750 12px/1.35 "IBM Plex Sans", sans-serif; text-transform: capitalize; }
+.workday-content-trust { margin: 0; padding: 15px; border-left: 3px solid #e98268; color: #536e82; font: 600 12px/1.5 "IBM Plex Sans", sans-serif; }
 
 /* Shared Workday navigation. */
 .workday-header {
@@ -294,13 +294,13 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
   transition: border-radius 220ms ease, min-height 220ms ease, background 220ms ease;
 }
 .workday-header.is-scrolled .workday-header__bar { min-height: 50px; border-radius: 999px; background: color-mix(in srgb, #fffdf8 92%, transparent); }
-.workday-header__brand { display: inline-flex; align-items: center; gap: 9px; color: #12263a; text-decoration: none; font: 800 clamp(15px, 1.6vw, 18px)/1 "Manrope", sans-serif; letter-spacing: -.045em; white-space: nowrap; }
+.workday-header__brand { display: inline-flex; align-items: center; gap: 9px; color: #12263a; text-decoration: none; font: 800 clamp(15px, 1.6vw, 18px)/1 "IBM Plex Sans", sans-serif; letter-spacing: -.045em; white-space: nowrap; }
 .workday-header__mark { width: 33px; height: 33px; display: grid; place-items: center; border-radius: 10px; color: #12263a; background: #ffca42; box-shadow: 3px 3px 0 rgba(18,38,58,.14); }
 .workday-header__mark svg { width: 20px; height: 20px; }
 .workday-header__links { display: flex; align-items: center; gap: 18px; margin-left: auto; }
-.workday-header__links a { color: #536e82; text-decoration: none; font: 750 12px/1 "Manrope", sans-serif; letter-spacing: -.015em; }
+.workday-header__links a { color: #536e82; text-decoration: none; font: 750 12px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.015em; }
 .workday-header__links a:hover { color: #12263a; }
-.workday-header__cta { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 15px; border-radius: 999px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "Manrope", sans-serif; letter-spacing: -.02em; box-shadow: 3px 3px 0 #ffca42; }
+.workday-header__cta { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 15px; border-radius: 999px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.02em; box-shadow: 3px 3px 0 #ffca42; }
 .workday-header__cta:hover { transform: translate(-1px, -1px); }
 
 @media (max-width: 760px) {
@@ -341,8 +341,8 @@ html.kyr-workday {
 }
 .workday-footer { position: relative; z-index: 10; padding: clamp(42px, 7vw, 72px) clamp(18px, 4vw, 48px) 24px; color: #f8f3e8; background: #12263a; border-top: 5px solid #ffca42; }
 .workday-footer__grid { width: min(1120px, 100%); margin: 0 auto; display: grid; grid-template-columns: minmax(220px, 1.6fr) repeat(3, minmax(130px, 1fr)); gap: clamp(26px, 5vw, 64px); }
-.workday-footer__brand { display: inline-flex; gap: 8px; align-items: center; color: #f8f3e8; text-decoration: none; font: 800 21px/1 "Manrope", sans-serif; letter-spacing: -.055em; }
-.workday-footer__brand span { color: #ffca42; font-size: 25px; }.workday-footer p { max-width: 310px; margin: 15px 0 0; color: #c5d8dc; font: 500 13px/1.6 "Manrope", sans-serif; }
-.workday-footer h2 { margin: 3px 0 14px; color: #ffca42; font: 800 10px/1 "Manrope", sans-serif; letter-spacing: .13em; text-transform: uppercase; }.workday-footer ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }.workday-footer a:not(.workday-footer__brand) { color: #f8f3e8; text-decoration-color: rgba(255,202,66,.5); font: 600 13px/1.4 "Manrope", sans-serif; }.workday-footer a:hover { color: #ffca42; }.workday-footer__bottom { width: min(1120px,100%); margin: 40px auto 0; padding-top: 18px; border-top: 1px solid rgba(255,253,248,.18); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; color: #c5d8dc; font: 700 10px/1.4 "Manrope",sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.workday-footer__brand { display: inline-flex; gap: 8px; align-items: center; color: #f8f3e8; text-decoration: none; font: 800 21px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.055em; }
+.workday-footer__brand span { color: #ffca42; font-size: 25px; }.workday-footer p { max-width: 310px; margin: 15px 0 0; color: #c5d8dc; font: 500 13px/1.6 "IBM Plex Sans", sans-serif; }
+.workday-footer h2 { margin: 3px 0 14px; color: #ffca42; font: 800 10px/1 "IBM Plex Sans", sans-serif; letter-spacing: .13em; text-transform: uppercase; }.workday-footer ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }.workday-footer a:not(.workday-footer__brand) { color: #f8f3e8; text-decoration-color: rgba(255,202,66,.5); font: 600 13px/1.4 "IBM Plex Sans", sans-serif; }.workday-footer a:hover { color: #ffca42; }.workday-footer__bottom { width: min(1120px,100%); margin: 40px auto 0; padding-top: 18px; border-top: 1px solid rgba(255,253,248,.18); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; color: #c5d8dc; font: 700 10px/1.4 "IBM Plex Sans",sans-serif; letter-spacing: .08em; text-transform: uppercase; }
 @media (max-width: 760px) { .workday-footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }.workday-footer__intro { grid-column: 1 / -1; }.workday-footer__bottom { margin-top: 30px; } }
 @media (prefers-reduced-motion: reduce) { .workday-header, .workday-header__bar, .workday-header__cta { transition: none !important; } }
