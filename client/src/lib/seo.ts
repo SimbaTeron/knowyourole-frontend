@@ -31,6 +31,14 @@ const foundationPages: PublicPage[] = [
     priority: 0.95,
   },
   {
+    path: "/careers",
+    title: "Career Paths by Personality & Work Style | KnowYouRole",
+    description:
+      "Explore career paths by personality and work style, then take the KnowYouRole quiz for practical career-fit guidance tailored to how you work.",
+    changeFrequency: "weekly",
+    priority: 0.85,
+  },
+  {
     path: "/about",
     title: "About KnowYouRole | Personality Quiz for Work & Career Clarity",
     description:

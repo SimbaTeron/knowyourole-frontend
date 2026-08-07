@@ -1,5 +1,8 @@
 import CareersClient from "./CareersClient";
 import { getCareerCatalog } from "@/lib/job-role-catalog-server";
+import { publicPageMetadata } from "@/lib/seo";
+
+export const metadata = publicPageMetadata("/careers");
 
 export const dynamic = "force-dynamic";
 
