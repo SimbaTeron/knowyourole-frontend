@@ -135,7 +135,12 @@ export function pageMetadata({
     applicationName: SITE_NAME,
     category: "personality quiz",
     icons: {
-      icon: "/favicon.png",
+      icon: [
+        { url: "/favicon.ico", type: "image/x-icon" },
+        { url: "/favicon-32x32.png?v=20260808", sizes: "32x32", type: "image/png" },
+        { url: "/favicon-16x16.png?v=20260808", sizes: "16x16", type: "image/png" },
+      ],
+      apple: "/apple-touch-icon.png?v=20260808",
     },
     alternates: {
       canonical: url,
@@ -220,7 +225,7 @@ export function baseJsonLd() {
       "@id": `${url}/#organization`,
       name: SITE_NAME,
       url,
-      logo: absoluteUrl("/favicon.png"),
+      logo: absoluteUrl("/knowyourrole-target.png?v=20260808"),
       sameAs: [],
     },
     {
