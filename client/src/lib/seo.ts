@@ -134,6 +134,7 @@ export function pageMetadata({
     description,
     applicationName: SITE_NAME,
     category: "personality quiz",
+    manifest: "/manifest.json?v=20260808",
     icons: {
       icon: [
         { url: "/favicon.ico", type: "image/x-icon" },
