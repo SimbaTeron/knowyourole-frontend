@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { SHORTFORM_V2_QUESTIONS } from "@/data/shortformV2Questions";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,10 @@ async function runSmoke(req: NextRequest) {
   }
 
   const origin = `${req.nextUrl.protocol}//${host}`;
-  const sessionId = `smoke-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const requestedSessionId = req.nextUrl.searchParams.get("sessionId");
+  const sessionId = requestedSessionId && /^smoke-[a-zA-Z0-9-]{1,140}$/.test(requestedSessionId)
+    ? requestedSessionId
+    : `smoke-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const payload = {
     tier: "19-25",
     mood: "focused",
@@ -50,24 +54,14 @@ async function runSmoke(req: NextRequest) {
     theme: "dark",
     sessionId,
     source: "dev_test",
-    scores: {
-      mbti: { E: 5, I: 2, S: 2, N: 6, T: 6, F: 2, J: 3, P: 5 },
-      disc: { D: 4, I: 3, S: 2, C: 5 },
-      bigFive: { O: 6, C: 5, E: 4, A: 4, N: 2 },
-      responses: [
-        { questionId: 1, choice: 1, timeSpent: 2.1, swipeDirection: "right", psych: "MBTI_N" },
-        { questionId: 2, choice: 0, timeSpent: 3.4, swipeDirection: "left", psych: "DISC_C" },
-        { questionId: 3, choice: 1, timeSpent: 1.9, swipeDirection: "right", psych: "BIG5_O" },
-      ],
-      swipeTimes: [2.1, 3.4, 1.9],
-      averageSwipeTime: 2.47,
-      currentDifficulty: "medium",
-      engagement: 3,
-      wildcardBoost: false,
-      criticalWildcard: 0,
-      firstPrinciplesWildcard: 0,
-      hybridTypes: [],
-    },
+    // Submit evidence only. The compute route derives all framework totals from
+    // these fixed-question answers; no client score maps are present.
+    responses: SHORTFORM_V2_QUESTIONS.map((question, index) => ({
+      questionId: question.id,
+      choice: index % question.answers.length,
+      timeSpent: 2 + (index % 3) * 0.25,
+      swipeDirection: index % 2 === 0 ? "left" : "right",
+    })),
   };
 
   console.log("[ResultDTO Smoke] Starting local smoke compute", { host, sessionId });

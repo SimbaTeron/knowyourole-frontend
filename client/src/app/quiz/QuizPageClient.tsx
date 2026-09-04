@@ -154,7 +154,9 @@ export default function QuizPage() {
       theme,
       sessionId: sessionId || undefined,
       source: "live_quiz",
-      scores,
+      // The browser submits evidence only. It never sends trusted framework totals,
+      // role matches, or a result ID for the server to accept.
+      responses: scores.responses,
     };
 
     console.log("[ResultDTO] POST /api/results/compute starting", {
@@ -187,7 +189,7 @@ export default function QuizPage() {
           status: response.status,
           reason: data?.error || "compute_unsuccessful",
         });
-        console.warn("[ResultDTO] Compute failed; keeping legacy results fallback", data);
+        console.warn("[ResultDTO] Canonical compute failed", data);
         return null;
       }
 
@@ -213,7 +215,7 @@ export default function QuizPage() {
         response_count: scores.responses.length,
         reason: "network_or_runtime_error",
       });
-      console.error("[ResultDTO] Compute/persist error; keeping legacy results fallback", error);
+      console.error("[ResultDTO] Compute/persist error", error);
       return null;
     }
   };
@@ -228,80 +230,30 @@ export default function QuizPage() {
       fun_mode: funMode,
     });
 
-    console.log("[QuizComplete] Received final scores from Quiz.tsx", {
-      responseCount: scores.responses.length,
-      mbti: scores.mbti,
-      disc: scores.disc,
-      bigFive: scores.bigFive,
-    });
-    setQuizScores(scores);
-
-    let sessionId: string | null = null;
-    let scales: APIScales | null = null;
-    let badges: EarnedBadge[] = [];
-    let hybrids: string[] = [];
-    let mbtiType = '';
-    let discStyle = '';
-
-    // The active fixed-28 completion has one authoritative compute-and-persist
-    // boundary. Do not call the legacy scorer first: it persists a second row
-    // from client-provided totals and creates result/session ambiguity.
+    // Only the server-returned DTO can cross the completion boundary. The locally
+    // accumulated scores are UI progress data and are deliberately never rendered
+    // as a live result.
     const canonicalResult = await computeAndStoreResultDTO(scores, null);
     if (!canonicalResult) {
+      setIsAnalyzingResults(false);
       toast({
-        title: "Your result is ready, but it was not saved",
-        description: "We could not reach the result service. This browser can still show your local result; retry later if you need it saved or recovered.",
+        title: "We could not save your result",
+        description: "Your result was not generated because the canonical result service is unavailable. Please start again when the connection is restored.",
         variant: "destructive",
       });
-    }
-    if (canonicalResult?.meta?.sessionId) {
-      sessionId = canonicalResult.meta.sessionId;
-      setQuizSessionId(sessionId);
-    }
-    if (canonicalResult?.scores?.mbti?.type && canonicalResult.scores.mbti.type !== "XXXX") {
-      mbtiType = canonicalResult.scores.mbti.type;
-    }
-    if (canonicalResult?.scores?.disc?.primary && canonicalResult.scores.disc.primary !== "Balanced") {
-      discStyle = canonicalResult.scores.disc.primary;
+      return;
     }
 
-    // ── Compute type strings from raw scores as fallback ──
-    if (!mbtiType) {
-      mbtiType = [
-        scores.mbti.E > scores.mbti.I ? "E" : "I",
-        scores.mbti.S > scores.mbti.N ? "S" : "N",
-        scores.mbti.T > scores.mbti.F ? "T" : "F",
-        scores.mbti.J > scores.mbti.P ? "J" : "P",
-      ].join("");
-    }
-    if (!discStyle) {
-      const discEntries = Object.entries(scores.disc) as [string, number][];
-      discStyle = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
-    }
-
-    // ── Store real scores in sessionStorage so results.tsx can find them ──
-    // results.tsx reads kyr_real_scores (not kyr_results). This remains the fallback
-    // while kyr_result_dto becomes the new canonical source in the next migration step.
-    sessionStorage.setItem("kyr_real_scores", JSON.stringify(scores));
-    console.log("[QuizComplete] Stored legacy fallback scores in sessionStorage:kyr_real_scores");
-
-    // Never place quiz answers, timing, score maps, or opaque session IDs in the URL.
-    // The canonical ResultDTO and legacy display fallback remain browser-session data.
-
-    console.log("[QuizComplete] Redirecting to legacy results route with ResultDTO available as optional canonical source", {
-      hasResultDTO: Boolean(sessionStorage.getItem("kyr_result_dto")),
-      sessionId,
-      mbtiType,
-      discStyle,
-    });
+    const sessionId = canonicalResult.meta.sessionId;
+    setQuizSessionId(sessionId);
 
     trackKyrEvent("conversion_results_handoff", {
       tier: ageTier,
       response_count: scores.responses.length,
-      has_result_dto: Boolean(sessionStorage.getItem("kyr_result_dto")),
-      session_id_present: Boolean(sessionId),
-      mbti_type: mbtiType,
-      primary_disc: discStyle,
+      has_result_dto: true,
+      session_id_present: true,
+      mbti_type: canonicalResult.scores.mbti.type,
+      primary_disc: canonicalResult.scores.disc.primary,
     });
 
     await minimumAnalysisTime;

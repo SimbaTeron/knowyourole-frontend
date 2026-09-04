@@ -1,84 +1,20 @@
 import { NextResponse } from "next/server";
-import { validateInput, calculatePersonality, checkRateLimit } from "@/lib/scoring";
 
-export async function POST(req: Request) {
-  // CORS headers
-  const headers = {
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  };
+const headers = { "Cache-Control": "no-store" };
 
-  if (req.method === "OPTIONS") {
-    return new NextResponse(null, { status: 200, headers });
-  }
+/**
+ * Retired. This legacy endpoint accepted client-computed score totals and
+ * returned a noncanonical result shape. All active quiz completion must use
+ * POST /api/results/compute, which validates fixed-question evidence, computes
+ * server-side, persists once, and returns the canonical ResultDTO.
+ */
+export async function POST() {
+  return NextResponse.json(
+    { error: "Use /api/results/compute for canonical quiz completion" },
+    { status: 410, headers },
+  );
+}
 
-  if (req.method !== "POST") {
-    return NextResponse.json({ error: "Method Not Allowed" }, { status: 405, headers });
-  }
-
-  // Rate limit: 10 submissions per hour
-  if (!checkRateLimit(req, 10, 3600000)) {
-    return NextResponse.json(
-      { error: "Rate limit exceeded. Maximum 10 quiz submissions per hour." },
-      { status: 429, headers }
-    );
-  }
-
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400, headers });
-  }
-
-  const validation = validateInput(body);
-  if (!validation.valid) {
-    const { error } = validation as { valid: false; error: string };
-    return NextResponse.json(
-      { error: `Invalid quiz submission: ${error}` },
-      { status: 400, headers }
-    );
-  }
-
-  try {
-    const result = calculatePersonality(validation.data);
-
-    // Return session ID + computed results
-    return NextResponse.json({
-      sessionId: result.sessionId,
-      mbtiType: result.mbtiType,
-      mbtiBlend: result.mbtiBlend,
-      discStyle: result.discStyle,
-      bigFive: result.bigFive,
-      bigFiveProfile: result.bigFiveProfile,
-      title: result.title,
-      spark: result.spark,
-      proxyNudge: result.proxyNudge,
-      engagement: result.engagement,
-      totalQuestions: result.totalQuestions,
-      avgResponseTime: result.avgResponseTime,
-      scales: result.scales,
-      hybridTypes: result.hybridTypes,
-      mbtiAxisConfidence: result.mbtiAxisConfidence,
-      closeCallDimensions: result.closeCallDimensions,
-      modelConfidence: result.modelConfidence,
-      modelConfidenceLabels: result.modelConfidenceLabels,
-      resultConfidenceLabel: result.resultConfidenceLabel,
-      earnedBadges: result.earnedBadges,
-      traitConsistency: result.traitConsistency,
-      swipeAnalytics: result.swipeAnalytics,
-      consistency: result.consistency,
-      proxyBreakdown: result.proxyBreakdown,
-      criticalThinking: result.criticalThinking,
-      firstPrinciples: result.firstPrinciples,
-      criticalQuest: result.criticalQuest,
-      firstPrinciplesQuest: result.firstPrinciplesQuest,
-    }, { headers });
-  } catch (err) {
-    console.error("Score calculation error:", err);
-    return NextResponse.json(
-      { error: "Failed to calculate personality scores" },
-      { status: 500, headers }
-    );
-  }
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers });
 }

@@ -814,25 +814,6 @@ function buildPremiumRoleMatchCards({
   });
 }
 
-// ─── Real scores are browser-session data written by handleQuizComplete ───────────────────
-function getStoredScores(): QuizScores | null {
-  if (typeof window === "undefined") return null;
-  try {
-    // Quiz answers must never be serialized into a results URL. The canonical
-    // DTO is stored separately and this legacy fallback is session-scoped.
-    const raw = sessionStorage.getItem("kyr_real_scores")
-      || sessionStorage.getItem("kyr_fake_scores");
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as QuizScores;
-    // Validate data shape — invalidate corrupted/old-format entries (missing DISC keys)
-    if (!parsed || !parsed.disc || parsed.disc.D === undefined || parsed.disc.C === undefined) {
-      sessionStorage.removeItem("kyr_fake_scores");
-      return null;
-    }
-    return parsed;
-  } catch { return null; }
-}
-
 type DeepDivePanel = { label: string; title: string; body: string; color: string };
 
 type MbtiDeepDiveCore = {
@@ -1819,45 +1800,29 @@ function useRealResults(enabled = true) {
       canonicalResult: resultDTO,
     };
   }
-  const scores = getStoredScores();
-  const tier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
   const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const inTestMode = urlParams.get("test") === "true";
+  const inDemoMode = urlParams.get("demo") === "true";
 
-  // No stored scores — in test or demo mode, generate fake scores inline
-  if (!scores) {
-    const inTestMode = urlParams.get("test") === "true";
-    const inDemoMode = urlParams.get("demo") === "true";
-    if (inTestMode || inDemoMode) {
-      const testTier = (urlParams.get("tier") || tier) as "13-18" | "19-25" | "25plus";
-      // Read MBTI override from sessionStorage (set by dev panel's MBTI selector)
-      const forcedMBTI = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_fake_mbti") : null) || undefined;
-      const fakeScores = getFakeScores(testTier, forcedMBTI);
-      // Use calculateResult for consistent real scoring (MBTI, DISC, Big Five percentiles)
-      // Pass forcedMBTI so calculateResult uses it instead of deriving from dimensions
-      const result = calculateResult(fakeScores as unknown as QuizScores, forcedMBTI);
-      const bigFive = result.bigFiveProfile;
-      const disc = normalizeDiscProfile(fakeScores.disc);
-      const primaryDisc = computePrimaryDisc(disc);
-      const type = `${result.mbtiType}-${primaryDisc}`;
-      return { type, tier: testTier, bigFive, disc, mbtiType: result.mbtiType, primaryDisc, rawScores: fakeScores as unknown as QuizScores, isDemo: inDemoMode, discDesc: result.discStyle === primaryDisc ? result.discDesc : undefined, secondaryDisc: result.secondaryDisc, secondaryDiscLabel: result.secondaryDiscLabel, secondaryDiscColor: result.secondaryDiscColor };
-    }
-    // Not test or demo mode — redirect to quiz
-    if (typeof window !== "undefined") {
-      window.location.href = "/quiz";
-    }
-    return null;
+  // Client-side result calculation is intentionally confined to explicit preview
+  // modes. Live results must originate from the server-persisted ResultDTO.
+  if (inTestMode || inDemoMode) {
+    const tier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
+    const testTier = (urlParams.get("tier") || tier) as "13-18" | "19-25" | "25plus";
+    const forcedMBTI = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_fake_mbti") : null) || undefined;
+    const fakeScores = getFakeScores(testTier, forcedMBTI);
+    const result = calculateResult(fakeScores as unknown as QuizScores, forcedMBTI);
+    const bigFive = result.bigFiveProfile;
+    const disc = normalizeDiscProfile(fakeScores.disc);
+    const primaryDisc = computePrimaryDisc(disc);
+    const type = `${result.mbtiType}-${primaryDisc}`;
+    return { type, tier: testTier, bigFive, disc, mbtiType: result.mbtiType, primaryDisc, rawScores: fakeScores as unknown as QuizScores, isDemo: inDemoMode, discDesc: result.discStyle === primaryDisc ? result.discDesc : undefined, secondaryDisc: result.secondaryDisc, secondaryDiscLabel: result.secondaryDiscLabel, secondaryDiscColor: result.secondaryDiscColor };
   }
 
-  const result = calculateResult(scores);
-  const mbtiType = result.mbtiType;
-  const bigFive = result.bigFiveProfile;
-  const disc = normalizeDiscProfile(scores.disc);
-  const primaryDisc = computePrimaryDisc(disc);
-  const type = `${mbtiType}-${primaryDisc}`;
-  // Detect ?demo=true in URL (used by Stripe demo/preview redirect)
-  const isDemo = urlParams.get("demo") === "true";
-
-  return { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores: scores, isDemo, discDesc: result.discStyle === primaryDisc ? result.discDesc : undefined, secondaryDisc: result.secondaryDisc, secondaryDiscLabel: result.secondaryDiscLabel, secondaryDiscColor: result.secondaryDiscColor };
+  if (typeof window !== "undefined") {
+    window.location.replace("/quiz");
+  }
+  return null;
 }
 
 // ─── MBTI → #1 Career Match mapping (mirrors backend scoring) ────────────────

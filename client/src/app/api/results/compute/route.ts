@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
 import { getOptionalAuthUser } from "@/app/api/_lib/auth";
 import { createAnonymousCapability } from "@/app/api/_lib/anonymous-result-capability";
-import { buildResultDTO, type BuildResultDTOInput, type ResultDTO } from "@/lib/results/buildResultDTO";
+import { buildResultDTO, validateResultDTO, type BuildResultDTOInput, type ResultDTO } from "@/lib/results/buildResultDTO";
 import type { ScoresData } from "@/lib/scoring";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
 import {
@@ -60,36 +60,32 @@ export async function POST(req: NextRequest) {
     }
 
     const persistence = await persistResultDTOSafely(result);
-    const anonymousCapability = persistence.ok && !result.meta.userId && persistence.created
-      ? await issueAnonymousCapability(result.meta.sessionId)
+    if (!persistence.ok) {
+      // A live result is canonical only once the server has durably stored it.
+      // Returning a successful-but-unpersisted DTO would reintroduce the exact
+      // display/persistence split this endpoint exists to eliminate.
+      return NextResponse.json(
+        { success: false, requestId, error: "Result persistence is temporarily unavailable", persistence },
+        { status: 503, headers: responseHeaders },
+      );
+    }
+
+    const anonymousCapability = !persistence.result.meta.userId && persistence.created
+      ? await issueAnonymousCapability(persistence.result.meta.sessionId)
       : null;
-    const persistedResult: ResultDTO = {
-      ...result,
-      meta: {
-        ...result.meta,
-        resultId: persistence.resultId ?? result.meta.resultId,
-        updatedAt: new Date().toISOString(),
-      },
-      audit: {
-        ...result.audit,
-        recoverableErrors: [
-          ...(result.audit.recoverableErrors ?? []),
-          ...(persistence.ok ? [] : [`Persistence skipped: ${persistence.error}`]),
-        ],
-        trace: {
-          ...result.audit.trace,
-          persistenceAttemptId: persistence.persistenceAttemptId,
-        },
-      },
-    };
 
     return NextResponse.json(
       {
         success: true,
         requestId,
-        result: persistedResult,
+        result: persistence.result,
         validation,
-        persistence,
+        persistence: {
+          ok: true,
+          resultId: persistence.resultId,
+          persistenceAttemptId: persistence.persistenceAttemptId,
+          created: persistence.created,
+        },
         anonymousDeletionCapability: anonymousCapability?.token ?? null,
         anonymousDeletionCapabilityExpiresAt: anonymousCapability?.expiresAt ?? null,
       },
@@ -184,7 +180,7 @@ function recomputeAuthoritativeShortformScores(rawResponses: unknown): BuildResu
 }
 
 async function persistResultDTOSafely(result: ResultDTO): Promise<
-  | { ok: true; resultId: string; persistenceAttemptId: string; created: boolean }
+  | { ok: true; resultId: string; persistenceAttemptId: string; created: boolean; result: ResultDTO }
   | { ok: false; resultId: null; persistenceAttemptId: string; error: string; created: false }
 > {
   const persistenceAttemptId = `persist-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -200,7 +196,7 @@ async function persistResultDTOSafely(result: ResultDTO): Promise<
   }
 }
 
-async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string): Promise<{ ok: true; resultId: string; persistenceAttemptId: string; created: boolean }> {
+async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string): Promise<{ ok: true; resultId: string; persistenceAttemptId: string; created: boolean; result: ResultDTO }> {
   const supabase = getSupabaseAdmin();
 
   // Maintain the existing schema contract first: create/ensure quiz_sessions,
@@ -229,7 +225,7 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
   // place regardless so ordinary retries are safe.
   const { data: existingResult, error: existingResultError } = await supabase
     .from("quiz_results")
-    .select("id")
+    .select("id, responses")
     .eq("session_id", result.meta.sessionId)
     .maybeSingle();
 
@@ -237,7 +233,13 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
     throw new Error(`Failed to check existing quiz result: ${existingResultError.message}`);
   }
   if (existingResult) {
-    return { ok: true, resultId: existingResult.id, persistenceAttemptId, created: false };
+    return {
+      ok: true,
+      resultId: existingResult.id,
+      persistenceAttemptId,
+      created: false,
+      result: readPersistedResultDTO(existingResult.responses, existingResult.id),
+    };
   }
 
   const now = new Date().toISOString();
@@ -289,7 +291,7 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
     if (lostConcurrentInsertRace) {
       const { data: racedResult, error: racedResultError } = await supabase
         .from("quiz_results")
-        .select("id")
+        .select("id, responses")
         .eq("session_id", result.meta.sessionId)
         .maybeSingle();
 
@@ -297,7 +299,13 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
         throw new Error(`Failed to retrieve concurrently persisted quiz result: ${racedResultError.message}`);
       }
       if (racedResult) {
-        return { ok: true, resultId: racedResult.id, persistenceAttemptId, created: false };
+        return {
+          ok: true,
+          resultId: racedResult.id,
+          persistenceAttemptId,
+          created: false,
+          result: readPersistedResultDTO(racedResult.responses, racedResult.id),
+        };
       }
     }
 
@@ -305,7 +313,18 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
     throw new Error(`Failed to persist quiz result: ${resultError.message}`);
   }
 
-  return { ok: true, resultId: result.meta.resultId, persistenceAttemptId, created: true };
+  return { ok: true, resultId: result.meta.resultId, persistenceAttemptId, created: true, result };
+}
+
+function readPersistedResultDTO(responses: unknown, resultId: string): ResultDTO {
+  const dto = responses && typeof responses === "object" && !Array.isArray(responses)
+    ? (responses as { dto?: unknown }).dto
+    : undefined;
+  const validation = validateResultDTO(dto);
+  if (!validation.ok) {
+    throw new Error(`Existing result ${resultId} does not contain a valid canonical DTO`);
+  }
+  return dto as ResultDTO;
 }
 
 async function issueAnonymousCapability(sessionId: string): Promise<{ token: string; expiresAt: string } | null> {
