@@ -9,10 +9,15 @@ import type { CareerCatalogRole } from "@/lib/job-role-catalog";
 
 const CATEGORY_META: Record<string, { label: string; icon: typeof Briefcase; color: string }> = {
   white: { label: "Professional & Office", icon: Building2, color: "text-dusty-blue dark:text-[#67E8F9]" },
+  "Business, technology & operations": { label: "Business, technology & operations", icon: Building2, color: "text-dusty-blue dark:text-[#67E8F9]" },
   blue: { label: "Skilled Trades & Technical", icon: Wrench, color: "text-sage-green dark:text-[#34D399]" },
+  "Trades & Technical": { label: "Trades & Technical", icon: Wrench, color: "text-sage-green dark:text-[#34D399]" },
   healthcare: { label: "Healthcare & Wellness", icon: HeartPulse, color: "text-terracotta dark:text-[#F87171]" },
+  Healthcare: { label: "Healthcare & Wellness", icon: HeartPulse, color: "text-terracotta dark:text-[#F87171]" },
   service: { label: "Service & Community", icon: HandHelping, color: "text-amber-600 dark:text-[#FBBF24]" },
+  "Service & Hospitality": { label: "Service & community", icon: HandHelping, color: "text-amber-600 dark:text-[#FBBF24]" },
   arts: { label: "Creative & Arts", icon: Palette, color: "text-purple-600 dark:text-[#A78BFA]" },
+  "Creative & Arts": { label: "Creative & arts", icon: Palette, color: "text-purple-600 dark:text-[#A78BFA]" },
 };
 
 type CatalogPresentation =
@@ -52,6 +57,7 @@ type CareersClientProps = {
 
 export default function CareersClient({ roles, loadError }: CareersClientProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const grouped: Record<string, string[]> = {};
   for (const role of roles) {
@@ -67,6 +73,7 @@ export default function CareersClient({ roles, loadError }: CareersClientProps) 
   const lowerSearch = searchTerm.toLowerCase().trim();
   const filteredGrouped: Record<string, string[]> = {};
   for (const cat of filteredCategories) {
+    if (activeCategory && cat !== activeCategory) continue;
     const filtered = (grouped[cat] || []).filter(name => name.toLowerCase().includes(lowerSearch));
     if (filtered.length > 0) filteredGrouped[cat] = filtered;
   }
@@ -89,7 +96,17 @@ export default function CareersClient({ roles, loadError }: CareersClientProps) 
           <p className="text-warm-gray/70 dark:text-[#94A3B8] leading-relaxed">
             {presentation.intro}
           </p>
+          {isReady && <p className="mt-3 max-w-2xl text-sm leading-relaxed text-warm-gray/60 dark:text-[#94A3B8]">
+            Use this as a comparison set: shortlist roles that match your preferred problems, environment, training path, and constraints—then test those hypotheses with real conversations and small projects.
+          </p>}
         </div>
+
+        {isReady && (
+          <div className="mb-6 flex flex-wrap gap-2" aria-label="Filter careers by work domain">
+            <button type="button" onClick={() => setActiveCategory(null)} className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${activeCategory === null ? "border-terracotta bg-terracotta text-white dark:border-[#A78BFA] dark:bg-[#A78BFA]" : "border-warm-gray/15 bg-white/60 text-warm-gray/70 hover:border-terracotta dark:border-white/10 dark:bg-white/5 dark:text-[#CBD5E1]"}`}>All domains ({totalRoles})</button>
+            {filteredCategories.map((category) => <button key={category} type="button" onClick={() => setActiveCategory(category)} className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${activeCategory === category ? "border-terracotta bg-terracotta text-white dark:border-[#A78BFA] dark:bg-[#A78BFA]" : "border-warm-gray/15 bg-white/60 text-warm-gray/70 hover:border-terracotta dark:border-white/10 dark:bg-white/5 dark:text-[#CBD5E1]"}`}>{CATEGORY_META[category]?.label || category} ({grouped[category].length})</button>)}
+          </div>
+        )}
 
         {isReady && (
           <div className="relative mb-8">

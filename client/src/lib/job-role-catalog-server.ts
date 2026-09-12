@@ -1,5 +1,6 @@
 import "server-only";
 
+import { FALLBACK_CAREER_CATALOG, CAREER_CATALOG_MINIMUM } from "@/data/careerCatalog";
 import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
 import { CareerCatalogRole } from "@/lib/job-role-catalog";
 import { z } from "zod";
@@ -19,9 +20,13 @@ export async function getCareerCatalog(): Promise<CareerCatalogRole[]> {
 
   if (error) throw new Error(`Career catalog query failed: ${error.message}`);
 
-  return z.array(jobRoleRowSchema).parse(data ?? []).map((role) => ({
+  const catalog = z.array(jobRoleRowSchema).parse(data ?? []).map((role) => ({
     id: role.role_number,
     roleName: role.role_name,
     category: role.category,
   }));
+
+  // A partially seeded database should never make the public product look like a
+  // thin prototype. The checked-in catalog remains the reliable public baseline.
+  return catalog.length >= CAREER_CATALOG_MINIMUM ? catalog : FALLBACK_CAREER_CATALOG;
 }

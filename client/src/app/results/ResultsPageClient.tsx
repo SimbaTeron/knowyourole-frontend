@@ -73,8 +73,16 @@ const SOCIAL_IDENTITY_TITLES: Record<string, string> = {
   ESFP: "Energy Translator",
 };
 
+export function humanizeResultLabel(label: string) {
+  return label
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function getArchetype(mbti: string) {
-  return ARCHETYPES[mbti] || "The Architect";
+  return humanizeResultLabel(ARCHETYPES[mbti] || "The Architect");
 }
 
 function stripLeadingThe(label: string) {

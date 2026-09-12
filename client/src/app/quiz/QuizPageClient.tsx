@@ -35,6 +35,7 @@ export default function QuizPage() {
   const [hybridTypes, setHybridTypes] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [isAnalyzingResults, setIsAnalyzingResults] = useState(false);
+  const [isQuizInProgress, setIsQuizInProgress] = useState(false);
   const [isDonationReturn, setIsDonationReturn] = useState(false);
   const { toast } = useToast();
   const { teamName, isLocalitySet } = useLocalityTheme();
@@ -61,6 +62,10 @@ export default function QuizPage() {
   const sessionLandmark = landmarkData ? JSON.parse(landmarkData) : null;
 
   // Direct-start quiz: age/mood setup screens are hidden. Default to adult tier when missing.
+  useEffect(() => {
+    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: 28 });
+  }, []);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const tier = normalizeTier(sessionStorage.getItem("kyr_quiz_tier"));
@@ -267,6 +272,7 @@ export default function QuizPage() {
     setQuizSessionId(null);
     setShowResults(false);
     setIsAnalyzingResults(false);
+    setIsQuizInProgress(false);
     router.push("/");
   };
 
@@ -276,6 +282,7 @@ export default function QuizPage() {
     setQuizSessionId(null);
     setShowResults(false);
     setIsAnalyzingResults(false);
+    setIsQuizInProgress(false);
     router.push("/");
   };
 
@@ -936,9 +943,10 @@ export default function QuizPage() {
           theme={theme}
           onComplete={handleQuizComplete}
           onExit={handleQuizExit}
+          onQuizStarted={() => setIsQuizInProgress(true)}
         />
 
-        <section
+        {!isQuizInProgress && <section
           aria-labelledby="quiz-seo-heading"
           className="relative mx-auto w-[min(1080px,calc(100%-32px))] px-0 pb-20 pt-10 text-white/80"
         >
@@ -989,7 +997,7 @@ export default function QuizPage() {
               </article>
             </div>
           </div>
-        </section>
+        </section>}
       </main>
     </div>
   );

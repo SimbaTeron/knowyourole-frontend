@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { FALLBACK_CAREER_CATALOG, CAREER_CATALOG_MINIMUM } from '@/data/careerCatalog';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
 
 
@@ -38,10 +39,19 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const managedRoles = data || [];
+    const publicRoles = !category && managedRoles.length < CAREER_CATALOG_MINIMUM
+      ? FALLBACK_CAREER_CATALOG.slice(0, limit).map((role) => ({
+          role_number: role.id,
+          role_name: role.roleName,
+          category: role.category,
+        }))
+      : managedRoles;
+
     return NextResponse.json({
       success: true,
-      count: data?.length || 0,
-      jobRoles: data,
+      count: publicRoles.length,
+      jobRoles: publicRoles,
     }, { headers: corsHeaders });
   } catch (error) {
     console.error('[GET /api/job-roles] Error:', error);

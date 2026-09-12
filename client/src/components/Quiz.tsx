@@ -312,6 +312,7 @@ interface QuizProps {
   theme: string;
   onComplete: (scores: QuizScores) => void;
   onExit: () => void;
+  onQuizStarted?: () => void;
 }
 
 export interface QuizScores {
@@ -804,8 +805,8 @@ const getBrowserSessionItem = (key: string) => {
   }
 };
 
-export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, onComplete, onExit }: QuizProps) {
-  return <ShortformV2Quiz tier={rawTier} mood={mood} funMode={funMode} landmark={landmark} theme={theme} onComplete={onComplete} onExit={onExit} />;
+export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, onComplete, onExit, onQuizStarted }: QuizProps) {
+  return <ShortformV2Quiz tier={rawTier} mood={mood} funMode={funMode} landmark={landmark} theme={theme} onComplete={onComplete} onExit={onExit} onQuizStarted={onQuizStarted} />;
   const tier: ActiveTierValue = rawTier === "7-12" ? "13-18" : (rawTier as ActiveTierValue);
   const quizConfig = getQuizConfig(tier);
   const { teamName, isLocalitySet } = useLocalityTheme();

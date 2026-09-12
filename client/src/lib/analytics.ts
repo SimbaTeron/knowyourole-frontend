@@ -1,5 +1,7 @@
 "use client";
 
+import { hasAnalyticsConsent } from "@/components/CookieConsentBanner";
+
 export type AnalyticsParams = Record<string, string | number | boolean | null | undefined>;
 
 type AnalyticsEventRecord = {
@@ -25,9 +27,23 @@ declare global {
   }
 }
 
+const SENSITIVE_ANALYTICS_KEYS = new Set([
+  "answer_id",
+  "question_id",
+  "mbti_type",
+  "primary_disc",
+  "disc_style",
+  "direction_title",
+  "role_title",
+  "archetype",
+  "email",
+  "session_id",
+  "result_id",
+]);
+
 function sanitizeAnalyticsParams(params: AnalyticsParams = {}) {
   return Object.fromEntries(
-    Object.entries(params).filter(([, value]) => value !== undefined && value !== null),
+    Object.entries(params).filter(([key, value]) => value !== undefined && value !== null && !SENSITIVE_ANALYTICS_KEYS.has(key)),
   ) as Record<string, string | number | boolean>;
 }
 
@@ -36,7 +52,7 @@ function eventCategoryFor(eventName: string) {
 }
 
 export function trackKyrEvent(eventName: string, params: AnalyticsParams = {}) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !hasAnalyticsConsent()) return;
 
   const sanitizedParams = {
     ...sanitizeAnalyticsParams(params),
@@ -45,8 +61,8 @@ export function trackKyrEvent(eventName: string, params: AnalyticsParams = {}) {
   };
   const prefixedName = `${EVENT_PREFIX}${eventName}`;
 
-  // Local verification sink. This keeps Phase 5D testable even when GA is disabled by
-  // consent, blockers, or a clean local profile. It does not persist or transmit data.
+  // Consent-gated local verification sink. It never persists or transmits data;
+  // it lets browser tests verify the same aggregate events that GA would receive.
   window.__kyrAnalyticsEvents = window.__kyrAnalyticsEvents || [];
   window.__kyrAnalyticsEvents.push({
     name: prefixedName,

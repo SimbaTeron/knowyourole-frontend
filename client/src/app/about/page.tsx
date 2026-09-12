@@ -36,9 +36,6 @@ export default function About() {
             <p>
               <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of KnowYouRole, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person.
             </p>
-            <p className="text-sm">
-              No stock headshot, fake team photo, or placeholder bio is shown here. Founder imagery can be added later if a real image is provided.
-            </p>
           </div>
         </section>
 
@@ -65,27 +62,6 @@ export default function About() {
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             KnowYouRole's mission is to help people understand their strengths, friction points, communication style, and career-fit themes earlier — so they can make better decisions with more self-awareness and less guesswork.
           </p>
-        </section>
-
-        <section className="mb-10" aria-labelledby="community-notes-title">
-          <h2 id="community-notes-title" className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
-            <Heart className="w-5 h-5 text-terracotta dark:text-[#A78BFA]" />
-            What people notice
-          </h2>
-          <div className="space-y-3">
-            <figure className="rounded-xl border border-warm-gray/10 bg-warm-gray/5 p-4 dark:border-white/10 dark:bg-white/5">
-              <blockquote className="text-warm-gray/80 dark:text-[#D7E1EA] leading-relaxed">“The report gave me language for how I work without boxing me into a cartoon personality type.”</blockquote>
-              <figcaption className="mt-2 text-sm font-semibold text-warm-gray/70 dark:text-[#94A3B8]">Maya R. · Product team lead</figcaption>
-            </figure>
-            <figure className="rounded-xl border border-warm-gray/10 bg-warm-gray/5 p-4 dark:border-white/10 dark:bg-white/5">
-              <blockquote className="text-warm-gray/80 dark:text-[#D7E1EA] leading-relaxed">“I liked that it connected traits to roles and team behavior. It felt practical instead of mystical.”</blockquote>
-              <figcaption className="mt-2 text-sm font-semibold text-warm-gray/70 dark:text-[#94A3B8]">Jordan K. · Career switcher</figcaption>
-            </figure>
-            <figure className="rounded-xl border border-warm-gray/10 bg-warm-gray/5 p-4 dark:border-white/10 dark:bg-white/5">
-              <blockquote className="text-warm-gray/80 dark:text-[#D7E1EA] leading-relaxed">“The result was easy to share with my team because it explained strengths, friction points, and next moves clearly.”</blockquote>
-              <figcaption className="mt-2 text-sm font-semibold text-warm-gray/70 dark:text-[#94A3B8]">Ari S. · Founder</figcaption>
-            </figure>
-          </div>
         </section>
 
         <section className="mb-10">

@@ -39,6 +39,14 @@ const foundationPages: PublicPage[] = [
     priority: 0.85,
   },
   {
+    path: "/build",
+    title: "How KnowYouRole Was Built | Product & Engineering Case Study",
+    description:
+      "A transparent product and engineering case study: KnowYouRole's problem, architecture, validation, data decisions, AI-assisted workflow, and lessons learned.",
+    changeFrequency: "monthly",
+    priority: 0.55,
+  },
+  {
     path: "/about",
     title: "About KnowYouRole | Personality Quiz for Work & Career Clarity",
     description:

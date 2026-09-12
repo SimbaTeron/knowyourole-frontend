@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const groups = [
   { title: "Explore", links: [["Take the quiz", "/quiz"], ["Career paths", "/careers"], ["Learn", "/learn"], ["Method", "/methodology"]] },
-  { title: "About", links: [["About KnowYouRole", "/about"], ["Questions", "/faq"], ["Contact", "/contact"]] },
+  { title: "About", links: [["About KnowYouRole", "/about"], ["How it was built", "/build"], ["Questions", "/faq"], ["Contact", "/contact"]] },
   { title: "Your choices", links: [["Privacy", "/privacy"], ["Cookie settings", "/privacy#cookie-preferences"], ["Terms", "/terms"]] },
 ] as const;
 

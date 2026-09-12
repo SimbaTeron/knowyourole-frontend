@@ -1,4 +1,5 @@
 import CareersClient from "./CareersClient";
+import { FALLBACK_CAREER_CATALOG } from "@/data/careerCatalog";
 import { getCareerCatalog } from "@/lib/job-role-catalog-server";
 import { publicPageMetadata } from "@/lib/seo";
 
@@ -11,7 +12,7 @@ export default async function CareersPage() {
     const roles = await getCareerCatalog();
     return <CareersClient roles={roles} loadError={false} />;
   } catch (error) {
-    console.error("[CareersPage] Failed to load career catalog:", error);
-    return <CareersClient roles={[]} loadError />;
+    console.error("[CareersPage] Failed to load managed catalog; serving checked-in public fallback:", error);
+    return <CareersClient roles={FALLBACK_CAREER_CATALOG} loadError={false} />;
   }
 }

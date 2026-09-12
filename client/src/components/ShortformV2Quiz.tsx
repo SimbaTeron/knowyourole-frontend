@@ -20,6 +20,7 @@ interface ShortformV2QuizProps {
   theme: string;
   onComplete: (scores: QuizScores) => void;
   onExit: () => void;
+  onQuizStarted?: () => void;
 }
 
 const INITIAL_CAREER = CAREER_SCORE_KEYS.reduce((acc, key) => {
@@ -186,7 +187,7 @@ function rebuildScoresFromResponses(responses: QuizScores["responses"]): QuizSco
   };
 }
 
-export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete, onExit }: ShortformV2QuizProps) {
+export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete, onExit, onQuizStarted }: ShortformV2QuizProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<QuizScores>(INITIAL_SCORES);
@@ -212,6 +213,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const handleStart = () => {
     setStartedAt(Date.now());
     setHasStarted(true);
+    onQuizStarted?.();
     trackKyrEvent("quiz_started", { source: "shortform_v2", tier, total_questions: totalQuestions });
   };
 
@@ -476,7 +478,6 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
                         <span className="mt-1 block truncate font-bold uppercase tracking-[0.12em] sm:mt-2 sm:tracking-[0.18em]" style={{ color: "#456174", fontSize: "9px" }}>{answer.resultSignal}</span>
                       </span>
                       {isSelected && <span className="absolute right-2 top-2 rounded-full bg-cyan-200 px-2 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-[#050510] sm:text-[9px]">Selected</span>}
-                      <div className="mt-auto hidden pt-3 sm:block"><div className="h-1.5 w-full rounded-sm bg-black/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]" /></div>
                     </div>
                   </motion.button>
                 );
