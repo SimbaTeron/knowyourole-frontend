@@ -248,9 +248,12 @@ export async function POST(req: NextRequest) {
     page.drawRectangle({ x: dividerX, y: hero.yBottom + 6, width: 1, height: 106, color: color('border') });
     const careerX = dividerX + 24;
     page.drawText('BEST-FIT DIRECTION', { x: careerX, y: hero.yTop + 2, size: 7.4, font: bold, color: color('gold') });
-    page.drawText(truncateToWidth(careerTitle, bold, 20, hero.width - 304), { x: careerX, y: hero.yTop - 24, size: 20, font: bold, color: color('gold') });
-    if (careerSalary) page.drawText(truncateToWidth(careerSalary, bold, 8.8, hero.width - 304), { x: careerX, y: hero.yTop - 42, size: 8.8, font: bold, color: color('muted') });
-    drawWrapped(careerSummary, careerX, hero.yTop - 60, hero.width - 304, 9.1, 4, regular, 'muted', 2.5);
+    // Career names and salary bands are user-visible claims: wrapping beats silent ellipses.
+    const careerTitleLines = wrapByWidth(careerTitle, bold, 14.5, hero.width - 304, 2);
+    careerTitleLines.forEach((line, index) => page.drawText(line, { x: careerX, y: hero.yTop - 22 - index * 16, size: 14.5, font: bold, color: color('gold') }));
+    const careerDetailY = hero.yTop - 24 - careerTitleLines.length * 16;
+    if (careerSalary) drawWrapped(careerSalary, careerX, careerDetailY, hero.width - 304, 8.2, 2, bold, 'muted', 1.5);
+    drawWrapped(careerSummary, careerX, careerDetailY - (careerSalary ? 24 : 4), hero.width - 304, 8.4, 5, regular, 'muted', 2);
     drawWrapped('The shortest useful read: what to pursue, how you move, and which trait is steering the wheel.', careerX, hero.yBottom + 12, hero.width - 304, 7.8, 2, italic, 'dim', 2);
     y -= 166;
 
@@ -264,8 +267,8 @@ export async function POST(req: NextRequest) {
     signals.forEach((item, index) => {
       const card = drawCardShell(margin + index * (signalW + 10), signalTop, signalW, 76, item.accent, 'card2');
       page.drawText(item.label.toUpperCase(), { x: card.x, y: card.yTop, size: 7, font: bold, color: color(item.accent) });
-      drawWrapped(item.value, card.x, card.yTop - 18, card.width, index === 1 ? 13.5 : 11, 2, bold, 'text', 1.8);
-      page.drawText(truncateToWidth(item.note, regular, 7.2, card.width), { x: card.x, y: card.yBottom + 1, size: 7.2, font: regular, color: color('dim') });
+      drawWrapped(item.value, card.x, card.yTop - 18, card.width, index === 1 ? 11 : 9.5, 2, bold, 'text', 1.8);
+      drawWrapped(item.note, card.x, card.yBottom + 8, card.width, 6.8, 2, regular, 'dim', 1);
     });
     y -= 92;
 
@@ -308,8 +311,8 @@ export async function POST(req: NextRequest) {
     let guideY = fieldY + 29;
     guideLines.forEach((line, index) => {
       page.drawCircle({ x: insight.x + 108, y: guideY + 3, size: 1.8, color: color('gold') });
-      page.drawText(truncateToWidth(line, regular, 7.8, insight.width - 238), { x: insight.x + 116, y: guideY, size: 7.8, font: regular, color: color('muted') });
-      guideY -= 12;
+      drawWrapped(line, insight.x + 116, guideY, insight.width - 238, 7.2, 2, regular, 'muted', 1);
+      guideY -= 22;
       if (index === 2) page.drawText(BRAND_URL, { x: insight.x + insight.width - 88, y: fieldY + 5, size: 9, font: bold, color: color('cyan') });
     });
     y = fieldY - 18;

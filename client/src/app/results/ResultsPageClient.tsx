@@ -2291,7 +2291,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     ctx.fillStyle = "rgba(255,255,255,0.56)";
     ctx.fillText("Full Portrait share card", 72, 132);
 
-    fillRoundRect(72, 190, 936, 780, 42, "rgba(255,255,255,0.065)", "rgba(255,255,255,0.18)");
+    fillRoundRect(72, 190, 936, 840, 42, "rgba(255,255,255,0.065)", "rgba(255,255,255,0.18)");
     ctx.font = "800 28px Inter, Arial, sans-serif";
     ctx.fillStyle = "rgba(255,255,255,0.58)";
     ctx.fillText("MY PERSONALITY SIGNAL", 122, 270);
@@ -2306,7 +2306,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     ctx.fillText("DISC", 154, 642);
     ctx.font = "900 30px Inter, Arial, sans-serif";
     ctx.fillStyle = discColor;
-    ctx.fillText(`${report.primaryDisc} - ${discLabel}`, 154, 678);
+    drawText(`${report.primaryDisc} - ${discLabel}`, 154, 678, 300, 28, 2, "900 28px Inter, Arial, sans-serif", discColor);
 
     fillRoundRect(520, 610, 360, 88, 24, "rgba(245,158,11,0.10)", "rgba(245,158,11,0.30)");
     ctx.font = "800 22px Inter, Arial, sans-serif";
@@ -2314,22 +2314,26 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     ctx.fillText("TOP TRAIT", 548, 642);
     ctx.font = "900 30px Inter, Arial, sans-serif";
     ctx.fillStyle = "#f59e0b";
-    ctx.fillText(`${topBigFiveName} ${topBigFive[1]}%`, 548, 678);
+    drawText(`${topBigFiveName} ${topBigFive[1]}%`, 548, 678, 300, 28, 2, "900 28px Inter, Arial, sans-serif", "#f59e0b");
 
     ctx.font = "800 24px Inter, Arial, sans-serif";
     ctx.fillStyle = "rgba(255,255,255,0.58)";
-    ctx.fillText("CAREER SIGNAL", 126, 790);
-    drawText(report.career.title, 126, 850, 780, 56, 2, "900 54px Inter, Arial, sans-serif", "#fbbf24");
-    drawText(report.career.salary || "", 126, 955, 780, 34, 1, "800 30px Inter, Arial, sans-serif", "rgba(255,255,255,0.70)");
+    ctx.fillText("CAREER DIRECTION", 126, 790);
+    drawText(report.career.title, 126, 850, 780, 50, 2, "900 48px Inter, Arial, sans-serif", "#fbbf24");
+    drawText(report.career.salary || "", 126, 950, 780, 30, 2, "800 27px Inter, Arial, sans-serif", "rgba(255,255,255,0.70)");
+    ctx.font = "800 20px Inter, Arial, sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    ctx.fillText("WHY THIS DIRECTION", 126, 995);
+    drawText(report.career.summary || `A direction that pairs ${report.mbtiType} preferences with ${report.primaryDisc} ${discLabel.toLowerCase()} energy.`, 126, 1028, 810, 29, 3, "700 25px Inter, Arial, sans-serif", "rgba(255,255,255,0.88)");
 
-    fillRoundRect(72, 1032, 936, 190, 34, "rgba(34,211,238,0.075)", "rgba(34,211,238,0.20)");
+    fillRoundRect(72, 1100, 936, 150, 34, "rgba(34,211,238,0.075)", "rgba(34,211,238,0.20)");
     ctx.font = "800 22px Inter, Arial, sans-serif";
     ctx.fillStyle = "rgba(255,255,255,0.58)";
-    ctx.fillText("MY OPERATING SIGNAL", 122, 1090);
-    drawText(shareInsight, 122, 1142, 800, 42, 2, "800 35px Inter, Arial, sans-serif", "#ffffff");
+    ctx.fillText("MY OPERATING SIGNAL", 122, 1150);
+    drawText(shareInsight, 122, 1194, 800, 34, 2, "800 29px Inter, Arial, sans-serif", "#ffffff");
     ctx.font = "900 30px Inter, Arial, sans-serif";
     ctx.fillStyle = "#22d3ee";
-    ctx.fillText(BRAND_SHARE_HOST, 122, 1270);
+    ctx.fillText(BRAND_SHARE_HOST, 122, 1310);
 
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((nextBlob) => nextBlob ? resolve(nextBlob) : reject(new Error("Share card export failed.")), "image/png", 0.92);
