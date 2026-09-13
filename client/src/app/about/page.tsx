@@ -60,7 +60,7 @@ export default function About() {
             Mission
           </h2>
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            KnowYouRole's mission is to help people understand their strengths, friction points, communication style, and career-fit themes earlier — so they can make better decisions with more self-awareness and less guesswork.
+            KnowYouRole's mission is to help people understand their strengths, friction points, communication style, and career-fit themes earlier, so they can make better decisions with more self-awareness and less guesswork.
           </p>
         </section>
 
