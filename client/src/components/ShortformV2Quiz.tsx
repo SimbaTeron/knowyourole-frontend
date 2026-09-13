@@ -464,7 +464,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
                     transition={{ delay: index * 0.045, duration: 0.22 }}
                     whileHover={!selectedAnswer ? { y: -4, scale: 1.012 } : undefined}
                     whileTap={!selectedAnswer ? { scale: 0.98 } : undefined}
-                    className={`shortform-v2-answer-button group relative overflow-hidden rounded-[19px] border p-2.5 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 sm:rounded-[22px] sm:p-3.5 lg:min-h-0 lg:p-4 ${isSelected ? "border-cyan-200/95 bg-[#17233a] shadow-[0_0_0_1px_rgba(125,211,252,0.45),0_0_50px_rgba(34,211,238,0.30)]" : "border-white/12 bg-[#0d1324]/94 shadow-[0_18px_54px_rgba(0,0,0,0.30)] hover:border-[#f8f0df] hover:bg-[#e6d8bd] hover:shadow-[0_18px_54px_rgba(230,216,189,0.20)] active:!border-[#f3e6cf] active:!bg-[#dccdb3]"}`}
+                    className={`shortform-v2-answer-button group relative overflow-hidden rounded-[19px] border p-2.5 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 sm:rounded-[22px] sm:p-3.5 lg:min-h-0 lg:p-4 ${isSelected ? "border-[#f3e6cf] bg-[#dccdb3] shadow-[0_0_0_1px_rgba(243,230,207,0.72),0_0_42px_rgba(220,205,179,0.34)]" : "border-white/12 bg-[#0d1324]/94 shadow-[0_18px_54px_rgba(0,0,0,0.30)] hover:border-[#f8f0df] hover:bg-[#e6d8bd] hover:shadow-[0_18px_54px_rgba(230,216,189,0.20)] active:!border-[#f3e6cf] active:!bg-[#dccdb3]"}`}
                     aria-label={`Answer ${answer.id}: ${answer.text}`}
                     aria-pressed={isSelected}
                     data-testid={`button-v2-answer-${answer.id}`}
@@ -474,10 +474,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
                     <div className="relative z-10 grid h-full grid-cols-[34px_minmax(0,1fr)] items-center gap-2.5 sm:flex sm:flex-col sm:items-stretch sm:gap-0">
                       <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[13px] bg-gradient-to-br ${accent} text-[11px] font-black text-[#050510] shadow-[0_12px_30px_rgba(0,0,0,0.35)] sm:mb-4 sm:h-8 sm:w-8 sm:rounded-full sm:text-xs`}>{answer.id}</span>
                       <span className="min-w-0">
-                        <h2 className="text-[0.92rem] font-black leading-[1.16] tracking-[-0.025em] text-white transition-colors group-hover:text-[#12263a] group-active:text-[#12263a] sm:max-w-[23ch] sm:text-[1.13rem] lg:text-[1.2rem]">{answer.text}</h2>
-                        <span className="mt-1 block truncate text-[#456174] font-bold uppercase tracking-[0.12em] transition-colors group-hover:text-[#31485d] group-active:text-[#31485d] sm:mt-2 sm:tracking-[0.18em]" style={{ fontSize: "9px" }}>{answer.resultSignal}</span>
+                        <h2 className={`text-[0.92rem] font-black leading-[1.16] tracking-[-0.025em] transition-colors sm:max-w-[23ch] sm:text-[1.13rem] lg:text-[1.2rem] ${isSelected ? "text-[#12263a]" : "text-white group-hover:text-[#12263a] group-active:text-[#12263a]"}`}>{answer.text}</h2>
+                        <span className={`mt-1 block truncate font-bold uppercase tracking-[0.12em] transition-colors sm:mt-2 sm:tracking-[0.18em] ${isSelected ? "text-[#31485d]" : "text-[#456174] group-hover:text-[#31485d] group-active:text-[#31485d]"}`} style={{ fontSize: "9px" }}>{answer.resultSignal}</span>
                       </span>
-                      {isSelected && <span className="absolute right-2 top-2 rounded-full bg-cyan-200 px-2 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-[#050510] sm:text-[9px]">Selected</span>}
+                      {isSelected && <span className="absolute right-2 top-2 rounded-full border border-[#f3e6cf] bg-[#c9b68f] px-2 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-[#12263a] sm:text-[9px]">Selected</span>}
                     </div>
                   </motion.button>
                 );
