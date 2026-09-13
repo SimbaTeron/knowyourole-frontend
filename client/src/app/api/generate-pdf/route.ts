@@ -233,8 +233,8 @@ export async function POST(req: NextRequest) {
 
     // One-page Full Portrait: magazine-style hierarchy, fewer duplicate boxes, clearer scanning path.
     page.drawText('KnowYouRole', { x: margin, y, size: 18, font: bold, color: color('cyan') });
-    page.drawText('FULL PORTRAIT', { x: pageSize[0] - margin - 92, y: y + 3, size: 8.8, font: bold, color: color('dim') });
-    page.drawText('shareable signal card', { x: pageSize[0] - margin - 104, y: y - 9, size: 8, font: italic, color: color('muted') });
+    page.drawText('WORK-STYLE PORTRAIT', { x: pageSize[0] - margin - 118, y: y + 3, size: 8.4, font: bold, color: color('dim') });
+    page.drawText('PERSONAL RESULT SUMMARY', { x: pageSize[0] - margin - 132, y: y - 9, size: 7.1, font: bold, color: color('muted') });
     y -= 28;
 
     const hero = drawCardShell(margin, y, contentWidth, 150, 'cyan');
@@ -253,26 +253,12 @@ export async function POST(req: NextRequest) {
     const careerTitleLines = wrapByWidth(careerTitle, bold, 13, hero.width - 304, 2);
     careerTitleLines.forEach((line, index) => page.drawText(line, { x: careerX, y: hero.yTop - 22 - index * 15, size: 13, font: bold, color: color('gold') }));
     if (careerSalary) drawWrapped(careerSalary, careerX, hero.yTop - 29 - careerTitleLines.length * 15, hero.width - 304, 8, 1, bold, 'muted', 1);
-    y -= 166;
+    y -= 180;
 
-    const signalTop = y;
-    const signalW = (contentWidth - 20) / 3;
-    const signals = [
-      { label: 'Career signal', value: careerTitle, note: careerSalary || 'role direction', accent: 'gold' as keyof typeof COLORS },
-      { label: 'Operating mode', value: `${primaryDisc} - ${discLabel}`, note: 'primary DISC style', accent: discAccent as keyof typeof COLORS },
-      { label: 'Dominant dial', value: `${topBigFiveLabel}`, note: `${topBigFiveScore}% Big Five lead`, accent: 'cyan' as keyof typeof COLORS },
-    ];
-    signals.forEach((item, index) => {
-      const card = drawCardShell(margin + index * (signalW + 10), signalTop, signalW, 76, item.accent, 'card2');
-      page.drawText(item.label.toUpperCase(), { x: card.x, y: card.yTop, size: 7, font: bold, color: color(item.accent) });
-      drawWrapped(item.value, card.x, card.yTop - 18, card.width, index === 1 ? 11 : 9.5, 2, bold, 'text', 1.8);
-      drawWrapped(item.note, card.x, card.yBottom + 8, card.width, 6.8, 2, regular, 'dim', 1);
-    });
-    y -= 92;
-
-    const insight = drawCardShell(margin, y, contentWidth, 166, 'purple');
-    page.drawText('The useful bits', { x: insight.x, y: insight.yTop + 1, size: 14, font: bold, color: color('text') });
-    page.drawText('MBTI compass + Big Five dials. Still one page. Still not a spreadsheet.', { x: insight.x + 106, y: insight.yTop + 4, size: 7.8, font: italic, color: color('dim') });
+    // A single roomy diagnostic panel is clearer than three duplicated micro-cards.
+    const insight = drawCardShell(margin, y, contentWidth, 238, 'purple');
+    page.drawText('Work-style signals', { x: insight.x, y: insight.yTop + 1, size: 14, font: bold, color: color('text') });
+    page.drawText('Preference pattern and trait distribution', { x: insight.x + 128, y: insight.yTop + 4, size: 8, font: regular, color: color('dim') });
 
     const compassX = insight.x;
     const compassY = insight.yTop - 30;
