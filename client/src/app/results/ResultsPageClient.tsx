@@ -2862,7 +2862,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
   const bigFiveConfidenceBody = bigFiveTopGap >= 15
     ? `${topBigFiveRow.label} leads ${secondBigFiveRow.label} by ${bigFiveTopGap} points, so it is a useful anchor for reading the profile.`
     : `${topBigFiveRow.label} and ${secondBigFiveRow.label} are close. Read the Big Five shape as a blend, not a single-trait headline.`;
-  const socialIdentityTitle = SOCIAL_IDENTITY_TITLES[mbtiType] || displayedCareerTitle;
+  const socialIdentityTitle = humanizeResultLabel(SOCIAL_IDENTITY_TITLES[mbtiType] || displayedCareerTitle);
   const mbtiEmoji = MBTI_EMOJIS[mbtiType] || "✨";
   const mbtiShortName = stripLeadingThe(arch);
   const socialShareLine = MBTI_SHARE_INSIGHTS[mbtiType] || getShareInsight(mbtiType, DISC_LABELS[primary] || primary);
@@ -4791,7 +4791,7 @@ function OrbitalGlassV2Results({
   }, [view]);
 
   const arch = getArchetype(mbtiType);
-  const identity = SOCIAL_IDENTITY_TITLES[mbtiType] || `${stripLeadingThe(arch)} Builder`;
+  const identity = humanizeResultLabel(SOCIAL_IDENTITY_TITLES[mbtiType] || `${stripLeadingThe(arch)} Builder`);
   const emoji = MBTI_EMOJIS[mbtiType] || "◈";
   const discLabel = DISC_LABELS[primaryDisc] || primaryDisc;
   const canonicalRoles = canonicalCareerDirection?.examples.map(role => ({ title: role.title, salary: role.marketData?.salaryRange || "", desc: role.reasoning })) ?? [];
