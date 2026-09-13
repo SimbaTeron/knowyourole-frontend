@@ -2409,11 +2409,24 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
   const shareTopBigFive = (Object.entries(report.bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
   const shareTopBigFiveName = shareTopBigFive[0] === "O" ? "Openness" : shareTopBigFive[0] === "C" ? "Structure / Follow-through" : shareTopBigFive[0] === "E" ? "Extraversion" : shareTopBigFive[0] === "A" ? "Agreeableness" : "Stress Reactivity";
 
+  const sharePalette = {
+    ink: "#173246",
+    muted: "#61717a",
+    dim: "#7c7569",
+    paper: "#fffdf7",
+    parchment: "#f5eddf",
+    sand: "#e6d8bd",
+    pressed: "#dccdb3",
+    line: "#d8c9ae",
+    gold: "#a76d24",
+    danger: "#8d3131",
+  };
+
   const baseActionStyle: CSSProperties = {
     width: "100%",
-    border: `1px solid ${C.glassBorderBright}`,
-    background: "rgba(255,255,255,0.055)",
-    color: C.text,
+    border: `1px solid ${sharePalette.line}`,
+    background: "rgba(255,253,247,0.82)",
+    color: sharePalette.ink,
     textAlign: "left",
     fontFamily: "Inter, sans-serif",
     cursor: "pointer",
@@ -2444,7 +2457,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
   };
 
   const actionLabelStyle: CSSProperties = { display: "block", fontSize: 13, fontWeight: 900, letterSpacing: -0.1 };
-  const actionHintStyle: CSSProperties = { display: "block", fontSize: 10.5, lineHeight: 1.35, color: C.textMuted, marginTop: 5 };
+  const actionHintStyle: CSSProperties = { display: "block", fontSize: 10.5, lineHeight: 1.35, color: sharePalette.muted, marginTop: 5 };
 
   return (
     <div
@@ -2452,42 +2465,42 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
       aria-modal="true"
       aria-label="Share results"
       onClick={(event) => event.target === event.currentTarget && onClose()}
-      style={{ position: "fixed", inset: 0, zIndex: 300, background: "radial-gradient(circle at 50% 18%, rgba(34,211,238,0.18), transparent 34%), rgba(3, 2, 10, 0.82)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", padding: 16, display: "flex", alignItems: "center", justifyContent: "center" }}
+      style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(52, 42, 29, 0.38)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", padding: 16, display: "flex", alignItems: "center", justifyContent: "center" }}
     >
-      <div style={{ width: "min(500px, 100%)", maxHeight: "90dvh", overflowY: "auto", borderRadius: 30, background: `linear-gradient(145deg, rgba(13,8,30,0.98), rgba(6,4,16,0.99))`, border: `1px solid ${C.glassBorderBright}`, boxShadow: "0 32px 100px rgba(0,0,0,0.62)", color: C.text }}>
+      <div style={{ width: "min(500px, 100%)", maxHeight: "90dvh", overflowY: "auto", borderRadius: 30, background: `linear-gradient(145deg, ${sharePalette.paper}, ${sharePalette.parchment})`, border: `1px solid ${sharePalette.line}`, boxShadow: "0 32px 80px rgba(53,39,22,0.28)", color: sharePalette.ink }}>
         <div style={{ padding: 18, position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at top left, ${C.cyanGlow}, transparent 42%), radial-gradient(circle at 90% 0%, rgba(168,85,247,0.32), transparent 38%)`, pointerEvents: "none" }} />
-          <button type="button" onClick={onClose} aria-label="Close share options" style={{ position: "absolute", top: 14, right: 14, width: 34, height: 34, borderRadius: 999, border: `1px solid ${C.glassBorder}`, background: "rgba(255,255,255,0.075)", color: C.text, cursor: "pointer", fontSize: 18, zIndex: 2 }}>×</button>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at top left, rgba(230,216,189,0.82), transparent 46%), radial-gradient(circle at 92% 0%, rgba(167,109,36,0.16), transparent 40%)", pointerEvents: "none" }} />
+          <button type="button" onClick={onClose} aria-label="Close share options" style={{ position: "absolute", top: 14, right: 14, width: 34, height: 34, borderRadius: 999, border: `1px solid ${sharePalette.line}`, background: "rgba(255,253,247,0.86)", color: sharePalette.ink, cursor: "pointer", fontSize: 18, zIndex: 2 }}>×</button>
 
           <div style={{ position: "relative", display: "grid", gap: 14 }}>
             <div>
-              <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: C.cyan, textTransform: "uppercase", marginBottom: 6 }}>Share your Full Portrait</div>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 28, fontWeight: 900, marginBottom: 4, letterSpacing: -0.6 }}>Pick the format</div>
-              <div style={{ fontSize: 12, lineHeight: 1.45, color: C.textMuted, maxWidth: 360 }}>One visual card, one polished PDF, or a clean message. No clutter.</div>
+              <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: sharePalette.gold, textTransform: "uppercase", marginBottom: 6 }}>Share your Full Portrait</div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 28, fontWeight: 900, marginBottom: 4, letterSpacing: -0.6, color: sharePalette.ink }}>Pick the format</div>
+              <div style={{ fontSize: 12, lineHeight: 1.45, color: sharePalette.muted, maxWidth: 360 }}>One visual card, one polished PDF, or a clean message. No clutter.</div>
             </div>
 
-            <div style={{ border: `1px solid rgba(34,211,238,0.24)`, background: "linear-gradient(135deg, rgba(34,211,238,0.11), rgba(168,85,247,0.08))", borderRadius: 24, padding: 14, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}>
+            <div style={{ border: `1px solid ${sharePalette.line}`, background: "linear-gradient(135deg, rgba(255,253,247,0.96), rgba(230,216,189,0.60))", borderRadius: 24, padding: 14, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.88)" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
                 <div>
-                  <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: 1.1, fontWeight: 900, marginBottom: 4 }}>Preview</div>
-                  <div style={{ fontSize: 18, fontWeight: 950, color: C.text }}>{report.mbtiType} · {report.primaryDisc} {discLabel}</div>
+                  <div style={{ fontSize: 10, color: sharePalette.dim, textTransform: "uppercase", letterSpacing: 1.1, fontWeight: 900, marginBottom: 4 }}>Preview</div>
+                  <div style={{ fontSize: 18, fontWeight: 950, color: sharePalette.ink }}>{report.mbtiType} · {report.primaryDisc} {discLabel}</div>
                 </div>
-                <div style={{ width: 48, height: 48, borderRadius: 18, display: "grid", placeItems: "center", background: "rgba(255,255,255,0.08)", border: `1px solid ${C.glassBorder}`, fontSize: 24 }}>↗</div>
+                <div style={{ width: 48, height: 48, borderRadius: 18, display: "grid", placeItems: "center", background: "rgba(220,205,179,0.74)", border: `1px solid ${sharePalette.line}`, color: sharePalette.ink, fontSize: 24 }}>↗</div>
               </div>
-              <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.4 }}>{report.career.title} · {shareTopBigFiveName} signal · {BRAND_SHARE_HOST}</div>
+              <div style={{ fontSize: 12, color: sharePalette.muted, lineHeight: 1.4 }}>{report.career.title} · {shareTopBigFiveName} signal · {BRAND_SHARE_HOST}</div>
             </div>
           </div>
         </div>
 
         <div style={{ padding: "0 18px 18px", display: "grid", gap: 12 }}>
           {shareError && (
-            <div role="alert" style={{ border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.1)", borderRadius: 16, padding: "10px 12px", color: "#fecaca", fontSize: 12, lineHeight: 1.45 }}>
+            <div role="alert" style={{ border: "1px solid #d7a4a0", background: "#fff1ee", borderRadius: 16, padding: "10px 12px", color: sharePalette.danger, fontSize: 12, lineHeight: 1.45 }}>
               {shareError}
             </div>
           )}
 
           <div style={{ display: "grid", gap: 10 }}>
-            <button type="button" onClick={handleSocialCard} disabled={Boolean(busyAction)} style={{ ...primaryActionStyle, minHeight: 88, borderColor: "rgba(245,158,11,0.48)", background: "linear-gradient(145deg, rgba(245,158,11,0.22), rgba(168,85,247,0.12))", boxShadow: "0 16px 42px rgba(245,158,11,0.12)" }}>
+            <button type="button" onClick={handleSocialCard} disabled={Boolean(busyAction)} style={{ ...primaryActionStyle, minHeight: 88, borderColor: "#c89a55", background: "linear-gradient(145deg, #f5e7c9, #e6d8bd)", boxShadow: "0 16px 36px rgba(167,109,36,0.16)" }}>
               <span style={{ fontSize: 24 }}>🖼️</span>
               <span>
                 <span style={{ ...actionLabelStyle, fontSize: 15 }}>{busyAction === "image" ? "Creating…" : "Share result card"}</span>
@@ -2495,7 +2508,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
               </span>
             </button>
 
-            <button type="button" onClick={handleDownload} disabled={Boolean(busyAction)} style={{ ...quickActionStyle, minHeight: 54, flexDirection: "row", gap: 9, borderColor: "rgba(34,211,238,0.28)", background: `linear-gradient(145deg, rgba(34,211,238,0.10), rgba(168,85,247,0.07))` }}>
+            <button type="button" onClick={handleDownload} disabled={Boolean(busyAction)} style={{ ...quickActionStyle, minHeight: 54, flexDirection: "row", gap: 9, borderColor: sharePalette.line, background: "linear-gradient(145deg, #fffdf7, #f0e4cd)" }}>
               <span style={{ fontSize: 18 }}>📄</span>
               <span style={{ fontSize: 12, fontWeight: 900 }}>{busyAction === "pdf" ? "Building PDF…" : "Save PDF"}</span>
             </button>
@@ -2520,7 +2533,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
             </button>
           </div>
 
-          <div style={{ fontSize: 10.5, color: C.textDim, textAlign: "center", lineHeight: 1.4, padding: "2px 10px 0" }}>
+          <div style={{ fontSize: 10.5, color: sharePalette.dim, textAlign: "center", lineHeight: 1.4, padding: "2px 10px 0" }}>
             Share card is the visual flex. PDF is the keep-it-forever version.
           </div>
         </div>
