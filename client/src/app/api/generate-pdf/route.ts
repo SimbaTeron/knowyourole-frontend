@@ -248,13 +248,11 @@ export async function POST(req: NextRequest) {
     page.drawRectangle({ x: dividerX, y: hero.yBottom + 6, width: 1, height: 106, color: color('border') });
     const careerX = dividerX + 24;
     page.drawText('BEST-FIT DIRECTION', { x: careerX, y: hero.yTop + 2, size: 7.4, font: bold, color: color('gold') });
-    // Career names and salary bands are user-visible claims: wrapping beats silent ellipses.
-    const careerTitleLines = wrapByWidth(careerTitle, bold, 14.5, hero.width - 304, 2);
-    careerTitleLines.forEach((line, index) => page.drawText(line, { x: careerX, y: hero.yTop - 22 - index * 16, size: 14.5, font: bold, color: color('gold') }));
-    const careerDetailY = hero.yTop - 24 - careerTitleLines.length * 16;
-    if (careerSalary) drawWrapped(careerSalary, careerX, careerDetailY, hero.width - 304, 8.2, 2, bold, 'muted', 1.5);
-    drawWrapped(careerSummary, careerX, careerDetailY - (careerSalary ? 24 : 4), hero.width - 304, 8.4, 5, regular, 'muted', 2);
-    drawWrapped('The shortest useful read: what to pursue, how you move, and which trait is steering the wheel.', careerX, hero.yBottom + 12, hero.width - 304, 7.8, 2, italic, 'dim', 2);
+    // Fixed-height hero: only show content that has a guaranteed visual slot.
+    // The longer rationale belongs in the result page and the PNG summary, not behind other PDF text.
+    const careerTitleLines = wrapByWidth(careerTitle, bold, 13, hero.width - 304, 2);
+    careerTitleLines.forEach((line, index) => page.drawText(line, { x: careerX, y: hero.yTop - 22 - index * 15, size: 13, font: bold, color: color('gold') }));
+    if (careerSalary) drawWrapped(careerSalary, careerX, hero.yTop - 29 - careerTitleLines.length * 15, hero.width - 304, 8, 1, bold, 'muted', 1);
     y -= 166;
 
     const signalTop = y;
@@ -272,7 +270,7 @@ export async function POST(req: NextRequest) {
     });
     y -= 92;
 
-    const insight = drawCardShell(margin, y, contentWidth, 196, 'purple');
+    const insight = drawCardShell(margin, y, contentWidth, 166, 'purple');
     page.drawText('The useful bits', { x: insight.x, y: insight.yTop + 1, size: 14, font: bold, color: color('text') });
     page.drawText('MBTI compass + Big Five dials. Still one page. Still not a spreadsheet.', { x: insight.x + 106, y: insight.yTop + 4, size: 7.8, font: italic, color: color('dim') });
 
@@ -300,22 +298,7 @@ export async function POST(req: NextRequest) {
       barY -= 21;
     }
 
-    const fieldY = insight.yBottom - 58;
-    page.drawRectangle({ x: insight.x, y: fieldY, width: insight.width, height: 46, color: rgb(0.07, 0.05, 0.12), borderColor: color('border'), borderWidth: 0.7 });
-    page.drawText('Tiny field guide', { x: insight.x + 10, y: fieldY + 29, size: 10.2, font: bold, color: color('gold') });
-    const guideLines = [
-      `Chase rooms that reward ${careerTitle.toLowerCase()} energy.`,
-      `Use ${primaryDisc} ${discLabel.toLowerCase()} mode for momentum; pause before autopilot.`,
-      `Let ${topBigFiveLabel.toLowerCase()} choose better environments, not smaller dreams.`,
-    ];
-    let guideY = fieldY + 29;
-    guideLines.forEach((line, index) => {
-      page.drawCircle({ x: insight.x + 108, y: guideY + 3, size: 1.8, color: color('gold') });
-      drawWrapped(line, insight.x + 116, guideY, insight.width - 238, 7.2, 2, regular, 'muted', 1);
-      guideY -= 22;
-      if (index === 2) page.drawText(BRAND_URL, { x: insight.x + insight.width - 88, y: fieldY + 5, size: 9, font: bold, color: color('cyan') });
-    });
-    y = fieldY - 18;
+    y = insight.yBottom - 18;
 
     page.drawText('Mirror, not a cage. Use the signal. Keep the agency.', { x: margin, y: 42, size: 8.7, font: italic, color: color('muted') });
 
