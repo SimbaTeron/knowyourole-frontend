@@ -94,7 +94,8 @@ export default function Home() {
           max-width: 690px;
           margin: 0;
           color: #f8fbff !important;
-          font-size: clamp(3.15rem, 6vw, 5.55rem);
+          font-family: 'Space Grotesk', Arial, sans-serif;
+          font-size: clamp(3.025rem, 5.8vw, 5.3rem);
           line-height: 0.9;
           letter-spacing: -0.076em;
           font-weight: 950;
@@ -271,7 +272,7 @@ export default function Home() {
         @media (max-width: 640px) {
           .home-shell { width: min(100% - 28px, 1120px); }
           .hero-section { padding: 86px 0 48px; }
-          .hero-title { font-size: clamp(2.78rem, 13.5vw, 3.8rem); }
+          .hero-title { font-size: clamp(2.655rem, 13.1vw, 3.675rem); }
           .hero-subtitle { font-size: 0.98rem; }
           .primary-cta { width: 100%; }
           .quiz-facts { line-height: 1.55; }
