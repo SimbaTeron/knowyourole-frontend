@@ -270,7 +270,22 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
 .workday-content-related a { display: flex; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(18,38,58,.12); color: #28475d; text-decoration: none; font: 750 12px/1.35 "IBM Plex Sans", sans-serif; text-transform: capitalize; }
 .workday-content-trust { margin: 0; padding: 15px; border-left: 3px solid #e98268; color: #536e82; font: 600 12px/1.5 "IBM Plex Sans", sans-serif; }
 
-/* Shared Workday navigation. */
+/* Shared warm shell for concise trust and support pages. */
+.workday-simple-page { background: #f8f3e8; color: #12263a; }
+.workday-simple-wrap { width: min(100% - 40px, 760px); margin: 0 auto; }
+.workday-simple-eyebrow { margin: 0; color: #315f74; font: 800 11px/1 "IBM Plex Sans", sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+.workday-simple-page h1 { max-width: 760px; margin: 16px 0 0; font: 700 clamp(3rem, 7vw, 5.7rem)/.9 "Space Grotesk", Arial, sans-serif; letter-spacing: -.075em; }
+.workday-simple-intro { max-width: 700px; margin: 24px 0 0; color: #405f72; font: 600 clamp(1rem, 1.8vw, 1.15rem)/1.6 "IBM Plex Sans", sans-serif; }
+.workday-simple-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 36px; }
+.workday-simple-grid article { min-height: 190px; padding: 24px; border: 1px solid rgba(18,38,58,.16); background: #fffdf8; box-shadow: 6px 6px 0 rgba(18,38,58,.08); }
+.workday-simple-grid p { margin: 0; color: #315f74; font: 800 10px/1 "IBM Plex Sans", sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.workday-simple-grid h2 { margin: 16px 0 0; font: 700 25px/1 "Space Grotesk", Arial, sans-serif; letter-spacing: -.045em; }
+.workday-simple-grid span { display: block; margin-top: 15px; color: #536e82; font: 500 14px/1.55 "IBM Plex Sans", sans-serif; }
+.workday-simple-callout { margin-top: 18px; padding: 20px 22px; border-left: 4px solid #e98268; background: #eaf5f6; color: #29495c; font: 700 14px/1.55 "IBM Plex Sans", sans-serif; }
+.workday-simple-email { display: inline-flex; align-items: center; gap: 12px; margin-top: 28px; padding: 14px 17px; background: #12263a; color: #fffdf8; text-decoration: none; font: 800 13px/1 "IBM Plex Sans", sans-serif; box-shadow: 4px 4px 0 #ffca42; }
+.workday-simple-email:hover { transform: translate(-1px, -1px); }
+
+/* Primary public navigation. */
 .workday-header {
   position: fixed;
   inset: 0 0 auto;
@@ -314,6 +329,10 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
   .workday-content-aside { position: static; }
   .workday-content-section { padding: 23px 19px; }
   .workday-content-library { grid-template-columns: 1fr; }
+  .workday-simple-wrap { width: min(100% - 28px, 760px); }
+  .workday-simple-page h1 { font-size: clamp(2.75rem, 14vw, 4.5rem); }
+  .workday-simple-grid { grid-template-columns: 1fr; margin-top: 28px; }
+  .workday-simple-grid article { min-height: 0; padding: 20px; }
   .workday-header { padding-inline: 12px; }
   .workday-header__bar { min-height: 50px; padding: 7px 8px 7px 11px; gap: 8px; border-radius: 17px; }
   .workday-header__links { display: none; }

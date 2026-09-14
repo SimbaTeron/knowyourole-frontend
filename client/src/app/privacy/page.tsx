@@ -1,7 +1,6 @@
 'use client';
 
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { AppHeader } from "@/components/layout/AppHeader";
 import { COOKIE_PREFERENCES_EVENT } from "@/components/CookieConsentBanner";
 
 const sectionClass = "space-y-3";
@@ -14,17 +13,9 @@ export default function Privacy() {
   };
 
   return (
-    <div className="min-h-screen bg-soft-cream dark:bg-[#0A0A12] text-warm-gray dark:text-[#F8FAFC]">
-      <header className="sticky top-0 z-50 px-6 py-4 bg-soft-cream/90 dark:bg-[#0A0A12]/90 backdrop-blur-sm border-b border-warm-gray/10 dark:border-[#A78BFA]/10">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 text-sm text-warm-gray/70 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-back-home">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-12">
+    <div className="workday-simple-page min-h-screen bg-soft-cream text-warm-gray">
+      <AppHeader />
+      <main className="workday-simple-wrap max-w-2xl px-6 py-32">
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-privacy-title">Privacy Policy</h1>
         <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last reviewed: July 27, 2026</p>
 

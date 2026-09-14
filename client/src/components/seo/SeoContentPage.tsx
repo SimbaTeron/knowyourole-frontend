@@ -12,6 +12,15 @@ function jsonLd(page: SeoPage) {
   ];
 }
 
+function relatedLabel(href: string) {
+  const labels: Record<string, string> = {
+    "/results/types": "Results types",
+    "/personality-quiz": "Personality quiz",
+    "/career-personality-quiz": "Career personality quiz",
+  };
+  return labels[href] ?? href.split("/").filter(Boolean).map((part) => part.replaceAll("-", " ")).join(" · ");
+}
+
 /** Shared content architecture for every guide, comparison, career page, and result-type page. */
 export function SeoContentPage({ page, indexPages = [] }: { page: SeoPage; indexPages?: SeoPage[] }) {
   const schema = jsonLd(page);
@@ -45,8 +54,8 @@ export function SeoContentPage({ page, indexPages = [] }: { page: SeoPage; index
           {page.faqs?.length ? <section className="workday-content-section"><p className="workday-content-count">FAQ</p><h2>Common questions</h2><div className="workday-content-faq">{page.faqs.map((faq) => <details key={faq.q}><summary>{faq.q}</summary><p>{faq.a}</p></details>)}</div></section> : null}
         </article>
         <aside className="workday-content-aside">
-          <div className="workday-content-next"><p>One practical next step</p><h2>Get your work-style picture.</h2><span>Five minutes. No account required to start.</span><Link href="/quiz">Start the quiz <b>↗</b></Link></div>
-          {page.related?.length ? <nav className="workday-content-related" aria-label="Related pages"><p>Related reading</p>{page.related.map((href) => <Link key={href} href={href}>{href.replaceAll("/", "").replaceAll("-", " ")} <span>↗</span></Link>)}</nav> : null}
+          <div className="workday-content-next"><p>One practical next step</p><h2>Get your work-style picture.</h2><span>28 questions. No account required to start.</span><Link href="/quiz">Start the quiz <b>↗</b></Link></div>
+          {page.related?.length ? <nav className="workday-content-related" aria-label="Related pages"><p>Related reading</p>{page.related.map((href) => <Link key={href} href={href}>{relatedLabel(href)} <span>↗</span></Link>)}</nav> : null}
           <p className="workday-content-trust">Built for self-reflection and career-fit exploration—not diagnosis, hiring decisions, or a life sentence.</p>
         </aside>
       </section>

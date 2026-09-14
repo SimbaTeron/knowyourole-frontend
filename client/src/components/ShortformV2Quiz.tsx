@@ -311,7 +311,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_16%,rgba(34,211,238,0.18),transparent_31%),radial-gradient(circle_at_82%_72%,rgba(168,85,247,0.18),transparent_35%)]" />
         <section aria-labelledby="shortform-welcome-heading" className="relative mx-auto w-full max-w-2xl rounded-[30px] border border-white/15 bg-[#0b1222]/92 p-5 shadow-[0_28px_92px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:rounded-[38px] sm:p-9">
           <p className="quiz-welcome-kicker text-[11px] font-black uppercase tracking-[0.28em] text-cyan-200">KnowYourRole · work-style exploration</p>
-          <h1 id="shortform-welcome-heading" className="mt-4 max-w-xl text-3xl font-black tracking-[-0.055em] text-white sm:text-5xl">28 grounded questions. One practical starting point.</h1>
+          <h2 id="shortform-welcome-heading" className="mt-4 max-w-xl text-3xl font-black tracking-[-0.055em] text-white sm:text-5xl">28 grounded questions. One practical starting point.</h2>
           <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-white/72 sm:text-base sm:leading-7">Answer for your usual work pattern—not your ideal day or the answer that sounds impressive. There are no right answers.</p>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2" aria-label="What to expect">
             <li className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-sm leading-6 text-white/75"><strong className="block text-white">A calm, fixed flow</strong> One question at a time, with back navigation if you want to change an answer.</li>
