@@ -291,7 +291,7 @@ export default function Home() {
             <div>
               <p className="eyebrow">Free personality quiz for work style &amp; career fit</p>
               <h1 id="home-hero-title" className="hero-title">
-                Find the work patterns—and career directions—worth testing next.
+                Discover your work style, uncover your strengths, and find career paths to explore next.
               </h1>
               <p className="hero-subtitle">
                 A private, 28-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.
