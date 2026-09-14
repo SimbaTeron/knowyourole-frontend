@@ -43,6 +43,9 @@ html.kyr-workday ::selection { background: var(--workday-sun); color: var(--work
 html.kyr-workday a { text-underline-offset: 0.22em; }
 html.kyr-workday :focus-visible { outline: 3px solid var(--workday-sun); outline-offset: 3px; }
 
+/* Quiz welcome: the base component is dark, but Workday presents it on a light surface. */
+html.kyr-workday .quiz-welcome-kicker { color: #1f5e78 !important; }
+
 /* Homepage — retain the information architecture while replacing the dark/glass skin. */
 html.kyr-workday .kyr-home-page {
   background: var(--workday-paper) !important;
