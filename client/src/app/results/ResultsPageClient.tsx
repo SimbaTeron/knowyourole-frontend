@@ -2161,7 +2161,17 @@ function downloadBlob(blob: Blob, filename: string) {
 function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: () => void; report: ShareReportPayload }) {
   const [busyAction, setBusyAction] = useState<"pdf" | "native" | "image" | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setShowMoreOptions(false);
+      setCopied(false);
+      setShareError(null);
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const discLabel = DISC_LABELS[report.primaryDisc] || "Primary Style";
@@ -2265,74 +2275,74 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     };
 
     const bg = ctx.createLinearGradient(0, 0, 1080, 1350);
-    bg.addColorStop(0, "#080414");
-    bg.addColorStop(0.48, "#120826");
-    bg.addColorStop(1, "#05020c");
+    bg.addColorStop(0, "#fffdf7");
+    bg.addColorStop(0.5, "#f8f3e8");
+    bg.addColorStop(1, "#eee2ca");
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, 1080, 1350);
-    ctx.globalAlpha = 0.28;
-    ctx.fillStyle = "#22d3ee";
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "#c6e4e7";
     ctx.beginPath(); ctx.arc(130, 120, 260, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#a855f7";
+    ctx.fillStyle = "#f1c77a";
     ctx.beginPath(); ctx.arc(1000, 90, 330, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#f472b6";
+    ctx.fillStyle = "#e6c6b6";
     ctx.beginPath(); ctx.arc(920, 1180, 250, 0, Math.PI * 2); ctx.fill();
     ctx.globalAlpha = 1;
 
-    ctx.fillStyle = "#22d3ee";
+    ctx.fillStyle = "#315f74";
     ctx.fillRect(0, 0, 1080, 14);
-    ctx.fillStyle = "#a855f7";
+    ctx.fillStyle = "#bf7c12";
     ctx.fillRect(0, 0, 650, 14);
 
-    ctx.font = "800 38px Inter, Arial, sans-serif";
-    ctx.fillStyle = "#22d3ee";
+    ctx.font = "800 38px 'Space Grotesk', Arial, sans-serif";
+    ctx.fillStyle = "#315f74";
     ctx.fillText("KnowYouRole", 72, 96);
-    ctx.font = "700 20px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.56)";
+    ctx.font = "700 20px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("Full Portrait share card", 72, 132);
 
-    fillRoundRect(72, 190, 936, 840, 42, "rgba(255,255,255,0.065)", "rgba(255,255,255,0.18)");
-    ctx.font = "800 28px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    fillRoundRect(72, 190, 936, 870, 42, "rgba(255,253,247,0.84)", "#d8c9ae");
+    ctx.font = "800 28px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("MY PERSONALITY SIGNAL", 122, 270);
-    ctx.font = "900 150px Inter, Arial, sans-serif";
-    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 150px 'Space Grotesk', Arial, sans-serif";
+    ctx.fillStyle = "#12263a";
     ctx.fillText(report.mbtiType, 118, 430);
-    drawText(report.archetype, 126, 488, 560, 50, 2, "800 42px Inter, Arial, sans-serif", "#a855f7");
+    drawText(report.archetype, 126, 488, 560, 50, 2, "800 42px 'Space Grotesk', Arial, sans-serif", "#c95f46");
 
-    fillRoundRect(126, 610, 360, 88, 24, "rgba(34,211,238,0.10)", "rgba(34,211,238,0.30)");
-    ctx.font = "800 22px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    fillRoundRect(126, 610, 360, 88, 24, "#eaf5f6", "#9bc8cf");
+    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("DISC", 154, 642);
-    ctx.font = "900 30px Inter, Arial, sans-serif";
+    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
     ctx.fillStyle = discColor;
-    drawText(`${report.primaryDisc} - ${discLabel}`, 154, 678, 300, 28, 2, "900 28px Inter, Arial, sans-serif", discColor);
+    drawText(`${report.primaryDisc} - ${discLabel}`, 154, 678, 300, 28, 2, "900 28px 'Space Grotesk', Arial, sans-serif", discColor);
 
-    fillRoundRect(520, 610, 360, 88, 24, "rgba(245,158,11,0.10)", "rgba(245,158,11,0.30)");
-    ctx.font = "800 22px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    fillRoundRect(520, 610, 360, 88, 24, "#fff4d9", "#e6c36e");
+    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("TOP TRAIT", 548, 642);
-    ctx.font = "900 30px Inter, Arial, sans-serif";
-    ctx.fillStyle = "#f59e0b";
-    drawText(`${topBigFiveName} ${topBigFive[1]}%`, 548, 678, 300, 28, 2, "900 28px Inter, Arial, sans-serif", "#f59e0b");
+    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
+    ctx.fillStyle = "#a76d24";
+    drawText(`${topBigFiveName} ${topBigFive[1]}%`, 548, 672, 300, 24, 2, "900 25px 'Space Grotesk', Arial, sans-serif", "#a76d24");
 
-    ctx.font = "800 24px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
-    ctx.fillText("CAREER DIRECTION", 126, 790);
-    drawText(report.career.title, 126, 850, 780, 50, 2, "900 48px Inter, Arial, sans-serif", "#fbbf24");
-    drawText(report.career.salary || "", 126, 950, 780, 30, 2, "800 27px Inter, Arial, sans-serif", "rgba(255,255,255,0.70)");
-    ctx.font = "800 20px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
-    ctx.fillText("WHY THIS DIRECTION", 126, 995);
-    drawText(report.career.summary || `A direction that pairs ${report.mbtiType} preferences with ${report.primaryDisc} ${discLabel.toLowerCase()} energy.`, 126, 1028, 810, 29, 3, "700 25px Inter, Arial, sans-serif", "rgba(255,255,255,0.88)");
+    ctx.font = "800 24px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
+    ctx.fillText("CAREER DIRECTION", 126, 770);
+    drawText(report.career.title, 126, 828, 780, 46, 2, "900 46px 'Space Grotesk', Arial, sans-serif", "#12263a");
+    drawText(report.career.salary || "", 126, 916, 780, 27, 2, "800 27px 'IBM Plex Sans', Arial, sans-serif", "#456174");
+    ctx.font = "800 20px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
+    ctx.fillText("WHY THIS DIRECTION", 126, 964);
+    drawText(report.career.summary || `A direction that pairs ${report.mbtiType} preferences with ${report.primaryDisc} ${discLabel.toLowerCase()} energy.`, 126, 994, 810, 24, 3, "700 22px 'IBM Plex Sans', Arial, sans-serif", "#29495c");
 
-    fillRoundRect(72, 1100, 936, 150, 34, "rgba(34,211,238,0.075)", "rgba(34,211,238,0.20)");
-    ctx.font = "800 22px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    fillRoundRect(72, 1100, 936, 150, 34, "#eaf5f6", "#9bc8cf");
+    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("MY OPERATING SIGNAL", 122, 1150);
-    drawText(shareInsight, 122, 1194, 800, 34, 2, "800 29px Inter, Arial, sans-serif", "#ffffff");
-    ctx.font = "900 30px Inter, Arial, sans-serif";
-    ctx.fillStyle = "#22d3ee";
+    drawText(shareInsight, 122, 1194, 800, 34, 2, "800 29px 'Space Grotesk', Arial, sans-serif", "#12263a");
+    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
+    ctx.fillStyle = "#315f74";
     ctx.fillText(BRAND_SHARE_HOST, 122, 1310);
 
     const blob = await new Promise<Blob>((resolve, reject) => {
@@ -2410,11 +2420,9 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     }
   };
 
-  const shareTopBigFive = (Object.entries(report.bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
-  const shareTopBigFiveName = shareTopBigFive[0] === "O" ? "Openness" : shareTopBigFive[0] === "C" ? "Structure / Follow-through" : shareTopBigFive[0] === "E" ? "Extraversion" : shareTopBigFive[0] === "A" ? "Agreeableness" : "Stress Reactivity";
-
   const sharePalette = {
     ink: "#173246",
+    cyan: "#315f74",
     muted: "#61717a",
     dim: "#7c7569",
     paper: "#fffdf7",
@@ -2472,27 +2480,14 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
       style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(52, 42, 29, 0.38)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", padding: 16, display: "flex", alignItems: "center", justifyContent: "center" }}
     >
       <div style={{ width: "min(500px, 100%)", maxHeight: "90dvh", overflowY: "auto", borderRadius: 30, background: `linear-gradient(145deg, ${sharePalette.paper}, ${sharePalette.parchment})`, border: `1px solid ${sharePalette.line}`, boxShadow: "0 32px 80px rgba(53,39,22,0.28)", color: sharePalette.ink }}>
-        <div style={{ padding: 18, position: "relative", overflow: "hidden" }}>
+        <div style={{ padding: 20, position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at top left, rgba(230,216,189,0.82), transparent 46%), radial-gradient(circle at 92% 0%, rgba(167,109,36,0.16), transparent 40%)", pointerEvents: "none" }} />
           <button type="button" onClick={onClose} aria-label="Close share options" style={{ position: "absolute", top: 14, right: 14, width: 34, height: 34, borderRadius: 999, border: `1px solid ${sharePalette.line}`, background: "rgba(255,253,247,0.86)", color: sharePalette.ink, cursor: "pointer", fontSize: 18, zIndex: 2 }}>×</button>
 
-          <div style={{ position: "relative", display: "grid", gap: 14 }}>
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: sharePalette.gold, textTransform: "uppercase", marginBottom: 6 }}>Share your Full Portrait</div>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 28, fontWeight: 900, marginBottom: 4, letterSpacing: -0.6, color: sharePalette.ink }}>Pick the format</div>
-              <div style={{ fontSize: 12, lineHeight: 1.45, color: sharePalette.muted, maxWidth: 360 }}>One visual card, one polished PDF, or a clean message. No clutter.</div>
-            </div>
-
-            <div style={{ border: `1px solid ${sharePalette.line}`, background: "linear-gradient(135deg, rgba(255,253,247,0.96), rgba(230,216,189,0.60))", borderRadius: 24, padding: 14, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.88)" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontSize: 10, color: sharePalette.dim, textTransform: "uppercase", letterSpacing: 1.1, fontWeight: 900, marginBottom: 4 }}>Preview</div>
-                  <div style={{ fontSize: 18, fontWeight: 950, color: sharePalette.ink }}>{report.mbtiType} · {report.primaryDisc} {discLabel}</div>
-                </div>
-                <div style={{ width: 48, height: 48, borderRadius: 18, display: "grid", placeItems: "center", background: "rgba(220,205,179,0.74)", border: `1px solid ${sharePalette.line}`, color: sharePalette.ink, fontSize: 24 }}>↗</div>
-              </div>
-              <div style={{ fontSize: 12, color: sharePalette.muted, lineHeight: 1.4 }}>{report.career.title} · {shareTopBigFiveName} signal · {BRAND_SHARE_HOST}</div>
-            </div>
+          <div style={{ position: "relative" }}>
+            <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: sharePalette.gold, textTransform: "uppercase", marginBottom: 7 }}>Your Full Portrait</div>
+            <div style={{ fontFamily: "'Space Grotesk', Arial, sans-serif", fontSize: 30, lineHeight: 0.98, fontWeight: 800, marginBottom: 8, letterSpacing: -1.2, color: sharePalette.ink }}>Share your result</div>
+            <div style={{ fontSize: 13, lineHeight: 1.5, color: sharePalette.muted, maxWidth: 360 }}>Send a visual card now, or keep the full report as a PDF.</div>
           </div>
         </div>
 
@@ -2504,41 +2499,50 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
           )}
 
           <div style={{ display: "grid", gap: 10 }}>
-            <button type="button" onClick={handleSocialCard} disabled={Boolean(busyAction)} style={{ ...primaryActionStyle, minHeight: 88, borderColor: "#c89a55", background: "linear-gradient(145deg, #f5e7c9, #e6d8bd)", boxShadow: "0 16px 36px rgba(167,109,36,0.16)" }}>
-              <span style={{ fontSize: 24 }}>🖼️</span>
+            <button type="button" onClick={handleSocialCard} disabled={Boolean(busyAction)} style={{ ...primaryActionStyle, minHeight: 94, borderColor: "#c89a55", background: "linear-gradient(145deg, #f5e7c9, #e6d8bd)", boxShadow: "0 16px 36px rgba(167,109,36,0.16)" }}>
+              <span style={{ fontSize: 25 }}>🖼️</span>
               <span>
-                <span style={{ ...actionLabelStyle, fontSize: 15 }}>{busyAction === "image" ? "Creating…" : "Share result card"}</span>
-                <span style={actionHintStyle}>Primary action: a clean visual card for socials, texts, and group chats.</span>
+                <span style={{ ...actionLabelStyle, fontSize: 16 }}>{busyAction === "image" ? "Preparing your card…" : "Share result card"}</span>
+                <span style={actionHintStyle}>A ready-to-send image for messages, socials, and group chats.</span>
               </span>
             </button>
 
-            <button type="button" onClick={handleDownload} disabled={Boolean(busyAction)} style={{ ...quickActionStyle, minHeight: 54, flexDirection: "row", gap: 9, borderColor: sharePalette.line, background: "linear-gradient(145deg, #fffdf7, #f0e4cd)" }}>
-              <span style={{ fontSize: 18 }}>📄</span>
-              <span style={{ fontSize: 12, fontWeight: 900 }}>{busyAction === "pdf" ? "Building PDF…" : "Save PDF"}</span>
+            <button type="button" onClick={handleDownload} disabled={Boolean(busyAction)} style={{ ...quickActionStyle, minHeight: 64, flexDirection: "row", justifyContent: "flex-start", gap: 12, padding: "13px 16px", borderColor: sharePalette.line, background: "linear-gradient(145deg, #fffdf7, #f0e4cd)" }}>
+              <span style={{ fontSize: 20 }}>📄</span>
+              <span style={{ textAlign: "left" }}>
+                <span style={{ display: "block", fontSize: 13, fontWeight: 900 }}>{busyAction === "pdf" ? "Building PDF…" : "Download PDF report"}</span>
+                <span style={{ display: "block", marginTop: 3, color: sharePalette.muted, fontSize: 10.5, lineHeight: 1.35 }}>A printable copy of your Full Portrait.</span>
+              </span>
             </button>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 8 }}>
-            <button type="button" onClick={handleNativeShare} disabled={Boolean(busyAction)} style={quickActionStyle}>
-              <span style={{ fontSize: 18, marginBottom: 5 }}>📤</span>
-              <span style={{ fontSize: 11, fontWeight: 900 }}>{busyAction === "native" ? "Prep…" : "Share"}</span>
-            </button>
-            <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} onClick={() => trackKyrEvent("share_action_clicked", { ...shareEventParams, share_action: "email" })} style={quickActionStyle}>
-              <span style={{ fontSize: 18, marginBottom: 5 }}>✉️</span>
-              <span style={{ fontSize: 11, fontWeight: 900 }}>Email</span>
-            </a>
-            <a href={`sms:?&body=${smsBody}`} onClick={() => trackKyrEvent("share_action_clicked", { ...shareEventParams, share_action: "text" })} style={quickActionStyle}>
-              <span style={{ fontSize: 18, marginBottom: 5 }}>💬</span>
-              <span style={{ fontSize: 11, fontWeight: 900 }}>Text</span>
-            </a>
-            <button type="button" onClick={copyMessage} style={quickActionStyle}>
-              <span style={{ fontSize: 18, marginBottom: 5 }}>{copied ? "✓" : "⧉"}</span>
-              <span style={{ fontSize: 11, fontWeight: 900 }}>{copied ? "Copied" : "Copy"}</span>
-            </button>
-          </div>
+          <button type="button" onClick={() => setShowMoreOptions((value) => !value)} aria-expanded={showMoreOptions} style={{ border: 0, background: "transparent", color: sharePalette.cyan, cursor: "pointer", padding: "5px 2px 2px", fontFamily: "'IBM Plex Sans', Arial, sans-serif", fontSize: 12, fontWeight: 800, textAlign: "center" }}>
+            {showMoreOptions ? "Hide other options" : "More sharing options"}
+          </button>
+
+          {showMoreOptions && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8, paddingTop: 2 }}>
+              <button type="button" onClick={handleNativeShare} disabled={Boolean(busyAction)} style={quickActionStyle}>
+                <span style={{ fontSize: 18, marginBottom: 5 }}>📤</span>
+                <span style={{ fontSize: 11, fontWeight: 900 }}>{busyAction === "native" ? "Preparing…" : "Share PDF"}</span>
+              </button>
+              <button type="button" onClick={copyMessage} style={quickActionStyle}>
+                <span style={{ fontSize: 18, marginBottom: 5 }}>{copied ? "✓" : "⧉"}</span>
+                <span style={{ fontSize: 11, fontWeight: 900 }}>{copied ? "Copied" : "Copy message"}</span>
+              </button>
+              <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} onClick={() => trackKyrEvent("share_action_clicked", { ...shareEventParams, share_action: "email" })} style={quickActionStyle}>
+                <span style={{ fontSize: 18, marginBottom: 5 }}>✉️</span>
+                <span style={{ fontSize: 11, fontWeight: 900 }}>Email</span>
+              </a>
+              <a href={`sms:?&body=${smsBody}`} onClick={() => trackKyrEvent("share_action_clicked", { ...shareEventParams, share_action: "text" })} style={quickActionStyle}>
+                <span style={{ fontSize: 18, marginBottom: 5 }}>💬</span>
+                <span style={{ fontSize: 11, fontWeight: 900 }}>Text</span>
+              </a>
+            </div>
+          )}
 
           <div style={{ fontSize: 10.5, color: sharePalette.dim, textAlign: "center", lineHeight: 1.4, padding: "2px 10px 0" }}>
-            Share card is the visual flex. PDF is the keep-it-forever version.
+            Your result remains yours. Choose the version that is useful to share or keep.
           </div>
         </div>
       </div>
