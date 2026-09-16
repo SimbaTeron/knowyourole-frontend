@@ -5046,7 +5046,6 @@ function OrbitalGlassV2Results({
               <button className="result-link" onClick={() => go("mbti")}><span className="icon">♟</span><span><b>MBTI-style</b><span>Your cognitive operating pattern.</span></span><span className="arrow">›</span></button>
               <button className="result-link" onClick={() => go("bigfive")}><span className="icon">🌌</span><span><b>Big Five</b><span>Your trait gravity and environment fit.</span></span><span className="arrow">›</span></button>
               <button className="result-link" onClick={() => go("disc")}><span className="icon">📊</span><span><b>DISC</b><span>Your visible work behavior.</span></span><span className="arrow">›</span></button>
-              <button className="result-link" onClick={() => go("share")}><span className="icon">↗</span><span><b>Share</b><span>Save or send a clean result summary.</span></span><span className="arrow">›</span></button>
             </div>
           </section>
         )}
