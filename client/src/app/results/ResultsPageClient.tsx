@@ -12,6 +12,7 @@ import { trackKyrEvent } from "@/lib/analytics";
 import { calculateMbtiAxisConfidence, resultConfidenceLabel as getResultConfidenceLabel } from "@/lib/scoring";
 import { DirectionFeedbackCard } from "@/components/results/DirectionFeedbackCard";
 import { ResultDecisionBrief } from "@/components/results/ResultDecisionBrief";
+import { FrameworkReference } from "@/components/results/FrameworkReference";
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
 
 // ─── Workday report tokens ───────────────────────────────────────────────────
@@ -3388,6 +3389,24 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
           <strong style={{ color: C.text }}>Most flexible:</strong> {mostFlexibleMbtiDimensions.map(d => `${d.dominant} ${d.words[d.dominant as keyof typeof d.words]} (${d.dominantPct}%)`).join(", ")}
         </div>
 
+        <FrameworkReference
+          kind="mbti"
+          mbtiAxes={mbtiDimensions.map(d => ({
+            label: d.plainLabel,
+            leftLetter: d.leftLetter,
+            rightLetter: d.rightLetter,
+            leftWord: d.words[d.leftLetter as keyof typeof d.words],
+            rightWord: d.words[d.rightLetter as keyof typeof d.words],
+            leftDescription: d.meanings[d.leftLetter as keyof typeof d.meanings],
+            rightDescription: d.meanings[d.rightLetter as keyof typeof d.meanings],
+            dominant: d.dominant,
+            leftPct: d.leftPct,
+            rightPct: d.rightPct,
+            isClose: d.dominantPct < 60,
+          }))}
+          onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "full_portrait", framework: "mbti", mbti_type: mbtiType, primary_disc: primary })}
+        />
+
       </PortraitAccordion>
 
       <PortraitAccordion
@@ -3429,6 +3448,12 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             ))}
           </div>
         </div>
+        <FrameworkReference
+          kind="disc"
+          primaryDisc={primary}
+          disc={disc}
+          onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "full_portrait", framework: "disc", mbti_type: mbtiType, primary_disc: primary })}
+        />
       </PortraitAccordion>
 
       <PortraitAccordion
@@ -3490,6 +3515,11 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             </div>
           </div>
         ))}
+        <FrameworkReference
+          kind="bigFive"
+          bigFive={bigFive}
+          onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "full_portrait", framework: "big_five", mbti_type: mbtiType, primary_disc: primary })}
+        />
       </PortraitAccordion>
       </FullPortraitSection>
 
@@ -5039,11 +5069,11 @@ function OrbitalGlassV2Results({
           </section>
         )}
 
-        {view === "mbti" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>MBTI</h2><p>Your preferred mental route: how you plan, process, decide, and build.</p></div></div><div className="detail-card"><h3>{mbtiType}: {stripLeadingThe(arch)} mode</h3><p>{MBTI_TAGLINES[mbtiType] || "Personality pattern"}. This describes the route your mind tends to select when making sense of people, problems, and plans.</p><div className="analogy"><b>Analogy</b>MBTI is your navigation app: it does not choose the destination, but it reveals the route your mind keeps selecting.</div></div><div className="detail-card"><h3>Cognitive flow</h3><div className="meter-list">{mbtiDimensions.map((axis) => <div key={axis.label}><div className="meter-top"><span>{axis.label} · {axis.words[axis.dominant as keyof typeof axis.words]}</span><span>{axis.pct}%</span></div><div className="bar"><div className="fill" style={{ "--v": `${axis.pct}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>Use it well</h3><p>Give yourself the conditions your type actually uses well. The point is not a label; it is better decision design.</p></div></section>}
+        {view === "mbti" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>MBTI</h2><p>Your preferred mental route: how you plan, process, decide, and build.</p></div></div><div className="detail-card"><h3>{mbtiType}: {stripLeadingThe(arch)} mode</h3><p>{MBTI_TAGLINES[mbtiType] || "Personality pattern"}. This describes the route your mind tends to select when making sense of people, problems, and plans.</p><div className="analogy"><b>Analogy</b>MBTI is your navigation app: it does not choose the destination, but it reveals the route your mind keeps selecting.</div></div><div className="detail-card"><h3>Cognitive flow</h3><div className="meter-list">{mbtiDimensions.map((axis) => <div key={axis.label}><div className="meter-top"><span>{axis.label} · {axis.words[axis.dominant as keyof typeof axis.words]}</span><span>{axis.pct}%</span></div><div className="bar"><div className="fill" style={{ "--v": `${axis.pct}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>Use it well</h3><p>Give yourself the conditions your type actually uses well. The point is not a label; it is better decision design.</p></div><div className="detail-card"><FrameworkReference kind="mbti" mbtiAxes={mbtiDimensions.map(axis => ({ label: axis.label, leftLetter: axis.leftLetter, rightLetter: axis.rightLetter, leftWord: axis.words[axis.leftLetter as keyof typeof axis.words], rightWord: axis.words[axis.rightLetter as keyof typeof axis.words], leftDescription: axis.leftLetter === "E" ? "Processes through interaction and external engagement." : axis.leftLetter === "S" ? "Notices concrete facts and proven methods." : axis.leftLetter === "T" ? "Prioritizes analysis, consistency, and trade-offs." : "Prefers structure, closure, and planned progress.", rightDescription: axis.rightLetter === "I" ? "Processes internally and restores energy through reflection." : axis.rightLetter === "N" ? "Notices patterns, possibilities, and what could change." : axis.rightLetter === "F" ? "Prioritizes values, people impact, and alignment." : "Prefers flexibility and adapting as new information appears.", dominant: axis.dominant, leftPct: axis.dominant === axis.leftLetter ? axis.pct : 100 - axis.pct, rightPct: axis.dominant === axis.rightLetter ? axis.pct : 100 - axis.pct, isClose: axis.pct < 60 }))} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "mbti", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "bigfive" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>Big Five</h2><p>Your trait climate: what reliably pulls, drains, stabilizes, or amplifies you.</p></div></div><div className="detail-card"><h3>Trait gravity</h3><div className="meter-list">{rankedTraits.map(([key, value]) => <div key={key}><div className="meter-top"><span>{TRAIT_DEEP_DIVE[key].label}</span><span>{value}%</span></div><div className="bar"><div className="fill" style={{ "--v": `${value}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>What it means</h3><p>Your strongest Big Five signal is {topTraitMeta.label}. That does not define your entire personality, but it does shape the environment where your effort compounds fastest.</p><div className="analogy"><b>Analogy</b>Big Five is your climate report. MBTI is route preference; DISC is driving behavior; Big Five is the weather system you operate inside.</div></div></section>}
+        {view === "bigfive" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>Big Five</h2><p>Your trait climate: what reliably pulls, drains, stabilizes, or amplifies you.</p></div></div><div className="detail-card"><h3>Trait gravity</h3><div className="meter-list">{rankedTraits.map(([key, value]) => <div key={key}><div className="meter-top"><span>{TRAIT_DEEP_DIVE[key].label}</span><span>{value}%</span></div><div className="bar"><div className="fill" style={{ "--v": `${value}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>What it means</h3><p>Your strongest Big Five signal is {topTraitMeta.label}. That does not define your entire personality, but it does shape the environment where your effort compounds fastest.</p><div className="analogy"><b>Analogy</b>Big Five is your climate report. MBTI is route preference; DISC is driving behavior; Big Five is the weather system you operate inside.</div></div><div className="detail-card"><FrameworkReference kind="bigFive" bigFive={bigFive} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "big_five", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "disc" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>DISC</h2><p>Your visible work behavior: pace, pressure, communication, and standards.</p></div></div><div className="detail-card"><h3>Work behavior map</h3><div className="disc-grid">{(["D", "I", "S", "C"] as const).map((key) => <div className={`quad ${primaryDisc === key ? "active" : ""}`} key={key}><b>{key}</b><span>{DISC_LABELS[key]} · {disc[key]}%</span></div>)}</div></div><div className="detail-card"><h3>{discLabel} strength</h3><p>{discDesc || `Your ${discLabel.toLowerCase()} style describes how you tend to move when work involves pressure, standards, and other people.`}</p><div className="analogy"><b>Analogy</b>DISC is your dashboard while driving with other people in the car: speed, steering, braking, and how aggressively you take corners.</div></div><div className="detail-card"><h3>Second signal</h3><p>Your next strongest DISC signal is {DISC_LABELS[secondaryDiscEntry?.[0] || "C"] || secondaryDiscEntry?.[0]} at {secondaryDiscEntry?.[1] ?? 0}%. That secondary style colors how your primary style shows up.</p></div></section>}
+        {view === "disc" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>DISC</h2><p>Your visible work behavior: pace, pressure, communication, and standards.</p></div></div><div className="detail-card"><h3>Work behavior map</h3><div className="disc-grid">{(["D", "I", "S", "C"] as const).map((key) => <div className={`quad ${primaryDisc === key ? "active" : ""}`} key={key}><b>{key}</b><span>{DISC_LABELS[key]} · {disc[key]}%</span></div>)}</div></div><div className="detail-card"><h3>{discLabel} strength</h3><p>{discDesc || `Your ${discLabel.toLowerCase()} style describes how you tend to move when work involves pressure, standards, and other people.`}</p><div className="analogy"><b>Analogy</b>DISC is your dashboard while driving with other people in the car: speed, steering, braking, and how aggressively you take corners.</div></div><div className="detail-card"><h3>Second signal</h3><p>Your next strongest DISC signal is {DISC_LABELS[secondaryDiscEntry?.[0] || "C"] || secondaryDiscEntry?.[0]} at {secondaryDiscEntry?.[1] ?? 0}%. That secondary style colors how your primary style shows up.</p></div><div className="detail-card"><FrameworkReference kind="disc" primaryDisc={primaryDisc} disc={disc} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "disc", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
         {view === "share" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>Share</h2><p>Export a polished result card as an image or PDF, then send by text or email.</p></div></div><div className="detail-card"><div className="share-preview"><div className="eyebrow">Instant Portrait</div><h2>{identity}</h2><p>“{shareLine}”</p><div className="role-card"><small>Best-fit direction</small><h2>{roleDirection.title}</h2><p>{mbtiType} · {discLabel} · {topTraitMeta.label}</p></div></div></div><div className="detail-card"><h3>Share options</h3><p>Every shared result includes the invite link: <b>knowyourole.com</b>.</p><div className="share-actions"><button className="share-btn primary" onClick={() => onShare("image_action")}>Image</button><button className="share-btn primary" onClick={() => onShare("pdf_action")}>PDF</button><button className="share-btn" onClick={() => onShare("text_action")}>Text</button><button className="share-btn" onClick={() => onShare("email_action")}>Email</button></div></div></section>}
 
