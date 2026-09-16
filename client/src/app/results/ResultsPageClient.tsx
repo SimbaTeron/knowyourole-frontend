@@ -2596,18 +2596,16 @@ function resultPageEventName(page: ResultPageId) {
   return page === 1 ? "full_portrait" : page;
 }
 
-function BottomBar({ active = 1, onNavigate, onShare }: {
+function BottomBar({ active = 1, onNavigate }: {
   active?: ResultPageId;
   onNavigate?: (page: ResultPageId) => void;
-  onShare?: () => void;
 }) {
-  const btns: Array<{ id: ResultPageId | "share"; icon: string; label: string; action: "navigate" | "share" }> = [
-    { id: 1, icon: "🏆", label: "Portrait", action: "navigate" },
-    { id: "insights", icon: "🧭", label: "Insights", action: "navigate" },
-    { id: "pressure", icon: "⚡", label: "Pressure", action: "navigate" },
-    { id: "chemistry", icon: "🧪", label: "Chemistry", action: "navigate" },
-    { id: "roles", icon: "🎯", label: "Roles", action: "navigate" },
-    { id: "share", icon: "↗️", label: "Share", action: "share" },
+  const btns: Array<{ id: ResultPageId; icon: string; label: string }> = [
+    { id: 1, icon: "🏆", label: "Portrait" },
+    { id: "insights", icon: "🧭", label: "Insights" },
+    { id: "pressure", icon: "⚡", label: "Pressure" },
+    { id: "chemistry", icon: "🧪", label: "Chemistry" },
+    { id: "roles", icon: "🎯", label: "Roles" },
   ];
 
   return (
@@ -2619,11 +2617,11 @@ function BottomBar({ active = 1, onNavigate, onShare }: {
       pointerEvents: "none",
     }}>
       {btns.map(b => {
-        const isActive = b.action === "navigate" && active === b.id;
+        const isActive = active === b.id;
         return (
           <button
             key={String(b.id)}
-            onClick={() => b.action === "share" ? onShare?.() : onNavigate?.(b.id as ResultPageId)}
+            onClick={() => onNavigate?.(b.id)}
             aria-current={isActive ? "page" : undefined}
             style={{
               flex: "1 1 0",
@@ -2631,11 +2629,11 @@ function BottomBar({ active = 1, onNavigate, onShare }: {
               minHeight: 52,
               padding: "5px 1px",
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
-              background: isActive ? "rgba(103, 232, 249, 0.08)" : b.action === "share" ? "rgba(168,85,247,0.06)" : "none",
+              background: isActive ? "rgba(103, 232, 249, 0.08)" : "none",
               border: "none",
               borderRadius: 14,
-              color: isActive ? C.cyan : b.action === "share" ? C.purple : C.textMuted,
-              opacity: isActive || b.action === "share" ? 1 : 0.62,
+              color: isActive ? C.cyan : C.textMuted,
+              opacity: isActive ? 1 : 0.62,
               fontSize: 7.6, fontWeight: 700, lineHeight: 1.1, cursor: "pointer",
               pointerEvents: "auto",
               fontFamily: "Inter, sans-serif", transition: "all 0.2s",
@@ -4939,7 +4937,6 @@ function OrbitalGlassV2Results({
     { id: "mbti", icon: "♟", label: "MBTI" },
     { id: "bigfive", icon: "🌌", label: "Big" },
     { id: "disc", icon: "📊", label: "DISC" },
-    { id: "share", icon: "↗", label: "Share" },
   ];
 
   const orbStyle: CSSProperties = {
@@ -4985,7 +4982,7 @@ function OrbitalGlassV2Results({
         .meter-list { display:grid; gap:12px; margin-top:12px; } .meter-top { display:flex; justify-content:space-between; color:var(--muted); font-size:12px; font-weight:850; margin-bottom:7px; } .bar { height:12px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(255,255,255,.08); } .fill { height:100%; width:var(--v); border-radius:999px; background:linear-gradient(90deg,var(--accent),rgba(255,255,255,.82)); }
         .disc-grid { display:grid; grid-template-columns:repeat(2,1fr); border:1px solid rgba(255,255,255,.12); border-radius:23px; overflow:hidden; margin-top:12px; } .quad { min-height:96px; padding:13px; background:rgba(255,255,255,.055); display:flex; flex-direction:column; justify-content:space-between; } .quad.active { background:linear-gradient(135deg,rgba(255,99,207,.30),rgba(82,241,255,.08)); } .quad b { font-size:26px; } .quad span { color:var(--muted); font-size:12px; }
         .share-preview { border-radius:28px; padding:18px; background:linear-gradient(150deg,rgba(82,241,255,.22),rgba(167,119,255,.14),rgba(255,213,129,.12)); border:1px solid rgba(255,255,255,.18); } .share-preview h2 { margin:15px 0; font-size:54px; line-height:.82; letter-spacing:-.085em; } .share-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-top:13px; } .share-btn { border:1px solid rgba(255,255,255,.14); border-radius:17px; padding:13px 10px; color:white; background:rgba(255,255,255,.09); font-weight:900; cursor:pointer; } .share-btn.primary { color:#061018; background:linear-gradient(135deg,#52f1ff,#ffd581); }
-        .bottom-nav { position:relative; z-index:40; width:100%; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; padding:8px; border-radius:25px; border:1px solid rgba(255,255,255,.14); background:rgba(5,7,17,.78); backdrop-filter:blur(20px); box-shadow:0 18px 60px rgba(0,0,0,.38); } .bottom-nav button { text-align:center; border:0; border-radius:18px; padding:8px 5px; color:var(--muted); background:transparent; font-size:10px; font-weight:950; cursor:pointer; } .bottom-nav button i { display:block; font-style:normal; font-size:19px; margin-bottom:3px; } .bottom-nav button.active { color:white; background:rgba(255,255,255,.105); }
+        .bottom-nav { position:relative; z-index:40; width:100%; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:8px; border-radius:25px; border:1px solid rgba(255,255,255,.14); background:rgba(5,7,17,.78); backdrop-filter:blur(20px); box-shadow:0 18px 60px rgba(0,0,0,.38); } .bottom-nav button { text-align:center; border:0; border-radius:18px; padding:8px 5px; color:var(--muted); background:transparent; font-size:10px; font-weight:950; cursor:pointer; } .bottom-nav button i { display:block; font-style:normal; font-size:19px; margin-bottom:3px; } .bottom-nav button.active { color:white; background:rgba(255,255,255,.105); }
         .result-home-exit { margin:30px 0 18px; padding:20px 16px; text-align:center; border-top:1px solid rgba(18,38,58,.18); } .result-home-exit p { max-width:330px; margin:0 auto 14px; color:#456174; font-size:12px; line-height:1.48; } .result-home-exit p strong { color:#12263a; } .result-home-exit__actions { display:grid; grid-template-columns:1fr; gap:9px; max-width:360px; margin:0 auto; } .result-home-exit button { min-height:46px; border-radius:4px; padding:11px 14px; font:800 13px/1.2 Manrope,Inter,system-ui,sans-serif; cursor:pointer; } .result-home-exit__share { border:1px solid rgba(18,38,58,.18); background:#fffdf8; color:#12263a; } .result-home-exit__home { border:1px solid #315f74; background:#315f74; color:#fffdf8; box-shadow:3px 3px 0 rgba(18,38,58,.16); } .result-home-exit__home:hover { background:#234b5d; transform:translate(-1px,-1px); box-shadow:4px 4px 0 rgba(18,38,58,.18); } .result-home-exit button:focus-visible { outline:3px solid #ffca42; outline-offset:3px; }
         @media (min-width:500px) { .result-home-exit__actions { grid-template-columns:1fr 1fr; } }
         @media (min-width:760px) { .orbital-results-v2 { display:grid; place-items:start center; } .orb-stage { width:min(calc(100% - 48px),760px); margin-top:18px; min-height:calc(100vh - 36px); border-left:1px solid rgba(18,38,58,.12); border-right:1px solid rgba(18,38,58,.12); } }
