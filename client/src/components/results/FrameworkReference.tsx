@@ -1,6 +1,6 @@
 'use client';
 
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 export type FrameworkDiscProfile = { D: number; I: number; S: number; C: number };
 export type FrameworkBigFiveProfile = { O: number; C: number; E: number; A: number; N: number };
@@ -46,8 +46,36 @@ const discColors: Record<string, string> = { D: "#c95f46", I: "#b7791f", S: "#3b
 const shell: CSSProperties = { marginTop: 14, borderRadius: 14, background: T.paper, border: `1px solid ${T.line}` };
 const summary: CSSProperties = { listStyle: "none", cursor: "pointer", padding: "12px 13px", display: "grid", gridTemplateColumns: "1fr auto", gap: 10, alignItems: "center", WebkitTapHighlightColor: "transparent" };
 const row: CSSProperties = { padding: "10px 11px", borderRadius: 11, background: "rgba(255,255,255,0.62)", border: `1px solid ${T.line}` };
+const frameworkHintKey = "kyr_framework_hint_seen_v1";
 
 export function FrameworkReference({ kind, primaryDisc, disc, bigFive, mbtiAxes, onOpen }: FrameworkReferenceProps) {
+  const [showNudge, setShowNudge] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(frameworkHintKey)) return;
+    } catch {
+      return;
+    }
+
+    const begin = window.setTimeout(() => {
+      try { window.localStorage.setItem(frameworkHintKey, "1"); } catch { /* optional UI preference only */ }
+      setShowNudge(true);
+    }, 1200);
+    const end = window.setTimeout(() => setShowNudge(false), 6400);
+    const stop = () => setShowNudge(false);
+    window.addEventListener("scroll", stop, { once: true, passive: true });
+    window.addEventListener("pointerdown", stop, { once: true, passive: true });
+    window.addEventListener("keydown", stop, { once: true });
+    return () => {
+      window.clearTimeout(begin);
+      window.clearTimeout(end);
+      window.removeEventListener("scroll", stop);
+      window.removeEventListener("pointerdown", stop);
+      window.removeEventListener("keydown", stop);
+    };
+  }, []);
+
   const title = kind === "mbti" ? "How MBTI-style preferences work" : kind === "disc" ? "How DISC work styles work" : "How the Big Five traits work";
   const intro = kind === "mbti"
     ? "These are four preference pairs, not four boxes. A close split means both sides may feel familiar."
@@ -69,11 +97,20 @@ export function FrameworkReference({ kind, primaryDisc, disc, bigFive, mbtiAxes,
   ];
 
   return (
-    <details style={shell} onToggle={(event) => { if (event.currentTarget.open) onOpen?.(); }}>
+    <>
+      <style>{`
+        @keyframes kyr-framework-nudge {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(49, 95, 116, 0); border-color: rgba(18, 38, 58, 0.16); }
+          48% { box-shadow: 0 0 0 5px rgba(49, 95, 116, 0.14); border-color: rgba(49, 95, 116, 0.46); }
+        }
+        .kyr-framework-reference--nudge { animation: kyr-framework-nudge 1.65s ease-in-out 3; }
+        @media (prefers-reduced-motion: reduce) { .kyr-framework-reference--nudge { animation: none; border-color: rgba(49, 95, 116, 0.46) !important; } }
+      `}</style>
+      <details className={showNudge ? "kyr-framework-reference--nudge" : undefined} style={shell} onToggle={(event) => { if (event.currentTarget.open) { setShowNudge(false); onOpen?.(); } }}>
       <summary style={summary}>
         <span>
           <span style={{ display: "block", fontSize: 12, fontWeight: 900, color: T.ink, marginBottom: 3 }}>Understand the framework</span>
-          <span style={{ display: "block", fontSize: 10.5, lineHeight: 1.4, color: T.muted }}>See what each dimension is measuring.</span>
+          <span style={{ display: "block", fontSize: 10.5, lineHeight: 1.4, color: T.muted }}>See how your result was interpreted.</span>
         </span>
         <span aria-hidden="true" style={{ color: T.teal, fontSize: 17, fontWeight: 900 }}>⌄</span>
       </summary>
@@ -126,6 +163,7 @@ export function FrameworkReference({ kind, primaryDisc, disc, bigFive, mbtiAxes,
           </div>;
         })}
       </div>
-    </details>
+      </details>
+    </>
   );
 }
