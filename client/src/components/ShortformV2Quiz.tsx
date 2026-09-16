@@ -193,7 +193,6 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const [scores, setScores] = useState<QuizScores>(INITIAL_SCORES);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [startedAt, setStartedAt] = useState(() => Date.now());
-  const [isCompleting, setIsCompleting] = useState(false);
   const questionHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const currentQuestion = SHORTFORM_V2_QUESTIONS[currentIndex];
@@ -205,10 +204,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const userFacingSection = QUIZ_TIMELINE_SECTIONS.find((section) => section.group === currentQuestion.group)?.label ?? "Question";
 
   useEffect(() => {
-    if (!hasStarted || isCompleting) return;
+    if (!hasStarted) return;
     const focusTimer = window.setTimeout(() => questionHeadingRef.current?.focus(), 320);
     return () => window.clearTimeout(focusTimer);
-  }, [currentIndex, hasStarted, isCompleting]);
+  }, [currentIndex, hasStarted]);
 
   const handleStart = () => {
     setStartedAt(Date.now());
@@ -218,7 +217,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   };
 
   const handleAnswer = (answer: ShortformV2Answer, optionIndex: number) => {
-    if (selectedAnswer || isCompleting) return;
+    if (selectedAnswer) return;
     const timeSpent = Math.max(0.1, (Date.now() - startedAt) / 1000);
     setSelectedAnswer(answer.id);
 
@@ -267,7 +266,6 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
 
     window.setTimeout(() => {
       if (currentIndex >= totalQuestions - 1) {
-        setIsCompleting(true);
         trackKyrEvent("quiz_completed", {
           source: "shortform_v2",
           tier,
@@ -280,7 +278,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
           ...updatedScores,
           ...authoritativeScoreMaps,
         });
-        window.setTimeout(() => onComplete(authoritativeScores), 900);
+        onComplete(authoritativeScores);
         return;
       }
       setCurrentIndex((index) => index + 1);
@@ -290,7 +288,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   };
 
   const goBack = () => {
-    if (currentIndex === 0 || answeredCount === 0 || selectedAnswer || isCompleting) return;
+    if (currentIndex === 0 || answeredCount === 0 || selectedAnswer) return;
     const responseBeingRevisited = scores.responses[scores.responses.length - 1];
     const retainedResponses = scores.responses.slice(0, -1);
     setScores(rebuildScoresFromResponses(retainedResponses));
@@ -319,25 +317,6 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
           </ul>
           <p className="mt-5 text-sm leading-6 text-white/58">Your responses are interpreted as work-style and career-exploration signals—not a diagnosis, hiring screen, or career prescription.</p>
           <button type="button" onClick={handleStart} className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-300 px-5 py-3 text-sm font-black text-[#06101f] shadow-[0_16px_42px_rgba(34,211,238,0.25)] transition hover:brightness-105 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-cyan-200 sm:w-auto">Start the 28 questions</button>
-        </section>
-      </div>
-    );
-  }
-
-  if (isCompleting) {
-    return (
-      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050510] px-5 text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_15%,rgba(34,211,238,0.22),transparent_32%),radial-gradient(circle_at_75%_75%,rgba(168,85,247,0.20),transparent_34%)]" />
-        <section className="relative w-full max-w-md rounded-[34px] border border-white/15 bg-white/[0.07] p-7 text-center shadow-[0_30px_110px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-          <motion.div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-violet-400 to-amber-200" animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 1.4, repeat: Infinity }}>
-            <Brain className="h-10 w-10 text-[#050510]" />
-          </motion.div>
-          <p className="mb-2 text-[11px] font-black uppercase tracking-[0.32em] text-cyan-200">Pattern locked</p>
-          <h1 className="text-3xl font-black tracking-[-0.04em]">Building your result</h1>
-          <p className="mx-auto mt-3 max-w-xs text-sm font-semibold leading-6 text-white/65">Scoring your fixed 28 signals against personality, work behavior, and career-fit vectors.</p>
-          <div className="mt-7 h-3 overflow-hidden rounded-full bg-white/10">
-            <motion.div className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-violet-300 to-amber-200" initial={{ width: "12%" }} animate={{ width: "100%" }} transition={{ duration: 1.1, ease: "easeOut" }} />
-          </div>
         </section>
       </div>
     );
