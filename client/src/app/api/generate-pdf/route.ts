@@ -22,24 +22,24 @@ type ReportPayload = {
   sections?: ReportSection[];
 };
 
-// Current Orbital Glass result system: dark ink, cyan signal, and a warm best-fit card.
+// Homepage Workday system: paper, sky, sun, coral, and editorial navy.
 const COLORS = {
-  bg: { r: 0.027, g: 0.039, b: 0.071 }, // #070a12
-  card: { r: 0.047, g: 0.071, b: 0.114 }, // dark glass base
-  card2: { r: 0.071, g: 0.12, b: 0.18 },
-  cream: { r: 1, g: 0.973, b: 0.91 }, // #fff8e8
-  creamBorder: { r: 0.956, g: 0.875, b: 0.706 }, // #f4dfb4
-  border: { r: 0.18, g: 0.235, b: 0.31 },
-  cyan: { r: 0.322, g: 0.945, b: 1 }, // #52f1ff
-  purple: { r: 1, g: 0.835, b: 0.506 }, // #ffd581, legacy key retained for call sites
-  pink: { r: 1, g: 0.835, b: 0.506 },
-  gold: { r: 1, g: 0.835, b: 0.506 },
-  green: { r: 0.42, g: 0.86, b: 0.67 },
-  text: { r: 0.973, g: 0.984, b: 1 }, // #f8fbff
-  ink: { r: 0.082, g: 0.067, b: 0.047 }, // #15110c
-  muted: { r: 0.69, g: 0.75, b: 0.82 },
-  dim: { r: 0.49, g: 0.56, b: 0.66 },
-  track: { r: 0.12, g: 0.17, b: 0.24 },
+  bg: { r: 0.973, g: 0.953, b: 0.91 }, // #f8f3e8
+  card: { r: 1, g: 0.992, b: 0.969 }, // #fffdf8
+  card2: { r: 0.914, g: 0.969, b: 0.976 }, // pale sky
+  cream: { r: 1, g: 0.969, b: 0.835 }, // sun-washed paper
+  creamBorder: { r: 0.89, g: 0.78, b: 0.51 },
+  border: { r: 0.56, g: 0.71, b: 0.75 },
+  cyan: { r: 0.62, g: 0.847, b: 0.902 }, // #9ed8e6
+  purple: { r: 0.914, g: 0.51, b: 0.408 }, // #e98268; legacy key retained for call sites
+  pink: { r: 0.914, g: 0.51, b: 0.408 },
+  gold: { r: 1, g: 0.792, b: 0.259 }, // #ffca42
+  green: { r: 0.45, g: 0.71, b: 0.58 },
+  text: { r: 0.071, g: 0.149, b: 0.227 }, // #12263a
+  ink: { r: 0.071, g: 0.149, b: 0.227 },
+  muted: { r: 0.376, g: 0.443, b: 0.518 }, // #607184
+  dim: { r: 0.376, g: 0.443, b: 0.518 },
+  track: { r: 0.82, g: 0.89, b: 0.9 },
 };
 
 const DISC_LABELS: Record<string, string> = {
@@ -163,15 +163,14 @@ export async function POST(req: NextRequest) {
 
     const paintBackground = () => {
       page.drawRectangle({ x: 0, y: 0, width: pageSize[0], height: pageSize[1], color: color('bg') });
-      // Soft orbital fields replace the legacy purple/neon ambience.
-      page.drawCircle({ x: 28, y: 736, size: 188, color: color('cyan'), opacity: 0.055 });
-      page.drawCircle({ x: 586, y: 675, size: 214, color: color('gold'), opacity: 0.045 });
-      page.drawCircle({ x: 532, y: 85, size: 174, color: color('cyan'), opacity: 0.035 });
-      page.drawCircle({ x: 306, y: 493, size: 213, borderColor: color('cyan'), borderWidth: 0.7, borderOpacity: 0.12 });
-      page.drawCircle({ x: 306, y: 493, size: 153, borderColor: color('gold'), borderWidth: 0.6, borderOpacity: 0.1 });
+      // The homepage hero's sky / paper / coral atmosphere, translated to print-safe shapes.
+      page.drawCircle({ x: 20, y: 760, size: 196, color: color('cyan'), opacity: 0.72 });
+      page.drawCircle({ x: 595, y: 700, size: 176, color: color('purple'), opacity: 0.68 });
+      page.drawCircle({ x: 490, y: 750, size: 48, color: color('gold'), opacity: 0.92 });
+      page.drawCircle({ x: 585, y: 40, size: 120, color: color('cyan'), opacity: 0.24 });
       page.drawRectangle({ x: margin, y: 27, width: contentWidth, height: 1, color: color('border') });
-      page.drawText('KnowYouRole', { x: margin, y: 12, size: 8, font: bold, color: color('muted') });
-      page.drawText('knowyourole.com', { x: pageSize[0] - margin - 78, y: 12, size: 8, font: bold, color: color('cyan') });
+      page.drawText('KnowYouRole', { x: margin, y: 12, size: 8, font: bold, color: color('ink') });
+      page.drawText('knowyourole.com', { x: pageSize[0] - margin - 78, y: 12, size: 8, font: bold, color: color('ink') });
     };
 
     const truncateToWidth = (text: string, fontRef: typeof regular, size: number, maxWidth: number) => {
@@ -299,6 +298,63 @@ export async function POST(req: NextRequest) {
     });
 
     page.drawText('Mirror, not a cage. Use the signal. Keep the agency.', { x: margin, y: 44, size: 8.5, font: italic, color: color('muted') });
+
+    // Page two turns the compact portrait into a useful report rather than a screen capture.
+    page = pdfDoc.addPage(pageSize);
+    pageNo += 1;
+    paintBackground();
+    page.drawText('YOUR FULL SIGNAL MAP', { x: margin, y: 742, size: 23, font: bold, color: color('ink') });
+    page.drawText('Trait, behavior, preference, and practical reflection data from your result.', { x: margin, y: 720, size: 10, font: regular, color: color('muted') });
+
+    const columnGap = 16;
+    const columnWidth = (contentWidth - columnGap) / 2;
+    const panelTop = 680;
+    const panelHeight = 190;
+    drawRoundedPanel(margin, panelTop - panelHeight, columnWidth, panelHeight, 18, 'card', 'border', 1);
+    drawRoundedPanel(margin + columnWidth + columnGap, panelTop - panelHeight, columnWidth, panelHeight, 18, 'card2', 'border', 1);
+    page.drawText('BIG FIVE TRAITS', { x: margin + 18, y: panelTop - 24, size: 9, font: bold, color: color('ink') });
+    page.drawText('Relative signal, not a diagnostic score.', { x: margin + 18, y: panelTop - 40, size: 7.8, font: regular, color: color('muted') });
+    let traitY = panelTop - 66;
+    bigFiveEntries.forEach(([label, value, accent]) => { drawProgressBar(label, value, margin + 18, traitY, 78, accent); traitY -= 22; });
+
+    const discX = margin + columnWidth + columnGap;
+    page.drawText('DISC BEHAVIOR', { x: discX + 18, y: panelTop - 24, size: 9, font: bold, color: color('ink') });
+    page.drawText('Observable work-behavior tendencies.', { x: discX + 18, y: panelTop - 40, size: 7.8, font: regular, color: color('muted') });
+    let discY = panelTop - 68;
+    (['D', 'I', 'S', 'C'] as const).forEach((key) => {
+      const score = clampScore(payload.disc?.[key]);
+      drawProgressBar(`${key}  ${DISC_LABELS[key]}`, score, discX + 18, discY, 78, key === primaryDisc ? 'purple' : 'cyan');
+      discY -= 25;
+    });
+
+    const preferenceTop = 454;
+    drawRoundedPanel(margin, preferenceTop - 132, contentWidth, 132, 18, 'cream', 'creamBorder', 1);
+    page.drawText('PREFERENCE PATTERN', { x: margin + 20, y: preferenceTop - 25, size: 9, font: bold, color: color('ink') });
+    page.drawText(`${mbtiType} is a readable shorthand for which side you currently lean toward on each axis.`, { x: margin + 20, y: preferenceTop - 43, size: 8.5, font: regular, color: color('muted') });
+    MBTI_DIMENSIONS.forEach((dim, index) => {
+      const dominant = mbtiType[index] || dim.left;
+      const x = margin + 20 + index * 132;
+      page.drawText(dim.label.toUpperCase(), { x, y: preferenceTop - 74, size: 6.8, font: bold, color: color('muted') });
+      page.drawText(`${dim.left} / ${dim.right}`, { x, y: preferenceTop - 91, size: 9, font: bold, color: color('ink') });
+      page.drawText(dominant, { x, y: preferenceTop - 115, size: 18, font: bold, color: color(index % 2 ? 'purple' : 'ink') });
+    });
+
+    const suppliedSections = (payload.sections ?? []).filter((section) => cleanText(section.title || section.body)).slice(0, 3);
+    const reflectionTop = 290;
+    drawRoundedPanel(margin, reflectionTop - 198, contentWidth, 198, 18, 'card', 'border', 1);
+    page.drawText('PRACTICAL NOTES', { x: margin + 20, y: reflectionTop - 25, size: 9, font: bold, color: color('ink') });
+    const notes = suppliedSections.length ? suppliedSections : [
+      { title: 'How to use this', body: `Use ${careerTitle} as a direction to investigate, not a promise. Compare it with tasks you enjoy, environments where you do good work, and feedback from people who know your contribution.` },
+      { title: 'Strongest signal', body: `${topBigFiveLabel} (${topBigFiveScore}%) and ${primaryDisc} ${discLabel} are the clearest signals in this result. Look for settings that reward those tendencies while giving you room to develop the rest.` },
+    ];
+    let noteY = reflectionTop - 50;
+    notes.forEach((section) => {
+      const heading = cleanText(section.title || 'Result note');
+      const bodyText = cleanText(section.body || section.subtitle || '');
+      page.drawText(truncateToWidth(heading, bold, 10, contentWidth - 40), { x: margin + 20, y: noteY, size: 10, font: bold, color: color('purple') });
+      noteY = drawWrapped(bodyText, margin + 20, noteY - 16, contentWidth - 40, 8.6, 3, regular, 'ink', 3) - 9;
+    });
+    page.drawText(`Full Portrait · Page ${pageNo} of 2`, { x: pageSize[0] - margin - 92, y: 44, size: 8, font: bold, color: color('muted') });
 
     const pdfBytes = await pdfDoc.save();
 
