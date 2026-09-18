@@ -42,9 +42,17 @@ const foundationPages: PublicPage[] = [
     path: "/build",
     title: "How KnowYouRole Was Built | Product & Engineering Case Study",
     description:
-      "A transparent product and engineering case study: KnowYouRole's problem, architecture, validation, data decisions, AI-assisted workflow, and lessons learned.",
+      "A transparent product and engineering case study: KnowYouRole's problem, architecture, validation, privacy decisions, and lessons learned.",
     changeFrequency: "monthly",
     priority: 0.55,
+  },
+  {
+    path: "/for-schools",
+    title: "KnowYouRole for Schools & Counselors | Student Career Reflection",
+    description:
+      "A plain-language guide for educators and IT teams: what KnowYouRole is, appropriate student use, privacy choices, and technical access information.",
+    changeFrequency: "monthly",
+    priority: 0.7,
   },
   {
     path: "/about",
@@ -235,6 +243,8 @@ export function baseJsonLd() {
       name: SITE_NAME,
       url,
       logo: absoluteUrl("/knowyourrole-target.png?v=20260808"),
+      description: "KnowYouRole is a free work-style reflection and career-exploration website for individuals, educators, and counselors.",
+      email: "info@knowyourole.com",
       sameAs: [],
     },
     {
@@ -249,14 +259,14 @@ export function baseJsonLd() {
     },
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
+      "@type": ["EducationalApplication", "WebApplication"],
       "@id": `${url}/#webapplication`,
       name: SITE_NAME,
       url,
-      applicationCategory: "LifestyleApplication",
+      applicationCategory: "EducationalApplication",
       operatingSystem: "Any",
       description:
-        "A free personality quiz that blends Big Five traits, MBTI-style patterns, DISC-style work behavior, and career-fit guidance into one practical result.",
+        "A free, fixed-question work-style reflection and career-exploration tool. It is designed for self-reflection and guided discussion, not diagnosis, hiring, admissions, or automated decision-making.",
       offers: {
         "@type": "Offer",
         price: "0",

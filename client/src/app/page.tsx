@@ -360,6 +360,7 @@ export default function Home() {
             <a href="/terms">Terms</a>
             <a href="/faq">FAQ</a>
             <a href="/about">About</a>
+            <a href="/for-schools">For schools &amp; counselors</a>
           </nav>
         </div>
       </footer>

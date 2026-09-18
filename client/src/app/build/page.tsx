@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Database, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { ArrowLeft, ArrowRight, Database, ShieldCheck, Workflow } from "lucide-react";
 import { publicPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata("/build");
@@ -22,9 +22,9 @@ const sections = [
     body: "Results are designed as private self-reflection records, with data-access and deletion paths in the product. The quiz is explicit about its limits: it is not a diagnosis, hiring tool, or prediction engine.",
   },
   {
-    icon: Sparkles,
-    title: "AI-assisted workflow",
-    body: "AI assistance accelerates research, implementation, visual review, and regression work. Product scope, claims, privacy constraints, and acceptance criteria remain deliberate human decisions—not outputs accepted on autopilot.",
+    icon: ShieldCheck,
+    title: "Deliberate product review",
+    body: "Research, implementation, visual review, and regression checks support a deliberate product process. Product scope, claims, privacy constraints, and acceptance criteria are reviewed rather than accepted on autopilot.",
   },
 ];
 
