@@ -7,10 +7,6 @@ export const metadata: Metadata = publicPageMetadata("/methodology");
 
 const citations = [
   {
-    title: "John, O. P., & Srivastava, S. (1999). The Big Five trait taxonomy.",
-    href: "https://pages.uoregon.edu/sanjay/pubs/bigfive.pdf",
-  },
-  {
     title: "Soto, C. J., & John, O. P. (2017). The next Big Five Inventory (BFI-2).",
     href: "https://doi.org/10.1037/pspp0000096",
   },
