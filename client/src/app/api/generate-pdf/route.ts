@@ -22,20 +22,24 @@ type ReportPayload = {
   sections?: ReportSection[];
 };
 
+// Current Orbital Glass result system: dark ink, cyan signal, and a warm best-fit card.
 const COLORS = {
-  bg: { r: 0.031, g: 0.016, b: 0.078 },
-  card: { r: 0.075, g: 0.047, b: 0.13 },
-  card2: { r: 0.055, g: 0.035, b: 0.105 },
-  border: { r: 0.23, g: 0.18, b: 0.34 },
-  cyan: { r: 0.133, g: 0.827, b: 0.933 },
-  purple: { r: 0.659, g: 0.333, b: 0.969 },
-  pink: { r: 0.957, g: 0.447, b: 0.714 },
-  gold: { r: 0.961, g: 0.62, b: 0.043 },
-  green: { r: 0.255, g: 0.875, b: 0.659 },
-  text: { r: 0.97, g: 0.98, b: 1 },
-  muted: { r: 0.72, g: 0.74, b: 0.82 },
-  dim: { r: 0.48, g: 0.5, b: 0.62 },
-  track: { r: 0.14, g: 0.105, b: 0.22 },
+  bg: { r: 0.027, g: 0.039, b: 0.071 }, // #070a12
+  card: { r: 0.047, g: 0.071, b: 0.114 }, // dark glass base
+  card2: { r: 0.071, g: 0.12, b: 0.18 },
+  cream: { r: 1, g: 0.973, b: 0.91 }, // #fff8e8
+  creamBorder: { r: 0.956, g: 0.875, b: 0.706 }, // #f4dfb4
+  border: { r: 0.18, g: 0.235, b: 0.31 },
+  cyan: { r: 0.322, g: 0.945, b: 1 }, // #52f1ff
+  purple: { r: 1, g: 0.835, b: 0.506 }, // #ffd581, legacy key retained for call sites
+  pink: { r: 1, g: 0.835, b: 0.506 },
+  gold: { r: 1, g: 0.835, b: 0.506 },
+  green: { r: 0.42, g: 0.86, b: 0.67 },
+  text: { r: 0.973, g: 0.984, b: 1 }, // #f8fbff
+  ink: { r: 0.082, g: 0.067, b: 0.047 }, // #15110c
+  muted: { r: 0.69, g: 0.75, b: 0.82 },
+  dim: { r: 0.49, g: 0.56, b: 0.66 },
+  track: { r: 0.12, g: 0.17, b: 0.24 },
 };
 
 const DISC_LABELS: Record<string, string> = {
@@ -159,15 +163,15 @@ export async function POST(req: NextRequest) {
 
     const paintBackground = () => {
       page.drawRectangle({ x: 0, y: 0, width: pageSize[0], height: pageSize[1], color: color('bg') });
-      page.drawRectangle({ x: 0, y: 0, width: pageSize[0], height: pageSize[1], color: rgb(0.025, 0.016, 0.06), opacity: 0.96 });
-      page.drawCircle({ x: 42, y: 744, size: 160, color: rgb(0.08, 0.32, 0.42), opacity: 0.22 });
-      page.drawCircle({ x: 570, y: 724, size: 190, color: rgb(0.47, 0.17, 0.7), opacity: 0.18 });
-      page.drawCircle({ x: 514, y: 116, size: 145, color: rgb(0.9, 0.36, 0.62), opacity: 0.11 });
-      page.drawRectangle({ x: 0, y: pageSize[1] - 9, width: pageSize[0], height: 9, color: color('cyan'), opacity: 0.72 });
-      page.drawRectangle({ x: 0, y: pageSize[1] - 9, width: pageSize[0] * 0.58, height: 9, color: color('purple'), opacity: 0.78 });
-      page.drawRectangle({ x: margin, y: 24, width: contentWidth, height: 1, color: color('border') });
-      page.drawText('KnowYouRole Full Portrait  |  one-page share card', { x: margin, y: 12, size: 8, font: regular, color: color('dim') });
-      page.drawText(BRAND_URL, { x: pageSize[0] - margin - 78, y: 12, size: 8, font: bold, color: color('cyan') });
+      // Soft orbital fields replace the legacy purple/neon ambience.
+      page.drawCircle({ x: 28, y: 736, size: 188, color: color('cyan'), opacity: 0.055 });
+      page.drawCircle({ x: 586, y: 675, size: 214, color: color('gold'), opacity: 0.045 });
+      page.drawCircle({ x: 532, y: 85, size: 174, color: color('cyan'), opacity: 0.035 });
+      page.drawCircle({ x: 306, y: 493, size: 213, borderColor: color('cyan'), borderWidth: 0.7, borderOpacity: 0.12 });
+      page.drawCircle({ x: 306, y: 493, size: 153, borderColor: color('gold'), borderWidth: 0.6, borderOpacity: 0.1 });
+      page.drawRectangle({ x: margin, y: 27, width: contentWidth, height: 1, color: color('border') });
+      page.drawText('KnowYouRole', { x: margin, y: 12, size: 8, font: bold, color: color('muted') });
+      page.drawText('knowyourole.com', { x: pageSize[0] - margin - 78, y: 12, size: 8, font: bold, color: color('cyan') });
     };
 
     const truncateToWidth = (text: string, fontRef: typeof regular, size: number, maxWidth: number) => {
@@ -209,15 +213,21 @@ export async function POST(req: NextRequest) {
       return nextY;
     };
 
+    const drawRoundedPanel = (x: number, py: number, width: number, height: number, _radius: number, fill: keyof typeof COLORS, border?: keyof typeof COLORS, borderWidth = 0, opacity = 1) => {
+      // pdf-lib's SVG-path coordinate transform differs from its text/rectangle transform.
+      // Native PDF rectangles preserve the exact baseline geometry for every report renderer.
+      page.drawRectangle({ x, y: py, width, height, color: color(fill), borderColor: border ? color(border) : undefined, borderWidth, opacity });
+    };
+
     const drawCardShell = (x: number, top: number, width: number, height: number, accent: keyof typeof COLORS = 'purple', fill: keyof typeof COLORS = 'card') => {
-      page.drawRectangle({ x: x + 3, y: top - height - 4, width, height, color: rgb(0, 0, 0), opacity: 0.22 });
-      page.drawRectangle({ x, y: top - height, width, height, color: color(fill), borderColor: color('border'), borderWidth: 1 });
-      page.drawRectangle({ x, y: top - 3.5, width, height: 3.5, color: color(accent), opacity: 0.95 });
+      drawRoundedPanel(x + 3, top - height - 4, width, height, 18, 'text', undefined, 0, 0.12);
+      drawRoundedPanel(x, top - height, width, height, 18, fill, 'border', 1);
+      page.drawRectangle({ x: x + 18, y: top - 3.5, width: width - 36, height: 3.5, color: color(accent), opacity: 0.95 });
       return { x: x + 14, yTop: top - 20, yBottom: top - height + 12, width: width - 28, height };
     };
 
     const drawPill = (text: string, x: number, py: number, width: number, fill: keyof typeof COLORS = 'card2', textColor: keyof typeof COLORS = 'muted') => {
-      page.drawRectangle({ x, y: py, width, height: 18, color: color(fill), borderColor: color('border'), borderWidth: 0.7 });
+      drawRoundedPanel(x, py, width, 18, 9, fill, 'border', 0.7);
       page.drawText(truncateToWidth(text, bold, 8, width - 14), { x: x + 7, y: py + 5.5, size: 8, font: bold, color: color(textColor) });
     };
 
@@ -231,62 +241,64 @@ export async function POST(req: NextRequest) {
 
     paintBackground();
 
-    // One-page Full Portrait: magazine-style hierarchy, fewer duplicate boxes, clearer scanning path.
-    page.drawText('KnowYouRole', { x: margin, y, size: 18, font: bold, color: color('cyan') });
-    page.drawText('WORK-STYLE PORTRAIT', { x: pageSize[0] - margin - 118, y: y + 3, size: 8.4, font: bold, color: color('dim') });
-    page.drawText('PERSONAL RESULT SUMMARY', { x: pageSize[0] - margin - 132, y: y - 9, size: 7.1, font: bold, color: color('muted') });
-    y -= 28;
+    // Mirrors the live result sequence: identity, direction, compact signals, then evidence.
+    page.drawText('KnowYouRole', { x: margin, y, size: 18, font: bold, color: color('text') });
+    page.drawText('FULL PORTRAIT', { x: pageSize[0] - margin - 72, y: y + 3, size: 8.4, font: bold, color: color('cyan') });
+    y -= 42;
 
-    const hero = drawCardShell(margin, y, contentWidth, 150, 'cyan');
-    page.drawText('YOUR PATTERN', { x: hero.x, y: hero.yTop + 2, size: 7.4, font: bold, color: color('dim') });
-    page.drawText(mbtiType, { x: hero.x, y: hero.yTop - 43, size: 52, font: bold, color: color('text') });
-    drawWrapped(archetype, hero.x + 2, hero.yTop - 63, 190, 11.4, 2, bold, 'purple', 2.5);
-    drawPill(`${primaryDisc} DISC - ${discLabel}`, hero.x + 2, hero.yBottom + 9, 126, 'card2', discAccent);
-    drawPill(`Population ${payload.population || 'N/A'}`, hero.x + 136, hero.yBottom + 9, 124, 'card2', 'muted');
+    page.drawText('YOUR WORKING PATTERN', { x: margin, y, size: 8.2, font: bold, color: color('cyan') });
+    page.drawText(mbtiType, { x: margin, y: y - 63, size: 66, font: bold, color: color('text') });
+    drawWrapped(archetype, margin, y - 88, contentWidth, 22, 2, bold, 'text', 3);
+    drawWrapped('A personal snapshot of how you tend to focus, decide, and move work forward.', margin, y - 122, contentWidth - 32, 10.2, 2, regular, 'muted', 3);
 
-    const dividerX = hero.x + 268;
-    page.drawRectangle({ x: dividerX, y: hero.yBottom + 6, width: 1, height: 106, color: color('border') });
-    const careerX = dividerX + 24;
-    page.drawText('BEST-FIT DIRECTION', { x: careerX, y: hero.yTop + 2, size: 7.4, font: bold, color: color('gold') });
-    // Fixed-height hero: only show content that has a guaranteed visual slot.
-    // The longer rationale belongs in the result page and the PNG summary, not behind other PDF text.
-    const careerTitleLines = wrapByWidth(careerTitle, bold, 13, hero.width - 304, 2);
-    careerTitleLines.forEach((line, index) => page.drawText(line, { x: careerX, y: hero.yTop - 22 - index * 15, size: 13, font: bold, color: color('gold') }));
-    if (careerSalary) drawWrapped(careerSalary, careerX, hero.yTop - 29 - careerTitleLines.length * 15, hero.width - 304, 8, 1, bold, 'muted', 1);
-    y -= 180;
-
-    // A single roomy diagnostic panel is clearer than three duplicated micro-cards.
-    const insight = drawCardShell(margin, y, contentWidth, 238, 'purple');
-    page.drawText('Work-style signals', { x: insight.x, y: insight.yTop + 1, size: 14, font: bold, color: color('text') });
-    page.drawText('Preference pattern and trait distribution', { x: insight.x + 128, y: insight.yTop + 4, size: 8, font: regular, color: color('dim') });
-
-    const compassX = insight.x;
-    const compassY = insight.yTop - 30;
-    page.drawText(`${mbtiType} compass`, { x: compassX, y: compassY, size: 11.2, font: bold, color: color('purple') });
-    MBTI_DIMENSIONS.forEach((dim, index) => {
-      const dominant = mbtiType[index] || dim.left;
-      const rowY = compassY - 22 - index * 28;
-      page.drawText(dim.label.toUpperCase(), { x: compassX, y: rowY, size: 6.8, font: bold, color: color('dim') });
-      page.drawText(dim.left, { x: compassX + 74, y: rowY - 1, size: 7.8, font: bold, color: dominant === dim.left ? color('cyan') : color('dim') });
-      page.drawRectangle({ x: compassX + 91, y: rowY + 2, width: 72, height: 4.5, color: color('track') });
-      page.drawRectangle({ x: dominant === dim.left ? compassX + 91 : compassX + 127, y: rowY + 2, width: 36, height: 4.5, color: dominant === dim.left ? color('cyan') : color('purple') });
-      page.drawText(dim.right, { x: compassX + 172, y: rowY - 1, size: 7.8, font: bold, color: dominant === dim.right ? color('purple') : color('dim') });
-      page.drawText(dominant, { x: compassX + 196, y: rowY - 4, size: 13, font: bold, color: dominant === dim.left ? color('cyan') : color('purple') });
-    });
-
-    const dialsX = insight.x + 286;
-    const dialsY = insight.yTop - 30;
-    page.drawText('Big Five dials', { x: dialsX, y: dialsY, size: 11.2, font: bold, color: color('cyan') });
-    page.drawText(truncateToWidth(`${topBigFiveLabel} is the loudest signal`, regular, 8, insight.width - 286), { x: dialsX, y: dialsY - 13, size: 8, font: regular, color: color('muted') });
-    let barY = dialsY - 34;
-    for (const [label, value, accent] of bigFiveEntries) {
-      drawProgressBar(label, value, dialsX, barY, 82, accent);
-      barY -= 21;
+    const directionTop = 565;
+    const directionHeight = 162;
+    drawRoundedPanel(margin + 3, directionTop - directionHeight - 5, contentWidth, directionHeight, 25, 'ink', undefined, 0, 0.28);
+    drawRoundedPanel(margin, directionTop - directionHeight, contentWidth, directionHeight, 25, 'cream', 'creamBorder', 1);
+    page.drawText('BEST-FIT DIRECTION', { x: margin + 20, y: directionTop - 25, size: 8.3, font: bold, color: color('ink') });
+    const careerTitleLines = wrapByWidth(careerTitle, bold, 21, contentWidth - 40, 2);
+    careerTitleLines.forEach((line, index) => page.drawText(line, { x: margin + 20, y: directionTop - 55 - index * 24, size: 21, font: bold, color: color('ink') }));
+    const careerSummaryY = directionTop - 76 - careerTitleLines.length * 24;
+    drawWrapped(careerSummary, margin + 20, careerSummaryY, contentWidth - 40, 9.2, 3, regular, 'ink', 3);
+    if (careerSalary) {
+      const salaryWidth = Math.min(contentWidth - 40, bold.widthOfTextAtSize(careerSalary, 8.1) + 24);
+      drawRoundedPanel(margin + 20, directionTop - directionHeight + 16, salaryWidth, 18, 9, 'creamBorder');
+      page.drawText(careerSalary, { x: margin + 32, y: directionTop - directionHeight + 22, size: 8.1, font: bold, color: color('ink') });
     }
 
-    y = insight.yBottom - 18;
+    const tileTop = 374;
+    const tileHeight = 76;
+    const tileGap = 10;
+    const tileWidth = (contentWidth - tileGap * 2) / 3;
+    const tiles = [
+      ['DISC SIGNAL', `${primaryDisc} ${discLabel}`, discAccent],
+      ['TOP TRAIT', `${topBigFiveLabel} ${topBigFiveScore}%`, 'cyan'],
+      ['TYPE RARITY', payload.population ? `${payload.population} of people` : 'Personal signal', 'gold'],
+    ] as const;
+    tiles.forEach(([label, value, accent], index) => {
+      const x = margin + index * (tileWidth + tileGap);
+      drawRoundedPanel(x, tileTop - tileHeight, tileWidth, tileHeight, 18, 'card2', 'border', 1);
+      page.drawText(label, { x: x + 13, y: tileTop - 21, size: 6.8, font: bold, color: color('dim') });
+      drawWrapped(value, x + 13, tileTop - 42, tileWidth - 26, 10.2, 2, bold, accent, 2);
+    });
 
-    page.drawText('Mirror, not a cage. Use the signal. Keep the agency.', { x: margin, y: 42, size: 8.7, font: italic, color: color('muted') });
+    const signalTop = 273;
+    const signalHeight = 154;
+    drawRoundedPanel(margin + 3, signalTop - signalHeight - 4, contentWidth, signalHeight, 24, 'ink', undefined, 0, 0.25);
+    drawRoundedPanel(margin, signalTop - signalHeight, contentWidth, signalHeight, 24, 'card', 'border', 1);
+    page.drawText('YOUR OPERATING SIGNAL', { x: margin + 20, y: signalTop - 25, size: 8.2, font: bold, color: color('cyan') });
+    page.drawText('The preferences that shape your default approach to work.', { x: margin + 20, y: signalTop - 43, size: 9.2, font: regular, color: color('muted') });
+    MBTI_DIMENSIONS.forEach((dim, index) => {
+      const dominant = mbtiType[index] || dim.left;
+      const rowY = signalTop - 70 - index * 17;
+      page.drawText(dim.label.toUpperCase(), { x: margin + 20, y: rowY, size: 6.8, font: bold, color: color('dim') });
+      page.drawText(`${dim.left}  ${dim.right}`, { x: margin + 116, y: rowY - 1, size: 8.3, font: bold, color: color('muted') });
+      page.drawCircle({ x: margin + 214, y: rowY + 3, size: 4.5, color: color(dominant === dim.left ? 'cyan' : 'gold') });
+      page.drawText(dominant, { x: margin + 230, y: rowY - 3, size: 12.5, font: bold, color: color(dominant === dim.left ? 'cyan' : 'gold') });
+      page.drawText(dominant === dim.left ? 'leans left' : 'leans right', { x: margin + 250, y: rowY - 1, size: 8, font: regular, color: color('muted') });
+    });
+
+    page.drawText('Mirror, not a cage. Use the signal. Keep the agency.', { x: margin, y: 44, size: 8.5, font: italic, color: color('muted') });
 
     const pdfBytes = await pdfDoc.save();
 
