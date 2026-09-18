@@ -18,7 +18,7 @@ export type SeoPage = {
 };
 
 const standardFaqs: SeoFaq[] = [
-  { q: "Is KnowYouRole free?", a: "Yes. The core KnowYouRole personality quiz is free and gives a practical result focused on personality, work style, communication, and career-fit direction." },
+  { q: "Is KnowYouRole free?", a: "Yes. Everything currently available on KnowYouRole is free and no result or content is locked behind a paywall. The quiz gives a practical result focused on personality, work style, communication, and career-fit direction." },
   { q: "Is this an official MBTI or DISC test?", a: "No. KnowYouRole uses MBTI-style and DISC-style language for clarity, then combines those signals with Big Five-informed trait patterns and role-fit guidance." },
   { q: "Is this clinical or diagnostic?", a: "No. KnowYouRole is a self-reflection and career-fit tool, not a clinical assessment, diagnosis, hiring screen, or medical instrument." },
   { q: "How long does the quiz take?", a: "The current short-form quiz uses 28 focused prompts designed to be fast while still collecting useful personality, work-style, and role-fit signals." },

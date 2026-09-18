@@ -490,7 +490,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
                     <div className="relative z-10 grid h-full grid-cols-[34px_minmax(0,1fr)] items-center gap-2.5 sm:flex sm:flex-col sm:items-stretch sm:gap-0">
                       <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[13px] bg-gradient-to-br ${accent} text-[11px] font-black text-[#050510] shadow-[0_12px_30px_rgba(0,0,0,0.35)] sm:mb-4 sm:h-8 sm:w-8 sm:rounded-full sm:text-xs`}>{answer.id}</span>
                       <span className="min-w-0">
-                        <h2 className={`text-[0.92rem] font-black leading-[1.16] tracking-[-0.025em] transition-colors sm:max-w-[23ch] sm:text-[1.13rem] lg:text-[1.2rem] ${isSelected ? "text-[#12263a]" : "text-white group-hover:text-[#12263a] group-active:text-[#12263a]"}`}>{answer.text}</h2>
+                        <h2 className={`text-[1rem] font-black leading-[1.2] tracking-[-0.025em] transition-colors sm:max-w-[23ch] sm:text-[1.13rem] lg:text-[1.2rem] ${isSelected ? "text-[#12263a]" : "text-white group-hover:text-[#12263a] group-active:text-[#12263a]"}`}>{answer.text}</h2>
                         <span className={`mt-1 block truncate font-bold uppercase tracking-[0.12em] transition-colors sm:mt-2 sm:tracking-[0.18em] ${isSelected ? "text-[#31485d]" : "text-[#456174] group-hover:text-[#31485d] group-active:text-[#31485d]"}`} style={{ fontSize: "9px" }}>{answer.resultSignal}</span>
                       </span>
                       {isSelected && <span className="absolute right-2 top-2 rounded-full border border-[#f3e6cf] bg-[#c9b68f] px-2 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-[#12263a] sm:text-[9px]">Selected</span>}

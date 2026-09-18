@@ -38,13 +38,14 @@ const headingClass = "font-display text-2xl font-bold tracking-[-0.025em] text-[
 export default function MethodologyPage() {
   return (
     <div className="min-h-screen bg-[#fffaf0] text-[#12263a]">
+      <style>{`html.kyr-workday header[class*="sticky"] .methodology-primary-cta { color: #fffdf8 !important; font-size: 16px !important; }`}</style>
       <header className="sticky top-0 z-50 border-b border-[#12263a]/10 bg-[#fffaf0]/90 px-4 py-4 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">
           <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm font-semibold text-[#315f74] underline-offset-4 transition hover:text-[#b64d35] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b64d35]">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back to KnowYouRole
           </Link>
-          <Link href="/quiz" className="inline-flex min-h-11 items-center rounded-full bg-[#12263a] px-4 text-sm font-bold text-white transition hover:bg-[#24455c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b64d35]">
+          <Link href="/quiz" className="methodology-primary-cta inline-flex min-h-11 items-center rounded-full bg-[#12263a] px-4 font-bold transition hover:bg-[#24455c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b64d35]">
             Take the quiz
           </Link>
         </div>
