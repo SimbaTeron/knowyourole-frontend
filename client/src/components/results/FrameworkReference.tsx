@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 
 export type FrameworkDiscProfile = { D: number; I: number; S: number; C: number };
 export type FrameworkBigFiveProfile = { O: number; C: number; E: number; A: number; N: number };
@@ -46,35 +46,8 @@ const discColors: Record<string, string> = { D: "#c95f46", I: "#b7791f", S: "#3b
 const shell: CSSProperties = { marginTop: 14, borderRadius: 14, background: T.paper, border: `1px solid ${T.line}` };
 const summary: CSSProperties = { listStyle: "none", cursor: "pointer", padding: "12px 13px", display: "grid", gridTemplateColumns: "1fr auto", gap: 10, alignItems: "center", WebkitTapHighlightColor: "transparent" };
 const row: CSSProperties = { padding: "10px 11px", borderRadius: 11, background: "rgba(255,255,255,0.62)", border: `1px solid ${T.line}` };
-const frameworkHintKey = "kyr_framework_hint_seen_v1";
 
 export function FrameworkReference({ kind, primaryDisc, disc, bigFive, mbtiAxes, onOpen }: FrameworkReferenceProps) {
-  const [showNudge, setShowNudge] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (window.localStorage.getItem(frameworkHintKey)) return;
-    } catch {
-      return;
-    }
-
-    const begin = window.setTimeout(() => {
-      try { window.localStorage.setItem(frameworkHintKey, "1"); } catch { /* optional UI preference only */ }
-      setShowNudge(true);
-    }, 1200);
-    const end = window.setTimeout(() => setShowNudge(false), 6400);
-    const stop = () => setShowNudge(false);
-    window.addEventListener("scroll", stop, { once: true, passive: true });
-    window.addEventListener("pointerdown", stop, { once: true, passive: true });
-    window.addEventListener("keydown", stop, { once: true });
-    return () => {
-      window.clearTimeout(begin);
-      window.clearTimeout(end);
-      window.removeEventListener("scroll", stop);
-      window.removeEventListener("pointerdown", stop);
-      window.removeEventListener("keydown", stop);
-    };
-  }, []);
 
   const title = kind === "mbti" ? "How MBTI-style preferences work" : kind === "disc" ? "How DISC work styles work" : "How the Big Five traits work";
   const intro = kind === "mbti"
@@ -99,14 +72,36 @@ export function FrameworkReference({ kind, primaryDisc, disc, bigFive, mbtiAxes,
   return (
     <>
       <style>{`
-        @keyframes kyr-framework-nudge {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(49, 95, 116, 0); border-color: rgba(18, 38, 58, 0.16); }
-          48% { box-shadow: 0 0 0 5px rgba(49, 95, 116, 0.14); border-color: rgba(49, 95, 116, 0.46); }
+        @keyframes kyr-framework-idle-glow {
+          0%, 100% {
+            box-shadow: 0 0 0 0 rgba(49, 127, 116, 0.18), 0 0 12px rgba(49, 127, 116, 0.12);
+            border-color: rgba(49, 95, 116, 0.34);
+          }
+          50% {
+            box-shadow: 0 0 0 5px rgba(49, 127, 116, 0.12), 0 0 22px rgba(49, 127, 116, 0.34);
+            border-color: rgba(49, 127, 116, 0.68);
+          }
         }
-        .kyr-framework-reference--nudge { animation: kyr-framework-nudge 1.65s ease-in-out 3; }
-        @media (prefers-reduced-motion: reduce) { .kyr-framework-reference--nudge { animation: none; border-color: rgba(49, 95, 116, 0.46) !important; } }
+        .kyr-framework-reference:not([open]) {
+          animation: kyr-framework-idle-glow 2.2s ease-in-out infinite;
+        }
+        .kyr-framework-reference[open] {
+          box-shadow: none;
+        }
+        .kyr-framework-reference > summary:focus-visible {
+          outline: 3px solid rgba(49, 127, 116, 0.58);
+          outline-offset: 3px;
+          border-radius: 11px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .kyr-framework-reference:not([open]) {
+            animation: none;
+            border-color: rgba(49, 127, 116, 0.68) !important;
+            box-shadow: 0 0 0 3px rgba(49, 127, 116, 0.14);
+          }
+        }
       `}</style>
-      <details className={showNudge ? "kyr-framework-reference--nudge" : undefined} style={shell} onToggle={(event) => { if (event.currentTarget.open) { setShowNudge(false); onOpen?.(); } }}>
+      <details className="kyr-framework-reference" style={shell} onToggle={(event) => { if (event.currentTarget.open) onOpen?.(); }}>
       <summary style={summary}>
         <span>
           <span style={{ display: "block", fontSize: 12, fontWeight: 900, color: T.ink, marginBottom: 3 }}>Understand the framework</span>
