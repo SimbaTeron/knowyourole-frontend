@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, ChevronLeft, Sparkles, X } from "lucide-react";
 import type { QuizScores } from "./Quiz";
@@ -192,8 +192,11 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<QuizScores>(INITIAL_SCORES);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [activeOptionIndex, setActiveOptionIndex] = useState(0);
   const [startedAt, setStartedAt] = useState(() => Date.now());
   const questionHeadingRef = useRef<HTMLHeadingElement>(null);
+  const answerButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const restoreAnswerFocusRef = useRef(false);
 
   const currentQuestion = SHORTFORM_V2_QUESTIONS[currentIndex];
   const totalQuestions = SHORTFORM_V2_QUESTIONS.length;
@@ -205,9 +208,18 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
 
   useEffect(() => {
     if (!hasStarted) return;
-    const focusTimer = window.setTimeout(() => questionHeadingRef.current?.focus(), 320);
+    const selectedIndex = currentQuestion.answers.findIndex((answer) => answer.id === selectedAnswer);
+    setActiveOptionIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    const focusTimer = window.setTimeout(() => {
+      if (restoreAnswerFocusRef.current) {
+        restoreAnswerFocusRef.current = false;
+        answerButtonRefs.current[selectedIndex >= 0 ? selectedIndex : 0]?.focus();
+        return;
+      }
+      questionHeadingRef.current?.focus();
+    }, 320);
     return () => window.clearTimeout(focusTimer);
-  }, [currentIndex, hasStarted]);
+  }, [currentIndex, currentQuestion.answers, hasStarted, selectedAnswer]);
 
   const handleStart = () => {
     setStartedAt(Date.now());
@@ -217,42 +229,49 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   };
 
   const handleAnswer = (answer: ShortformV2Answer, optionIndex: number) => {
-    if (selectedAnswer) return;
-    const timeSpent = Math.max(0.1, (Date.now() - startedAt) / 1000);
-    setSelectedAnswer(answer.id);
+    const existingResponseIndex = scores.responses.findIndex((response) => response.questionId === currentQuestion.id);
+    const isReviewingAnswer = existingResponseIndex >= 0;
+    if (selectedAnswer && !isReviewingAnswer) return;
 
-    const nextScores = addWeights(scores, answer);
-    const updatedSwipeTimes = [...scores.swipeTimes, timeSpent];
+    const existingResponse = isReviewingAnswer ? scores.responses[existingResponseIndex] : undefined;
+    const timeSpent = existingResponse?.timeSpent ?? Math.max(0.1, (Date.now() - startedAt) / 1000);
+    const response = {
+      questionId: currentQuestion.id,
+      choice: optionIndex as 0 | 1 | 2 | 3,
+      timeSpent,
+      swipeDirection: optionIndex < 2 ? "left" as const : "right" as const,
+      responseType: "multiChoice" as const,
+      psych: currentQuestion.group,
+      selectedOptionMeta: answer.resultSignal,
+      selectedOptionLabel: answer.text,
+      answerId: answer.id,
+    };
+
+    const responses = isReviewingAnswer
+      ? scores.responses.map((currentResponse, index) => index === existingResponseIndex ? response : currentResponse)
+      : [...scores.responses, response];
+    const rebuiltScores = isReviewingAnswer
+      ? rebuildScoresFromResponses(responses)
+      : addWeights(scores, answer);
+    const updatedSwipeTimes = isReviewingAnswer ? rebuiltScores.swipeTimes : [...scores.swipeTimes, timeSpent];
     const averageSwipeTime = updatedSwipeTimes.reduce((sum, value) => sum + value, 0) / updatedSwipeTimes.length;
     const updatedScores: QuizScores = {
-      ...nextScores,
-      responses: [
-        ...nextScores.responses,
-        {
-          questionId: currentQuestion.id,
-          choice: optionIndex as 0 | 1 | 2 | 3,
-          timeSpent,
-          swipeDirection: optionIndex < 2 ? "left" : "right",
-          responseType: "multiChoice",
-          psych: currentQuestion.group,
-          selectedOptionMeta: answer.resultSignal,
-          selectedOptionLabel: answer.text,
-          answerId: answer.id,
-        },
-      ],
+      ...rebuiltScores,
+      responses,
       swipeTimes: updatedSwipeTimes,
       averageSwipeTime,
       currentDifficulty: calculateDifficulty(updatedSwipeTimes, averageSwipeTime),
-      engagement: nextScores.engagement + 1,
+      engagement: responses.length,
       wildcardBoost: false,
-      criticalWildcard: nextScores.mbti.T >= nextScores.mbti.F && nextScores.bigFive.O > 0 ? 1 : 0,
-      firstPrinciplesWildcard: nextScores.mbti.N >= nextScores.mbti.S && nextScores.bigFive.O > 0 ? 1 : 0,
+      criticalWildcard: rebuiltScores.mbti.T >= rebuiltScores.mbti.F && rebuiltScores.bigFive.O > 0 ? 1 : 0,
+      firstPrinciplesWildcard: rebuiltScores.mbti.N >= rebuiltScores.mbti.S && rebuiltScores.bigFive.O > 0 ? 1 : 0,
       quizVersion: "shortform-v2-fixed-28",
       questionDatabase: "shortformV2Questions.ts",
       deterministicResult: true,
       moodContext: { mood, theme, funMode },
     };
 
+    setSelectedAnswer(answer.id);
     setScores(updatedScores);
 
     trackKyrEvent("quiz_answer_selected", {
@@ -287,19 +306,33 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     }, 360);
   };
 
+  const handleAnswerKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, index: number) => {
+    const last = currentQuestion.answers.length - 1;
+    const target = event.key === "Home" ? 0
+      : event.key === "End" ? last
+      : ["ArrowDown", "ArrowRight"].includes(event.key) ? (index + 1) % currentQuestion.answers.length
+      : ["ArrowUp", "ArrowLeft"].includes(event.key) ? (index - 1 + currentQuestion.answers.length) % currentQuestion.answers.length
+      : null;
+    if (target === null) return;
+    event.preventDefault();
+    setActiveOptionIndex(target);
+    answerButtonRefs.current[target]?.focus();
+  };
+
   const goBack = () => {
     if (currentIndex === 0 || answeredCount === 0 || selectedAnswer) return;
-    const responseBeingRevisited = scores.responses[scores.responses.length - 1];
-    const retainedResponses = scores.responses.slice(0, -1);
-    setScores(rebuildScoresFromResponses(retainedResponses));
+    const responseBeingRevisited = scores.responses.find((response) => response.questionId === SHORTFORM_V2_QUESTIONS[currentIndex - 1]?.id);
+    const answerId = responseBeingRevisited?.answerId;
+    if (!responseBeingRevisited || typeof answerId !== "string") return;
+    restoreAnswerFocusRef.current = true;
     setCurrentIndex((index) => Math.max(0, index - 1));
-    setSelectedAnswer(null);
+    setSelectedAnswer(answerId);
     setStartedAt(Date.now());
     trackKyrEvent("quiz_answer_reviewed", {
       source: "shortform_v2",
       tier,
-      question_id: responseBeingRevisited?.questionId ?? null,
-      remaining_answers: retainedResponses.length,
+      question_id: responseBeingRevisited.questionId,
+      remaining_answers: scores.responses.length,
     });
   };
 
@@ -420,7 +453,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
                 <div className="mt-auto pb-0.5">
                   <p className="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-white/76 sm:mb-3 sm:text-[11px]" aria-live="polite" aria-atomic="true">Question {timelinePosition} of {totalQuestions}</p>
                   <div className="sr-only" role="progressbar" aria-label="Quiz progress" aria-valuemin={1} aria-valuemax={totalQuestions} aria-valuenow={timelinePosition}>Question {timelinePosition} of {totalQuestions}</div>
-                  <h1 ref={questionHeadingRef} tabIndex={-1} className="shortform-v2-question-title text-balance font-black text-white drop-shadow-[0_14px_38px_rgba(0,0,0,0.45)] focus:outline-none">
+                  <h1 id="shortform-v2-question-heading" ref={questionHeadingRef} tabIndex={-1} className="shortform-v2-question-title text-balance font-black text-white drop-shadow-[0_14px_38px_rgba(0,0,0,0.45)] focus:outline-none">
                     {currentQuestion.prompt}
                   </h1>
                   <p className="mt-2 max-w-md text-[0.75rem] font-bold leading-4 text-white/72 sm:mt-4 sm:text-[0.9rem] sm:font-extrabold sm:leading-6">{currentQuestion.guidance}</p>
@@ -428,24 +461,28 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
               </div>
             </section>
 
-            <section className="shortform-v2-answer-grid grid gap-2 lg:gap-3 lg:auto-rows-fr">
+            <section className="shortform-v2-answer-grid grid gap-2 lg:gap-3 lg:auto-rows-fr" role="radiogroup" aria-labelledby="shortform-v2-question-heading">
               {currentQuestion.answers.map((answer, index) => {
                 const isSelected = selectedAnswer === answer.id;
                 const isDimmed = Boolean(selectedAnswer && !isSelected);
                 return (
                   <motion.button
                     key={answer.id}
+                    ref={(element) => { answerButtonRefs.current[index] = element; }}
                     type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    tabIndex={activeOptionIndex === index ? 0 : -1}
                     onClick={() => handleAnswer(answer, index)}
-                    disabled={Boolean(selectedAnswer)}
+                    onKeyDown={(event) => handleAnswerKeyDown(event, index)}
+                    disabled={Boolean(selectedAnswer) && !scores.responses.some((response) => response.questionId === currentQuestion.id)}
                     initial={false}
                     animate={{ opacity: isDimmed ? 0.42 : 1, y: 0, scale: isSelected ? 1.025 : 1 }}
                     transition={{ delay: index * 0.045, duration: 0.22 }}
                     whileHover={!selectedAnswer ? { y: -4, scale: 1.012 } : undefined}
                     whileTap={!selectedAnswer ? { scale: 0.98 } : undefined}
                     className={`shortform-v2-answer-button group relative overflow-hidden rounded-[19px] border p-2.5 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 sm:rounded-[22px] sm:p-3.5 lg:min-h-0 lg:p-4 ${isSelected ? "border-[#f3e6cf] bg-[#dccdb3] shadow-[0_0_0_1px_rgba(243,230,207,0.72),0_0_42px_rgba(220,205,179,0.34)]" : "border-white/12 bg-[#0d1324]/94 shadow-[0_18px_54px_rgba(0,0,0,0.30)] hover:border-[#f8f0df] hover:bg-[#e6d8bd] hover:shadow-[0_18px_54px_rgba(230,216,189,0.20)] active:!border-[#f3e6cf] active:!bg-[#dccdb3]"}`}
-                    aria-label={`Answer ${answer.id}: ${answer.text}`}
-                    aria-pressed={isSelected}
+                    aria-label={answer.text}
                     data-testid={`button-v2-answer-${answer.id}`}
                   >
                     <div className={`absolute -right-10 -top-12 h-28 w-28 rounded-full bg-gradient-to-br ${accent} opacity-12 blur-2xl transition-opacity group-hover:opacity-24 sm:h-32 sm:w-32`} />

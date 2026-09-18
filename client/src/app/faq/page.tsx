@@ -43,7 +43,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Do I need an account or have to pay?",
-    answer: "No. You can start and complete the core quiz without an account, and the current core experience is free. KnowYouRole does not require a purchase to show your result."
+    answer: "No. You can start and complete the quiz without an account, and everything on KnowYouRole today is free. Nothing is locked or paywalled right now, and you do not need a purchase to see your result."
   },
   {
     question: "How is my quiz data handled?",

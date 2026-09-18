@@ -144,7 +144,8 @@ export default function Home() {
         .preview-label {
           display: block;
           margin: 0 0 10px;
-          color: rgba(174,239,255,0.88);
+          color: #315f74;
+          text-shadow: 0 1px 0 rgba(255,255,255,0.58);
           font-size: 10px;
           font-weight: 900;
           letter-spacing: 0.16em;
@@ -169,10 +170,10 @@ export default function Home() {
         .sample-type {
           display: inline-flex;
           padding: 7px 11px;
-          border: 1px solid rgba(255,255,255,0.15);
+          border: 1px solid rgba(49,95,116,0.22);
           border-radius: 999px;
-          background: rgba(255,255,255,0.07);
-          color: rgba(248,251,255,0.72);
+          background: rgba(223,243,250,0.86);
+          color: #315f74;
           font-size: 10px;
           font-weight: 900;
           letter-spacing: 0.06em;
@@ -223,6 +224,25 @@ export default function Home() {
           line-height: 1.28;
           font-weight: 760;
         }
+        .preview-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+        .preview-detail { min-width: 0; padding: 11px; border: 1px solid rgba(255,255,255,0.10); border-radius: 14px; background: rgba(3,4,13,0.28); }
+        .preview-detail-label { display: block; color: rgba(174,239,255,0.72); font-size: 8px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+        .preview-detail strong { display: block; margin-top: 5px; color: #fff; font-size: 13px; line-height: 1.2; }
+        .preview-detail p { margin: 5px 0 0; color: rgba(248,251,255,0.68); font-size: 10px; line-height: 1.36; font-weight: 650; }
+        .trait-bars { display: grid; gap: 5px; margin-top: 7px; }
+        .trait-bar { display: grid; grid-template-columns: 1fr 32px; gap: 6px; align-items: center; color: rgba(248,251,255,0.72); font-size: 9px; font-weight: 800; }
+        .trait-bar i { display: block; height: 5px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,0.12); }
+        .trait-bar i::after { content: ''; display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #48dcff, #a78bfa); }
+        .trait-bar:nth-child(1) i::after { width: 82%; }.trait-bar:nth-child(2) i::after { width: 74%; }.trait-bar:nth-child(3) i::after { width: 68%; }
+
+        .how-section { padding: clamp(48px, 7vw, 84px) 0; background: #070817; }
+        .how-heading { max-width: 700px; margin: 0; color: #fff; font-size: clamp(2rem, 4vw, 3.65rem); line-height: 0.94; letter-spacing: -0.06em; font-weight: 950; }
+        .how-copy { max-width: 640px; margin: 16px 0 0; color: rgba(248,251,255,0.66); font-size: 15px; line-height: 1.58; font-weight: 650; }
+        .how-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 30px 0 0; padding: 0; list-style: none; }
+        .how-step { min-height: 170px; padding: 20px; border: 1px solid rgba(255,255,255,0.11); border-radius: 20px; background: rgba(255,255,255,0.045); }
+        .how-step-number { display: block; color: #aeefff; font-size: 10px; font-weight: 950; letter-spacing: 0.14em; }
+        .how-step h3 { margin: 14px 0 8px; color: #fff; font-size: 1.2rem; line-height: 1; letter-spacing: -0.04em; }
+        .how-step p { margin: 0; color: rgba(248,251,255,0.68); font-size: 13px; line-height: 1.46; font-weight: 650; }
 
         .trust-section {
           padding: clamp(48px, 7vw, 84px) 0;
@@ -277,8 +297,9 @@ export default function Home() {
           .primary-cta { width: 100%; }
           .quiz-facts { line-height: 1.55; }
           .sample-card { border-radius: 24px; }
-          .result-list { grid-template-columns: 1fr; }
-          .trust-section, .final-section { padding: 46px 0; }
+          .result-list, .preview-details, .how-steps { grid-template-columns: 1fr; }
+          .how-step { min-height: 0; }
+          .trust-section, .how-section, .final-section { padding: 46px 0; }
           .final-panel { align-items: stretch; border-radius: 24px; }
           .final-panel .primary-cta { width: 100%; }
         }
@@ -311,14 +332,58 @@ export default function Home() {
                   <h3>Strategic Analyst</h3>
                   <p>Explore the environments, problems, and working patterns that may fit you best.</p>
                 </div>
-                <ul className="result-list" aria-label="Result contents">
-                  <li>Your work style and strengths</li>
-                  <li>Likely friction points</li>
-                  <li>Roles and environments to explore</li>
-                  <li>One next experiment to try</li>
-                </ul>
+                <div className="preview-details" aria-label="What the example result includes">
+                  <section className="preview-detail">
+                    <span className="preview-detail-label">Archetype</span>
+                    <strong>Systems Builder</strong>
+                    <p>A concise work-style pattern, not a permanent label.</p>
+                  </section>
+                  <section className="preview-detail">
+                    <span className="preview-detail-label">Trait signals</span>
+                    <div className="trait-bars" aria-label="Example trait signals">
+                      <span className="trait-bar">Curiosity <i aria-hidden="true" /><b>82</b></span>
+                      <span className="trait-bar">Structure <i aria-hidden="true" /><b>74</b></span>
+                      <span className="trait-bar">Independence <i aria-hidden="true" /><b>68</b></span>
+                    </div>
+                  </section>
+                  <section className="preview-detail">
+                    <span className="preview-detail-label">Role fit</span>
+                    <strong>Strategic Analyst</strong>
+                    <p>One direction to compare with nearby possibilities.</p>
+                  </section>
+                  <section className="preview-detail">
+                    <span className="preview-detail-label">Decision brief</span>
+                    <strong>Try one real experiment</strong>
+                    <p>Use your result to choose a small project, conversation, or role to investigate.</p>
+                  </section>
+                </div>
               </div>
             </aside>
+          </div>
+        </section>
+
+        <section className="how-section" aria-labelledby="how-title">
+          <div className="home-shell">
+            <p className="eyebrow">A simple, fixed flow</p>
+            <h2 id="how-title" className="how-heading">Here&apos;s how your result comes together.</h2>
+            <p className="how-copy">The quiz is designed to give you practical language for a next conversation or experiment—not to assign a permanent identity or make a career decision for you.</p>
+            <ol className="how-steps">
+              <li className="how-step">
+                <span className="how-step-number">STEP 01</span>
+                <h3>Answer 28 questions</h3>
+                <p>Respond for your usual work, study, or project pattern—not the version of you that sounds most impressive.</p>
+              </li>
+              <li className="how-step">
+                <span className="how-step-number">STEP 02</span>
+                <h3>See your work-style picture</h3>
+                <p>Get trait signals, preference language, communication patterns, and an explanation of the evidence.</p>
+              </li>
+              <li className="how-step">
+                <span className="how-step-number">STEP 03</span>
+                <h3>Explore a next direction</h3>
+                <p>Compare possible roles and choose one small experiment worth testing in real life.</p>
+              </li>
+            </ol>
           </div>
         </section>
 

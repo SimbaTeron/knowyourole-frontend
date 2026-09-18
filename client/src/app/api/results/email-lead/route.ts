@@ -73,8 +73,18 @@ export async function POST(req: NextRequest) {
 
     const lead = parsed.data;
     const normalizedEmail = lead.email.trim().toLowerCase();
-    const authUser = await getOptionalAuthUser(req);
     const deliveryConfigured = isResultEmailDeliveryConfigured();
+    if (!deliveryConfigured) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Result email delivery is unavailable right now. Use the PDF or sharing options instead.",
+        },
+        { status: 503, headers: corsHeaders },
+      );
+    }
+
+    const authUser = await getOptionalAuthUser(req);
     const supabase = getSupabaseAdmin();
 
     const { data, error } = await supabase
@@ -134,6 +144,16 @@ export async function POST(req: NextRequest) {
           message: updateError.message,
         });
       }
+    }
+
+    if (delivery.status !== "sent") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "We could not send that result email. Use the PDF or sharing options instead.",
+        },
+        { status: 502, headers: corsHeaders },
+      );
     }
 
     return NextResponse.json(

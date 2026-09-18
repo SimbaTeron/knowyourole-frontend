@@ -16,11 +16,14 @@ const required = [
   ["no-right-answer instruction", "There are no right answers."],
   ["question count", "Question {timelinePosition} of {totalQuestions}"],
   ["semantic answer buttons", "<motion.button"],
-  ["answer label", "aria-label={`Answer ${answer.id}: ${answer.text}`}"],
+  ["answer radiogroup", "role=\"radiogroup\""],
+  ["radio answer semantics", "role=\"radio\""],
+  ["radio checked state", "aria-checked={isSelected}"],
+  ["roving keyboard model", "handleAnswerKeyDown(event, index)"],
   ["answer focus ring", "focus-visible:outline-cyan-200"],
   ["announced progress", "role=\"progressbar\""],
   ["focus transfer", "questionHeadingRef.current?.focus()"],
-  ["back review", "setScores(rebuildScoresFromResponses(retainedResponses))"],
+  ["back restores selected answer", "setSelectedAnswer(answerId);"],
   ["reduced motion", "prefers-reduced-motion: reduce"],
   ["safe mobile viewport", "min-h-[100dvh]"],
 ];
@@ -35,6 +38,6 @@ if (/onExit\(\);\s*\/\/ Reliable one-step undo/.test(quiz)) throw new Error("leg
 
 console.log("SHORTFORM_V2_FLOW_ACCESSIBILITY_PASS");
 console.log("- fixed 28-question start surface present");
-console.log("- semantic labelled response buttons and visible focus present");
+console.log("- semantic radiogroup answers, roving keyboard navigation, and visible focus present");
 console.log("- progress announcement, heading focus, reduced-motion, and 100dvh safeguards present");
-console.log("- back action rebuilds retained answer scores instead of exiting");
+console.log("- back action restores a reviewed answer without losing score history");

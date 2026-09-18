@@ -39,7 +39,7 @@ export default function Privacy() {
             <ul className={listClass}>
               <li>Quiz answers, score outputs, result pages viewed, and result identifiers.</li>
               <li>Age tier selection so quiz copy and experience can be age-appropriate.</li>
-              <li>Email address and related delivery metadata if you request report delivery, updates, or account access.</li>
+              <li>Email address, selected result-summary fields, consent, and delivery status when you explicitly request that a result summary be emailed.</li>
               <li>Feedback you submit voluntarily.</li>
               <li>Device, browser, referral, and performance data when analytics is enabled through cookie preferences.</li>
               <li>Browser storage used for quiz state, consent preferences, and session continuity.</li>
@@ -50,7 +50,7 @@ export default function Privacy() {
             <h2 className={headingClass}>How we use information</h2>
             <ul className={listClass}>
               <li>Generate and save your personality profile and career-fit recommendations.</li>
-              <li>Deliver results or account/report links if you provide an email address.</li>
+              <li>Send a requested result summary when delivery is available and you explicitly opt in to that one-time request.</li>
               <li>Maintain and improve quiz quality, accessibility, and product usability.</li>
               <li>Monitor site performance, abuse prevention, and basic security.</li>
               <li>Measure aggregate usage, such as quiz starts, completions, page views, and share clicks, only when analytics consent is enabled.</li>
@@ -92,9 +92,12 @@ export default function Privacy() {
           </section>
 
           <section className={sectionClass}>
-            <h2 className={headingClass}>Email capture and report delivery</h2>
+            <h2 className={headingClass}>Requested result email</h2>
             <p>
-              If you choose “Email this result,” we store your email, result/session identifiers, displayed summary fields (such as the MBTI-style pattern, DISC-style result, and primary role title), consent to send the summary, and delivery status. We use that record to send or queue the requested summary. A separate optional marketing consent exists in the data model, but this current result form submits it as false and does not sign you up for marketing.
+              If you choose “Email this result,” KnowYouRole stores your email address, result/session identifiers, the visible summary fields needed for the email (such as the MBTI-style pattern, DISC-style result, and primary role title), your explicit request to send the summary, and delivery status. Raw quiz answers are not included in the email-request record or the emailed summary.
+            </p>
+            <p>
+              This is a one-time result-delivery request, not marketing enrollment. Marketing consent is off by default and is not collected by this form. If result-email delivery is unavailable, the form tells you to use the existing PDF or sharing options instead of silently treating an email request as delivered.
             </p>
           </section>
 
@@ -122,7 +125,7 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Data deletion, export, and correction requests</h2>
             <p>
-              To request deletion, export, or correction, email <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline">info@knowyourole.com</a>. Include enough detail for us to locate your record, such as the email you used for report delivery or the result/session identifier if available. We may need to verify the request before acting on it.
+              To request deletion, export, or correction, email <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline">info@knowyourole.com</a>. Include enough detail for us to locate the relevant record, such as the result/session identifier if available. We may need to verify the request before acting on it.
             </p>
           </section>
 

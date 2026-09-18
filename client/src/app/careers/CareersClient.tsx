@@ -179,7 +179,7 @@ export default function CareersClient({ roles, loadError }: CareersClientProps) 
             {presentation.cta}
           </p>
           <Link
-            href="/"
+            href="/quiz"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-terracotta dark:bg-[#A78BFA] text-white font-medium text-sm transition-opacity hover:opacity-90"
             data-testid="link-take-quiz"
           >

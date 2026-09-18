@@ -27,7 +27,7 @@ export default function About() {
           </h2>
           <div className="space-y-3 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             <p>
-              <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of KnowYouRole, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person.
+              <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of KnowYouRole, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person. Questions or corrections: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline underline-offset-4">info@knowyourole.com</a>.
             </p>
           </div>
         </section>
@@ -83,7 +83,7 @@ export default function About() {
             </div>
           </div>
           <Link href="/methodology" className="mt-4 inline-block text-sm font-semibold text-terracotta dark:text-[#A78BFA] underline underline-offset-4">
-            Read the methodology
+            Read how results are formed
           </Link>
         </section>
 

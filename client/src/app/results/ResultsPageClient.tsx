@@ -2963,7 +2963,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
         throw new Error(errorMessage);
       }
       setLeadStatus("success");
-      setLeadMessage(data?.deliveryStatus === "sent" ? "Saved and sent. Check your inbox." : "Saved. Email delivery is queued or not configured yet.");
+      setLeadMessage("Sent. Check your inbox for your result summary.");
       trackKyrEvent("email_capture_completed", { result_page: "full_portrait", source: "batch4_result_cta", status: "success", delivery_status: data?.deliveryStatus || "unknown", mbti_type: mbtiType, primary_disc: primary });
     } catch (error) {
       setLeadStatus("error");

@@ -846,8 +846,8 @@ export default function QuizPage() {
               Building your Full Portrait
             </div>
             <h1 className="mb-3 text-3xl font-black tracking-tight">Analyzing<span className="analysis-dots" aria-hidden="true" /></h1>
-            <p className="mx-auto mb-7 max-w-xs text-sm leading-6 text-white/72">
-              Scoring your personality pattern, career fit, and role signals. Tiny robots are pretending this is very hard.
+            <p className="analysis-message mx-auto mb-7 max-w-sm text-sm leading-6 text-white/72" role="status" aria-live="polite">
+              Analyzing your 28 answers to build your work-style profile, career-fit signals, and role directions.
             </p>
 
             <div className="mb-5 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10" aria-label="Results analysis progress">
@@ -986,7 +986,7 @@ export default function QuizPage() {
               <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">
                 <h3 className="text-sm font-black text-white">Is this a free personality quiz?</h3>
                 <p className="mt-2 text-sm leading-6 text-white/60">
-                  Yes. The core quiz is free and focuses on personality, work style, communication, and career-fit insight.
+                  Yes. Everything on KnowYouRole today is free. Nothing is locked or paywalled right now, and your full result is included.
                 </p>
               </article>
               <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">

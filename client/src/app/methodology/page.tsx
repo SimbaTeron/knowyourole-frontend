@@ -114,6 +114,9 @@ export default function MethodologyPage() {
             <p className="mt-5 rounded-2xl border border-[#d9a441]/35 bg-[#fff5d8] p-4 text-sm leading-relaxed text-[#5a451a]">
               <strong>Important:</strong> research on the Big Five does not validate this exact 28-question KYR implementation, its weighting, or any individual role recommendation. We do not publish an accuracy percentage because we do not have evidence to support one.
             </p>
+            <p className="mt-5 text-sm leading-relaxed text-[#405f72]">
+              Ready to compare these ideas with your own answers? <Link href="/quiz" className="font-semibold text-[#315f74] underline underline-offset-4 hover:text-[#b64d35]">Take the free 28-question work-style quiz</Link> and use the result as one input to a real-world experiment.
+            </p>
           </section>
 
           <section className={cardClass}>
