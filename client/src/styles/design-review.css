@@ -1,0 +1,357 @@
+/*
+ * Five reversible visual directions for live-route review.
+ * The scope is deliberately gated by html:has(.kyr-design-review); no query parameter,
+ * no visual change. Application markup, scoring, and route behavior remain canonical.
+ */
+
+html:has(.kyr-design-review) {
+  --review-paper: #f8f4ea;
+  --review-surface: #fffdf8;
+  --review-ink: #12263a;
+  --review-muted: #607184;
+  --review-accent: #ffca42;
+  --review-line: rgba(18, 38, 58, 0.16);
+  --background: 43 48% 95%;
+  --foreground: 209 53% 15%;
+  --card: 43 64% 98%;
+  --card-foreground: 209 53% 15%;
+  --border: 209 26% 78%;
+  --primary: 209 53% 15%;
+  --primary-foreground: 43 48% 95%;
+  --secondary: 43 55% 88%;
+  --secondary-foreground: 209 53% 15%;
+  --muted: 43 28% 89%;
+  --muted-foreground: 209 18% 37%;
+  --accent: 43 100% 63%;
+  --accent-foreground: 209 53% 15%;
+  --ring: 43 100% 63%;
+  --font-sans: "Manrope", "Outfit", ui-sans-serif, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --radius: 0.9rem;
+  color-scheme: light;
+}
+
+html:has(.kyr-design-review) body {
+  background: var(--review-paper) !important;
+  color: var(--review-ink) !important;
+  font-family: var(--font-sans) !important;
+}
+
+html:has(.kyr-design-review) .kyr-page,
+html:has(.kyr-design-review) .kyr-home-page {
+  background: var(--review-paper) !important;
+  color: var(--review-ink) !important;
+  font-family: var(--font-sans) !important;
+}
+
+html:has(.kyr-design-review) .kyr-home-page .hero-section::before {
+  background: var(--review-hero) !important;
+}
+
+html:has(.kyr-design-review) .kyr-home-page .hero-section::after {
+  opacity: 0.36 !important;
+  background-image: var(--review-grid) !important;
+  background-size: var(--review-grid-size, 42px 42px) !important;
+}
+
+html:has(.kyr-design-review) .kyr-home-page .hero-title,
+html:has(.kyr-design-review) .kyr-home-page .section-title,
+html:has(.kyr-design-review) .kyr-home-page .sample-title,
+html:has(.kyr-design-review) .kyr-home-page .role-preview,
+html:has(.kyr-design-review) .kyr-home-page .testimonial-quote {
+  color: var(--review-ink) !important;
+  font-family: var(--font-serif) !important;
+}
+
+html:has(.kyr-design-review) .kyr-home-page .hero-subtitle,
+html:has(.kyr-design-review) .kyr-home-page .section-copy,
+html:has(.kyr-design-review) .kyr-home-page .model-description,
+html:has(.kyr-design-review) .kyr-home-page .step-copy,
+html:has(.kyr-design-review) .kyr-home-page .testimonial-person,
+html:has(.kyr-design-review) .kyr-home-page .person-role,
+html:has(.kyr-design-review) .kyr-home-page .full-results-note,
+html:has(.kyr-design-review) .kyr-home-page .footer-links,
+html:has(.kyr-design-review) .kyr-home-page .home-footer {
+  color: var(--review-muted) !important;
+}
+
+html:has(.kyr-design-review) .kyr-home-page .primary-cta,
+html:has(.kyr-design-review) button[class*="bg-"],
+html:has(.kyr-design-review) a[class*="bg-"] {
+  background: var(--review-cta) !important;
+  border-color: var(--review-ink) !important;
+  box-shadow: var(--review-button-shadow, none) !important;
+  color: var(--review-cta-text, var(--review-paper)) !important;
+}
+
+html:has(.kyr-design-review) .kyr-home-page .primary-cta:hover,
+html:has(.kyr-design-review) button[class*="bg-"]:hover,
+html:has(.kyr-design-review) a[class*="bg-"]:hover {
+  transform: translateY(-2px) !important;
+  filter: saturate(1.12) brightness(1.03);
+}
+
+html:has(.kyr-design-review) .kyr-home-page .secondary-cta,
+html:has(.kyr-design-review) .kyr-home-page .sample-card,
+html:has(.kyr-design-review) .kyr-home-page .model-card,
+html:has(.kyr-design-review) .kyr-home-page .how-card,
+html:has(.kyr-design-review) .kyr-home-page .testimonial-card,
+html:has(.kyr-design-review) .kyr-home-page .section-break-card,
+html:has(.kyr-design-review) [class*="bg-slate-"],
+html:has(.kyr-design-review) [class*="bg-zinc-"],
+html:has(.kyr-design-review) [class*="bg-neutral-"],
+html:has(.kyr-design-review) [class*="bg-gray-"] {
+  background: var(--review-surface) !important;
+  border-color: var(--review-line) !important;
+  box-shadow: var(--review-card-shadow, none) !important;
+}
+
+html:has(.kyr-design-review) .kyr-home-page .sample-card,
+html:has(.kyr-design-review) .kyr-home-page .model-card,
+html:has(.kyr-design-review) .kyr-home-page .how-card,
+html:has(.kyr-design-review) .kyr-home-page .testimonial-card,
+html:has(.kyr-design-review) [class*="border-"] {
+  border-color: var(--review-line) !important;
+}
+
+html:has(.kyr-design-review) [class*="text-white"],
+html:has(.kyr-design-review) [class*="text-slate-"],
+html:has(.kyr-design-review) [class*="text-zinc-"],
+html:has(.kyr-design-review) [class*="text-gray-"] {
+  color: var(--review-ink) !important;
+}
+
+html:has(.kyr-design-review) [class*="text-muted"],
+html:has(.kyr-design-review) [class*="text-neutral"] {
+  color: var(--review-muted) !important;
+}
+
+html:has(.kyr-design-review) input,
+html:has(.kyr-design-review) textarea,
+html:has(.kyr-design-review) select {
+  background: var(--review-surface) !important;
+  border-color: var(--review-line) !important;
+  color: var(--review-ink) !important;
+}
+
+/* Review controls: intentionally visible only while a design query parameter is active. */
+.kyr-design-review {
+  position: fixed;
+  z-index: 2147483000;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 28px);
+  padding: 9px 11px;
+  transform: translateX(-50%);
+  border: 1px solid var(--review-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--review-surface) 88%, transparent);
+  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.2);
+  backdrop-filter: blur(16px);
+  color: var(--review-ink);
+  font: 700 10px/1 "DM Mono", ui-monospace, monospace;
+}
+.kyr-design-review__identity { display: grid; gap: 4px; padding: 0 5px; white-space: nowrap; }
+.kyr-design-review__identity span { color: var(--review-muted); letter-spacing: .08em; text-transform: uppercase; }
+.kyr-design-review__identity strong { color: var(--review-ink); font: 700 10px/1 var(--font-sans); }
+.kyr-design-review__themes { display: flex; gap: 4px; }
+.kyr-design-review button,
+.kyr-design-review a { min-height: 30px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--review-muted); cursor: pointer; font: inherit; padding: 0 9px; text-decoration: none; display: inline-flex; align-items: center; }
+.kyr-design-review__themes button span,
+.kyr-design-review__themes a span { display: none; }
+.kyr-design-review__themes button.is-active,
+.kyr-design-review__themes a.is-active { border-color: var(--review-ink); background: var(--review-ink); color: var(--review-paper); }
+.kyr-design-review__exit { border-color: var(--review-line) !important; }
+.kyr-design-review__exit:hover { background: var(--review-accent) !important; color: var(--review-ink) !important; }
+
+/* 01 — WORKDAY: sunny, documentary, human. */
+html:has(.kyr-design-review--workday) {
+  --review-paper: #f8f3e8;
+  --review-surface: #fffdf8;
+  --review-ink: #12263a;
+  --review-muted: #536e82;
+  --review-accent: #ffca42;
+  --review-line: rgba(18, 38, 58, 0.18);
+  --review-hero: radial-gradient(circle at 75% 34%, rgba(255, 202, 66, .92) 0 11%, transparent 11.3%), linear-gradient(130deg, #9ed8e6 0 48%, #f8f3e8 48% 68%, #e98268 68% 100%);
+  --review-grid: linear-gradient(rgba(18, 38, 58, .12) 1px, transparent 1px), linear-gradient(90deg, rgba(18, 38, 58, .12) 1px, transparent 1px);
+  --review-cta: #12263a;
+  --review-cta-text: #f8f3e8;
+  --review-card-shadow: 8px 8px 0 rgba(18, 38, 58, .09);
+  --review-button-shadow: 4px 4px 0 #ffca42;
+}
+html:has(.kyr-design-review--workday) .kyr-home-page .hero-title { max-width: 650px; }
+html:has(.kyr-design-review--workday) .kyr-home-page .sample-card { transform: rotate(1.25deg); }
+html:has(.kyr-design-review--workday) .kyr-home-page .model-card:nth-child(2) { background: #12263a !important; }
+html:has(.kyr-design-review--workday) .kyr-home-page .model-card:nth-child(2) * { color: #f8f3e8 !important; }
+
+/* 02 — EVIDENCE: sharp, inspectable, deliberately unglamorous. */
+html:has(.kyr-design-review--evidence) {
+  --review-paper: #f4efe4;
+  --review-surface: #fbf8f0;
+  --review-ink: #1e1c19;
+  --review-muted: #655f55;
+  --review-accent: #d7503b;
+  --review-line: rgba(30, 28, 25, .22);
+  --review-hero: linear-gradient(90deg, rgba(30,28,25,.08) 1px, transparent 1px), linear-gradient(#fbf8f0, #f4efe4);
+  --review-grid: linear-gradient(rgba(30,28,25,.10) 1px, transparent 1px);
+  --review-grid-size: 100% 32px;
+  --review-cta: #1e1c19;
+  --review-cta-text: #fbf8f0;
+  --review-card-shadow: 6px 6px 0 #d7503b;
+  --review-button-shadow: none;
+  --font-sans: "DM Mono", ui-monospace, monospace;
+  --font-serif: "Space Grotesk", "DM Mono", sans-serif;
+  --radius: 0;
+}
+html:has(.kyr-design-review--evidence) .kyr-home-page .selected-pill::before { border-radius: 0; background: #d7503b; box-shadow: none; }
+html:has(.kyr-design-review--evidence) .kyr-home-page .model-card,
+html:has(.kyr-design-review--evidence) .kyr-home-page .how-card { border-left: 5px solid var(--review-accent) !important; }
+html:has(.kyr-design-review--evidence) .kyr-home-page .model-number::before { content: "EXHIBIT "; color: var(--review-accent); }
+
+/* 03 — STUDIO: loud material contrasts, creative confidence. */
+html:has(.kyr-design-review--studio) {
+  --review-paper: #f4f1ec;
+  --review-surface: #fffdfa;
+  --review-ink: #251928;
+  --review-muted: #745e75;
+  --review-accent: #ff4d8d;
+  --review-line: rgba(37, 25, 40, .20);
+  --review-hero: linear-gradient(122deg, #ff4d8d 0 29%, #ffca42 29% 51%, #157f90 51% 74%, #f4f1ec 74%);
+  --review-grid: radial-gradient(rgba(37,25,40,.18) 1px, transparent 1.2px);
+  --review-grid-size: 17px 17px;
+  --review-cta: #251928;
+  --review-cta-text: #fffdfa;
+  --review-card-shadow: 7px 7px 0 rgba(37, 25, 40, .18);
+  --review-button-shadow: 5px 5px 0 #ff4d8d;
+  --radius: 0;
+}
+html:has(.kyr-design-review--studio) .kyr-home-page .sample-card { transform: rotate(-1.4deg); }
+html:has(.kyr-design-review--studio) .kyr-home-page .model-card:nth-child(2) { transform: rotate(-1deg); }
+html:has(.kyr-design-review--studio) .kyr-home-page .model-card:nth-child(3) { transform: rotate(1deg); }
+html:has(.kyr-design-review--studio) .kyr-home-page .section-kicker { background: var(--review-accent); color: #251928 !important; display: inline-block; padding: 5px 8px; }
+
+/* 04 — SIMULATOR: system thinking, controlled clarity, no vaporwave. */
+html:has(.kyr-design-review--simulator) {
+  --review-paper: #edf4f4;
+  --review-surface: rgba(255, 255, 255, .84);
+  --review-ink: #0e1c2d;
+  --review-muted: #516a78;
+  --review-accent: #baff32;
+  --review-line: rgba(14, 28, 45, .18);
+  --review-hero: radial-gradient(circle at 76% 43%, #baff32 0 7%, #edf4f4 7.5% 15%, #144460 15.5% 16.5%, #edf4f4 17% 24%, #144460 24.5% 25.5%, transparent 26%), linear-gradient(#edf4f4, #e1efef);
+  --review-grid: linear-gradient(rgba(14,28,45,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(14,28,45,.10) 1px, transparent 1px);
+  --review-grid-size: 30px 30px;
+  --review-cta: #0e1c2d;
+  --review-cta-text: #edf4f4;
+  --review-card-shadow: 0 12px 36px rgba(14, 28, 45, .09);
+  --review-button-shadow: none;
+  --font-sans: "Space Grotesk", "Outfit", sans-serif;
+  --font-serif: "Space Grotesk", "Outfit", sans-serif;
+  --radius: 1rem;
+}
+html:has(.kyr-design-review--simulator) .kyr-home-page .model-card { border-top: 6px solid var(--review-accent) !important; }
+html:has(.kyr-design-review--simulator) .kyr-home-page .model-card:nth-child(2) { border-top-color: #3074a1 !important; }
+html:has(.kyr-design-review--simulator) .kyr-home-page .model-card:nth-child(3) { border-top-color: #e36b54 !important; }
+html:has(.kyr-design-review--simulator) .kyr-home-page .sample-card { border-radius: 28px !important; }
+
+/* 05 — DISPATCH: a personal report, not a dashboard. */
+html:has(.kyr-design-review--dispatch) {
+  --review-paper: #f5f0e7;
+  --review-surface: #fffdf8;
+  --review-ink: #1d2a42;
+  --review-muted: #5b6980;
+  --review-accent: #d56952;
+  --review-line: rgba(29, 42, 66, .18);
+  --review-hero: linear-gradient(90deg, transparent 9%, rgba(213,105,82,.20) 9.1%, transparent 9.25%), linear-gradient(135deg, #f5f0e7 0 52%, #e8dbbd 52%);
+  --review-grid: linear-gradient(rgba(29,42,66,.08) 1px, transparent 1px);
+  --review-grid-size: 100% 36px;
+  --review-cta: #1d2a42;
+  --review-cta-text: #f5f0e7;
+  --review-card-shadow: none;
+  --review-button-shadow: none;
+  --font-sans: "Manrope", "Outfit", sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --radius: .25rem;
+}
+html:has(.kyr-design-review--dispatch) .kyr-home-page .hero-section { min-height: 700px; }
+html:has(.kyr-design-review--dispatch) .kyr-home-page .model-card,
+html:has(.kyr-design-review--dispatch) .kyr-home-page .testimonial-card { border-width: 1px 0 0 !important; }
+html:has(.kyr-design-review--dispatch) .kyr-home-page .sample-card { background: #e8dbbd !important; }
+
+/* Home owns a dense, inline visual system. These overrides keep the actual section
+   structure while preventing inherited dark surfaces from defeating review contrast. */
+html:has(.kyr-design-review) .kyr-home-page .model-section,
+html:has(.kyr-design-review) .kyr-home-page .testimonial-section,
+html:has(.kyr-design-review) .kyr-home-page .home-footer {
+  background: var(--review-paper) !important;
+  color: var(--review-ink) !important;
+}
+html:has(.kyr-design-review) .kyr-home-page .how-card,
+html:has(.kyr-design-review) .kyr-home-page .how-list,
+html:has(.kyr-design-review) .kyr-home-page .how-step,
+html:has(.kyr-design-review) .kyr-home-page .metric-box {
+  background: var(--review-surface) !important;
+  border-color: var(--review-line) !important;
+}
+html:has(.kyr-design-review) .kyr-home-page .model-card *,
+html:has(.kyr-design-review) .kyr-home-page .how-card *,
+html:has(.kyr-design-review) .kyr-home-page .how-list *,
+html:has(.kyr-design-review) .kyr-home-page .how-step *,
+html:has(.kyr-design-review) .kyr-home-page .testimonial-card *,
+html:has(.kyr-design-review) .kyr-home-page .home-footer * {
+  color: var(--review-ink) !important;
+}
+html:has(.kyr-design-review) .kyr-home-page .model-card:nth-child(2) *,
+html:has(.kyr-design-review) .kyr-home-page .model-card:nth-child(2) .model-description {
+  color: var(--review-card-contrast, var(--review-ink)) !important;
+}
+html:has(.kyr-design-review--workday) .kyr-home-page .model-card:nth-child(2) *,
+html:has(.kyr-design-review--workday) .kyr-home-page .model-card:nth-child(2) .model-description {
+  color: #f8f3e8 !important;
+}
+
+/* The active quiz is a self-contained dark-mysterious surface. Re-skin its existing
+   cards and answer controls instead of creating a second quiz implementation. */
+html:has(.kyr-design-review) .dark-mysterious {
+  background: var(--review-paper) !important;
+  color: var(--review-ink) !important;
+}
+html:has(.kyr-design-review) .dark-mysterious [class*="bg-"],
+html:has(.kyr-design-review) .dark-mysterious [style*="background"] {
+  background: var(--review-surface) !important;
+  background-image: none !important;
+  border-color: var(--review-line) !important;
+  box-shadow: var(--review-card-shadow, none) !important;
+}
+html:has(.kyr-design-review) .dark-mysterious [class*="text-"],
+html:has(.kyr-design-review) .dark-mysterious h1,
+html:has(.kyr-design-review) .dark-mysterious h2,
+html:has(.kyr-design-review) .dark-mysterious h3,
+html:has(.kyr-design-review) .dark-mysterious p,
+html:has(.kyr-design-review) .dark-mysterious span {
+  color: var(--review-ink) !important;
+}
+html:has(.kyr-design-review) .dark-mysterious button {
+  border-color: var(--review-line) !important;
+}
+html:has(.kyr-design-review) .dark-mysterious button:hover,
+html:has(.kyr-design-review) .dark-mysterious button:focus-visible {
+  background: var(--review-accent) !important;
+  color: var(--review-ink) !important;
+}
+
+@media (max-width: 760px) {
+  .kyr-design-review { gap: 4px; padding: 7px; }
+  .kyr-design-review__identity { display: none; }
+  .kyr-design-review__themes button,
+  .kyr-design-review__themes a { min-width: 30px; padding: 0 7px; font-size: 0; }
+  .kyr-design-review__themes button span,
+  .kyr-design-review__themes a span { display: inline; font-size: 10px; }
+  .kyr-design-review__exit { font-size: 0 !important; min-width: 30px; }
+  .kyr-design-review__exit::after { content: "×"; font-size: 16px; }
+  html:has(.kyr-design-review) .kyr-home-page .hero-section { min-height: auto; }
+  html:has(.kyr-design-review--simulator) .kyr-home-page .hero-section { padding-bottom: 280px; }
+}

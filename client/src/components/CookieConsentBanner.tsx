@@ -140,12 +140,15 @@ export function CookieConsentBanner() {
     setShowPreferences(false);
   };
 
+  // Results are decision content. A translucent, fixed bottom sheet obscured the
+  // direction card on small screens; consent must clearly own the interaction or
+  // stay out of the way—not create an unreadable layer collision.
   const shellClassName = isResultsRoute
-    ? "fixed bottom-0 left-0 right-0 z-[9000] px-3 pb-[calc(10px+env(safe-area-inset-bottom,0px))] pt-2 pointer-events-none sm:p-4"
+    ? "fixed inset-0 z-[9000] flex items-end justify-center bg-[#12263a]/65 px-3 pb-[calc(10px+env(safe-area-inset-bottom,0px))] pt-3 backdrop-blur-sm pointer-events-none sm:p-4"
     : "fixed bottom-0 left-0 right-0 z-[9000] p-4 pointer-events-none";
 
   const panelClassName = isResultsRoute
-    ? "mx-auto max-w-md rounded-2xl border border-[#12263a]/20 bg-[#fffdf8]/95 p-3 text-[#12263a] shadow-2xl backdrop-blur-xl pointer-events-auto max-h-[42dvh] overflow-y-auto sm:max-h-[min(72dvh,420px)] sm:p-5"
+    ? "mx-auto w-full max-w-md rounded-2xl border border-[#12263a]/20 bg-[#fffdf8] p-3 text-[#12263a] shadow-2xl pointer-events-auto max-h-[calc(100dvh-1.5rem)] overflow-y-auto sm:max-h-[min(72dvh,420px)] sm:p-5"
     : "mx-auto max-w-2xl rounded-2xl border border-[#12263a]/20 bg-[#fffdf8]/95 p-5 text-[#12263a] shadow-2xl backdrop-blur-xl pointer-events-auto";
 
   const primaryActionsClassName = isResultsRoute

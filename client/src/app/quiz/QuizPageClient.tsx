@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import PathCanvas from "@/components/PathCanvas";
 import Quiz, { QuizScores } from "@/components/Quiz";
@@ -30,6 +30,7 @@ export default function QuizPage() {
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
   const [quizSessionId, setQuizSessionId] = useState<string | null>(null);
+  const quizSessionIdRef = useRef<string | null>(null);
   const [apiScales, setApiScales] = useState<APIScales | null>(null);
   const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>([]);
   const [hybridTypes, setHybridTypes] = useState<string[]>([]);
@@ -85,6 +86,26 @@ export default function QuizPage() {
   const funMode = storedFunMode ?? sessionFunMode;
   const landmark = storedLandmark ? { landmark: storedLandmark } : sessionLandmark;
 
+  const handleQuizStarted = () => {
+    setIsQuizInProgress(true);
+    if (quizSessionIdRef.current) return;
+
+    const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    quizSessionIdRef.current = sessionId;
+    setQuizSessionId(sessionId);
+    sessionStorage.setItem("kyr_active_quiz_session_id", sessionId);
+
+    // This records a server timestamp. It is intentionally not derived from the
+    // device clock, which is not suitable for analytics.
+    void fetch("/api/quiz/session/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, tier: ageTier, mood, funMode }),
+    }).catch((error) => {
+      console.warn("[Quiz session] start timestamp was not recorded", error);
+    });
+  };
+
   // Handle donation return - restore state from localStorage and show results on Page 3
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -107,6 +128,7 @@ export default function QuizPage() {
             setStoredMood(state.mood);
             setStoredFunMode(state.funMode);
             setStoredLandmark(state.landmark);
+            quizSessionIdRef.current = state.sessionId;
             setQuizSessionId(state.sessionId);
             setApiScales(state.apiScales);
             setEarnedBadges(state.earnedBadges || []);
@@ -199,6 +221,12 @@ export default function QuizPage() {
       }
 
       sessionStorage.setItem("kyr_result_dto", JSON.stringify(data.result));
+      // The anonymous capability is intentionally browser-session scoped. It authorizes
+      // result-linked actions (such as pilot feedback) without exposing result rows to
+      // the public Supabase API or treating an arbitrary session ID as authorization.
+      if (typeof data.anonymousDeletionCapability === "string" && data.anonymousDeletionCapability.length >= 40 && data.result.meta?.sessionId) {
+        sessionStorage.setItem(`kyr_anonymous_result_capability:${data.result.meta.sessionId}`, data.anonymousDeletionCapability);
+      }
       const persistenceOk = data.persistence?.ok === true;
       trackKyrEvent(persistenceOk ? "quiz_result_persisted" : "quiz_result_computed_unpersisted", {
         tier: ageTier,
@@ -238,7 +266,7 @@ export default function QuizPage() {
     // Only the server-returned DTO can cross the completion boundary. The locally
     // accumulated scores are UI progress data and are deliberately never rendered
     // as a live result.
-    const canonicalResult = await computeAndStoreResultDTO(scores, null);
+    const canonicalResult = await computeAndStoreResultDTO(scores, quizSessionIdRef.current);
     if (!canonicalResult) {
       setIsAnalyzingResults(false);
       toast({
@@ -250,6 +278,7 @@ export default function QuizPage() {
     }
 
     const sessionId = canonicalResult.meta.sessionId;
+    quizSessionIdRef.current = sessionId;
     setQuizSessionId(sessionId);
 
     trackKyrEvent("conversion_results_handoff", {
@@ -268,6 +297,7 @@ export default function QuizPage() {
   const handleQuizExit = () => {
     // Clear all session data and go to home
     sessionStorage.clear();
+    quizSessionIdRef.current = null;
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
@@ -278,6 +308,7 @@ export default function QuizPage() {
 
   const handleRestart = () => {
     sessionStorage.clear();
+    quizSessionIdRef.current = null;
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
@@ -943,7 +974,7 @@ export default function QuizPage() {
           theme={theme}
           onComplete={handleQuizComplete}
           onExit={handleQuizExit}
-          onQuizStarted={() => setIsQuizInProgress(true)}
+          onQuizStarted={handleQuizStarted}
         />
 
         {!isQuizInProgress && <section

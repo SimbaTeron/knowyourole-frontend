@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
 import { requireAuth } from "@/app/api/_lib/auth";
+import { summarizePersistedQuizResult, type PersistedQuizResultRow } from "@/lib/results/persistedQuizResult";
 
 export const dynamic = "force-dynamic";
+const RESULT_COLUMNS = "id,user_id,session_id,responses,created_at,updated_at,deleted";
 
-// Legacy session enumeration is now account-scoped. Anonymous results are never
-// enumerable; they can only be accessed through their capability-protected item route.
+// Account-scoped result enumeration. Anonymous results remain capability-only.
 export const GET = requireAuth(async (req: NextRequest, ctx) => {
   const { searchParams } = new URL(req.url);
   const requestedLimit = Number.parseInt(searchParams.get("limit") ?? "10", 10);
@@ -15,7 +16,7 @@ export const GET = requireAuth(async (req: NextRequest, ctx) => {
 
   const { data, error, count } = await getSupabaseAdmin()
     .from("quiz_results")
-    .select("*", { count: "exact" })
+    .select(RESULT_COLUMNS, { count: "exact" })
     .eq("user_id", ctx.user.sub)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
@@ -23,7 +24,17 @@ export const GET = requireAuth(async (req: NextRequest, ctx) => {
     console.error("[quiz sessions] account query failed", error);
     return NextResponse.json({ error: "Failed to fetch sessions" }, { status: 500, headers: { "Cache-Control": "no-store" } });
   }
-  return NextResponse.json({ sessions: data ?? [], total: count ?? 0, limit, offset }, { headers: { "Cache-Control": "no-store" } });
+
+  const sessions = (data ?? []).flatMap((row) => {
+    try {
+      const summary = summarizePersistedQuizResult(row as PersistedQuizResultRow);
+      return summary.deleted ? [] : [summary];
+    } catch (readError) {
+      console.error("[quiz sessions] invalid canonical result", { id: row.id, error: readError });
+      return [];
+    }
+  });
+  return NextResponse.json({ sessions, total: count ?? 0, limit, offset }, { headers: { "Cache-Control": "no-store" } });
 });
 
 // Canonical result persistence is POST /api/results/compute. This route formerly

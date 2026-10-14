@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
 import { getOptionalAuthUser } from "@/app/api/_lib/auth";
 import { createAnonymousCapability } from "@/app/api/_lib/anonymous-result-capability";
-import { buildResultDTO, validateResultDTO, type BuildResultDTOInput, type ResultDTO } from "@/lib/results/buildResultDTO";
+import { buildResultDTO, type BuildResultDTOInput, type ResultDTO } from "@/lib/results/buildResultDTO";
+import { readPersistedQuizResultDTO } from "@/lib/results/persistedQuizResult";
+import { buildQuizResultReportingProjection } from "@/lib/results/quizResultReportingProjection";
 import type { ScoresData } from "@/lib/scoring";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
 import {
@@ -199,9 +201,9 @@ async function persistResultDTOSafely(result: ResultDTO): Promise<
 async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string): Promise<{ ok: true; resultId: string; persistenceAttemptId: string; created: boolean; result: ResultDTO }> {
   const supabase = getSupabaseAdmin();
 
-  // Maintain the existing schema contract first: create/ensure quiz_sessions,
-  // then insert quiz_results. The full canonical DTO is stored in responses.dto
-  // until dedicated jsonb columns/migrations are added.
+  // Ensure the session exists without resetting an already-recorded server start.
+  // Direct/API callers that bypass the browser start endpoint retain a null start
+  // rather than receiving a fabricated duration.
   const { error: sessionError } = await supabase
     .from("quiz_sessions")
     .upsert({
@@ -212,11 +214,20 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
       fun_mode: result.raw.funMode ?? false,
       landmark: result.raw.locality?.landmark ?? null,
       theme: result.raw.locality?.theme ?? "compass",
-    }, { onConflict: "id" });
+    }, { onConflict: "id", ignoreDuplicates: true });
 
   if (sessionError) {
     console.error("[POST /api/results/compute] quiz_sessions upsert failed", { persistenceAttemptId, error: sessionError });
     throw new Error(`Failed to persist quiz session: ${sessionError.message}`);
+  }
+
+  const { data: sessionRecord, error: sessionLookupError } = await supabase
+    .from("quiz_sessions")
+    .select("started_at")
+    .eq("id", result.meta.sessionId)
+    .maybeSingle();
+  if (sessionLookupError) {
+    throw new Error(`Failed to retrieve quiz session timing: ${sessionLookupError.message}`);
   }
 
   // Idempotency guard: a browser retry must not create another result for the
@@ -242,37 +253,27 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
     };
   }
 
-  const now = new Date().toISOString();
-  const primary = result.careerMatches[0];
-  const secondary = result.careerMatches[1];
+  // The DTO is canonical; these reporting columns are server-derived snapshots
+  // for admin exports and analysis, never browser-controlled score inputs.
+  const reportingProjection = buildQuizResultReportingProjection(result);
+  const completedAt = new Date().toISOString();
+  const startedAt = sessionRecord?.started_at ?? null;
+  const quizDurationSeconds = startedAt
+    ? Math.max(0, Math.round((Date.parse(completedAt) - Date.parse(startedAt)) / 1000))
+    : null;
   const { error: resultError } = await supabase
     .from("quiz_results")
     .insert({
       id: result.meta.resultId,
       user_id: result.meta.userId,
       session_id: result.meta.sessionId,
-      tier: result.raw.tier,
-      mood: result.raw.mood ?? null,
-      fun_mode: result.raw.funMode ?? false,
-      landmark: result.raw.locality?.landmark ?? null,
-      mbti_type: result.scores.mbti.type,
-      mbti_blend: `${result.scores.mbti.type}-${result.scores.disc.primary}`,
-      disc_style: result.scores.disc.primary,
-      primary_role_title: primary?.title ?? null,
-      secondary_role_title: secondary?.title ?? null,
-      big_five_o: result.scores.bigFive.traits.O.normalized,
-      big_five_c: result.scores.bigFive.traits.C.normalized,
-      big_five_e: result.scores.bigFive.traits.E.normalized,
-      big_five_a: result.scores.bigFive.traits.A.normalized,
-      big_five_n: result.scores.bigFive.traits.N.normalized,
-      critical_thinking: readNumericExtension(result, "criticalThinking"),
-      first_principles: readNumericExtension(result, "firstPrinciples"),
-      total_questions: result.audit.scoringAudit?.totalQuestions ?? result.raw.responses.length,
-      avg_response_time: result.scores.adaptive.averageResponseTime ?? null,
-      engagement_score: readNumericExtension(result, "engagement"),
       created_at: result.meta.createdAt,
-      updated_at: now,
+      updated_at: completedAt,
+      quiz_started_at: startedAt,
+      quiz_completed_at: completedAt,
+      quiz_duration_seconds: quizDurationSeconds,
       deleted: false,
+      ...reportingProjection,
       responses: {
         raw: result.raw.responses,
         dto: result,
@@ -313,18 +314,22 @@ async function persistResultDTO(result: ResultDTO, persistenceAttemptId: string)
     throw new Error(`Failed to persist quiz result: ${resultError.message}`);
   }
 
+  const { error: completionSessionError } = await supabase
+    .from("quiz_sessions")
+    .update({ completed_at: completedAt })
+    .eq("id", result.meta.sessionId);
+  if (completionSessionError) {
+    // The immutable result already carries the completion timestamp. Do not turn
+    // a successful result into a client-visible failure over a redundant session
+    // lifecycle projection; retain the server log for operational follow-up.
+    console.error("[POST /api/results/compute] quiz session completion update failed", { persistenceAttemptId, error: completionSessionError });
+  }
+
   return { ok: true, resultId: result.meta.resultId, persistenceAttemptId, created: true, result };
 }
 
 function readPersistedResultDTO(responses: unknown, resultId: string): ResultDTO {
-  const dto = responses && typeof responses === "object" && !Array.isArray(responses)
-    ? (responses as { dto?: unknown }).dto
-    : undefined;
-  const validation = validateResultDTO(dto);
-  if (!validation.ok) {
-    throw new Error(`Existing result ${resultId} does not contain a valid canonical DTO`);
-  }
-  return dto as ResultDTO;
+  return readPersistedQuizResultDTO({ id: resultId, responses });
 }
 
 async function issueAnonymousCapability(sessionId: string): Promise<{ token: string; expiresAt: string } | null> {
@@ -348,10 +353,4 @@ function normalizeSource(value: unknown): BuildResultDTOInput["source"] {
 function normalizeVisibility(value: unknown, userId: unknown): BuildResultDTOInput["visibility"] {
   if (value === "premium" || value === "admin" || value === "authenticated" || value === "anonymous") return value;
   return typeof userId === "string" && userId ? "authenticated" : "anonymous";
-}
-
-function readNumericExtension(result: ResultDTO, key: "criticalThinking" | "firstPrinciples" | "engagement"): number | null {
-  const legacy = result.scores.extensions?.legacyAdvanced as Record<string, unknown> | undefined;
-  const value = legacy?.[key];
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
