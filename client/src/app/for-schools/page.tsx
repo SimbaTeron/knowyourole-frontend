@@ -18,7 +18,7 @@ export default function ForSchoolsPage() {
     <div className="min-h-screen bg-[#fffaf0] text-[#12263a]">
       <AppHeader />
       <main className="mx-auto max-w-5xl px-4 pb-16 pt-28 sm:px-6 sm:pb-20 sm:pt-36">
-        <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#b64d35]">For schools, counselors & educators</p>
+        <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#a3402b]">For schools, counselors & educators</p>
         <h1 className="mt-4 max-w-4xl font-display text-4xl font-bold leading-[0.98] tracking-[-0.05em] sm:text-6xl">A short, structured way to start a better student conversation.</h1>
         <p className="mt-6 max-w-3xl text-lg leading-relaxed text-[#405f72] sm:text-xl">
           KnowYouRole is a free work-style reflection and career-exploration tool. In about 15 minutes, students answer 28 fixed questions and receive practical language they can discuss with a counselor, teacher, parent, or caregiver.
@@ -27,7 +27,7 @@ export default function ForSchoolsPage() {
         <section className="mt-12 grid gap-4 sm:grid-cols-2" aria-label="How KnowYouRole is intended to be used">
           {principles.map(([title, body], index) => (
             <article key={title} className="rounded-3xl border border-[#12263a]/12 bg-white/75 p-6 shadow-[0_14px_35px_rgba(18,38,58,0.06)] sm:p-7">
-              <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f7eddc] text-sm font-extrabold text-[#b64d35]">0{index + 1}</span>
+              <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f7eddc] text-sm font-extrabold text-[#a3402b]">0{index + 1}</span>
               <h2 className="mt-5 font-display text-2xl font-bold tracking-[-0.025em]">{title}</h2>
               <p className="mt-3 text-sm leading-relaxed text-[#405f72]">{body}</p>
             </article>

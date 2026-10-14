@@ -40,7 +40,7 @@ export default function BuildPage() {
     <div className="min-h-screen bg-[#fffaf0] text-[#12263a]">
       <header className="sticky top-0 z-50 border-b border-[#12263a]/10 bg-[#fffaf0]/90 px-4 py-4 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
-          <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm font-semibold text-[#315f74] underline-offset-4 transition hover:text-[#b64d35] hover:underline">
+          <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm font-semibold text-[#315f74] underline-offset-4 transition hover:text-[#a3402b] hover:underline">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to KnowYouRole
           </Link>
           <Link href="/quiz" className="inline-flex min-h-11 items-center rounded-full bg-[#12263a] px-4 text-sm font-bold !text-white transition hover:bg-[#24455c]">
@@ -50,13 +50,13 @@ export default function BuildPage() {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-        <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#b64d35]">Build case study</p>
+        <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#a3402b]">Build case study</p>
         <h1 className="mt-3 max-w-4xl font-display text-4xl font-bold leading-[0.98] tracking-[-0.05em] sm:text-6xl">Building a career-reflection product that refuses to pretend it has all the answers.</h1>
         <p className="mt-6 max-w-3xl text-lg leading-relaxed text-[#405f72] sm:text-xl">KnowYouRole is a public product experiment in turning self-reported work preferences into practical reflection—while making the system, its limits, and its data responsibilities visible enough to inspect.</p>
 
         <section className="mt-12 grid gap-4 sm:grid-cols-2" aria-label="Build overview">
           {sections.map(({ icon: Icon, title, body }) => <article key={title} className="rounded-3xl border border-[#12263a]/12 bg-white/75 p-6 shadow-[0_14px_35px_rgba(18,38,58,0.06)]">
-            <Icon className="h-6 w-6 text-[#b64d35]" aria-hidden="true" />
+            <Icon className="h-6 w-6 text-[#a3402b]" aria-hidden="true" />
             <h2 className="mt-4 font-display text-2xl font-bold">{title}</h2>
             <p className="mt-3 text-sm leading-relaxed text-[#405f72]">{body}</p>
           </article>)}
@@ -70,10 +70,10 @@ export default function BuildPage() {
         </section>
 
         <section className="mt-12">
-          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#b64d35]">Difficult decisions</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#a3402b]">Difficult decisions</p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.035em] sm:text-4xl">What was deliberately not optimized away</h2>
           <div className="mt-6 space-y-4">
-            {decisions.map(([title, body], index) => <article key={title} className="grid gap-3 rounded-2xl border border-[#12263a]/12 bg-white/70 p-5 sm:grid-cols-[3rem_1fr] sm:p-6"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f7eddc] font-bold text-[#b64d35]">{index + 1}</span><div><h3 className="font-display text-xl font-bold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#405f72]">{body}</p></div></article>)}
+            {decisions.map(([title, body], index) => <article key={title} className="grid gap-3 rounded-2xl border border-[#12263a]/12 bg-white/70 p-5 sm:grid-cols-[3rem_1fr] sm:p-6"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f7eddc] font-bold text-[#a3402b]">{index + 1}</span><div><h3 className="font-display text-xl font-bold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#405f72]">{body}</p></div></article>)}
           </div>
         </section>
 

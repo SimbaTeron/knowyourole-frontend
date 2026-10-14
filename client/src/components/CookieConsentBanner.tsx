@@ -231,7 +231,7 @@ export function CookieConsentBanner() {
                           aria-label={`${consent[key] ? "Disable" : "Enable"} ${label}`}
                           aria-pressed={consent[key]}
                           onClick={() => setConsent((prev) => ({ ...prev, [key]: !prev[key] }))}
-                          className={`flex h-7 w-12 items-center rounded-full p-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b64d35] ${consent[key] ? "justify-end bg-[#315f74]" : "justify-start bg-[#9eb3bd]"}`}
+                          className={`flex h-7 w-12 items-center rounded-full p-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a3402b] ${consent[key] ? "justify-end bg-[#315f74]" : "justify-start bg-[#9eb3bd]"}`}
                         >
                           <span className="h-5 w-5 rounded-full bg-white shadow" />
                         </button>

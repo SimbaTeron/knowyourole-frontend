@@ -78,7 +78,7 @@ export default function Privacy() {
               id="cookie-preferences"
               type="button"
               onClick={openCookiePreferences}
-              className="mt-2 rounded-full border border-[#00C8FF]/40 px-4 py-2 text-sm font-semibold text-[#00C8FF] hover:bg-[#00C8FF]/10"
+              className="mt-2 rounded-full border border-[#315f74]/40 px-4 py-2 text-sm font-semibold text-[#1f5b70] hover:bg-[#315f74]/10"
             >
               Manage cookie preferences
             </button>

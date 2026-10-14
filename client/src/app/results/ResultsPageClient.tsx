@@ -5008,11 +5008,11 @@ function OrbitalGlassV2Results({
         .glass-tile { border-radius:3px !important; } .type-chip,.chip { border-color:rgba(18,38,58,.18) !important; background:#eaf5f6 !important; color:#12263a !important; }
         .shareline p,.detail-card p,.detail-head p,.mini-role span,.lane-card p,.result-link span span,.stat span,.meter-top,.quad span { color:#456174 !important; }
         .role-card { border-radius:3px !important; background:linear-gradient(135deg,#ffca42,#f8df9a) !important; color:#12263a !important; box-shadow:5px 5px 0 #c95f46 !important; }
-        .mini-stats .stat { border-color:rgba(18,38,58,.16) !important; background:#12263a !important; color:#fffdf8 !important; border-radius:3px !important; } .mini-stats .stat span { color:#dcedf0 !important; }
+        .mini-stats .stat { border-color:rgba(18,38,58,.16) !important; background:#12263a !important; color:#fffdf8 !important; border-radius:3px !important; } .mini-stats .stat span { color:#dcedf0 !important; } .mini-stats .stat small { color:#9fd8e6 !important; }
         .result-link { border-radius:3px !important; } .result-link:hover { background:#fff3d7 !important; transform:translate(-2px,-2px); box-shadow:6px 6px 0 rgba(18,38,58,.14) !important; }
         .detail-head h2,.orb-h1,.share-preview h2 { font-family:Fraunces,Georgia,serif !important; color:#12263a !important; }
         .analogy,.share-preview { border-color:rgba(18,38,58,.18) !important; background:#eaf5f6 !important; color:#29495c !important; }
-        .analogy b { color:#c95f46 !important; } .bar { border-color:rgba(18,38,58,.15) !important; background:#e7e1d5 !important; } .fill { background:linear-gradient(90deg,var(--accent),#ffca42) !important; }
+        .analogy b { color:#a3402b !important; } .bar { border-color:rgba(18,38,58,.15) !important; background:#e7e1d5 !important; } .fill { background:linear-gradient(90deg,var(--accent),#ffca42) !important; }
         .disc-grid { border-color:rgba(18,38,58,.18) !important; } .quad { background:#fffdf8 !important; } .quad.active { background:linear-gradient(135deg,#dcedf0,#fff0c8) !important; }
         .lane-preview span,.lane-roles span { border-color:rgba(18,38,58,.18) !important; background:#fff0c8 !important; color:#12263a !important; }
         .bottom-nav { border-color:rgba(18,38,58,.2) !important; background:#fffdf8 !important; box-shadow:5px 5px 0 rgba(18,38,58,.12) !important; } .bottom-nav button.active { color:#12263a !important; background:#ffca42 !important; }
