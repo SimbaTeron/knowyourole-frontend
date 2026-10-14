@@ -368,8 +368,7 @@ export function calculatePersonality(data: Record<string, unknown>) {
   const cleanMbti = mbtiType
     .replace(/X/g, (_, i) => {
       const pairs = [["E", "I"], ["S", "N"], ["T", "F"], ["J", "P"]];
-      const idx = mbtiType.indexOf("X");
-      const pair = pairs[idx];
+      const pair = pairs[i];
       return mbti[pair[0] as keyof typeof mbti] >= mbti[pair[1] as keyof typeof mbti] ? pair[0] : pair[1];
     });
 

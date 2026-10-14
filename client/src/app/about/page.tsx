@@ -1,21 +1,14 @@
 'use client';
 
 import Link from "next/link";
-import { ArrowLeft, Brain, Target, Users, BookOpen, Heart } from "lucide-react";
+import { Brain, Target, Users, BookOpen, Heart } from "lucide-react";
+import { AppHeader } from "@/components/layout/AppHeader";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-soft-cream dark:bg-[#0A0A12] text-warm-gray dark:text-[#F8FAFC]">
-      <header className="sticky top-0 z-50 px-6 py-4 bg-soft-cream/90 dark:bg-[#0A0A12]/90 backdrop-blur-sm border-b border-warm-gray/10 dark:border-[#A78BFA]/10">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 text-sm text-warm-gray/70 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-back-home">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-12">
+    <div className="workday-simple-page min-h-screen bg-soft-cream text-warm-gray">
+      <AppHeader />
+      <main className="workday-simple-wrap max-w-2xl px-6 py-32">
         <h1 className="text-3xl font-display font-bold mb-6" data-testid="text-about-title">About KnowYouRole</h1>
 
         <section className="space-y-4 mb-10">
@@ -34,10 +27,7 @@ export default function About() {
           </h2>
           <div className="space-y-3 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             <p>
-              <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of KnowYouRole, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person.
-            </p>
-            <p className="text-sm">
-              No stock headshot, fake team photo, or placeholder bio is shown here. Founder imagery can be added later if a real image is provided.
+              <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of KnowYouRole, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person. Questions or corrections: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline underline-offset-4">info@knowyourole.com</a>.
             </p>
           </div>
         </section>
@@ -63,7 +53,7 @@ export default function About() {
             Mission
           </h2>
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            KnowYouRole's mission is to help people understand their strengths, friction points, communication style, and career-fit themes earlier — so they can make better decisions with more self-awareness and less guesswork.
+            KnowYouRole's mission is to help people understand their strengths, friction points, communication style, and career-fit themes earlier, so they can make better decisions with more self-awareness and less guesswork.
           </p>
         </section>
 
@@ -76,7 +66,7 @@ export default function About() {
             <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
               <h3 className="font-semibold mb-1">Big Five backbone</h3>
               <p className="text-sm text-warm-gray/70 dark:text-[#94A3B8]">
-                The Big Five is used as the strongest research-backed trait layer in the product.
+                The Big Five provides the most research-informed trait language in the product. That research does not validate every KYR score or career suggestion.
               </p>
             </div>
             <div className="p-4 rounded-xl bg-warm-gray/5 dark:bg-white/5 border border-warm-gray/10 dark:border-[#A78BFA]/10">
@@ -93,7 +83,7 @@ export default function About() {
             </div>
           </div>
           <Link href="/methodology" className="mt-4 inline-block text-sm font-semibold text-terracotta dark:text-[#A78BFA] underline underline-offset-4">
-            Read the methodology
+            Read how results are formed
           </Link>
         </section>
 

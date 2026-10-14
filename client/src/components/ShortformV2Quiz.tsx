@@ -1,12 +1,14 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, ChevronLeft, Sparkles, X } from "lucide-react";
 import type { QuizScores } from "./Quiz";
 import { CAREER_SCORE_KEYS, SHORTFORM_V2_QUESTIONS, type CareerKey, type ShortformV2Answer } from "@/data/shortformV2Questions";
 import { trackKyrEvent } from "@/lib/analytics";
+import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
+import { recomputeShortformV2ScoreMaps, validateShortformV2Responses } from "@/lib/quiz/shortformV2Scoring";
 
 type TierValue = "13-18" | "19-25" | "25+" | "25plus" | "7-12";
 
@@ -18,6 +20,7 @@ interface ShortformV2QuizProps {
   theme: string;
   onComplete: (scores: QuizScores) => void;
   onExit: () => void;
+  onQuizStarted?: () => void;
 }
 
 const INITIAL_CAREER = CAREER_SCORE_KEYS.reduce((acc, key) => {
@@ -61,31 +64,31 @@ type TimelineSection = {
 
 const GROUP_TIMELINE_META: Record<string, Pick<TimelineSection, "label" | "color" | "glow" | "gradient">> = {
   "Core operating style": {
-    label: "Core",
+    label: "Foundations",
     color: "#67e8f9",
     glow: "rgba(103,232,249,0.72)",
     gradient: "linear-gradient(90deg, #67e8f9, #60a5fa, #a78bfa)",
   },
   "Big Five backbone": {
-    label: "Big 5",
+    label: "Work patterns",
     color: "#5eead4",
     glow: "rgba(94,234,212,0.68)",
     gradient: "linear-gradient(90deg, #6ee7b7, #5eead4, #67e8f9)",
   },
   "DISC work behavior": {
-    label: "DISC",
+    label: "Team rhythms",
     color: "#fbbf24",
     glow: "rgba(251,191,36,0.65)",
     gradient: "linear-gradient(90deg, #fde68a, #fb923c, #fb7185)",
   },
   "Career-fit vector": {
-    label: "Career",
+    label: "Work preferences",
     color: "#f0abfc",
     glow: "rgba(240,171,252,0.66)",
     gradient: "linear-gradient(90deg, #f0abfc, #a78bfa, #67e8f9)",
   },
   Calibration: {
-    label: "Final",
+    label: "Final reflections",
     color: "#fff7ed",
     glow: "rgba(255,247,237,0.55)",
     gradient: "linear-gradient(90deg, #ffffff, #cffafe, #fde68a)",
@@ -148,12 +151,52 @@ function calculateDifficulty(times: number[], average: number): "easy" | "medium
   return "easy";
 }
 
-export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete, onExit }: ShortformV2QuizProps) {
+function rebuildScoresFromResponses(responses: QuizScores["responses"]): QuizScores {
+  let rebuilt: QuizScores = {
+    ...INITIAL_SCORES,
+    mbti: { ...INITIAL_SCORES.mbti },
+    disc: { ...INITIAL_SCORES.disc },
+    bigFive: { ...INITIAL_SCORES.bigFive },
+    career: { ...INITIAL_CAREER },
+    responses: [],
+    swipeTimes: [],
+    hybridTypes: [],
+  };
+
+  for (const response of responses) {
+    const question = SHORTFORM_V2_QUESTIONS.find((item) => item.id === response.questionId);
+    const answer = question?.answers[response.choice];
+    if (!question || !answer) continue;
+    rebuilt = addWeights(rebuilt, answer);
+    rebuilt = {
+      ...rebuilt,
+      responses: [...rebuilt.responses, response],
+      swipeTimes: [...rebuilt.swipeTimes, response.timeSpent ?? 0],
+    };
+  }
+
+  const averageSwipeTime = rebuilt.swipeTimes.length
+    ? rebuilt.swipeTimes.reduce((sum, value) => sum + value, 0) / rebuilt.swipeTimes.length
+    : 0;
+
+  return {
+    ...rebuilt,
+    averageSwipeTime,
+    currentDifficulty: calculateDifficulty(rebuilt.swipeTimes, averageSwipeTime),
+    engagement: rebuilt.responses.length,
+  };
+}
+
+export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete, onExit, onQuizStarted }: ShortformV2QuizProps) {
+  const [hasStarted, setHasStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<QuizScores>(INITIAL_SCORES);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [activeOptionIndex, setActiveOptionIndex] = useState(0);
   const [startedAt, setStartedAt] = useState(() => Date.now());
-  const [isCompleting, setIsCompleting] = useState(false);
+  const questionHeadingRef = useRef<HTMLHeadingElement>(null);
+  const answerButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const restoreAnswerFocusRef = useRef(false);
 
   const currentQuestion = SHORTFORM_V2_QUESTIONS[currentIndex];
   const totalQuestions = SHORTFORM_V2_QUESTIONS.length;
@@ -161,44 +204,74 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const accent = GROUP_ACCENTS[currentQuestion.group] ?? GROUP_ACCENTS.Calibration;
   const answeredCount = scores.responses.length;
   const timelinePosition = currentIndex + 1;
+  const userFacingSection = QUIZ_TIMELINE_SECTIONS.find((section) => section.group === currentQuestion.group)?.label ?? "Question";
+
+  useEffect(() => {
+    if (!hasStarted) return;
+    const selectedIndex = currentQuestion.answers.findIndex((answer) => answer.id === selectedAnswer);
+    setActiveOptionIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    const focusTimer = window.setTimeout(() => {
+      if (restoreAnswerFocusRef.current) {
+        restoreAnswerFocusRef.current = false;
+        answerButtonRefs.current[selectedIndex >= 0 ? selectedIndex : 0]?.focus();
+        return;
+      }
+      questionHeadingRef.current?.focus();
+    }, 320);
+    return () => window.clearTimeout(focusTimer);
+  }, [currentIndex, currentQuestion.answers, hasStarted, selectedAnswer]);
+
+  const handleStart = () => {
+    setStartedAt(Date.now());
+    setHasStarted(true);
+    onQuizStarted?.();
+    trackKyrEvent("quiz_started", { source: "shortform_v2", tier, total_questions: totalQuestions });
+  };
 
   const handleAnswer = (answer: ShortformV2Answer, optionIndex: number) => {
-    if (selectedAnswer || isCompleting) return;
-    const timeSpent = Math.max(0.1, (Date.now() - startedAt) / 1000);
-    setSelectedAnswer(answer.id);
+    const existingResponseIndex = scores.responses.findIndex((response) => response.questionId === currentQuestion.id);
+    const isReviewingAnswer = existingResponseIndex >= 0;
+    if (selectedAnswer && !isReviewingAnswer) return;
 
-    const nextScores = addWeights(scores, answer);
-    const updatedSwipeTimes = [...scores.swipeTimes, timeSpent];
+    const existingResponse = isReviewingAnswer ? scores.responses[existingResponseIndex] : undefined;
+    const timeSpent = existingResponse?.timeSpent ?? Math.max(0.1, (Date.now() - startedAt) / 1000);
+    const response = {
+      questionId: currentQuestion.id,
+      choice: optionIndex as 0 | 1 | 2 | 3,
+      timeSpent,
+      swipeDirection: optionIndex < 2 ? "left" as const : "right" as const,
+      responseType: "multiChoice" as const,
+      psych: currentQuestion.group,
+      selectedOptionMeta: answer.resultSignal,
+      selectedOptionLabel: answer.text,
+      answerId: answer.id,
+    };
+
+    const responses = isReviewingAnswer
+      ? scores.responses.map((currentResponse, index) => index === existingResponseIndex ? response : currentResponse)
+      : [...scores.responses, response];
+    const rebuiltScores = isReviewingAnswer
+      ? rebuildScoresFromResponses(responses)
+      : addWeights(scores, answer);
+    const updatedSwipeTimes = isReviewingAnswer ? rebuiltScores.swipeTimes : [...scores.swipeTimes, timeSpent];
     const averageSwipeTime = updatedSwipeTimes.reduce((sum, value) => sum + value, 0) / updatedSwipeTimes.length;
     const updatedScores: QuizScores = {
-      ...nextScores,
-      responses: [
-        ...nextScores.responses,
-        {
-          questionId: currentQuestion.id,
-          choice: optionIndex as 0 | 1 | 2 | 3,
-          timeSpent,
-          swipeDirection: optionIndex < 2 ? "left" : "right",
-          responseType: "multiChoice",
-          psych: currentQuestion.group,
-          selectedOptionMeta: answer.resultSignal,
-          selectedOptionLabel: answer.text,
-          answerId: answer.id,
-        },
-      ],
+      ...rebuiltScores,
+      responses,
       swipeTimes: updatedSwipeTimes,
       averageSwipeTime,
       currentDifficulty: calculateDifficulty(updatedSwipeTimes, averageSwipeTime),
-      engagement: nextScores.engagement + 1,
+      engagement: responses.length,
       wildcardBoost: false,
-      criticalWildcard: nextScores.mbti.T >= nextScores.mbti.F && nextScores.bigFive.O > 0 ? 1 : 0,
-      firstPrinciplesWildcard: nextScores.mbti.N >= nextScores.mbti.S && nextScores.bigFive.O > 0 ? 1 : 0,
+      criticalWildcard: rebuiltScores.mbti.T >= rebuiltScores.mbti.F && rebuiltScores.bigFive.O > 0 ? 1 : 0,
+      firstPrinciplesWildcard: rebuiltScores.mbti.N >= rebuiltScores.mbti.S && rebuiltScores.bigFive.O > 0 ? 1 : 0,
       quizVersion: "shortform-v2-fixed-28",
       questionDatabase: "shortformV2Questions.ts",
       deterministicResult: true,
       moodContext: { mood, theme, funMode },
     };
 
+    setSelectedAnswer(answer.id);
     setScores(updatedScores);
 
     trackKyrEvent("quiz_answer_selected", {
@@ -212,14 +285,19 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
 
     window.setTimeout(() => {
       if (currentIndex >= totalQuestions - 1) {
-        setIsCompleting(true);
         trackKyrEvent("quiz_completed", {
           source: "shortform_v2",
           tier,
           total_questions: totalQuestions,
           average_response_time: Math.round(averageSwipeTime * 10) / 10,
         });
-        window.setTimeout(() => onComplete(updatedScores), 900);
+        const authoritativeResponses = validateShortformV2Responses(updatedScores.responses);
+        const authoritativeScoreMaps = recomputeShortformV2ScoreMaps(authoritativeResponses);
+        const authoritativeScores = calibrateShortformV2Scores({
+          ...updatedScores,
+          ...authoritativeScoreMaps,
+        });
+        onComplete(authoritativeScores);
         return;
       }
       setCurrentIndex((index) => index + 1);
@@ -228,33 +306,57 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     }, 360);
   };
 
-  const goBack = () => {
-    if (currentIndex === 0 || answeredCount === 0 || selectedAnswer || isCompleting) return;
-    // Reliable one-step undo would require answer-level inverse weights. For now restart is safer than pretending.
-    onExit();
+  const handleAnswerKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, index: number) => {
+    const last = currentQuestion.answers.length - 1;
+    const target = event.key === "Home" ? 0
+      : event.key === "End" ? last
+      : ["ArrowDown", "ArrowRight"].includes(event.key) ? (index + 1) % currentQuestion.answers.length
+      : ["ArrowUp", "ArrowLeft"].includes(event.key) ? (index - 1 + currentQuestion.answers.length) % currentQuestion.answers.length
+      : null;
+    if (target === null) return;
+    event.preventDefault();
+    setActiveOptionIndex(target);
+    answerButtonRefs.current[target]?.focus();
   };
 
-  if (isCompleting) {
+  const goBack = () => {
+    if (currentIndex === 0 || answeredCount === 0 || selectedAnswer) return;
+    const responseBeingRevisited = scores.responses.find((response) => response.questionId === SHORTFORM_V2_QUESTIONS[currentIndex - 1]?.id);
+    const answerId = responseBeingRevisited?.answerId;
+    if (!responseBeingRevisited || typeof answerId !== "string") return;
+    restoreAnswerFocusRef.current = true;
+    setCurrentIndex((index) => Math.max(0, index - 1));
+    setSelectedAnswer(answerId);
+    setStartedAt(Date.now());
+    trackKyrEvent("quiz_answer_reviewed", {
+      source: "shortform_v2",
+      tier,
+      question_id: responseBeingRevisited.questionId,
+      remaining_answers: scores.responses.length,
+    });
+  };
+
+  if (!hasStarted) {
     return (
-      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050510] px-5 text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_15%,rgba(34,211,238,0.22),transparent_32%),radial-gradient(circle_at_75%_75%,rgba(168,85,247,0.20),transparent_34%)]" />
-        <section className="relative w-full max-w-md rounded-[34px] border border-white/15 bg-white/[0.07] p-7 text-center shadow-[0_30px_110px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-          <motion.div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-violet-400 to-amber-200" animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 1.4, repeat: Infinity }}>
-            <Brain className="h-10 w-10 text-[#050510]" />
-          </motion.div>
-          <p className="mb-2 text-[11px] font-black uppercase tracking-[0.32em] text-cyan-200">Pattern locked</p>
-          <h1 className="text-3xl font-black tracking-[-0.04em]">Building your result</h1>
-          <p className="mx-auto mt-3 max-w-xs text-sm font-semibold leading-6 text-white/65">Scoring your fixed 28 signals against personality, work behavior, and career-fit vectors.</p>
-          <div className="mt-7 h-3 overflow-hidden rounded-full bg-white/10">
-            <motion.div className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-violet-300 to-amber-200" initial={{ width: "12%" }} animate={{ width: "100%" }} transition={{ duration: 1.1, ease: "easeOut" }} />
-          </div>
+      <div className="relative flex min-h-[100dvh] items-center overflow-hidden bg-[#050510] px-4 py-8 text-white sm:px-6">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_16%,rgba(34,211,238,0.18),transparent_31%),radial-gradient(circle_at_82%_72%,rgba(168,85,247,0.18),transparent_35%)]" />
+        <section aria-labelledby="shortform-welcome-heading" className="relative mx-auto w-full max-w-2xl rounded-[30px] border border-white/15 bg-[#0b1222]/92 p-5 shadow-[0_28px_92px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:rounded-[38px] sm:p-9">
+          <p className="quiz-welcome-kicker text-[11px] font-black uppercase tracking-[0.28em] text-cyan-200">KnowYourRole · work-style exploration</p>
+          <h2 id="shortform-welcome-heading" className="mt-4 max-w-xl text-3xl font-black tracking-[-0.055em] text-white sm:text-5xl">28 grounded questions. One practical starting point.</h2>
+          <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-white/72 sm:text-base sm:leading-7">Answer for your usual work pattern—not your ideal day or the answer that sounds impressive. There are no right answers.</p>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2" aria-label="What to expect">
+            <li className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-sm leading-6 text-white/75"><strong className="block text-white">A calm, fixed flow</strong> One question at a time, with back navigation if you want to change an answer.</li>
+            <li className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-sm leading-6 text-white/75"><strong className="block text-white">A practical result</strong> A work-style snapshot, communication clues, pressure patterns, and exploratory role directions.</li>
+          </ul>
+          <p className="mt-5 text-sm leading-6 text-white/58">Your responses are interpreted as work-style and career-exploration signals—not a diagnosis, hiring screen, or career prescription.</p>
+          <button type="button" onClick={handleStart} className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-300 px-5 py-3 text-sm font-black text-[#06101f] shadow-[0_16px_42px_rgba(34,211,238,0.25)] transition hover:brightness-105 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-cyan-200 sm:w-auto">Start the 28 questions</button>
         </section>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050510] text-white">
+    <div className="shortform-v2-motion relative min-h-[100dvh] overflow-hidden bg-[#050510] text-white">
       <style>{`
         .shortform-v2-layout { grid-template-columns: 1fr; }
         .shortform-v2-timeline-grid {
@@ -268,6 +370,9 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
         }
         .shortform-v2-answer-grid { grid-template-columns: 1fr; }
         .shortform-v2-answer-button { min-height: 74px; }
+        @media (prefers-reduced-motion: reduce) {
+          .shortform-v2-motion * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
         @media (max-height: 740px) and (max-width: 640px) {
           .shortform-v2-question-title { font-size: 1.27rem; }
           .shortform-v2-answer-button { min-height: 68px; }
@@ -317,10 +422,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       </div>
 
       <div className="fixed left-3 right-3 top-3 z-40 flex items-center justify-between pointer-events-none sm:left-4 sm:right-4 sm:top-4">
-        <button onClick={onExit} className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#0b1020]/80 text-white/70 shadow-[0_18px_48px_rgba(0,0,0,0.35)] backdrop-blur-xl transition hover:bg-white/[0.1] hover:text-white sm:h-10 sm:w-10" aria-label="Exit quiz">
+        <button onClick={onExit} className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#0b1020]/80 text-white/70 shadow-[0_18px_48px_rgba(0,0,0,0.35)] backdrop-blur-xl transition hover:bg-white/[0.1] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 sm:h-10 sm:w-10" aria-label="Exit quiz">
           <X className="h-4 w-4" />
         </button>
-        <button onClick={goBack} disabled={currentIndex === 0} className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#0b1020]/80 text-white/70 shadow-[0_18px_48px_rgba(0,0,0,0.35)] backdrop-blur-xl transition enabled:hover:bg-white/[0.1] enabled:hover:text-white disabled:opacity-30 sm:h-10 sm:w-10" aria-label="Go back">
+        <button onClick={goBack} disabled={currentIndex === 0 || Boolean(selectedAnswer)} className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#0b1020]/80 text-white/70 shadow-[0_18px_48px_rgba(0,0,0,0.35)] backdrop-blur-xl transition enabled:hover:bg-white/[0.1] enabled:hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:opacity-30 sm:h-10 sm:w-10" aria-label="Go back and change the previous answer" title="Go back and change the previous answer">
           <ChevronLeft className="h-4 w-4" />
         </button>
       </div>
@@ -340,14 +445,15 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
               <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.09)_1px,transparent_1px)] [background-size:34px_34px]" />
 
               <div className="relative z-10 flex h-full min-h-[186px] flex-col pt-1 sm:min-h-[320px] lg:min-h-[378px] xl:min-h-[418px]">
-                <div className={`mb-3 inline-flex h-7 max-w-full items-center gap-2 self-start rounded-full bg-gradient-to-r ${accent} px-3 text-[8.5px] font-black uppercase tracking-[0.16em] text-[#050510] shadow-[0_0_38px_rgba(34,211,238,0.18)] sm:mb-7 sm:h-9 sm:px-4 sm:text-[10px] lg:mb-8`}>
-                  <Sparkles className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
-                  <span className="truncate">{currentQuestion.group}</span>
+                <div className={`mb-3 inline-flex h-7 max-w-full items-center gap-2 self-start rounded-full bg-gradient-to-r ${accent} px-3 text-[8.5px] font-black uppercase tracking-[0.16em] text-[#050510] shadow-[0_0_38px_rgba(34,211,238,0.18)] sm:mb-7 sm:h-9 sm:px-4 sm:text-[10px]`}>
+                  <Sparkles className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
+                  <span className="truncate">{userFacingSection}</span>
                 </div>
 
                 <div className="mt-auto pb-0.5">
-                  <p className="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-white/76 sm:mb-3 sm:text-[11px]">{currentQuestion.signal}</p>
-                  <h1 className="shortform-v2-question-title text-balance font-black text-white drop-shadow-[0_14px_38px_rgba(0,0,0,0.45)]">
+                  <p className="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-white/76 sm:mb-3 sm:text-[11px]" aria-live="polite" aria-atomic="true">Question {timelinePosition} of {totalQuestions}</p>
+                  <div className="sr-only" role="progressbar" aria-label="Quiz progress" aria-valuemin={1} aria-valuemax={totalQuestions} aria-valuenow={timelinePosition}>Question {timelinePosition} of {totalQuestions}</div>
+                  <h1 id="shortform-v2-question-heading" ref={questionHeadingRef} tabIndex={-1} className="shortform-v2-question-title text-balance font-black text-white drop-shadow-[0_14px_38px_rgba(0,0,0,0.45)] focus:outline-none">
                     {currentQuestion.prompt}
                   </h1>
                   <p className="mt-2 max-w-md text-[0.75rem] font-bold leading-4 text-white/72 sm:mt-4 sm:text-[0.9rem] sm:font-extrabold sm:leading-6">{currentQuestion.guidance}</p>
@@ -355,22 +461,28 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
               </div>
             </section>
 
-            <section className="shortform-v2-answer-grid grid gap-2 lg:gap-3 lg:auto-rows-fr">
+            <section className="shortform-v2-answer-grid grid gap-2 lg:gap-3 lg:auto-rows-fr" role="radiogroup" aria-labelledby="shortform-v2-question-heading">
               {currentQuestion.answers.map((answer, index) => {
                 const isSelected = selectedAnswer === answer.id;
                 const isDimmed = Boolean(selectedAnswer && !isSelected);
                 return (
                   <motion.button
                     key={answer.id}
+                    ref={(element) => { answerButtonRefs.current[index] = element; }}
                     type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    tabIndex={activeOptionIndex === index ? 0 : -1}
                     onClick={() => handleAnswer(answer, index)}
-                    disabled={Boolean(selectedAnswer)}
+                    onKeyDown={(event) => handleAnswerKeyDown(event, index)}
+                    disabled={Boolean(selectedAnswer) && !scores.responses.some((response) => response.questionId === currentQuestion.id)}
                     initial={false}
                     animate={{ opacity: isDimmed ? 0.42 : 1, y: 0, scale: isSelected ? 1.025 : 1 }}
                     transition={{ delay: index * 0.045, duration: 0.22 }}
                     whileHover={!selectedAnswer ? { y: -4, scale: 1.012 } : undefined}
                     whileTap={!selectedAnswer ? { scale: 0.98 } : undefined}
-                    className={`shortform-v2-answer-button group relative overflow-hidden rounded-[19px] border p-2.5 text-left transition-all duration-300 sm:rounded-[22px] sm:p-3.5 lg:min-h-0 lg:p-4 ${isSelected ? "border-cyan-200/95 bg-[#17233a] shadow-[0_0_0_1px_rgba(125,211,252,0.45),0_0_50px_rgba(34,211,238,0.30)]" : "border-white/12 bg-[#0d1324]/94 shadow-[0_18px_54px_rgba(0,0,0,0.30)] hover:border-cyan-200/55 hover:bg-[#131c31]"}`}
+                    className={`shortform-v2-answer-button group relative overflow-hidden rounded-[19px] border p-2.5 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 sm:rounded-[22px] sm:p-3.5 lg:min-h-0 lg:p-4 ${isSelected ? "border-[#f3e6cf] bg-[#dccdb3] shadow-[0_0_0_1px_rgba(243,230,207,0.72),0_0_42px_rgba(220,205,179,0.34)]" : "border-white/12 bg-[#0d1324]/94 shadow-[0_18px_54px_rgba(0,0,0,0.30)] hover:border-[#f8f0df] hover:bg-[#e6d8bd] hover:shadow-[0_18px_54px_rgba(230,216,189,0.20)] active:!border-[#f3e6cf] active:!bg-[#dccdb3]"}`}
+                    aria-label={answer.text}
                     data-testid={`button-v2-answer-${answer.id}`}
                   >
                     <div className={`absolute -right-10 -top-12 h-28 w-28 rounded-full bg-gradient-to-br ${accent} opacity-12 blur-2xl transition-opacity group-hover:opacity-24 sm:h-32 sm:w-32`} />
@@ -378,12 +490,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
                     <div className="relative z-10 grid h-full grid-cols-[34px_minmax(0,1fr)] items-center gap-2.5 sm:flex sm:flex-col sm:items-stretch sm:gap-0">
                       <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[13px] bg-gradient-to-br ${accent} text-[11px] font-black text-[#050510] shadow-[0_12px_30px_rgba(0,0,0,0.35)] sm:mb-4 sm:h-8 sm:w-8 sm:rounded-full sm:text-xs`}>{answer.id}</span>
                       <span className="min-w-0">
-                        <span className="hidden text-[9px] font-black uppercase tracking-[0.18em] text-white/50 sm:block sm:text-[10px] sm:tracking-[0.2em]">{answer.resultSignal}</span>
-                        <h2 className="text-[0.92rem] font-black leading-[1.16] tracking-[-0.025em] text-white sm:mt-2 sm:max-w-[23ch] sm:text-[1.13rem] lg:text-[1.2rem]">{answer.text}</h2>
-                        <span className="mt-1 block truncate text-[10px] font-bold uppercase tracking-[0.12em] text-white/45 sm:hidden">{answer.resultSignal}</span>
+                        <h2 className={`text-[1rem] font-black leading-[1.2] tracking-[-0.025em] transition-colors sm:max-w-[23ch] sm:text-[1.13rem] lg:text-[1.2rem] ${isSelected ? "text-[#12263a]" : "text-white group-hover:text-[#12263a] group-active:text-[#12263a]"}`}>{answer.text}</h2>
+                        <span className={`mt-1 block truncate font-bold uppercase tracking-[0.12em] transition-colors sm:mt-2 sm:tracking-[0.18em] ${isSelected ? "text-[#31485d]" : "text-[#456174] group-hover:text-[#31485d] group-active:text-[#31485d]"}`} style={{ fontSize: "9px" }}>{answer.resultSignal}</span>
                       </span>
-                      {isSelected && <span className="absolute right-2 top-2 rounded-full bg-cyan-200 px-2 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-[#050510] sm:text-[9px]">Selected</span>}
-                      <div className="mt-auto hidden pt-3 sm:block"><div className="h-1.5 w-full rounded-sm bg-black/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]" /></div>
+                      {isSelected && <span className="absolute right-2 top-2 rounded-full border border-[#f3e6cf] bg-[#c9b68f] px-2 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-[#12263a] sm:text-[9px]">Selected</span>}
                     </div>
                   </motion.button>
                 );

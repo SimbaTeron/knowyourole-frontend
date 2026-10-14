@@ -427,7 +427,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     group: "Calibration",
     signal: "Strength mirror",
     prompt: "If someone described your strongest contribution, which would feel most accurate?",
-    guidance: "This calibrates whether your pattern is converging or split.",
+    guidance: "Choose the contribution others would recognize most often.",
     answers: [
       { id: "A", text: "I bring clarity when things are confusing.", supportingText: "You help people see the clean structure underneath the mess.", resultSignal: "Clarity contribution", scores: { mbti: { I: 1, T: 3, J: 1 }, disc: { C: 3 }, bigFive: { C: 2, O: 1 }, career: { analysis: 3, systems: 2 } } },
       { id: "B", text: "I bring momentum when things are stuck.", supportingText: "You help motion return when the room stalls.", resultSignal: "Momentum contribution", scores: { mbti: { E: 2, T: 1, P: 1 }, disc: { D: 3, I: 1 }, bigFive: { E: 2 }, career: { leadership: 3, entrepreneurship: 2, pace: 2 } } },
@@ -441,7 +441,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     group: "Calibration",
     signal: "Anti-fit warning",
     prompt: "Which kind of work would become frustrating fastest?",
-    guidance: "Anti-fit is often more predictive than fantasy-fit. Annoying, but useful.",
+    guidance: "What drains you can be as useful to name as what attracts you.",
     answers: [
       { id: "A", text: "Work with constant interruption and little time to think.", supportingText: "Your best work needs protected attention.", resultSignal: "Avoid interruption-heavy roles", scores: { mbti: { I: 3, J: 1 }, disc: { C: 2 }, bigFive: { E: -2, C: 1 }, career: { deepFocus: 3, analysis: 1, people: -1, pace: -1 } } },
       { id: "B", text: "Work with rigid rules and no room to improve anything.", supportingText: "Stagnation and needless constraint drain you quickly.", resultSignal: "Avoid rigid-stagnant roles", scores: { mbti: { N: 2, P: 2 }, disc: { I: 1, D: 1 }, bigFive: { O: 3 }, career: { creative: 2, autonomy: 3, entrepreneurship: 1, stability: -1 } } },

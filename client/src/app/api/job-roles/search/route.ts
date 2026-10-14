@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
 
 const headers = {
-  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };

@@ -10,27 +10,33 @@ import type { QuizScores } from "@/components/Quiz";
 import rolesData from "@/data/roles.json";
 import { trackKyrEvent } from "@/lib/analytics";
 import { calculateMbtiAxisConfidence, resultConfidenceLabel as getResultConfidenceLabel } from "@/lib/scoring";
+import { DirectionFeedbackCard } from "@/components/results/DirectionFeedbackCard";
+import { ResultDecisionBrief } from "@/components/results/ResultDecisionBrief";
+import { FrameworkReference } from "@/components/results/FrameworkReference";
+import type { ResultDTO } from "@/lib/results/buildResultDTO";
 
-// ─── Design Tokens (from mockups) ───────────────────────────────────────────
+// ─── Workday report tokens ───────────────────────────────────────────────────
+// Result data and interactions stay intact; this is the presentation contract for
+// the report so it belongs to the same paper / ink / sunlit palette as the site.
 const C = {
-  bg: "#080414",
-  cyan: "#22d3ee",
-  cyanDim: "rgba(34, 211, 238, 0.6)",
-  cyanGlow: "rgba(34, 211, 238, 0.3)",
-  purple: "#a855f7",
-  purpleDim: "rgba(168, 85, 247, 0.6)",
-  pink: "#f472b6",
-  gold: "#f59e0b",
-  goldLight: "#fbbf24",
-  teal: "#06b6d4",
-  text: "#ffffff",
-  textMuted: "#cccccc",
-  textDim: "#cccccc",
-  glassBg: "rgba(255, 255, 255, 0.04)",
-  glassBgHover: "rgba(255, 255, 255, 0.08)",
-  glassBorder: "rgba(255, 255, 255, 0.1)",
-  glassBorderBright: "rgba(255, 255, 255, 0.2)",
-  cardRadius: "20px",
+  bg: "#f8f3e8",
+  cyan: "#315f74",
+  cyanDim: "rgba(49, 95, 116, 0.72)",
+  cyanGlow: "rgba(158, 216, 230, 0.48)",
+  purple: "#c95f46",
+  purpleDim: "rgba(201, 95, 70, 0.68)",
+  pink: "#5a9aaa",
+  gold: "#bf7c12",
+  goldLight: "#9b650d",
+  teal: "#2f7b87",
+  text: "#12263a",
+  textMuted: "#456174",
+  textDim: "#637b8a",
+  glassBg: "rgba(255, 253, 248, 0.94)",
+  glassBgHover: "#fff7e7",
+  glassBorder: "rgba(18, 38, 58, 0.16)",
+  glassBorderBright: "rgba(18, 38, 58, 0.28)",
+  cardRadius: "4px",
 } as const;
 
 
@@ -68,8 +74,16 @@ const SOCIAL_IDENTITY_TITLES: Record<string, string> = {
   ESFP: "Energy Translator",
 };
 
+export function humanizeResultLabel(label: string) {
+  return label
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function getArchetype(mbti: string) {
-  return ARCHETYPES[mbti] || "The Architect";
+  return humanizeResultLabel(ARCHETYPES[mbti] || "The Architect");
 }
 
 function stripLeadingThe(label: string) {
@@ -465,14 +479,28 @@ type CareerRoleOption = { title: string; salary?: string; desc?: string; source:
 function normalizeDiscProfile(rawDisc: DiscProfile): DiscProfile {
   const entries = Object.entries(rawDisc) as [keyof DiscProfile, number][];
   const safeEntries = entries.map(([key, value]) => [key, Number.isFinite(value) ? Math.max(0, value) : 0] as const);
-  const max = Math.max(...safeEntries.map(([, value]) => value), 0);
+  const total = safeEntries.reduce((sum, [, value]) => sum + value, 0);
 
-  if (max <= 0) {
+  if (total <= 0) {
     return { D: 25, I: 25, S: 25, C: 25 };
   }
 
-  return safeEntries.reduce((next, [key, value]) => {
-    next[key] = Math.max(0, Math.min(100, Math.round((value / max) * 100)));
+  const normalized = safeEntries.map(([key, value]) => {
+    const exact = (value / total) * 100;
+    return { key, value: Math.floor(exact), remainder: exact % 1 };
+  });
+
+  let remainderPoints = 100 - normalized.reduce((sum, item) => sum + item.value, 0);
+  [...normalized]
+    .sort((a, b) => b.remainder - a.remainder)
+    .forEach((item) => {
+      if (remainderPoints <= 0) return;
+      item.value += 1;
+      remainderPoints -= 1;
+    });
+
+  return normalized.reduce((next, item) => {
+    next[item.key] = Math.max(0, Math.min(100, item.value));
     return next;
   }, { D: 0, I: 0, S: 0, C: 0 } as DiscProfile);
 }
@@ -484,8 +512,7 @@ function buildResultSummaryLine({ roleTitle, identity, mbtiType, discLabel, topT
   discLabel: string;
   topTraitLabel: string;
 }) {
-  const article = /^[AEFHILMNORSX]/i.test(mbtiType) ? "an" : "a";
-  return `${identity}: your answers point toward ${roleTitle}, with ${article} ${mbtiType} thinking pattern, ${discLabel.toLowerCase()} work style, and ${topTraitLabel.toLowerCase()} as the strongest trait signal.`;
+  return `${identity}. Best-fit direction: ${roleTitle}. Your strongest signals are ${mbtiType} thinking, a ${discLabel.toLowerCase()} work style, and ${topTraitLabel.toLowerCase()}.`;
 }
 type RoleFitCategory = "leadership" | "technical" | "creative" | "care" | "operations" | "influence" | "generalist";
 
@@ -680,7 +707,7 @@ const MBTI_ROLE_SIGNALS: Record<string, string> = {
   E: "external momentum and fast feedback",
   I: "focused depth before public action",
   S: "practical reality-testing",
-  N: "pattern-spotting and future possibilities",
+  N: "future-pattern thinking",
   T: "clear tradeoff decisions",
   F: "human impact and values awareness",
   J: "structure, deadlines, and closure",
@@ -753,6 +780,7 @@ function buildPremiumRoleMatchCards({
   const sourceRoles = [
     { rank: "#1", role: roleMatch.primary, primary: true },
     { rank: "#2", role: roleMatch.secondary, primary: false },
+    ...(roleMatch.alternatives ?? []).slice(0, 2).map((role, index) => ({ rank: `#${index + 3}`, role, primary: false })),
   ];
 
   return sourceRoles.map(({ rank, role, primary }) => {
@@ -773,7 +801,6 @@ function buildPremiumRoleMatchCards({
     const discLabel = lowerFirst(DISC_LABELS[primaryDisc] || "Dominant");
     const topTraitLabel = lowerFirst(getTopRoleTrait(bigFive, profile));
     const mbtiFit = describeMbtiForRole(mbtiType, profile);
-    const roleDesc = role.desc ? role.desc.replace(/\.$/, "") : `work in the ${profile.label.toLowerCase()} lane`;
     const proofMove = profile.proof.replace(/\.$/, "");
 
     return {
@@ -781,42 +808,19 @@ function buildPremiumRoleMatchCards({
       title: role.title,
       salary: role.salary,
       pct: primary ? Math.max(analysis.match, 88) : clampScore(analysis.match - 8, 70, 89),
-      why: `${role.title} fits because it asks you to ${lowerFirst(roleDesc)}. ${mbtiFit}. Your ${discLabel} style adds ${DISC_ROLE_SIGNALS[primaryDisc] || "useful work energy"}.`,
+      why: primary && roleMatch.whyThisFits
+        ? roleMatch.whyThisFits
+        : `This direction fits because it rewards ${profile.label.toLowerCase()} work. ${mbtiFit}. Your ${discLabel} style adds ${DISC_ROLE_SIGNALS[primaryDisc] || "useful work energy"}.`,
       daily: ROLE_DAILY_LOOPS[category] || ROLE_DAILY_LOOPS.generalist,
-      skill: ROLE_SKILL_GAPS[category] || ROLE_SKILL_GAPS.generalist,
-      firstMove: `This week: ${proofMove}. Then ask one person in the field how to improve it.`,
+      skill: primary && roleMatch.mayNotFit
+        ? roleMatch.mayNotFit
+        : ROLE_SKILL_GAPS[category] || ROLE_SKILL_GAPS.generalist,
+      firstMove: primary && roleMatch.starterPath
+        ? roleMatch.starterPath
+        : `This week: ${proofMove}. Then ask one person in the field how to improve it.`,
       primary,
     };
   });
-}
-
-// ─── Real scores from URL params or sessionStorage (written by handleQuizComplete) ───────
-function getStoredScores(): QuizScores | null {
-  if (typeof window === "undefined") return null;
-  try {
-    // FIRST: Check URL params — scores passed via ?scores=<base64> survive page refresh and new tabs
-    const urlParams = new URLSearchParams(window.location.search);
-    const encodedScores = urlParams.get("scores");
-    if (encodedScores) {
-      try {
-        const decoded = JSON.parse(atob(encodedScores)) as QuizScores;
-        if (decoded && typeof decoded === "object") return decoded;
-      } catch {
-        // Malformed scores param — fall through to sessionStorage
-      }
-    }
-    // SECOND: Fall back to sessionStorage (test mode, inline quiz completion)
-    const raw = sessionStorage.getItem("kyr_real_scores")
-      || sessionStorage.getItem("kyr_fake_scores");
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as QuizScores;
-    // Validate data shape — invalidate corrupted/old-format entries (missing DISC keys)
-    if (!parsed || !parsed.disc || parsed.disc.D === undefined || parsed.disc.C === undefined) {
-      sessionStorage.removeItem("kyr_fake_scores");
-      return null;
-    }
-    return parsed;
-  } catch { return null; }
 }
 
 type DeepDivePanel = { label: string; title: string; body: string; color: string };
@@ -1772,47 +1776,62 @@ function normalizeBigFive(raw: number): number {
   return Math.round(Math.max(10, Math.min(99, raw)));
 }
 
-function useRealResults(enabled = true) {
-  if (!enabled) return null;
-  const scores = getStoredScores();
-  const tier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
-  const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-
-  // No stored scores — in test or demo mode, generate fake scores inline
-  if (!scores) {
-    const inTestMode = urlParams.get("test") === "true";
-    const inDemoMode = urlParams.get("demo") === "true";
-    if (inTestMode || inDemoMode) {
-      const testTier = (urlParams.get("tier") || tier) as "13-18" | "19-25" | "25plus";
-      // Read MBTI override from sessionStorage (set by dev panel's MBTI selector)
-      const forcedMBTI = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_fake_mbti") : null) || undefined;
-      const fakeScores = getFakeScores(testTier, forcedMBTI);
-      // Use calculateResult for consistent real scoring (MBTI, DISC, Big Five percentiles)
-      // Pass forcedMBTI so calculateResult uses it instead of deriving from dimensions
-      const result = calculateResult(fakeScores as unknown as QuizScores, forcedMBTI);
-      const primaryDisc = result.discStyle;
-      const type = `${result.mbtiType}-${primaryDisc}`;
-      const bigFive = result.bigFiveProfile;
-      const disc = normalizeDiscProfile(fakeScores.disc);
-      return { type, tier: testTier, bigFive, disc, mbtiType: result.mbtiType, primaryDisc, rawScores: fakeScores as unknown as QuizScores, isDemo: inDemoMode, discDesc: result.discDesc, secondaryDisc: result.secondaryDisc, secondaryDiscLabel: result.secondaryDiscLabel, secondaryDiscColor: result.secondaryDiscColor };
-    }
-    // Not test or demo mode — redirect to quiz
-    if (typeof window !== "undefined") {
-      window.location.href = "/quiz";
-    }
+function getStoredResultDTO(): ResultDTO | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const dto = JSON.parse(sessionStorage.getItem("kyr_result_dto") || "null") as ResultDTO | null;
+    return dto?.version?.schemaVersion === "1.0.0" && dto.careerDirection?.title ? dto : null;
+  } catch {
     return null;
   }
+}
 
-  const result = calculateResult(scores);
-  const mbtiType = result.mbtiType;
-  const primaryDisc = result.discStyle;
-  const type = `${mbtiType}-${primaryDisc}`;
-  const bigFive = result.bigFiveProfile;
-  const disc = normalizeDiscProfile(scores.disc);
-  // Detect ?demo=true in URL (used by Stripe demo/preview redirect)
-  const isDemo = urlParams.get("demo") === "true";
+function useRealResults(enabled = true) {
+  if (!enabled) return null;
+  const resultDTO = getStoredResultDTO();
+  if (resultDTO) {
+    const primaryDisc = resultDTO.scores.disc.primary === "Balanced" ? "C" : resultDTO.scores.disc.primary;
+    return {
+      type: `${resultDTO.scores.mbti.type}-${primaryDisc}`,
+      tier: resultDTO.raw.tier,
+      bigFive: Object.fromEntries(Object.entries(resultDTO.scores.bigFive.traits).map(([key, trait]) => [key, trait.normalized])) as BigFiveProfile,
+      disc: {
+        D: Math.round(resultDTO.scores.disc.scores.D.normalized),
+        I: Math.round(resultDTO.scores.disc.scores.I.normalized),
+        S: Math.round(resultDTO.scores.disc.scores.S.normalized),
+        C: Math.round(resultDTO.scores.disc.scores.C.normalized),
+      },
+      mbtiType: resultDTO.scores.mbti.type,
+      primaryDisc,
+      rawScores: resultDTO.raw.legacyScores as QuizScores,
+      isDemo: false,
+      discDesc: resultDTO.scores.disc.summary,
+      canonicalResult: resultDTO,
+    };
+  }
+  const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const inTestMode = urlParams.get("test") === "true";
+  const inDemoMode = urlParams.get("demo") === "true";
 
-  return { type, tier, bigFive, disc, mbtiType, primaryDisc, rawScores: scores, isDemo, discDesc: result.discDesc, secondaryDisc: result.secondaryDisc, secondaryDiscLabel: result.secondaryDiscLabel, secondaryDiscColor: result.secondaryDiscColor };
+  // Client-side result calculation is intentionally confined to explicit preview
+  // modes. Live results must originate from the server-persisted ResultDTO.
+  if (inTestMode || inDemoMode) {
+    const tier = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_tier") : null) || "25+";
+    const testTier = (urlParams.get("tier") || tier) as "13-18" | "19-25" | "25plus";
+    const forcedMBTI = (typeof window !== "undefined" ? sessionStorage.getItem("kyr_fake_mbti") : null) || undefined;
+    const fakeScores = getFakeScores(testTier, forcedMBTI);
+    const result = calculateResult(fakeScores as unknown as QuizScores, forcedMBTI);
+    const bigFive = result.bigFiveProfile;
+    const disc = normalizeDiscProfile(fakeScores.disc);
+    const primaryDisc = computePrimaryDisc(disc);
+    const type = `${result.mbtiType}-${primaryDisc}`;
+    return { type, tier: testTier, bigFive, disc, mbtiType: result.mbtiType, primaryDisc, rawScores: fakeScores as unknown as QuizScores, isDemo: inDemoMode, discDesc: result.discStyle === primaryDisc ? result.discDesc : undefined, secondaryDisc: result.secondaryDisc, secondaryDiscLabel: result.secondaryDiscLabel, secondaryDiscColor: result.secondaryDiscColor };
+  }
+
+  if (typeof window !== "undefined") {
+    window.location.replace("/quiz");
+  }
+  return null;
 }
 
 // ─── MBTI → #1 Career Match mapping (mirrors backend scoring) ────────────────
@@ -1840,10 +1859,9 @@ function AuroraBg() {
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 0,
-      background: `radial-gradient(ellipse 100% 60% at 50% -20%, rgba(168,85,247,0.2) 0%, transparent 60%),
-                   radial-gradient(ellipse 80% 50% at 80% 110%, rgba(34,211,238,0.1) 0%, transparent 50%),
-                   radial-gradient(ellipse 60% 40% at 10% 80%, rgba(244,114,182,0.08) 0%, transparent 50%),
-                   ${C.bg}`,
+      background: `radial-gradient(ellipse 86% 54% at -6% 0%, rgba(158,216,230,.88) 0%, transparent 68%),
+                   radial-gradient(ellipse 58% 46% at 104% 92%, rgba(233,130,104,.58) 0%, transparent 74%),
+                   linear-gradient(132deg, #f8f3e8 0%, #f8f3e8 56%, #fff7e7 56%, #fff7e7 100%)`,
       overflow: "hidden",
     }}>
       <style>{`
@@ -1872,9 +1890,9 @@ function TopNav({ premium = false, left = null as ReactNode, right = null as Rea
   return (
     <nav style={{
       position: "sticky", top: 0, zIndex: 100,
-      background: "rgba(8, 4, 20, 0.85)",
-      backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-      borderBottom: `1px solid ${C.glassBorder}`,
+      background: "rgba(255,253,248,0.92)",
+      backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)",
+      borderBottom: `1px solid ${C.glassBorderBright}`,
       padding: "12px 0",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 4px" }}>
@@ -2144,7 +2162,17 @@ function downloadBlob(blob: Blob, filename: string) {
 function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: () => void; report: ShareReportPayload }) {
   const [busyAction, setBusyAction] = useState<"pdf" | "native" | "image" | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setShowMoreOptions(false);
+      setCopied(false);
+      setShareError(null);
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const discLabel = DISC_LABELS[report.primaryDisc] || "Primary Style";
@@ -2248,71 +2276,75 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     };
 
     const bg = ctx.createLinearGradient(0, 0, 1080, 1350);
-    bg.addColorStop(0, "#080414");
-    bg.addColorStop(0.48, "#120826");
-    bg.addColorStop(1, "#05020c");
+    bg.addColorStop(0, "#fffdf7");
+    bg.addColorStop(0.5, "#f8f3e8");
+    bg.addColorStop(1, "#eee2ca");
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, 1080, 1350);
-    ctx.globalAlpha = 0.28;
-    ctx.fillStyle = "#22d3ee";
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "#c6e4e7";
     ctx.beginPath(); ctx.arc(130, 120, 260, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#a855f7";
+    ctx.fillStyle = "#f1c77a";
     ctx.beginPath(); ctx.arc(1000, 90, 330, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#f472b6";
+    ctx.fillStyle = "#e6c6b6";
     ctx.beginPath(); ctx.arc(920, 1180, 250, 0, Math.PI * 2); ctx.fill();
     ctx.globalAlpha = 1;
 
-    ctx.fillStyle = "#22d3ee";
+    ctx.fillStyle = "#315f74";
     ctx.fillRect(0, 0, 1080, 14);
-    ctx.fillStyle = "#a855f7";
+    ctx.fillStyle = "#bf7c12";
     ctx.fillRect(0, 0, 650, 14);
 
-    ctx.font = "800 38px Inter, Arial, sans-serif";
-    ctx.fillStyle = "#22d3ee";
+    ctx.font = "800 38px 'Space Grotesk', Arial, sans-serif";
+    ctx.fillStyle = "#315f74";
     ctx.fillText("KnowYouRole", 72, 96);
-    ctx.font = "700 20px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.56)";
+    ctx.font = "700 20px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("Full Portrait share card", 72, 132);
 
-    fillRoundRect(72, 190, 936, 780, 42, "rgba(255,255,255,0.065)", "rgba(255,255,255,0.18)");
-    ctx.font = "800 28px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    fillRoundRect(72, 190, 936, 870, 42, "rgba(255,253,247,0.84)", "#d8c9ae");
+    ctx.font = "800 28px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("MY PERSONALITY SIGNAL", 122, 270);
-    ctx.font = "900 150px Inter, Arial, sans-serif";
-    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 150px 'Space Grotesk', Arial, sans-serif";
+    ctx.fillStyle = "#12263a";
     ctx.fillText(report.mbtiType, 118, 430);
-    drawText(report.archetype, 126, 488, 560, 50, 2, "800 42px Inter, Arial, sans-serif", "#a855f7");
+    drawText(report.archetype, 126, 488, 560, 50, 2, "800 42px 'Space Grotesk', Arial, sans-serif", "#c95f46");
 
-    fillRoundRect(126, 610, 360, 88, 24, "rgba(34,211,238,0.10)", "rgba(34,211,238,0.30)");
-    ctx.font = "800 22px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    fillRoundRect(126, 610, 360, 88, 24, "#eaf5f6", "#9bc8cf");
+    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("DISC", 154, 642);
-    ctx.font = "900 30px Inter, Arial, sans-serif";
+    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
     ctx.fillStyle = discColor;
-    ctx.fillText(`${report.primaryDisc} - ${discLabel}`, 154, 678);
+    drawText(`${report.primaryDisc} - ${discLabel}`, 154, 678, 300, 28, 2, "900 28px 'Space Grotesk', Arial, sans-serif", discColor);
 
-    fillRoundRect(520, 610, 360, 88, 24, "rgba(245,158,11,0.10)", "rgba(245,158,11,0.30)");
-    ctx.font = "800 22px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    fillRoundRect(520, 610, 360, 88, 24, "#fff4d9", "#e6c36e");
+    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
     ctx.fillText("TOP TRAIT", 548, 642);
-    ctx.font = "900 30px Inter, Arial, sans-serif";
-    ctx.fillStyle = "#f59e0b";
-    ctx.fillText(`${topBigFiveName} ${topBigFive[1]}%`, 548, 678);
+    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
+    ctx.fillStyle = "#a76d24";
+    drawText(`${topBigFiveName} ${topBigFive[1]}%`, 548, 672, 300, 24, 2, "900 25px 'Space Grotesk', Arial, sans-serif", "#a76d24");
 
-    ctx.font = "800 24px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
-    ctx.fillText("CAREER SIGNAL", 126, 790);
-    drawText(report.career.title, 126, 850, 780, 56, 2, "900 54px Inter, Arial, sans-serif", "#fbbf24");
-    drawText(report.career.salary || "", 126, 955, 780, 34, 1, "800 30px Inter, Arial, sans-serif", "rgba(255,255,255,0.70)");
+    ctx.font = "800 24px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
+    ctx.fillText("CAREER DIRECTION", 126, 770);
+    drawText(report.career.title, 126, 828, 780, 46, 2, "900 46px 'Space Grotesk', Arial, sans-serif", "#12263a");
+    drawText(report.career.salary || "", 126, 916, 780, 27, 2, "800 27px 'IBM Plex Sans', Arial, sans-serif", "#456174");
+    ctx.font = "800 20px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
+    ctx.fillText("WHY THIS DIRECTION", 126, 964);
+    drawText(report.career.summary || `A direction that pairs ${report.mbtiType} preferences with ${report.primaryDisc} ${discLabel.toLowerCase()} energy.`, 126, 994, 810, 24, 3, "700 22px 'IBM Plex Sans', Arial, sans-serif", "#29495c");
 
-    fillRoundRect(72, 1032, 936, 190, 34, "rgba(34,211,238,0.075)", "rgba(34,211,238,0.20)");
-    ctx.font = "800 22px Inter, Arial, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
-    ctx.fillText("MY OPERATING SIGNAL", 122, 1090);
-    drawText(shareInsight, 122, 1142, 800, 42, 2, "800 35px Inter, Arial, sans-serif", "#ffffff");
-    ctx.font = "900 30px Inter, Arial, sans-serif";
-    ctx.fillStyle = "#22d3ee";
-    ctx.fillText(BRAND_SHARE_HOST, 122, 1270);
+    fillRoundRect(72, 1100, 936, 150, 34, "#eaf5f6", "#9bc8cf");
+    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.fillStyle = "#61717a";
+    ctx.fillText("MY OPERATING SIGNAL", 122, 1150);
+    drawText(shareInsight, 122, 1194, 800, 34, 2, "800 29px 'Space Grotesk', Arial, sans-serif", "#12263a");
+    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
+    ctx.fillStyle = "#315f74";
+    ctx.fillText(BRAND_SHARE_HOST, 122, 1310);
 
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((nextBlob) => nextBlob ? resolve(nextBlob) : reject(new Error("Share card export failed.")), "image/png", 0.92);
@@ -2389,14 +2421,25 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     }
   };
 
-  const shareTopBigFive = (Object.entries(report.bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
-  const shareTopBigFiveName = shareTopBigFive[0] === "O" ? "Openness" : shareTopBigFive[0] === "C" ? "Structure / Follow-through" : shareTopBigFive[0] === "E" ? "Extraversion" : shareTopBigFive[0] === "A" ? "Agreeableness" : "Stress Reactivity";
+  const sharePalette = {
+    ink: "#173246",
+    cyan: "#315f74",
+    muted: "#61717a",
+    dim: "#7c7569",
+    paper: "#fffdf7",
+    parchment: "#f5eddf",
+    sand: "#e6d8bd",
+    pressed: "#dccdb3",
+    line: "#d8c9ae",
+    gold: "#a76d24",
+    danger: "#8d3131",
+  };
 
   const baseActionStyle: CSSProperties = {
     width: "100%",
-    border: `1px solid ${C.glassBorderBright}`,
-    background: "rgba(255,255,255,0.055)",
-    color: C.text,
+    border: `1px solid ${sharePalette.line}`,
+    background: "rgba(255,253,247,0.82)",
+    color: sharePalette.ink,
     textAlign: "left",
     fontFamily: "Inter, sans-serif",
     cursor: "pointer",
@@ -2427,7 +2470,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
   };
 
   const actionLabelStyle: CSSProperties = { display: "block", fontSize: 13, fontWeight: 900, letterSpacing: -0.1 };
-  const actionHintStyle: CSSProperties = { display: "block", fontSize: 10.5, lineHeight: 1.35, color: C.textMuted, marginTop: 5 };
+  const actionHintStyle: CSSProperties = { display: "block", fontSize: 10.5, lineHeight: 1.35, color: sharePalette.muted, marginTop: 5 };
 
   return (
     <div
@@ -2435,76 +2478,72 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
       aria-modal="true"
       aria-label="Share results"
       onClick={(event) => event.target === event.currentTarget && onClose()}
-      style={{ position: "fixed", inset: 0, zIndex: 300, background: "radial-gradient(circle at 50% 18%, rgba(34,211,238,0.18), transparent 34%), rgba(3, 2, 10, 0.82)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", padding: 16, display: "flex", alignItems: "center", justifyContent: "center" }}
+      style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(52, 42, 29, 0.38)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", padding: 16, display: "flex", alignItems: "center", justifyContent: "center" }}
     >
-      <div style={{ width: "min(500px, 100%)", maxHeight: "90dvh", overflowY: "auto", borderRadius: 30, background: `linear-gradient(145deg, rgba(13,8,30,0.98), rgba(6,4,16,0.99))`, border: `1px solid ${C.glassBorderBright}`, boxShadow: "0 32px 100px rgba(0,0,0,0.62)", color: C.text }}>
-        <div style={{ padding: 18, position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at top left, ${C.cyanGlow}, transparent 42%), radial-gradient(circle at 90% 0%, rgba(168,85,247,0.32), transparent 38%)`, pointerEvents: "none" }} />
-          <button type="button" onClick={onClose} aria-label="Close share options" style={{ position: "absolute", top: 14, right: 14, width: 34, height: 34, borderRadius: 999, border: `1px solid ${C.glassBorder}`, background: "rgba(255,255,255,0.075)", color: C.text, cursor: "pointer", fontSize: 18, zIndex: 2 }}>×</button>
+      <div style={{ width: "min(500px, 100%)", maxHeight: "90dvh", overflowY: "auto", borderRadius: 30, background: `linear-gradient(145deg, ${sharePalette.paper}, ${sharePalette.parchment})`, border: `1px solid ${sharePalette.line}`, boxShadow: "0 32px 80px rgba(53,39,22,0.28)", color: sharePalette.ink }}>
+        <div style={{ padding: 20, position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at top left, rgba(230,216,189,0.82), transparent 46%), radial-gradient(circle at 92% 0%, rgba(167,109,36,0.16), transparent 40%)", pointerEvents: "none" }} />
+          <button type="button" onClick={onClose} aria-label="Close share options" style={{ position: "absolute", top: 14, right: 14, width: 34, height: 34, borderRadius: 999, border: `1px solid ${sharePalette.line}`, background: "rgba(255,253,247,0.86)", color: sharePalette.ink, cursor: "pointer", fontSize: 18, zIndex: 2 }}>×</button>
 
-          <div style={{ position: "relative", display: "grid", gap: 14 }}>
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: C.cyan, textTransform: "uppercase", marginBottom: 6 }}>Share your Full Portrait</div>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 28, fontWeight: 900, marginBottom: 4, letterSpacing: -0.6 }}>Pick the format</div>
-              <div style={{ fontSize: 12, lineHeight: 1.45, color: C.textMuted, maxWidth: 360 }}>One visual card, one polished PDF, or a clean message. No clutter.</div>
-            </div>
-
-            <div style={{ border: `1px solid rgba(34,211,238,0.24)`, background: "linear-gradient(135deg, rgba(34,211,238,0.11), rgba(168,85,247,0.08))", borderRadius: 24, padding: 14, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: 1.1, fontWeight: 900, marginBottom: 4 }}>Preview</div>
-                  <div style={{ fontSize: 18, fontWeight: 950, color: C.text }}>{report.mbtiType} · {report.primaryDisc} {discLabel}</div>
-                </div>
-                <div style={{ width: 48, height: 48, borderRadius: 18, display: "grid", placeItems: "center", background: "rgba(255,255,255,0.08)", border: `1px solid ${C.glassBorder}`, fontSize: 24 }}>↗</div>
-              </div>
-              <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.4 }}>{report.career.title} · {shareTopBigFiveName} signal · {BRAND_SHARE_HOST}</div>
-            </div>
+          <div style={{ position: "relative" }}>
+            <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: sharePalette.gold, textTransform: "uppercase", marginBottom: 7 }}>Your Full Portrait</div>
+            <div style={{ fontFamily: "'Space Grotesk', Arial, sans-serif", fontSize: 30, lineHeight: 0.98, fontWeight: 800, marginBottom: 8, letterSpacing: -1.2, color: sharePalette.ink }}>Share your result</div>
+            <div style={{ fontSize: 13, lineHeight: 1.5, color: sharePalette.muted, maxWidth: 360 }}>Send a visual card now, or keep the full report as a PDF.</div>
           </div>
         </div>
 
         <div style={{ padding: "0 18px 18px", display: "grid", gap: 12 }}>
           {shareError && (
-            <div role="alert" style={{ border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.1)", borderRadius: 16, padding: "10px 12px", color: "#fecaca", fontSize: 12, lineHeight: 1.45 }}>
+            <div role="alert" style={{ border: "1px solid #d7a4a0", background: "#fff1ee", borderRadius: 16, padding: "10px 12px", color: sharePalette.danger, fontSize: 12, lineHeight: 1.45 }}>
               {shareError}
             </div>
           )}
 
           <div style={{ display: "grid", gap: 10 }}>
-            <button type="button" onClick={handleSocialCard} disabled={Boolean(busyAction)} style={{ ...primaryActionStyle, minHeight: 88, borderColor: "rgba(245,158,11,0.48)", background: "linear-gradient(145deg, rgba(245,158,11,0.22), rgba(168,85,247,0.12))", boxShadow: "0 16px 42px rgba(245,158,11,0.12)" }}>
-              <span style={{ fontSize: 24 }}>🖼️</span>
+            <button type="button" onClick={handleSocialCard} disabled={Boolean(busyAction)} style={{ ...primaryActionStyle, minHeight: 94, borderColor: "#c89a55", background: "linear-gradient(145deg, #f5e7c9, #e6d8bd)", boxShadow: "0 16px 36px rgba(167,109,36,0.16)" }}>
+              <span style={{ fontSize: 25 }}>🖼️</span>
               <span>
-                <span style={{ ...actionLabelStyle, fontSize: 15 }}>{busyAction === "image" ? "Creating…" : "Share result card"}</span>
-                <span style={actionHintStyle}>Primary action: a clean visual card for socials, texts, and group chats.</span>
+                <span style={{ ...actionLabelStyle, fontSize: 16 }}>{busyAction === "image" ? "Preparing your card…" : "Share result card"}</span>
+                <span style={actionHintStyle}>A ready-to-send image for messages, socials, and group chats.</span>
               </span>
             </button>
 
-            <button type="button" onClick={handleDownload} disabled={Boolean(busyAction)} style={{ ...quickActionStyle, minHeight: 54, flexDirection: "row", gap: 9, borderColor: "rgba(34,211,238,0.28)", background: `linear-gradient(145deg, rgba(34,211,238,0.10), rgba(168,85,247,0.07))` }}>
-              <span style={{ fontSize: 18 }}>📄</span>
-              <span style={{ fontSize: 12, fontWeight: 900 }}>{busyAction === "pdf" ? "Building PDF…" : "Save PDF"}</span>
+            <button type="button" onClick={handleDownload} disabled={Boolean(busyAction)} style={{ ...quickActionStyle, minHeight: 64, flexDirection: "row", justifyContent: "flex-start", gap: 12, padding: "13px 16px", borderColor: sharePalette.line, background: "linear-gradient(145deg, #fffdf7, #f0e4cd)" }}>
+              <span style={{ fontSize: 20 }}>📄</span>
+              <span style={{ textAlign: "left" }}>
+                <span style={{ display: "block", fontSize: 13, fontWeight: 900 }}>{busyAction === "pdf" ? "Building PDF…" : "Download PDF report"}</span>
+                <span style={{ display: "block", marginTop: 3, color: sharePalette.muted, fontSize: 10.5, lineHeight: 1.35 }}>A printable copy of your Full Portrait.</span>
+              </span>
             </button>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 8 }}>
-            <button type="button" onClick={handleNativeShare} disabled={Boolean(busyAction)} style={quickActionStyle}>
-              <span style={{ fontSize: 18, marginBottom: 5 }}>📤</span>
-              <span style={{ fontSize: 11, fontWeight: 900 }}>{busyAction === "native" ? "Prep…" : "Share"}</span>
-            </button>
-            <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} onClick={() => trackKyrEvent("share_action_clicked", { ...shareEventParams, share_action: "email" })} style={quickActionStyle}>
-              <span style={{ fontSize: 18, marginBottom: 5 }}>✉️</span>
-              <span style={{ fontSize: 11, fontWeight: 900 }}>Email</span>
-            </a>
-            <a href={`sms:?&body=${smsBody}`} onClick={() => trackKyrEvent("share_action_clicked", { ...shareEventParams, share_action: "text" })} style={quickActionStyle}>
-              <span style={{ fontSize: 18, marginBottom: 5 }}>💬</span>
-              <span style={{ fontSize: 11, fontWeight: 900 }}>Text</span>
-            </a>
-            <button type="button" onClick={copyMessage} style={quickActionStyle}>
-              <span style={{ fontSize: 18, marginBottom: 5 }}>{copied ? "✓" : "⧉"}</span>
-              <span style={{ fontSize: 11, fontWeight: 900 }}>{copied ? "Copied" : "Copy"}</span>
-            </button>
-          </div>
+          <button type="button" onClick={() => setShowMoreOptions((value) => !value)} aria-expanded={showMoreOptions} style={{ border: 0, background: "transparent", color: sharePalette.cyan, cursor: "pointer", padding: "5px 2px 2px", fontFamily: "'IBM Plex Sans', Arial, sans-serif", fontSize: 12, fontWeight: 800, textAlign: "center" }}>
+            {showMoreOptions ? "Hide other options" : "More sharing options"}
+          </button>
 
-          <div style={{ fontSize: 10.5, color: C.textDim, textAlign: "center", lineHeight: 1.4, padding: "2px 10px 0" }}>
-            Share card is the visual flex. PDF is the keep-it-forever version.
+          {showMoreOptions && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8, paddingTop: 2 }}>
+              <button type="button" onClick={handleNativeShare} disabled={Boolean(busyAction)} style={quickActionStyle}>
+                <span style={{ fontSize: 18, marginBottom: 5 }}>📤</span>
+                <span style={{ fontSize: 11, fontWeight: 900 }}>{busyAction === "native" ? "Preparing…" : "Share PDF"}</span>
+              </button>
+              <button type="button" onClick={copyMessage} style={quickActionStyle}>
+                <span style={{ fontSize: 18, marginBottom: 5 }}>{copied ? "✓" : "⧉"}</span>
+                <span style={{ fontSize: 11, fontWeight: 900 }}>{copied ? "Copied" : "Copy message"}</span>
+              </button>
+              <a href={`mailto:?subject=${emailSubject}&body=${emailBody}`} onClick={() => trackKyrEvent("share_action_clicked", { ...shareEventParams, share_action: "email" })} style={quickActionStyle}>
+                <span style={{ fontSize: 18, marginBottom: 5 }}>✉️</span>
+                <span style={{ fontSize: 11, fontWeight: 900 }}>Email</span>
+              </a>
+              <a href={`sms:?&body=${smsBody}`} onClick={() => trackKyrEvent("share_action_clicked", { ...shareEventParams, share_action: "text" })} style={quickActionStyle}>
+                <span style={{ fontSize: 18, marginBottom: 5 }}>💬</span>
+                <span style={{ fontSize: 11, fontWeight: 900 }}>Text</span>
+              </a>
+            </div>
+          )}
+
+          <div style={{ fontSize: 10.5, color: sharePalette.dim, textAlign: "center", lineHeight: 1.4, padding: "2px 10px 0" }}>
+            Your result remains yours. Choose the version that is useful to share or keep.
           </div>
         </div>
       </div>
@@ -2557,34 +2596,32 @@ function resultPageEventName(page: ResultPageId) {
   return page === 1 ? "full_portrait" : page;
 }
 
-function BottomBar({ active = 1, onNavigate, onShare }: {
+function BottomBar({ active = 1, onNavigate }: {
   active?: ResultPageId;
   onNavigate?: (page: ResultPageId) => void;
-  onShare?: () => void;
 }) {
-  const btns: Array<{ id: ResultPageId | "share"; icon: string; label: string; action: "navigate" | "share" }> = [
-    { id: 1, icon: "🏆", label: "Portrait", action: "navigate" },
-    { id: "insights", icon: "🧭", label: "Insights", action: "navigate" },
-    { id: "pressure", icon: "⚡", label: "Pressure", action: "navigate" },
-    { id: "chemistry", icon: "🧪", label: "Chemistry", action: "navigate" },
-    { id: "roles", icon: "🎯", label: "Roles", action: "navigate" },
-    { id: "share", icon: "↗️", label: "Share", action: "share" },
+  const btns: Array<{ id: ResultPageId; icon: string; label: string }> = [
+    { id: 1, icon: "🏆", label: "Portrait" },
+    { id: "insights", icon: "🧭", label: "Insights" },
+    { id: "pressure", icon: "⚡", label: "Pressure" },
+    { id: "chemistry", icon: "🧪", label: "Chemistry" },
+    { id: "roles", icon: "🎯", label: "Roles" },
   ];
 
   return (
     <div className="results-bottom-bar" aria-label="Results pages and sharing" style={{
-      background: "rgba(8, 4, 20, 0.92)",
-      backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-      border: `1px solid ${C.glassBorder}`,
+      background: "rgba(255,253,248,0.94)",
+      backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)",
+      border: `1px solid ${C.glassBorderBright}`,
       display: "flex", justifyContent: "space-between",
       pointerEvents: "none",
     }}>
       {btns.map(b => {
-        const isActive = b.action === "navigate" && active === b.id;
+        const isActive = active === b.id;
         return (
           <button
             key={String(b.id)}
-            onClick={() => b.action === "share" ? onShare?.() : onNavigate?.(b.id as ResultPageId)}
+            onClick={() => onNavigate?.(b.id)}
             aria-current={isActive ? "page" : undefined}
             style={{
               flex: "1 1 0",
@@ -2592,11 +2629,11 @@ function BottomBar({ active = 1, onNavigate, onShare }: {
               minHeight: 52,
               padding: "5px 1px",
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
-              background: isActive ? "rgba(103, 232, 249, 0.08)" : b.action === "share" ? "rgba(168,85,247,0.06)" : "none",
+              background: isActive ? "rgba(103, 232, 249, 0.08)" : "none",
               border: "none",
               borderRadius: 14,
-              color: isActive ? C.cyan : b.action === "share" ? C.purple : C.textMuted,
-              opacity: isActive || b.action === "share" ? 1 : 0.62,
+              color: isActive ? C.cyan : C.textMuted,
+              opacity: isActive ? 1 : 0.62,
               fontSize: 7.6, fontWeight: 700, lineHeight: 1.1, cursor: "pointer",
               pointerEvents: "auto",
               fontFamily: "Inter, sans-serif", transition: "all 0.2s",
@@ -2617,7 +2654,7 @@ function PrivacyStrip() {
     <div style={{
       display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
       padding: "14px 0 8px", fontSize: 9, color: C.textDim,
-    }}>🛡 Your profile is saved securely. We never sell your results.</div>
+    }}>🛡 Your completion may be saved to generate and recover this result. We do not sell quiz results.</div>
   );
 }
 
@@ -2639,7 +2676,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
   const discColor = DISC_COLORS[primary];
   const pct = (v: number) => v; // Real normalized scores — no random jitter
   const career = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
-  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive);
+  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career);
   const [primaryRoleCard] = buildPremiumRoleMatchCards({
     roleMatch,
     mbtiType,
@@ -2845,7 +2882,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
   const bigFiveConfidenceBody = bigFiveTopGap >= 15
     ? `${topBigFiveRow.label} leads ${secondBigFiveRow.label} by ${bigFiveTopGap} points, so it is a useful anchor for reading the profile.`
     : `${topBigFiveRow.label} and ${secondBigFiveRow.label} are close. Read the Big Five shape as a blend, not a single-trait headline.`;
-  const socialIdentityTitle = SOCIAL_IDENTITY_TITLES[mbtiType] || displayedCareerTitle;
+  const socialIdentityTitle = humanizeResultLabel(SOCIAL_IDENTITY_TITLES[mbtiType] || displayedCareerTitle);
   const mbtiEmoji = MBTI_EMOJIS[mbtiType] || "✨";
   const mbtiShortName = stripLeadingThe(arch);
   const socialShareLine = MBTI_SHARE_INSIGHTS[mbtiType] || getShareInsight(mbtiType, DISC_LABELS[primary] || primary);
@@ -2926,7 +2963,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
         throw new Error(errorMessage);
       }
       setLeadStatus("success");
-      setLeadMessage(data?.deliveryStatus === "sent" ? "Saved and sent. Check your inbox." : "Saved. Email delivery is queued or not configured yet.");
+      setLeadMessage("Sent. Check your inbox for your result summary.");
       trackKyrEvent("email_capture_completed", { result_page: "full_portrait", source: "batch4_result_cta", status: "success", delivery_status: data?.deliveryStatus || "unknown", mbti_type: mbtiType, primary_disc: primary });
     } catch (error) {
       setLeadStatus("error");
@@ -3350,6 +3387,24 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
           <strong style={{ color: C.text }}>Most flexible:</strong> {mostFlexibleMbtiDimensions.map(d => `${d.dominant} ${d.words[d.dominant as keyof typeof d.words]} (${d.dominantPct}%)`).join(", ")}
         </div>
 
+        <FrameworkReference
+          kind="mbti"
+          mbtiAxes={mbtiDimensions.map(d => ({
+            label: d.plainLabel,
+            leftLetter: d.leftLetter,
+            rightLetter: d.rightLetter,
+            leftWord: d.words[d.leftLetter as keyof typeof d.words],
+            rightWord: d.words[d.rightLetter as keyof typeof d.words],
+            leftDescription: d.meanings[d.leftLetter as keyof typeof d.meanings],
+            rightDescription: d.meanings[d.rightLetter as keyof typeof d.meanings],
+            dominant: d.dominant,
+            leftPct: d.leftPct,
+            rightPct: d.rightPct,
+            isClose: d.dominantPct < 60,
+          }))}
+          onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "full_portrait", framework: "mbti", mbti_type: mbtiType, primary_disc: primary })}
+        />
+
       </PortraitAccordion>
 
       <PortraitAccordion
@@ -3391,6 +3446,12 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             ))}
           </div>
         </div>
+        <FrameworkReference
+          kind="disc"
+          primaryDisc={primary}
+          disc={disc}
+          onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "full_portrait", framework: "disc", mbti_type: mbtiType, primary_disc: primary })}
+        />
       </PortraitAccordion>
 
       <PortraitAccordion
@@ -3452,6 +3513,11 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             </div>
           </div>
         ))}
+        <FrameworkReference
+          kind="bigFive"
+          bigFive={bigFive}
+          onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "full_portrait", framework: "big_five", mbti_type: mbtiType, primary_disc: primary })}
+        />
       </PortraitAccordion>
       </FullPortraitSection>
 
@@ -3536,7 +3602,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
           <div style={{ width: 42, height: 42, borderRadius: 15, display: "grid", placeItems: "center", background: "rgba(255,255,255,0.07)", border: `1px solid ${C.glassBorder}`, fontSize: 20 }}>✉️</div>
         </div>
         <p style={{ margin: "0 0 12px", fontSize: 11, lineHeight: 1.5, color: C.textMuted }}>
-          Save the useful version so you can revisit it later. We save the email request and result summary consent; no raw quiz answers are sent here.
+          To send or queue this summary, we store your email, session/result identifiers, visible summary fields, your consent, and delivery status. This form does not enroll you in marketing; raw answers are not included in the email-request record.
         </p>
         <form onSubmit={handleEmailLeadSubmit} style={{ display: "grid", gap: 9 }}>
           <input
@@ -4738,6 +4804,9 @@ function OrbitalGlassV2Results({
   mbtiType,
   primaryDisc,
   rawScores,
+  canonicalResult,
+  canonicalCareerDirection,
+  sessionId,
   discDesc,
   onShare,
 }: {
@@ -4746,6 +4815,9 @@ function OrbitalGlassV2Results({
   mbtiType: string;
   primaryDisc: string;
   rawScores?: QuizScores;
+  canonicalResult?: ResultDTO;
+  canonicalCareerDirection?: ResultDTO["careerDirection"];
+  sessionId?: string;
   discDesc?: string;
   onShare: (source?: string) => void;
 }) {
@@ -4768,18 +4840,51 @@ function OrbitalGlassV2Results({
   }, [view]);
 
   const arch = getArchetype(mbtiType);
-  const identity = SOCIAL_IDENTITY_TITLES[mbtiType] || `${stripLeadingThe(arch)} Builder`;
+  const identity = humanizeResultLabel(SOCIAL_IDENTITY_TITLES[mbtiType] || `${stripLeadingThe(arch)} Builder`);
   const emoji = MBTI_EMOJIS[mbtiType] || "◈";
   const discLabel = DISC_LABELS[primaryDisc] || primaryDisc;
-  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive);
+  const canonicalRoles = canonicalCareerDirection?.examples.map(role => ({ title: role.title, salary: role.marketData?.salaryRange || "", desc: role.reasoning })) ?? [];
+  const roleMatch: CareerRoleMatch = canonicalCareerDirection
+    ? {
+        primary: canonicalRoles[0] || { title: canonicalCareerDirection.title, salary: "", desc: canonicalCareerDirection.rationale },
+        secondary: canonicalRoles[1] || canonicalRoles[0] || { title: canonicalCareerDirection.title, salary: "", desc: canonicalCareerDirection.rationale },
+        alternatives: canonicalRoles.slice(2),
+        direction: {
+          laneKey: canonicalCareerDirection.laneKey as never,
+          title: canonicalCareerDirection.title,
+          rationale: canonicalCareerDirection.rationale,
+          examples: canonicalRoles,
+        },
+        whyThisFits: canonicalCareerDirection.rationale,
+        starterPath: "Test one example through a small project, conversation, or shadowing opportunity.",
+        mayNotFit: "Treat this as a direction to test, not a fixed job prescription.",
+        matchSource: "career-vector",
+      }
+    : findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career);
   const roleCards = buildPremiumRoleMatchCards({ roleMatch, mbtiType, primaryDisc, disc, bigFive });
   const primaryRole = roleCards[0] || { title: (TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP).title, pct: 84, why: roleMatch.whyThisFits || "Your pattern fits work that turns messy inputs into useful progress.", daily: "Translate ambiguity into structure people can use.", skill: "Systems thinking", firstMove: "Build one small proof project.", primary: true, rank: "01" };
+  const roleDirection = canonicalCareerDirection
+    ? {
+        laneKey: canonicalCareerDirection.laneKey,
+        title: canonicalCareerDirection.title,
+        rationale: canonicalCareerDirection.rationale,
+        examples: canonicalCareerDirection.examples.map(role => ({ title: role.title, salary: role.marketData?.salaryRange || "", desc: role.reasoning })),
+      }
+    : roleMatch.direction ?? {
+    title: primaryRole.title,
+    examples: [roleMatch.primary, roleMatch.secondary, ...(roleMatch.alternatives ?? [])]
+      .filter((role, index, roles) => roles.findIndex(candidate => candidate.title === role.title) === index)
+      .slice(0, 3),
+    rationale: primaryRole.why,
+  };
   const adjacentRoles = roleCards.slice(1, 4);
+  const laneExamples = roleMatch.laneExamples?.filter(lane => lane.roles.length > 0).slice(0, 2) ?? [];
+  const laneConfidence = (score: number, mixed = false) => mixed ? "Mixed evidence" : score >= 65 ? "Clear pull" : score >= 45 ? "Strong pull" : "Worth exploring";
   const rankedTraits = (Object.entries(bigFive) as [keyof BigFiveProfile, number][]).sort((a, b) => b[1] - a[1]);
   const topTrait = rankedTraits[0];
   const topTraitMeta = TRAIT_DEEP_DIVE[topTrait[0]];
   const resultSummaryLine = buildResultSummaryLine({
-    roleTitle: primaryRole.title,
+    roleTitle: roleDirection.title,
     identity,
     mbtiType,
     discLabel,
@@ -4814,10 +4919,17 @@ function OrbitalGlassV2Results({
     return { ...axis, pct: dominantPct };
   });
   const discEntries = (Object.entries(disc) as [keyof DiscProfile, number][]).sort((a, b) => b[1] - a[1]);
+  const secondaryDiscEntry = discEntries.find(([key]) => key !== primaryDisc) || discEntries[1] || discEntries[0];
 
   const go = (next: OrbitalResultView, source = "orbital_v2") => {
     trackKyrEvent("result_section_clicked", { result_page: view, target_page: next, source, mbti_type: mbtiType, primary_disc: primaryDisc });
+    if (next === "role") trackKyrEvent("role_fit_opened", { result_page: view, source, mbti_type: mbtiType, primary_disc: primaryDisc });
     setView(next);
+  };
+
+  const returnHome = () => {
+    trackKyrEvent("result_home_return_clicked", { result_page: view, mbti_type: mbtiType, primary_disc: primaryDisc });
+    window.location.assign("/");
   };
 
   const navItems: Array<{ id: OrbitalResultView; icon: string; label: string }> = [
@@ -4825,11 +4937,10 @@ function OrbitalGlassV2Results({
     { id: "mbti", icon: "♟", label: "MBTI" },
     { id: "bigfive", icon: "🌌", label: "Big" },
     { id: "disc", icon: "📊", label: "DISC" },
-    { id: "share", icon: "↗", label: "Share" },
   ];
 
   const orbStyle: CSSProperties = {
-    ["--accent" as string]: view === "role" ? "#ffd581" : view === "mbti" ? "#a777ff" : view === "bigfive" ? "#73ffc8" : view === "disc" ? "#ff63cf" : "#52f1ff",
+    ["--accent" as string]: view === "role" ? "#bf7c12" : view === "mbti" ? "#c95f46" : view === "bigfive" ? "#2f7b87" : view === "disc" ? "#5a9aaa" : "#315f74",
   };
 
   return (
@@ -4856,6 +4967,7 @@ function OrbitalGlassV2Results({
         .shareline { margin:16px 0 13px; } .shareline b { color:#ffd581; font-size:10px; letter-spacing:.18em; text-transform:uppercase; } .shareline p { margin:7px 0 0; font-size:clamp(15.5px,4.4vw,20px); line-height:1.28; letter-spacing:-.026em; font-weight:720; color:rgba(248,251,255,.80); text-wrap:pretty; }
         .role-card { margin-top:13px; border-radius:25px; padding:17px; background:linear-gradient(145deg,#fff8e8,#f4dfb4); color:#15110c; box-shadow:0 18px 48px rgba(0,0,0,.26); }
         .role-card small { display:block; color:rgba(74,54,28,.62); font-size:10px; font-weight:950; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px; } .role-card h2 { margin:0 0 6px; font-size:25px; letter-spacing:-.055em; line-height:1.03; text-wrap:balance; } .role-card p { margin:0; color:rgba(20,14,7,.74); font-size:13px; line-height:1.48; font-weight:650; text-wrap:pretty; }
+        .direction-examples { margin-top:15px; display:grid; gap:9px; } .direction-examples b { color:rgba(74,54,28,.62); font-size:10px; font-weight:950; letter-spacing:.13em; text-transform:uppercase; } .direction-examples span { color:#21180c; font-size:clamp(18px,2vw,20px); font-weight:900; line-height:1.18; letter-spacing:-.018em; }
         .mini-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:11px; } .stat { border-radius:18px; padding:11px 9px; background:rgba(5,7,15,.70); border:1px solid rgba(255,255,255,.11); min-height:74px; } .stat small { display:block; color:#52f1ff; font-size:9px; text-transform:uppercase; letter-spacing:.11em; font-weight:950; margin-bottom:7px; } .stat strong { display:block; font-size:18px; letter-spacing:-.04em; } .stat span { color:var(--muted); font-size:10px; line-height:1.25; display:block; margin-top:2px; }
         .link-stack { margin-top:14px; display:grid; gap:9px; padding-bottom:calc(8px + env(safe-area-inset-bottom)); } .result-link { width:100%; text-align:left; display:grid; grid-template-columns:42px minmax(0,1fr) auto; gap:10px; align-items:center; padding:12px; border-radius:21px; border:1px solid rgba(255,255,255,.12); color:white; background:linear-gradient(135deg,rgba(255,255,255,.095),rgba(255,255,255,.035)); box-shadow:0 12px 30px rgba(0,0,0,.14); cursor:pointer; } .icon { width:44px; height:44px; border-radius:16px; display:grid; place-items:center; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.11); font-size:21px; } .result-link b { display:block; font-size:15px; letter-spacing:-.03em; } .result-link span span { display:block; color:var(--muted); font-size:12px; line-height:1.28; margin-top:2px; } .arrow { color:var(--faint); font-size:22px; }
         .detail-head { border-radius:31px; padding:17px; min-height:250px; border:1px solid rgba(255,255,255,.16); background:radial-gradient(circle at 82% 10%, color-mix(in srgb,var(--accent),transparent 66%), transparent 36%), linear-gradient(150deg,rgba(255,255,255,.105),rgba(255,255,255,.035)); box-shadow:0 24px 70px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.14); backdrop-filter:blur(22px); display:flex; flex-direction:column; justify-content:space-between; margin-bottom:12px; }
@@ -4865,11 +4977,38 @@ function OrbitalGlassV2Results({
         .chips { display:flex; overflow-x:auto; gap:8px; margin-top:13px; padding-bottom:2px; scrollbar-width:none; } .chip { flex:0 0 auto; padding:8px 10px; border-radius:999px; background:rgba(255,255,255,.075); border:1px solid rgba(255,255,255,.11); color:var(--muted); font-size:11px; font-weight:850; }
         .orbit-mini { height:280px; position:relative; overflow:hidden; } .core { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:126px; height:126px; border-radius:50%; display:grid; place-items:center; text-align:center; font-weight:950; background:radial-gradient(circle, rgba(255,255,255,.16), color-mix(in srgb,var(--accent),transparent 82%)); border:1px solid rgba(255,255,255,.2); box-shadow:0 0 56px color-mix(in srgb,var(--accent),transparent 70%); } .ring { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); border:1px dashed rgba(255,255,255,.17); border-radius:50%; } .r1 { width:214px; height:214px; } .r2 { width:318px; height:318px; opacity:.55; } .node { position:absolute; padding:8px 9px; border-radius:999px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.12); font-size:11px; font-weight:900; } .n1 { left:4%; top:21%; } .n2 { right:4%; top:21%; } .n3 { left:3%; bottom:18%; } .n4 { right:5%; bottom:18%; }
         .role-list { display:grid; gap:9px; margin-top:10px; } .mini-role { padding:13px; border-radius:18px; background:rgba(255,255,255,.065); border:1px solid rgba(255,255,255,.10); } .mini-role b { display:block; font-size:14px; margin-bottom:4px; } .mini-role span { color:var(--muted); font-size:12.5px; line-height:1.38; }
+        .lane-preview { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; } .lane-preview span { border:1px solid rgba(255,213,129,.38); background:rgba(255,213,129,.10); color:#fff0c9; border-radius:999px; padding:7px 9px; font-size:10px; font-weight:900; text-transform:capitalize; }
+        .lane-grid { display:grid; gap:10px; margin-top:12px; } .lane-card { border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:13px; background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.035)); } .lane-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; } .lane-card h4 { margin:0; font-size:15px; letter-spacing:-.03em; text-transform:capitalize; } .lane-card em { flex:0 0 auto; color:var(--accent); font-style:normal; font-size:10px; font-weight:950; letter-spacing:.08em; text-transform:uppercase; } .lane-card p { margin:6px 0 0; color:var(--muted); font-size:12px; line-height:1.4; } .lane-roles { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; } .lane-roles span { border:1px solid rgba(255,255,255,.11); border-radius:999px; background:rgba(5,7,17,.42); color:#fff; padding:6px 8px; font-size:11px; font-weight:800; }
         .meter-list { display:grid; gap:12px; margin-top:12px; } .meter-top { display:flex; justify-content:space-between; color:var(--muted); font-size:12px; font-weight:850; margin-bottom:7px; } .bar { height:12px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(255,255,255,.08); } .fill { height:100%; width:var(--v); border-radius:999px; background:linear-gradient(90deg,var(--accent),rgba(255,255,255,.82)); }
         .disc-grid { display:grid; grid-template-columns:repeat(2,1fr); border:1px solid rgba(255,255,255,.12); border-radius:23px; overflow:hidden; margin-top:12px; } .quad { min-height:96px; padding:13px; background:rgba(255,255,255,.055); display:flex; flex-direction:column; justify-content:space-between; } .quad.active { background:linear-gradient(135deg,rgba(255,99,207,.30),rgba(82,241,255,.08)); } .quad b { font-size:26px; } .quad span { color:var(--muted); font-size:12px; }
         .share-preview { border-radius:28px; padding:18px; background:linear-gradient(150deg,rgba(82,241,255,.22),rgba(167,119,255,.14),rgba(255,213,129,.12)); border:1px solid rgba(255,255,255,.18); } .share-preview h2 { margin:15px 0; font-size:54px; line-height:.82; letter-spacing:-.085em; } .share-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-top:13px; } .share-btn { border:1px solid rgba(255,255,255,.14); border-radius:17px; padding:13px 10px; color:white; background:rgba(255,255,255,.09); font-weight:900; cursor:pointer; } .share-btn.primary { color:#061018; background:linear-gradient(135deg,#52f1ff,#ffd581); }
-        .bottom-nav { position:relative; z-index:40; width:100%; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; padding:8px; border-radius:25px; border:1px solid rgba(255,255,255,.14); background:rgba(5,7,17,.78); backdrop-filter:blur(20px); box-shadow:0 18px 60px rgba(0,0,0,.38); } .bottom-nav button { text-align:center; border:0; border-radius:18px; padding:8px 5px; color:var(--muted); background:transparent; font-size:10px; font-weight:950; cursor:pointer; } .bottom-nav button i { display:block; font-style:normal; font-size:19px; margin-bottom:3px; } .bottom-nav button.active { color:white; background:rgba(255,255,255,.105); }
-        @media (min-width:760px) { .orbital-results-v2 { display:grid; place-items:start center; } .orb-stage { margin-top:18px; min-height:calc(100vh - 36px); border-left:1px solid rgba(255,255,255,.08); border-right:1px solid rgba(255,255,255,.08); } }
+        .bottom-nav { position:relative; z-index:40; width:100%; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:8px; border-radius:25px; border:1px solid rgba(255,255,255,.14); background:rgba(5,7,17,.78); backdrop-filter:blur(20px); box-shadow:0 18px 60px rgba(0,0,0,.38); } .bottom-nav button { text-align:center; border:0; border-radius:18px; padding:8px 5px; color:var(--muted); background:transparent; font-size:10px; font-weight:950; cursor:pointer; } .bottom-nav button i { display:block; font-style:normal; font-size:19px; margin-bottom:3px; } .bottom-nav button.active { color:white; background:rgba(255,255,255,.105); }
+        .result-home-exit { margin:30px 0 18px; padding:20px 16px; text-align:center; border-top:1px solid rgba(18,38,58,.18); } .result-home-exit p { max-width:330px; margin:0 auto 14px; color:#456174; font-size:12px; line-height:1.48; } .result-home-exit p strong { color:#12263a; } .result-home-exit__actions { display:grid; grid-template-columns:1fr; gap:9px; max-width:360px; margin:0 auto; } .result-home-exit button { min-height:46px; border-radius:4px; padding:11px 14px; font:800 13px/1.2 Manrope,Inter,system-ui,sans-serif; cursor:pointer; } .result-home-exit__share { order:-1; min-height:52px !important; border:1px solid #9d3e2b; background:linear-gradient(135deg,#c95f46,#a84732); color:#fffdf8; box-shadow:4px 4px 0 rgba(18,38,58,.18); } .result-home-exit__share:hover { background:linear-gradient(135deg,#b84f38,#913825); transform:translate(-1px,-1px); box-shadow:5px 5px 0 rgba(18,38,58,.20); } .result-home-exit__home { border:1px solid rgba(18,38,58,.26); background:#fffdf8; color:#315f74; } .result-home-exit__home:hover { background:#fff3d7; color:#12263a; } .result-home-exit button:focus-visible { outline:3px solid #ffca42; outline-offset:3px; }
+        @media (min-width:500px) { .result-home-exit__actions { grid-template-columns:1fr 1fr; } .result-home-exit__share { order:0; } }
+        @media (min-width:760px) { .orbital-results-v2 { display:grid; place-items:start center; } .orb-stage { width:min(calc(100% - 48px),760px); margin-top:18px; min-height:calc(100vh - 36px); border-left:1px solid rgba(18,38,58,.12); border-right:1px solid rgba(18,38,58,.12); } }
+
+        /* Workday report treatment: retained interactions, rebuilt visual language. */
+        .orbital-results-v2 { --ink:#12263a; --muted:#456174; --faint:#637b8a; --line:rgba(18,38,58,.18); color:var(--ink); font-family:Manrope,Inter,system-ui,sans-serif; background:linear-gradient(132deg,#9ed8e6 0 22%,#f8f3e8 22% 68%,#e98268 68% 100%) !important; }
+        .orbital-results-v2:before { background-image:linear-gradient(rgba(18,38,58,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(18,38,58,.075) 1px,transparent 1px); opacity:.35; }
+        .orb-top { background:linear-gradient(to bottom,rgba(255,253,248,.96),rgba(255,253,248,.78),transparent) !important; }
+        .orb-brand { color:#12263a !important; } .orb-mark { border-radius:4px; background:linear-gradient(135deg,#ffca42,#e98268) !important; box-shadow:4px 4px 0 rgba(18,38,58,.16) !important; }
+        .orb-pill { border-color:rgba(18,38,58,.2) !important; background:#fffdf8 !important; color:#315f74 !important; }
+        .portrait-card,.detail-head { border-color:rgba(18,38,58,.2) !important; border-radius:4px !important; background:linear-gradient(145deg,rgba(255,253,248,.97),rgba(246,239,224,.93)) !important; box-shadow:8px 8px 0 rgba(18,38,58,.12) !important; backdrop-filter:none !important; }
+        .eyebrow,.shareline b,.stat small { color:#315f74 !important; }
+        .avatar,.icon { border-color:rgba(18,38,58,.16) !important; background:#dcedf0 !important; border-radius:4px !important; }
+        .glass-tile,.detail-card,.result-link,.lane-card,.mini-role { border-color:rgba(18,38,58,.16) !important; background:#fffdf8 !important; color:#12263a !important; box-shadow:4px 4px 0 rgba(18,38,58,.09) !important; backdrop-filter:none !important; }
+        .glass-tile { border-radius:3px !important; } .type-chip,.chip { border-color:rgba(18,38,58,.18) !important; background:#eaf5f6 !important; color:#12263a !important; }
+        .shareline p,.detail-card p,.detail-head p,.mini-role span,.lane-card p,.result-link span span,.stat span,.meter-top,.quad span { color:#456174 !important; }
+        .role-card { border-radius:3px !important; background:linear-gradient(135deg,#ffca42,#f8df9a) !important; color:#12263a !important; box-shadow:5px 5px 0 #c95f46 !important; }
+        .mini-stats .stat { border-color:rgba(18,38,58,.16) !important; background:#12263a !important; color:#fffdf8 !important; border-radius:3px !important; } .mini-stats .stat span { color:#dcedf0 !important; }
+        .result-link { border-radius:3px !important; } .result-link:hover { background:#fff3d7 !important; transform:translate(-2px,-2px); box-shadow:6px 6px 0 rgba(18,38,58,.14) !important; }
+        .detail-head h2,.orb-h1,.share-preview h2 { font-family:Fraunces,Georgia,serif !important; color:#12263a !important; }
+        .analogy,.share-preview { border-color:rgba(18,38,58,.18) !important; background:#eaf5f6 !important; color:#29495c !important; }
+        .analogy b { color:#c95f46 !important; } .bar { border-color:rgba(18,38,58,.15) !important; background:#e7e1d5 !important; } .fill { background:linear-gradient(90deg,var(--accent),#ffca42) !important; }
+        .disc-grid { border-color:rgba(18,38,58,.18) !important; } .quad { background:#fffdf8 !important; } .quad.active { background:linear-gradient(135deg,#dcedf0,#fff0c8) !important; }
+        .lane-preview span,.lane-roles span { border-color:rgba(18,38,58,.18) !important; background:#fff0c8 !important; color:#12263a !important; }
+        .bottom-nav { border-color:rgba(18,38,58,.2) !important; background:#fffdf8 !important; box-shadow:5px 5px 0 rgba(18,38,58,.12) !important; } .bottom-nav button.active { color:#12263a !important; background:#ffca42 !important; }
+
       `}</style>
 
       <main className="orb-stage">
@@ -4881,31 +5020,78 @@ function OrbitalGlassV2Results({
         {view === "main" && (
           <section>
             <article className="portrait-card">
-              <div className="card-head"><div className="eyebrow">What you'll get</div><div className="avatar">{emoji}</div></div>
+              <div className="card-head"><div className="eyebrow">Your result</div><div className="avatar">{emoji}</div></div>
               <div className="glass-tile"><div className="type-chip">{emoji} {mbtiType} <small>{stripLeadingThe(arch)}</small></div><h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1></div>
-              <div className="shareline"><b>Result summary</b><p>“{shareLine}”</p></div>
-              <div className="role-card"><small>Best-fit role direction</small><h2>{primaryRole.title}</h2><p>{primaryRole.why}</p></div>
-              <div className="mini-stats"><div className="stat"><small>MBTI</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>DISC</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>Trait</small><strong>{topTrait[1]}%</strong><span>{topTraitMeta.label}</span></div></div>
+              <div className="shareline"><b>Snapshot</b><p>“{shareLine}”</p></div>
+              <div className="role-card"><small>Best-fit direction</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>Strong examples</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}</div>
+              <div className="mini-stats"><div className="stat"><small>Mind</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>Work style</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>Top trait</small><strong>{topTrait[1]}%</strong><span>{topTraitMeta.label}</span></div></div>
             </article>
+            <ResultDecisionBrief
+              result={canonicalResult}
+              fallback={{
+                directionTitle: roleDirection.title,
+                rationale: roleDirection.rationale,
+                examples: roleDirection.examples.map((role) => ({ title: role.title, reasoning: role.desc })),
+                starterMove: primaryRole.firstMove,
+                watchOut: primaryRole.skill,
+              }}
+              onExploreRole={() => go("role", "decision_brief")}
+            />
+            <DirectionFeedbackCard
+              resultId={canonicalResult?.meta.resultId}
+              sessionId={canonicalResult?.meta.sessionId || sessionId}
+              directionTitle={roleDirection.title}
+              recommendations={roleDirection.examples.map((role) => role.title)}
+            />
             <div className="link-stack">
               <button className="result-link" onClick={() => go("role")}><span className="icon">🏆</span><span><b>Role Fit</b><span>Career direction and adjacent roles.</span></span><span className="arrow">›</span></button>
               <button className="result-link" onClick={() => go("mbti")}><span className="icon">♟</span><span><b>MBTI-style</b><span>Your cognitive operating pattern.</span></span><span className="arrow">›</span></button>
               <button className="result-link" onClick={() => go("bigfive")}><span className="icon">🌌</span><span><b>Big Five</b><span>Your trait gravity and environment fit.</span></span><span className="arrow">›</span></button>
               <button className="result-link" onClick={() => go("disc")}><span className="icon">📊</span><span><b>DISC</b><span>Your visible work behavior.</span></span><span className="arrow">›</span></button>
-              <button className="result-link" onClick={() => go("share")}><span className="icon">↗</span><span><b>Share</b><span>Save or send a clean result summary.</span></span><span className="arrow">›</span></button>
             </div>
           </section>
         )}
 
-        {view === "role" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>Role Fit</h2><p>Your career direction, explained like a flight path rather than a prison sentence.</p></div></div><div className="detail-card orbit-mini"><div className="ring r1" /><div className="ring r2" /><div className="core">{primaryRole.title}</div><div className="node n1">Pattern</div><div className="node n2">Process</div><div className="node n3">Strategy</div><div className="node n4">Quality</div></div><div className="detail-card"><h3>Why this fits</h3><p>{primaryRole.why}</p><div className="chips"><span className="chip">{mbtiType} pattern</span><span className="chip">{discLabel} work style</span><span className="chip">{topTraitMeta.label}</span></div><div className="analogy"><b>Analogy</b>Role fit is a flight path. It does not trap you in one destination; it shows which skies have the least turbulence.</div></div><div className="detail-card"><h3>Other good-fit roles</h3><div className="role-list">{adjacentRoles.map((role) => <div className="mini-role" key={role.title}><b>{role.title}</b><span>{role.why}</span></div>)}</div></div></section>}
+        {view === "role" && (
+          <section>
+            <div className="detail-head">
+              <button className="back" onClick={() => go("main", "back")}>← Portrait</button>
+              <div><h2>Role Fit</h2><p>Your career direction, explained like a flight path rather than a prison sentence.</p></div>
+            </div>
+            <div className="detail-card orbit-mini">
+              <div className="ring r1" /><div className="ring r2" /><div className="core">{roleDirection.title}</div>
+              <div className="node n1">Pattern</div><div className="node n2">Process</div><div className="node n3">Strategy</div><div className="node n4">Quality</div>
+            </div>
+            <div className="detail-card">
+              <h3>Why this direction fits</h3><p>{roleDirection.rationale}</p>
+              <div className="chips"><span className="chip">{mbtiType} pattern</span><span className="chip">{discLabel} work style</span><span className="chip">{topTraitMeta.label}</span></div>
+              <div className="analogy"><b>Analogy</b>Role fit is a flight path. It does not trap you in one destination; it shows which skies have the least turbulence.</div>
+            </div>
+            {laneExamples.length > 0 && <div className="detail-card">
+              <h3>Your work directions</h3><p>These are parallel environments to explore, not a single job prescription. Each lane includes examples with the least friction for your current signals.</p>
+              <div className="lane-grid">{laneExamples.map(lane => <article className="lane-card" key={lane.key}><div className="lane-card-head"><h4>{lane.label}</h4><em>{laneConfidence(lane.score, lane.mixed)}</em></div><p>{lane.score}% lane evidence from your direct work-preference answers.</p><div className="lane-roles">{lane.roles.map(role => <span key={role.title}>{role.title}</span>)}</div></article>)}</div>
+            </div>}
+            <div className="detail-card"><h3>First experiment</h3><p>{primaryRole.firstMove}</p></div>
+            <div className="detail-card"><h3>Watch-out</h3><p>{primaryRole.skill}</p></div>
+            <div className="detail-card"><h3>Other good-fit roles</h3><div className="role-list">{adjacentRoles.map((role) => <div className="mini-role" key={role.title}><b>{role.title}</b><span>{role.why}</span></div>)}</div></div>
+          </section>
+        )}
 
-        {view === "mbti" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>MBTI</h2><p>Your preferred mental route: how you plan, process, decide, and build.</p></div></div><div className="detail-card"><h3>{mbtiType}: {stripLeadingThe(arch)} mode</h3><p>{MBTI_TAGLINES[mbtiType] || "Personality pattern"}. This describes the route your mind tends to select when making sense of people, problems, and plans.</p><div className="analogy"><b>Analogy</b>MBTI is your navigation app: it does not choose the destination, but it reveals the route your mind keeps selecting.</div></div><div className="detail-card"><h3>Cognitive flow</h3><div className="meter-list">{mbtiDimensions.map((axis) => <div key={axis.label}><div className="meter-top"><span>{axis.label} · {axis.words[axis.dominant as keyof typeof axis.words]}</span><span>{axis.pct}%</span></div><div className="bar"><div className="fill" style={{ "--v": `${axis.pct}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>Use it well</h3><p>Give yourself the conditions your type actually uses well. The point is not a label; it is better decision design.</p></div></section>}
+        {view === "mbti" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>MBTI</h2><p>Your preferred mental route: how you plan, process, decide, and build.</p></div></div><div className="detail-card"><h3>{mbtiType}: {stripLeadingThe(arch)} mode</h3><p>{MBTI_TAGLINES[mbtiType] || "Personality pattern"}. This describes the route your mind tends to select when making sense of people, problems, and plans.</p><div className="analogy"><b>Analogy</b>MBTI is your navigation app: it does not choose the destination, but it reveals the route your mind keeps selecting.</div></div><div className="detail-card"><h3>Cognitive flow</h3><div className="meter-list">{mbtiDimensions.map((axis) => <div key={axis.label}><div className="meter-top"><span>{axis.label} · {axis.words[axis.dominant as keyof typeof axis.words]}</span><span>{axis.pct}%</span></div><div className="bar"><div className="fill" style={{ "--v": `${axis.pct}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>Use it well</h3><p>Give yourself the conditions your type actually uses well. The point is not a label; it is better decision design.</p></div><div className="detail-card"><FrameworkReference kind="mbti" mbtiAxes={mbtiDimensions.map(axis => ({ label: axis.label, leftLetter: axis.leftLetter, rightLetter: axis.rightLetter, leftWord: axis.words[axis.leftLetter as keyof typeof axis.words], rightWord: axis.words[axis.rightLetter as keyof typeof axis.words], leftDescription: axis.leftLetter === "E" ? "Processes through interaction and external engagement." : axis.leftLetter === "S" ? "Notices concrete facts and proven methods." : axis.leftLetter === "T" ? "Prioritizes analysis, consistency, and trade-offs." : "Prefers structure, closure, and planned progress.", rightDescription: axis.rightLetter === "I" ? "Processes internally and restores energy through reflection." : axis.rightLetter === "N" ? "Notices patterns, possibilities, and what could change." : axis.rightLetter === "F" ? "Prioritizes values, people impact, and alignment." : "Prefers flexibility and adapting as new information appears.", dominant: axis.dominant, leftPct: axis.dominant === axis.leftLetter ? axis.pct : 100 - axis.pct, rightPct: axis.dominant === axis.rightLetter ? axis.pct : 100 - axis.pct, isClose: axis.pct < 60 }))} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "mbti", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "bigfive" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>Big Five</h2><p>Your trait climate: what reliably pulls, drains, stabilizes, or amplifies you.</p></div></div><div className="detail-card"><h3>Trait gravity</h3><div className="meter-list">{rankedTraits.map(([key, value]) => <div key={key}><div className="meter-top"><span>{TRAIT_DEEP_DIVE[key].label}</span><span>{value}%</span></div><div className="bar"><div className="fill" style={{ "--v": `${value}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>What it means</h3><p>Your strongest Big Five signal is {topTraitMeta.label}. That does not define your entire personality, but it does shape the environment where your effort compounds fastest.</p><div className="analogy"><b>Analogy</b>Big Five is your climate report. MBTI is route preference; DISC is driving behavior; Big Five is the weather system you operate inside.</div></div></section>}
+        {view === "bigfive" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>Big Five</h2><p>Your trait climate: what reliably pulls, drains, stabilizes, or amplifies you.</p></div></div><div className="detail-card"><h3>Trait gravity</h3><div className="meter-list">{rankedTraits.map(([key, value]) => <div key={key}><div className="meter-top"><span>{TRAIT_DEEP_DIVE[key].label}</span><span>{value}%</span></div><div className="bar"><div className="fill" style={{ "--v": `${value}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>What it means</h3><p>Your strongest Big Five signal is {topTraitMeta.label}. That does not define your entire personality, but it does shape the environment where your effort compounds fastest.</p><div className="analogy"><b>Analogy</b>Big Five is your climate report. MBTI is route preference; DISC is driving behavior; Big Five is the weather system you operate inside.</div></div><div className="detail-card"><FrameworkReference kind="bigFive" bigFive={bigFive} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "big_five", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "disc" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>DISC</h2><p>Your visible work behavior: pace, pressure, communication, and standards.</p></div></div><div className="detail-card"><h3>Work behavior map</h3><div className="disc-grid">{(["D", "I", "S", "C"] as const).map((key) => <div className={`quad ${primaryDisc === key ? "active" : ""}`} key={key}><b>{key}</b><span>{DISC_LABELS[key]} · {disc[key]}%</span></div>)}</div></div><div className="detail-card"><h3>{discLabel} strength</h3><p>{discDesc || `Your ${primaryDisc} style describes how you tend to move when work involves pressure, standards, and other people.`}</p><div className="analogy"><b>Analogy</b>DISC is your dashboard while driving with other people in the car: speed, steering, braking, and how aggressively you take corners.</div></div><div className="detail-card"><h3>Second signal</h3><p>Your next strongest DISC signal is {DISC_LABELS[String(discEntries[1]?.[0] || "C")] || discEntries[1]?.[0]} at {discEntries[1]?.[1] ?? 0}%. That secondary style colors how your primary style shows up.</p></div></section>}
+        {view === "disc" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>DISC</h2><p>Your visible work behavior: pace, pressure, communication, and standards.</p></div></div><div className="detail-card"><h3>Work behavior map</h3><div className="disc-grid">{(["D", "I", "S", "C"] as const).map((key) => <div className={`quad ${primaryDisc === key ? "active" : ""}`} key={key}><b>{key}</b><span>{DISC_LABELS[key]} · {disc[key]}%</span></div>)}</div></div><div className="detail-card"><h3>{discLabel} strength</h3><p>{discDesc || `Your ${discLabel.toLowerCase()} style describes how you tend to move when work involves pressure, standards, and other people.`}</p><div className="analogy"><b>Analogy</b>DISC is your dashboard while driving with other people in the car: speed, steering, braking, and how aggressively you take corners.</div></div><div className="detail-card"><h3>Second signal</h3><p>Your next strongest DISC signal is {DISC_LABELS[secondaryDiscEntry?.[0] || "C"] || secondaryDiscEntry?.[0]} at {secondaryDiscEntry?.[1] ?? 0}%. That secondary style colors how your primary style shows up.</p></div><div className="detail-card"><FrameworkReference kind="disc" primaryDisc={primaryDisc} disc={disc} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "disc", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "share" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>Share</h2><p>Export a polished result card as an image or PDF, then send by text or email.</p></div></div><div className="detail-card"><div className="share-preview"><div className="eyebrow">Instant Portrait</div><h2>{identity}</h2><p>“{shareLine}”</p><div className="role-card"><small>Best-fit direction</small><h2>{primaryRole.title}</h2><p>{mbtiType} · {discLabel} · {topTraitMeta.label}</p></div></div></div><div className="detail-card"><h3>Share options</h3><p>Every shared result includes the invite link: <b>knowyourole.com</b>.</p><div className="share-actions"><button className="share-btn primary" onClick={() => onShare("image_action")}>Image</button><button className="share-btn primary" onClick={() => onShare("pdf_action")}>PDF</button><button className="share-btn" onClick={() => onShare("text_action")}>Text</button><button className="share-btn" onClick={() => onShare("email_action")}>Email</button></div></div></section>}
+        {view === "share" && <section><div className="detail-head"><button className="back" onClick={() => go("main", "back")}>← Portrait</button><div><h2>Share</h2><p>Export a polished result card as an image or PDF, then send by text or email.</p></div></div><div className="detail-card"><div className="share-preview"><div className="eyebrow">Instant Portrait</div><h2>{identity}</h2><p>“{shareLine}”</p><div className="role-card"><small>Best-fit direction</small><h2>{roleDirection.title}</h2><p>{mbtiType} · {discLabel} · {topTraitMeta.label}</p></div></div></div><div className="detail-card"><h3>Share options</h3><p>Every shared result includes the invite link: <b>knowyourole.com</b>.</p><div className="share-actions"><button className="share-btn primary" onClick={() => onShare("image_action")}>Image</button><button className="share-btn primary" onClick={() => onShare("pdf_action")}>PDF</button><button className="share-btn" onClick={() => onShare("text_action")}>Text</button><button className="share-btn" onClick={() => onShare("email_action")}>Email</button></div></div></section>}
+
+        <footer className="result-home-exit" aria-label="Finish viewing your results">
+          <p><strong>Finished exploring?</strong><br />Your result stays available while this browser session remains open.</p>
+          <div className="result-home-exit__actions">
+            <button className="result-home-exit__share" onClick={() => onShare("result_footer")}>Save or share your result</button>
+            <button className="result-home-exit__home" onClick={returnHome}>← Back to KnowYouRole home</button>
+          </div>
+        </footer>
 
         {view !== "main" && <nav className="bottom-nav" aria-label="Mobile result navigation">{navItems.map((item) => <button key={item.id} className={view === item.id ? "active" : ""} onClick={() => go(item.id, "bottom_nav")}><i>{item.icon}</i>{item.label}</button>)}</nav>}
       </main>
@@ -4916,11 +5102,14 @@ function OrbitalGlassV2Results({
 // ─── Main Results Page ───────────────────────────────────────────────────────
 export default function ResultsPage() {
   const [mounted, setMounted] = useState(false);
+  const [realResults, setRealResults] = useState<ReturnType<typeof useRealResults>>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const lastResultViewEventKey = useRef("");
-  const realResults = useRealResults(mounted);
 
   useEffect(() => {
+    // Resolve browser-only storage and URL fixtures after hydration. This keeps
+    // real completed quizzes, local fixtures, and result links on one path.
+    setRealResults(useRealResults(true));
     setMounted(true);
   }, []);
 
@@ -4952,9 +5141,15 @@ export default function ResultsPage() {
 
   if (!realResults) {
     return (
-      <div style={{ background: "#050711", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, fontFamily: "Inter, sans-serif" }}>Loading your results…</div>
-      </div>
+      <main className="workday-empty-result">
+        <AppHeader />
+        <section>
+          <p>Results desk</p>
+          <h1>Your work-style report starts with an answer.</h1>
+          <span>Finish the short quiz and this page becomes your evidence-led role direction, strengths, friction points, and first experiment.</span>
+          <a href="/quiz">Start the quiz <b>↗</b></a>
+        </section>
+      </main>
     );
   }
 
@@ -4963,9 +5158,9 @@ export default function ResultsPage() {
   const career = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
   const topBigFive = (Object.entries(bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
   const topBigFiveLabel = TRAIT_DEEP_DIVE[topBigFive[0]]?.label || topBigFive[0];
-  const reportRoleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive);
+  const reportRoleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career);
   const [reportPrimaryRole] = buildPremiumRoleMatchCards({ roleMatch: reportRoleMatch, mbtiType, primaryDisc, disc, bigFive });
-  const reportRoleTitle = reportPrimaryRole?.title || career.title;
+  const reportRoleTitle = realResults.canonicalResult?.careerDirection.title || reportPrimaryRole?.title || career.title;
   const reportRoleSalary = reportPrimaryRole?.salary || career.salary;
   const reportIdentity = SOCIAL_IDENTITY_TITLES[mbtiType] || `${stripLeadingThe(arch)} Builder`;
   const reportSummary = buildResultSummaryLine({
@@ -5019,7 +5214,7 @@ export default function ResultsPage() {
 
   return (
     <>
-      <OrbitalGlassV2Results bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} rawScores={rawScores} discDesc={discDesc} onShare={openShareModal} />
+      <OrbitalGlassV2Results bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} rawScores={rawScores} canonicalResult={realResults.canonicalResult} canonicalCareerDirection={realResults.canonicalResult?.careerDirection} sessionId={realResults.canonicalResult?.meta.sessionId || sessionId} discDesc={discDesc} onShare={openShareModal} />
       <ShareResultsModal open={shareOpen} onClose={() => setShareOpen(false)} report={reportPayload} />
     </>
   );

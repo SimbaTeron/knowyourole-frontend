@@ -1,57 +1,53 @@
 'use client';
 
-import Link from "next/link";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { AppHeader } from "@/components/layout/AppHeader";
 import { useState } from "react";
 
 const FAQ_ITEMS = [
   {
-    question: "What is KnowYouRole?",
-    answer: "KnowYouRole is a free personality and career-reflection platform that combines a Big Five trait backbone with MBTI-style patterns and DISC-style communication language. It helps you understand your tendencies and explore possible career directions without pretending a quiz can define your whole identity. It is currently tailored for teens, young adults, and adults."
+    question: "What is the current KnowYouRole quiz?",
+    answer: "KnowYouRole is a free 28-prompt self-reflection quiz for work style and role exploration. It turns your answers into a practical report on preferences, work behavior, trait signals, and career directions worth testing. It is not designed to reduce a person to one permanent label."
   },
   {
-    question: "Is KnowYouRole really free?",
-    answer: "Yes! The core personality assessments and career matching features are completely free, with no sign-up required to get started. We offer optional premium features for deeper insights, but the essential experience costs nothing."
+    question: "What do I get when I finish?",
+    answer: "Your result brings together a Big Five-informed trait read, MBTI-style preference language, DISC-style work behavior, and an evidence-led career direction. Depending on how strongly your answers converge, the report can show one clear direction, two plausible directions, or an exploratory starting point."
   },
   {
-    question: "How long does the assessment take?",
-    answer: "Most users complete the assessment in ~5 minutes. The questions are designed to be quick and intuitive — just pick what feels most true most often. There are no trick questions or wrong answers."
+    question: "How long does the quiz take?",
+    answer: "The current quiz has 28 focused prompts. There is no timer and no trick question. Take enough time to answer for what is usually true in your day-to-day work, study, or project life—not what sounds most impressive."
   },
   {
-    question: "How accurate is the assessment?",
-    answer: "Your result reflects patterns in your answers, not a perfect measurement of your identity. Big Five gives the strongest research-backed trait layer; MBTI-style and DISC-style outputs are used as practical language for reflection and communication. Taking the quiz when you're in a typical mood, not extremely stressed or excited, tends to produce the most useful result."
+    question: "Are there right or wrong answers?",
+    answer: "No. The useful answer is the one that best describes your usual pattern. Choosing what you think you should be will produce a very polished report about someone else."
   },
   {
-    question: "Is it safe for teens?",
-    answer: "Yes. The teen experience uses age-appropriate language and positive framing focused on strengths, communication, and self-understanding. We do not knowingly collect personal information from children under 13 without parental consent."
+    question: "How are results calculated?",
+    answer: "Each answer contributes to several signals across Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and role-fit vectors. KnowYouRole recomputes the result from the complete answer set before showing the report, so the direction reflects the whole pattern rather than one answer or a client-side guess."
   },
   {
-    question: "What personality frameworks do you use?",
-    answer: "We use three complementary layers: Big Five traits as the research-backed backbone; MBTI-style patterns as memorable personality language; and DISC-style categories for communication and work-style reflection. The point is useful self-understanding, not forcing you into a permanent box."
+    question: "Is this an official MBTI, DISC, or clinical assessment?",
+    answer: "No. KnowYouRole uses MBTI-style and DISC-style language as accessible reflection lenses, alongside Big Five-informed trait signals. It is not an official MBTI or DISC instrument, a clinical assessment, a diagnosis, a hiring screen, or a prediction of job performance."
   },
   {
-    question: "Can I retake the assessment?",
-    answer: "Yes, you can retake the assessment anytime. Personality can shift based on mood, life stage, and personal growth, so retaking it periodically can reveal how you're evolving."
+    question: "How accurate is the quiz?",
+    answer: "We do not publish an accuracy percentage. The report is a structured reflection on your answers, not a definitive measurement of identity or career fit. Treat close scores, mixed evidence, and role directions as useful hypotheses to test against your skills, values, experience, and real opportunities."
   },
   {
-    question: "Do I need to create an account?",
-    answer: "Quiz completion data is saved securely so we can generate, recover, and improve results. You can still take the quiz without creating an account. Creating an account, when enabled, can add long-term history and comparison features."
+    question: "What are career directions based on?",
+    answer: "Career directions combine your answer evidence with trait, preference, work-behavior, and role-fit signals. They are starting points for practical experiments—projects, conversations, classes, shadowing, or job research—not a verdict, hiring recommendation, or life sentence."
   },
   {
-    question: "How is my data handled?",
-    answer: "Quiz completions are saved securely so your result can be generated, recovered, and improved. We do not sell your quiz results. Optional analytics and future advertising settings are controlled through cookie preferences where practical. See our Privacy Policy for details."
+    question: "Can I retake the quiz?",
+    answer: "Yes. Retake it when you want to compare a genuinely different context or check whether you answered from a temporary mood or pressure state. If you want the most comparable result, answer from a typical week and use the same interpretation of each prompt."
   },
   {
-    question: "What are the career matches based on?",
-    answer: "Career matches are generated by mapping your Big Five trait shape, MBTI-style pattern, DISC-style work style, and answer evidence to role profiles. Treat them as directions to test with projects, shadowing, classes, or interviews — not as a hiring prediction or life sentence."
+    question: "Do I need an account or have to pay?",
+    answer: "No. You can start and complete the quiz without an account, and everything on KnowYouRole today is free. Nothing is locked or paywalled right now, and you do not need a purchase to see your result."
   },
   {
-    question: "Why do my results change when I retake the quiz?",
-    answer: "Personality isn't fixed — it can shift based on your mood, recent experiences, and personal growth. Small variations between sessions are normal and expected. If you notice large swings, it could mean you were in a very different headspace. For the most consistent results, take the quiz when you're in a typical day-to-day mood."
-  },
-  {
-    question: "What happens to my results if I don't create an account?",
-    answer: "Your results are saved securely after quiz completion so your profile can be generated, recovered, and improved. If you want long-term history or comparison features, create an account when that option is available."
+    question: "How is my quiz data handled?",
+    answer: "Quiz completion data may be saved to generate and recover a result. KnowYouRole does not sell quiz results. Analytics loads only after you affirmatively opt in through cookie preferences; it does not use your answers, scores, role direction, or result labels. See the Privacy Policy for the current details."
   },
 ];
 
@@ -81,17 +77,9 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 
 export default function Faq() {
   return (
-    <div className="min-h-screen bg-soft-cream dark:bg-[#0A0A12] text-warm-gray dark:text-[#F8FAFC]">
-      <header className="sticky top-0 z-50 px-6 py-4 bg-soft-cream/90 dark:bg-[#0A0A12]/90 backdrop-blur-sm border-b border-warm-gray/10 dark:border-[#A78BFA]/10">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 text-sm text-warm-gray/70 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-back-home">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-12">
+    <div className="workday-simple-page min-h-screen bg-soft-cream text-warm-gray">
+      <AppHeader />
+      <main className="workday-simple-wrap max-w-2xl px-6 py-32">
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-faq-title">Frequently Asked Questions</h1>
         <p className="text-warm-gray/60 dark:text-[#94A3B8] mb-8">Everything you need to know about KnowYouRole</p>
 

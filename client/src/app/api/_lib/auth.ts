@@ -135,6 +135,17 @@ export function extractBearerToken(req: NextRequest): string | null {
   return authHeader.slice(7).trim() || null;
 }
 
+export async function getOptionalAuthUser(req: NextRequest): Promise<AuthUser | null> {
+  const token = extractBearerToken(req);
+  return token ? validateAuth0Token(token) : null;
+}
+
+export async function requireVerifiedAuthUser(req: NextRequest): Promise<AuthUser | NextResponse> {
+  const user = await getOptionalAuthUser(req);
+  if (user) return user;
+  return NextResponse.json({ error: "Missing, invalid, or expired authorization token" }, { status: 401 });
+}
+
 export function isAuthRequiredInProduction(): boolean {
   return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
 }

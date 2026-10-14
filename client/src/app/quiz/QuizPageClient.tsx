@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import PathCanvas from "@/components/PathCanvas";
 import Quiz, { QuizScores } from "@/components/Quiz";
 import Results from "@/components/Results";
 import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { trackKyrEvent } from "@/lib/analytics";
 import { Brain, Sparkles, Target } from "lucide-react";
@@ -28,20 +27,16 @@ interface EarnedBadge {
 export default function QuizPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const [theme, setTheme] = useState<ThemeMode>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem("knowrole-theme") as ThemeMode | null;
-      return stored === "light" ? "light" : "dark";
-    }
-    return "dark";
-  });
+  const [theme, setTheme] = useState<ThemeMode>("light");
   const [quizScores, setQuizScores] = useState<QuizScores | null>(null);
   const [quizSessionId, setQuizSessionId] = useState<string | null>(null);
+  const quizSessionIdRef = useRef<string | null>(null);
   const [apiScales, setApiScales] = useState<APIScales | null>(null);
   const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>([]);
   const [hybridTypes, setHybridTypes] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [isAnalyzingResults, setIsAnalyzingResults] = useState(false);
+  const [isQuizInProgress, setIsQuizInProgress] = useState(false);
   const [isDonationReturn, setIsDonationReturn] = useState(false);
   const { toast } = useToast();
   const { teamName, isLocalitySet } = useLocalityTheme();
@@ -69,6 +64,10 @@ export default function QuizPage() {
 
   // Direct-start quiz: age/mood setup screens are hidden. Default to adult tier when missing.
   useEffect(() => {
+    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: 28 });
+  }, []);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const tier = normalizeTier(sessionStorage.getItem("kyr_quiz_tier"));
       if (!tier) {
@@ -86,6 +85,26 @@ export default function QuizPage() {
   const mood = storedMood ?? sessionMood;
   const funMode = storedFunMode ?? sessionFunMode;
   const landmark = storedLandmark ? { landmark: storedLandmark } : sessionLandmark;
+
+  const handleQuizStarted = () => {
+    setIsQuizInProgress(true);
+    if (quizSessionIdRef.current) return;
+
+    const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    quizSessionIdRef.current = sessionId;
+    setQuizSessionId(sessionId);
+    sessionStorage.setItem("kyr_active_quiz_session_id", sessionId);
+
+    // This records a server timestamp. It is intentionally not derived from the
+    // device clock, which is not suitable for analytics.
+    void fetch("/api/quiz/session/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, tier: ageTier, mood, funMode }),
+    }).catch((error) => {
+      console.warn("[Quiz session] start timestamp was not recorded", error);
+    });
+  };
 
   // Handle donation return - restore state from localStorage and show results on Page 3
   useEffect(() => {
@@ -109,6 +128,7 @@ export default function QuizPage() {
             setStoredMood(state.mood);
             setStoredFunMode(state.funMode);
             setStoredLandmark(state.landmark);
+            quizSessionIdRef.current = state.sessionId;
             setQuizSessionId(state.sessionId);
             setApiScales(state.apiScales);
             setEarnedBadges(state.earnedBadges || []);
@@ -140,25 +160,15 @@ export default function QuizPage() {
 
 
   useEffect(() => {
-    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark", "dark-mysterious");
-    } else {
-      document.documentElement.classList.add("light-clinical");
-    }
-  }, [theme]);
+    document.documentElement.classList.remove("dark", "dark-mysterious");
+    document.documentElement.classList.add("light-clinical");
+  }, []);
 
-  const handleThemeChange = (newTheme: ThemeMode) => {
-    setTheme(newTheme);
-    localStorage.setItem("knowrole-theme", newTheme);
-    
-    document.documentElement.classList.remove("dark", "light-clinical", "dark-mysterious");
-
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark", "dark-mysterious");
-    } else {
-      document.documentElement.classList.add("light-clinical");
-    }
+  const handleThemeChange = () => {
+    setTheme("light");
+    localStorage.setItem("knowrole-theme", "light");
+    document.documentElement.classList.remove("dark", "dark-mysterious");
+    document.documentElement.classList.add("light-clinical");
   };
 
   const computeAndStoreResultDTO = async (scores: QuizScores, sessionId: string | null) => {
@@ -171,7 +181,9 @@ export default function QuizPage() {
       theme,
       sessionId: sessionId || undefined,
       source: "live_quiz",
-      scores,
+      // The browser submits evidence only. It never sends trusted framework totals,
+      // role matches, or a result ID for the server to accept.
+      responses: scores.responses,
     };
 
     console.log("[ResultDTO] POST /api/results/compute starting", {
@@ -204,12 +216,19 @@ export default function QuizPage() {
           status: response.status,
           reason: data?.error || "compute_unsuccessful",
         });
-        console.warn("[ResultDTO] Compute failed; keeping legacy results fallback", data);
+        console.warn("[ResultDTO] Canonical compute failed", data);
         return null;
       }
 
       sessionStorage.setItem("kyr_result_dto", JSON.stringify(data.result));
-      trackKyrEvent("quiz_result_persisted", {
+      // The anonymous capability is intentionally browser-session scoped. It authorizes
+      // result-linked actions (such as pilot feedback) without exposing result rows to
+      // the public Supabase API or treating an arbitrary session ID as authorization.
+      if (typeof data.anonymousDeletionCapability === "string" && data.anonymousDeletionCapability.length >= 40 && data.result.meta?.sessionId) {
+        sessionStorage.setItem(`kyr_anonymous_result_capability:${data.result.meta.sessionId}`, data.anonymousDeletionCapability);
+      }
+      const persistenceOk = data.persistence?.ok === true;
+      trackKyrEvent(persistenceOk ? "quiz_result_persisted" : "quiz_result_computed_unpersisted", {
         tier: ageTier,
         response_count: scores.responses.length,
         result_id_present: Boolean(data.result.meta?.resultId),
@@ -229,7 +248,7 @@ export default function QuizPage() {
         response_count: scores.responses.length,
         reason: "network_or_runtime_error",
       });
-      console.error("[ResultDTO] Compute/persist error; keeping legacy results fallback", error);
+      console.error("[ResultDTO] Compute/persist error", error);
       return null;
     }
   };
@@ -244,154 +263,57 @@ export default function QuizPage() {
       fun_mode: funMode,
     });
 
-    console.log("[QuizComplete] Received final scores from Quiz.tsx", {
-      responseCount: scores.responses.length,
-      mbti: scores.mbti,
-      disc: scores.disc,
-      bigFive: scores.bigFive,
-    });
-    setQuizScores(scores);
-
-    let sessionId: string | null = null;
-    let scales: APIScales | null = null;
-    let badges: EarnedBadge[] = [];
-    let hybrids: string[] = [];
-    let mbtiType = '';
-    let discStyle = '';
-
-    try {
-      const response = await apiRequest("POST", "/api/quiz/score", {
-        tier: ageTier,
-        mood,
-        funMode,
-        landmark: landmark?.landmark,
-        theme,
-        scores,
+    // Only the server-returned DTO can cross the completion boundary. The locally
+    // accumulated scores are UI progress data and are deliberately never rendered
+    // as a live result.
+    const canonicalResult = await computeAndStoreResultDTO(scores, quizSessionIdRef.current);
+    if (!canonicalResult) {
+      setIsAnalyzingResults(false);
+      toast({
+        title: "We could not save your result",
+        description: "Your result was not generated because the canonical result service is unavailable. Please start again when the connection is restored.",
+        variant: "destructive",
       });
-      const data = await response.json();
-
-      // sessionId may come back as top-level or nested
-      sessionId = data.sessionId ?? data.id ?? null;
-      if (sessionId) {
-        setQuizSessionId(sessionId as string);
-      }
-
-      // API returns scales directly on data (not data.result)
-      if (data.scales) {
-        scales = data.scales;
-        setApiScales(data.scales);
-      }
-
-      // Phase 2.2: Extract badges and hybrid types from API response
-      if (data.earnedBadges) {
-        badges = data.earnedBadges;
-        setEarnedBadges(data.earnedBadges);
-      }
-      if (data.hybridTypes) {
-        hybrids = data.hybridTypes;
-        setHybridTypes(data.hybridTypes);
-      }
-
-      // Type strings from API (preferred) — used for URL params below
-      if (data.mbtiType) mbtiType = data.mbtiType;
-      if (data.discStyle) discStyle = data.discStyle;
-
-      console.log("[QuizComplete] Legacy /api/quiz/score finished", {
-        sessionId,
-        hasScales: Boolean(scales),
-        badgeCount: badges.length,
-        hybridCount: hybrids.length,
-        mbtiType,
-        discStyle,
-      });
-
-    } catch (error) {
-      console.error("[QuizComplete] Legacy /api/quiz/score failed; continuing with local fallback", error);
+      return;
     }
 
-    const canonicalResult = await computeAndStoreResultDTO(scores, sessionId);
-    if (canonicalResult?.meta?.sessionId && !sessionId) {
-      sessionId = canonicalResult.meta.sessionId;
-      setQuizSessionId(sessionId);
-    }
-    if (canonicalResult?.scores?.mbti?.type && canonicalResult.scores.mbti.type !== "XXXX") {
-      mbtiType = canonicalResult.scores.mbti.type;
-    }
-    if (canonicalResult?.scores?.disc?.primary && canonicalResult.scores.disc.primary !== "Balanced") {
-      discStyle = canonicalResult.scores.disc.primary;
-    }
-
-    // ── Compute type strings from raw scores as fallback ──
-    if (!mbtiType) {
-      mbtiType = [
-        scores.mbti.E > scores.mbti.I ? "E" : "I",
-        scores.mbti.S > scores.mbti.N ? "S" : "N",
-        scores.mbti.T > scores.mbti.F ? "T" : "F",
-        scores.mbti.J > scores.mbti.P ? "J" : "P",
-      ].join("");
-    }
-    if (!discStyle) {
-      const discEntries = Object.entries(scores.disc) as [string, number][];
-      discStyle = discEntries.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
-    }
-
-    // ── Store real scores in sessionStorage so results.tsx can find them ──
-    // results.tsx reads kyr_real_scores (not kyr_results). This remains the fallback
-    // while kyr_result_dto becomes the new canonical source in the next migration step.
-    sessionStorage.setItem("kyr_real_scores", JSON.stringify(scores));
-    console.log("[QuizComplete] Stored legacy fallback scores in sessionStorage:kyr_real_scores");
-
-    // ── Encode scores as URL param for shareable links ──
-    const scoresParam = btoa(JSON.stringify(scores));
-
-    // ── Redirect to results page with scores and API data in URL ──
-    // The scores param lets results.tsx reconstruct the quiz answers on refresh.
-    // API result data (scales, badges, etc.) are appended as separate params.
-    const resultParams = new URLSearchParams();
-    resultParams.set("scores", scoresParam);
-    if (sessionId) resultParams.set("sessionId", sessionId as string);
-    if (scales) resultParams.set("hasScales", "1");
-    if (badges.length) resultParams.set("badges", JSON.stringify(badges));
-    if (hybrids.length) resultParams.set("hybrids", JSON.stringify(hybrids));
-    resultParams.set("mbtiType", mbtiType);
-    resultParams.set("discStyle", discStyle);
-
-    console.log("[QuizComplete] Redirecting to legacy results route with ResultDTO available as optional canonical source", {
-      hasResultDTO: Boolean(sessionStorage.getItem("kyr_result_dto")),
-      sessionId,
-      mbtiType,
-      discStyle,
-    });
+    const sessionId = canonicalResult.meta.sessionId;
+    quizSessionIdRef.current = sessionId;
+    setQuizSessionId(sessionId);
 
     trackKyrEvent("conversion_results_handoff", {
       tier: ageTier,
       response_count: scores.responses.length,
-      has_result_dto: Boolean(sessionStorage.getItem("kyr_result_dto")),
-      session_id_present: Boolean(sessionId),
-      mbti_type: mbtiType,
-      primary_disc: discStyle,
+      has_result_dto: true,
+      session_id_present: true,
+      mbti_type: canonicalResult.scores.mbti.type,
+      primary_disc: canonicalResult.scores.disc.primary,
     });
 
     await minimumAnalysisTime;
-    router.push(`/results?${resultParams.toString()}`);
+    router.push("/results");
   };
 
   const handleQuizExit = () => {
     // Clear all session data and go to home
     sessionStorage.clear();
+    quizSessionIdRef.current = null;
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
     setIsAnalyzingResults(false);
+    setIsQuizInProgress(false);
     router.push("/");
   };
 
   const handleRestart = () => {
     sessionStorage.clear();
+    quizSessionIdRef.current = null;
     setQuizScores(null);
     setQuizSessionId(null);
     setShowResults(false);
     setIsAnalyzingResults(false);
+    setIsQuizInProgress(false);
     router.push("/");
   };
 
@@ -955,8 +877,8 @@ export default function QuizPage() {
               Building your Full Portrait
             </div>
             <h1 className="mb-3 text-3xl font-black tracking-tight">Analyzing<span className="analysis-dots" aria-hidden="true" /></h1>
-            <p className="mx-auto mb-7 max-w-xs text-sm leading-6 text-white/72">
-              Scoring your personality pattern, career fit, and role signals. Tiny robots are pretending this is very hard.
+            <p className="analysis-message mx-auto mb-7 max-w-sm text-sm leading-6 text-white/72" role="status" aria-live="polite">
+              Analyzing your 28 answers to build your work-style profile, career-fit signals, and role directions.
             </p>
 
             <div className="mb-5 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10" aria-label="Results analysis progress">
@@ -1036,6 +958,14 @@ export default function QuizPage() {
       <PathCanvas />
       
       <main className="relative z-10">
+        <section aria-labelledby="quiz-intro-heading" className="sr-only">
+          <h1 id="quiz-intro-heading">Take a free personality quiz for work style and career fit</h1>
+          <p>
+            Answer grounded prompts and get a practical KnowYouRole result that combines Big Five traits,
+            MBTI-style patterns, DISC work behavior, communication style, pressure behavior, and career-fit guidance.
+          </p>
+        </section>
+
         <Quiz
           tier={ageTier}
           mood={mood}
@@ -1044,7 +974,61 @@ export default function QuizPage() {
           theme={theme}
           onComplete={handleQuizComplete}
           onExit={handleQuizExit}
+          onQuizStarted={handleQuizStarted}
         />
+
+        {!isQuizInProgress && <section
+          aria-labelledby="quiz-seo-heading"
+          className="relative mx-auto w-[min(1080px,calc(100%-32px))] px-0 pb-20 pt-10 text-white/80"
+        >
+          <div className="rounded-[32px] border border-white/10 bg-black/35 p-5 shadow-2xl backdrop-blur-xl md:p-8">
+            <p className="mb-3 text-[11px] font-black uppercase tracking-[0.28em] text-[#315f74]">Before you start</p>
+            <h2 id="quiz-seo-heading" className="max-w-3xl text-2xl font-black tracking-tight text-white md:text-4xl">
+              A free personality quiz for clearer work style, communication, and career fit.
+            </h2>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-white/70 md:text-base md:leading-7">
+              KnowYouRole turns a short set of personality quiz answers into one practical result. It blends Big Five
+              traits, MBTI-style preference patterns, and DISC-style work behavior so your result is more useful than a
+              single label.
+            </p>
+
+            <div className="mt-7 grid gap-3 md:grid-cols-3">
+              <article className="rounded-3xl border border-white/10 bg-white/[0.045] p-4">
+                <h3 className="text-sm font-black text-white">What you’ll get</h3>
+                <p className="mt-2 text-sm leading-6 text-white/60">
+                  A readable personality snapshot, work-style notes, communication clues, pressure behavior, and role-fit direction.
+                </p>
+              </article>
+              <article className="rounded-3xl border border-white/10 bg-white/[0.045] p-4">
+                <h3 className="text-sm font-black text-white">What it measures</h3>
+                <p className="mt-2 text-sm leading-6 text-white/60">
+                  Big Five trait signals, MBTI-style patterns, DISC work behavior, decision style, motivation, and team fit.
+                </p>
+              </article>
+              <article className="rounded-3xl border border-white/10 bg-white/[0.045] p-4">
+                <h3 className="text-sm font-black text-white">Privacy</h3>
+                <p className="mt-2 text-sm leading-6 text-white/60">
+                  Quiz completion data can be saved to generate and recover your result. We do not sell quiz results; see Privacy for current details.
+                </p>
+              </article>
+            </div>
+
+            <div className="mt-8 grid gap-3 md:grid-cols-2">
+              <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">
+                <h3 className="text-sm font-black text-white">Is this a free personality quiz?</h3>
+                <p className="mt-2 text-sm leading-6 text-white/60">
+                  Yes. Everything on KnowYouRole today is free. Nothing is locked or paywalled right now, and your full result is included.
+                </p>
+              </article>
+              <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">
+                <h3 className="text-sm font-black text-white">How do the models work together?</h3>
+                <p className="mt-2 text-sm leading-6 text-white/60">
+                  Big Five gives trait depth, MBTI-style language makes patterns easier to understand, and DISC helps describe workplace behavior.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>}
       </main>
     </div>
   );

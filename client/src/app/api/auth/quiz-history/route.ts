@@ -1,92 +1,81 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/app/api/_lib/auth';
-import { getSupabaseAdmin } from '@/app/api/_lib/supabase';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuth } from "@/app/api/_lib/auth";
+import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
+import { summarizePersistedQuizResult, type PersistedQuizResultRow } from "@/lib/results/persistedQuizResult";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-// Simple arc evolution calculation
-function calculateArcEvolution(results: any[]): object | null {
-  if (results.length < 2) return null;
+const RESULT_COLUMNS = "id,user_id,session_id,responses,created_at,updated_at,deleted";
 
-  const sorted = [...results].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  );
-
-  const first = sorted[0];
-  const last = sorted[sorted.length - 1];
-
-  const personalityChanges = {
-    mbtiEvolution: first.mbtiType !== last.mbtiType ? `${first.mbtiType} → ${last.mbtiType}` : null,
-    discEvolution: first.discStyle !== last.discStyle ? `${first.discStyle} → ${last.discStyle}` : null,
-    bigFiveShifts: {},
-  };
-
-  const bigFiveTraits = ['bigFiveO', 'bigFiveC', 'bigFiveE', 'bigFiveA', 'bigFiveN'];
-  for (const trait of bigFiveTraits) {
-    const firstVal = first[trait];
-    const lastVal = last[trait];
-    if (firstVal !== undefined && lastVal !== undefined && firstVal !== lastVal) {
-      (personalityChanges.bigFiveShifts as any)[trait] = lastVal - firstVal;
-    }
-  }
-
-  return personalityChanges;
+interface HistoryResult {
+  id: string;
+  createdAt: string | null;
+  mbtiType: string;
+  discStyle: string;
+  bigFive: { O: number; C: number; E: number; A: number; N: number };
+  primaryRole: string | null;
+  criticalThinking: number | null;
+  firstPrinciples: number | null;
 }
 
-export const GET = requireAuth(async (req: NextRequest, ctx) => {
+function calculateArcEvolution(results: HistoryResult[]): object | null {
+  if (results.length < 2) return null;
+  const sorted = [...results].sort((a, b) => new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime());
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  const bigFiveShifts = (Object.keys(first.bigFive) as Array<keyof HistoryResult["bigFive"]>)
+    .reduce<Record<string, number>>((changes, trait) => {
+      const difference = last.bigFive[trait] - first.bigFive[trait];
+      if (difference !== 0) changes[trait] = difference;
+      return changes;
+    }, {});
+  return {
+    mbtiEvolution: first.mbtiType !== last.mbtiType ? `${first.mbtiType} → ${last.mbtiType}` : null,
+    discEvolution: first.discStyle !== last.discStyle ? `${first.discStyle} → ${last.discStyle}` : null,
+    bigFiveShifts,
+  };
+}
+
+export const GET = requireAuth(async (_req: NextRequest, ctx) => {
   try {
-    const userId = ctx.user.sub;
-
-    const { data: results, error } = await getSupabaseAdmin()
-      .from('quiz_results')
-      .select('*')
-      .eq('user_id', userId)
-      .order('createdAt', { ascending: true });
-
+    const { data, error } = await getSupabaseAdmin()
+      .from("quiz_results")
+      .select(RESULT_COLUMNS)
+      .eq("user_id", ctx.user.sub)
+      .order("created_at", { ascending: true });
     if (error) {
-      console.error('Error fetching quiz history:', error);
-      return NextResponse.json(
-        { message: 'Failed to fetch quiz history' },
-        { status: 500 }
-      );
+      console.error("[quiz history] fetch failed", error);
+      return NextResponse.json({ message: "Failed to fetch quiz history" }, { status: 500 });
     }
 
-    if (!results || results.length === 0) {
-      return NextResponse.json({
-        success: true,
-        results: [],
-        arcData: null,
-        message: 'No quiz history found',
-      });
-    }
-
-    const arcData = results.length >= 2 ? calculateArcEvolution(results) : null;
+    const results = (data ?? []).flatMap((row) => {
+      try {
+        const summary = summarizePersistedQuizResult(row as PersistedQuizResultRow);
+        if (summary.deleted) return [];
+        return [{
+          id: summary.id,
+          createdAt: summary.createdAt,
+          mbtiType: summary.mbtiType,
+          discStyle: summary.discStyle,
+          bigFive: summary.bigFive,
+          primaryRole: summary.primaryRoleTitle,
+          criticalThinking: summary.criticalThinking,
+          firstPrinciples: summary.firstPrinciples,
+        } satisfies HistoryResult];
+      } catch (readError) {
+        console.error("[quiz history] invalid canonical result", { id: row.id, error: readError });
+        return [];
+      }
+    });
 
     return NextResponse.json({
       success: true,
-      results: results.map((r) => ({
-        id: r.id,
-        createdAt: r.createdAt,
-        mbtiType: r.mbtiType,
-        discStyle: r.discStyle,
-        bigFive: {
-          O: r.bigFiveO,
-          C: r.bigFiveC,
-          E: r.bigFiveE,
-          A: r.bigFiveA,
-          N: r.bigFiveN,
-        },
-        primaryRole: r.primaryRoleTitle,
-        criticalThinking: r.criticalThinking,
-        firstPrinciples: r.firstPrinciples,
-      })),
-      arcData,
+      results,
+      arcData: calculateArcEvolution(results),
+      ...(results.length === 0 ? { message: "No quiz history found" } : {}),
     });
   } catch (error) {
-    console.error('Error fetching quiz history:', error);
-    return NextResponse.json(
-      { message: 'Failed to fetch quiz history' },
-      { status: 500 }
-    );
+    console.error("[quiz history] unexpected error", error);
+    return NextResponse.json({ message: "Failed to fetch quiz history" }, { status: 500 });
   }
 });

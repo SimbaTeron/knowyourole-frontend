@@ -27,10 +27,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { GoogleAuth } = await import('google-auth-library');
     const { google } = await import('googleapis');
 
-    const auth = new GoogleAuth({
+    const auth = new google.auth.GoogleAuth({
       credentials: {
         type: 'service_account',
         client_email: googleClientEmail,

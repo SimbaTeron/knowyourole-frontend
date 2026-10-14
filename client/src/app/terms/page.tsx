@@ -1,23 +1,14 @@
 'use client';
 
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { AppHeader } from "@/components/layout/AppHeader";
 
 export default function Terms() {
   return (
-    <div className="min-h-screen bg-soft-cream dark:bg-[#0A0A12] text-warm-gray dark:text-[#F8FAFC]">
-      <header className="sticky top-0 z-50 px-6 py-4 bg-soft-cream/90 dark:bg-[#0A0A12]/90 backdrop-blur-sm border-b border-warm-gray/10 dark:border-[#A78BFA]/10">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 text-sm text-warm-gray/70 dark:text-[#94A3B8] hover:text-terracotta dark:hover:text-[#A78BFA] transition-colors" data-testid="link-back-home">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-12">
+    <div className="workday-simple-page min-h-screen bg-soft-cream text-warm-gray">
+      <AppHeader />
+      <main className="workday-simple-wrap max-w-2xl px-6 py-32">
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-terms-title">Terms of Service</h1>
-        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last updated: March 2026</p>
+        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last reviewed: July 27, 2026</p>
 
         <div className="space-y-8 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
           <section>
@@ -30,7 +21,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Description of Service</h2>
             <p>
-              KnowYouRole provides personality assessments based on established psychological frameworks (Big Five, MBTI, and DISC), along with career matching recommendations. The Service is available for users of all ages, with age-appropriate content tiers.
+              KnowYouRole provides a 28-question self-reflection experience that uses Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-exploration guidance. It is not the official MBTI assessment, a clinical instrument, or a selection tool. The Service includes age-tiered copy where available.
             </p>
           </section>
 
@@ -49,7 +40,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Assessment Results Disclaimer</h2>
             <p>
-              The personality assessments and career recommendations provided by KnowYouRole are for informational and educational purposes only. They are not a substitute for professional psychological evaluation, career counseling, or medical advice. Results should be considered as one of many inputs in your self-discovery journey, not as definitive classifications.
+              KnowYouRole results are for informational, educational, self-reflection, and career-exploration purposes only. They are not a psychological evaluation, medical advice, career counseling, hiring or admissions screen, job-performance prediction, or guarantee of satisfaction. Treat results as one input among skills, values, experience, opportunity, constraints, and qualified human advice—not as a definitive classification.
             </p>
           </section>
 
