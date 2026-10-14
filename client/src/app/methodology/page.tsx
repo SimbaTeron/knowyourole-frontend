@@ -37,25 +37,25 @@ export default function MethodologyPage() {
       <style>{`html.kyr-workday header[class*="sticky"] .methodology-primary-cta { color: #fffdf8 !important; font-size: 16px !important; }`}</style>
       <header className="sticky top-0 z-50 border-b border-[#12263a]/10 bg-[#fffaf0]/90 px-4 py-4 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">
-          <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm font-semibold text-[#315f74] underline-offset-4 transition hover:text-[#b64d35] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b64d35]">
+          <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm font-semibold text-[#315f74] underline-offset-4 transition hover:text-[#a3402b] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a3402b]">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back to KnowYouRole
           </Link>
-          <Link href="/quiz" className="methodology-primary-cta inline-flex min-h-11 items-center rounded-full bg-[#12263a] px-4 font-bold transition hover:bg-[#24455c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b64d35]">
+          <Link href="/quiz" className="methodology-primary-cta inline-flex min-h-11 items-center rounded-full bg-[#12263a] px-4 font-bold transition hover:bg-[#24455c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a3402b]">
             Take the quiz
           </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-        <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.2em] text-[#b64d35]">Methodology & limits</p>
+        <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.2em] text-[#a3402b]">Methodology & limits</p>
         <h1 className="max-w-3xl font-display text-4xl font-bold leading-[0.98] tracking-[-0.045em] text-[#12263a] sm:text-6xl">
           A useful work-style read, not a verdict on a person.
         </h1>
         <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#405f72] sm:text-xl">
           KnowYouRole turns a short set of self-reported work preferences into practical language for reflection and role exploration. It does not diagnose, rank, certify, hire, or predict a person&apos;s future.
         </p>
-        <p className="mt-4 text-sm font-medium text-[#617987]">Last reviewed: July 27, 2026 · Questions or corrections: <a className="text-[#315f74] underline underline-offset-4 hover:text-[#b64d35]" href="mailto:info@knowyourole.com">info@knowyourole.com</a></p>
+        <p className="mt-4 text-sm font-medium text-[#536e82]">Last reviewed: July 27, 2026 · Questions or corrections: <a className="text-[#315f74] underline underline-offset-4 hover:text-[#a3402b]" href="mailto:info@knowyourole.com">info@knowyourole.com</a></p>
 
         <section className="mt-10 grid gap-4 sm:grid-cols-3" aria-label="Methodology summary">
           {[
@@ -112,7 +112,7 @@ export default function MethodologyPage() {
               <strong>Important:</strong> research on the Big Five does not validate this exact 28-question KYR implementation, its weighting, or any individual role recommendation. We do not publish an accuracy percentage because we do not have evidence to support one.
             </p>
             <p className="mt-5 text-sm leading-relaxed text-[#405f72]">
-              Ready to compare these ideas with your own answers? <Link href="/quiz" className="font-semibold text-[#315f74] underline underline-offset-4 hover:text-[#b64d35]">Take the free 28-question work-style quiz</Link> and use the result as one input to a real-world experiment.
+              Ready to compare these ideas with your own answers? <Link href="/quiz" className="font-semibold text-[#315f74] underline underline-offset-4 hover:text-[#a3402b]">Take the free 28-question work-style quiz</Link> and use the result as one input to a real-world experiment.
             </p>
           </section>
 
@@ -139,7 +139,7 @@ export default function MethodologyPage() {
                   <li>Choosing a small experiment to run next</li>
                 </ul>
               </div>
-              <div className="rounded-2xl border border-[#b64d35]/25 bg-[#fff0e9] p-5">
+              <div className="rounded-2xl border border-[#a3402b]/25 bg-[#fff0e9] p-5">
                 <h3 className="font-bold text-[#853520]">Not designed for</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#6e3d31]">
                   <li>Diagnosis, treatment, or mental-health screening</li>
@@ -157,8 +157,8 @@ export default function MethodologyPage() {
             <ol className="mt-5 space-y-3 text-sm leading-relaxed text-[#405f72]">
               {citations.map((citation) => (
                 <li key={citation.href} className="flex gap-3">
-                  <span className="text-[#b64d35]">•</span>
-                  <a href={citation.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 font-semibold text-[#315f74] underline decoration-[#315f74]/35 underline-offset-4 hover:text-[#b64d35] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b64d35]">
+                  <span className="text-[#a3402b]">•</span>
+                  <a href={citation.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 font-semibold text-[#315f74] underline decoration-[#315f74]/35 underline-offset-4 hover:text-[#a3402b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a3402b]">
                     {citation.title}<ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   </a>
                 </li>

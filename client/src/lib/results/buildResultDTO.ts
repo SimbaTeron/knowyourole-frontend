@@ -581,7 +581,7 @@ export function buildResultDTO(input: BuildResultDTOInput): BuildResultDTOOutput
       status: "not_started",
       goalType: "career",
       targets: [legacy.primaryRole?.title || "Clarify best-fit career direction"],
-      recommendedActions: [{ id: "career-reflection-1", title: "Validate your top role", description: "Compare your top career match against your current interests, skills, and energy patterns.", effort: "low", timeframe: "this_week" }],
+      recommendedActions: [{ id: "career-reflection-1", title: "Test your top role", description: "Compare your top career match against your current interests, skills, and energy patterns.", effort: "low", timeframe: "this_week" }],
       weeklyCheckins: [{ week: 1, prompt: "Did your top role feel energizing, realistic, and worth exploring?", metric: "career_fit_confidence" }],
     },
     energyProductivity: { pattern: `${mbti.type}/${disc.primary} productivity pattern`, recommendations: ["Use this result to identify work conditions that protect energy and increase follow-through."] },

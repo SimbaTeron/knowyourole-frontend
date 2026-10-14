@@ -375,7 +375,7 @@ function findCareerVectorRoleMatch(
     laneKey: directionDefinition.laneKey,
     title: directionDefinition.title,
     examples: directionDefinition.examples.map(title => ({ title, salary: "", desc: "" })),
-    rationale: `Your direct work-preference answers emphasized ${signalText}. That is stronger evidence for this work direction than any one job title.`,
+    rationale: `Your direct work-preference answers emphasized ${signalText}. This is a better clue than any single job title.`,
   };
   const whyThisFits = winner.match.whyThisFits
     ? `${winner.match.whyThisFits} Your strongest direct work-interest signals were ${signalText}.`
