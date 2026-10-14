@@ -315,6 +315,11 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
 .workday-header__brand { display: inline-flex; align-items: center; gap: 9px; color: #12263a; text-decoration: none; font: 800 clamp(15px, 1.6vw, 18px)/1 "IBM Plex Sans", sans-serif; letter-spacing: -.045em; white-space: nowrap; }
 .workday-header__mark { width: 33px; height: 33px; display: grid; place-items: center; border-radius: 10px; color: #12263a; background: #ffca42; box-shadow: 3px 3px 0 rgba(18,38,58,.14); }
 .workday-header__mark svg { width: 20px; height: 20px; }
+.workday-header__menu { display: none; position: relative; margin-left: auto; }
+.workday-header__menu summary { list-style: none; cursor: pointer; color: #12263a; font: 750 12px/1 "IBM Plex Sans", sans-serif; padding: 8px 10px; border-radius: 10px; }
+.workday-header__menu summary::-webkit-details-marker { display: none; }
+.workday-header__menu nav { position: absolute; right: 0; top: calc(100% + 6px); display: grid; gap: 4px; min-width: 160px; padding: 8px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(18,38,58,.15); z-index: 50; }
+.workday-header__menu nav a { color: #12263a; text-decoration: none; font: 700 13px/1.2 "IBM Plex Sans", sans-serif; padding: 9px 10px; border-radius: 8px; }
 .workday-header__links { display: flex; align-items: center; gap: 18px; margin-left: auto; }
 .workday-header__links a { color: #536e82; text-decoration: none; font: 750 12px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.015em; }
 .workday-header__links a:hover { color: #12263a; }
@@ -336,6 +341,7 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
   .workday-header { padding-inline: 12px; }
   .workday-header__bar { min-height: 50px; padding: 7px 8px 7px 11px; gap: 8px; border-radius: 17px; }
   .workday-header__links { display: none; }
+  .workday-header__menu { display: block; }
   .workday-header__mark { width: 29px; height: 29px; border-radius: 8px; }
   .workday-header__cta { min-height: 34px; padding-inline: 11px; font-size: 11px; }
   html.kyr-workday .kyr-home-page .hero-section { min-height: auto; }

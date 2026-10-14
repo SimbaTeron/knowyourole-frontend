@@ -52,6 +52,14 @@ export function AppHeader() {
           <Link href="/learn">Learn</Link>
           <Link href="/methodology">Method</Link>
         </nav>
+        <details className="workday-header__menu">
+          <summary aria-label="Open site menu">Menu</summary>
+          <nav aria-label="Explore KnowYouRole (mobile)">
+            <Link href="/careers">Career paths</Link>
+            <Link href="/learn">Learn</Link>
+            <Link href="/methodology">Method</Link>
+          </nav>
+        </details>
         <Link href="/quiz" className="workday-header__cta" aria-label="Start the free KnowYouRole quiz">
           Take the quiz <span aria-hidden="true">↗</span>
         </Link>
