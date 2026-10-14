@@ -38,3 +38,7 @@ npm-debug.log*
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Never commit env files
+.env*
+!.env.example
