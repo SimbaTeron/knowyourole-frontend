@@ -1,5 +1,6 @@
 'use client';
 import { resolveResultClarityDisplay, formatTopTraitLabel } from "@/lib/results/resultClarity";
+import { ResultEmailCard } from "@/components/email/ResultEmailCard";
 
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
@@ -5073,6 +5074,18 @@ function OrbitalGlassV2Results({
               <button className="result-link" onClick={() => go("bigfive")}><span className="icon">🌌</span><span><b>Big Five</b><span>Your trait gravity and environment fit.</span></span><span className="arrow">›</span></button>
               <button className="result-link" onClick={() => go("disc")}><span className="icon">📊</span><span><b>DISC</b><span>Your visible work behavior.</span></span><span className="arrow">›</span></button>
             </div>
+            <ResultEmailCard
+              summary={{
+                identity,
+                mbtiType,
+                discLabel,
+                topTraits: topTraitDisplay,
+                clarityHeading: clarityDisplay.heading,
+                roleTitle: roleDirection.title,
+                snapshot: shareLine,
+              }}
+              onDownloadPdf={() => onShare("email_card_under13_pdf")}
+            />
           </section>
         )}
 
