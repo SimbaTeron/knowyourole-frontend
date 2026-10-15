@@ -42,3 +42,4 @@ vite.config.ts.*
 # Never commit env files
 .env*
 !.env.example
+results-v3/
