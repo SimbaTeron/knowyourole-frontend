@@ -17,7 +17,7 @@ export default function Privacy() {
       <AppHeader />
       <main className="workday-simple-wrap max-w-2xl px-6 py-32">
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-privacy-title">Privacy Policy</h1>
-        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last reviewed: July 27, 2026</p>
+        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last reviewed: October 15, 2026</p>
 
         <div className="p-4 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 mb-8" data-testid="section-data-promise">
           <h2 className={headingClass}>Plain-English summary</h2>
@@ -39,7 +39,7 @@ export default function Privacy() {
             <ul className={listClass}>
               <li>Quiz answers, score outputs, result pages viewed, and result identifiers.</li>
               <li>Age tier selection so quiz copy and experience can be age-appropriate.</li>
-              <li>Email address, selected result-summary fields, consent, and delivery status when you explicitly request that a result summary be emailed.</li>
+              <li>Your email address, only if you are 13 or older and choose “Email me my results.” If you only want the one-time copy, we use the address to send it and do not keep it. If you also tick “occasional updates,” we keep your address, your choices, the date, and which version of the consent wording you saw.</li>
               <li>Feedback you submit voluntarily.</li>
               <li>Device, browser, referral, and performance data when analytics is enabled through cookie preferences.</li>
               <li>Browser storage used for quiz state, consent preferences, and session continuity.</li>
@@ -92,13 +92,17 @@ export default function Privacy() {
           </section>
 
           <section className={sectionClass}>
-            <h2 className={headingClass}>Requested result email</h2>
+            <h2 className={headingClass}>Email me my results (optional)</h2>
             <p>
-              If you choose “Email this result,” KnowYouRole stores your email address, result/session identifiers, the visible summary fields needed for the email (such as the MBTI-style pattern, DISC-style result, and primary role title), your explicit request to send the summary, and delivery status. Raw quiz answers are not included in the email-request record or the emailed summary.
+              Your results are always shown first and never require an email. Below them, people who say they are 13 or older can ask us to email a copy. If you answer that you are under 13, the email box is hidden and we don’t send or store anything; you can copy, print or download your results instead, or ask a parent or teacher to email them.
             </p>
-            <p>
-              This is a one-time result-delivery request, not marketing enrollment. Marketing consent is off by default and is not collected by this form. If result-email delivery is unavailable, the form tells you to use the existing PDF or sharing options instead of silently treating an email request as delivered.
-            </p>
+            <ul className={listClass}>
+              <li><strong>One-time copy (default):</strong> we use your address to send one email and do not store it. To prevent abuse we keep short-lived counters based on a scrambled (hashed) version of your address and network address, never the raw values, and they are cleared within about two days.</li>
+              <li><strong>Occasional updates (unticked unless you tick it):</strong> we store your email address, that you asked for updates, that you said you are 13 or older, the consent wording version, and dates. Nothing is sent beyond your copy until you click the confirmation link in that email; unconfirmed addresses are deleted within 7 days. Updates are about monthly.</li>
+              <li>This email list is kept separately from quiz results and is not linked to your answers or result record. The email includes a short summary and a link to view that summary; raw quiz answers are never included.</li>
+              <li>Every email has a one-click unsubscribe link and a “delete my email” link that removes your address from our records. We never sell or share email addresses, never add advertising or tracking pixels to these emails, and don’t ask for your name.</li>
+              <li>Emails are delivered through our email provider (Resend), which processes your address only to deliver the message.</li>
+            </ul>
           </section>
 
           <section className={sectionClass}>
