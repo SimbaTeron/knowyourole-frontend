@@ -275,6 +275,21 @@ test("v3 improves critical personas without tanking average proxy fit", () => {
   assert.ok(v3Summary.fails <= v2Summary.fails, `check fails ${v2Summary.fails} -> ${v3Summary.fails}`);
 });
 
+test("v3 close-letter note is rare among consistent personas (tight threshold)", async () => {
+  const { WEAK_CAL_GAP, WEAK_RAW_GAP } = await import(
+    pathToFileURL(join(root, "src/lib/quiz/mbtiConfidence.ts")).href
+  );
+  assert.equal(WEAK_CAL_GAP, 4);
+  assert.equal(WEAK_RAW_GAP, 2);
+  const close = v3Rows.filter((r) => (r.mbtiConfidence?.weakAxes || []).length > 0);
+  // Tuned so ~15–20% of realistic (persona+1-flip) answerers see a close-letter note.
+  // Among the 18 locked personas that lands at a small minority (currently 3/18).
+  assert.ok(close.length >= 1 && close.length <= 5, `close-letter personas: ${close.length} ${close.map((r) => r.id)}`);
+  const p05 = v3Rows.find((r) => r.id === "P05");
+  assert.ok(p05.mbtiConfidence?.note, "P05 keeps Broad/confidence note");
+  assert.ok((p05.alts || []).length >= 1 || p05.clarity === "broad", "P05 keeps alternate roles path");
+});
+
 test("v3 simulation stats are recorded", () => {
   const simV2 = runSimulation("v2", 400);
   const simV3 = runSimulation("v3", 400);

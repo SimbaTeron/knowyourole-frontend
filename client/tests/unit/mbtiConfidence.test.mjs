@@ -30,3 +30,19 @@ test("multiple close axes name the letters in the note", () => {
   assert.ok(c.note.includes("/") || c.badge.includes("light"));
   assert.equal(c.type.length, 4);
 });
+
+test("calibrated gap of 4 is not weak; gap of 3 is", () => {
+  const clear = getMbtiConfidence({ E: 80, I: 20, S: 54, N: 50, T: 70, F: 30, J: 75, P: 25 });
+  assert.equal(clear.weakAxes.length, 0, `gap 4 should be clear, got ${clear.weakAxes}`);
+  const close = getMbtiConfidence({ E: 80, I: 20, S: 53, N: 50, T: 70, F: 30, J: 75, P: 25 });
+  assert.ok(close.weakAxes.includes("SN"), "gap 3 should be light lean");
+});
+
+test("raw gap below 2 marks light lean even when calibrated is clear", () => {
+  const c = getMbtiConfidence(
+    { E: 80, I: 20, S: 70, N: 30, T: 70, F: 30, J: 75, P: 25 },
+    { E: 10, I: 9, S: 12, N: 4, T: 11, F: 3, J: 13, P: 2 },
+  );
+  assert.ok(c.weakAxes.includes("EI"), "raw EI gap 1 should count");
+  assert.equal(c.weakAxes.includes("SN"), false);
+});
