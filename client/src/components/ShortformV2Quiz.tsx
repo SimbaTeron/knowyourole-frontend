@@ -187,6 +187,26 @@ function rebuildScoresFromResponses(responses: QuizScores["responses"]): QuizSco
   };
 }
 
+const PROGRESS_KEY = "kyr_quiz_progress_v1";
+const PROGRESS_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+type SavedProgress = { v: 1; currentIndex: number; responses: QuizScores["responses"]; savedAt: number };
+
+function readSavedProgress(): SavedProgress | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = JSON.parse(window.sessionStorage.getItem(PROGRESS_KEY) || "null") as SavedProgress | null;
+    if (!saved || saved.v !== 1 || !Array.isArray(saved.responses) || Date.now() - saved.savedAt > PROGRESS_MAX_AGE_MS) return null;
+    if (saved.responses.length === 0 || saved.currentIndex < 0 || saved.currentIndex >= SHORTFORM_V2_QUESTIONS.length) return null;
+    return saved;
+  } catch {
+    return null;
+  }
+}
+
+function clearSavedProgress() {
+  try { window.sessionStorage.removeItem(PROGRESS_KEY); } catch { /* storage unavailable */ }
+}
+
 export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete, onExit, onQuizStarted }: ShortformV2QuizProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -197,8 +217,43 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const questionHeadingRef = useRef<HTMLHeadingElement>(null);
   const answerButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const restoreAnswerFocusRef = useRef(false);
+  const restoredRef = useRef(false);
 
-  const currentQuestion = SHORTFORM_V2_QUESTIONS[currentIndex];
+  // Restore in-progress answers after a remount, reload, or back/forward navigation
+  // so the quiz does not drop the user back to the intro mid-run.
+  useEffect(() => {
+    if (restoredRef.current) return;
+    restoredRef.current = true;
+    const saved = readSavedProgress();
+    if (!saved) return;
+    const rebuilt = rebuildScoresFromResponses(saved.responses);
+    setScores({ ...rebuilt, responses: saved.responses });
+    setCurrentIndex(Math.min(saved.currentIndex, saved.responses.length));
+    setSelectedAnswer(null);
+    setStartedAt(Date.now());
+    setHasStarted(true);
+    onQuizStarted?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!hasStarted || scores.responses.length === 0) return;
+    try {
+      const nextIndex = selectedAnswer ? Math.min(currentIndex + 1, SHORTFORM_V2_QUESTIONS.length - 1) : currentIndex;
+      const payload: SavedProgress = { v: 1, currentIndex: nextIndex, responses: scores.responses, savedAt: Date.now() };
+      window.sessionStorage.setItem(PROGRESS_KEY, JSON.stringify(payload));
+    } catch { /* storage unavailable: quiz still works in memory */ }
+  }, [hasStarted, currentIndex, selectedAnswer, scores.responses]);
+
+  // Guard: never index past the question list (prevents "reading 'group'" crashes).
+  const safeIndex = Math.min(Math.max(currentIndex, 0), SHORTFORM_V2_QUESTIONS.length - 1);
+  const currentQuestion = SHORTFORM_V2_QUESTIONS[safeIndex];
+  const advancingRef = useRef(false);
+  const advanceTimerRef = useRef<number | null>(null);
+  const completedRef = useRef(false);
+  useEffect(() => () => {
+    if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
+  }, []);
   const totalQuestions = SHORTFORM_V2_QUESTIONS.length;
   const progress = Math.round(((currentIndex + 1) / totalQuestions) * 100);
   const accent = GROUP_ACCENTS[currentQuestion.group] ?? GROUP_ACCENTS.Calibration;
@@ -231,7 +286,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const handleAnswer = (answer: ShortformV2Answer, optionIndex: number) => {
     const existingResponseIndex = scores.responses.findIndex((response) => response.questionId === currentQuestion.id);
     const isReviewingAnswer = existingResponseIndex >= 0;
+    // Ignore clicks while an auto-advance is pending (double clicks, rapid taps) or after completion.
+    if (advancingRef.current || completedRef.current) return;
     if (selectedAnswer && !isReviewingAnswer) return;
+    advancingRef.current = true;
 
     const existingResponse = isReviewingAnswer ? scores.responses[existingResponseIndex] : undefined;
     const timeSpent = existingResponse?.timeSpent ?? Math.max(0.1, (Date.now() - startedAt) / 1000);
@@ -283,8 +341,13 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       progress,
     });
 
-    window.setTimeout(() => {
-      if (currentIndex >= totalQuestions - 1) {
+    const answeredIndex = safeIndex;
+    if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
+    advanceTimerRef.current = window.setTimeout(() => {
+      advanceTimerRef.current = null;
+      if (answeredIndex >= totalQuestions - 1) {
+        if (completedRef.current) return;
+        completedRef.current = true;
         trackKyrEvent("quiz_completed", {
           source: "shortform_v2",
           tier,
@@ -297,12 +360,14 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
           ...updatedScores,
           ...authoritativeScoreMaps,
         });
+        clearSavedProgress();
         onComplete(authoritativeScores);
         return;
       }
-      setCurrentIndex((index) => index + 1);
+      setCurrentIndex(Math.min(answeredIndex + 1, totalQuestions - 1));
       setSelectedAnswer(null);
       setStartedAt(Date.now());
+      advancingRef.current = false;
     }, 360);
   };
 
@@ -320,7 +385,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   };
 
   const goBack = () => {
-    if (currentIndex === 0 || answeredCount === 0 || selectedAnswer) return;
+    if (advancingRef.current || currentIndex === 0 || answeredCount === 0 || selectedAnswer) return;
     const responseBeingRevisited = scores.responses.find((response) => response.questionId === SHORTFORM_V2_QUESTIONS[currentIndex - 1]?.id);
     const answerId = responseBeingRevisited?.answerId;
     if (!responseBeingRevisited || typeof answerId !== "string") return;
