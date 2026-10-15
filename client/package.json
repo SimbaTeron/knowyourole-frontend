@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
+    "test:unit": "node --test tests/unit/*.test.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {
