@@ -24,6 +24,7 @@ import {
   type WorkLaneScores,
 } from "@/lib/results/workLanes";
 import { getResultClarity, detectFlatAnswerPattern, resolveResultClarityDisplay } from "@/lib/results/resultClarity";
+import { getMbtiConfidence, type MbtiConfidence } from "@/lib/quiz/mbtiConfidence";
 
 export type ScoreVersion = "v2" | "v3";
 export type VersionedResponse = { questionId: number; choice: 0 | 1 | 2 | 3; timeSpent?: number };
@@ -146,6 +147,7 @@ export type VersionedResult = {
   direction: WorkDirection;
   altDirections: WorkDirection[];
   nTier: "low" | "medium" | "high";
+  mbtiConfidence: MbtiConfidence;
 };
 
 export function scoreShortformVersioned(
@@ -163,9 +165,11 @@ export function scoreShortformVersioned(
   const clarity = getResultClarity(calibrated.bigFive, clarityOpts);
   const flat = detectFlatAnswerPattern(responses);
   const clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
-  const soft = version === "v3" && clarity.level === "broad";
   const type = mbtiType(calibrated.mbti, false);
-  const display = mbtiType(calibrated.mbti, soft, soft ? 18 : 0, soft ? raw.mbti : undefined, 8);
+  const mbtiConfidence = version === "v3"
+    ? getMbtiConfidence(calibrated.mbti, raw.mbti, { broad: clarity.level === "broad" })
+    : getMbtiConfidence(calibrated.mbti, undefined, { broad: false });
+  const display = mbtiConfidence.type; // always full 4-letter; never X
   const ranked = (Object.entries(calibrated.bigFive) as [string, number][]).sort((a, b) => b[1] - a[1]);
   const lanes = deriveWorkLaneScores(calibrated.career)!;
   const direction =
@@ -189,6 +193,7 @@ export function scoreShortformVersioned(
     direction,
     altDirections,
     nTier: n >= 67 ? "high" : n <= 33 ? "low" : "medium",
+    mbtiConfidence,
   };
 }
 

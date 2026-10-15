@@ -53,16 +53,21 @@ function evaluatePersona(fixture, version, flags) {
       : fail("clarity", `${result.clarity.level} != ${env.clarity}`);
   }
   if (env.mbti_ok) {
-    const ok =
-      env.mbti_ok.includes(result.mbtiType) ||
-      env.mbti_ok.includes(result.mbtiDisplay) ||
-      (env.mbti_hedged && /X/.test(result.mbtiDisplay));
+    const ok = env.mbti_ok.includes(result.mbtiType) || env.mbti_ok.includes(result.mbtiDisplay);
     ok ? pass("mbti", result.mbtiDisplay) : fail("mbti", `${result.mbtiDisplay} not in ${env.mbti_ok.join(",")}`);
   }
-  if (env.mbti_hedged) {
-    /X/.test(result.mbtiDisplay) || result.clarity.level === "broad"
-      ? pass("mbti_hedged", result.mbtiDisplay)
-      : fail("mbti_hedged", result.mbtiDisplay);
+  // Never allow X letters in the displayed type
+  if (/X/.test(result.mbtiDisplay) || /X/.test(result.mbtiType)) {
+    fail("no_x_letters", result.mbtiDisplay);
+  } else {
+    pass("no_x_letters", result.mbtiDisplay);
+  }
+  if (env.mbti_hedged || env.clarity === "broad") {
+    const note = result.mbtiConfidence?.note || "";
+    const badge = result.mbtiConfidence?.badge || "";
+    note || badge || result.clarity.level === "broad"
+      ? pass("mbti_confidence_note", badge || note.slice(0, 60))
+      : fail("mbti_confidence_note", "missing confidence note for weak/broad result");
   }
   if (env.disc) {
     env.disc.includes(result.discPrimary)
@@ -122,6 +127,7 @@ function evaluatePersona(fixture, version, flags) {
     role: result.direction.title,
     lane: result.direction.laneKey,
     alts: result.altDirections.map((d) => d.title),
+    mbtiConfidence: result.mbtiConfidence,
     checks,
     failed: failed.length,
     proxyFit: proxy,
@@ -252,7 +258,15 @@ test("v3 improves critical personas without tanking average proxy fit", () => {
 
   const p16 = v3Rows.find((r) => r.id === "P16");
   assert.equal(p16.clarity, "broad");
-  assert.ok(/X/.test(p16.mbtiDisplay), `P16 should hedge type, got ${p16.mbtiDisplay}`);
+  assert.ok(!/X/.test(p16.mbtiDisplay), `P16 must show full type, got ${p16.mbtiDisplay}`);
+  assert.equal(p16.mbtiDisplay.length, 4);
+  assert.ok(p16.mbtiConfidence?.note || p16.mbtiConfidence?.badge, "P16 needs confidence note");
+  assert.ok(p16.alts?.length >= 1, "P16 should keep alternate roles");
+
+  const p05 = v3Rows.find((r) => r.id === "P05");
+  assert.equal(p05.clarity, "broad");
+  assert.ok(!/X/.test(p05.mbtiDisplay), `P05 must show full type, got ${p05.mbtiDisplay}`);
+  assert.ok(p05.mbtiConfidence?.note || p05.mbtiConfidence?.badge, "P05 needs confidence note");
 
   assert.ok(
     v3Summary.avgProxy >= v2Summary.avgProxy - 0.05,

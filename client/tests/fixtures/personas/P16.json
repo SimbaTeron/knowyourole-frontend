@@ -8,7 +8,15 @@
     "clarity": "broad",
     "mbti_hedged": true,
     "role_multi": true,
-    "notes": "random"
+    "notes": "random",
+    "mbti_ok": [
+      "ENTP",
+      "ENTJ",
+      "ESTP",
+      "ESTJ",
+      "INTP",
+      "INTJ"
+    ]
   },
   "answers": [
     {

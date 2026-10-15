@@ -1,7 +1,7 @@
 'use client';
 import { resolveResultClarityDisplay, formatTopTraitLabel } from "@/lib/results/resultClarity";
 import { isScoringV3 } from "@/lib/quiz/scoringVersions";
-import { softMbtiTypeV3 } from "@/lib/quiz/softMbtiV3";
+import { getMbtiConfidence } from "@/lib/quiz/mbtiConfidence";
 
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
@@ -4917,7 +4917,18 @@ function OrbitalGlassV2Results({
   const clarityDisplay = resolveResultClarityDisplay(bigFive, rawScores?.responses, v3 ? { version: "v3", maxCareer } : {});
   const clarity = clarityDisplay.clarity;
   const topTraitDisplay = formatTopTraitLabel(clarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
-  const displayMbti = v3 && clarity.level === "broad" && rawScores?.mbti ? softMbtiTypeV3(rawScores.mbti as Record<string, number>, 15) : mbtiType;
+  const mbtiConfidenceScores = (rawScores?.mbti as Record<string, number> | undefined) || {};
+  const hasMbtiScores = ["E","I","S","N","T","F","J","P"].every((k) => typeof mbtiConfidenceScores[k] === "number");
+  const mbtiConfidenceResolved = v3 && hasMbtiScores
+    ? getMbtiConfidence(mbtiConfidenceScores, undefined, { broad: clarity.level === "broad" })
+    : v3 && clarity.level === "broad"
+      ? { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "This type is a directional sketch — your trait pattern was broad, so treat it as a starting point, not a hard label.", badge: "directional sketch" }
+      : { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "", badge: "" };
+  // Always show the full 4-letter type (never X). Close letters get a light-lean marker + note.
+  const displayMbti = mbtiType;
+  const typeBadge = v3 ? mbtiConfidenceResolved.badge : "";
+  const typeConfidenceNote = v3 ? mbtiConfidenceResolved.note : "";
+  const lightLeanLetters = new Set(v3 ? mbtiConfidenceResolved.lightLeanLetters : []);
   const resultSummaryLine = buildResultSummaryLine({
     roleTitle: roleDirection.title,
     identity,
@@ -5003,6 +5014,7 @@ function OrbitalGlassV2Results({
         .role-card { margin-top:13px; border-radius:25px; padding:17px; background:linear-gradient(145deg,#fff8e8,#f4dfb4); color:#15110c; box-shadow:0 18px 48px rgba(0,0,0,.26); }
         .role-card small { display:block; color:rgba(74,54,28,.62); font-size:10px; font-weight:950; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px; } .role-card h2 { margin:0 0 6px; font-size:25px; letter-spacing:-.055em; line-height:1.03; text-wrap:balance; } .role-card p { margin:0; color:rgba(20,14,7,.74); font-size:13px; line-height:1.48; font-weight:650; text-wrap:pretty; }
         .direction-examples { margin-top:15px; display:grid; gap:9px; } .direction-examples b { color:rgba(74,54,28,.62); font-size:10px; font-weight:950; letter-spacing:.13em; text-transform:uppercase; } .direction-examples span { color:#21180c; font-size:clamp(18px,2vw,20px); font-weight:900; line-height:1.18; letter-spacing:-.018em; }
+        .mbti-letters { letter-spacing: 0.04em; } .mbti-letter.light-lean { border-bottom: 2px dotted rgba(159,216,230,0.95); padding-bottom: 1px; } .type-badge { display:inline-block; margin-left:8px; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; background:rgba(159,216,230,0.18); color:#9fd8e6; vertical-align:middle; } .mbti-confidence-note { margin:8px 0 0; font-size:13px; line-height:1.45; color:var(--muted); } 
         .clarity-note { margin-top:11px; border-radius:3px; padding:12px 14px; background:#12263a !important; border:1px solid rgba(18,38,58,.16); color:#fffdf8 !important; } .clarity-note b { display:block; font-size:13px; letter-spacing:.04em; margin-bottom:4px; color:#9fd8e6 !important; } .clarity-note p { margin:0; font-size:14px; line-height:1.45; color:#fffdf8 !important; } .clarity-note .flat-note { margin-top:6px; } .clarity-inline { margin-top:8px !important; }
         .mini-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:11px; } .stat { border-radius:18px; padding:11px 9px; background:rgba(5,7,15,.70); border:1px solid rgba(255,255,255,.11); min-height:74px; } .stat small { display:block; color:#52f1ff; font-size:9px; text-transform:uppercase; letter-spacing:.11em; font-weight:950; margin-bottom:7px; } .stat strong { display:block; font-size:18px; letter-spacing:-.04em; } .stat span { color:var(--muted); font-size:10px; line-height:1.25; display:block; margin-top:2px; }
         .link-stack { margin-top:14px; display:grid; gap:9px; padding-bottom:calc(8px + env(safe-area-inset-bottom)); } .result-link { width:100%; text-align:left; display:grid; grid-template-columns:42px minmax(0,1fr) auto; gap:10px; align-items:center; padding:12px; border-radius:21px; border:1px solid rgba(255,255,255,.12); color:white; background:linear-gradient(135deg,rgba(255,255,255,.095),rgba(255,255,255,.035)); box-shadow:0 12px 30px rgba(0,0,0,.14); cursor:pointer; } .icon { width:44px; height:44px; border-radius:16px; display:grid; place-items:center; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.11); font-size:21px; } .result-link b { display:block; font-size:15px; letter-spacing:-.03em; } .result-link span span { display:block; color:var(--muted); font-size:12px; line-height:1.28; margin-top:2px; } .arrow { color:var(--faint); font-size:22px; }
@@ -5036,7 +5048,7 @@ function OrbitalGlassV2Results({
         .glass-tile { border-radius:3px !important; } .type-chip,.chip { border-color:rgba(18,38,58,.18) !important; background:#eaf5f6 !important; color:#12263a !important; }
         .shareline p,.detail-card p,.detail-head p,.mini-role span,.lane-card p,.result-link span span,.stat span,.meter-top,.quad span { color:#456174 !important; }
         .role-card { border-radius:3px !important; background:linear-gradient(135deg,#ffca42,#f8df9a) !important; color:#12263a !important; box-shadow:5px 5px 0 #c95f46 !important; }
-        .mini-stats .stat { border-color:rgba(18,38,58,.16) !important; background:#12263a !important; color:#fffdf8 !important; border-radius:3px !important; } .mini-stats .stat span { color:#dcedf0 !important; } .mini-stats .stat small { color:#9fd8e6 !important; }
+        .mini-stats .stat { border-color:rgba(18,38,58,.16) !important; background:#12263a !important; color:#fffdf8 !important; border-radius:3px !important; } .mini-stats .stat span { color:#dcedf0 !important; } .mini-stats .stat small { color:#9fd8e6 !important; } .type-badge { background:#12263a !important; color:#9fd8e6 !important; } .mbti-confidence-note { color:#12263a !important; } .mbti-letter.light-lean { border-bottom-color:#1a6b7c !important; }
         .result-link { border-radius:3px !important; } .result-link:hover { background:#fff3d7 !important; transform:translate(-2px,-2px); box-shadow:6px 6px 0 rgba(18,38,58,.14) !important; }
         .detail-head h2,.orb-h1,.share-preview h2 { font-family:Fraunces,Georgia,serif !important; color:#12263a !important; }
         .analogy,.share-preview { border-color:rgba(18,38,58,.18) !important; background:#eaf5f6 !important; color:#29495c !important; }
@@ -5059,11 +5071,11 @@ function OrbitalGlassV2Results({
           <section>
             <article className="portrait-card">
               <div className="card-head"><div className="eyebrow">Your result</div><div className="avatar">{emoji}</div></div>
-              <div className="glass-tile"><div className="type-chip">{emoji} {displayMbti} <small>{clarity.level === "broad" && v3 ? "directional sketch" : stripLeadingThe(arch)}</small></div><h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1></div>
+              <div className="glass-tile"><div className="type-chip" data-testid="mbti-type-chip">{emoji} <span className="mbti-letters">{displayMbti.split("").map((letter, i) => <span key={i} className={lightLeanLetters.has(letter) ? "mbti-letter light-lean" : "mbti-letter"} title={lightLeanLetters.has(letter) ? "light lean" : undefined}>{letter}</span>)}</span>{typeBadge ? <span className="type-badge" data-testid="mbti-confidence-badge">{typeBadge}</span> : null} <small>{stripLeadingThe(arch)}</small></div><h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1></div>
               <div className="shareline"><b>Snapshot</b><p>“{shareLine}”</p></div>
               <div className="role-card"><small>{clarity.level === "broad" && v3 ? "Directions to explore" : "Best-fit direction"}</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>Strong examples</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}{clarity.level === "broad" && v3 && adjacentRoles.length > 0 && <div className="direction-examples" data-testid="broad-alt-roles"><b>Also explore</b>{adjacentRoles.slice(0,2).map(role => <span key={role.title}>• {role.title}</span>)}</div>}</div>
               <div className="mini-stats"><div className="stat"><small>Mind</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>Work style</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>{clarity.blended ? "Top traits" : "Top trait"}</small><strong>{leanBand(topTrait[1])}</strong><span>{topTraitDisplay}</span></div></div>
-              <div className={`clarity-note clarity-${clarityDisplay.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplay.heading}</b><p>{clarityDisplay.body}</p></div>
+              {typeConfidenceNote && <p className="mbti-confidence-note" data-testid="mbti-confidence-note">{typeConfidenceNote}</p>}<div className={`clarity-note clarity-${clarityDisplay.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplay.heading}</b><p>{clarityDisplay.body}</p></div>
             </article>
             <ResultDecisionBrief
               result={canonicalResult}

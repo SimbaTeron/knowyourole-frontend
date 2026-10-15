@@ -8,9 +8,8 @@
     "mbti_ok": [
       "ISFJ",
       "ISTJ",
-      "XXXX",
-      "XSXJ",
-      "ISXJ"
+      "ISFP",
+      "ISTP"
     ],
     "disc": [
       "S",
@@ -22,7 +21,9 @@
       "knowledge"
     ],
     "clarity": "broad",
-    "notes": "ambivalent"
+    "notes": "ambivalent",
+    "mbti_hedged": true,
+    "role_multi": true
   },
   "answers": [
     {
