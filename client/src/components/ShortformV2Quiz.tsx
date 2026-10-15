@@ -245,7 +245,15 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     } catch { /* storage unavailable: quiz still works in memory */ }
   }, [hasStarted, currentIndex, selectedAnswer, scores.responses]);
 
-  const currentQuestion = SHORTFORM_V2_QUESTIONS[currentIndex];
+  // Guard: never index past the question list (prevents "reading 'group'" crashes).
+  const safeIndex = Math.min(Math.max(currentIndex, 0), SHORTFORM_V2_QUESTIONS.length - 1);
+  const currentQuestion = SHORTFORM_V2_QUESTIONS[safeIndex];
+  const advancingRef = useRef(false);
+  const advanceTimerRef = useRef<number | null>(null);
+  const completedRef = useRef(false);
+  useEffect(() => () => {
+    if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
+  }, []);
   const totalQuestions = SHORTFORM_V2_QUESTIONS.length;
   const progress = Math.round(((currentIndex + 1) / totalQuestions) * 100);
   const accent = GROUP_ACCENTS[currentQuestion.group] ?? GROUP_ACCENTS.Calibration;
@@ -278,7 +286,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const handleAnswer = (answer: ShortformV2Answer, optionIndex: number) => {
     const existingResponseIndex = scores.responses.findIndex((response) => response.questionId === currentQuestion.id);
     const isReviewingAnswer = existingResponseIndex >= 0;
+    // Ignore clicks while an auto-advance is pending (double clicks, rapid taps) or after completion.
+    if (advancingRef.current || completedRef.current) return;
     if (selectedAnswer && !isReviewingAnswer) return;
+    advancingRef.current = true;
 
     const existingResponse = isReviewingAnswer ? scores.responses[existingResponseIndex] : undefined;
     const timeSpent = existingResponse?.timeSpent ?? Math.max(0.1, (Date.now() - startedAt) / 1000);
@@ -330,8 +341,13 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       progress,
     });
 
-    window.setTimeout(() => {
-      if (currentIndex >= totalQuestions - 1) {
+    const answeredIndex = safeIndex;
+    if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
+    advanceTimerRef.current = window.setTimeout(() => {
+      advanceTimerRef.current = null;
+      if (answeredIndex >= totalQuestions - 1) {
+        if (completedRef.current) return;
+        completedRef.current = true;
         trackKyrEvent("quiz_completed", {
           source: "shortform_v2",
           tier,
@@ -348,9 +364,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
         onComplete(authoritativeScores);
         return;
       }
-      setCurrentIndex((index) => index + 1);
+      setCurrentIndex(Math.min(answeredIndex + 1, totalQuestions - 1));
       setSelectedAnswer(null);
       setStartedAt(Date.now());
+      advancingRef.current = false;
     }, 360);
   };
 
@@ -368,7 +385,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   };
 
   const goBack = () => {
-    if (currentIndex === 0 || answeredCount === 0 || selectedAnswer) return;
+    if (advancingRef.current || currentIndex === 0 || answeredCount === 0 || selectedAnswer) return;
     const responseBeingRevisited = scores.responses.find((response) => response.questionId === SHORTFORM_V2_QUESTIONS[currentIndex - 1]?.id);
     const answerId = responseBeingRevisited?.answerId;
     if (!responseBeingRevisited || typeof answerId !== "string") return;
