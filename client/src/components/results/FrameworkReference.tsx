@@ -2,6 +2,14 @@
 
 import { type CSSProperties } from "react";
 
+/** Display-only banding (approximate leanings, not measurements). */
+function bandLabel(value: number): string {
+  if (value >= 70) return "Strong lean";
+  if (value >= 55) return "Moderate lean";
+  if (value >= 45) return "Balanced";
+  return "Light lean";
+}
+
 export type FrameworkDiscProfile = { D: number; I: number; S: number; C: number };
 export type FrameworkBigFiveProfile = { O: number; C: number; E: number; A: number; N: number };
 
@@ -128,7 +136,7 @@ export function FrameworkReference({ kind, primaryDisc, disc, bigFive, mbtiAxes,
               ].map(side => {
                 const active = side.letter === axis.dominant;
                 return <div key={side.letter} style={{ padding: "8px 8px 9px", borderRadius: 10, background: active ? T.tealSoft : "rgba(255,255,255,0.45)", border: `1px solid ${active ? "rgba(49, 95, 116, 0.28)" : T.line}` }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 5, alignItems: "baseline", marginBottom: 4 }}><strong style={{ fontSize: 10.5, color: active ? T.teal : T.ink }}>{side.letter} · {side.word}</strong><span style={{ fontSize: 9.5, color: active ? T.teal : T.dim }}>{side.value}%</span></div>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 5, alignItems: "baseline", marginBottom: 4 }}><strong style={{ fontSize: 10.5, color: active ? T.teal : T.ink }}>{side.letter} · {side.word}</strong><span style={{ fontSize: 9.5, color: active ? T.teal : T.dim }}>{bandLabel(side.value)}</span></div>
                   <div style={{ fontSize: 9.8, lineHeight: 1.42, color: T.muted }}>{side.description}</div>
                 </div>;
               })}
@@ -143,7 +151,7 @@ export function FrameworkReference({ kind, primaryDisc, disc, bigFive, mbtiAxes,
           const active = style.key === primaryDisc;
           const color = discColors[style.key];
           return <div key={style.key} style={{ ...row, borderColor: active ? `${color}88` : T.lineStrong }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 9, alignItems: "baseline", marginBottom: 4 }}><strong style={{ fontSize: 11.5, color: active ? color : T.ink }}>{style.key} · {style.label}</strong><span style={{ fontSize: 10, fontWeight: 900, color: active ? color : T.dim }}>{share}%</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 9, alignItems: "baseline", marginBottom: 4 }}><strong style={{ fontSize: 11.5, color: active ? color : T.ink }}>{style.key} · {style.label}</strong><span style={{ fontSize: 10, fontWeight: 900, color: active ? color : T.dim }}>{bandLabel(share)}</span></div>
             <div style={{ fontSize: 10.5, lineHeight: 1.45, color: T.muted }}>{style.description}</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8, fontSize: 9.6, lineHeight: 1.38 }}><span style={{ color: T.dim }}><strong style={{ color: T.ink }}>Adds:</strong> {style.contribution}</span><span style={{ color: T.dim }}><strong style={{ color: T.ink }}>Watch:</strong> {style.watch}</span></div>
           </div>;
@@ -152,7 +160,7 @@ export function FrameworkReference({ kind, primaryDisc, disc, bigFive, mbtiAxes,
         {kind === "bigFive" && bigFiveReference.map(trait => {
           const score = bigFive?.[trait.key] ?? 50;
           return <div key={trait.key} style={row}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 9, alignItems: "baseline", marginBottom: 7 }}><strong style={{ fontSize: 11.5, color: T.ink }}>{trait.label}</strong><span style={{ fontSize: 10, fontWeight: 900, color: T.teal }}>{score}%</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 9, alignItems: "baseline", marginBottom: 7 }}><strong style={{ fontSize: 11.5, color: T.ink }}>{trait.label}</strong><span style={{ fontSize: 10, fontWeight: 900, color: T.teal }}>{bandLabel(score)}</span></div>
             <div style={{ height: 6, borderRadius: 999, background: "linear-gradient(90deg, rgba(201,95,70,0.36), rgba(49,95,116,0.58))", position: "relative", margin: "0 3px 8px" }}><span aria-hidden="true" style={{ position: "absolute", left: `calc(${score}% - 6px)`, top: -3, width: 12, height: 12, borderRadius: 999, background: "#fffdf8", border: `2px solid ${T.teal}`, boxShadow: "0 2px 8px rgba(18,38,58,0.22)" }} /></div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 9.8, lineHeight: 1.4, color: T.muted }}><span><strong style={{ color: T.dim }}>Lower:</strong> {trait.low}</span><span><strong style={{ color: T.dim }}>Higher:</strong> {trait.high}</span></div>
           </div>;

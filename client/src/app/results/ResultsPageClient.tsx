@@ -450,8 +450,8 @@ function buildLearningPlan({ mbtiType, primaryDisc, bigFive }: { mbtiType: strin
     ],
     setupCards: [
       { label: "Work pace", title: discGuide.pace, body: `Best support: ${discGuide.accountability}.`, accent: DISC_COLORS[primaryDisc] || "#14b8a6" },
-      { label: `${topSignal.label} ${topBand}`, title: `Strong signal: ${topTrait[1]}%`, body: topBand === "low" ? topSignal.low : topSignal.high, accent: C.cyan },
-      { label: `${lowSignal.label} ${lowBand}`, title: `Watch signal: ${lowestTrait[1]}%`, body: lowBand === "high" ? lowSignal.high : lowSignal.low, accent: C.gold },
+      { label: `${topSignal.label} ${topBand}`, title: `Strong signal: ${leanBand(topTrait[1]).toLowerCase()}`, body: topBand === "low" ? topSignal.low : topSignal.high, accent: C.cyan },
+      { label: `${lowSignal.label} ${lowBand}`, title: `Watch signal: ${leanBand(lowestTrait[1]).toLowerCase()}`, body: lowBand === "high" ? lowSignal.high : lowSignal.low, accent: C.gold },
     ],
     tactics: style.tips,
     antiPattern: `Avoid ${discGuide.trap}. Busy learning is not the same as skill.`,
@@ -511,6 +511,14 @@ function leanBand(value: number): string {
   if (value >= 55) return "Moderate lean";
   if (value >= 45) return "Balanced";
   return "Light lean";
+}
+
+/** Display-only fit wording for role/compatibility matches (approximate, not a measurement). */
+function fitBand(value: number): string {
+  if (value >= 75) return "Strong fit";
+  if (value >= 60) return "Good fit";
+  if (value >= 45) return "Possible fit";
+  return "Stretch fit";
 }
 
 function buildResultSummaryLine({ roleTitle, identity, mbtiType, discLabel, topTraitLabel }: {
@@ -682,16 +690,16 @@ function analyzeDreamRoleFit({
     categoryText,
     evidence: [
       `Role type: ${categoryText}.`,
-      `Work style fit: ${DISC_LABELS[primaryDisc] || primaryDisc} matches this role ${Math.round(discScore)}%.`,
-      `Personality type fit: ${mbtiType} matches this role ${Math.round(mbtiScore)}%.`,
-      `Big Five fit: ${Math.round(bigFiveScore)}%. Strongest useful trait: ${topBigFive ? TRAIT_DEEP_DIVE[topBigFive.trait].label : "balanced traits"}.`,
+      `Work style fit: ${DISC_LABELS[primaryDisc] || primaryDisc} looks like a ${fitBand(discScore).toLowerCase()} for this role.`,
+      `Personality type fit: ${mbtiType} looks like a ${fitBand(mbtiScore).toLowerCase()} for this role.`,
+      `Big Five fit: ${fitBand(bigFiveScore)}. Strongest useful trait: ${topBigFive ? TRAIT_DEEP_DIVE[topBigFive.trait].label : "balanced traits"}.`,
     ],
     friction: weakestBigFive
       ? `Main watch-out: ${strongestCategory.friction}. Keep an eye on ${TRAIT_DEEP_DIVE[weakestBigFive.trait].label.toLowerCase()} here.`
       : `Main friction: ${strongestCategory.friction}.`,
     leverage: `Use your ${mbtiType} personality type and ${DISC_LABELS[primaryDisc] || "work style"} by making one proof piece: ${strongestCategory.proof}.`,
     path: [
-      { num: 1, title: "Test the fit", text: `Treat ${role} as an experiment. Your estimated fit is ${match}%.` },
+      { num: 1, title: "Test the fit", text: `Treat ${role} as an experiment. Your answers suggest a ${fitBand(match).toLowerCase()} (approximate).` },
       { num: 2, title: "Make proof", text: `Build this first: ${strongestCategory.proof}.` },
       { num: 3, title: "Ask insiders", text: "Talk to 3 people in the role. Ask what drains them and what beginners miss." },
       { num: 4, title: "Practice the gap", text: `${primaryDisc === "C" ? "Share useful summaries faster" : primaryDisc === "D" ? "Practice patience with other people" : primaryDisc === "I" ? "Finish one boring but valuable task" : "Make your work more visible"}.` },
@@ -2333,7 +2341,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     ctx.fillText("TOP TRAIT", 548, 642);
     ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
     ctx.fillStyle = "#a76d24";
-    drawText(`${topBigFiveName} ${topBigFive[1]}%`, 548, 672, 300, 24, 2, "900 25px 'Space Grotesk', Arial, sans-serif", "#a76d24");
+    drawText(`${topBigFiveName} · ${leanBand(topBigFive[1])}`, 548, 672, 300, 24, 2, "900 25px 'Space Grotesk', Arial, sans-serif", "#a76d24");
 
     ctx.font = "800 24px 'IBM Plex Sans', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
@@ -2700,11 +2708,11 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
   const [leadMessage, setLeadMessage] = useState("");
 
   const bigFiveRows = [
-    { key: "O", label: "Openness", value: bigFive.O, color: C.cyan, sub: `${pct(bigFive.O)}%` },
-    { key: "C", label: "Follow-through", value: bigFive.C, color: C.purple, sub: `${pct(bigFive.C)}%` },
-    { key: "E", label: "Extraversion", value: bigFive.E, color: C.pink, sub: `${pct(bigFive.E)}%` },
-    { key: "A", label: "Agreeable", value: bigFive.A, color: C.gold, sub: `${pct(bigFive.A)}%` },
-    { key: "N", label: "Stress Reactivity", value: bigFive.N, color: "#64748b", sub: `${pct(bigFive.N)}%` },
+    { key: "O", label: "Openness", value: bigFive.O, color: C.cyan, sub: leanBand(pct(bigFive.O)) },
+    { key: "C", label: "Follow-through", value: bigFive.C, color: C.purple, sub: leanBand(pct(bigFive.C)) },
+    { key: "E", label: "Extraversion", value: bigFive.E, color: C.pink, sub: leanBand(pct(bigFive.E)) },
+    { key: "A", label: "Agreeable", value: bigFive.A, color: C.gold, sub: leanBand(pct(bigFive.A)) },
+    { key: "N", label: "Stress Reactivity", value: bigFive.N, color: "#64748b", sub: leanBand(pct(bigFive.N)) },
   ];
 
   const mbtiScoreMap: Record<string, number> = {
@@ -2864,7 +2872,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
     N: "steadier under pressure and less easily thrown by emotional noise",
   };
   const bigFiveShapeTitle = `${topBigFiveRow.label}-led profile`;
-  const bigFiveShapeBody = `${topBigFiveRow.label} is your strongest Big Five signal at ${topBigFiveRow.value}%. That points to a style that is ${bigFiveShapeLead[topBigFiveRow.key]}. Your lightest signal is ${lowestBigFiveRow.label}, so ${bigFiveShapeLow[lowestBigFiveRow.key]}.`;
+  const bigFiveShapeBody = `${topBigFiveRow.label} is your strongest Big Five signal (${leanBand(topBigFiveRow.value).toLowerCase()}). That points to a style that is ${bigFiveShapeLead[topBigFiveRow.key]}. Your lightest signal is ${lowestBigFiveRow.label}, so ${bigFiveShapeLow[lowestBigFiveRow.key]}.`;
 
   const mbtiAverageStrength = Math.round(mbtiDimensions.reduce((sum, d) => sum + d.dominantPct, 0) / mbtiDimensions.length);
   const mbtiCloseCount = mbtiDimensions.filter(d => d.dominantPct < 60).length;
@@ -3060,7 +3068,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             {[
               { label: "MBTI-style", value: `${mbtiEmoji} ${mbtiType}`, sub: mbtiShortName },
               { label: "Work style", value: `${DISC_EMOJIS[primary] || "⚡"} ${primary}`, sub: DISC_LABELS[primary] || primary },
-              { label: "Top trait", value: `${topBigFiveRow.value}%`, sub: topBigFiveRow.label },
+              { label: "Top trait", value: leanBand(topBigFiveRow.value), sub: topBigFiveRow.label },
             ].map(item => (
               <div key={item.label} style={{ minWidth: 0, borderRadius: 17, padding: "11px 10px", background: "rgba(4,5,15,0.72)", border: "1px solid rgba(255,255,255,0.10)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}>
                 <div style={{ fontSize: 8, fontWeight: 950, letterSpacing: 1.05, color: C.cyan, textTransform: "uppercase", marginBottom: 6 }}>{item.label}</div>
@@ -3253,7 +3261,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
           }}>
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, marginBottom: 5 }}>
               <div style={{ fontSize: 9, fontWeight: 950, letterSpacing: 0.8, textTransform: "uppercase", color: C.goldLight }}>Career confidence</div>
-              <div style={{ fontSize: 11, fontWeight: 900, color: C.text }}>{careerConfidenceScore}%</div>
+              <div style={{ fontSize: 11, fontWeight: 900, color: C.text }}>{fitBand(careerConfidenceScore)}</div>
             </div>
             <div style={{ fontSize: 12.5, fontWeight: 900, color: C.text, marginBottom: 5 }}>{careerConfidenceLabel}</div>
             <div style={{ fontSize: 11.5, lineHeight: 1.5, color: C.textMuted }}>{careerConfidenceBody}</div>
@@ -3302,7 +3310,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
           <div style={{ padding: "10px 11px", borderRadius: 14, background: "rgba(34,211,238,0.06)", border: "1px solid rgba(34,211,238,0.18)" }}>
             <div style={{ fontSize: 9, fontWeight: 950, letterSpacing: 0.7, textTransform: "uppercase", color: C.cyan, marginBottom: 4 }}>Validity signal</div>
             <div style={{ fontSize: 12.5, fontWeight: 900, color: C.text }}>{resultConfidenceLabel}</div>
-            <div style={{ fontSize: 10.5, color: C.textDim, marginTop: 3 }}>{mbtiConfidenceAverage}% MBTI axis confidence</div>
+            <div style={{ fontSize: 10.5, color: C.textDim, marginTop: 3 }}>{leanBand(mbtiConfidenceAverage)} overall MBTI-style leaning (approximate)</div>
           </div>
           <div style={{ padding: "10px 11px", borderRadius: 14, background: "rgba(168,85,247,0.06)", border: "1px solid rgba(168,85,247,0.18)" }}>
             <div style={{ fontSize: 9, fontWeight: 950, letterSpacing: 0.7, textTransform: "uppercase", color: C.purple, marginBottom: 4 }}>Close-call axes</div>
@@ -3323,7 +3331,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
                 <div style={{ fontSize: 9.5, fontWeight: 850, letterSpacing: 0.7, textTransform: "uppercase", color: C.textDim, marginBottom: 5 }}>{d.label}</div>
                 <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ fontSize: 14, fontWeight: 900, color: C.text }}>{d.dominant}</span>
-                  <span style={{ fontSize: 12, fontWeight: 850, color: C.cyan }}>{d.dominantPct}%</span>
+                  <span style={{ fontSize: 12, fontWeight: 850, color: C.cyan }}>{leanBand(d.dominantPct)}</span>
                 </div>
                 <div style={{ fontSize: 10.5, lineHeight: 1.35, color: C.textMuted, marginTop: 3 }}>{dominantWord}</div>
                 <div style={{ height: 3, borderRadius: 999, background: "rgba(255,255,255,0.07)", marginTop: 8, overflow: "hidden" }}>
@@ -3373,7 +3381,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
                   </div>
                 </div>
                 <div style={{ textAlign: "right", minWidth: 54 }}>
-                  <div style={{ fontSize: 12, fontWeight: 950, color: C.cyan }}>{d.dominantPct}%</div>
+                  <div style={{ fontSize: 12, fontWeight: 950, color: C.cyan }}>{leanBand(d.dominantPct)}</div>
                   <div style={{ fontSize: 9, fontWeight: 850, color: C.textDim, marginTop: 2 }}>{d.strength}</div>
                 </div>
               </div>
@@ -3419,7 +3427,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
         icon={primary === "D" ? "🦅" : primary === "I" ? "🦜" : primary === "S" ? "🕊️" : "🦉"}
         eyebrow="Communication style"
         title={`${primary} — ${DISC_LABELS[primary]}`}
-        summary={`${discPrimaryShare}% primary share · How people read your style.`}
+        summary={`${leanBand(discPrimaryShare)} primary style · How people read your style.`}
         accent={discColor}
         analyticsId="communication_style"
         onOpen={trackAccordionOpen}
@@ -3465,7 +3473,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
       <PortraitAccordion
         icon="🧬"
         eyebrow="Big Five primary"
-        title={`${topBigFiveRow.label} · ${topBigFiveRow.value}%`}
+        title={`${topBigFiveRow.label} · ${leanBand(topBigFiveRow.value)}`}
         summary={`${bigFiveConfidenceLabel} · Your strongest trait signal.`}
         accent={C.cyan}
         analyticsId="big_five_primary"
@@ -3504,7 +3512,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
             ].map(item => (
               <div key={item.label} style={{ padding: "8px 9px", borderRadius: 12, background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.06)" }}>
                 <div style={{ fontSize: 9, fontWeight: 900, letterSpacing: 0.55, textTransform: "uppercase", color: C.textMuted, marginBottom: 3 }}>{item.label}</div>
-                <div style={{ fontSize: 11.5, fontWeight: 900, color: item.color }}>{item.trait} · {item.value}%</div>
+                <div style={{ fontSize: 11.5, fontWeight: 900, color: item.color }}>{item.trait} · {leanBand(item.value)}</div>
               </div>
             ))}
           </div>
@@ -3854,25 +3862,25 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo,
   const profileSummaryCards = [
     { icon: "🧬", label: "Type", value: mbtiType, sub: arch, accent: C.purple, bg: "rgba(168,85,247,0.07)" },
     { icon: DISC_EMOJIS[primary] || "📊", label: "Work Style", value: DISC_LABELS[primary as keyof typeof DISC_LABELS] || primary, sub: "Primary pattern", accent: DISC_COLORS[primary as keyof typeof DISC_COLORS] || C.cyan, bg: "rgba(34,211,238,0.06)" },
-    { icon: "🎯", label: "Big Five", value: `${bigFive.O}%`, sub: "Openness", accent: C.cyan, bg: "rgba(34,211,238,0.05)" },
+    { icon: "🎯", label: "Big Five", value: leanBand(bigFive.O), sub: "Openness", accent: C.cyan, bg: "rgba(34,211,238,0.05)" },
   ];
 
   const pressureSummaryCards = [
     profileSummaryCards[0],
     { ...profileSummaryCards[1], sub: "Under pressure" },
-    { icon: "🎯", label: "Big Five", value: `${bigFive.N}%`, sub: "Stress Reactivity", accent: C.pink, bg: "rgba(244,114,182,0.06)" },
+    { icon: "🎯", label: "Big Five", value: leanBand(bigFive.N), sub: "Stress Reactivity", accent: C.pink, bg: "rgba(244,114,182,0.06)" },
   ];
 
   const chemistrySummaryCards = [
     { icon: "🧬", label: "You", value: mbtiType, sub: DISC_LABELS[primary] || primary, accent: C.purple, bg: "rgba(168,85,247,0.07)" },
     { icon: COMPATIBILITY_STYLES[compatibilityStyle].icon, label: "Other", value: COMPATIBILITY_STYLES[compatibilityStyle].label, sub: COMPATIBILITY_STYLES[compatibilityStyle].short, accent: COMPATIBILITY_STYLES[compatibilityStyle].color, bg: "rgba(34,211,238,0.05)" },
-    { icon: "🎯", label: "Score", value: `${compatibilityInsight.score}%`, sub: compatibilityInsight.tag, accent: C.cyan, bg: "rgba(34,211,238,0.06)" },
+    { icon: "🎯", label: "Score", value: fitBand(compatibilityInsight.score), sub: compatibilityInsight.tag, accent: C.cyan, bg: "rgba(34,211,238,0.06)" },
   ];
 
   const roleSummaryCards = [
     { icon: "🧬", label: "You", value: mbtiType, sub: DISC_LABELS[primary] || primary, accent: C.purple, bg: "rgba(168,85,247,0.07)" },
     { icon: "💼", label: "Role", value: submittedDreamRole, sub: submittedRoleMeta.source || "Custom role", accent: C.gold, bg: "rgba(245,158,11,0.07)" },
-    { icon: "🎯", label: "Fit", value: `${dreamRoleMatch}%`, sub: dreamRoleFitLabel, accent: C.pink, bg: "rgba(244,114,182,0.06)" },
+    { icon: "🎯", label: "Fit", value: fitBand(dreamRoleMatch), sub: dreamRoleFitLabel, accent: C.pink, bg: "rgba(244,114,182,0.06)" },
   ];
 
   const sideHustlePlan = buildSideHustlePlan({ hustle, hustleGoal, hustleHours, mbtiType, primaryDisc, bigFive });
@@ -4010,7 +4018,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo,
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 5 }}>
                   <div style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, color: C.textDim }}>{r.rank}</div>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: C.cyan }}>{r.pct}% match {expanded ? "▲" : "▼"}</div>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: C.cyan }}>{fitBand(r.pct)} {expanded ? "▲" : "▼"}</div>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 2 }}>{r.title}</div>
                 <div style={{ fontSize: 10, color: C.cyan, marginBottom: 8 }}>{r.salary}</div>
@@ -4437,7 +4445,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo,
                   <div style={{ fontSize: 9, fontWeight: 900, letterSpacing: 1, textTransform: "uppercase", color: C.purple, marginBottom: 5 }}>{compatibilityInsight.label}</div>
                   <div style={{ fontSize: 17, fontWeight: 950, color: C.text, lineHeight: 1.15 }}>{compatibilityInsight.tag}</div>
                 </div>
-                <div style={{ flex: "0 0 auto", fontSize: 22, fontWeight: 950, color: C.cyan }}>{compatibilityInsight.score}%</div>
+                <div style={{ flex: "0 0 auto", fontSize: 22, fontWeight: 950, color: C.cyan }}>{fitBand(compatibilityInsight.score)}</div>
               </div>
               <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.55 }}>{compatibilityInsight.contextHeadline}</div>
             </div>
@@ -4510,7 +4518,7 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo,
                   <div style={{ fontSize: 10, color: C.textDim, marginTop: 4 }}>{submittedRoleMeta.source || "Custom role"}</div>
                 </div>
                 <div style={{ flex: "0 0 auto", textAlign: "right" }}>
-                  <div style={{ fontSize: 26, fontWeight: 950, color: C.goldLight, lineHeight: 1 }}>{dreamRoleMatch}%</div>
+                  <div style={{ fontSize: 26, fontWeight: 950, color: C.goldLight, lineHeight: 1 }}>{fitBand(dreamRoleMatch)}</div>
                   <div style={{ fontSize: 9, fontWeight: 900, color: C.textMuted }}>{dreamRoleFitLabel}</div>
                 </div>
               </div>
@@ -4989,7 +4997,7 @@ function OrbitalGlassV2Results({
         .lane-grid { display:grid; gap:10px; margin-top:12px; } .lane-card { border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:13px; background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.035)); } .lane-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; } .lane-card h4 { margin:0; font-size:15px; letter-spacing:-.03em; text-transform:capitalize; } .lane-card em { flex:0 0 auto; color:var(--accent); font-style:normal; font-size:10px; font-weight:950; letter-spacing:.08em; text-transform:uppercase; } .lane-card p { margin:6px 0 0; color:var(--muted); font-size:12px; line-height:1.4; } .lane-roles { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; } .lane-roles span { border:1px solid rgba(255,255,255,.11); border-radius:999px; background:rgba(5,7,17,.42); color:#fff; padding:6px 8px; font-size:11px; font-weight:800; }
         .meter-list { display:grid; gap:12px; margin-top:12px; } .meter-top { display:flex; justify-content:space-between; color:var(--muted); font-size:12px; font-weight:850; margin-bottom:7px; } .bar { height:12px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(255,255,255,.08); } .fill { height:100%; width:var(--v); border-radius:999px; background:linear-gradient(90deg,var(--accent),rgba(255,255,255,.82)); }
         .disc-grid { display:grid; grid-template-columns:repeat(2,1fr); border:1px solid rgba(255,255,255,.12); border-radius:23px; overflow:hidden; margin-top:12px; } .quad { min-height:96px; padding:13px; background:rgba(255,255,255,.055); display:flex; flex-direction:column; justify-content:space-between; } .quad.active { background:linear-gradient(135deg,rgba(255,99,207,.30),rgba(82,241,255,.08)); } .quad b { font-size:26px; } .quad span { color:var(--muted); font-size:12px; }
-        .share-preview { border-radius:28px; padding:18px; background:linear-gradient(150deg,rgba(82,241,255,.22),rgba(167,119,255,.14),rgba(255,213,129,.12)); border:1px solid rgba(255,255,255,.18); } .share-preview h2 { margin:15px 0; font-size:54px; line-height:.82; letter-spacing:-.085em; } .share-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-top:13px; } .share-btn { border:1px solid rgba(255,255,255,.14); border-radius:17px; padding:13px 10px; color:white; background:rgba(255,255,255,.09); font-weight:900; cursor:pointer; } .share-btn.primary { color:#061018; background:linear-gradient(135deg,#52f1ff,#ffd581); }
+        .share-preview { border-radius:28px; padding:18px; background:linear-gradient(150deg,rgba(82,241,255,.22),rgba(167,119,255,.14),rgba(255,213,129,.12)); border:1px solid rgba(255,255,255,.18); } .share-preview h2 { margin:15px 0; font-size:54px; line-height:.82; letter-spacing:-.085em; } .share-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-top:13px; } .share-btn { border:1px solid rgba(255,255,255,.14); border-radius:17px; padding:13px 10px; color:white; background:rgba(255,255,255,.09); font-weight:900; cursor:pointer; } .share-btn.primary { color:#061018; background:linear-gradient(135deg,#52f1ff,#ffd581); } .share-btn:not(.primary) { color:#12263a !important; background:#f1eadb !important; border-color:rgba(18,38,58,.22) !important; } .share-btn:not(.primary):hover { background:#e6dcc7 !important; } .share-btn:focus-visible { outline:3px solid #12263a; outline-offset:2px; }
         .bottom-nav { position:relative; z-index:40; width:100%; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:8px; border-radius:25px; border:1px solid rgba(255,255,255,.14); background:rgba(5,7,17,.78); backdrop-filter:blur(20px); box-shadow:0 18px 60px rgba(0,0,0,.38); } .bottom-nav button { text-align:center; border:0; border-radius:18px; padding:8px 5px; color:var(--muted); background:transparent; font-size:10px; font-weight:950; cursor:pointer; } .bottom-nav button i { display:block; font-style:normal; font-size:19px; margin-bottom:3px; } .bottom-nav button.active { color:white; background:rgba(255,255,255,.105); }
         .result-home-exit { margin:30px 0 18px; padding:20px 16px; text-align:center; border-top:1px solid rgba(18,38,58,.18); } .result-home-exit p { max-width:330px; margin:0 auto 14px; color:#456174; font-size:12px; line-height:1.48; } .result-home-exit p strong { color:#12263a; } .result-home-exit__actions { display:grid; grid-template-columns:1fr; gap:9px; max-width:360px; margin:0 auto; } .result-home-exit button { min-height:46px; border-radius:4px; padding:11px 14px; font:800 13px/1.2 Manrope,Inter,system-ui,sans-serif; cursor:pointer; } .result-home-exit__share { order:-1; min-height:52px !important; border:1px solid #9d3e2b; background:linear-gradient(135deg,#c95f46,#a84732); color:#fffdf8; box-shadow:4px 4px 0 rgba(18,38,58,.18); } .result-home-exit__share:hover { background:linear-gradient(135deg,#b84f38,#913825); transform:translate(-1px,-1px); box-shadow:5px 5px 0 rgba(18,38,58,.20); } .result-home-exit__home { border:1px solid rgba(18,38,58,.26); background:#fffdf8; color:#315f74; } .result-home-exit__home:hover { background:#fff3d7; color:#12263a; } .result-home-exit button:focus-visible { outline:3px solid #ffca42; outline-offset:3px; }
         @media (min-width:500px) { .result-home-exit__actions { grid-template-columns:1fr 1fr; } .result-home-exit__share { order:0; } }
@@ -5214,7 +5222,7 @@ export default function ResultsPage() {
       },
       {
         title: "Big Five",
-        subtitle: `${topBigFiveLabel} dominant · ${topBigFive[1]}%`,
+        subtitle: `${topBigFiveLabel} · ${leanBand(topBigFive[1]).toLowerCase()}`,
         body: `Big Five is your climate report: the trait environment you operate inside.`,
       },
     ],
