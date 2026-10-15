@@ -1,0 +1,169 @@
+{
+  "id": "P05",
+  "persona": "Sam, 15, HS sophomore. Genuinely ambivalent: answers mostly neutral/middle on almost everything, unsure about self.",
+  "expected": "Flat/balanced profile; result should carry a low-clarity note rather than a strong type.",
+  "qa_fit_score": 4,
+  "qa_fit_reason": "Broad clarity correct, but still a named ISFJ type and specific role",
+  "envelope": {
+    "mbti_ok": [
+      "ISFJ",
+      "ISTJ",
+      "XXXX",
+      "XSXJ",
+      "ISXJ"
+    ],
+    "disc": [
+      "S",
+      "C"
+    ],
+    "role_family": [
+      "operations",
+      "people",
+      "knowledge"
+    ],
+    "clarity": "broad",
+    "notes": "ambivalent"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 2,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 3,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 4,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 5,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 6,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 7,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 8,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 9,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 10,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 13,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 14,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 15,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 16,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 17,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 18,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 19,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 20,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 21,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 22,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 23,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 24,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 25,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 26,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 27,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ]
+}

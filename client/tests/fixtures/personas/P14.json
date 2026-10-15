@@ -1,0 +1,164 @@
+{
+  "id": "P14",
+  "persona": "Greg, 41, compliance officer. Extremely detail-oriented, rule-follower, dislikes ambiguity, reserved, conventional, low openness.",
+  "expected": "Very high conscientiousness, low openness, introverted; ISTJ; DISC C; auditor/compliance role.",
+  "qa_fit_score": 5,
+  "qa_fit_reason": "ISTJ/C/compliance-like ops",
+  "envelope": {
+    "mbti_ok": [
+      "ISTJ",
+      "ISFJ"
+    ],
+    "disc": [
+      "C"
+    ],
+    "role_family": [
+      "operations",
+      "technical",
+      "knowledge"
+    ],
+    "notes": "compliance"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 2,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 3,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 4,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 5,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 6,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 7,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 8,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 9,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 10,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 13,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 14,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 15,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 16,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 17,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 18,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 19,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 20,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 21,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 22,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 23,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 24,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 25,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 26,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 27,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ]
+}

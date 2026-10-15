@@ -1,0 +1,155 @@
+{
+  "id": "P16",
+  "persona": "Tyler, 14, 8th/9th grader. Disengaged, doesn't care about the quiz, answers somewhat randomly and inconsistently, mild preference for being alone and gaming.",
+  "expected": "Noisy/low-clarity result; ideally a mixed or low-clarity note; mild introversion.",
+  "qa_fit_score": 2,
+  "qa_fit_reason": "Broad clarity good, but confident ENTP label with incoherent role for random answers",
+  "envelope": {
+    "clarity": "broad",
+    "mbti_hedged": true,
+    "role_multi": true,
+    "notes": "random"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 2,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 3,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 4,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 5,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 6,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 7,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 8,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 9,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 10,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 13,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 14,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 15,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 16,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 17,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 18,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 19,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 20,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 21,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 22,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 23,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 24,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 25,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 26,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 27,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 28,
+      "choice": 1,
+      "letter": "B"
+    }
+  ]
+}

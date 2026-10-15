@@ -40,7 +40,20 @@ const CLARITY_COPY: Record<ResultClarityLevel, { label: string; body: string }> 
   },
 };
 
-export function getResultClarity(bigFive: Record<string, number>): ResultClarity {
+export type ClarityOptions = {
+  /**
+   * v3: also treat low-spread / low-evidence profiles as Broad so random or
+   * ambivalent answerers do not get a confident single type.
+   */
+  version?: "v2" | "v3";
+  /** Max career dimension (raw) — when very flat, prefer Broad under v3. */
+  maxCareer?: number;
+};
+
+export function getResultClarity(
+  bigFive: Record<string, number>,
+  options: ClarityOptions = {},
+): ResultClarity {
   const ranked = Object.entries(bigFive)
     .filter(([, value]) => Number.isFinite(value))
     .sort((a, b) => b[1] - a[1]);
@@ -49,8 +62,19 @@ export function getResultClarity(bigFive: Record<string, number>): ResultClarity
   const gap = Math.round((topValue - secondValue) * 10) / 10;
   const allMedium = ranked.length > 0 && ranked.every(([, value]) => value >= MEDIUM_MIN && value <= MEDIUM_MAX);
   const blended = ranked.length > 1 && gap <= BLEND_GAP;
-  const level: ResultClarityLevel = allMedium ? "broad" : blended ? "mixed" : "clear";
-  return { level, ...CLARITY_COPY[level], topKey, secondKey, gap, blended };
+  const spread = ranked.length ? ranked[0][1] - ranked[ranked.length - 1][1] : 0;
+  const lowEvidence =
+    options.version === "v3" &&
+    ((spread <= 32 && gap <= 10) || (typeof options.maxCareer === "number" && options.maxCareer < 22));
+  const level: ResultClarityLevel = allMedium || lowEvidence ? "broad" : blended ? "mixed" : "clear";
+  const copy =
+    level === "broad" && lowEvidence && !allMedium
+      ? {
+          label: "Broad",
+          body: "Your answers did not form a sharp single pattern. Treat the type and role below as a light sketch — explore the alternatives too.",
+        }
+      : CLARITY_COPY[level];
+  return { level, ...copy, topKey, secondKey, gap, blended: blended || (level === "broad" && gap <= 10) };
 }
 
 export type FlatPatternResult = {
@@ -92,16 +116,10 @@ export function detectFlatAnswerPattern(
   };
 }
 
-/**
- * What to show in the clarity box. When the same-letter / flat-pattern caution
- * triggers, it REPLACES Clear, Mixed, or Broad — never shown alongside them.
- */
 export type ResultClarityDisplay = {
-  /** "flat" when the caution replaces the clarity note; otherwise the clarity level. */
   kind: ResultClarityLevel | "flat";
   heading: string;
   body: string;
-  /** Kept from the underlying clarity so blended "X + Y" labels still work. */
   clarity: ResultClarity;
   flat: FlatPatternResult;
 };
@@ -109,8 +127,9 @@ export type ResultClarityDisplay = {
 export function resolveResultClarityDisplay(
   bigFive: Record<string, number>,
   responses: ReadonlyArray<{ choice?: unknown }> | null | undefined,
+  options: ClarityOptions = {},
 ): ResultClarityDisplay {
-  const clarity = getResultClarity(bigFive);
+  const clarity = getResultClarity(bigFive, options);
   const flat = detectFlatAnswerPattern(responses);
   if (flat.flagged && flat.note) {
     return {

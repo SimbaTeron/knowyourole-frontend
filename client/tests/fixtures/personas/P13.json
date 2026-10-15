@@ -1,0 +1,166 @@
+{
+  "id": "P13",
+  "persona": "Iris, 15, HS freshman. Introverted, dreamy, writes poetry and draws, sensitive, avoids crowds, moderately organized.",
+  "expected": "High openness, introverted, moderate-high agreeableness; INFP; DISC S/C; creative solo role (writer/illustrator).",
+  "qa_fit_score": 4,
+  "qa_fit_reason": "INFP/creative right; DISC I unexpected for introvert",
+  "envelope": {
+    "mbti_ok": [
+      "INFP",
+      "INFJ",
+      "ISFP"
+    ],
+    "disc": [
+      "C",
+      "I",
+      "S"
+    ],
+    "role_family": [
+      "creative",
+      "knowledge"
+    ],
+    "notes": "introverted creative"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 2,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 3,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 4,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 5,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 6,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 7,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 8,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 9,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 10,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 11,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 12,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 13,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 14,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 15,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 16,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 17,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 18,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 19,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 20,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 21,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 22,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 23,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 24,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 25,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 26,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 27,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 28,
+      "choice": 0,
+      "letter": "A"
+    }
+  ]
+}

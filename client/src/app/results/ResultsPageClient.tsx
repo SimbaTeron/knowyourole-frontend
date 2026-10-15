@@ -1,5 +1,7 @@
 'use client';
 import { resolveResultClarityDisplay, formatTopTraitLabel } from "@/lib/results/resultClarity";
+import { isScoringV3 } from "@/lib/quiz/scoringVersions";
+import { softMbtiTypeV3 } from "@/lib/quiz/softMbtiV3";
 
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
@@ -403,7 +405,7 @@ const BIG_FIVE_LEARNING_SIGNALS: Record<keyof BigFiveProfile, { label: string; h
   C: { label: "Structure / Follow-through", high: "Use checklists, milestones, and scheduled review; your consistency can compound fast.", low: "Use tiny frictionless starts, visible cues, and shorter reps; motivation beats elaborate planning here." },
   E: { label: "Extraversion", high: "Add discussion, demos, teaching, or live feedback; social energy improves recall.", low: "Protect solo processing time, written notes, and quiet review before group feedback." },
   A: { label: "Agreeableness", high: "Use supportive feedback and service-based projects; harsh competition can distort focus.", low: "Use debate, critique, and independent standards; do not wait for consensus to keep learning." },
-  N: { label: "Stress Reactivity", high: "Use low-threat reps, shorter sessions, and early wins; you may do best when pressure builds gradually.", low: "Use harder simulations and deadlines; you may be comfortable with more challenge." },
+  N: { label: "Stress Reactivity", high: "Use low-threat reps, shorter sessions, and early wins; you may do best when pressure builds gradually. That sensitivity is useful information — especially for teens, treat it as a signal to pace yourself, not a flaw.", low: "Use harder simulations and deadlines; you may be comfortable with more challenge." },
 };
 
 function bigFiveBand(score: number) {
@@ -511,6 +513,15 @@ function leanBand(value: number): string {
   if (value >= 70) return "Strong lean";
   if (value >= 55) return "Moderate lean";
   if (value >= 45) return "Balanced";
+  return "Light lean";
+}
+
+/** DISC normalized values are share-of-mix (~25–55). Do not use Big Five cutoffs. */
+function discLeanBand(value: number, isPrimary: boolean, secondBest: number): string {
+  const lead = value - secondBest;
+  if (isPrimary && (value >= 38 || lead >= 6)) return "Strong lean";
+  if (isPrimary) return "Moderate lean";
+  if (value >= 28) return "Moderate lean";
   return "Light lean";
 }
 
@@ -2693,7 +2704,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
   const discColor = DISC_COLORS[primary];
   const pct = (v: number) => v; // Real normalized scores — no random jitter
   const career = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
-  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career);
+  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career, (rawScores as any)?.scoringVersion);
   const [primaryRoleCard] = buildPremiumRoleMatchCards({
     roleMatch,
     mbtiType,
@@ -4877,7 +4888,7 @@ function OrbitalGlassV2Results({
         mayNotFit: "Treat this as a direction to test, not a fixed job prescription.",
         matchSource: "career-vector",
       }
-    : findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career);
+    : findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career, (rawScores as any)?.scoringVersion);
   const roleCards = buildPremiumRoleMatchCards({ roleMatch, mbtiType, primaryDisc, disc, bigFive });
   const primaryRole = roleCards[0] || { title: (TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP).title, pct: 84, why: roleMatch.whyThisFits || "Your pattern fits work that turns messy inputs into useful progress.", daily: "Translate ambiguity into structure people can use.", skill: "Systems thinking", firstMove: "Build one small proof project.", primary: true, rank: "01" };
   const roleDirection = canonicalCareerDirection
@@ -4900,9 +4911,13 @@ function OrbitalGlassV2Results({
   const rankedTraits = (Object.entries(bigFive) as [keyof BigFiveProfile, number][]).sort((a, b) => b[1] - a[1]);
   const topTrait = rankedTraits[0];
   const topTraitMeta = TRAIT_DEEP_DIVE[topTrait[0]];
-  const clarityDisplay = resolveResultClarityDisplay(bigFive, rawScores?.responses);
+  const scoringVersion = (rawScores as any)?.scoringVersion || canonicalResult?.version?.scoringVersion;
+  const v3 = isScoringV3(scoringVersion);
+  const maxCareer = rawScores?.career ? Math.max(...Object.values(rawScores.career as Record<string, number>).map((n) => Number(n) || 0)) : undefined;
+  const clarityDisplay = resolveResultClarityDisplay(bigFive, rawScores?.responses, v3 ? { version: "v3", maxCareer } : {});
   const clarity = clarityDisplay.clarity;
   const topTraitDisplay = formatTopTraitLabel(clarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
+  const displayMbti = v3 && clarity.level === "broad" && rawScores?.mbti ? softMbtiTypeV3(rawScores.mbti as Record<string, number>, 15) : mbtiType;
   const resultSummaryLine = buildResultSummaryLine({
     roleTitle: roleDirection.title,
     identity,
@@ -5044,9 +5059,9 @@ function OrbitalGlassV2Results({
           <section>
             <article className="portrait-card">
               <div className="card-head"><div className="eyebrow">Your result</div><div className="avatar">{emoji}</div></div>
-              <div className="glass-tile"><div className="type-chip">{emoji} {mbtiType} <small>{stripLeadingThe(arch)}</small></div><h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1></div>
+              <div className="glass-tile"><div className="type-chip">{emoji} {displayMbti} <small>{clarity.level === "broad" && v3 ? "directional sketch" : stripLeadingThe(arch)}</small></div><h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1></div>
               <div className="shareline"><b>Snapshot</b><p>“{shareLine}”</p></div>
-              <div className="role-card"><small>Best-fit direction</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>Strong examples</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}</div>
+              <div className="role-card"><small>{clarity.level === "broad" && v3 ? "Directions to explore" : "Best-fit direction"}</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>Strong examples</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}{clarity.level === "broad" && v3 && adjacentRoles.length > 0 && <div className="direction-examples" data-testid="broad-alt-roles"><b>Also explore</b>{adjacentRoles.slice(0,2).map(role => <span key={role.title}>• {role.title}</span>)}</div>}</div>
               <div className="mini-stats"><div className="stat"><small>Mind</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>Work style</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>{clarity.blended ? "Top traits" : "Top trait"}</small><strong>{leanBand(topTrait[1])}</strong><span>{topTraitDisplay}</span></div></div>
               <div className={`clarity-note clarity-${clarityDisplay.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplay.heading}</b><p>{clarityDisplay.body}</p></div>
             </article>
@@ -5103,9 +5118,9 @@ function OrbitalGlassV2Results({
 
         {view === "mbti" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>MBTI</h2><p>Your preferred mental route: how you plan, process, decide, and build.</p></div></div><div className="detail-card"><h3>{mbtiType}: {stripLeadingThe(arch)} mode</h3><p>{MBTI_TAGLINES[mbtiType] || "Personality pattern"}. This describes the route you may tend to reach for when making sense of people, problems, and plans.</p><div className="analogy"><b>Analogy</b>MBTI is your navigation app: it does not choose the destination, but it suggests the route you may tend to reach for.</div></div><div className="detail-card"><h3>Cognitive flow</h3><div className="meter-list">{mbtiDimensions.map((axis) => <div key={axis.label}><div className="meter-top"><span>{axis.label} · {axis.words[axis.dominant as keyof typeof axis.words]}</span><span>{leanBand(axis.pct)}</span></div><div className="bar"><div className="fill" style={{ "--v": `${axis.pct}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>Use it well</h3><p>Give yourself the conditions your type actually uses well. The point is not a label; it is better decision design.</p></div><div className="detail-card"><FrameworkReference kind="mbti" mbtiAxes={mbtiDimensions.map(axis => ({ label: axis.label, leftLetter: axis.leftLetter, rightLetter: axis.rightLetter, leftWord: axis.words[axis.leftLetter as keyof typeof axis.words], rightWord: axis.words[axis.rightLetter as keyof typeof axis.words], leftDescription: axis.leftLetter === "E" ? "Processes through interaction and external engagement." : axis.leftLetter === "S" ? "Notices concrete facts and proven methods." : axis.leftLetter === "T" ? "Prioritizes analysis, consistency, and trade-offs." : "Prefers structure, closure, and planned progress.", rightDescription: axis.rightLetter === "I" ? "Processes internally and restores energy through reflection." : axis.rightLetter === "N" ? "Notices patterns, possibilities, and what could change." : axis.rightLetter === "F" ? "Prioritizes values, people impact, and alignment." : "Prefers flexibility and adapting as new information appears.", dominant: axis.dominant, leftPct: axis.dominant === axis.leftLetter ? axis.pct : 100 - axis.pct, rightPct: axis.dominant === axis.rightLetter ? axis.pct : 100 - axis.pct, isClose: axis.pct < 60 }))} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "mbti", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "bigfive" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>Big Five</h2><p>Your trait climate: what reliably pulls, drains, stabilizes, or amplifies you.</p></div></div><div className="detail-card"><h3>Trait gravity</h3><div className="meter-list">{rankedTraits.map(([key, value]) => <div key={key}><div className="meter-top"><span>{TRAIT_DEEP_DIVE[key].label}</span><span>{leanBand(value)}</span></div><div className="bar"><div className="fill" style={{ "--v": `${value}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>What it means</h3><p>{clarity.blended ? <>Your leading Big Five signals are {topTraitDisplay}, which came out close together.</> : <>Your leading Big Five signal is {topTraitMeta.label}.</>} That does not define your entire personality, but it may shape where your effort tends to pay off.</p><p className="clarity-inline" data-testid="result-clarity-inline"><b>{clarityDisplay.heading}{clarityDisplay.kind === "flat" ? "" : "."}</b> {clarityDisplay.body}</p><div className="analogy"><b>Analogy</b>Big Five is your climate report. MBTI is route preference; DISC is driving behavior; Big Five is the weather system you operate inside.</div></div><div className="detail-card"><FrameworkReference kind="bigFive" bigFive={bigFive} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "big_five", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
+        {view === "bigfive" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>Big Five</h2><p>Your trait climate: what reliably pulls, drains, stabilizes, or amplifies you.</p></div></div><div className="detail-card"><h3>Trait gravity</h3><div className="meter-list">{rankedTraits.map(([key, value]) => <div key={key}><div className="meter-top"><span>{TRAIT_DEEP_DIVE[key].label}</span><span>{leanBand(value)}</span></div><div className="bar"><div className="fill" style={{ "--v": `${value}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>What it means</h3><p>{clarity.blended ? <>Your leading Big Five signals are {topTraitDisplay}, which came out close together.</> : <>Your leading Big Five signal is {topTraitMeta.label}.</>} That does not define your entire personality, but it may shape where your effort tends to pay off.</p>{v3 && (bigFive.N ?? 0) >= 67 && <p className="clarity-inline" data-testid="stress-support-note">Stress sensitivity showed up clearly. That can mean you notice risk and care deeply — use supportive routines and smaller pressure steps rather than treating it as a problem to fix.</p>}<p className="clarity-inline" data-testid="result-clarity-inline"><b>{clarityDisplay.heading}{clarityDisplay.kind === "flat" ? "" : "."}</b> {clarityDisplay.body}</p><div className="analogy"><b>Analogy</b>Big Five is your climate report. MBTI is route preference; DISC is driving behavior; Big Five is the weather system you operate inside.</div></div><div className="detail-card"><FrameworkReference kind="bigFive" bigFive={bigFive} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "big_five", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "disc" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>DISC</h2><p>Your visible work behavior: pace, pressure, communication, and standards.</p></div></div><div className="detail-card"><h3>Work behavior map</h3><div className="disc-grid">{(["D", "I", "S", "C"] as const).map((key) => <div className={`quad ${primaryDisc === key ? "active" : ""}`} key={key}><b>{key}</b><span>{DISC_LABELS[key]} · {leanBand(disc[key])}</span></div>)}</div></div><div className="detail-card"><h3>{discLabel} strength</h3><p>{discDesc || `Your ${discLabel.toLowerCase()} style describes how you tend to move when work involves pressure, standards, and other people.`}</p><div className="analogy"><b>Analogy</b>DISC is your dashboard while driving with other people in the car: speed, steering, braking, and how aggressively you take corners.</div></div><div className="detail-card"><h3>Second signal</h3><p>Your next strongest DISC signal is {DISC_LABELS[secondaryDiscEntry?.[0] || "C"] || secondaryDiscEntry?.[0]} at {secondaryDiscEntry?.[1] ?? 0}%. That secondary style colors how your primary style shows up.</p></div><div className="detail-card"><FrameworkReference kind="disc" primaryDisc={primaryDisc} disc={disc} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "disc", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
+        {view === "disc" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>DISC</h2><p>Your visible work behavior: pace, pressure, communication, and standards.</p></div></div><div className="detail-card"><h3>Work behavior map</h3><div className="disc-grid">{(["D", "I", "S", "C"] as const).map((key) => <div className={`quad ${primaryDisc === key ? "active" : ""}`} key={key}><b>{key}</b><span>{DISC_LABELS[key]} · {discLeanBand(disc[key], primaryDisc === key, secondaryDiscEntry?.[1] ?? 0)}</span></div>)}</div></div><div className="detail-card"><h3>{discLabel} strength</h3><p>{discDesc || `Your ${discLabel.toLowerCase()} style describes how you tend to move when work involves pressure, standards, and other people.`}</p><div className="analogy"><b>Analogy</b>DISC is your dashboard while driving with other people in the car: speed, steering, braking, and how aggressively you take corners.</div></div><div className="detail-card"><h3>Second signal</h3><p>Your next strongest DISC signal is {DISC_LABELS[secondaryDiscEntry?.[0] || "C"] || secondaryDiscEntry?.[0]} at {secondaryDiscEntry?.[1] ?? 0}%. That secondary style colors how your primary style shows up.</p></div><div className="detail-card"><FrameworkReference kind="disc" primaryDisc={primaryDisc} disc={disc} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "disc", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
         {view === "share" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>Share</h2><p>Export a polished result card as an image or PDF, then send by text or email.</p></div></div><div className="detail-card"><div className="share-preview"><div className="eyebrow">Instant Portrait</div><h2>{identity}</h2><p>“{shareLine}”</p><div className="role-card"><small>Best-fit direction</small><h2>{roleDirection.title}</h2><p>{mbtiType} · {discLabel} · {topTraitMeta.label}</p></div></div></div><div className="detail-card"><h3>Share options</h3><p>Every shared result includes the invite link: <b>knowyourole.com</b>.</p><div className="share-actions"><button className="share-btn primary" onClick={() => onShare("image_action")}>Image</button><button className="share-btn primary" onClick={() => onShare("pdf_action")}>PDF</button><button className="share-btn" onClick={() => onShare("text_action")}>Text</button><button className="share-btn" onClick={() => onShare("email_action")}>Email</button></div></div></section>}
 
@@ -5189,7 +5204,7 @@ export default function ResultsPage() {
   const reportClarityDisplay = resolveResultClarityDisplay(bigFive, rawScores?.responses);
   const reportClarity = reportClarityDisplay.clarity;
   const reportTopTraitDisplay = formatTopTraitLabel(reportClarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
-  const reportRoleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career);
+  const reportRoleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career, (rawScores as any)?.scoringVersion);
   const [reportPrimaryRole] = buildPremiumRoleMatchCards({ roleMatch: reportRoleMatch, mbtiType, primaryDisc, disc, bigFive });
   const reportRoleTitle = realResults.canonicalResult?.careerDirection.title || reportPrimaryRole?.title || career.title;
   const reportRoleSalary = reportPrimaryRole?.salary || career.salary;

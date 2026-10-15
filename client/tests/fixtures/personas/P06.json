@@ -1,0 +1,167 @@
+{
+  "id": "P06",
+  "persona": "Lena, 38, accountant switching careers into UX design. Detail-oriented and reliable, but newly curious and creative; moderately introverted, cooperative.",
+  "expected": "High conscientiousness + rising openness, moderate introversion; ISFJ/INFJ; DISC C/S; designer/analyst-type role.",
+  "qa_fit_score": 4,
+  "qa_fit_reason": "Clear C, reasonable; new creative interest lost (INTJ, analysis not design)",
+  "envelope": {
+    "mbti_ok": [
+      "INTJ",
+      "INFJ",
+      "INFP",
+      "ISFP"
+    ],
+    "disc": [
+      "C",
+      "I"
+    ],
+    "role_family": [
+      "creative",
+      "knowledge",
+      "technical"
+    ],
+    "notes": "career change to design"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 2,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 3,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 4,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 5,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 6,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 7,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 8,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 9,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 10,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 11,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 12,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 13,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 14,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 15,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 16,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 17,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 18,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 19,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 20,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 21,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 22,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 23,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 24,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 25,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 26,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 27,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ]
+}

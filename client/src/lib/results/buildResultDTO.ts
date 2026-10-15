@@ -1,3 +1,5 @@
+import { SCORING_VERSION_V3, CAREER_MATCH_VERSION_V3, NARRATIVE_VERSION_V3, isScoringV3 } from "@/lib/quiz/scoringVersions";
+import { deriveWorkDirectionV3, deriveWorkLaneScores } from "@/lib/results/workLanes";
 import { calculatePersonality, validateInput, type ScoresData } from "@/lib/scoring";
 import { calculateResult, findBestRoleMatch, type PersonalityResult } from "@/components/results/resultsData";
 
@@ -454,6 +456,7 @@ function buildCareerDirection(legacy: PersonalityResult, scores: ScoresData): Ca
     legacy.bigFiveProfile,
     scores.mbti as Record<string, number>,
     scores.career as Partial<Record<import("@/data/shortformV2Questions").CareerKey, number>>,
+    (scores as any).scoringVersion,
   );
   const direction = roleMatch.direction ?? {
     laneKey: "legacy",
@@ -558,7 +561,12 @@ export function buildResultDTO(input: BuildResultDTOInput): BuildResultDTOOutput
   const overallConfidence = pct((mbti.confidence + disc.confidence + bigFive.confidence + adaptive.completionConfidence) / 4);
 
   const result: ResultDTO = {
-    version: { schemaVersion: RESULT_DTO_SCHEMA_VERSION, scoringVersion: "legacy-scoring-adapter-1.0.0", narrativeVersion: "legacy-copy-1.0.0", careerMatchVersion: "legacy-role-match-1.0.0" },
+    version: {
+      schemaVersion: RESULT_DTO_SCHEMA_VERSION,
+      scoringVersion: typeof (input.scores as any).scoringVersion === "string" ? (input.scores as any).scoringVersion : "legacy-scoring-adapter-1.0.0",
+      narrativeVersion: typeof (input.scores as any).narrativeVersion === "string" ? (input.scores as any).narrativeVersion : "legacy-copy-1.0.0",
+      careerMatchVersion: typeof (input.scores as any).careerMatchVersion === "string" ? (input.scores as any).careerMatchVersion : "legacy-role-match-1.0.0",
+    },
     meta: { resultId, sessionId, userId: input.userId ?? null, source: input.source ?? "live_quiz", visibility: input.visibility ?? (input.userId ? "authenticated" : "anonymous"), createdAt: now, updatedAt: now, deleted: false, runtime: input.runtime },
     raw: { tier: normalizeTier(input.tier), mood: input.mood, moodBlend: input.moodBlend, funMode: input.funMode, locality: { landmark: input.landmark, theme: input.theme }, responses: (input.scores.responses ?? []).map((r) => ({ questionId: r.questionId, value: r.sliderValue ?? r.choice, choice: r.choice, sliderValue: r.sliderValue, timeSpent: r.timeSpent, swipeDirection: r.swipeDirection ?? "none", psych: r.psych })), legacyScores: input.scores },
     scores,

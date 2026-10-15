@@ -1,0 +1,170 @@
+{
+  "id": "P12",
+  "persona": "Victor, 34, sales rep. Ruthlessly competitive, skeptical of others, argumentative, outgoing, confident, wants to win.",
+  "expected": "Low agreeableness, high extraversion, low N; ENTJ/ESTP; DISC D; sales/negotiation/leadership role.",
+  "qa_fit_score": 4,
+  "qa_fit_reason": "Extraversion + D right; ENTP vs ENTJ; role emergency ops not sales",
+  "envelope": {
+    "mbti_ok": [
+      "ENTJ",
+      "ESTJ",
+      "ENTP"
+    ],
+    "disc": [
+      "D",
+      "I"
+    ],
+    "role_family": [
+      "leadership",
+      "sales",
+      "influence"
+    ],
+    "forbid_role": [
+      "highPressure",
+      "emergency"
+    ],
+    "notes": "sales"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 2,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 3,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 4,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 5,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 6,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 7,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 8,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 9,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 10,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 13,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 14,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 15,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 16,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 17,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 18,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 19,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 20,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 21,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 22,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 23,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 24,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 25,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 26,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 27,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ]
+}
