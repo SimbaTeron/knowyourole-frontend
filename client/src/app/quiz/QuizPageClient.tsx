@@ -90,6 +90,14 @@ export default function QuizPage() {
     setIsQuizInProgress(true);
     if (quizSessionIdRef.current) return;
 
+    // Resuming after a remount/reload: keep the original session id and start timestamp.
+    const existingSessionId = sessionStorage.getItem("kyr_active_quiz_session_id");
+    if (existingSessionId && sessionStorage.getItem("kyr_quiz_progress_v1")) {
+      quizSessionIdRef.current = existingSessionId;
+      setQuizSessionId(existingSessionId);
+      return;
+    }
+
     const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     quizSessionIdRef.current = sessionId;
     setQuizSessionId(sessionId);
