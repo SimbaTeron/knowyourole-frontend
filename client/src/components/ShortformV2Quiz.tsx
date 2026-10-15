@@ -187,6 +187,26 @@ function rebuildScoresFromResponses(responses: QuizScores["responses"]): QuizSco
   };
 }
 
+const PROGRESS_KEY = "kyr_quiz_progress_v1";
+const PROGRESS_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+type SavedProgress = { v: 1; currentIndex: number; responses: QuizScores["responses"]; savedAt: number };
+
+function readSavedProgress(): SavedProgress | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = JSON.parse(window.sessionStorage.getItem(PROGRESS_KEY) || "null") as SavedProgress | null;
+    if (!saved || saved.v !== 1 || !Array.isArray(saved.responses) || Date.now() - saved.savedAt > PROGRESS_MAX_AGE_MS) return null;
+    if (saved.responses.length === 0 || saved.currentIndex < 0 || saved.currentIndex >= SHORTFORM_V2_QUESTIONS.length) return null;
+    return saved;
+  } catch {
+    return null;
+  }
+}
+
+function clearSavedProgress() {
+  try { window.sessionStorage.removeItem(PROGRESS_KEY); } catch { /* storage unavailable */ }
+}
+
 export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete, onExit, onQuizStarted }: ShortformV2QuizProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -197,6 +217,33 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const questionHeadingRef = useRef<HTMLHeadingElement>(null);
   const answerButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const restoreAnswerFocusRef = useRef(false);
+  const restoredRef = useRef(false);
+
+  // Restore in-progress answers after a remount, reload, or back/forward navigation
+  // so the quiz does not drop the user back to the intro mid-run.
+  useEffect(() => {
+    if (restoredRef.current) return;
+    restoredRef.current = true;
+    const saved = readSavedProgress();
+    if (!saved) return;
+    const rebuilt = rebuildScoresFromResponses(saved.responses);
+    setScores({ ...rebuilt, responses: saved.responses });
+    setCurrentIndex(Math.min(saved.currentIndex, saved.responses.length));
+    setSelectedAnswer(null);
+    setStartedAt(Date.now());
+    setHasStarted(true);
+    onQuizStarted?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!hasStarted || scores.responses.length === 0) return;
+    try {
+      const nextIndex = selectedAnswer ? Math.min(currentIndex + 1, SHORTFORM_V2_QUESTIONS.length - 1) : currentIndex;
+      const payload: SavedProgress = { v: 1, currentIndex: nextIndex, responses: scores.responses, savedAt: Date.now() };
+      window.sessionStorage.setItem(PROGRESS_KEY, JSON.stringify(payload));
+    } catch { /* storage unavailable: quiz still works in memory */ }
+  }, [hasStarted, currentIndex, selectedAnswer, scores.responses]);
 
   const currentQuestion = SHORTFORM_V2_QUESTIONS[currentIndex];
   const totalQuestions = SHORTFORM_V2_QUESTIONS.length;
@@ -297,6 +344,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
           ...updatedScores,
           ...authoritativeScoreMaps,
         });
+        clearSavedProgress();
         onComplete(authoritativeScores);
         return;
       }
