@@ -5027,6 +5027,13 @@ function OrbitalGlassV2Results({
 
         <p className="result-disclaimer" role="note" style={{ margin: "8px auto 12px", maxWidth: 560, fontSize: 12.5, lineHeight: 1.45, color: "#536e82", textAlign: "center" }}>A reflection starting point, not a diagnosis, hiring screen, or prediction. Bars show approximate leanings, not measurements. <a href="/methodology" style={{ color: "inherit", textDecoration: "underline" }}>How this works</a></p>
 
+        {(() => {
+          const responses = (canonicalResult?.raw?.responses ?? []) as Array<{ choice?: number }>;
+          const neutralCount = responses.filter((response) => response.choice === 4).length;
+          if (neutralCount < 6) return null;
+          return <p className="result-low-confidence" role="note" style={{ margin: "0 auto 12px", maxWidth: 560, padding: "10px 12px", borderRadius: 12, background: "#fff4d6", color: "#5a4300", fontSize: 13, lineHeight: 1.45 }}><b>Lower-confidence result.</b> You chose &ldquo;Not sure&rdquo; on {neutralCount} of 28 questions, so this pattern is based on fewer signals. Treat it as a loose starting point, or retake the quiz later.</p>;
+        })()}
+
         {view === "main" && (
           <section>
             <article className="portrait-card">

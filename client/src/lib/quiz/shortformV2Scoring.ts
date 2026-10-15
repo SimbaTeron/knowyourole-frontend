@@ -7,7 +7,7 @@ import {
 
 export type ShortformV2ResponseInput = {
   questionId: number;
-  choice: 0 | 1 | 2 | 3;
+  choice: 0 | 1 | 2 | 3 | 4;
   timeSpent?: number;
   swipeDirection?: "left" | "right";
 };
@@ -66,7 +66,7 @@ export function validateShortformV2Responses(value: unknown): ShortformV2Respons
       throw new ShortformV2ResponseValidationError(`response ${index + 1} has an invalid choice`);
     }
     const selectedChoice = choice as number;
-    if (!Number.isInteger(selectedChoice) || selectedChoice < 0 || selectedChoice > 3) {
+    if (!Number.isInteger(selectedChoice) || selectedChoice < 0 || selectedChoice > 4) {
       throw new ShortformV2ResponseValidationError(`response ${index + 1} has an invalid choice`);
     }
     if (seen.has(questionId as number)) {
@@ -80,7 +80,7 @@ export function validateShortformV2Responses(value: unknown): ShortformV2Respons
     const swipeDirection: ShortformV2ResponseInput["swipeDirection"] = candidate.swipeDirection === "left" || candidate.swipeDirection === "right"
       ? candidate.swipeDirection
       : undefined;
-    return { questionId: questionId as number, choice: choice as 0 | 1 | 2 | 3, timeSpent, swipeDirection };
+    return { questionId: questionId as number, choice: choice as 0 | 1 | 2 | 3 | 4, timeSpent, swipeDirection };
   });
 
   if (seen.size !== EXPECTED_IDS.size) {

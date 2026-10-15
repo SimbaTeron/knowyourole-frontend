@@ -330,7 +330,7 @@ export interface QuizScores {
   };
   responses: Array<{
     questionId: number;
-    choice: 0 | 1 | 2 | 3;
+    choice: 0 | 1 | 2 | 3 | 4;
     timeSpent: number;
     swipeDirection: "left" | "right";
     sliderValue?: number; // Phase 1.1: -2 to +2 for slider questions

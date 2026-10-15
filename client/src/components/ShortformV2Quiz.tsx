@@ -284,7 +284,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     const timeSpent = existingResponse?.timeSpent ?? Math.max(0.1, (Date.now() - startedAt) / 1000);
     const response = {
       questionId: currentQuestion.id,
-      choice: optionIndex as 0 | 1 | 2 | 3,
+      choice: optionIndex as 0 | 1 | 2 | 3 | 4,
       timeSpent,
       swipeDirection: optionIndex < 2 ? "left" as const : "right" as const,
       responseType: "multiChoice" as const,

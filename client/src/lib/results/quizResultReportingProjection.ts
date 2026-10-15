@@ -44,7 +44,7 @@ export function buildQuizResultReportingProjection(result: ResultDTO): QuizResul
 
   for (const question of SHORTFORM_V2_QUESTIONS) {
     const choice = answersByQuestionId.get(String(question.id))?.choice;
-    if (!Number.isInteger(choice) || choice === undefined || choice < 0 || choice > 3) {
+    if (!Number.isInteger(choice) || choice === undefined || choice < 0 || choice > 4) {
       throw new Error(`Canonical ResultDTO has no valid selected answer for question ${question.id}`);
     }
     projection[`q${question.id}`] = choice + 1;

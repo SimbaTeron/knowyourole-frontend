@@ -157,7 +157,7 @@ export function checkRateLimit(req: Request, limit: number, windowMs: number): b
 
 export interface ResponseEntry {
   questionId: number;
-  choice: 0 | 1 | 2 | 3;
+  choice: 0 | 1 | 2 | 3 | 4;
   timeSpent?: number;
   sliderValue?: number;
   psych?: string;

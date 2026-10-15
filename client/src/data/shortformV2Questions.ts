@@ -18,7 +18,7 @@ export type CareerKey =
   | "pace";
 
 export interface ShortformV2Answer {
-  id: "A" | "B" | "C" | "D";
+  id: "A" | "B" | "C" | "D" | "E";
   text: string;
   supportingText: string;
   resultSignal: string;
@@ -56,7 +56,19 @@ export const CAREER_SCORE_KEYS: CareerKey[] = [
   "pace",
 ];
 
-export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
+/**
+ * PROPOSAL: a neutral "Not sure / it depends" option (choice index 4) on every question.
+ * It carries no trait weights, so it adds no evidence in any direction.
+ */
+export const NEUTRAL_ANSWER: ShortformV2Answer = {
+  id: "E",
+  text: "Not sure / it depends",
+  supportingText: "Pick this if none of the options fits you right now.",
+  resultSignal: "neutral",
+  scores: {},
+};
+
+const BASE_SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
   {
     id: 1,
     key: "recharge-pattern",
@@ -450,3 +462,9 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     ],
   },
 ];
+
+
+export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = BASE_SHORTFORM_V2_QUESTIONS.map((question) => ({
+  ...question,
+  answers: [...question.answers, NEUTRAL_ANSWER],
+}));

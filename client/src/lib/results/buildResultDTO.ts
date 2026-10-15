@@ -71,7 +71,7 @@ export interface RawQuizAnswer {
   /** Raw selected value: binary, slider, multi-choice, or adaptive answer. */
   value?: unknown;
   /** Current binary/swipe choice. */
-  choice?: 0 | 1 | 2 | 3;
+  choice?: 0 | 1 | 2 | 3 | 4;
   /** Slider response value where present. */
   sliderValue?: number;
   /** Time spent answering. Used for confidence and analytics. */

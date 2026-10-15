@@ -200,7 +200,7 @@ export function checkRateLimit(identifier: string, limit: number, windowMs: numb
 
 export interface ResponseItem {
   questionId: number;
-  choice: 0 | 1 | 2 | 3;
+  choice: 0 | 1 | 2 | 3 | 4;
   timeSpent?: number;
   sliderValue?: number;
   psych?: string;
@@ -334,7 +334,7 @@ interface ScoresData {
 
 interface ResponseEntry {
   questionId: number;
-  choice: 0 | 1 | 2 | 3;
+  choice: 0 | 1 | 2 | 3 | 4;
   timeSpent?: number;
   sliderValue?: number;
   psych?: string;
