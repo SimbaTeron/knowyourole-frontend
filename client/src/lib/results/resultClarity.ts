@@ -92,6 +92,44 @@ export function detectFlatAnswerPattern(
   };
 }
 
+/**
+ * What to show in the clarity box. When the same-letter / flat-pattern caution
+ * triggers, it REPLACES Clear, Mixed, or Broad — never shown alongside them.
+ */
+export type ResultClarityDisplay = {
+  /** "flat" when the caution replaces the clarity note; otherwise the clarity level. */
+  kind: ResultClarityLevel | "flat";
+  heading: string;
+  body: string;
+  /** Kept from the underlying clarity so blended "X + Y" labels still work. */
+  clarity: ResultClarity;
+  flat: FlatPatternResult;
+};
+
+export function resolveResultClarityDisplay(
+  bigFive: Record<string, number>,
+  responses: ReadonlyArray<{ choice?: unknown }> | null | undefined,
+): ResultClarityDisplay {
+  const clarity = getResultClarity(bigFive);
+  const flat = detectFlatAnswerPattern(responses);
+  if (flat.flagged && flat.note) {
+    return {
+      kind: "flat",
+      heading: "Answer pattern note",
+      body: flat.note,
+      clarity,
+      flat,
+    };
+  }
+  return {
+    kind: clarity.level,
+    heading: `Result clarity: ${clarity.label}`,
+    body: clarity.body,
+    clarity,
+    flat,
+  };
+}
+
 /** "Openness + Agreeableness" when blended, otherwise just the top label. */
 export function formatTopTraitLabel(clarity: ResultClarity, labelFor: (key: string) => string): string {
   return clarity.blended ? `${labelFor(clarity.topKey)} + ${labelFor(clarity.secondKey)}` : labelFor(clarity.topKey);
