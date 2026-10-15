@@ -2,6 +2,8 @@
 import { resolveResultClarityDisplay, formatTopTraitLabel } from "@/lib/results/resultClarity";
 import { isScoringV3 } from "@/lib/quiz/scoringVersions";
 import { getMbtiConfidence } from "@/lib/quiz/mbtiConfidence";
+import { recomputeShortformV2ScoreMaps } from "@/lib/quiz/shortformV2Scoring";
+import { applyV3RawDeltas, computeV3RawDeltas, V3_ALL } from "@/lib/quiz/shortformV3Adjustments";
 
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
@@ -4919,8 +4921,23 @@ function OrbitalGlassV2Results({
   const topTraitDisplay = formatTopTraitLabel(clarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
   const mbtiConfidenceScores = (rawScores?.mbti as Record<string, number> | undefined) || {};
   const hasMbtiScores = ["E","I","S","N","T","F","J","P"].every((k) => typeof mbtiConfidenceScores[k] === "number");
+  // Derive raw MBTI from answer evidence so the dual close-letter threshold (cal + raw) matches the harness.
+  let rawMbtiForConfidence: Record<string, number> | undefined;
+  if (v3 && Array.isArray(rawScores?.responses) && rawScores!.responses!.length >= 28) {
+    try {
+      const evidence = rawScores!.responses!
+        .filter((r) => typeof r?.questionId === "number" && typeof r?.choice === "number")
+        .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
+      if (evidence.length >= 28) {
+        const maps = recomputeShortformV2ScoreMaps(evidence);
+        rawMbtiForConfidence = applyV3RawDeltas(maps, computeV3RawDeltas(evidence, V3_ALL)).mbti;
+      }
+    } catch {
+      rawMbtiForConfidence = undefined;
+    }
+  }
   const mbtiConfidenceResolved = v3 && hasMbtiScores
-    ? getMbtiConfidence(mbtiConfidenceScores, undefined, { broad: clarity.level === "broad" })
+    ? getMbtiConfidence(mbtiConfidenceScores, rawMbtiForConfidence, { broad: clarity.level === "broad" })
     : v3 && clarity.level === "broad"
       ? { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "This type is a directional sketch — your trait pattern was broad, so treat it as a starting point, not a hard label.", badge: "directional sketch" }
       : { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "", badge: "" };
