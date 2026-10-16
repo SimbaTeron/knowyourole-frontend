@@ -2527,6 +2527,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
             <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: sharePalette.gold, textTransform: "uppercase", marginBottom: 7 }}>Your Full Portrait</div>
             <div style={{ fontFamily: "'Space Grotesk', Arial, sans-serif", fontSize: 30, lineHeight: 0.98, fontWeight: 800, marginBottom: 8, letterSpacing: -1.2, color: sharePalette.ink }}>Share your result</div>
             <div style={{ fontSize: 13, lineHeight: 1.5, color: sharePalette.muted, maxWidth: 360 }}>Send a visual card now, or keep the full report as a PDF.</div>
+            <div data-testid="share-modal-note" style={{ fontSize: 12, lineHeight: 1.45, color: sharePalette.muted, maxWidth: 360, marginTop: 6 }}>The card shows your result type and direction only, with no answers or personal information. It is a reflection starting point, not a diagnosis.</div>
           </div>
         </div>
 
