@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { publicPageMetadata } from "@/lib/seo";
+import { AppFooter } from "@/components/layout/AppFooter";
 
 export const metadata: Metadata = publicPageMetadata("/methodology");
 
@@ -167,6 +168,7 @@ export default function MethodologyPage() {
           </section>
         </div>
       </main>
+      <AppFooter />
     </div>
   );
 }

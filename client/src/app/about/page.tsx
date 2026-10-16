@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Brain, Target, Users, BookOpen, Heart } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { AppFooter } from "@/components/layout/AppFooter";
 
 export default function About() {
   return (
@@ -97,6 +98,7 @@ export default function About() {
           </p>
         </section>
       </main>
+      <AppFooter />
     </div>
   );
 }

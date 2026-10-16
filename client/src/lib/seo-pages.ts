@@ -88,7 +88,7 @@ export const landingPages: SeoPage[] = [
     sections: [
       { heading: "Free should not mean shallow", body: "The quiz is designed to be quick, but it still gathers signals across multiple personality and work-style dimensions. The result is meant to be understandable without becoming childish or fake-scientific." },
       { heading: "What the result includes", body: "Expect a practical read on personality pattern, work style, communication behavior, role-fit direction, and blind spots. The language is designed to be shareable and useful, not merely decorative." },
-      { heading: "Privacy and trust", body: "Quiz completion data can be saved to generate and recover a result. KnowYouRole does not sell quiz results, and the quiz is not a clinical or diagnostic test." },
+      { heading: "Privacy and trust", body: "Your answers and result are saved on our servers, with no name or account attached, so we can show and recover your result. We never sell quiz results. The quiz is not a clinical or diagnostic test." },
     ], faqs: standardFaqs, related: ["/quiz", "/personality-quiz", "/privacy", "/methodology"]
   },
   {

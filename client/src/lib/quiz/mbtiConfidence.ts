@@ -58,9 +58,12 @@ export function fullMbtiType(mbti: Record<string, number>): string {
 export function getMbtiConfidence(
   calibrated: Record<string, number>,
   raw?: Record<string, number>,
-  options?: { broad?: boolean },
+  options?: { broad?: boolean; displayType?: string },
 ): MbtiConfidence {
-  const type = fullMbtiType(calibrated);
+  // When the UI shows a type computed elsewhere, notes and light-lean markers must use
+  // that same type so the letters never contradict the note (QuizQA R6 P63/P73).
+  const displayType = options?.displayType && /^[EI][SN][TF][JP]$/.test(options.displayType) ? options.displayType : undefined;
+  const type = displayType ?? fullMbtiType(calibrated);
   const weakAxes: MbtiAxis[] = [];
   const lightLeanLetters: string[] = [];
 
@@ -70,7 +73,8 @@ export function getMbtiConfidence(
     const rawClose = raw ? gap(raw, a, b) < WEAK_RAW_GAP : false;
     if (calClose || rawClose) {
       weakAxes.push(axis);
-      lightLeanLetters.push(winner(calibrated, a, b));
+      const idx = (Object.keys(MBTI_AXIS_PAIRS) as MbtiAxis[]).indexOf(axis);
+      lightLeanLetters.push(displayType ? displayType[idx] : winner(calibrated, a, b));
     }
   });
 

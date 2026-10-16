@@ -48,3 +48,16 @@ test("raw gap below threshold marks light lean even when calibrated is clear", (
   assert.ok(c.weakAxes.includes("EI"), "raw EI gap 1 should count");
   assert.equal(c.weakAxes.includes("SN"), false);
 });
+
+test("displayType keeps note and light-lean letters consistent with the shown type (R6 P63/P73)", () => {
+  // Calibrated scores would say ESTP, but the UI shows ENTP: note must not name a different type.
+  const c = getMbtiConfidence({ E: 60, I: 40, S: 50.5, N: 49.5, T: 51, F: 49, J: 40, P: 60 }, undefined, { displayType: "ENTP" });
+  assert.equal(c.type, "ENTP");
+  assert.ok(!/ESTP/.test(c.note), c.note);
+  for (const letter of c.lightLeanLetters) assert.ok("ENTP".includes(letter), letter);
+});
+
+test("directional sketch badge only when broad", () => {
+  const c = getMbtiConfidence({ E: 80, I: 20, S: 75, N: 25, T: 70, F: 30, J: 75, P: 25 }, undefined, { broad: false });
+  assert.notEqual(c.badge, "directional sketch");
+});

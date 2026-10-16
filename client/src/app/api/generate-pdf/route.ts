@@ -170,6 +170,7 @@ export async function POST(req: NextRequest) {
       page.drawCircle({ x: 585, y: 40, size: 120, color: color('cyan'), opacity: 0.24 });
       page.drawRectangle({ x: margin, y: 27, width: contentWidth, height: 1, color: color('border') });
       page.drawText('KnowYouRole', { x: margin, y: 12, size: 8, font: bold, color: color('ink') });
+      page.drawText('A reflection starting point, not a diagnosis, hiring screen, or prediction.', { x: margin + 62, y: 12, size: 7, font: regular, color: color('muted') });
       page.drawText('knowyourole.com', { x: pageSize[0] - margin - 78, y: 12, size: 8, font: bold, color: color('ink') });
     };
 

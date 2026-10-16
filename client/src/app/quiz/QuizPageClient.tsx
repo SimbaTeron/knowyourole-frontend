@@ -1016,7 +1016,7 @@ export default function QuizPage() {
               <article className="rounded-3xl border border-white/10 bg-white/[0.045] p-4">
                 <h3 className="text-sm font-black text-white">Privacy</h3>
                 <p className="mt-2 text-sm leading-6 text-white/60">
-                  Quiz completion data can be saved to generate and recover your result. We do not sell quiz results; see Privacy for current details.
+                  Your answers and result are saved on our servers, with no name or account attached, so we can show and recover your result. We never sell quiz results. See Privacy for details.
                 </p>
               </article>
             </div>
