@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
   alternates: { canonical: null },
   openGraph: null,
+  twitter: { card: "summary", title: "Page not found | KnowYouRole", description: "We couldn't find that page.", images: [] },
 };
 
 export default function NotFound() {

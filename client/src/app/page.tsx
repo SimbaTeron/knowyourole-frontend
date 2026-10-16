@@ -316,10 +316,10 @@ export default function Home() {
                 Discover your work style, uncover your strengths, and find career paths to explore next.
               </h1>
               <p className="hero-subtitle">
-                A private, 30-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.
+                A free, 30-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.
               </p>
               <a className="primary-cta" href="/quiz">Take the free quiz</a>
-              <p className="quiz-facts">30 questions · Private by default · No account required</p>
+              <p className="quiz-facts">30 questions · No account or name needed · <a href="/privacy">What we store</a></p>
             </div>
 
             <aside className="result-preview" aria-label="Example KnowYouRole result">
@@ -407,7 +407,7 @@ export default function Home() {
             <div className="final-panel testimonial-card">
               <div>
                 <h2 id="final-title" className="final-title section-title">Get a useful starting point in 30 questions.</h2>
-                <p className="final-copy section-copy">Private by default. No account required.</p>
+                <p className="final-copy section-copy">No account or name needed. Your result is saved without your name so you can come back to it.</p>
               </div>
               <a className="primary-cta" href="/quiz">Take the free quiz</a>
             </div>

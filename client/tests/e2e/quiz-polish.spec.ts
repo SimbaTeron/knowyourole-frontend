@@ -9,7 +9,7 @@ test.describe("quiz interaction polish", () => {
     });
     await expect(explainer).toBeVisible();
 
-    await page.getByRole("button", { name: "Start the 28 questions" }).click();
+    await page.getByRole("button", { name: "Start the 30 questions" }).click();
 
     await expect(page.getByRole("heading", {
       name: "After a demanding day, what most reliably helps you feel like yourself again?",

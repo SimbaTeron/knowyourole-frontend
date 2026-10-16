@@ -11,22 +11,27 @@ export type PublicPage = {
   description: string;
   changeFrequency: MetadataRoute.Sitemap[0]["changeFrequency"];
   priority: number;
+  /** ISO date the page content last changed meaningfully. Defaults to CONTENT_LAST_UPDATED. */
+  lastModified?: string;
 };
+
+/** Bump when site-wide copy changes (v5 scoring + 30-question copy shipped 2026-10-16). */
+export const CONTENT_LAST_UPDATED = "2026-10-16";
 
 const foundationPages: PublicPage[] = [
   {
     path: "/",
-    title: "Free Personality Quiz for Work Style & Career Fit | KnowYouRole",
+    title: "Free Work Style & Career Quiz for Students and Adults | KnowYouRole",
     description:
-      "Take a free personality quiz that blends Big Five traits, MBTI-style patterns, DISC work behavior, and career-fit guidance into one practical result.",
+      "A free 30-question work style and personality quiz with no sign-up. Blends Big Five, MBTI-style and DISC signals into career directions to explore, from trades to creative work.",
     changeFrequency: "weekly",
     priority: 1,
   },
   {
     path: "/quiz",
-    title: "Take a Free Personality Quiz | Big Five, Work Style & Career Fit",
+    title: "Take the Free Work Style Quiz | 30 Questions, No Sign-Up | KnowYouRole",
     description:
-      "Take a free personality quiz and get a practical result for Big Five traits, MBTI-style patterns, DISC work style, communication, and career fit.",
+      "Start the free 30-question work style quiz. No account or name needed. Get Big Five, MBTI-style and DISC signals plus career directions to explore, including trades and creative paths.",
     changeFrequency: "weekly",
     priority: 0.95,
   },
@@ -131,18 +136,41 @@ export function absoluteUrl(path = "/") {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/** Per-page social card rendered by /og (src/app/og/route.tsx). */
+export function ogImagePath(title: string, path = "/") {
+  const clean = title.replace(/\s*\|\s*KnowYouRole\s*$/, "").replace(/\s*\|\s*/g, " · ").trim();
+  const params = new URLSearchParams({ title: clean, path });
+  return `/og?${params.toString()}`;
+}
+
+export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ name: "Home", path: "/" }, ...items].map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.path === "/" ? SITE_URL : absoluteUrl(item.path),
+    })),
+  };
+}
+
 export function pageMetadata({
   path,
   title,
   description,
   index = true,
+  ogTitle,
 }: {
   path: string;
   title: string;
   description: string;
   index?: boolean;
+  ogTitle?: string;
 }): Metadata {
   const url = absoluteUrl(path);
+  const ogImage = absoluteUrl(ogImagePath(ogTitle ?? title, path));
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -170,7 +198,7 @@ export function pageMetadata({
       url,
       images: [
         {
-          url: absoluteUrl(DEFAULT_OG_IMAGE),
+          url: ogImage,
           width: 1200,
           height: 630,
           alt: "KnowYouRole personality quiz for work style and career fit",
@@ -181,7 +209,7 @@ export function pageMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: [absoluteUrl(DEFAULT_OG_IMAGE)],
+      images: [ogImage],
     },
     robots: index
       ? {
@@ -223,12 +251,18 @@ export function publicPageMetadata(path: string): Metadata {
   });
 }
 
-export function noIndexMetadata(path: string, title = "KnowYouRole"): Metadata {
+export function noIndexMetadata(
+  path: string,
+  title = "KnowYouRole",
+  description = "A free work style and career reflection quiz. No account or name needed.",
+  ogTitle?: string,
+): Metadata {
   return pageMetadata({
     path,
     title,
-    description: "This KnowYouRole utility page is not intended for search indexing.",
+    description,
     index: false,
+    ogTitle,
   });
 }
 
