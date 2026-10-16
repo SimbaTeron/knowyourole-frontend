@@ -204,11 +204,14 @@ function runSimulation(version, n = 1000) {
 }
 
 function realisticCloseLetterRate(personas, version, flipsPer = 3) {
+  // Seeded so CI is deterministic (Math.random made this test flaky around the 0.22 line).
+  let seed = 20260 >>> 0;
+  const rand = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
   let close = 0, total = 0;
   for (const p of personas) {
     for (let t = 0; t < flipsPer; t++) {
-      const qi = Math.floor(Math.random() * 28);
-      const c = /** @type {0|1|2|3} */ ((p.answers[qi].choice + 1 + Math.floor(Math.random() * 3)) % 4);
+      const qi = Math.floor(rand() * 28);
+      const c = /** @type {0|1|2|3} */ ((p.answers[qi].choice + 1 + Math.floor(rand() * 3)) % 4);
       const alt = p.answers.map((a, i) => (i === qi ? { ...a, choice: c } : a));
       total++;
       if ((scoreShortformVersioned(alt, version).mbtiConfidence?.weakAxes || []).length > 0) close++;
