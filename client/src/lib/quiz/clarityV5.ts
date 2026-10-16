@@ -40,6 +40,14 @@ export function medianSeconds(responses: ReadonlyArray<Resp> | null | undefined)
   return t[Math.floor(t.length / 2)];
 }
 
+/** Mean seconds over the plausible timings (0.2–600 s). */
+export function meanSeconds(responses: ReadonlyArray<Resp> | null | undefined): number {
+  const t = (responses ?? []).map((r) => Number(r?.timeSpent)).filter((n) => Number.isFinite(n) && n >= 0.2 && n <= 600);
+  return t.length ? t.reduce((a, b) => a + b, 0) / t.length : Infinity;
+}
+/** ...and the whole quiz took under ~2 s per question on average (about a minute for 30). */
+export const V5_FAST_MEAN_SECONDS = 2;
+
 /** Very fast = under ~1.2 s per question on median (too fast to read most questions). */
 export const V5_FAST_MEDIAN_SECONDS = 1.2;
 
@@ -86,7 +94,9 @@ export function adjustClarityV5(
     .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
   const scatter = scatterCheckV5(evidence, report.meanCoherence);
   const median = medianSeconds(responses);
-  const fast = median !== null && median < V5_FAST_MEDIAN_SECONDS;
+  // Fast needs BOTH a very short typical answer and a short quiz overall, so a few quick
+  // clicks (or bursty pacing) at a normal overall pace never trigger the note.
+  const fast = median !== null && median < V5_FAST_MEDIAN_SECONDS && meanSeconds(responses) < V5_FAST_MEAN_SECONDS;
   // Strict on purpose: most honest answer sets look a bit uneven, and speed must stay a soft signal.
   const uneven = scatter.meanCoherence < 0.25 && scatter.agreement < 0.03;
 

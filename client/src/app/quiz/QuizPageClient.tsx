@@ -200,6 +200,15 @@ export default function QuizPage() {
       sessionId: payload.sessionId,
       responseCount: scores.responses.length,
     });
+    // Dev-only: per-question timings actually sent (seconds). Enable on a built site with
+    // localStorage.setItem("kyr:debug-timing", "1").
+    try {
+      if (process.env.NODE_ENV !== "production" || (typeof window !== "undefined" && window.localStorage.getItem("kyr:debug-timing") === "1")) {
+        console.info("[kyr timing] seconds per question", scores.responses.map((r) => (typeof r.timeSpent === "number" ? Math.round(r.timeSpent * 10) / 10 : null)));
+      }
+    } catch {
+      /* storage unavailable */
+    }
 
     try {
       const response = await fetch("/api/results/compute", {

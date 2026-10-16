@@ -493,7 +493,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     group: "Calibration",
     signal: "Where you are now",
     prompt: "Last one: which best describes you right now?",
-    guidance: "This only changes the next steps we suggest. It does not change your result type.",
+    guidance: "Not scored, helps tailor examples. This only changes the next steps we suggest, not your result.",
     answers: [
       { id: "A", text: "I'm in middle school.", supportingText: "We'll suggest classes, clubs, and things to try.", resultSignal: "Middle school", scores: {} },
       { id: "B", text: "I'm in high school.", supportingText: "We'll suggest electives, programs, and first jobs.", resultSignal: "High school", scores: {} },

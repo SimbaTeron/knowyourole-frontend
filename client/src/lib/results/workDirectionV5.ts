@@ -45,9 +45,9 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   trades: {
     title: "Skilled trades: building, fixing, and installing",
     phrase: "building and fixing real things with tools",
-    adult: ["Electrician", "Welder", "Auto or diesel mechanic", "Carpenter", "Plumber", "HVAC technician"],
+    adult: ["Electrician", "Welder", "Electrical lineworker", "Auto or diesel mechanic", "Carpenter", "Plumber", "HVAC technician"],
     teen: ["Electrician", "Auto mechanic", "Welder", "Robotics or electronics technician", "Carpenter"],
-    college: ["Electrician apprentice", "Automotive technician", "Welding technician", "HVAC technician"],
+    college: ["Electrician apprentice", "Automotive technician", "Welding technician", "Lineworker apprentice", "HVAC technician"],
     teenSteps: ["Take shop, auto, or construction class if your school has it", "Join a robotics, build, or maker club", "Ask about career and technical (CTE) programs or trade-school visits", "Fix or build one real project at home and take photos of it"],
     collegeSteps: ["Look at apprenticeships (electrical, plumbing, HVAC) that pay while you learn", "Try a community college or trade-school certificate", "Spend a day shadowing someone in the trade"],
     adultSteps: ["Look up union or employer apprenticeships near you", "Take one short certificate course (for example welding or electrical basics)", "Talk to two people working in the trade about their week"],
@@ -65,8 +65,8 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   creator: {
     title: "Video, content, and online creation",
     phrase: "making videos and content for an audience",
-    adult: ["Video editor", "YouTuber or streamer", "Social media producer", "Podcast producer", "Content creator"],
-    teen: ["Video editor", "YouTuber or streamer", "Content creator", "Podcast host"],
+    adult: ["Video editor", "YouTuber or streamer", "Broadcaster or radio host", "Social media producer", "Podcast producer", "Content creator"],
+    teen: ["Video editor", "YouTuber or streamer", "Content creator", "Sports or radio broadcaster", "Podcast host"],
     college: ["Video production student", "Social media assistant", "Junior video editor", "Content creator"],
     teenSteps: ["Join film, broadcast, or media club", "Make and post 5 short videos and see what you enjoy most", "Learn a free editing app", "Help a club or team with their videos or posts"],
     collegeSteps: ["Try a film, media, or communications class", "Post on a schedule for 2 months and track what works", "Offer to edit videos for a club, team, or small business"],
@@ -282,7 +282,9 @@ export function deriveWorkDirectionV5(
   const afterRunner = merged ? ranked[3] : third;
   const tight = top - laneScores[runnerUp] <= 2 && top - laneScores[afterRunner] <= BROAD_MARGIN;
   // Trait clarity (options.broad) only widens the direction when the work-interest lead is also small.
-  const broad = Boolean(options.forceBroad) || top < MIN_EVIDENCE || tight || (Boolean(options.broad) && top - laneScores[runnerUp] <= 6);
+  // Middle-of-the-road work answers (nothing reached 50, top two nearly tied) are not a confident direction.
+  const lukewarm = top < 50 && top - laneScores[runnerUp] <= 4;
+  const broad = Boolean(options.forceBroad) || top < MIN_EVIDENCE || tight || lukewarm || (Boolean(options.broad) && top - laneScores[runnerUp] <= 6);
   const sk = stageKey(stage);
 
   if (broad) {
