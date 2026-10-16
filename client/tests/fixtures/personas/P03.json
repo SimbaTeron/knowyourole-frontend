@@ -1,0 +1,169 @@
+{
+  "id": "P03",
+  "persona": "Jordan, 16, HS junior. Team captain, decisive, competitive, blunt, likes being in charge, impatient with long discussions.",
+  "expected": "High extraversion, low agreeableness-ish; ESTJ/ENTJ; DISC D; leader/driver role.",
+  "qa_fit_score": 3,
+  "qa_fit_reason": "DISC D right, but ESTP instead of ESTJ/ENTJ; decisive in-charge captain read as improviser; role skews emergency ops not leadership",
+  "envelope": {
+    "mbti_ok": [
+      "ESTJ",
+      "ENTJ",
+      "ESTP"
+    ],
+    "disc": [
+      "D"
+    ],
+    "role_family": [
+      "leadership",
+      "operations",
+      "sales"
+    ],
+    "forbid_role": [
+      "highPressure",
+      "emergency"
+    ],
+    "notes": "decisive captain"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 2,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 3,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 4,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 5,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 6,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 7,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 8,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 9,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 10,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 13,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 14,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 15,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 16,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 17,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 18,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 19,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 20,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 21,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 22,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 23,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 24,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 25,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 26,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 27,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ]
+}

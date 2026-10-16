@@ -2,8 +2,12 @@
 
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
 
+export type ClarityLevelForBrief = "clear" | "mixed" | "broad";
+
 type ResultDecisionBriefProps = {
   result?: ResultDTO;
+  /** Result clarity from Big Five pattern — gates the "still broad" early-signal box. */
+  clarityLevel?: ClarityLevelForBrief;
   fallback: {
     directionTitle: string;
     rationale: string;
@@ -21,7 +25,8 @@ type EvidenceState = {
   color: string;
 };
 
-function getEvidenceState(result?: ResultDTO): EvidenceState {
+/** Exported for unit tests. "Still broad" only when clarity is Broad. */
+export function getEvidenceState(result?: ResultDTO, clarityLevel?: ClarityLevelForBrief): EvidenceState {
   if (!result) {
     return {
       label: "Exploratory read",
@@ -34,7 +39,10 @@ function getEvidenceState(result?: ResultDTO): EvidenceState {
   const confidence = result.audit.overallConfidence;
   const weakSignals = result.scores.adaptive.weakSignals;
   const hybridCount = result.audit.scoringAudit?.hybridDimensions.length ?? 0;
-  if (confidence < 55 || weakSignals.length >= 3) {
+
+  // Only Broad clarity gets the early-signal "pattern is still broad" box.
+  // Clear/Mixed results must not show it (even when overallConfidence is low).
+  if (clarityLevel === "broad") {
     return {
       label: "Early signal",
       title: "The pattern is still broad",
@@ -42,7 +50,8 @@ function getEvidenceState(result?: ResultDTO): EvidenceState {
       color: "#c95f46",
     };
   }
-  if (weakSignals.length > 0 || hybridCount >= 2) {
+
+  if (weakSignals.length > 0 || hybridCount >= 2 || confidence < 55) {
     return {
       label: "Mixed evidence",
       title: "More than one work pattern is plausible",
@@ -58,22 +67,22 @@ function getEvidenceState(result?: ResultDTO): EvidenceState {
   };
 }
 
-export function ResultDecisionBrief({ result, fallback, onExploreRole }: ResultDecisionBriefProps) {
+export function ResultDecisionBrief({ result, clarityLevel, fallback, onExploreRole }: ResultDecisionBriefProps) {
   const direction = result?.careerDirection;
   const roles = direction?.examples.map((role) => ({ title: role.title, reasoning: role.reasoning })) ?? fallback.examples;
   const action = result?.growthPlan.recommendedActions[0];
-  const evidence = getEvidenceState(result);
+  const evidence = getEvidenceState(result, clarityLevel);
   const cautions = direction?.examples.flatMap((role) => role.cautions ?? []).filter(Boolean) ?? [];
   const watchOut = cautions[0] || fallback.watchOut;
   const starterMove = action ? `${action.title}: ${action.description}` : fallback.starterMove;
 
   return (
-    <section aria-labelledby="decision-brief-title" style={shellStyle}>
+    <section aria-labelledby="decision-brief-title" style={shellStyle} data-testid="result-decision-brief">
       <div style={eyebrowStyle}>Your practical decision brief</div>
       <h2 id="decision-brief-title" style={titleStyle}>{direction?.title || fallback.directionTitle}</h2>
       <p style={introStyle}>A work direction is useful only if it gives you a next test—not a new label to live inside.</p>
 
-      <div style={{ ...evidenceStyle, borderColor: `${evidence.color}55` }}>
+      <div style={{ ...evidenceStyle, borderColor: `${evidence.color}55` }} data-testid="decision-brief-evidence" data-evidence-label={evidence.label}>
         <div style={{ ...smallLabelStyle, color: evidence.color }}>{evidence.label}</div>
         <strong style={cardTitleStyle}>{evidence.title}</strong>
         <p style={bodyStyle}>{evidence.body}</p>

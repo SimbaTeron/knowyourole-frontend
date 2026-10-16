@@ -36,21 +36,36 @@ export async function POST(req: NextRequest) {
   const verifiedUser = await getOptionalAuthUser(req);
   const now = new Date().toISOString();
 
-  const { error } = await getSupabaseAdmin()
-    .from("quiz_sessions")
-    .upsert({
-      id: sessionId,
-      user_id: verifiedUser?.sub ?? null,
-      tier,
-      mood,
-      fun_mode: funMode,
-      started_at: now,
-    }, { onConflict: "id", ignoreDuplicates: true });
+  try {
+    const { error } = await getSupabaseAdmin()
+      .from("quiz_sessions")
+      .upsert({
+        id: sessionId,
+        user_id: verifiedUser?.sub ?? null,
+        tier,
+        mood,
+        fun_mode: funMode,
+        started_at: now,
+      }, { onConflict: "id", ignoreDuplicates: true });
 
-  if (error) {
-    console.error("[POST /api/quiz/session/start] failed", { error, sessionId });
-    return NextResponse.json({ error: "Could not start quiz session" }, { status: 503, headers: responseHeaders });
+    if (error) {
+      console.error("[POST /api/quiz/session/start] failed", { error, sessionId });
+      // Non-blocking for the quiz UX: client already ignores start failures.
+      return NextResponse.json(
+        { success: true, sessionId, startedAt: now, persisted: false, warning: "session_start_unavailable" },
+        { status: 201, headers: responseHeaders },
+      );
+    }
+  } catch (error) {
+    console.warn("[POST /api/quiz/session/start] admin unavailable; continuing without persistence", {
+      sessionId,
+      error: error instanceof Error ? error.message : "unknown",
+    });
+    return NextResponse.json(
+      { success: true, sessionId, startedAt: now, persisted: false, warning: "session_start_unavailable" },
+      { status: 201, headers: responseHeaders },
+    );
   }
 
-  return NextResponse.json({ success: true, sessionId, startedAt: now }, { status: 201, headers: responseHeaders });
+  return NextResponse.json({ success: true, sessionId, startedAt: now, persisted: true }, { status: 201, headers: responseHeaders });
 }

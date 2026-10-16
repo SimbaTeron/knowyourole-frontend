@@ -1,6 +1,7 @@
 import rolesData from "@/data/roles.json";
 import { CAREER_SCORE_KEYS, SHORTFORM_V2_QUESTIONS, type CareerKey } from "@/data/shortformV2Questions";
-import { deriveWorkDirection, deriveWorkLaneScores, getRoleWorkProfile, MIXED_WORK_LANE_MARGIN, qualifyingWorkLanes, scoreRoleWorkProfile, WORK_LANE_LABELS, type WorkLaneKey } from "@/lib/results/workLanes";
+import { deriveWorkDirection, deriveWorkDirectionV3, deriveWorkLaneScores, getRoleWorkProfile, MIXED_WORK_LANE_MARGIN, qualifyingWorkLanes, scoreRoleWorkProfile, WORK_LANE_LABELS, type WorkLaneKey } from "@/lib/results/workLanes";
+import { isScoringV3 } from "@/lib/quiz/scoringVersions";
 import type { QuizScores } from "../Quiz";
 import { Sparkles, Target, Users, Heart, Brain } from "lucide-react";
 
@@ -105,7 +106,7 @@ export interface CareerRole {
 }
 
 export interface CareerDirection {
-  laneKey: WorkLaneKey;
+  laneKey: WorkLaneKey | "leadershipManagement" | "legacy";
   title: string;
   examples: CareerRole[];
   rationale: string;
@@ -284,6 +285,7 @@ function findCareerVectorRoleMatch(
   discStyle: string,
   bigFive: { O: number; C: number; E: number; A: number; N: number },
   career: CareerVector,
+  scoringVersion?: string,
 ): CareerRoleMatch | null {
   const normalizedCareer = normalizeCareerVector(career);
   if (!normalizedCareer) return null;
@@ -370,12 +372,36 @@ function findCareerVectorRoleMatch(
     };
   });
   const signalText = humanList(topSignals.map(key => CAREER_SIGNAL_LABELS[key]));
-  const directionDefinition = deriveWorkDirection(normalizedCareer, workLanes);
+  const useV3 = isScoringV3(scoringVersion ?? (career as any)?.scoringVersion);
+  let directionDefinition = useV3
+    ? deriveWorkDirectionV3(normalizedCareer, workLanes)
+    : deriveWorkDirection(normalizedCareer, workLanes);
+  const maxRawCareer = Math.max(...Object.values(career).map((v) => Number(v) || 0));
+  const laneVals = Object.values(workLanes);
+  const laneSpread = Math.max(...laneVals) - Math.min(...laneVals);
+  const weakCareer = useV3 && (maxRawCareer < 22 || laneSpread <= 5);
+  if (weakCareer) {
+    // Broad / low-evidence: sketch title + diverse examples (avoid overconfident niche lanes).
+    directionDefinition = {
+      laneKey: "knowledgeStrategy",
+      title: "Several directions fit — treat this as a sketch",
+      examples: [
+        "Research Analyst",
+        "Operations Coordinator",
+        "Systems Analyst",
+        "Community Program Coordinator",
+      ],
+    };
+  }
   const direction = {
     laneKey: directionDefinition.laneKey,
     title: directionDefinition.title,
-    examples: directionDefinition.examples.map(title => ({ title, salary: "", desc: "" })),
-    rationale: `Your direct work-preference answers emphasized ${signalText}. This is a better clue than any single job title.`,
+    examples: directionDefinition.examples.map((title: string | { title: string }) =>
+      typeof title === "string" ? { title, salary: "", desc: "" } : { title: title.title, salary: "", desc: "" },
+    ),
+    rationale: weakCareer
+      ? `Your answers did not point to one sharp work lane (${signalText}). Explore a few directions before specializing.`
+      : `Your direct work-preference answers emphasized ${signalText}. This is a better clue than any single job title.`,
   };
   const whyThisFits = winner.match.whyThisFits
     ? `${winner.match.whyThisFits} Your strongest direct work-interest signals were ${signalText}.`
@@ -401,9 +427,9 @@ function findCareerVectorRoleMatch(
   };
 }
 
-export function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: { O: number; C: number; E: number; A: number; N: number }, mbtiScores: Record<string, number> = {}, career?: CareerVector): CareerRoleMatch {
+export function findBestRoleMatch(mbtiType: string, discStyle: string, bigFive: { O: number; C: number; E: number; A: number; N: number }, mbtiScores: Record<string, number> = {}, career?: CareerVector, scoringVersion?: string): CareerRoleMatch {
   const roles = rolesData.roles as Record<string, CareerRoleMatch>;
-  const careerVectorMatch = findCareerVectorRoleMatch(roles, mbtiType, discStyle, bigFive, career ?? {});
+  const careerVectorMatch = findCareerVectorRoleMatch(roles, mbtiType, discStyle, bigFive, career ?? {}, scoringVersion);
   if (careerVectorMatch) return careerVectorMatch;
   
   const sortedTraits = getCalibratedBigFiveTraitOrder(bigFive, mbtiScores, discStyle);
@@ -523,7 +549,7 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
   const discInfo = traits.disc[primaryDisc as keyof typeof traits.disc] || traits.disc.D;
   const secondaryDiscInfo = traits.disc[secondaryDisc as keyof typeof traits.disc] || traits.disc.I;
 
-  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFiveProfile, mbti, scores.career);
+  const roleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFiveProfile, mbti, scores.career, (scores as any).scoringVersion);
 
   const bigFiveLabels: Record<string, { high: string; low: string }> = {};
   Object.entries(traits.bigFive).forEach(([key, value]) => {

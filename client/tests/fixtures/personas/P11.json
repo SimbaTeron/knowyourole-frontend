@@ -1,0 +1,167 @@
+{
+  "id": "P11",
+  "persona": "Noah, 17, HS senior. Highly anxious, worries constantly, moody, easily stressed by change, otherwise average on most traits.",
+  "expected": "Very high neuroticism dominant; ISFP/INFP-ish; DISC S or C; result should acknowledge stress sensitivity without being diagnostic; calm, predictable role.",
+  "qa_fit_score": 2,
+  "qa_fit_reason": "Very anxious persona shows Stress Reactivity Balanced; Structure top trait; core trait missed",
+  "envelope": {
+    "mbti_ok": [
+      "ISFJ",
+      "INFJ",
+      "ISTJ"
+    ],
+    "disc": [
+      "S",
+      "C"
+    ],
+    "role_family": [
+      "people",
+      "operations",
+      "care"
+    ],
+    "want_n_high": true,
+    "notes": "very anxious"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 2,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 3,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 4,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 5,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 6,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 7,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 8,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 9,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 10,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 13,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 14,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 15,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 16,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 17,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 18,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 19,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 20,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 21,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 22,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 23,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 24,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 25,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 26,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 27,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 28,
+      "choice": 2,
+      "letter": "C"
+    }
+  ]
+}

@@ -61,7 +61,7 @@ export const MIN_WORK_LANE_EVIDENCE = 35;
 export const MIXED_WORK_LANE_MARGIN = 8;
 
 export type WorkDirection = {
-  laneKey: WorkLaneKey;
+  laneKey: WorkLaneKey | "leadershipManagement" | "legacy";
   title: string;
   examples: string[];
 };
@@ -206,4 +206,82 @@ export function scoreRoleWorkProfile(lanes: WorkLaneScores, profile: RoleWorkPro
 
 export function topWorkLanes(lanes: WorkLaneScores, count = 3): WorkLaneKey[] {
   return [...WORK_LANE_KEYS].sort((a, b) => lanes[b] - lanes[a]).slice(0, count);
+}
+
+
+/** v3-only leadership lane (not part of WORK_LANE_KEYS so v2 deriveWorkDirection is unchanged). */
+export const LEADERSHIP_LANE_KEY = "leadershipManagement" as const;
+export type WorkLaneKeyV3 = WorkLaneKey | typeof LEADERSHIP_LANE_KEY;
+
+const LEADERSHIP_LANE_WEIGHTS: Partial<Record<CareerKey, number>> = {
+  leadership: 0.4,
+  people: 0.2,
+  operations: 0.15,
+  entrepreneurship: 0.15,
+  pace: 0.1,
+};
+
+export function leadershipLaneScore(career?: CareerVector): number {
+  if (!career) return 0;
+  return Math.round(
+    Object.entries(LEADERSHIP_LANE_WEIGHTS).reduce(
+      (sum, [key, weight]) => sum + Math.max(0, Number(career[key as CareerKey] ?? 0)) * Number(weight),
+      0,
+    ),
+  );
+}
+
+const LEADERSHIP_DIRECTION: WorkDirection = {
+  laneKey: "leadershipManagement" as WorkLaneKey,
+  title: "Leadership, management, and directing people",
+  examples: ["Team Lead", "Operations Manager", "Sales Manager", "Program Director"],
+};
+
+const SALES_INFLUENCE_DIRECTION: WorkDirection = {
+  laneKey: "leadershipManagement" as WorkLaneKey,
+  title: "Sales, influence, and client leadership",
+  examples: ["Account Executive", "Sales Manager", "Business Development Lead"],
+};
+
+/**
+ * v3 work direction: prefers an explicit leadership lane when leadership evidence
+ * is strong and pace does not dominate (avoids decisive leaders → emergency-ops).
+ * Optional preferLane forces a secondary lane title for Broad multi-direction UI.
+ */
+export function deriveWorkDirectionV3(
+  career: CareerVector,
+  lanes: WorkLaneScores,
+  preferLane?: WorkLaneKey,
+): WorkDirection {
+  const lead = leadershipLaneScore(career);
+  const pace = Number(career.pace ?? 0);
+  const leadership = Number(career.leadership ?? 0);
+  const people = Number(career.people ?? 0);
+  const laneScores = { ...lanes, leadershipManagement: lead };
+  const ranked = (Object.entries(laneScores) as [string, number][]).sort((a, b) => b[1] - a[1]);
+
+  // Decisive leaders / managers: leadership strong, not a pure emergency profile
+  if (leadership >= 18 && lead >= (lanes.highPressureResponse ?? 0) && !(pace >= leadership + 8 && Number(career.handsOn ?? 0) >= 20)) {
+    if (people >= 20 && pace >= 12 && leadership >= 20) return SALES_INFLUENCE_DIRECTION;
+    return LEADERSHIP_DIRECTION;
+  }
+  // High-pressure only when pace+handsOn really dominate
+  if ((lanes.highPressureResponse ?? 0) >= 20 && pace >= 25 && Number(career.handsOn ?? 0) >= 15 && leadership < 30) {
+    return DIRECTION_FALLBACKS.highPressureResponse;
+  }
+
+  if (preferLane && preferLane in DIRECTION_FALLBACKS) {
+    // Still allow special-case patterns, but bias title toward preferred lane when close
+    const primary = deriveWorkDirection(career, lanes);
+    if (primary.laneKey === preferLane) return primary;
+    return DIRECTION_FALLBACKS[preferLane];
+  }
+
+  const primary = deriveWorkDirection(career, lanes);
+  // If v2 would return highPressure but leadership is competitive, redirect
+  if (primary.laneKey === "highPressureResponse" && leadership >= 18) {
+    if (people >= 18) return SALES_INFLUENCE_DIRECTION;
+    return LEADERSHIP_DIRECTION;
+  }
+  return primary;
 }

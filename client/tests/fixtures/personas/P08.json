@@ -1,0 +1,166 @@
+{
+  "id": "P08",
+  "persona": "Ava, 29, barista and aspiring artist. Highly imaginative, emotional, spontaneous, empathetic, dislikes routines and rules.",
+  "expected": "High openness & agreeableness & neuroticism, low conscientiousness; INFP; DISC I/S; creative role.",
+  "qa_fit_score": 3,
+  "qa_fit_reason": "Openness/I/creative right; ENFP vs INFP, emotionality not reflected",
+  "envelope": {
+    "mbti_ok": [
+      "INFP",
+      "ENFP",
+      "INFJ"
+    ],
+    "disc": [
+      "I",
+      "S"
+    ],
+    "role_family": [
+      "creative",
+      "people"
+    ],
+    "want_n_elevated": true,
+    "notes": "sensitive creative"
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 2,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 3,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 4,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 5,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 6,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 7,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 8,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 9,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 10,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 11,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 12,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 13,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 14,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 15,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 16,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 17,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 18,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 19,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 20,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 21,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 22,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 23,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 24,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 25,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 26,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 27,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 28,
+      "choice": 1,
+      "letter": "B"
+    }
+  ]
+}

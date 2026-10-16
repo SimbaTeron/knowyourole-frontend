@@ -3,10 +3,13 @@ import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
 import { getOptionalAuthUser } from "@/app/api/_lib/auth";
 import { createAnonymousCapability } from "@/app/api/_lib/anonymous-result-capability";
 import { buildResultDTO, type BuildResultDTOInput, type ResultDTO } from "@/lib/results/buildResultDTO";
+import { buildUnpersistedComputeSuccess } from "@/lib/results/computePersistenceFallback";
 import { readPersistedQuizResultDTO } from "@/lib/results/persistedQuizResult";
 import { buildQuizResultReportingProjection } from "@/lib/results/quizResultReportingProjection";
 import type { ScoresData } from "@/lib/scoring";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
+import { applyV3RawDeltas, computeV3RawDeltas } from "@/lib/quiz/shortformV3Adjustments";
+import { SCORING_VERSION_V3, CAREER_MATCH_VERSION_V3, NARRATIVE_VERSION_V3 } from "@/lib/quiz/scoringVersions";
 import {
   getShortformV2Question,
   recomputeShortformV2ScoreMaps,
@@ -63,12 +66,23 @@ export async function POST(req: NextRequest) {
 
     const persistence = await persistResultDTOSafely(result);
     if (!persistence.ok) {
-      // A live result is canonical only once the server has durably stored it.
-      // Returning a successful-but-unpersisted DTO would reintroduce the exact
-      // display/persistence split this endpoint exists to eliminate.
+      // Persistence outage must not hide a successfully computed result. Return the
+      // deterministic DTO so the client can show results; mark persistence.ok false
+      // so analytics/UI can distinguish unpersisted from saved.
+      console.warn("[POST /api/results/compute] persistence unavailable; returning DTO fallback", {
+        requestId,
+        persistenceAttemptId: persistence.persistenceAttemptId,
+        error: persistence.error,
+      });
       return NextResponse.json(
-        { success: false, requestId, error: "Result persistence is temporarily unavailable", persistence },
-        { status: 503, headers: responseHeaders },
+        buildUnpersistedComputeSuccess({
+          requestId,
+          result,
+          validation,
+          persistenceAttemptId: persistence.persistenceAttemptId,
+          error: persistence.error,
+        }),
+        { status: 200, headers: responseHeaders },
       );
     }
 
@@ -162,22 +176,30 @@ function recomputeAuthoritativeShortformScores(rawResponses: unknown): BuildResu
     };
   });
 
+  const v3Maps = applyV3RawDeltas(
+    rawScoreMaps,
+    computeV3RawDeltas(responses.map((r) => ({ questionId: r.questionId, choice: r.choice }))),
+  );
   const scoreInput = {
-    ...rawScoreMaps,
+    ...v3Maps,
     responses: canonicalResponses,
     swipeTimes,
     averageSwipeTime,
     currentDifficulty: averageSwipeTime < 2 ? "hard" as const : averageSwipeTime < 5 ? "medium" as const : "easy" as const,
     engagement: canonicalResponses.length,
     wildcardBoost: false,
-    criticalWildcard: rawScoreMaps.mbti.T >= rawScoreMaps.mbti.F && rawScoreMaps.bigFive.O > 0 ? 1 : 0,
-    firstPrinciplesWildcard: rawScoreMaps.mbti.N >= rawScoreMaps.mbti.S && rawScoreMaps.bigFive.O > 0 ? 1 : 0,
+    criticalWildcard: v3Maps.mbti.T >= v3Maps.mbti.F && v3Maps.bigFive.O > 0 ? 1 : 0,
+    firstPrinciplesWildcard: v3Maps.mbti.N >= v3Maps.mbti.S && v3Maps.bigFive.O > 0 ? 1 : 0,
     hybridTypes: [],
     quizVersion: "shortform-v2-fixed-28",
     questionDatabase: "shortformV2Questions.ts",
     deterministicResult: true,
+    scoringVersion: SCORING_VERSION_V3,
+    careerMatchVersion: CAREER_MATCH_VERSION_V3,
+    narrativeVersion: NARRATIVE_VERSION_V3,
   };
 
+  // Calibrate against v2 bank profiles after v3 raw deltas (J/N rebalance).
   return calibrateShortformV2Scores(scoreInput) as ScoresData;
 }
 
