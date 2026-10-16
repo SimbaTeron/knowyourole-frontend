@@ -1,11 +1,8 @@
 'use client';
-import { resolveResultClarityDisplay, formatTopTraitLabel } from "@/lib/results/resultClarity";
+import { formatTopTraitLabel } from "@/lib/results/resultClarity";
+import { resolveFinalClarity, shouldShowStressSecondary } from "@/lib/results/finalClarity";
 import { isScoringV3, isScoringV4 } from "@/lib/quiz/scoringVersions";
-import { detectInconsistency, adjustClarityV41, RESULT_CLARITY_COPY_V41 } from "@/lib/quiz/inconsistencyDetect";
-import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
 import { getMbtiConfidence } from "@/lib/quiz/mbtiConfidence";
-import { recomputeShortformV2ScoreMaps } from "@/lib/quiz/shortformV2Scoring";
-import { applyV3RawDeltas, computeV3RawDeltas, V3_ALL } from "@/lib/quiz/shortformV3Adjustments";
 
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
@@ -4918,57 +4915,18 @@ function OrbitalGlassV2Results({
   const scoringVersion = (rawScores as any)?.scoringVersion || canonicalResult?.version?.scoringVersion;
   const v3 = isScoringV3(scoringVersion);
   const maxCareer = rawScores?.career ? Math.max(...Object.values(rawScores.career as Record<string, number>).map((n) => Number(n) || 0)) : undefined;
-  const clarityDisplay = resolveResultClarityDisplay(bigFive, rawScores?.responses, v3 ? { version: "v3", maxCareer } : {});
+  // One final clarity value for every view (main, Big Five tab, decision brief, report).
+  const finalClarity = resolveFinalClarity(bigFive as unknown as Record<string, number>, rawScores?.responses, scoringVersion, maxCareer);
+  const clarityDisplay = finalClarity.display;
+  const clarityDisplayShown = clarityDisplay;
   const clarity = clarityDisplay.clarity;
+  const clarityLevelForBrief = finalClarity.level;
   const topTraitDisplay = formatTopTraitLabel(clarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
   const mbtiConfidenceScores = (rawScores?.mbti as Record<string, number> | undefined) || {};
   const hasMbtiScores = ["E","I","S","N","T","F","J","P"].every((k) => typeof mbtiConfidenceScores[k] === "number");
-  // Derive raw MBTI from answer evidence so the dual close-letter threshold (cal + raw) matches the harness.
-  let rawMbtiForConfidence: Record<string, number> | undefined;
-  if (v3 && Array.isArray(rawScores?.responses) && rawScores!.responses!.length >= 28) {
-    try {
-      const evidence = rawScores!.responses!
-        .filter((r) => typeof r?.questionId === "number" && typeof r?.choice === "number")
-        .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
-      if (evidence.length >= 28) {
-        const maps = recomputeShortformV2ScoreMaps(evidence);
-        rawMbtiForConfidence = applyV3RawDeltas(maps, computeV3RawDeltas(evidence, V3_ALL)).mbti;
-      }
-    } catch {
-      rawMbtiForConfidence = undefined;
-    }
-  }
+  const rawMbtiForConfidence = finalClarity.rawMbti;
   const v4 = isScoringV4(scoringVersion);
-  let inconsistencyNote = "";
-  let clarityLevelForBrief = clarity.level as "clear" | "mixed" | "broad";
-  let clarityDisplayShown = clarityDisplay;
-  if (v4 && Array.isArray(rawScores?.responses) && rawScores!.responses!.length >= 28) {
-    try {
-      const evidence = rawScores!.responses!
-        .filter((r) => typeof r?.questionId === "number" && typeof r?.choice === "number")
-        .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
-      if (evidence.length >= 28) {
-        const report = detectInconsistency(evidence);
-        if (rawMbtiForConfidence) {
-          const remapped = applyV4OptionRemaps(
-            { mbti: { ...rawMbtiForConfidence }, disc: {}, bigFive: {}, career: {} },
-            evidence,
-          );
-          rawMbtiForConfidence = remapped.mbti;
-        }
-        if (report.flagged || report.guarded) inconsistencyNote = report.note;
-        if (clarityDisplay.kind !== "flat") {
-          clarityLevelForBrief = adjustClarityV41(clarity.level, report, bigFive as unknown as Record<string, number>, rawMbtiForConfidence);
-        }
-        if (clarityLevelForBrief !== clarity.level) {
-          const copy = RESULT_CLARITY_COPY_V41[clarityLevelForBrief];
-          clarityDisplayShown = { ...clarityDisplay, kind: clarityLevelForBrief, heading: `Result clarity: ${copy.label}`, body: copy.body };
-        }
-      }
-    } catch {
-      /* keep prior */
-    }
-  }
+  const inconsistencyNote = finalClarity.report && (finalClarity.report.flagged || finalClarity.report.guarded) ? finalClarity.report.note : "";
   const mbtiConfidenceResolved = v3 && hasMbtiScores
     ? getMbtiConfidence(mbtiConfidenceScores, rawMbtiForConfidence, { broad: clarity.level === "broad" || !!inconsistencyNote })
     : v3 && clarity.level === "broad"
@@ -4982,7 +4940,7 @@ function OrbitalGlassV2Results({
   const displayMbti = mbtiType;
   const typeBadge = v3 ? mbtiConfidenceResolved.badge : "";
   const typeConfidenceNote = v3 ? mbtiConfidenceResolved.note : "";
-  const stressSecondaryNote = v4 && topTrait[0] !== "N" && (bigFive.N ?? 0) >= 67
+  const stressSecondaryNote = shouldShowStressSecondary(bigFive as unknown as Record<string, number>, scoringVersion)
     ? "Second signal: Stress Reactivity is also high. You may push hard on the outside while feeling pressure on the inside — build in recovery and smaller pressure steps."
     : "";
   const lightLeanLetters = new Set(v3 ? mbtiConfidenceResolved.lightLeanLetters : []);
@@ -5271,7 +5229,9 @@ export default function ResultsPage() {
   const career = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
   const topBigFive = (Object.entries(bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
   const topBigFiveLabel = TRAIT_DEEP_DIVE[topBigFive[0]]?.label || topBigFive[0];
-  const reportClarityDisplay = resolveResultClarityDisplay(bigFive, rawScores?.responses);
+  const reportScoringVersion = (rawScores as any)?.scoringVersion;
+  const reportMaxCareer = rawScores?.career ? Math.max(...Object.values(rawScores.career as Record<string, number>).map((n) => Number(n) || 0)) : undefined;
+  const reportClarityDisplay = resolveFinalClarity(bigFive as unknown as Record<string, number>, rawScores?.responses, reportScoringVersion, reportMaxCareer).display;
   const reportClarity = reportClarityDisplay.clarity;
   const reportTopTraitDisplay = formatTopTraitLabel(reportClarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
   const reportRoleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career, (rawScores as any)?.scoringVersion);

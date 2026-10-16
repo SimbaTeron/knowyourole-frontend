@@ -51,7 +51,10 @@ export function getEvidenceState(result?: ResultDTO, clarityLevel?: ClarityLevel
     };
   }
 
-  if (weakSignals.length > 0 || hybridCount >= 2 || confidence < 55) {
+  // "Mixed evidence" only when the final clarity is Mixed. Clear results must not show it
+  // (same static-box bug class as v3's "still broad"). Legacy callers without a level keep old behavior.
+  const mixedEligible = clarityLevel === undefined ? (weakSignals.length > 0 || hybridCount >= 2 || confidence < 55) : clarityLevel === "mixed";
+  if (mixedEligible) {
     return {
       label: "Mixed evidence",
       title: "More than one work pattern is plausible",
