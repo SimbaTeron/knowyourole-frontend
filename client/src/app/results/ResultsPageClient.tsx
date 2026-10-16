@@ -1,4 +1,5 @@
 'use client';
+import { resultWording } from "@/lib/results/resultWording";
 import { formatTopTraitLabel } from "@/lib/results/resultClarity";
 import { resolveFinalClarity, shouldShowStressSecondary } from "@/lib/results/finalClarity";
 import { isScoringV3, isScoringV4 } from "@/lib/quiz/scoringVersions";
@@ -2176,6 +2177,8 @@ function FullPortraitSection({ step, eyebrow, title, subtitle, accent = C.cyan, 
 }
 
 type ShareReportPayload = {
+  /** Same headline as the main result card (follows clarity). */
+  headline?: string;
   sessionId?: string;
   title: string;
   subtitle: string;
@@ -2534,6 +2537,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
           <div style={{ position: "relative" }}>
             <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: sharePalette.gold, textTransform: "uppercase", marginBottom: 7 }}>Your Full Portrait</div>
             <div style={{ fontFamily: "'Space Grotesk', Arial, sans-serif", fontSize: 30, lineHeight: 0.98, fontWeight: 800, marginBottom: 8, letterSpacing: -1.2, color: sharePalette.ink }}>Share your result</div>
+            {report.headline && <div data-testid="share-modal-title" style={{ fontSize: 15, fontWeight: 800, color: sharePalette.ink, marginBottom: 6 }}>{report.headline}</div>}
             <div style={{ fontSize: 13, lineHeight: 1.5, color: sharePalette.muted, maxWidth: 360 }}>Send a visual card now, or keep the full report as a PDF.</div>
             <div data-testid="share-modal-note" style={{ fontSize: 12, lineHeight: 1.45, color: sharePalette.muted, maxWidth: 360, marginTop: 6 }}>The card shows your result type and direction only, with no answers or personal information. It is a reflection starting point, not a diagnosis.</div>
           </div>
@@ -5024,10 +5028,14 @@ function OrbitalGlassV2Results({
   const broadDirections = v5Direction ? roleDirection.examples.map(role => role.title).slice(0, 3) : Array.from(new Set([roleDirection.title, ...laneExamples.slice(1).map(lane => lane.label), ...adjacentRoles.map(role => role.title)])).slice(0, 3);
   const shareLine = resultSummaryLine;
   // Broad results: no crown/archetype badge ("ENTJ Commander"); describe it as a leaning pattern.
-  const broadLook = isBroadResult || clarity.level === "broad";
+  // Broad wording (headline, chip, share title) follows CLARITY. A broad work direction on a
+  // Mixed/Clear result only changes the examples header ("Directions to sample").
+  const wording = resultWording({ clarityLevel: clarity.level, directionBroad: isBroadResult, mbtiType, identity, arch: stripLeadingThe(arch) });
+  const clarityBroad = wording.broad;
+  const broadLook = clarityBroad;
   const shownEmoji = broadLook ? "◈" : emoji;
   const shownArch = broadLook ? `${mbtiType}-leaning pattern` : stripLeadingThe(arch);
-  const headlineText = isBroadResult ? "A broad, balanced pattern" : identity;
+  const headlineText = wording.headline;
   const identityWordCount = identity.trim().split(/\s+/).filter(Boolean).length;
   const identityScale: CSSProperties = identity.length >= 22
     ? { fontSize: "clamp(34px, 10vw, 58px)", lineHeight: 0.92, letterSpacing: "-0.068em" }
@@ -5163,9 +5171,9 @@ function OrbitalGlassV2Results({
           <section>
             <article className="portrait-card">
               <div className="card-head"><div className="eyebrow">Your result</div><div className="avatar">{shownEmoji}</div></div>
-              <div className="glass-tile"><div className="type-chip" data-testid="mbti-type-chip">{shownEmoji} <span className="mbti-letters">{displayMbti.split("").map((letter, i) => <span key={i} className={lightLeanLetters.has(letter) ? "mbti-letter light-lean" : "mbti-letter"} title={lightLeanLetters.has(letter) ? "light lean" : undefined}>{letter}</span>)}</span>{typeBadge ? <span className="type-badge" data-testid="mbti-confidence-badge">{typeBadge}</span> : null} <small>{shownArch}</small></div>{isBroadResult ? <h1 className="orb-h1" style={{ fontSize: "clamp(34px, 10vw, 58px)", lineHeight: 0.92, letterSpacing: "-0.068em" }} data-testid="broad-headline"><span>A broad,</span><span>balanced</span><span>pattern</span></h1> : <h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1>}</div>
+              <div className="glass-tile"><div className="type-chip" data-testid="mbti-type-chip">{shownEmoji} <span className="mbti-letters">{displayMbti.split("").map((letter, i) => <span key={i} className={lightLeanLetters.has(letter) ? "mbti-letter light-lean" : "mbti-letter"} title={lightLeanLetters.has(letter) ? "light lean" : undefined}>{letter}</span>)}</span>{typeBadge ? <span className="type-badge" data-testid="mbti-confidence-badge">{typeBadge}</span> : null} <small>{shownArch}</small></div>{clarityBroad ? <h1 className="orb-h1" style={{ fontSize: "clamp(34px, 10vw, 58px)", lineHeight: 0.92, letterSpacing: "-0.068em" }} data-testid="broad-headline"><span>A broad,</span><span>balanced</span><span>pattern</span></h1> : <h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1>}</div>
               <div className="shareline"><b>Snapshot</b><p>“{shareLine}”</p></div>
-              {isBroadResult ? <div className="role-card" data-testid="broad-directions"><small>Directions to sample</small><h2>Several directions are worth trying</h2><p>Your answers did not point strongly one way, so try a few of these and see which feels right.</p><div className="direction-examples" data-testid="broad-alt-roles"><b>Try exploring</b>{broadDirections.map(title => <span key={title}>• {title}</span>)}</div></div> : <div className="role-card"><small>A direction worth testing</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>Examples</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{!v5Direction && laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}</div>}
+              {isBroadResult && clarityBroad ? <div className="role-card" data-testid="broad-directions"><small>Directions to sample</small><h2>Several directions are worth trying</h2><p>Your answers did not point strongly one way, so try a few of these and see which feels right.</p><div className="direction-examples" data-testid="broad-alt-roles"><b>Try exploring</b>{broadDirections.map(title => <span key={title}>• {title}</span>)}</div></div> : <div className="role-card"><small>A direction worth testing</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>{isBroadResult ? "Directions to sample" : "Examples"}</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{!v5Direction && laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}</div>}
               {v5NextSteps.length > 0 && <div className="role-card next-steps-card" data-testid="next-steps"><small>Next steps</small><ul className="next-steps-list">{v5NextSteps.map(step => <li key={step}>{step}</li>)}</ul></div>}
 
 
@@ -5326,22 +5334,29 @@ export default function ResultsPage() {
   const reportRoleTitle = realResults.canonicalResult?.careerDirection.title || reportPrimaryRole?.title || career.title;
   const reportRoleSalary = reportPrimaryRole?.salary || career.salary;
   const reportIdentity = SOCIAL_IDENTITY_TITLES[mbtiType] || `${stripLeadingThe(arch)} Builder`;
+  // Share card follows CLARITY, exactly like the main headline.
+  const reportWording = resultWording({ clarityLevel: reportClarity.level, directionBroad: false, mbtiType, identity: humanizeResultLabel(reportIdentity), arch });
+  const reportBroad = reportWording.broad;
+  const reportHeadline = reportWording.headline;
+  const reportArch = reportWording.archetype;
   const reportSummary = buildResultSummaryLine({
     roleTitle: reportRoleTitle,
     identity: reportIdentity,
     mbtiType,
     discLabel: DISC_LABELS[primaryDisc] || primaryDisc,
     topTraitLabel: topBigFiveLabel,
+    broad: reportBroad,
   });
   const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const sessionId = searchParams?.get("sessionId") || undefined;
 
   const reportPayload: ShareReportPayload = {
     sessionId,
-    title: `KnowYouRole Result — ${mbtiType}`,
-    subtitle: `${mbtiType} — ${arch}`,
+    headline: reportHeadline,
+    title: `KnowYouRole Result — ${reportHeadline}`,
+    subtitle: reportBroad ? reportArch : `${mbtiType} — ${arch}`,
     mbtiType,
-    archetype: arch,
+    archetype: reportArch,
     primaryDisc,
     population: POPULATION_RATES[mbtiType] || "2.4%",
     career: {
