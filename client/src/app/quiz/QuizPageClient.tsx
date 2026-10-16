@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import PathCanvas from "@/components/PathCanvas";
 import Quiz, { QuizScores } from "@/components/Quiz";
-import Results from "@/components/Results";
+import dynamic from "next/dynamic";
+// Results is only shown after the last answer, so keep it out of the first-load bundle.
+const Results = dynamic(() => import("@/components/Results"), { ssr: false });
 import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";

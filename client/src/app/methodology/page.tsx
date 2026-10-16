@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { publicPageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, publicPageMetadata } from "@/lib/seo";
 import { AppFooter } from "@/components/layout/AppFooter";
 
 export const metadata: Metadata = publicPageMetadata("/methodology");
@@ -35,6 +35,11 @@ const headingClass = "font-display text-2xl font-bold tracking-[-0.025em] text-[
 export default function MethodologyPage() {
   return (
     <div className="min-h-screen bg-[#fffaf0] text-[#12263a]">
+      <script
+        id="kyr-methodology-breadcrumb-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([{ name: "Methodology", path: "/methodology" }])) }}
+      />
       <style>{`html.kyr-workday header[class*="sticky"] .methodology-primary-cta { color: #fffdf8 !important; font-size: 16px !important; }`}</style>
       <header className="sticky top-0 z-50 border-b border-[#12263a]/10 bg-[#fffaf0]/90 px-4 py-4 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">

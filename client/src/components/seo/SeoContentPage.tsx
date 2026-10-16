@@ -6,7 +6,7 @@ function jsonLd(page: SeoPage) {
   const url = `https://knowyourole.com${page.path === "/" ? "" : page.path}`;
   const breadcrumbParts = page.path.split("/").filter(Boolean);
   return [
-    { "@context": "https://schema.org", "@type": page.phase === "learn" || page.phase === "resource" || page.phase === "result" ? "Article" : "WebPage", headline: page.h1, name: page.h1, description: page.description, url, author: { "@type": "Organization", name: "KnowYouRole" }, publisher: { "@type": "Organization", name: "KnowYouRole", url: "https://knowyourole.com" }, mainEntityOfPage: url },
+    { "@context": "https://schema.org", "@type": page.phase === "learn" || page.phase === "resource" || page.phase === "result" ? "Article" : "WebPage", headline: page.h1, name: page.h1, description: page.description, url, author: { "@id": "https://knowyourole.com/#organization" }, publisher: { "@id": "https://knowyourole.com/#organization" }, isPartOf: { "@id": "https://knowyourole.com/#website" }, mainEntityOfPage: url },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: "https://knowyourole.com" }, ...breadcrumbParts.map((part, index) => ({ "@type": "ListItem", position: index + 2, name: part.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "), item: `https://knowyourole.com/${breadcrumbParts.slice(0, index + 1).join("/")}` }))] },
     ...(page.faqs?.length ? [{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: page.faqs.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })) }] : []),
   ];
