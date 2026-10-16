@@ -16,7 +16,8 @@
       "ESTJ",
       "INTP",
       "INTJ"
-    ]
+    ],
+    "expect_inconsistency_flag": true
   },
   "answers": [
     {

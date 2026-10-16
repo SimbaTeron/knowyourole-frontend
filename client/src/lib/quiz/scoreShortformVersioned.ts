@@ -9,11 +9,15 @@ import {
   type V3Flags,
   V3_ALL,
 } from "@/lib/quiz/shortformV3Adjustments";
+import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
+import { detectInconsistency, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
 import {
   SCORING_VERSION_V2,
   SCORING_VERSION_V3,
+  SCORING_VERSION_V4,
   CAREER_MATCH_VERSION_V2,
   CAREER_MATCH_VERSION_V3,
+  CAREER_MATCH_VERSION_V4,
 } from "@/lib/quiz/scoringVersions";
 import {
   deriveWorkDirection,
@@ -26,7 +30,7 @@ import {
 import { getResultClarity, detectFlatAnswerPattern, resolveResultClarityDisplay } from "@/lib/results/resultClarity";
 import { getMbtiConfidence, type MbtiConfidence } from "@/lib/quiz/mbtiConfidence";
 
-export type ScoreVersion = "v2" | "v3";
+export type ScoreVersion = "v2" | "v3" | "v4";
 export type VersionedResponse = { questionId: number; choice: 0 | 1 | 2 | 3; timeSpent?: number };
 
 export type VersionedScoreMaps = {
@@ -148,6 +152,7 @@ export type VersionedResult = {
   altDirections: WorkDirection[];
   nTier: "low" | "medium" | "high";
   mbtiConfidence: MbtiConfidence;
+  inconsistency: InconsistencyReport;
 };
 
 export function scoreShortformVersioned(
@@ -156,30 +161,66 @@ export function scoreShortformVersioned(
   flags: V3Flags = V3_ALL,
 ): VersionedResult {
   let raw = recompute(responses, SHORTFORM_V2_QUESTIONS);
-  if (version === "v3") {
+  if (version === "v3" || version === "v4") {
     raw = applyV3RawDeltas(raw, computeV3RawDeltas(responses, flags));
+  }
+  if (version === "v4") {
+    raw = applyV4OptionRemaps(raw, responses);
   }
   const calibrated = calibrate(raw);
   const maxCareer = Math.max(...Object.values(calibrated.career).map((v) => Number(v) || 0));
-  const clarityOpts = version === "v3" ? { version: "v3" as const, maxCareer } : {};
-  const clarity = getResultClarity(calibrated.bigFive, clarityOpts);
+  const useV3Clarity = version === "v3" || version === "v4";
+  const clarityOpts = useV3Clarity ? { version: "v3" as const, maxCareer } : {};
+  let clarity = getResultClarity(calibrated.bigFive, clarityOpts);
   const flat = detectFlatAnswerPattern(responses);
-  const clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
+  const inconsistency = version === "v4"
+    ? detectInconsistency(responses)
+    : { flagged: false, reasons: [], contradictionPairs: 0, entropy: 0, safeDefaultCount: 0, note: "" };
+  // Guarded / contradictory patterns: do not leave a confident Clear label.
+  if (version === "v4" && inconsistency.flagged && clarity.level === "clear") {
+    clarity = { ...clarity, level: "mixed", label: "Mixed", body: clarity.body };
+  }
+  let clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
+  if (version === "v4" && inconsistency.flagged) {
+    clarityDisplay = {
+      ...clarityDisplay,
+      kind: clarity.level === "broad" ? "broad" : "mixed",
+      heading: clarity.level === "broad" ? clarityDisplay.heading : "Result clarity: Mixed",
+      body: inconsistency.note || clarityDisplay.body,
+    };
+  }
   const type = mbtiType(calibrated.mbti, false);
-  const mbtiConfidence = version === "v3"
-    ? getMbtiConfidence(calibrated.mbti, raw.mbti, { broad: clarity.level === "broad" })
+  const broadForConf = clarity.level === "broad" || (version === "v4" && inconsistency.flagged);
+  const mbtiConfidence = version === "v3" || version === "v4"
+    ? getMbtiConfidence(calibrated.mbti, raw.mbti, { broad: broadForConf })
     : getMbtiConfidence(calibrated.mbti, undefined, { broad: false });
-  const display = mbtiConfidence.type; // always full 4-letter; never X
+  // Prefer detector note when flagged and confidence note empty / broad-generic
+  if (version === "v4" && inconsistency.flagged && inconsistency.note) {
+    if (!mbtiConfidence.note || /directional sketch|broad/i.test(mbtiConfidence.note)) {
+      mbtiConfidence.note = inconsistency.note;
+      if (!mbtiConfidence.badge) mbtiConfidence.badge = "rough sketch";
+    }
+  }
+  const display = mbtiConfidence.type;
   const ranked = (Object.entries(calibrated.bigFive) as [string, number][]).sort((a, b) => b[1] - a[1]);
   const lanes = deriveWorkLaneScores(calibrated.career)!;
   const direction =
-    version === "v3" ? deriveWorkDirectionV3(calibrated.career, lanes) : deriveWorkDirection(calibrated.career, lanes);
-  const altDirections = version === "v3" && clarity.level === "broad" ? buildAltDirections(calibrated.career, lanes, direction) : [];
+    version === "v3" || version === "v4"
+      ? deriveWorkDirectionV3(calibrated.career, lanes)
+      : deriveWorkDirection(calibrated.career, lanes);
+  const altDirections =
+    (version === "v3" || version === "v4") && (clarity.level === "broad" || inconsistency.flagged)
+      ? buildAltDirections(calibrated.career, lanes, direction)
+      : [];
   const n = calibrated.bigFive.N;
+  const scoringVersion =
+    version === "v4" ? SCORING_VERSION_V4 : version === "v3" ? SCORING_VERSION_V3 : SCORING_VERSION_V2;
+  const careerMatchVersion =
+    version === "v4" ? CAREER_MATCH_VERSION_V4 : version === "v3" ? CAREER_MATCH_VERSION_V3 : CAREER_MATCH_VERSION_V2;
   return {
     version,
-    scoringVersion: version === "v3" ? SCORING_VERSION_V3 : SCORING_VERSION_V2,
-    careerMatchVersion: version === "v3" ? CAREER_MATCH_VERSION_V3 : CAREER_MATCH_VERSION_V2,
+    scoringVersion,
+    careerMatchVersion,
     raw,
     calibrated,
     mbtiType: type,
@@ -194,6 +235,7 @@ export function scoreShortformVersioned(
     altDirections,
     nTier: n >= 67 ? "high" : n <= 33 ? "low" : "medium",
     mbtiConfidence,
+    inconsistency,
   };
 }
 

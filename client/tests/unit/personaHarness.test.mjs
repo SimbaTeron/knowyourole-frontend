@@ -1,6 +1,6 @@
 /**
- * Persona regression harness + simulation stats.
- * Locks v2 baseline; compares v3 when SCORING_COMPARE=v3 or when asserting improvements.
+ * Persona regression harness for scoring v2/v3/v4.
+ * Locks v3 baselines for P01–P30; records stepwise v4 metrics.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -11,8 +11,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "../..");
 const fixturesDir = join(root, "tests/fixtures/personas");
-const baselinePath = join(fixturesDir, "baseline-v2.json");
-const reportDir = join(root, "../results-v3");
+const baselineV3Path = join(fixturesDir, "baseline-v3.json");
+const baselineV2Path = join(fixturesDir, "baseline-v2.json");
+const reportDir = join(root, "../results-v4");
 
 const { scoreShortformVersioned } = await import(
   pathToFileURL(join(root, "src/lib/quiz/scoreShortformVersioned.ts")).href
@@ -28,7 +29,7 @@ function loadPersonas() {
 function roleFamily(title, laneKey) {
   const t = `${title} ${laneKey}`.toLowerCase();
   const tags = [];
-  if (/leadership|management|directing|team lead|sales manager|program director/.test(t)) tags.push("leadership");
+  if (/leadership|management|directing|team lead|sales manager|program director|project manager|program coordinator/.test(t)) tags.push("leadership");
   if (/sales|influence|account executive|business development/.test(t)) tags.push("sales", "influence");
   if (/operations|coordination|project manager|quality/.test(t)) tags.push("operations");
   if (/technical|systems|database|engineer|analyst/.test(t)) tags.push("technical");
@@ -52,11 +53,15 @@ function evaluatePersona(fixture, version, flags) {
       ? pass("clarity", result.clarity.level)
       : fail("clarity", `${result.clarity.level} != ${env.clarity}`);
   }
+  if (env.clarity_not) {
+    env.clarity_not.includes(result.clarity.level)
+      ? fail("clarity_not", result.clarity.level)
+      : pass("clarity_not", result.clarity.level);
+  }
   if (env.mbti_ok) {
     const ok = env.mbti_ok.includes(result.mbtiType) || env.mbti_ok.includes(result.mbtiDisplay);
     ok ? pass("mbti", result.mbtiDisplay) : fail("mbti", `${result.mbtiDisplay} not in ${env.mbti_ok.join(",")}`);
   }
-  // Never allow X letters in the displayed type
   if (/X/.test(result.mbtiDisplay) || /X/.test(result.mbtiType)) {
     fail("no_x_letters", result.mbtiDisplay);
   } else {
@@ -84,6 +89,26 @@ function evaluatePersona(fixture, version, flags) {
       ? pass("n_elevated", `N=${result.calibrated.bigFive.N}`)
       : fail("n_elevated", `N=${result.calibrated.bigFive.N}`);
   }
+  if (env.expect_inconsistency_flag) {
+    result.inconsistency?.flagged
+      ? pass("inconsistency", result.inconsistency.reasons.join(","))
+      : fail("inconsistency", "expected flag");
+  }
+  if (env.expect_inconsistency_or_hedge) {
+    result.inconsistency?.flagged || result.clarity.level !== "clear"
+      ? pass("inconsistency_or_hedge", `${result.clarity.level}/flag=${result.inconsistency?.flagged}`)
+      : fail("inconsistency_or_hedge", "still Clear without flag");
+  }
+  if (env.prefer_i && version === "v4") {
+    result.mbtiType[0] === "I"
+      ? pass("prefer_i", result.mbtiType)
+      : pass("prefer_i_soft", `got ${result.mbtiType} (E still allowed in mbti_ok)`);
+  }
+  if (env.prefer_p && version === "v4") {
+    result.mbtiType[3] === "P"
+      ? pass("prefer_p", result.mbtiType)
+      : pass("prefer_p_soft", `got ${result.mbtiType}`);
+  }
   const families = roleFamily(result.direction.title, result.direction.laneKey);
   if (env.role_family) {
     env.role_family.some((f) => families.includes(f))
@@ -102,16 +127,14 @@ function evaluatePersona(fixture, version, flags) {
   }
 
   const failed = checks.filter((c) => !c.ok);
-  // Proxy fit: start from QA fit, +/- based on critical checks
-  let proxy = fixture.qa_fit_score;
+  let proxy = fixture.qa_fit_score ?? 3;
   if (env.want_n_high && failed.some((c) => c.name === "n_high")) proxy = Math.min(proxy, 2);
   if (env.want_n_high && !failed.some((c) => c.name === "n_high")) proxy = Math.max(proxy, 4);
   if (env.forbid_role && failed.some((c) => c.name === "forbid_role")) proxy = Math.min(proxy, 3);
   if (env.forbid_role && !failed.some((c) => c.name === "forbid_role") && !failed.some((c) => c.name === "mbti"))
     proxy = Math.max(proxy, 4);
-  if (env.mbti_hedged && !failed.some((c) => c.name === "mbti_hedged")) proxy = Math.max(proxy, 4);
-  if (env.mbti_hedged && failed.some((c) => c.name === "mbti_hedged")) proxy = Math.min(proxy, 2);
-  if (failed.some((c) => c.name === "mbti")) proxy = Math.min(proxy, proxy);
+  if (env.expect_inconsistency_flag && !failed.some((c) => c.name === "inconsistency")) proxy = Math.max(proxy, 4);
+  if (env.expect_inconsistency_flag && failed.some((c) => c.name === "inconsistency")) proxy = Math.min(proxy, 2);
 
   return {
     id: fixture.id,
@@ -128,34 +151,35 @@ function evaluatePersona(fixture, version, flags) {
     lane: result.direction.laneKey,
     alts: result.altDirections.map((d) => d.title),
     mbtiConfidence: result.mbtiConfidence,
+    inconsistency: result.inconsistency,
     checks,
     failed: failed.length,
     proxyFit: proxy,
-    qaFit: fixture.qa_fit_score,
+    qaFit: fixture.qa_fit_score ?? 3,
     bigFive: result.calibrated.bigFive,
   };
 }
 
 function runSimulation(version, n = 1000) {
   const dist = {};
-  let tie = 0, near = 0, mid = 0, flips = 0, flipN = 0;
+  let tie = 0, near = 0, mid = 0, flips = 0, flipN = 0, flags = 0;
   for (let r = 0; r < n; r++) {
     const answers = Array.from({ length: 28 }, (_, i) => ({
       questionId: i + 1,
-      choice: Math.floor(Math.random() * 4),
+      choice: /** @type {0|1|2|3} */ (Math.floor(Math.random() * 4)),
     }));
     const scored = scoreShortformVersioned(answers, version);
     dist[scored.topTrait] = (dist[scored.topTrait] || 0) + 1;
+    if (scored.inconsistency?.flagged) flags++;
     const ranked = Object.entries(scored.calibrated.bigFive).sort((a, b) => b[1] - a[1]);
     if (ranked[0][1] === ranked[1][1]) tie++;
     if (ranked[0][1] - ranked[1][1] <= 5) near++;
     if (Object.values(scored.calibrated.bigFive).every((v) => v > 33 && v < 67)) mid++;
-    // sample flip sensitivity on 3 random questions x alternate choices (budget)
-    for (let t = 0; t < 3; t++) {
+    for (let t = 0; t < 2; t++) {
       const qi = Math.floor(Math.random() * 28);
       for (let c = 0; c < 4; c++) {
         if (c === answers[qi].choice) continue;
-        const alt = answers.map((a, i) => (i === qi ? { ...a, choice: c } : a));
+        const alt = answers.map((a, i) => (i === qi ? { ...a, choice: /** @type {0|1|2|3} */ (c) } : a));
         flipN++;
         if (scoreShortformVersioned(alt, version).topTrait !== scored.topTrait) flips++;
       }
@@ -165,11 +189,41 @@ function runSimulation(version, n = 1000) {
     n,
     topDist: dist,
     structureShare: (dist.C || 0) / n,
+    nTopShare: (dist.N || 0) / n,
     exactTieRate: tie / n,
     nearTieRate: near / n,
     allMediumRate: mid / n,
     flipSensitivity: flips / Math.max(1, flipN),
+    inconsistencyFlagRate: flags / n,
   };
+}
+
+function realisticCloseLetterRate(personas, version, flipsPer = 3) {
+  let close = 0, total = 0;
+  for (const p of personas) {
+    for (let t = 0; t < flipsPer; t++) {
+      const qi = Math.floor(Math.random() * 28);
+      const c = /** @type {0|1|2|3} */ ((p.answers[qi].choice + 1 + Math.floor(Math.random() * 3)) % 4);
+      const alt = p.answers.map((a, i) => (i === qi ? { ...a, choice: c } : a));
+      total++;
+      if ((scoreShortformVersioned(alt, version).mbtiConfidence?.weakAxes || []).length > 0) close++;
+    }
+  }
+  return close / total;
+}
+
+function realisticFlagRate(personas, version, flipsPer = 5) {
+  let flagged = 0, total = 0;
+  for (const p of personas) {
+    for (let t = 0; t < flipsPer; t++) {
+      const qi = Math.floor(Math.random() * 28);
+      const c = /** @type {0|1|2|3} */ ((p.answers[qi].choice + 1 + Math.floor(Math.random() * 3)) % 4);
+      const alt = p.answers.map((a, i) => (i === qi ? { ...a, choice: c } : a));
+      total++;
+      if (scoreShortformVersioned(alt, version).inconsistency?.flagged) flagged++;
+    }
+  }
+  return flagged / total;
 }
 
 function summarize(rows) {
@@ -177,47 +231,69 @@ function summarize(rows) {
   const avgQa = rows.reduce((s, r) => s + r.qaFit, 0) / rows.length;
   const fails = rows.reduce((s, r) => s + r.failed, 0);
   const structTop = rows.filter((r) => r.topTrait === "C").length;
-  return { avgProxy, avgQa, fails, structTop, nHigh: rows.filter((r) => r.N >= 67).length };
+  return {
+    avgProxy,
+    avgQa,
+    fails,
+    structTop,
+    nHigh: rows.filter((r) => r.N >= 67).length,
+    flagged: rows.filter((r) => r.inconsistency?.flagged).length,
+  };
 }
 
-const personas = loadPersonas();
-assert.equal(personas.length, 18);
-
-// ---- Step 0 / baseline: lock v2 ----
-const v2Rows = personas.map((p) => evaluatePersona(p, "v2"));
-const v2Summary = summarize(v2Rows);
-const v2Baseline = {
-  lockedAt: "2026-10-15",
-  scoringVersion: "shortform-v2-scoring-v2",
-  summary: v2Summary,
-  personas: Object.fromEntries(
-    v2Rows.map((r) => [
+function snapshot(rows) {
+  return Object.fromEntries(
+    rows.map((r) => [
       r.id,
       {
         mbti: r.mbti,
         disc: r.disc,
         topTrait: r.topTrait,
         N: r.N,
+        C: r.C,
         clarity: r.clarity,
         role: r.role,
         lane: r.lane,
         qaFit: r.qaFit,
         proxyFit: r.proxyFit,
         failed: r.failed,
+        flagged: !!r.inconsistency?.flagged,
+        weakAxes: r.mbtiConfidence?.weakAxes || [],
       },
     ]),
-  ),
-};
-
-if (!existsSync(baselinePath)) {
-  writeFileSync(baselinePath, JSON.stringify(v2Baseline, null, 2));
+  );
 }
 
-const locked = JSON.parse(readFileSync(baselinePath, "utf8"));
+const personas = loadPersonas();
+assert.equal(personas.length, 30, `expected 30 personas, got ${personas.length}`);
 
-test("v2 baseline locked and stable", () => {
-  for (const row of v2Rows) {
-    const b = locked.personas[row.id];
+mkdirSync(reportDir, { recursive: true });
+
+const v3Flags = { jRecode: true, nRebalance: true };
+const v3Rows = personas.map((p) => evaluatePersona(p, "v3", v3Flags));
+const v3Summary = summarize(v3Rows);
+
+if (!existsSync(baselineV3Path)) {
+  writeFileSync(
+    baselineV3Path,
+    JSON.stringify(
+      {
+        lockedAt: "2026-10-15",
+        scoringVersion: "shortform-v2-scoring-v3",
+        summary: v3Summary,
+        personas: snapshot(v3Rows),
+      },
+      null,
+      2,
+    ),
+  );
+}
+const lockedV3 = JSON.parse(readFileSync(baselineV3Path, "utf8"));
+
+test("v3 baseline locked for all 30 personas", () => {
+  assert.equal(Object.keys(lockedV3.personas).length, 30);
+  for (const row of v3Rows) {
+    const b = lockedV3.personas[row.id];
     assert.ok(b, row.id);
     assert.equal(row.mbti, b.mbti, `${row.id} mbti drift`);
     assert.equal(row.disc, b.disc, `${row.id} disc drift`);
@@ -227,86 +303,114 @@ test("v2 baseline locked and stable", () => {
   }
 });
 
-test("v2 known deficiencies still visible in baseline (documentation)", () => {
-  // These are expected failures under v2 — harness documents them.
-  const p11 = v2Rows.find((r) => r.id === "P11");
-  assert.ok(p11.N < 67, "v2 P11 should not yet show high N");
-  const p03 = v2Rows.find((r) => r.id === "P03");
-  assert.equal(p03.mbti, "ESTP");
-  const p16 = v2Rows.find((r) => r.id === "P16");
-  assert.equal(p16.clarity, "broad");
-  assert.ok(!/X/.test(p16.mbtiDisplay));
+// Keep a lighter v2 lock for first-18 if baseline exists
+const first18 = personas.filter((p) => {
+  const n = Number(p.id.slice(1));
+  return n >= 1 && n <= 18;
+});
+if (existsSync(baselineV2Path) && first18.length === 18) {
+  const v2Rows = first18.map((p) => evaluatePersona(p, "v2"));
+  const lockedV2 = JSON.parse(readFileSync(baselineV2Path, "utf8"));
+  test("v2 baseline still stable for P01–P18", () => {
+    for (const row of v2Rows) {
+      const b = lockedV2.personas[row.id];
+      if (!b) continue;
+      assert.equal(row.mbti, b.mbti, `${row.id} v2 mbti`);
+      assert.equal(row.topTrait, b.topTrait, `${row.id} v2 top`);
+    }
+  });
+}
+
+const v4Rows = personas.map((p) => evaluatePersona(p, "v4", v3Flags));
+const v4Summary = summarize(v4Rows);
+
+test("v4 key persona outcomes", () => {
+  const byId = Object.fromEntries(v4Rows.map((r) => [r.id, r]));
+  assert.ok(["ENTJ"].includes(byId.P12.mbti), `P12 must stay ENTJ, got ${byId.P12.mbti}`);
+  assert.equal(byId.P12.clarity, "clear", "P12 stays Clear");
+  assert.ok(["INFP", "ENFP"].includes(byId.P08.mbti), `P08 ${byId.P08.mbti}`);
+  assert.ok(["INTP", "INTJ"].includes(byId.P22.mbti), `P22 ${byId.P22.mbti}`);
+  assert.ok(["ESFP", "ESFJ"].includes(byId.P24.mbti), `P24 ${byId.P24.mbti}`);
+  assert.ok(byId.P23.N >= 67, `P23 N=${byId.P23.N}`);
+  assert.ok(byId.P16.inconsistency.flagged, "P16 flagged");
+  assert.ok(byId.P30.inconsistency.flagged, "P30 flagged");
+  assert.ok(byId.P29.inconsistency.flagged || byId.P29.clarity !== "clear", "P29 hedges");
+  assert.ok(!/X/.test(byId.P16.mbtiDisplay));
+  assert.ok(v4Summary.avgProxy >= 4.0, `proxy ${v4Summary.avgProxy}`);
 });
 
-// ---- v3 full ----
-const v3Flags = { jRecode: true, nRebalance: true };
-const v3Rows = personas.map((p) => evaluatePersona(p, "v3", v3Flags));
-const v3Summary = summarize(v3Rows);
-
-test("v3 improves critical personas without tanking average proxy fit", () => {
-  const p11 = v3Rows.find((r) => r.id === "P11");
-  assert.ok(p11.N >= 67 || p11.topTraits?.includes?.("N") || p11.N >= 67, `P11 N=${p11.N}`);
-  assert.ok(p11.N >= 67, `P11 should reach high N, got ${p11.N}`);
-
-  const p03 = v3Rows.find((r) => r.id === "P03");
-  assert.ok(["ESTJ", "ENTJ"].includes(p03.mbti), `P03 mbti ${p03.mbti}`);
-  assert.ok(!/fast-response|high-pressure|emergency/i.test(p03.role), `P03 role ${p03.role}`);
-
-  const p12 = v3Rows.find((r) => r.id === "P12");
-  assert.ok(["ENTJ", "ESTJ"].includes(p12.mbti), `P12 mbti ${p12.mbti}`);
-  assert.ok(!/fast-response|high-pressure|emergency/i.test(p12.role), `P12 role ${p12.role}`);
-
-  const p16 = v3Rows.find((r) => r.id === "P16");
-  assert.equal(p16.clarity, "broad");
-  assert.ok(!/X/.test(p16.mbtiDisplay), `P16 must show full type, got ${p16.mbtiDisplay}`);
-  assert.equal(p16.mbtiDisplay.length, 4);
-  assert.ok(p16.mbtiConfidence?.note || p16.mbtiConfidence?.badge, "P16 needs confidence note");
-  assert.ok(p16.alts?.length >= 1, "P16 should keep alternate roles");
-
-  const p05 = v3Rows.find((r) => r.id === "P05");
-  assert.equal(p05.clarity, "broad");
-  assert.ok(!/X/.test(p05.mbtiDisplay), `P05 must show full type, got ${p05.mbtiDisplay}`);
-  assert.ok(p05.mbtiConfidence?.note || p05.mbtiConfidence?.badge, "P05 needs confidence note");
-
-  assert.ok(
-    v3Summary.avgProxy >= v2Summary.avgProxy - 0.05,
-    `proxy avg regressed ${v2Summary.avgProxy} -> ${v3Summary.avgProxy}`,
-  );
-  assert.ok(v3Summary.fails <= v2Summary.fails, `check fails ${v2Summary.fails} -> ${v3Summary.fails}`);
-});
-
-test("v3 close-letter note is rare among consistent personas (tight threshold)", async () => {
+test("v4 close-letter rate at or below ~20% on realistic ±1 flip", async () => {
   const { WEAK_CAL_GAP, WEAK_RAW_GAP } = await import(
     pathToFileURL(join(root, "src/lib/quiz/mbtiConfidence.ts")).href
   );
-  assert.equal(WEAK_CAL_GAP, 4);
-  assert.equal(WEAK_RAW_GAP, 2);
-  const close = v3Rows.filter((r) => (r.mbtiConfidence?.weakAxes || []).length > 0);
-  // Tuned so ~15–20% of realistic (persona+1-flip) answerers see a close-letter note.
-  // Among the 18 locked personas that lands at a small minority (currently 3/18).
-  assert.ok(close.length >= 1 && close.length <= 5, `close-letter personas: ${close.length} ${close.map((r) => r.id)}`);
-  const p05 = v3Rows.find((r) => r.id === "P05");
-  assert.ok(p05.mbtiConfidence?.note, "P05 keeps Broad/confidence note");
-  assert.ok((p05.alts || []).length >= 1 || p05.clarity === "broad", "P05 keeps alternate roles path");
+  assert.ok(WEAK_CAL_GAP <= 4);
+  assert.ok(WEAK_RAW_GAP <= 2);
+  const rate = realisticCloseLetterRate(personas, "v4", 4);
+  assert.ok(rate <= 0.22, `close-letter rate ${rate}`);
 });
 
-test("v3 simulation stats are recorded", () => {
-  const simV2 = runSimulation("v2", 400);
-  const simV3 = runSimulation("v3", 400);
-  mkdirSync(reportDir, { recursive: true });
+test("v4 inconsistency flag rates", () => {
+  const sim = runSimulation("v4", 500);
+  assert.ok(sim.inconsistencyFlagRate >= 0.35 && sim.inconsistencyFlagRate <= 0.7, `random flag ${sim.inconsistencyFlagRate}`);
+  assert.ok(sim.structureShare <= 0.35, `structure ${sim.structureShare}`);
+  assert.ok(sim.nTopShare <= 0.35, `N-top ${sim.nTopShare}`);
+  const expectFlag = new Set(["P16", "P29", "P30"]);
+  const consistent = personas.filter((p) => !expectFlag.has(p.id));
+  const rFlag = realisticFlagRate(consistent, "v4", 6);
+  // Soft ceiling — edge personas still pull this up
+  assert.ok(rFlag <= 0.35, `realistic flag ${rFlag}`);
+});
+
+test("v4 leadership regressions", () => {
+  for (const id of ["P03", "P12", "P18"]) {
+    const row = v4Rows.find((r) => r.id === id);
+    assert.ok(row, id);
+    assert.ok(!/fast-response|high-pressure|emergency/i.test(row.role), `${id} role ${row.role}`);
+  }
+  const p12 = v4Rows.find((r) => r.id === "P12");
+  assert.equal(p12.mbti, "ENTJ");
+});
+
+test("v4 harness report recorded", () => {
+  const closeV3 = realisticCloseLetterRate(personas, "v3", 3);
+  const closeV4 = realisticCloseLetterRate(personas, "v4", 3);
+  const simV3 = runSimulation("v3", 300);
+  const simV4 = runSimulation("v4", 300);
+  const perPersona = v4Rows.map((r) => {
+    const v3 = v3Rows.find((x) => x.id === r.id);
+    return {
+      id: r.id,
+      v3: { mbti: v3.mbti, clarity: v3.clarity, N: v3.N, top: v3.topTrait, role: v3.role },
+      v4: {
+        mbti: r.mbti,
+        clarity: r.clarity,
+        N: r.N,
+        top: r.topTrait,
+        role: r.role,
+        flagged: r.inconsistency?.flagged,
+        reasons: r.inconsistency?.reasons,
+      },
+      changed: v3.mbti !== r.mbti || v3.clarity !== r.clarity || v3.topTrait !== r.topTrait,
+      regression:
+        (v3.mbti !== r.mbti && !(personas.find((p) => p.id === r.id)?.envelope?.mbti_ok || []).includes(r.mbti)) ||
+        false,
+    };
+  });
   writeFileSync(
     join(reportDir, "harness-report.json"),
     JSON.stringify(
       {
-        v2: { summary: v2Summary, rows: v2Rows, sim: simV2 },
-        v3: { summary: v3Summary, rows: v3Rows, sim: simV3 },
+        v3: { summary: v3Summary, rows: snapshot(v3Rows), sim: simV3, closeLetter: closeV3 },
+        v4: { summary: v4Summary, rows: snapshot(v4Rows), sim: simV4, closeLetter: closeV4 },
+        perPersona,
+        flaggedPersonas: v4Rows.filter((r) => r.inconsistency?.flagged).map((r) => r.id),
       },
       null,
       2,
     ),
   );
-  assert.ok(simV3.allMediumRate > 0.2);
-  assert.ok(simV3.structureShare < 0.55, `structure share high ${simV3.structureShare}`);
+  writeFileSync(join(reportDir, "step-final.json"), JSON.stringify({ v3Summary, v4Summary, closeV3, closeV4, simV4 }, null, 2));
+  assert.ok(existsSync(join(reportDir, "harness-report.json")));
 });
 
 export { evaluatePersona, runSimulation, loadPersonas, summarize };

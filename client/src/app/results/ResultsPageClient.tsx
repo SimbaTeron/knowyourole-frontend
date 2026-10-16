@@ -1,6 +1,8 @@
 'use client';
 import { resolveResultClarityDisplay, formatTopTraitLabel } from "@/lib/results/resultClarity";
-import { isScoringV3 } from "@/lib/quiz/scoringVersions";
+import { isScoringV3, isScoringV4 } from "@/lib/quiz/scoringVersions";
+import { detectInconsistency } from "@/lib/quiz/inconsistencyDetect";
+import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
 import { getMbtiConfidence } from "@/lib/quiz/mbtiConfidence";
 import { recomputeShortformV2ScoreMaps } from "@/lib/quiz/shortformV2Scoring";
 import { applyV3RawDeltas, computeV3RawDeltas, V3_ALL } from "@/lib/quiz/shortformV3Adjustments";
@@ -4936,11 +4938,41 @@ function OrbitalGlassV2Results({
       rawMbtiForConfidence = undefined;
     }
   }
+  const v4 = isScoringV4(scoringVersion);
+  let inconsistencyNote = "";
+  let clarityLevelForBrief = clarity.level as "clear" | "mixed" | "broad";
+  if (v4 && Array.isArray(rawScores?.responses) && rawScores!.responses!.length >= 28) {
+    try {
+      const evidence = rawScores!.responses!
+        .filter((r) => typeof r?.questionId === "number" && typeof r?.choice === "number")
+        .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
+      if (evidence.length >= 28) {
+        const report = detectInconsistency(evidence);
+        if (report.flagged) {
+          inconsistencyNote = report.note;
+          if (clarityLevelForBrief === "clear") clarityLevelForBrief = "mixed";
+        }
+        if (rawMbtiForConfidence) {
+          const remapped = applyV4OptionRemaps(
+            { mbti: { ...rawMbtiForConfidence }, disc: {}, bigFive: {}, career: {} },
+            evidence,
+          );
+          rawMbtiForConfidence = remapped.mbti;
+        }
+      }
+    } catch {
+      /* keep prior */
+    }
+  }
   const mbtiConfidenceResolved = v3 && hasMbtiScores
-    ? getMbtiConfidence(mbtiConfidenceScores, rawMbtiForConfidence, { broad: clarity.level === "broad" })
+    ? getMbtiConfidence(mbtiConfidenceScores, rawMbtiForConfidence, { broad: clarity.level === "broad" || !!inconsistencyNote })
     : v3 && clarity.level === "broad"
       ? { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "This type is a directional sketch — your trait pattern was broad, so treat it as a starting point, not a hard label.", badge: "directional sketch" }
       : { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "", badge: "" };
+  if (inconsistencyNote) {
+    mbtiConfidenceResolved.note = inconsistencyNote;
+    if (!mbtiConfidenceResolved.badge) mbtiConfidenceResolved.badge = "rough sketch";
+  }
   // Always show the full 4-letter type (never X). Close letters get a light-lean marker + note.
   const displayMbti = mbtiType;
   const typeBadge = v3 ? mbtiConfidenceResolved.badge : "";
@@ -5096,7 +5128,7 @@ function OrbitalGlassV2Results({
             </article>
             <ResultDecisionBrief
               result={canonicalResult}
-              clarityLevel={clarity.level}
+              clarityLevel={clarityLevelForBrief}
               fallback={{
                 directionTitle: roleDirection.title,
                 rationale: roleDirection.rationale,

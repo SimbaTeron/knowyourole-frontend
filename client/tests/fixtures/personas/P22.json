@@ -1,0 +1,160 @@
+{
+  "id": "P22",
+  "persona": "Introverted, high O (ideas), low-moderate C; INTP; DISC C; technical/problem-solving role.",
+  "expected": "Introverted, high O (ideas), low-moderate C; INTP; DISC C; technical/problem-solving role.",
+  "qa_fit_score": 3,
+  "qa_fit_reason": "INTJ not INTP; procrastinating gamer tops on Structure",
+  "envelope": {
+    "notes": "Introverted, high O (ideas), low-moderate C; INTP; DISC C; technical/problem-solving role.",
+    "mbti_ok": [
+      "INTP",
+      "INTJ"
+    ],
+    "disc": [
+      "C"
+    ],
+    "prefer_p": true
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 2,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 3,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 4,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 5,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 6,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 7,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 8,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 9,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 10,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 11,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 12,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 13,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 14,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 15,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 16,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 17,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 18,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 19,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 20,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 21,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 22,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 23,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 24,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 25,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 26,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 27,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 28,
+      "choice": 0,
+      "letter": "A"
+    }
+  ]
+}

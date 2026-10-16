@@ -165,7 +165,7 @@ export const ROLE_WORK_PROFILES: RoleWorkProfile[] = [
   { pattern: /master electrician|electrician|hvac|field service|mechanic|technician|plumber|welder|carpenter|repair|installer|machinist/i, targets: { practicalField: 96, physicalWork: 100, technicalSystems: 72, operationsCoordination: 48 }, required: { practicalField: 32, physicalWork: 34 } },
   { pattern: /paramedic|emergency medical|emt|flight paramedic/i, targets: { practicalField: 82, physicalWork: 72, peopleService: 85, highPressureResponse: 100 }, careerSignals: ["people", "service", "pace", "handsOn"], category: "handsOn", displayPriority: ["peopleService", "highPressureResponse"], required: { peopleService: 30, highPressureResponse: 28 } },
   { pattern: /airline pilot|pilot/i, targets: { practicalField: 55, technicalSystems: 100, operationsCoordination: 90, highPressureResponse: 92 }, careerSignals: ["systems", "operations", "pace", "analysis"], category: "technical", displayPriority: ["technicalSystems", "highPressureResponse"], required: { technicalSystems: 32, highPressureResponse: 26 }, avoidHigh: { physicalWork: 58 } },
-  { pattern: /construction project manager|project manager/i, targets: { practicalField: 58, operationsCoordination: 100, technicalSystems: 68, highPressureResponse: 72 }, careerSignals: ["operations", "leadership", "systems", "handsOn"], category: "operations", displayPriority: ["operationsCoordination", "practicalField"], required: { operationsCoordination: 34 }, avoidHigh: { physicalWork: 75 } },
+  { pattern: /construction project manager|project manager/i, targets: { practicalField: 58, operationsCoordination: 100, technicalSystems: 68, highPressureResponse: 72 }, careerSignals: ["operations", "leadership", "systems"], category: "operations", displayPriority: ["operationsCoordination", "practicalField"], required: { operationsCoordination: 34 }, avoidHigh: { physicalWork: 75 } },
   { pattern: /chef|culinary|food service/i, targets: { practicalField: 90, physicalWork: 68, creativeExpression: 76, highPressureResponse: 86, operationsCoordination: 52 }, careerSignals: ["handsOn", "pace", "creative", "operations"], category: "handsOn", displayPriority: ["physicalWork", "highPressureResponse"], required: { practicalField: 30, highPressureResponse: 26 } },
   { pattern: /recruit|talent acquisition|talent partner/i, targets: { peopleService: 96, knowledgeStrategy: 48, operationsCoordination: 48, highPressureResponse: 62 }, careerSignals: ["people", "pace", "leadership", "entrepreneurship"], category: "influence", required: { peopleService: 32, highPressureResponse: 22 }, avoidHigh: { physicalWork: 55 } },
   { pattern: /teacher|education|curriculum|school counselor/i, targets: { peopleService: 92, creativeExpression: 58, operationsCoordination: 52, knowledgeStrategy: 45 }, careerSignals: ["people", "service", "creative", "stability"], category: "care", required: { peopleService: 32 }, avoidHigh: { physicalWork: 52, highPressureResponse: 65 } },
@@ -234,7 +234,7 @@ export function leadershipLaneScore(career?: CareerVector): number {
 const LEADERSHIP_DIRECTION: WorkDirection = {
   laneKey: "leadershipManagement" as WorkLaneKey,
   title: "Leadership, management, and directing people",
-  examples: ["Team Lead", "Operations Manager", "Sales Manager", "Program Director"],
+  examples: ["Project Manager", "Team Lead", "Operations Manager", "Program Coordinator"],
 };
 
 const SALES_INFLUENCE_DIRECTION: WorkDirection = {

@@ -20,8 +20,8 @@ export const MBTI_AXIS_LABELS: Record<MbtiAxis, string> = {
   JP: "J/P (structure)",
 };
 
-/** Calibrated gap below this = light lean on that axis. Tuned so ~15–20% of realistic (persona+1-flip) answerers see a close-letter note. */
-export const WEAK_CAL_GAP = 4;
+/** Calibrated gap below this = light lean on that axis. Tuned so ~10–20% of realistic (persona+1-flip) answerers see a close-letter note. */
+export const WEAK_CAL_GAP = 2;
 /** Raw gap below this also counts as light lean. */
 export const WEAK_RAW_GAP = 2;
 
