@@ -98,7 +98,7 @@ export function resolveFinalClarity(
     const body = V5_CLEAR_BODY;
     display = { ...display, kind: "clear", body, clarity: { ...display.clarity, body } };
   }
-  if (v5 && level === "broad" && !v5.flat && display.kind !== "flat") {
+  if (v5 && level === "broad" && (!v5.flat || v5.quickOrScattered) && display.kind !== "flat") {
     const body = "Your answers didn't settle into one clear pattern, so read your top trait and type as a light lean, not a label.";
     display = { ...display, kind: "broad", heading: "Result clarity: Broad", body, clarity: { ...display.clarity, level: "broad", label: "Broad", body } };
   }
