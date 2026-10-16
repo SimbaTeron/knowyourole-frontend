@@ -162,6 +162,7 @@ export function DirectionFeedbackCard({ resultId, sessionId, directionTitle, rec
             />
             <span style={characterCountStyle}>{note.length}/500</span>
           </label>
+          <p style={{ margin: "8px 0 0", fontSize: 12, color: "#405f72" }}>Anonymous. No names or personal details needed.</p>
           <button type="button" onClick={submit} disabled={status === "submitting"} style={{ ...submitStyle, ...(status === "submitting" ? disabledSubmitStyle : {}) }}>
             {status === "submitting" ? "Saving feedback…" : "Send feedback"}
           </button>

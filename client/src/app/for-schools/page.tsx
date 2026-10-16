@@ -9,7 +9,7 @@ export const metadata: Metadata = publicPageMetadata("/for-schools");
 const principles = [
   ["A conversation starter", "KnowYouRole uses a fixed 28-question reflection to give students language for discussing interests, work preferences, strengths, and possible directions to explore."],
   ["Not a label or decision tool", "It is not a clinical assessment, diagnosis, official MBTI instrument, hiring tool, admissions screen, prediction engine, or substitute for professional judgment."],
-  ["Private by default", "Students can complete the quiz without creating an account or providing an email address. Analytics is optional and only loads after affirmative cookie consent."],
+  ["No account, no name needed", "Students can complete the quiz without creating an account or providing an email address. Analytics is optional and only loads after affirmative cookie consent."],
   ["Built for guided use", "A counselor, teacher, or caregiver can sit with a student, clarify questions, and use the result as one input to a broader conversation—not as an answer about who the student is."],
 ] as const;
 
@@ -32,6 +32,50 @@ export default function ForSchoolsPage() {
               <p className="mt-3 text-sm leading-relaxed text-[#405f72]">{body}</p>
             </article>
           ))}
+        </section>
+
+        <section className="mt-12 grid gap-5 lg:grid-cols-2" aria-label="Student data and sample result">
+          <article className="rounded-3xl border border-[#12263a]/12 bg-white/75 p-6 sm:p-7">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#315f74]">Student data at a glance</p>
+            <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.035em]">What we keep, and what we don&apos;t.</h2>
+            <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[#405f72]">
+              <li>No accounts, no names, no student IDs.</li>
+              <li>We store quiz answers and the result with a random session ID, kept for 12 months.</li>
+              <li>Schools and parents can ask for deletion at info@knowyourole.com.</li>
+              <li>No selling, no ads, no marketing profiles.</li>
+              <li>Under 13: teacher-led use, and no email or personal details.</li>
+            </ul>
+            <Link href="/student-data" className="mt-5 inline-flex min-h-11 items-center rounded-full border border-[#315f74]/40 px-5 text-sm font-bold text-[#1f5b70] hover:bg-[#315f74]/10">Read the student data page</Link>
+          </article>
+          <article className="rounded-3xl border-2 border-dashed border-[#a3402b]/40 bg-[#fffdf8] p-6 sm:p-7" aria-label="Example result">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#a3402b]">Sample result</p>
+              <span className="rounded-full bg-[#a3402b] px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white">Example only</span>
+            </div>
+            <p className="mt-2 text-xs text-[#405f72]">A made-up student, so you can see what a result looks like.</p>
+            <h3 className="mt-4 font-display text-2xl font-bold">A hands-on problem solver</h3>
+            <p className="mt-2 text-sm leading-relaxed text-[#405f72]">Leans toward practical, step-by-step work and likes seeing real results. Comfortable working alone or in a small team.</p>
+            <div className="mt-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-[#12263a]">Directions worth testing</p>
+              <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+                {["Skilled trades", "Engineering tech", "Art & design"].map((d) => <span key={d} className="rounded-full bg-[#edf5f4] px-3 py-1 text-[#315f74]">{d}</span>)}
+              </div>
+            </div>
+            <div className="mt-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-[#12263a]">Next steps for a student</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[#405f72]">
+                <li>Try a shop or design elective next term.</li>
+                <li>Join a robotics or maker club.</li>
+                <li>Ask a counselor about local apprenticeships.</li>
+              </ul>
+            </div>
+            <p className="mt-4 text-xs italic text-[#405f72]">Results are a starting point for conversation, not a label or a decision.</p>
+          </article>
+        </section>
+
+        <section className="mt-6 rounded-3xl border border-[#12263a]/12 bg-white/70 p-6 text-sm leading-relaxed text-[#405f72] sm:p-7">
+          <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-[#12263a]">School contact</h2>
+          <p className="mt-3">Questions about a pilot, student data, deletion requests or a district data privacy agreement? Email <a className="font-semibold text-[#315f74] underline underline-offset-4" href="mailto:info@knowyourole.com">info@knowyourole.com</a>. Classroom use is free and allowed under our <Link className="font-semibold text-[#315f74] underline underline-offset-4" href="/terms#school-use">Terms</Link>.</p>
         </section>
 
         <section className="mt-12 grid gap-5 rounded-3xl border border-[#315f74]/20 bg-[#edf5f4] p-6 sm:grid-cols-[1.1fr_0.9fr] sm:p-9">
@@ -65,6 +109,7 @@ export default function ForSchoolsPage() {
             <h2 className="font-display text-2xl font-bold tracking-[-0.025em]">Review before use</h2>
             <p className="mt-4 text-sm leading-relaxed text-[#5a451a]">Educators and technology teams can review our privacy and methodology information before a pilot. A district’s own student-data, accessibility, and acceptable-use requirements always control.</p>
             <div className="mt-5 flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold">
+              <Link className="text-[#315f74] underline underline-offset-4" href="/student-data">Student data & privacy</Link>
               <Link className="text-[#315f74] underline underline-offset-4" href="/privacy">Privacy policy</Link>
               <Link className="text-[#315f74] underline underline-offset-4" href="/methodology">Methodology & limits</Link>
               <Link className="text-[#315f74] underline underline-offset-4" href="/contact">Contact</Link>

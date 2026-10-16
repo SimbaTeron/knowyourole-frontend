@@ -47,6 +47,14 @@ const foundationPages: PublicPage[] = [
     priority: 0.55,
   },
   {
+    path: "/student-data",
+    title: "Student Data & Privacy | KnowYouRole for Schools",
+    description:
+      "What KnowYouRole stores and doesn't, how long quiz results are kept, how schools and parents can request deletion, and our FERPA, COPPA and state student-privacy approach.",
+    changeFrequency: "monthly",
+    priority: 0.6,
+  },
+  {
     path: "/for-schools",
     title: "KnowYouRole for Schools & Counselors | Student Career Reflection",
     description:

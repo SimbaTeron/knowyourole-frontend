@@ -139,6 +139,7 @@ export function FeedbackOverlay({ s }: { s: FeedbackState }) {
                   className="resize-none text-sm"
                   data-testid="modal-textarea-suggestions"
                 />
+                <p className="text-xs text-warm-gray/60 dark:text-[#94A3B8]">Anonymous. No names or personal details needed.</p>
               </div>
 
               <Button

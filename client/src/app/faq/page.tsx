@@ -2,6 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { AppFooter } from "@/components/layout/AppFooter";
 import { useState } from "react";
 
 const FAQ_ITEMS = [
@@ -89,6 +90,7 @@ export default function Faq() {
           ))}
         </div>
       </main>
+      <AppFooter />
     </div>
   );
 }
