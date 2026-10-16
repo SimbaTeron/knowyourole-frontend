@@ -10,7 +10,7 @@ import {
   V3_ALL,
 } from "@/lib/quiz/shortformV3Adjustments";
 import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
-import { detectInconsistency, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
+import { detectInconsistency, adjustClarityV41, RESULT_CLARITY_COPY_V41, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
 import {
   SCORING_VERSION_V2,
   SCORING_VERSION_V3,
@@ -175,27 +175,25 @@ export function scoreShortformVersioned(
   const flat = detectFlatAnswerPattern(responses);
   const inconsistency = version === "v4"
     ? detectInconsistency(responses)
-    : { flagged: false, reasons: [], contradictionPairs: 0, entropy: 0, safeDefaultCount: 0, note: "" };
+    : { flagged: false, guarded: false, splitHalf: 0, meanCoherence: 1, coherence: [1, 1, 1, 1], reasons: [], contradictionPairs: 0, entropy: 0, safeDefaultCount: 0, note: "" };
   // Guarded / contradictory patterns: do not leave a confident Clear label.
-  if (version === "v4" && inconsistency.flagged && clarity.level === "clear") {
-    clarity = { ...clarity, level: "mixed", label: "Mixed", body: clarity.body };
+  if (version === "v4") {
+    const adj = adjustClarityV41(clarity.level, inconsistency, calibrated.bigFive, raw.mbti);
+    if (adj !== clarity.level) clarity = { ...clarity, level: adj, label: RESULT_CLARITY_COPY_V41[adj].label, body: RESULT_CLARITY_COPY_V41[adj].body };
   }
   let clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
-  if (version === "v4" && inconsistency.flagged) {
-    clarityDisplay = {
-      ...clarityDisplay,
-      kind: clarity.level === "broad" ? "broad" : "mixed",
-      heading: clarity.level === "broad" ? clarityDisplay.heading : "Result clarity: Mixed",
-      body: inconsistency.note || clarityDisplay.body,
-    };
+  if (version === "v4" && clarityDisplay.kind !== "flat" && clarityDisplay.kind !== clarity.level) {
+    const copy = RESULT_CLARITY_COPY_V41[clarity.level];
+    clarityDisplay = { ...clarityDisplay, kind: clarity.level, heading: `Result clarity: ${copy.label}`, body: copy.body };
   }
+
   const type = mbtiType(calibrated.mbti, false);
-  const broadForConf = clarity.level === "broad" || (version === "v4" && inconsistency.flagged);
+  const broadForConf = clarity.level === "broad" || (version === "v4" && (inconsistency.flagged || inconsistency.guarded));
   const mbtiConfidence = version === "v3" || version === "v4"
     ? getMbtiConfidence(calibrated.mbti, raw.mbti, { broad: broadForConf })
     : getMbtiConfidence(calibrated.mbti, undefined, { broad: false });
   // Prefer detector note when flagged and confidence note empty / broad-generic
-  if (version === "v4" && inconsistency.flagged && inconsistency.note) {
+  if (version === "v4" && (inconsistency.flagged || inconsistency.guarded) && inconsistency.note) {
     if (!mbtiConfidence.note || /directional sketch|broad/i.test(mbtiConfidence.note)) {
       mbtiConfidence.note = inconsistency.note;
       if (!mbtiConfidence.badge) mbtiConfidence.badge = "rough sketch";

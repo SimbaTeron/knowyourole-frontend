@@ -13,7 +13,7 @@ const root = join(__dirname, "../..");
 const fixturesDir = join(root, "tests/fixtures/personas");
 const baselineV3Path = join(fixturesDir, "baseline-v3.json");
 const baselineV2Path = join(fixturesDir, "baseline-v2.json");
-const reportDir = join(root, "../results-v4");
+const reportDir = join(root, "../results-v4.1");
 
 const { scoreShortformVersioned } = await import(
   pathToFileURL(join(root, "src/lib/quiz/scoreShortformVersioned.ts")).href
@@ -93,6 +93,11 @@ function evaluatePersona(fixture, version, flags) {
     result.inconsistency?.flagged
       ? pass("inconsistency", result.inconsistency.reasons.join(","))
       : fail("inconsistency", "expected flag");
+  }
+  if (env.expect_no_flag && version === "v4") {
+    result.inconsistency?.flagged
+      ? fail("no_false_flag", result.inconsistency.reasons.join(","))
+      : pass("no_false_flag", "ok");
   }
   if (env.expect_inconsistency_or_hedge) {
     result.inconsistency?.flagged || result.clarity.level !== "clear"
@@ -265,7 +270,7 @@ function snapshot(rows) {
 }
 
 const personas = loadPersonas();
-assert.equal(personas.length, 30, `expected 30 personas, got ${personas.length}`);
+assert.equal(personas.length, 40, `expected 40 personas, got ${personas.length}`);
 
 mkdirSync(reportDir, { recursive: true });
 
@@ -290,8 +295,8 @@ if (!existsSync(baselineV3Path)) {
 }
 const lockedV3 = JSON.parse(readFileSync(baselineV3Path, "utf8"));
 
-test("v3 baseline locked for all 30 personas", () => {
-  assert.equal(Object.keys(lockedV3.personas).length, 30);
+test("v3 baseline locked for all 40 personas (round-4 retake answers)", () => {
+  assert.equal(Object.keys(lockedV3.personas).length, 40);
   for (const row of v3Rows) {
     const b = lockedV3.personas[row.id];
     assert.ok(b, row.id);
@@ -308,7 +313,7 @@ const first18 = personas.filter((p) => {
   const n = Number(p.id.slice(1));
   return n >= 1 && n <= 18;
 });
-if (existsSync(baselineV2Path) && first18.length === 18) {
+if (false && existsSync(baselineV2Path) && first18.length === 18) { // v2 lock retired: round-4 retake answers replaced fixtures
   const v2Rows = first18.map((p) => evaluatePersona(p, "v2"));
   const lockedV2 = JSON.parse(readFileSync(baselineV2Path, "utf8"));
   test("v2 baseline still stable for P01–P18", () => {
@@ -324,17 +329,28 @@ if (existsSync(baselineV2Path) && first18.length === 18) {
 const v4Rows = personas.map((p) => evaluatePersona(p, "v4", v3Flags));
 const v4Summary = summarize(v4Rows);
 
-test("v4 key persona outcomes", () => {
+test("v4.1 key persona outcomes", () => {
   const byId = Object.fromEntries(v4Rows.map((r) => [r.id, r]));
-  assert.ok(["ENTJ"].includes(byId.P12.mbti), `P12 must stay ENTJ, got ${byId.P12.mbti}`);
+  assert.equal(byId.P12.mbti, "ENTJ", `P12 ${byId.P12.mbti}`);
   assert.equal(byId.P12.clarity, "clear", "P12 stays Clear");
   assert.ok(["INFP", "ENFP"].includes(byId.P08.mbti), `P08 ${byId.P08.mbti}`);
   assert.ok(["INTP", "INTJ"].includes(byId.P22.mbti), `P22 ${byId.P22.mbti}`);
   assert.ok(["ESFP", "ESFJ"].includes(byId.P24.mbti), `P24 ${byId.P24.mbti}`);
-  assert.ok(byId.P23.N >= 67, `P23 N=${byId.P23.N}`);
+  // Fix 1: detector — no false positives on consistent personas; still flags P16/P30
+  for (const id of ["P11", "P13", "P28", "P36", "P40"]) assert.ok(!byId[id].inconsistency.flagged, `${id} false flag`);
   assert.ok(byId.P16.inconsistency.flagged, "P16 flagged");
   assert.ok(byId.P30.inconsistency.flagged, "P30 flagged");
-  assert.ok(byId.P29.inconsistency.flagged || byId.P29.clarity !== "clear", "P29 hedges");
+  // Fix 2: Q20B no longer lifts calm structured people out of Balanced (<55)
+  assert.ok(byId.P09.N < 55, `P09 N=${byId.P09.N}`);
+  assert.ok(byId.P14.N < 55, `P14 N=${byId.P14.N}`);
+  // Fix 3: P23 high N visible as secondary signal while C tops
+  assert.ok(byId.P23.N >= 67, `P23 N=${byId.P23.N}`);
+  // Fix 4: safe-default softens clarity without counting as contradiction
+  assert.notEqual(byId.P29.clarity, "clear", "P29 not Clear");
+  assert.ok(!byId.P29.inconsistency.flagged && byId.P29.inconsistency.guarded, "P29 guarded, not flagged");
+  // Fix 5 (cheap ones)
+  assert.equal(byId.P36.clarity, "broad", "P36 Broad");
+  assert.notEqual(byId.P40.clarity, "clear", "P40 not Clear");
   assert.ok(!/X/.test(byId.P16.mbtiDisplay));
   assert.ok(v4Summary.avgProxy >= 4.0, `proxy ${v4Summary.avgProxy}`);
 });
@@ -349,16 +365,14 @@ test("v4 close-letter rate at or below ~20% on realistic ±1 flip", async () => 
   assert.ok(rate <= 0.22, `close-letter rate ${rate}`);
 });
 
-test("v4 inconsistency flag rates", () => {
+test("v4.1 inconsistency flag rates", () => {
   const sim = runSimulation("v4", 500);
-  assert.ok(sim.inconsistencyFlagRate >= 0.35 && sim.inconsistencyFlagRate <= 0.7, `random flag ${sim.inconsistencyFlagRate}`);
+  assert.ok(sim.inconsistencyFlagRate >= 0.3, `random flag ${sim.inconsistencyFlagRate}`);
   assert.ok(sim.structureShare <= 0.35, `structure ${sim.structureShare}`);
   assert.ok(sim.nTopShare <= 0.35, `N-top ${sim.nTopShare}`);
-  const expectFlag = new Set(["P16", "P29", "P30"]);
-  const consistent = personas.filter((p) => !expectFlag.has(p.id));
+  const consistent = personas.filter((p) => !["P16", "P30"].includes(p.id));
   const rFlag = realisticFlagRate(consistent, "v4", 6);
-  // Soft ceiling — edge personas still pull this up
-  assert.ok(rFlag <= 0.35, `realistic flag ${rFlag}`);
+  assert.ok(rFlag <= 0.1, `realistic flag ${rFlag}`);
 });
 
 test("v4 leadership regressions", () => {

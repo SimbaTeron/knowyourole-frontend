@@ -2,7 +2,7 @@
   "id": "P13",
   "persona": "Iris, 15, HS freshman. Introverted, dreamy, writes poetry and draws, sensitive, avoids crowds, moderately organized.",
   "expected": "High openness, introverted, moderate-high agreeableness; INFP; DISC S/C; creative solo role (writer/illustrator).",
-  "qa_fit_score": 4,
+  "qa_fit_score": 3,
   "qa_fit_reason": "INFP/creative right; DISC I unexpected for introvert",
   "envelope": {
     "mbti_ok": [
@@ -19,7 +19,8 @@
       "creative",
       "knowledge"
     ],
-    "notes": "introverted creative"
+    "notes": "introverted creative",
+    "expect_no_flag": true
   },
   "answers": [
     {

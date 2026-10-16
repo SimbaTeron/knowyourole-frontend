@@ -1,0 +1,161 @@
+{
+  "id": "P40",
+  "persona": "Kai, 19, college freshman. Mildly anxious, honest mixed answers that are internally consistent (introverted, creative, unsure about structure).",
+  "expected": "INFP/ISFP lean, Mixed clarity; a stress note is acceptable; no contradiction flag.",
+  "qa_fit_reason": "round4",
+  "envelope": {
+    "mbti_ok": [
+      "INFP",
+      "ISFP",
+      "INTP",
+      "ISFJ"
+    ],
+    "clarity_not": [
+      "clear"
+    ],
+    "expect_no_flag": true
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 2,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 3,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 4,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 5,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 6,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 7,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 8,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 9,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 10,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 11,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 12,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 13,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 14,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 15,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 16,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 17,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 18,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 19,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 20,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 21,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 22,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 23,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 24,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 25,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 26,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 27,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ],
+  "qa_fit_score": 3
+}

@@ -2,7 +2,7 @@
   "id": "P08",
   "persona": "Ava, 29, barista and aspiring artist. Highly imaginative, emotional, spontaneous, empathetic, dislikes routines and rules.",
   "expected": "High openness & agreeableness & neuroticism, low conscientiousness; INFP; DISC I/S; creative role.",
-  "qa_fit_score": 3,
+  "qa_fit_score": 5,
   "qa_fit_reason": "Openness/I/creative right; ENFP vs INFP, emotionality not reflected",
   "envelope": {
     "mbti_ok": [

@@ -2,7 +2,7 @@
   "id": "P18",
   "persona": "Kenji, 39, engineering lead. Quiet leader: introverted, calm, strategic, decisive when needed, listens carefully, high standards, open to ideas.",
   "expected": "Introverted, high C and O, low N, moderate A; INTJ/INFJ; DISC C/D; strategic leader/architect role.",
-  "qa_fit_score": 4,
+  "qa_fit_score": 5,
   "qa_fit_reason": "INTJ/C/technical; leadership dimension not reflected in role",
   "envelope": {
     "mbti_ok": [

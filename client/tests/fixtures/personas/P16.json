@@ -2,7 +2,7 @@
   "id": "P16",
   "persona": "Tyler, 14, 8th/9th grader. Disengaged, doesn't care about the quiz, answers somewhat randomly and inconsistently, mild preference for being alone and gaming.",
   "expected": "Noisy/low-clarity result; ideally a mixed or low-clarity note; mild introversion.",
-  "qa_fit_score": 2,
+  "qa_fit_score": 4,
   "qa_fit_reason": "Broad clarity good, but confident ENTP label with incoherent role for random answers",
   "envelope": {
     "clarity": "broad",

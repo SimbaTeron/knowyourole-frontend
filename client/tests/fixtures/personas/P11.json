@@ -2,7 +2,7 @@
   "id": "P11",
   "persona": "Noah, 17, HS senior. Highly anxious, worries constantly, moody, easily stressed by change, otherwise average on most traits.",
   "expected": "Very high neuroticism dominant; ISFP/INFP-ish; DISC S or C; result should acknowledge stress sensitivity without being diagnostic; calm, predictable role.",
-  "qa_fit_score": 2,
+  "qa_fit_score": 3,
   "qa_fit_reason": "Very anxious persona shows Stress Reactivity Balanced; Structure top trait; core trait missed",
   "envelope": {
     "mbti_ok": [
@@ -20,7 +20,8 @@
       "care"
     ],
     "want_n_high": true,
-    "notes": "very anxious"
+    "notes": "very anxious",
+    "expect_no_flag": true
   },
   "answers": [
     {

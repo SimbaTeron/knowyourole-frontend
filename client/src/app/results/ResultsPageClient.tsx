@@ -1,7 +1,7 @@
 'use client';
 import { resolveResultClarityDisplay, formatTopTraitLabel } from "@/lib/results/resultClarity";
 import { isScoringV3, isScoringV4 } from "@/lib/quiz/scoringVersions";
-import { detectInconsistency } from "@/lib/quiz/inconsistencyDetect";
+import { detectInconsistency, adjustClarityV41, RESULT_CLARITY_COPY_V41 } from "@/lib/quiz/inconsistencyDetect";
 import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
 import { getMbtiConfidence } from "@/lib/quiz/mbtiConfidence";
 import { recomputeShortformV2ScoreMaps } from "@/lib/quiz/shortformV2Scoring";
@@ -4941,6 +4941,7 @@ function OrbitalGlassV2Results({
   const v4 = isScoringV4(scoringVersion);
   let inconsistencyNote = "";
   let clarityLevelForBrief = clarity.level as "clear" | "mixed" | "broad";
+  let clarityDisplayShown = clarityDisplay;
   if (v4 && Array.isArray(rawScores?.responses) && rawScores!.responses!.length >= 28) {
     try {
       const evidence = rawScores!.responses!
@@ -4948,16 +4949,20 @@ function OrbitalGlassV2Results({
         .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
       if (evidence.length >= 28) {
         const report = detectInconsistency(evidence);
-        if (report.flagged) {
-          inconsistencyNote = report.note;
-          if (clarityLevelForBrief === "clear") clarityLevelForBrief = "mixed";
-        }
         if (rawMbtiForConfidence) {
           const remapped = applyV4OptionRemaps(
             { mbti: { ...rawMbtiForConfidence }, disc: {}, bigFive: {}, career: {} },
             evidence,
           );
           rawMbtiForConfidence = remapped.mbti;
+        }
+        if (report.flagged || report.guarded) inconsistencyNote = report.note;
+        if (clarityDisplay.kind !== "flat") {
+          clarityLevelForBrief = adjustClarityV41(clarity.level, report, bigFive as unknown as Record<string, number>, rawMbtiForConfidence);
+        }
+        if (clarityLevelForBrief !== clarity.level) {
+          const copy = RESULT_CLARITY_COPY_V41[clarityLevelForBrief];
+          clarityDisplayShown = { ...clarityDisplay, kind: clarityLevelForBrief, heading: `Result clarity: ${copy.label}`, body: copy.body };
         }
       }
     } catch {
@@ -4977,6 +4982,9 @@ function OrbitalGlassV2Results({
   const displayMbti = mbtiType;
   const typeBadge = v3 ? mbtiConfidenceResolved.badge : "";
   const typeConfidenceNote = v3 ? mbtiConfidenceResolved.note : "";
+  const stressSecondaryNote = v4 && topTrait[0] !== "N" && (bigFive.N ?? 0) >= 67
+    ? "Second signal: Stress Reactivity is also high. You may push hard on the outside while feeling pressure on the inside — build in recovery and smaller pressure steps."
+    : "";
   const lightLeanLetters = new Set(v3 ? mbtiConfidenceResolved.lightLeanLetters : []);
   const resultSummaryLine = buildResultSummaryLine({
     roleTitle: roleDirection.title,
@@ -5124,7 +5132,7 @@ function OrbitalGlassV2Results({
               <div className="shareline"><b>Snapshot</b><p>“{shareLine}”</p></div>
               <div className="role-card"><small>{clarity.level === "broad" && v3 ? "Directions to explore" : "Best-fit direction"}</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>Strong examples</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}{clarity.level === "broad" && v3 && adjacentRoles.length > 0 && <div className="direction-examples" data-testid="broad-alt-roles"><b>Also explore</b>{adjacentRoles.slice(0,2).map(role => <span key={role.title}>• {role.title}</span>)}</div>}</div>
               <div className="mini-stats"><div className="stat"><small>Mind</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>Work style</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>{clarity.blended ? "Top traits" : "Top trait"}</small><strong>{leanBand(topTrait[1])}</strong><span>{topTraitDisplay}</span></div></div>
-              {typeConfidenceNote && <p className="mbti-confidence-note" data-testid="mbti-confidence-note">{typeConfidenceNote}</p>}<div className={`clarity-note clarity-${clarityDisplay.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplay.heading}</b><p>{clarityDisplay.body}</p></div>
+              {typeConfidenceNote && <p className="mbti-confidence-note" data-testid="mbti-confidence-note">{typeConfidenceNote}</p>}<div className={`clarity-note clarity-${clarityDisplayShown.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplayShown.heading}</b><p>{clarityDisplayShown.body}</p></div>{stressSecondaryNote && <p className="mbti-confidence-note" data-testid="stress-secondary-note">{stressSecondaryNote}</p>}
             </article>
             <ResultDecisionBrief
               result={canonicalResult}

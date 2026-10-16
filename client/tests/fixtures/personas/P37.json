@@ -1,0 +1,167 @@
+{
+  "id": "P37",
+  "persona": "Elena, 42, marketing director moving into nonprofit leadership. Charismatic, organized, visionary, warm.",
+  "expected": "High E/O/C/A, low N; ENFJ; DISC I/D; leadership role.",
+  "qa_fit_reason": "round4",
+  "envelope": {
+    "mbti_ok": [
+      "ENFJ",
+      "ENFP",
+      "ENTJ"
+    ],
+    "prefer": "ENFJ",
+    "disc": [
+      "I",
+      "D"
+    ],
+    "role_family": [
+      "leadership",
+      "people",
+      "creative",
+      "sales"
+    ]
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 2,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 3,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 4,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 5,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 6,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 7,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 8,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 9,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 10,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 11,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 12,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 13,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 14,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 15,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 16,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 17,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 18,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 19,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 20,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 21,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 22,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 23,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 24,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 25,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 26,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 27,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ],
+  "qa_fit_score": 3
+}

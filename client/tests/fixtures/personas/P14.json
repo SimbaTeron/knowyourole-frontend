@@ -17,7 +17,8 @@
       "technical",
       "knowledge"
     ],
-    "notes": "compliance"
+    "notes": "compliance",
+    "expect_no_flag": true
   },
   "answers": [
     {

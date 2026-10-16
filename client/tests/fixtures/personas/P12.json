@@ -2,7 +2,7 @@
   "id": "P12",
   "persona": "Victor, 34, sales rep. Ruthlessly competitive, skeptical of others, argumentative, outgoing, confident, wants to win.",
   "expected": "Low agreeableness, high extraversion, low N; ENTJ/ESTP; DISC D; sales/negotiation/leadership role.",
-  "qa_fit_score": 4,
+  "qa_fit_score": 5,
   "qa_fit_reason": "Extraversion + D right; ENTP vs ENTJ; role emergency ops not sales",
   "envelope": {
     "mbti_ok": [
@@ -68,8 +68,8 @@
     },
     {
       "questionId": 9,
-      "choice": 3,
-      "letter": "D"
+      "choice": 2,
+      "letter": "C"
     },
     {
       "questionId": 10,

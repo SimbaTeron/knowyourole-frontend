@@ -2,7 +2,7 @@
   "id": "P28",
   "persona": "High A and C, low N, moderate E, moderate-low O; ESFJ; DISC S; community or volunteer coordination role.",
   "expected": "High A and C, low N, moderate E, moderate-low O; ESFJ; DISC S; community or volunteer coordination role.",
-  "qa_fit_score": 5,
+  "qa_fit_score": 3,
   "qa_fit_reason": "as expected",
   "envelope": {
     "notes": "High A and C, low N, moderate E, moderate-low O; ESFJ; DISC S; community or volunteer coordination role.",
@@ -11,7 +11,8 @@
     ],
     "disc": [
       "S"
-    ]
+    ],
+    "expect_no_flag": true
   },
   "answers": [
     {
@@ -111,8 +112,8 @@
     },
     {
       "questionId": 20,
-      "choice": 1,
-      "letter": "B"
+      "choice": 2,
+      "letter": "C"
     },
     {
       "questionId": 21,

@@ -25,11 +25,10 @@ export const V4_OPTION_REMAPS: Record<string, FamilyDelta> = {
   "1:D": { mbti: { I: 1 } },
   "9:D": { mbti: { P: 1 } },
   // N / Structure (anxious achiever) + N∩A decoupling (calm caregivers)
-  "20:B": { bigFive: { N: 2, C: -1 } },
+  "20:B": { bigFive: { C: -1 } }, // v4.1: N moved to conditional rule (calm structured people)
   "15:C": { bigFive: { N: -1 } },
   "28:C": { bigFive: { N: -1 } },
   "16:B": { bigFive: { N: -1 } },
-  "9:A": { bigFive: { N: 1 } },
   "27:C": { bigFive: { C: -1 } },
   // Light C trim
   "21:B": { bigFive: { C: -1 }, career: { handsOn: -2, operations: 1, leadership: 1 } },
@@ -74,6 +73,14 @@ export function applyV4OptionRemaps<T extends V4Maps>(
     for (const [k, v] of Object.entries(delta.bigFive || {})) bigFive[k] = (bigFive[k] || 0) + (v as number);
     for (const [k, v] of Object.entries(delta.disc || {})) disc[k] = (disc[k] || 0) + (v as number);
     for (const [k, v] of Object.entries(delta.career || {})) career[k] = (career[k] || 0) + (v as number);
+  }
+  // v4.1 conditional N: duty/perfection options read as stress only when the person also
+  // picked an explicit worry/overwhelm option (Q15D, "I feel scattered under pressure"). Calm structured people unaffected.
+  const chosen = new Set(responses.map((r) => `${r.questionId}:${LETTER[r.choice]}`));
+  const worry = chosen.has("15:D");
+  if (worry) {
+    if (chosen.has("20:B")) bigFive.N = (bigFive.N || 0) + 2;
+    if (chosen.has("9:A")) bigFive.N = (bigFive.N || 0) + 1;
   }
   return { ...raw, mbti, bigFive, disc, career };
 }
