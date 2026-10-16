@@ -86,7 +86,7 @@ export function answerAgreementV5(responses: ReadonlyArray<Resp>): number {
 const OPPOSITES: Record<string, [string[], string[]]> = {
   social: [["1A", "12C", "19C", "24A", "28A", "5A"], ["1B", "12A", "19D", "24B", "5B"]],
   decisive: [["15A", "17A", "21A", "14B", "16D"], ["28C", "14C", "15D"]],
-  structure: [["4A", "7A", "19B", "26B", "28D", "10A", "21B"], ["4B", "28B", "26A", "9D", "10C", "3D"]],
+  structure: [["4A", "7A", "19B", "26B", "28D", "10A", "21B"], ["4B", "28B", "9D", "10C", "3D"]],
 };
 const LET = ["A", "B", "C", "D"];
 
@@ -99,7 +99,32 @@ export function oppositeSplits(responses: ReadonlyArray<Resp>): Record<string, [
   return out;
 }
 
+/**
+ * Patterned answering: clicking in a fixed sequence (A-B-C-D-A-B…, or the same letter every time).
+ * Real answer sets never repeat at a fixed lag this often; random clicking matches ~25% of the time
+ * (99.9th percentile ≈ 0.6), so 0.8 is a safe line. Long repeated runs of 4 answers are the same signal.
+ */
+export function answerPatternScore(responses: ReadonlyArray<Resp>): { lag: number; repeats: number } {
+  const a = [...responses].sort((x, y) => x.questionId - y.questionId).map((r) => r.choice);
+  let lag = 0;
+  for (let p = 1; p <= 4; p++) {
+    let hit = 0;
+    for (let i = p; i < a.length; i++) if (a[i] === a[i - p]) hit++;
+    if (a.length > p) lag = Math.max(lag, hit / (a.length - p));
+  }
+  const seen = new Map<string, number>();
+  for (let i = 0; i + 4 <= a.length; i++) {
+    const k = a.slice(i, i + 4).join("");
+    seen.set(k, (seen.get(k) ?? 0) + 1);
+  }
+  let repeats = 0;
+  for (const v of seen.values()) if (v > 1) repeats += v - 1;
+  return { lag: Math.round(lag * 100) / 100, repeats };
+}
+
 export type ScatterV5 = {
+  /** Answers follow a mechanical sequence (A-B-C-D…, same letter every time). */
+  patterned: boolean;
   /** Picked both sides of an explicit opposite at least 3 times each. */
   contradictory: boolean;
   /** Answers don't hang together at all (random-like). */
@@ -114,6 +139,8 @@ export function scatterCheckV5(responses: ReadonlyArray<Resp>, meanCoherence: nu
   const agreement = answerAgreementV5(responses);
   const contradictory = Object.values(splits).some(([a, b]) => Math.min(a, b) >= 3);
   const oppositeTotal = Object.values(splits).reduce((sum, [a, b]) => sum + Math.min(a, b), 0);
-  const randomLike = meanCoherence < 0.2 && agreement < 0 && oppositeTotal >= 3;
-  return { contradictory, randomLike, agreement, meanCoherence, splits };
+  const randomLike = meanCoherence < 0.12 && agreement < 0 && oppositeTotal >= 3;
+  const pat = responses.length >= 24 ? answerPatternScore(responses) : { lag: 0, repeats: 0 };
+  const patterned = pat.lag >= 0.8 || pat.repeats >= 18;
+  return { patterned, contradictory, randomLike, agreement, meanCoherence, splits };
 }

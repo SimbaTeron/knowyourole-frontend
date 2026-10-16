@@ -60,7 +60,7 @@ export default function MethodologyPage() {
 
         <section className="mt-10 grid gap-4 sm:grid-cols-3" aria-label="Methodology summary">
           {[
-            ["28 prompts", "A fixed short-form assessment: 8 core-style, 8 Big Five, 5 DISC, 6 career-fit, 2 calibration, and 1 life-stage prompt."],
+            ["30 prompts", "A fixed short-form assessment covering core style, Big Five traits, DISC work style, the kind of work you enjoy, and one life-stage prompt."],
             ["Four lenses", "Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-evidence themes."],
             ["One purpose", "Generate hypotheses about work patterns and role directions worth testing in real life."],
           ].map(([title, body]) => (
@@ -98,7 +98,7 @@ export default function MethodologyPage() {
             <h2 className={headingClass}>How a result is formed</h2>
             <ol className="mt-4 grid gap-3 text-sm leading-relaxed text-[#405f72] sm:grid-cols-2">
               {[
-                "You answer the 28 prompts based on your usual work pattern—not an ideal self or one unusual week.",
+                "You answer the 30 prompts based on your usual work pattern—not an ideal self or one unusual week.",
                 "Answers contribute weighted signals to the four interpretation lenses above.",
                 "The result compares stronger and closer signals, then turns them into plain-English work patterns and role-direction hypotheses.",
                 "The report explains a leading direction, supporting evidence, nearby possibilities, and a practical experiment where available.",

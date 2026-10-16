@@ -546,10 +546,12 @@ function buildResultSummaryLine({ roleTitle, identity, mbtiType, discLabel, topT
   discLabel: string;
   topTraitLabel: string;
 }) {
-  if (broad && workClear) return `A broad, balanced personality pattern, but your work answers pointed clearly to ${roleTitle.toLowerCase()}. Your answers leaned a little toward ${mbtiType} thinking and ${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style.`;
-  if (/^several directions/i.test(roleTitle)) return `${broad ? "A broad, balanced pattern. " : ""}Several directions are worth trying${sampleTitles?.length ? `, such as ${sampleTitles.slice(0, 3).map((t) => t.toLowerCase()).join(", ")}` : ""}. Your answers leaned a little toward ${mbtiType} thinking and ${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style.`;
-  if (broad) return `A broad, balanced pattern. Several directions are worth trying, including ${roleTitle.toLowerCase()}. Your answers leaned a little toward ${mbtiType} thinking and ${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style.`;
-  return `${identity}. A direction worth testing: ${roleTitle}. Your leading signals are ${mbtiType} thinking, ${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style, and ${topTraitLabel.toLowerCase()}.`;
+  const workStyle = `${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style`;
+  if (broad && workClear) return `A broad, balanced personality pattern, but your work answers pointed clearly to ${roleTitle.toLowerCase()}. Your answers leaned a little toward the ${mbtiType} type and ${workStyle}.`;
+  if (/^several directions/i.test(roleTitle)) return `${broad ? "A broad, balanced pattern. " : ""}Several directions are worth trying${sampleTitles?.length ? `, such as ${sampleTitles.slice(0, 3).map((t) => t.toLowerCase()).join(", ")}` : ""}. Your answers leaned a little toward the ${mbtiType} type and ${workStyle}.`;
+  if (broad) return `A broad, balanced pattern. Several directions are worth trying, including ${roleTitle.toLowerCase()}. Your answers leaned a little toward the ${mbtiType} type and ${workStyle}.`;
+  const traitPart = topTraitLabel ? `, ${workStyle}, and high ${topTraitLabel.toLowerCase()}` : ` and ${workStyle}`;
+  return `${identity}. A direction worth testing: ${roleTitle}. Your strongest signals are the ${mbtiType} type${traitPart}.`;
 }
 type RoleFitCategory = "leadership" | "technical" | "creative" | "care" | "operations" | "influence" | "generalist";
 
@@ -4943,27 +4945,62 @@ function OrbitalGlassV2Results({
   const hasMbtiScores = ["E","I","S","N","T","F","J","P"].every((k) => typeof mbtiConfidenceScores[k] === "number");
   const rawMbtiForConfidence = finalClarity.rawMbti;
   const v4 = isScoringV4(scoringVersion);
+  // v5: the answer note comes from the server-scored result when present, so the page always
+  // matches the API (same timing data, same rules); the client recompute is only a fallback.
+  const serverAnswerNote = typeof canonicalCareerDirection?.laneKey === "string" && canonicalCareerDirection.laneKey.startsWith("v5:")
+    ? (canonicalCareerDirection as { answerNote?: string }).answerNote ?? ""
+    : undefined;
   const inconsistencyNote = finalClarity.v5
-    ? finalClarity.v5Note || (finalClarity.report?.guarded ? finalClarity.report.note : "")
+    ? (serverAnswerNote ?? finalClarity.v5Note) || (finalClarity.report?.guarded ? finalClarity.report.note : "")
     : finalClarity.report && (finalClarity.report.flagged || finalClarity.report.guarded) ? finalClarity.report.note : "";
   const mbtiConfidenceResolved = v3 && hasMbtiScores
     ? getMbtiConfidence(mbtiConfidenceScores, rawMbtiForConfidence, { broad: clarity.level === "broad", displayType: mbtiType })
     : v3 && clarity.level === "broad"
       ? { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "This type is a directional sketch — your trait pattern was broad, so treat it as a starting point, not a hard label.", badge: "directional sketch" }
       : { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "", badge: "" };
-  if (inconsistencyNote) {
-    mbtiConfidenceResolved.note = inconsistencyNote;
-    if (!mbtiConfidenceResolved.badge) mbtiConfidenceResolved.badge = "rough sketch";
+  // v5: "rough sketch" only for real answer problems (pattern, random, contradictory, fast + uneven),
+  // never for the soft speed note and never on a Clear result.
+  const roughSketch = finalClarity.v5
+    ? Boolean(finalClarity.v5.quickOrScattered) && finalClarity.level !== "clear"
+    : Boolean(inconsistencyNote);
+  if (inconsistencyNote) mbtiConfidenceResolved.note = inconsistencyNote;
+  if (roughSketch && !mbtiConfidenceResolved.badge) mbtiConfidenceResolved.badge = "rough sketch";
+  // Every letter the MBTI tab calls close (under 55%) also gets the light-lean marker.
+  const closeAxisLetters = v3 && hasMbtiScores
+    ? ([["E", "I"], ["S", "N"], ["T", "F"], ["J", "P"]] as const).flatMap(([a, b], i) => {
+        const dom = mbtiType[i];
+        const total = (mbtiConfidenceScores[a] ?? 50) + (mbtiConfidenceScores[b] ?? 50) || 1;
+        return ((mbtiConfidenceScores[dom] ?? 50) / total) * 100 < 55 ? [dom] : [];
+      })
+    : [];
+  const extraClose = closeAxisLetters.filter((l) => !mbtiConfidenceResolved.lightLeanLetters.includes(l));
+  if (extraClose.length) {
+    mbtiConfidenceResolved.lightLeanLetters = [...mbtiConfidenceResolved.lightLeanLetters, ...extraClose];
+    if (!mbtiConfidenceResolved.badge) {
+      const axisOf = (l: string) => (["E", "I"].includes(l) ? "E/I" : ["S", "N"].includes(l) ? "S/N" : ["T", "F"].includes(l) ? "T/F" : "J/P");
+      mbtiConfidenceResolved.badge = mbtiConfidenceResolved.lightLeanLetters.length === 1 ? `light lean on ${axisOf(mbtiConfidenceResolved.lightLeanLetters[0])}` : "some light leans";
+    }
   }
   // Always show the full 4-letter type (never X). Close letters get a light-lean marker + note.
   const displayMbti = mbtiType;
   const typeBadge = v3 ? mbtiConfidenceResolved.badge : "";
   const typeConfidenceNote = v3 ? mbtiConfidenceResolved.note : "";
   const stressIsTop = topTrait[0] === "N";
-  const stressSecondaryNote = shouldShowStressSecondary(bigFive as unknown as Record<string, number>, scoringVersion)
-    ? stressIsTop
+  const stressValue = Number(bigFive.N ?? 0);
+  // Wording follows the bar label: "high" only for a Strong lean (70+), otherwise "showed up too".
+  const stressSecondaryNote = shouldShowStressSecondary(bigFive as unknown as Record<string, number>, scoringVersion) && !(finalClarity.v5 && roughSketch)
+    ? stressIsTop && stressValue >= 70
       ? "Stress Reactivity came out high. You may feel pressure more than other people can see — build in recovery time and break big tasks into smaller steps."
-      : "Second signal: Stress Reactivity is also high. You may push hard on the outside while feeling pressure on the inside — build in recovery and smaller pressure steps."
+      : stressValue >= 70
+        ? "Second signal: Stress Reactivity is also high. You may push hard on the outside while feeling pressure on the inside — build in recovery and smaller pressure steps."
+        : "Second signal: Stress Reactivity showed up too. You may feel pressure more than you show — build in recovery time and take big tasks in smaller steps."
+    : "";
+  // Leading trait: never one that only reached "Balanced", and never one that contradicts the type letters.
+  const leadTrait = rankedTraits.find(([key, value]) => value >= 55 && !(key === "E" && mbtiType[0] === "I"));
+  const leadTraitLabel = leadTrait
+    ? (leadTrait[0] === clarity.topKey && clarity.blended && Number(bigFive[clarity.secondKey as keyof BigFiveProfile] ?? 0) >= 55 && !(clarity.secondKey === "E" && mbtiType[0] === "I")
+      ? topTraitDisplay
+      : TRAIT_DEEP_DIVE[leadTrait[0]].label)
     : "";
   const lightLeanLetters = new Set(v3 ? mbtiConfidenceResolved.lightLeanLetters : []);
   const v5Direction = typeof canonicalCareerDirection?.laneKey === "string" && canonicalCareerDirection.laneKey.startsWith("v5:");
@@ -4972,7 +5009,7 @@ function OrbitalGlassV2Results({
     identity,
     mbtiType,
     discLabel,
-    topTraitLabel: topTraitMeta.label,
+    topTraitLabel: leadTrait ? TRAIT_DEEP_DIVE[leadTrait[0]].label : "",
     broad: v3 && clarity.level === "broad",
     workClear: v5Direction && canonicalCareerDirection?.laneKey !== "v5:broad",
     sampleTitles: roleDirection.examples.map((role) => role.title),
@@ -5122,7 +5159,7 @@ function OrbitalGlassV2Results({
               {v5NextSteps.length > 0 && <div className="role-card next-steps-card" data-testid="next-steps"><small>Next steps</small><ul className="next-steps-list">{v5NextSteps.map(step => <li key={step}>{step}</li>)}</ul></div>}
 
 
-              <div className="mini-stats"><div className="stat"><small>Mind</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>Work style</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>{clarity.blended ? "Top traits" : "Top trait"}</small><strong>{clarity.level === "broad" ? "Light lean" : leanBand(topTrait[1])}</strong><span>{topTraitDisplay}</span></div></div>
+              <div className="mini-stats"><div className="stat"><small>Mind</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>Work style</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>{clarity.blended ? "Top traits" : "Top trait"}</small><strong>{leadTrait ? leanBand(leadTrait[1]) : "Balanced"}</strong><span>{leadTrait ? leadTraitLabel : "No single standout trait"}</span></div></div>
               {typeConfidenceNote && <p className="mbti-confidence-note" data-testid="mbti-confidence-note">{typeConfidenceNote}</p>}<div className={`clarity-note clarity-${clarityDisplayShown.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplayShown.heading}</b><p>{clarityDisplayShown.body}</p></div>{stressSecondaryNote && <p className="mbti-confidence-note" data-testid="stress-secondary-note">{stressSecondaryNote}</p>}
             </article>
             <ResultDecisionBrief

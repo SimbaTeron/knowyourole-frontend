@@ -886,7 +886,7 @@ export default function QuizPage() {
             </div>
             <h1 className="mb-3 text-3xl font-black tracking-tight">Analyzing<span className="analysis-dots" aria-hidden="true" /></h1>
             <p className="analysis-message mx-auto mb-7 max-w-sm text-sm leading-6 text-white/72" role="status" aria-live="polite">
-              Analyzing your 28 answers to build your work-style profile, career-fit signals, and role directions.
+              Analyzing your 30 answers to build your work-style profile, career-fit signals, and role directions.
             </p>
 
             <div className="mb-5 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10" aria-label="Results analysis progress">

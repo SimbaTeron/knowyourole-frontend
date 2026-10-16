@@ -21,7 +21,11 @@ const AXES: Array<[string, string]> = [["E", "I"], ["S", "N"], ["T", "F"], ["J",
 export const V5_FAST_NOTE = "You answered very quickly. If you skimmed some questions, try again when you have about 5 minutes for a sharper result.";
 export const V5_FAST_UNEVEN_NOTE = "You answered very quickly and some answers didn't line up, so this is only a rough sketch. Try again when you have about 5 minutes.";
 export const V5_SCATTERED_NOTE = "Some of your answers pointed in opposite directions (for example, both wanting clear rules and wanting no rules). Treat this as a rough sketch, not a label.";
+export const V5_PATTERN_NOTE = "Your answers followed a repeating pattern (like A, B, C, D), so this result can't say much about you. Try again and pick what really fits.";
+export const V5_UNSETTLED_NOTE = "Your answers didn't settle into one clear pattern, so this is only a rough sketch. If you rushed or guessed, try again when you can answer slowly.";
 export const V5_RANDOM_NOTE = "Your answers didn't form a clear pattern, so this is only a rough sketch. Try again when you can answer slowly and honestly.";
+/** v5 Clear copy: true even when two traits are both strong. */
+export const V5_CLEAR_BODY = "Your answers were consistent, and your strongest traits stood out from the rest.";
 /** Back-compat export. */
 export const V5_QUICK_NOTE = V5_FAST_UNEVEN_NOTE;
 
@@ -61,6 +65,8 @@ export type ClarityV5Result = {
   fast: boolean;
   scattered: boolean;
   randomLike: boolean;
+  /** Mechanical sequence (A-B-C-D…) detected. */
+  patterned: boolean;
   /** Broad because the profile is genuinely flat (vs. random / fast-and-uneven). */
   flat: boolean;
   note: string;
@@ -103,23 +109,39 @@ export function adjustClarityV5(
     // Clear when the type is consistent and one trait stands out (strongly, or clearly ahead of the rest).
     // Work answers that point one way very clearly also make the overall result clear.
     let workClear = false;
+    let workFlat = false;
     if (career) {
       const lanes = Object.values(deriveV5LaneScores(career)).sort((x, y) => y - x);
       workClear = lanes[0] >= 70 && lanes[0] - lanes[1] >= 15;
+      // Middle-of-the-road work answers: nothing pulled clearly ahead.
+      workFlat = lanes[0] < 50 || lanes[0] - lanes[1] <= 4;
     }
-    if (
+    const strongTrait = top >= 70 && sorted[0] - sorted[1] >= 10;
+    if (workFlat) {
+      // When the work answers are flat too, only a trait that really stands out makes it Clear.
+      if (strongTrait) next = "clear";
+    } else if (
       (nearEven <= 1 && top >= 64) ||
       (nearEven === 0 && top >= 56 && sorted[0] - sorted[1] >= 6) ||
-      (top >= 70 && sorted[0] - sorted[1] >= 10) ||
+      strongTrait ||
       (nearEven <= 1 && workClear)
     ) next = "clear";
   }
 
   let note = "";
   let roughSketch = false;
-  if (scatter.randomLike) {
+  // A flat (Broad) profile whose answers also don't agree with each other looks like guessing.
+  const unsettled = next === "broad" && flat && scatter.agreement < 0.02;
+  if (scatter.patterned) {
+    next = "broad";
+    note = V5_PATTERN_NOTE;
+    roughSketch = true;
+  } else if (scatter.randomLike) {
     next = "broad";
     note = V5_RANDOM_NOTE;
+    roughSketch = true;
+  } else if (unsettled) {
+    note = V5_UNSETTLED_NOTE;
     roughSketch = true;
   } else if (fast && (uneven || scatter.contradictory)) {
     next = "broad";
@@ -134,5 +156,5 @@ export function adjustClarityV5(
     note = V5_FAST_NOTE;
   }
 
-  return { level: next, quickOrScattered: roughSketch, fast, scattered: scatter.contradictory, randomLike: scatter.randomLike, flat, note, scatter };
+  return { level: next, quickOrScattered: roughSketch, fast, scattered: scatter.contradictory, randomLike: scatter.randomLike || unsettled || scatter.patterned, patterned: scatter.patterned, flat, note, scatter };
 }

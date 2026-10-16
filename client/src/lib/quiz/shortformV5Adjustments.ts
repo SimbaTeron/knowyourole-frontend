@@ -47,7 +47,10 @@ export const V5_OPTION_DELTAS: Record<string, FamilyDelta> = {
  * Stress evidence, weighted. Only Q15C ("I start to worry...") and Q15D ("I feel scattered...")
  * say it outright; the others hint at it (feedback stings, conflict drains, harmony first).
  */
-export const V5_STRESS_WEIGHTS: Record<string, number> = { "15:C": 1, "15:D": 1, "16:B": 0.5, "28:C": 0.5, "14:C": 0.25 };
+// 15C ("I start to worry") is the one explicit stress answer. 15D ("scattered unless I can simplify")
+// is about overload/organisation, so it only counts as a hint. 20B is perfectionism ("handing in
+// imperfect work feels bad").
+export const V5_STRESS_WEIGHTS: Record<string, number> = { "15:C": 1, "15:D": 0.5, "16:B": 0.5, "28:C": 0.5, "20:B": 0.5, "14:C": 0.25 };
 /** Kept for callers that only need the explicit-pick list. */
 export const V5_STRESS_PICKS = Object.keys(V5_STRESS_WEIGHTS);
 
@@ -89,7 +92,7 @@ export function applyV5Raw<T extends Maps>(raw: T, responses: ReadonlyArray<Resp
 export function applyV5StressGate(bigFive: Record<string, number>, responses: ReadonlyArray<Resp>): Record<string, number> {
   const w = stressEvidence(responses);
   const chosen = new Set(responses.map((r) => `${r.questionId}:${LETTER[r.choice]}`));
-  const explicit = chosen.has("15:C") || chosen.has("15:D");
+  const explicit = chosen.has("15:C");
   const out = { ...bigFive };
   const others = Math.max(out.O ?? 0, out.C ?? 0, out.E ?? 0, out.A ?? 0);
   if (w < 0.75) {
@@ -103,6 +106,10 @@ export function applyV5StressGate(bigFive: Record<string, number>, responses: Re
   } else {
     // One explicit stress answer: noticeable, not dominant.
     out.N = Math.min(Math.max(out.N, V5_STRESS_SHOW), 70);
+  }
+  if (explicit && w < 2.5) {
+    // Stress shows as a second signal, but only overwhelming evidence makes it the headline trait.
+    out.N = Math.min(out.N, others - 1);
   }
   out.N = Math.max(15, Math.min(85, Math.round(out.N)));
   return out;

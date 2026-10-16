@@ -85,9 +85,9 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   tech: {
     title: "Technology and computers",
     phrase: "computers, code, and technology",
-    adult: ["Software developer", "IT support specialist", "Cybersecurity analyst", "Robotics technician"],
+    adult: ["Software developer", "IT support specialist", "Engineer", "Cybersecurity analyst", "Robotics technician"],
     teen: ["Software developer", "Game developer", "IT technician", "Robotics engineer"],
-    college: ["Software or IT intern", "Help desk technician", "Junior developer"],
+    college: ["Software or IT intern", "Engineering student", "Help desk technician", "Junior developer"],
     teenSteps: ["Take a computer science class", "Join a robotics or coding club", "Build one small app, game, or website"],
     collegeSteps: ["Build two small projects you can show", "Look for IT help desk or developer internships", "Try a cybersecurity or IT certificate"],
     adultSteps: ["Take a beginner coding or IT certificate course", "Build one small project that solves a real problem", "Talk to someone in IT or software about their day"],
@@ -115,10 +115,10 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   business: {
     title: "Sales, business, and starting things",
     phrase: "convincing people, selling, and building something of your own",
-    adult: ["Sales representative", "Small business owner", "Marketing coordinator", "Real estate agent"],
+    adult: ["Small business owner", "Sales representative", "Restaurant, café, or shop owner", "Marketing coordinator", "Real estate agent"],
     teen: ["Business owner", "Marketing coordinator", "Salesperson", "Entrepreneur"],
     college: ["Sales or marketing intern", "Student business founder", "Business development assistant"],
-    teenSteps: ["Join DECA, FBLA, or a business club", "Start a small side business (selling, a service, or a online shop)", "Take a business or marketing class"],
+    teenSteps: ["Join DECA, FBLA, or a business club", "Start a small side business (selling, a service, or an online shop)", "Take a business or marketing class"],
     collegeSteps: ["Try a sales or marketing internship", "Run a small business or club fundraiser", "Take a marketing or entrepreneurship class"],
     adultSteps: ["Shadow a salesperson or business owner for a day", "Test a small side business idea", "Take a short sales or marketing course"],
   },
@@ -173,15 +173,22 @@ function stepsFor(lane: V5Lane, stage: LifeStage): string[] {
  * that sit where the two meet (e.g. tech + leading -> IT manager; trades + teaching -> instructor).
  * The title and "why" line still come from the top area, so they stay consistent.
  */
-type Combo = { first: V5Lane[]; second: V5Lane[]; adult: string[]; college: string[]; teen: string[]; step?: Partial<Record<"teen" | "college" | "adult", string>> };
+type Combo = { adultOnly?: boolean; title?: string; first: Array<V5Lane | "stem" | "people" | "creative">; second: V5Lane[]; adult: string[]; college: string[]; teen: string[]; step?: Partial<Record<"teen" | "college" | "adult", string>> };
 const COMBOS: Combo[] = [
-  { first: ["organizing"], second: ["tech"], adult: ["IT manager", "Technical operations manager", "Systems administrator"], college: ["IT operations intern", "Help desk lead"], teen: ["IT technician", "Tech club organizer"] },
-  { first: ["tech"], second: ["leading", "organizing"], adult: ["IT manager", "Engineering team lead", "Systems architect"], college: ["IT project coordinator", "Tech team lead on student projects"], teen: ["Robotics team captain", "Tech club leader"], step: { adult: "Ask to lead one technical project or mentor a newer teammate" } },
-  { first: ["research"], second: ["leading", "business"], adult: ["Lawyer", "Policy analyst"], college: ["Pre-law student", "Policy research intern"], teen: ["Lawyer", "Policy analyst"], step: { teen: "Join debate, mock trial, or Model UN", college: "Try mock trial, debate, or a law or policy class" } },
-  { first: ["leading", "business"], second: ["research"], adult: ["Lawyer", "Policy analyst"], college: ["Pre-law student", "Policy research intern"], teen: ["Lawyer", "Policy analyst"], step: { teen: "Join debate, mock trial, or Model UN", college: "Try mock trial, debate, or a law or policy class" } },
-  { first: ["research", "tech"], second: ["care"], adult: ["Doctor or physician assistant", "Pharmacist", "Medical lab scientist"], college: ["Pre-med student", "Pre-pharmacy student", "Medical lab assistant"], teen: ["Doctor", "Pharmacist", "Medical lab scientist"] },
-  { first: ["care"], second: ["research", "tech"], adult: ["Doctor or physician assistant", "Pharmacist"], college: ["Pre-med student", "Pre-pharmacy student"], teen: ["Doctor", "Pharmacist"] },
-  { first: ["care"], second: ["leading", "organizing"], adult: ["Emergency physician", "Charge nurse", "Clinic or hospital manager"], college: ["Pre-med student", "EMT", "Clinic operations intern"], teen: ["Doctor", "Paramedic", "Charge nurse"] },
+  // Merged pairs first, so e.g. science + tech + organizing reads as one combined direction.
+  { title: "Data, technology, and running operations", first: ["stem"], second: ["organizing"], adult: ["Analytics or data manager", "Operations or logistics director", "Engineering manager"], college: ["Data or operations analyst intern", "Engineering student"], teen: ["Engineer", "Data analyst", "Operations manager"], step: { adult: "Ask to own the numbers for one team or process and present what you find" } },
+  { title: "Leading schools, care teams, and programs", first: ["people"], second: ["organizing", "leading"], adult: ["School principal or administrator", "Program director", "Nurse manager"], college: ["Education or health administration student", "Youth program coordinator"], teen: ["Teacher or principal", "Coach", "Nurse"], step: { adult: "Ask to lead a team, program, or committee where you work now" } },
+  { adultOnly: true, title: "Health care and teaching others", first: ["care"], second: ["teaching"], adult: ["Nurse educator or clinical instructor", "Health educator", "Patient-care team lead"], college: ["Nursing student", "Health education student"], teen: ["Nurse", "Health teacher"], step: { adult: "Precept or mentor a new colleague, or teach one in-service class" } },
+  { title: "Coaching, teaching, and leading programs", first: ["teaching"], second: ["leading", "organizing"], adult: ["School principal or administrator", "Coach or athletic director", "Program director"], college: ["Assistant coach", "Youth program coordinator"], teen: ["Coach", "Teacher", "Camp leader"], step: { adult: "Ask to lead a team, program, or committee where you work now" } },
+  { adultOnly: true, title: "Running your own business", first: ["business"], second: ["trades", "care"], adult: ["Bakery, café, or food business owner", "Shop or franchise owner", "Catering or hospitality manager"], college: ["Restaurant or hospitality management student", "Student business founder"], teen: ["Small business owner", "Shop or café owner"] },
+  { title: "Leading teams with data and technology", first: ["leading"], second: ["tech", "research"], adult: ["Operations or technology director", "Analytics or data manager", "Project manager"], college: ["Project coordinator", "Operations analyst intern"], teen: ["Team captain", "Project manager"] },
+  { title: "Technology operations and IT management", first: ["organizing"], second: ["tech"], adult: ["IT manager", "Technical operations manager", "Systems administrator"], college: ["IT operations intern", "Help desk lead"], teen: ["IT technician", "Tech club organizer"] },
+  { title: "Technology and leading tech teams", first: ["tech"], second: ["leading", "organizing"], adult: ["IT manager", "Engineering team lead", "Systems architect"], college: ["IT project coordinator", "Tech team lead on student projects"], teen: ["Robotics team captain", "Tech club leader"], step: { adult: "Ask to lead one technical project or mentor a newer teammate" } },
+  { title: "Law, policy, and research", first: ["research"], second: ["leading", "business"], adult: ["Lawyer", "Policy analyst"], college: ["Pre-law student", "Policy research intern"], teen: ["Lawyer", "Policy analyst"], step: { teen: "Join debate, mock trial, or Model UN", college: "Try mock trial, debate, or a law or policy class" } },
+  { title: "Law, policy, and research", first: ["leading", "business"], second: ["research"], adult: ["Lawyer", "Policy analyst"], college: ["Pre-law student", "Policy research intern"], teen: ["Lawyer", "Policy analyst"], step: { teen: "Join debate, mock trial, or Model UN", college: "Try mock trial, debate, or a law or policy class" } },
+  { title: "Medicine and health science", first: ["research", "tech"], second: ["care"], adult: ["Doctor or physician assistant", "Pharmacist", "Medical lab scientist"], college: ["Pre-med student", "Pre-pharmacy student", "Medical lab assistant"], teen: ["Doctor", "Pharmacist", "Medical lab scientist"] },
+  { title: "Medicine and health science", first: ["care"], second: ["research", "tech"], adult: ["Doctor or physician assistant", "Pharmacist"], college: ["Pre-med student", "Pre-pharmacy student"], teen: ["Doctor", "Pharmacist"] },
+  { title: "Health care and leading care teams", first: ["care"], second: ["leading", "organizing"], adult: ["Emergency physician", "Charge nurse", "Clinic or hospital manager"], college: ["Pre-med student", "EMT", "Clinic operations intern"], teen: ["Doctor", "Paramedic", "Charge nurse"] },
   { first: ["organizing"], second: ["leading", "care"], adult: ["Operations director", "Operations manager", "Hospital or plant operations manager"], college: ["Operations intern", "Assistant operations manager"], teen: ["Event organizer", "Operations manager"] },
   { first: ["leading"], second: ["organizing"], adult: ["Operations director", "Operations manager"], college: ["Assistant operations manager", "Project coordinator"], teen: ["Event organizer", "Student government leader"] },
   { first: ["trades"], second: ["leading", "business", "organizing"], adult: ["Contractor or trades business owner", "Site supervisor"], college: ["Apprentice on a business-owner track", "Assistant site supervisor"], teen: ["Contractor or trades business owner", "Site supervisor"], step: { adult: "Talk to a trades business owner about licensing, pricing, and getting customers" } },
@@ -194,18 +201,21 @@ const COMBOS: Combo[] = [
   { first: ["creator"], second: ["business", "leading"], adult: ["Brand partnerships manager", "Social media manager", "Photographer or videographer business owner"], college: ["Social media manager", "Brand partnerships intern"], teen: ["Content creator", "Social media manager"] },
   { first: ["creator", "artDesign"], second: ["tech"], adult: ["Game designer", "Motion designer"], college: ["Game design student", "Motion design intern"], teen: ["Game designer", "Digital artist"] },
   { first: ["tech"], second: ["artDesign", "creator"], adult: ["Game developer", "UX designer"], college: ["Game development student", "UX design intern"], teen: ["Game developer", "Game designer"] },
-  { first: ["leading"], second: ["care", "teaching"], adult: ["Coach or athletic director", "Program director", "School principal"], college: ["Assistant coach", "Youth program coordinator"], teen: ["Coach", "Team captain", "Camp leader"] },
+  { title: "Coaching, teaching, and leading programs", first: ["leading"], second: ["care", "teaching"], adult: ["Coach or athletic director", "Program director", "School principal"], college: ["Assistant coach", "Youth program coordinator"], teen: ["Coach", "Team captain", "Camp leader"] },
   { first: ["leading"], second: ["trades"], adult: ["Construction manager", "Site supervisor"], college: ["Assistant site supervisor"], teen: ["Construction manager", "Site supervisor"] },
   { first: ["business"], second: ["teaching", "care"], adult: ["Coach or athletic director", "Fitness or sports business owner", "Recruiter"], college: ["Assistant coach", "Recreation program coordinator"], teen: ["Coach", "Sports or fitness business owner", "Team captain"] },
   { first: ["business"], second: ["leading"], adult: ["Business owner", "Sales manager", "Lawyer"], college: ["Student business founder", "Sales intern"], teen: ["Business owner", "Lawyer"] },
 ];
 
+/** Headings used by combined directions (for consistency checks). */
+export const V5_COMBO_TITLES: string[] = COMBOS.map((c) => c.title).filter((t): t is string => Boolean(t));
+
 function stageKey(stage: LifeStage): "teen" | "college" | "adult" {
   return stage === "middle" || stage === "high" ? "teen" : stage === "college" ? "college" : "adult";
 }
 
-function comboFor(first: V5Lane, second: V5Lane): Combo | undefined {
-  return COMBOS.find((c) => c.first.includes(first) && c.second.includes(second));
+function comboFor(first: V5Lane, second: V5Lane, stage: LifeStage = "unknown"): Combo | undefined {
+  return COMBOS.find((c) => c.first.includes(first) && c.second.includes(second) && (!c.adultOnly || stage === "adult"));
 }
 
 /** Business-ownership lanes: an independent streak adds an "own your own" example and step. */
@@ -225,9 +235,9 @@ export const V5_MERGED: Record<"creative" | "people" | "stem", { lanes: [V5Lane,
     lanes: ["artDesign", "creator"], margin: 12,
     title: "Creative work: art, design, music, and video",
     phrase: "art, design, music, and making videos or content for people to see or hear",
-    adult: ["Graphic designer", "Video editor", "Content creator or streamer", "Illustrator or animator", "Music producer or sound engineer", "Photographer or videographer", "UX designer"],
-    college: ["Design intern", "Video production student", "Illustration or animation student", "Music production student", "Photo or video assistant", "Social media assistant"],
-    teen: ["Graphic designer", "Video editor", "YouTuber or content creator", "Illustrator or animator", "Musician or music producer", "Photographer"],
+    adult: ["Graphic designer", "Video editor", "Content creator or streamer", "Illustrator or animator", "Music producer or sound engineer", "Photographer or videographer", "Makeup artist or cosmetologist", "UX designer"],
+    college: ["Design intern", "Video production student", "Illustration or animation student", "Music production student", "Photo or video assistant", "Cosmetology or makeup student", "Social media assistant"],
+    teen: ["Graphic designer", "Video editor", "YouTuber or content creator", "Illustrator or animator", "Musician or music producer", "Makeup artist or cosmetologist", "Photographer"],
   },
   people: {
     lanes: ["care", "teaching"], margin: 4,
@@ -260,6 +270,9 @@ export function deriveWorkDirectionV5(
   options: { broad?: boolean; forceBroad?: boolean; entrepreneurship?: number } = {},
 ): V5Direction {
   const laneScores = deriveV5LaneScores(career);
+  // Working adults: many work-content questions are phrased around school and hobbies, so their
+  // business answers get a modest lift (running or selling things usually happens at work, not in a hobby).
+  if (stage === "adult") for (const l of ["business"] as const) laneScores[l] = Math.round(laneScores[l] * 1.15 * 10) / 10;
   const ranked = [...V5_LANES].sort((a, b) => laneScores[b] - laneScores[a]);
   const [first, second, third] = ranked;
   const top = laneScores[first];
@@ -288,9 +301,10 @@ export function deriveWorkDirectionV5(
 
   const primary: V5Lane[] = merged ? [first, second] : [first];
   const partner = runnerUp;
-  const partnerStrong = laneScores[partner] >= MIN_EVIDENCE && laneScores[partner] >= top - 20;
+  const adultRolePartner = stage === "adult" && ROLE_TYPE_LANES.has(partner) && laneScores[partner] >= 40 && laneScores[partner] >= top - 35;
+  const partnerStrong = (laneScores[partner] >= MIN_EVIDENCE && laneScores[partner] >= top - 20) || adultRolePartner;
   const combo = partnerStrong
-    ? primary.map((p) => comboFor(p, partner)).find(Boolean)
+    ? [...(merged ? [merged] : []), ...primary].map((p) => comboFor(p as V5Lane, partner, stage)).find(Boolean)
     : undefined;
   const own = OWNABLE[first];
   const ownStreak = Boolean(own) && !merged && (laneScores.business >= 35 || Number(options.entrepreneurship ?? 0) >= 70) && !(combo && combo.second.includes("business"));
@@ -310,7 +324,8 @@ export function deriveWorkDirectionV5(
   const pull = partnerStrong ? `, with some pull toward ${V5_LANE_COPY[partner].phrase}` : "";
   return {
     laneKey: merged ? `v5:${merged}` : `v5:${first}`,
-    title: merged ? V5_MERGED[merged].title : V5_LANE_COPY[first].title,
+    // A combined direction gets a heading that matches its examples (e.g. law examples under "Law, policy, and research").
+    title: combo?.title ?? (merged ? V5_MERGED[merged].title : V5_LANE_COPY[first].title),
     examples,
     rationale: `Your answers about the work you enjoy pointed most to ${phrase}${pull}.`,
     nextSteps,

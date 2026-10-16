@@ -10,7 +10,7 @@ const rows = personas.map((p: any) => {
     clarity: r.clarity.level, flagged: r.inconsistency.flagged, guarded: r.inconsistency.guarded, quick: r.quickOrScattered ?? false,
     note: r.mbtiConfidence.note, badge: r.mbtiConfidence.badge,
     lane: r.direction.laneKey, title: r.direction.title, examples: r.direction.examples, rationale: r.v5Direction?.rationale ?? "",
-    nextSteps: r.v5Direction?.nextSteps ?? [], lanes: r.v5Direction?.laneScores ?? null, stage: r.stage ?? "", inc: { flagged: r.inconsistency.flagged, coh: r.inconsistency.meanCoherence, guarded: r.inconsistency.guarded, scattered: (r as any).scattered ?? null }, note5: (r as any).clarityNote ?? "", rawMbti: r.raw?.mbti ?? null,
+    nextSteps: r.v5Direction?.nextSteps ?? [], lanes: r.v5Direction?.laneScores ?? null, stage: r.stage ?? "", inc: { flagged: r.inconsistency.flagged, coh: r.inconsistency.meanCoherence, guarded: r.inconsistency.guarded, scattered: (r as any).scattered ?? null }, note5: (r as any).clarityNote ?? "", rawMbti: r.raw?.mbti ?? null, calMbti: r.calibrated?.mbti ?? null,
   };
 });
 writeFileSync(outPath, JSON.stringify(rows, null, 1));

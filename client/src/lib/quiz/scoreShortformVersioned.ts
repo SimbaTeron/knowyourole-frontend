@@ -11,7 +11,7 @@ import {
 } from "@/lib/quiz/shortformV3Adjustments";
 import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
 import { applyV5Raw, applyV5StressGate, lifeStageFromResponses, type LifeStage } from "@/lib/quiz/shortformV5Adjustments";
-import { adjustClarityV5 } from "@/lib/quiz/clarityV5";
+import { adjustClarityV5, V5_CLEAR_BODY } from "@/lib/quiz/clarityV5";
 import { deriveWorkDirectionV5, type V5Direction } from "@/lib/results/workDirectionV5";
 import { detectInconsistency, adjustClarityV41, RESULT_CLARITY_COPY_V41, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
 import {
@@ -282,10 +282,12 @@ function scoreV5(responses: VersionedResponse[], rawIn: VersionedScoreMaps): Ver
   const adj = adjustClarityV5(clarity.level, inconsistency, calibrated.bigFive, raw.mbti, responses, calibrated.career);
   if (adj.level !== clarity.level) clarity = { ...clarity, level: adj.level, label: RESULT_CLARITY_COPY_V41[adj.level].label, body: RESULT_CLARITY_COPY_V41[adj.level].body };
   let clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
-  if (clarityDisplay.kind !== "flat" && clarityDisplay.kind !== clarity.level) {
+  // v5 always shows the clarity line (its own pattern detector replaces the old same-letter note).
+  if (clarityDisplay.kind !== clarity.level) {
     const copy = RESULT_CLARITY_COPY_V41[clarity.level];
     clarityDisplay = { ...clarityDisplay, kind: clarity.level, heading: `Result clarity: ${copy.label}`, body: copy.body };
   }
+  if (clarity.level === "clear") clarityDisplay = { ...clarityDisplay, body: V5_CLEAR_BODY };
   const type = mbtiType(calibrated.mbti, false);
   const mbtiConfidence = getMbtiConfidence(calibrated.mbti, raw.mbti, { broad: clarity.level === "broad" });
   if (adj.quickOrScattered) {
