@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
 import { getOptionalAuthUser } from "@/app/api/_lib/auth";
 import { createAnonymousCapability } from "@/app/api/_lib/anonymous-result-capability";
 import { buildResultDTO, type BuildResultDTOInput, type ResultDTO } from "@/lib/results/buildResultDTO";
+import { buildUnpersistedComputeSuccess } from "@/lib/results/computePersistenceFallback";
 import { readPersistedQuizResultDTO } from "@/lib/results/persistedQuizResult";
 import { buildQuizResultReportingProjection } from "@/lib/results/quizResultReportingProjection";
 import type { ScoresData } from "@/lib/scoring";
@@ -65,12 +66,23 @@ export async function POST(req: NextRequest) {
 
     const persistence = await persistResultDTOSafely(result);
     if (!persistence.ok) {
-      // A live result is canonical only once the server has durably stored it.
-      // Returning a successful-but-unpersisted DTO would reintroduce the exact
-      // display/persistence split this endpoint exists to eliminate.
+      // Persistence outage must not hide a successfully computed result. Return the
+      // deterministic DTO so the client can show results; mark persistence.ok false
+      // so analytics/UI can distinguish unpersisted from saved.
+      console.warn("[POST /api/results/compute] persistence unavailable; returning DTO fallback", {
+        requestId,
+        persistenceAttemptId: persistence.persistenceAttemptId,
+        error: persistence.error,
+      });
       return NextResponse.json(
-        { success: false, requestId, error: "Result persistence is temporarily unavailable", persistence },
-        { status: 503, headers: responseHeaders },
+        buildUnpersistedComputeSuccess({
+          requestId,
+          result,
+          validation,
+          persistenceAttemptId: persistence.persistenceAttemptId,
+          error: persistence.error,
+        }),
+        { status: 200, headers: responseHeaders },
       );
     }
 
