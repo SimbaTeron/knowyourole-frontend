@@ -18,7 +18,7 @@ const OPPORTUNITY: Record<V5Lane, number> = V5_LANES.reduce((acc, key) => {
 
 /** Role-type lanes (lead / sell / organize) must beat work-content lanes clearly to win. */
 const ROLE_TYPE_LANES = new Set<V5Lane>(["leading", "business", "organizing"]);
-const ROLE_TYPE_WEIGHT = 0.95;
+const ROLE_TYPE_WEIGHT = 1.0;
 
 export function deriveV5LaneScores(career: Partial<Record<string, number>> | null | undefined): V5LaneScores {
   const out = {} as V5LaneScores;
@@ -46,7 +46,7 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
     title: "Skilled trades: building, fixing, and installing",
     phrase: "building and fixing real things with tools",
     adult: ["Electrician", "Welder", "Auto or diesel mechanic", "Carpenter", "Plumber", "HVAC technician"],
-    teen: ["Electrician", "Auto mechanic", "Welder", "Carpenter"],
+    teen: ["Electrician", "Auto mechanic", "Welder", "Robotics or electronics technician", "Carpenter"],
     college: ["Electrician apprentice", "Automotive technician", "Welding technician", "HVAC technician"],
     teenSteps: ["Take shop, auto, or construction class if your school has it", "Join a robotics, build, or maker club", "Ask about career and technical (CTE) programs or trade-school visits", "Fix or build one real project at home and take photos of it"],
     collegeSteps: ["Look at apprenticeships (electrical, plumbing, HVAC) that pay while you learn", "Try a community college or trade-school certificate", "Spend a day shadowing someone in the trade"],
@@ -54,11 +54,11 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   },
   artDesign: {
     title: "Art and design",
-    phrase: "art, design, and making things look or sound good",
-    adult: ["Graphic designer", "Illustrator", "UX designer", "Photographer", "Animator"],
-    teen: ["Graphic designer", "Illustrator", "Animator", "Photographer"],
-    college: ["Design intern", "Junior graphic designer", "Illustration or animation student", "Photo assistant"],
-    teenSteps: ["Take art, design, or photography class", "Keep a sketchbook or folder of your best work", "Join yearbook, the school paper, or theater crew", "Enter one art contest or show your work online"],
+    phrase: "art, design, music, and making things look or sound good",
+    adult: ["Graphic designer", "Illustrator", "UX designer", "Music producer or sound engineer", "Photographer", "Animator"],
+    teen: ["Graphic designer", "Illustrator", "Animator", "Musician or music producer", "Photographer"],
+    college: ["Design intern", "Junior graphic designer", "Illustration or animation student", "Music production student", "Photo assistant"],
+    teenSteps: ["Take art, music, design, or photography class", "Keep a sketchbook, playlist, or folder of your best work", "Join yearbook, the school paper, or theater crew", "Enter one art contest or show your work online"],
     collegeSteps: ["Build a portfolio of 6–10 pieces you are proud of", "Try a design, art, or media class or major", "Look for a design internship or freelance project"],
     adultSteps: ["Make 3 small portfolio pieces in the area you like most", "Take a short course in a design tool", "Take one small paid or volunteer design project"],
   },
@@ -95,11 +95,11 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   care: {
     title: "Health and caring for people",
     phrase: "helping and caring for people directly",
-    adult: ["Registered nurse", "Medical assistant", "Physical therapist assistant", "Counselor", "Social worker"],
-    teen: ["Nurse", "Medical assistant", "Physical therapist", "Counselor"],
-    college: ["Nursing student", "Medical assistant", "Patient care technician"],
-    teenSteps: ["Take health science or anatomy if offered", "Join HOSA, a peer-helper group, or volunteer at a hospital or care home", "Get first aid or CPR certified"],
-    collegeSteps: ["Shadow a nurse, therapist, or counselor", "Look at certified nursing assistant (CNA) or EMT courses", "Volunteer in a clinic or care setting"],
+    adult: ["Registered nurse", "Veterinary technician", "Physical therapist", "Counselor", "Medical assistant"],
+    teen: ["Nurse", "Veterinarian or vet tech", "Physical therapist", "Counselor"],
+    college: ["Nursing student", "Pre-vet or vet tech student", "Patient care technician", "Pre-med student"],
+    teenSteps: ["Take health science, anatomy, or biology", "Volunteer at a hospital, care home, or animal shelter", "Get first aid or CPR certified"],
+    collegeSteps: ["Shadow a nurse, vet, therapist, or counselor", "Look at certified nursing assistant (CNA), vet assistant, or EMT courses", "Volunteer in a clinic, animal shelter, or care setting"],
     adultSteps: ["Take a CNA, medical assistant, or EMT course", "Volunteer a few hours in a care setting", "Talk with someone in nursing or counseling about the work"],
   },
   teaching: {
@@ -125,8 +125,8 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   leading: {
     title: "Leading teams and projects",
     phrase: "taking charge and leading people",
-    adult: ["Team lead", "Project manager", "Store or restaurant manager", "Program director"],
-    teen: ["Team captain", "Club officer", "Event organizer", "Shift lead"],
+    adult: ["Team lead", "Project manager", "Program director", "Store or restaurant manager", "Business owner"],
+    teen: ["Team captain", "Student government leader", "Event organizer", "Business owner"],
     college: ["Student org leader", "Project coordinator", "Assistant manager"],
     teenSteps: ["Run for a club or student government role", "Captain or co-lead a team or project", "Organize one event from start to finish"],
     collegeSteps: ["Lead a student group or project team", "Look for shift-lead or project-coordinator jobs", "Take a leadership or management class"],
@@ -168,34 +168,109 @@ function stepsFor(lane: V5Lane, stage: LifeStage): string[] {
   return stage === "middle" || stage === "high" ? c.teenSteps : stage === "college" ? c.collegeSteps : c.adultSteps;
 }
 
+/**
+ * Combined directions: when the second work area is also strong, the examples lead with roles
+ * that sit where the two meet (e.g. tech + leading -> IT manager; trades + teaching -> instructor).
+ * The title and "why" line still come from the top area, so they stay consistent.
+ */
+type Combo = { first: V5Lane[]; second: V5Lane[]; adult: string[]; college: string[]; teen: string[]; step?: Partial<Record<"teen" | "college" | "adult", string>> };
+const COMBOS: Combo[] = [
+  { first: ["organizing"], second: ["tech"], adult: ["IT manager", "Technical operations manager", "Systems administrator"], college: ["IT operations intern", "Help desk lead"], teen: ["IT technician", "Tech club organizer"] },
+  { first: ["tech"], second: ["leading", "organizing"], adult: ["IT manager", "Engineering team lead", "Systems architect"], college: ["IT project coordinator", "Tech team lead on student projects"], teen: ["Robotics team captain", "Tech club leader"], step: { adult: "Ask to lead one technical project or mentor a newer teammate" } },
+  { first: ["research"], second: ["leading", "business"], adult: ["Lawyer", "Policy analyst"], college: ["Pre-law student", "Policy research intern"], teen: ["Lawyer", "Policy analyst"], step: { teen: "Join debate, mock trial, or Model UN", college: "Try mock trial, debate, or a law or policy class" } },
+  { first: ["leading", "business"], second: ["research"], adult: ["Lawyer", "Policy analyst"], college: ["Pre-law student", "Policy research intern"], teen: ["Lawyer", "Policy analyst"], step: { teen: "Join debate, mock trial, or Model UN", college: "Try mock trial, debate, or a law or policy class" } },
+  { first: ["research", "tech"], second: ["care"], adult: ["Doctor or physician assistant", "Pharmacist", "Medical lab scientist"], college: ["Pre-med student", "Pre-pharmacy student", "Medical lab assistant"], teen: ["Doctor", "Pharmacist", "Medical lab scientist"] },
+  { first: ["care"], second: ["research", "tech"], adult: ["Doctor or physician assistant", "Pharmacist"], college: ["Pre-med student", "Pre-pharmacy student"], teen: ["Doctor", "Pharmacist"] },
+  { first: ["care"], second: ["leading", "organizing"], adult: ["Emergency physician", "Charge nurse", "Clinic or hospital manager"], college: ["Pre-med student", "EMT", "Clinic operations intern"], teen: ["Doctor", "Paramedic", "Charge nurse"] },
+  { first: ["organizing"], second: ["leading", "care"], adult: ["Operations director", "Operations manager", "Hospital or plant operations manager"], college: ["Operations intern", "Assistant operations manager"], teen: ["Event organizer", "Operations manager"] },
+  { first: ["leading"], second: ["organizing"], adult: ["Operations director", "Operations manager"], college: ["Assistant operations manager", "Project coordinator"], teen: ["Event organizer", "Student government leader"] },
+  { first: ["trades"], second: ["leading", "business", "organizing"], adult: ["Contractor or trades business owner", "Site supervisor"], college: ["Apprentice on a business-owner track", "Assistant site supervisor"], teen: ["Contractor or trades business owner", "Site supervisor"], step: { adult: "Talk to a trades business owner about licensing, pricing, and getting customers" } },
+  { first: ["trades"], second: ["teaching", "care"], adult: ["Apprenticeship instructor", "Safety inspector", "Shop teacher"], college: ["Apprenticeship mentor", "Safety technician"], teen: ["Shop teacher", "Safety inspector"], step: { adult: "Ask your union or trade school about instructor or mentor roles" } },
+  { first: ["trades"], second: ["artDesign", "creator"], adult: ["Metal artist or custom fabricator", "Cabinetmaker or furniture maker"], college: ["Custom fabrication apprentice", "Cabinetmaking apprentice"], teen: ["Custom fabricator", "Furniture maker"] },
+  { first: ["trades"], second: ["tech", "research"], adult: ["Electronics technician", "Robotics technician", "Engineering technician"], college: ["Electronics technician student", "Engineering technician"], teen: ["Robotics or electronics technician", "Engineer"] },
+  { first: ["artDesign", "creator"], second: ["teaching", "care"], adult: ["Art teacher", "Community art instructor", "Museum educator"], college: ["Art education student", "Art camp counselor"], teen: ["Art teacher", "Art camp counselor"], step: { adult: "Teach one community class or workshop in your craft" } },
+  { first: ["teaching", "care"], second: ["artDesign", "creator"], adult: ["Art teacher", "Community art instructor", "Museum educator"], college: ["Art education student", "Art camp counselor"], teen: ["Art teacher", "Art camp counselor"] },
+  { first: ["artDesign"], second: ["business", "leading"], adult: ["Photographer or studio owner", "Brand designer", "Online shop owner (designs, patterns, prints)"], college: ["Freelance designer", "Online shop owner"], teen: ["Online shop owner (art, crafts, patterns)", "Costume or fashion designer"] },
+  { first: ["creator"], second: ["business", "leading"], adult: ["Brand partnerships manager", "Social media manager", "Photographer or videographer business owner"], college: ["Social media manager", "Brand partnerships intern"], teen: ["Content creator", "Social media manager"] },
+  { first: ["creator", "artDesign"], second: ["tech"], adult: ["Game designer", "Motion designer"], college: ["Game design student", "Motion design intern"], teen: ["Game designer", "Digital artist"] },
+  { first: ["tech"], second: ["artDesign", "creator"], adult: ["Game developer", "UX designer"], college: ["Game development student", "UX design intern"], teen: ["Game developer", "Game designer"] },
+  { first: ["leading"], second: ["care", "teaching"], adult: ["Coach or athletic director", "Program director", "School principal"], college: ["Assistant coach", "Youth program coordinator"], teen: ["Coach", "Team captain", "Camp leader"] },
+  { first: ["leading"], second: ["trades"], adult: ["Construction manager", "Site supervisor"], college: ["Assistant site supervisor"], teen: ["Construction manager", "Site supervisor"] },
+  { first: ["business"], second: ["teaching", "care"], adult: ["Coach or athletic director", "Fitness or sports business owner", "Recruiter"], college: ["Assistant coach", "Recreation program coordinator"], teen: ["Coach", "Sports or fitness business owner", "Team captain"] },
+  { first: ["business"], second: ["leading"], adult: ["Business owner", "Sales manager", "Lawyer"], college: ["Student business founder", "Sales intern"], teen: ["Business owner", "Lawyer"] },
+];
+
+function stageKey(stage: LifeStage): "teen" | "college" | "adult" {
+  return stage === "middle" || stage === "high" ? "teen" : stage === "college" ? "college" : "adult";
+}
+
+function comboFor(first: V5Lane, second: V5Lane): Combo | undefined {
+  return COMBOS.find((c) => c.first.includes(first) && c.second.includes(second));
+}
+
+/** Business-ownership lanes: an independent streak adds an "own your own" example and step. */
+const OWNABLE: Partial<Record<V5Lane, { adult: string; teen: string; step: string }>> = {
+  trades: { adult: "Own a trades business", teen: "Own a trades business someday", step: "Write a one-page plan for your own trades business (services, prices, first customers)" },
+  artDesign: { adult: "Own a studio or creative business", teen: "Run an online art or design shop", step: "Sell or show 3 pieces and see what people want" },
+  creator: { adult: "Run your own creator business", teen: "Grow your own channel as a small business", step: "List three ways your content could earn money" },
+  care: { adult: "Own a care business (clinic, grooming, training)", teen: "Start a pet-sitting or tutoring service", step: "Look into what it takes to open a small care business" },
+};
+
+/**
+ * Pairs of work areas that usually move together. When both lead and are close, the result
+ * shows one combined direction (e.g. art + video = creative work).
+ */
+export const V5_MERGED: Record<"creative" | "people" | "stem", { lanes: [V5Lane, V5Lane]; margin: number; title: string; phrase: string; adult: string[]; college: string[]; teen: string[] }> = {
+  creative: {
+    lanes: ["artDesign", "creator"], margin: 12,
+    title: "Creative work: art, design, music, and video",
+    phrase: "art, design, music, and making videos or content for people to see or hear",
+    adult: ["Graphic designer", "Video editor", "Content creator or streamer", "Illustrator or animator", "Music producer or sound engineer", "Photographer or videographer", "UX designer"],
+    college: ["Design intern", "Video production student", "Illustration or animation student", "Music production student", "Photo or video assistant", "Social media assistant"],
+    teen: ["Graphic designer", "Video editor", "YouTuber or content creator", "Illustrator or animator", "Musician or music producer", "Photographer"],
+  },
+  people: {
+    lanes: ["care", "teaching"], margin: 4,
+    title: "Helping people: health, care, and teaching",
+    phrase: "helping, caring for, and teaching people",
+    adult: ["Registered nurse", "Teacher", "Counselor", "Veterinary technician", "Coach", "Physical therapist"],
+    college: ["Nursing student", "Teaching assistant", "Pre-vet or vet tech student", "Youth program assistant", "Patient care technician"],
+    teen: ["Nurse", "Teacher", "Veterinarian or vet tech", "Coach", "Counselor"],
+  },
+  stem: {
+    lanes: ["research", "tech"], margin: 5,
+    title: "Science, research, and technology",
+    phrase: "science, research, computers, and figuring out how things work",
+    adult: ["Software developer", "Lab technician", "Data analyst", "Engineer", "Cybersecurity analyst", "Research assistant"],
+    college: ["Research assistant", "Software or IT intern", "Lab assistant", "Data analysis intern", "Engineering student"],
+    teen: ["Scientist", "Software developer", "Engineer", "Robotics engineer", "Data analyst"],
+  },
+};
+
+function mergedFor(a: V5Lane, b: V5Lane, gap: number): keyof typeof V5_MERGED | null {
+  for (const [key, m] of Object.entries(V5_MERGED) as [keyof typeof V5_MERGED, (typeof V5_MERGED)[keyof typeof V5_MERGED]][]) {
+    if (m.lanes.includes(a) && m.lanes.includes(b) && gap <= m.margin) return key;
+  }
+  return null;
+}
+
 export function deriveWorkDirectionV5(
   career: Partial<Record<string, number>> | null | undefined,
   stage: LifeStage = "unknown",
-  options: { broad?: boolean } = {},
+  options: { broad?: boolean; forceBroad?: boolean; entrepreneurship?: number } = {},
 ): V5Direction {
   const laneScores = deriveV5LaneScores(career);
   const ranked = [...V5_LANES].sort((a, b) => laneScores[b] - laneScores[a]);
   const [first, second, third] = ranked;
   const top = laneScores[first];
-  const tight = top - laneScores[second] <= 2 && top - laneScores[third] <= BROAD_MARGIN;
+  const merged = mergedFor(first, second, top - laneScores[second]);
+  // A merged pair counts as one direction, so "tight" compares against the next area.
+  const runnerUp = merged ? third : second;
+  const afterRunner = merged ? ranked[3] : third;
+  const tight = top - laneScores[runnerUp] <= 2 && top - laneScores[afterRunner] <= BROAD_MARGIN;
   // Trait clarity (options.broad) only widens the direction when the work-interest lead is also small.
-  const broad = top < MIN_EVIDENCE || tight || (Boolean(options.broad) && top - laneScores[second] <= 6);
-
-  // Art + creator close together: one creative direction covering both.
-  const creativePair = (first === "artDesign" && second === "creator") || (first === "creator" && second === "artDesign");
-  if (!broad && creativePair && top - laneScores[second] <= 8) {
-    const examples = [...examplesFor(first, stage).slice(0, 3), ...examplesFor(second, stage).slice(0, 2)];
-    return {
-      laneKey: "v5:creative",
-      title: "Creative work: art, design, and video",
-      examples,
-      rationale: "Your answers about the work you enjoy pointed most to art, design, and making videos or content for people to see.",
-      nextSteps: [...stepsFor(first, stage).slice(0, 2), ...stepsFor(second, stage).slice(0, 1)],
-      lanes: [first, second],
-      broad: false,
-      laneScores,
-    };
-  }
+  const broad = Boolean(options.forceBroad) || top < MIN_EVIDENCE || tight || (Boolean(options.broad) && top - laneScores[runnerUp] <= 6);
+  const sk = stageKey(stage);
 
   if (broad) {
     const lanes = ranked.slice(0, 3);
@@ -211,16 +286,35 @@ export function deriveWorkDirectionV5(
     };
   }
 
-  const secondNote = laneScores[second] >= MIN_EVIDENCE && laneScores[second] >= top - 12
-    ? `, with some pull toward ${V5_LANE_COPY[second].phrase}`
-    : "";
+  const primary: V5Lane[] = merged ? [first, second] : [first];
+  const partner = runnerUp;
+  const partnerStrong = laneScores[partner] >= MIN_EVIDENCE && laneScores[partner] >= top - 20;
+  const combo = partnerStrong
+    ? primary.map((p) => comboFor(p, partner)).find(Boolean)
+    : undefined;
+  const own = OWNABLE[first];
+  const ownStreak = Boolean(own) && !merged && (laneScores.business >= 35 || Number(options.entrepreneurship ?? 0) >= 70) && !(combo && combo.second.includes("business"));
+  const lead = [
+    ...(combo ? combo[sk].slice(0, 2) : []),
+    ...(ownStreak && own ? [sk === "adult" ? own.adult : own.teen] : []),
+  ];
+  const baseList = merged ? V5_MERGED[merged][sk] : examplesFor(first, stage);
+  const base = baseList.filter((e) => !lead.includes(e));
+  const examples = merged
+    ? [...lead, ...base].slice(0, Math.max(7, lead.length + 4))
+    : [...lead, ...base].slice(0, Math.max(4, Math.min(5, lead.length + 3)));
+  const extraStep = combo?.step?.[sk] ?? (ownStreak && own ? own.step : undefined);
+  const baseSteps = merged ? [...stepsFor(first, stage).slice(0, 2), stepsFor(second, stage)[0]] : stepsFor(first, stage).slice(0, 3);
+  const nextSteps = extraStep ? [extraStep, ...baseSteps.slice(0, 2)] : baseSteps;
+  const phrase = merged ? V5_MERGED[merged].phrase : V5_LANE_COPY[first].phrase;
+  const pull = partnerStrong ? `, with some pull toward ${V5_LANE_COPY[partner].phrase}` : "";
   return {
-    laneKey: `v5:${first}`,
-    title: V5_LANE_COPY[first].title,
-    examples: examplesFor(first, stage).slice(0, 4),
-    rationale: `Your answers about the work you enjoy pointed most to ${V5_LANE_COPY[first].phrase}${secondNote}.`,
-    nextSteps: stepsFor(first, stage).slice(0, 3),
-    lanes: [first, second],
+    laneKey: merged ? `v5:${merged}` : `v5:${first}`,
+    title: merged ? V5_MERGED[merged].title : V5_LANE_COPY[first].title,
+    examples,
+    rationale: `Your answers about the work you enjoy pointed most to ${phrase}${pull}.`,
+    nextSteps,
+    lanes: [...primary, partner],
     broad: false,
     laneScores,
   };
@@ -233,8 +327,8 @@ export function v5LaneFamily(lane: string): string {
   if (l === "business") return "sales";
   if (l === "organizing") return "operations";
   if (l === "artDesign" || l === "creator" || l === "creative") return "creative";
-  if (l === "care" || l === "teaching") return "care";
-  if (l === "research") return "research";
+  if (l === "care" || l === "teaching" || l === "people") return "care";
+  if (l === "research" || l === "stem") return "research";
   if (l === "tech") return "technical";
   if (l === "trades") return "trades";
   return l;

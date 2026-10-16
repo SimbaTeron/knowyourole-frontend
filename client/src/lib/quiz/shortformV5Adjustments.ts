@@ -24,7 +24,16 @@ const V5_LEGACY_EXCLUDED = new Set([24, 29, 30]);
 
 export const V5_OPTION_DELTAS: Record<string, FamilyDelta> = {
   // Q24 meaning change
-  "24:C": { mbti: { J: -3, P: 1 }, disc: { C: -1, D: 1 }, bigFive: { C: -2, N: 1 }, career: { stability: -3, operations: -2, handsOn: 3 } },
+  "24:C": { mbti: { J: -3 }, disc: { C: -1 }, bigFive: { C: -2, N: 1 }, career: { stability: -3, operations: -2, handsOn: 3 } },
+  // Hands-on work picks shouldn't make people bossy (D) or spontaneous (P) by themselves (ISTP / D skew)
+  "22:C": { disc: { D: -1 } },
+  "23:C": { disc: { D: -1 } },
+  // "Fast pace, clear stakes" is a pace preference more than a take-charge style
+  "19:A": { disc: { D: -2, I: 1 } },
+  // Ambition ("reaching big goals") is not the same as a take-charge style
+  "25:C": { disc: { D: -2 } },
+  // Q15C now says "I start to worry and want to talk it through" (explicit stress); undo v4's N trim
+  "15:C": { bigFive: { N: 1 } },
   "24:D": { mbti: { N: 1 }, disc: { D: -2, I: 1 }, bigFive: { O: 2 }, career: { pace: -3, entrepreneurship: -2, creative: 3 } },
   // De-stack S+J on "reliable default" options
   "4:A": { mbti: { J: -1 } },
@@ -34,13 +43,26 @@ export const V5_OPTION_DELTAS: Record<string, FamilyDelta> = {
   "10:A": { mbti: { S: -1, J: -1 } },
 };
 
-/** Explicit stress picks: pressure scatter / reassurance, conflict anti-fit, sting from feedback, harmony-first conflict. */
-export const V5_STRESS_PICKS = ["15:C", "15:D", "28:C", "16:B", "14:C"];
+/**
+ * Stress evidence, weighted. Only Q15C ("I start to worry...") and Q15D ("I feel scattered...")
+ * say it outright; the others hint at it (feedback stings, conflict drains, harmony first).
+ */
+export const V5_STRESS_WEIGHTS: Record<string, number> = { "15:C": 1, "15:D": 1, "16:B": 0.5, "28:C": 0.5, "14:C": 0.25 };
+/** Kept for callers that only need the explicit-pick list. */
+export const V5_STRESS_PICKS = Object.keys(V5_STRESS_WEIGHTS);
+
+export function stressEvidence(responses: ReadonlyArray<Resp>): number {
+  const chosen = new Set(responses.map((r) => `${r.questionId}:${LETTER[r.choice]}`));
+  return Object.entries(V5_STRESS_WEIGHTS).reduce((sum, [k, w]) => sum + (chosen.has(k) ? w : 0), 0);
+}
 
 export function countStressPicks(responses: ReadonlyArray<Resp>): number {
   const chosen = new Set(responses.map((r) => `${r.questionId}:${LETTER[r.choice]}`));
   return V5_STRESS_PICKS.filter((k) => chosen.has(k)).length;
 }
+
+/** Score at or above which Stress Reactivity is called out on the main result. */
+export const V5_STRESS_SHOW = 64;
 
 /** Raw maps -> v5 raw maps (before calibration). */
 export function applyV5Raw<T extends Maps>(raw: T, responses: ReadonlyArray<Resp>): T {
@@ -65,10 +87,24 @@ export function applyV5Raw<T extends Maps>(raw: T, responses: ReadonlyArray<Resp
 
 /** After calibration: gate Stress Reactivity on explicit evidence. */
 export function applyV5StressGate(bigFive: Record<string, number>, responses: ReadonlyArray<Resp>): Record<string, number> {
-  const picks = countStressPicks(responses);
+  const w = stressEvidence(responses);
+  const chosen = new Set(responses.map((r) => `${r.questionId}:${LETTER[r.choice]}`));
+  const explicit = chosen.has("15:C") || chosen.has("15:D");
   const out = { ...bigFive };
-  if (picks <= 1) out.N = Math.min(out.N, 60);
-  else if (picks >= 3) out.N = Math.max(out.N, 67);
+  const others = Math.max(out.O ?? 0, out.C ?? 0, out.E ?? 0, out.A ?? 0);
+  if (w < 0.75) {
+    // No real stress evidence: keep it low and never the headline trait.
+    out.N = Math.min(out.N, 45, others - 6);
+  } else if (!explicit) {
+    // Only hints (feedback stings, conflict drains): moderate at most.
+    out.N = Math.max(35, Math.min(out.N, 58, others - 3));
+  } else if (w >= 1.5) {
+    out.N = Math.max(out.N, 67);
+  } else {
+    // One explicit stress answer: noticeable, not dominant.
+    out.N = Math.min(Math.max(out.N, V5_STRESS_SHOW), 70);
+  }
+  out.N = Math.max(15, Math.min(85, Math.round(out.N)));
   return out;
 }
 

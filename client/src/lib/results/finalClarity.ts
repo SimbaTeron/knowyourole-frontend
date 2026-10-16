@@ -5,7 +5,8 @@
  */
 import { resolveResultClarityDisplay, type ResultClarityDisplay } from "@/lib/results/resultClarity";
 import { isScoringV3, isScoringV4, isScoringV5 } from "@/lib/quiz/scoringVersions";
-import { adjustClarityV5 } from "@/lib/quiz/clarityV5";
+import { adjustClarityV5, type ClarityV5Result } from "@/lib/quiz/clarityV5";
+import { applyV5Raw, V5_STRESS_SHOW } from "@/lib/quiz/shortformV5Adjustments";
 import { detectInconsistency, adjustClarityV41, RESULT_CLARITY_COPY_V41, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
 import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
 import { recomputeShortformV2ScoreMaps } from "@/lib/quiz/shortformV2Scoring";
@@ -21,6 +22,8 @@ export type FinalClarity = {
   rawMbti?: Record<string, number>;
   /** v5: note shown when answers were very quick or scattered. */
   v5Note?: string;
+  /** v5: full clarity details (fast / scattered / random flags). */
+  v5?: ClarityV5Result;
 };
 
 type Resp = { questionId?: unknown; choice?: unknown };
@@ -30,6 +33,7 @@ export function resolveFinalClarity(
   responses: ReadonlyArray<Resp> | null | undefined,
   scoringVersion: string | null | undefined,
   maxCareer?: number,
+  career?: Partial<Record<string, number>> | null,
 ): FinalClarity {
   const v3 = isScoringV3(scoringVersion);
   const base = resolveResultClarityDisplay(bigFive, responses as any, v3 ? { version: "v3", maxCareer } : {});
@@ -38,6 +42,7 @@ export function resolveFinalClarity(
   let report: InconsistencyReport | null = null;
   let rawMbti: Record<string, number> | undefined;
   let v5Note: string | undefined;
+  let v5: ClarityV5Result | undefined;
   const evidence = (responses ?? [])
     .filter((r) => typeof r?.questionId === "number" && typeof r?.choice === "number")
     .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
@@ -51,11 +56,18 @@ export function resolveFinalClarity(
   if (isScoringV4(scoringVersion) && evidence.length >= 28) {
     try {
       report = detectInconsistency(evidence.filter((r) => r.questionId <= 28));
-      if (rawMbti) {
+      if (isScoringV5(scoringVersion)) {
+        // Same raw maps as the scorer (scoreShortformVersioned v5).
+        try {
+          rawMbti = applyV5Raw(recomputeShortformV2ScoreMaps(evidence) as any, evidence).mbti;
+        } catch {
+          /* keep */
+        }
+      } else if (rawMbti) {
         rawMbti = applyV4OptionRemaps({ mbti: { ...rawMbti }, disc: {}, bigFive: {}, career: {} }, evidence).mbti;
       }
       if (isScoringV5(scoringVersion)) {
-        const v5 = adjustClarityV5(level, report, bigFive, rawMbti, responses);
+        v5 = adjustClarityV5(level, report, bigFive, rawMbti, responses, career);
         level = v5.level;
         v5Note = v5.note || undefined;
       } else {
@@ -77,13 +89,19 @@ export function resolveFinalClarity(
       /* keep base */
     }
   }
-  return { display, level, report, rawMbti, v5Note };
+  if (v5 && level === "broad" && !v5.flat && display.kind !== "flat") {
+    const body = "Your answers didn't settle into one clear pattern, so read your top trait and type as a light lean, not a label.";
+    display = { ...display, kind: "broad", heading: "Result clarity: Broad", body, clarity: { ...display.clarity, level: "broad", label: "Broad", body } };
+  }
+  return { display, level, report: v5 && report ? { ...report, flagged: v5.scattered || v5.randomLike } : report, rawMbti, v5Note, v5 };
 }
 
 /** Stress secondary note: N high AND not the top or co-top (within 5 pts) trait. */
 export function shouldShowStressSecondary(bigFive: Record<string, number>, scoringVersion: string | null | undefined): boolean {
   if (!isScoringV4(scoringVersion)) return false;
   const n = Number(bigFive.N ?? 0);
+  // v5: stress is gated on explicit stress answers, so show it on the main result whenever it is high.
+  if (isScoringV5(scoringVersion)) return n >= V5_STRESS_SHOW;
   if (n < 67) return false;
   const others = Object.entries(bigFive).filter(([k]) => k !== "N").map(([, v]) => Number(v) || 0);
   const top = Math.max(...others);

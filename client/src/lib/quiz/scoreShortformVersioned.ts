@@ -161,6 +161,9 @@ export type VersionedResult = {
   v5Direction?: V5Direction;
   stage?: LifeStage;
   quickOrScattered?: boolean;
+  fast?: boolean;
+  scattered?: boolean;
+  clarityNote?: string;
 };
 
 export function scoreShortformVersioned(
@@ -276,7 +279,7 @@ function scoreV5(responses: VersionedResponse[], rawIn: VersionedScoreMaps): Ver
   let clarity = getResultClarity(calibrated.bigFive, clarityOpts);
   const flat = detectFlatAnswerPattern(responses);
   const inconsistency = detectInconsistency(responses.filter((r) => r.questionId <= 28));
-  const adj = adjustClarityV5(clarity.level, inconsistency, calibrated.bigFive, raw.mbti, responses);
+  const adj = adjustClarityV5(clarity.level, inconsistency, calibrated.bigFive, raw.mbti, responses, calibrated.career);
   if (adj.level !== clarity.level) clarity = { ...clarity, level: adj.level, label: RESULT_CLARITY_COPY_V41[adj.level].label, body: RESULT_CLARITY_COPY_V41[adj.level].body };
   let clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
   if (clarityDisplay.kind !== "flat" && clarityDisplay.kind !== clarity.level) {
@@ -288,13 +291,16 @@ function scoreV5(responses: VersionedResponse[], rawIn: VersionedScoreMaps): Ver
   if (adj.quickOrScattered) {
     mbtiConfidence.note = adj.note;
     mbtiConfidence.badge = mbtiConfidence.badge || "rough sketch";
-  } else if ((inconsistency.flagged || inconsistency.guarded) && inconsistency.note && !mbtiConfidence.note) {
+  } else if (inconsistency.guarded && inconsistency.note && !mbtiConfidence.note) {
     mbtiConfidence.note = inconsistency.note;
-    mbtiConfidence.badge = mbtiConfidence.badge || "rough sketch";
   }
   const ranked = (Object.entries(calibrated.bigFive) as [string, number][]).sort((a, b) => b[1] - a[1]);
   const stage = lifeStageFromResponses(responses);
-  const v5Direction = deriveWorkDirectionV5(calibrated.career, stage, { broad: clarity.level === "broad" });
+  const v5Direction = deriveWorkDirectionV5(calibrated.career, stage, {
+    broad: clarity.level === "broad",
+    forceBroad: adj.randomLike || (adj.fast && adj.quickOrScattered),
+    entrepreneurship: calibrated.career.entrepreneurship,
+  });
   const direction: WorkDirection = { laneKey: v5Direction.laneKey as any, title: v5Direction.title, examples: v5Direction.examples };
   const n = calibrated.bigFive.N;
   return {
@@ -315,9 +321,12 @@ function scoreV5(responses: VersionedResponse[], rawIn: VersionedScoreMaps): Ver
     altDirections: v5Direction.broad ? v5Direction.lanes.slice(1).map((l) => ({ laneKey: `v5:${l}` as any, title: l, examples: [] })) : [],
     nTier: n >= 67 ? "high" : n <= 33 ? "low" : "medium",
     mbtiConfidence,
-    inconsistency,
+    inconsistency: { ...inconsistency, flagged: adj.scattered || adj.randomLike },
     v5Direction,
     stage,
     quickOrScattered: adj.quickOrScattered,
+    fast: adj.fast,
+    scattered: adj.scattered || adj.randomLike,
+    clarityNote: adj.note,
   };
 }

@@ -461,9 +461,15 @@ function buildCareerDirection(legacy: PersonalityResult, scores: ScoresData, tie
   const scoringVersion = (scores as any).scoringVersion;
   if (isScoringV5(scoringVersion)) {
     const responses = (scores.responses ?? []) as any[];
-    const clarity = resolveFinalClarity(scores.bigFive as unknown as Record<string, number>, responses, scoringVersion);
+    const career = (scores.career ?? {}) as Record<string, number>;
+    const maxCareer = Math.max(0, ...Object.values(career).map((n) => Number(n) || 0));
+    const clarity = resolveFinalClarity(scores.bigFive as unknown as Record<string, number>, responses, scoringVersion, maxCareer, career);
     const stage = lifeStageFromResponses(responses, typeof tier === "string" ? tier : undefined);
-    const v5 = deriveWorkDirectionV5(scores.career as Record<string, number>, stage, { broad: clarity.level === "broad" });
+    const v5 = deriveWorkDirectionV5(career, stage, {
+      broad: clarity.level === "broad",
+      forceBroad: Boolean(clarity.v5?.randomLike || (clarity.v5?.fast && clarity.v5?.quickOrScattered)),
+      entrepreneurship: career.entrepreneurship,
+    });
     return {
       laneKey: v5.laneKey,
       title: v5.title,
