@@ -60,7 +60,7 @@ export default function MethodologyPage() {
 
         <section className="mt-10 grid gap-4 sm:grid-cols-3" aria-label="Methodology summary">
           {[
-            ["28 prompts", "A fixed short-form assessment: 8 core-style, 8 Big Five, 5 DISC, 5 career-fit, and 2 calibration prompts."],
+            ["30 prompts", "A fixed short-form assessment covering core style, Big Five traits, DISC work style, the kind of work you enjoy, and one life-stage prompt."],
             ["Four lenses", "Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-evidence themes."],
             ["One purpose", "Generate hypotheses about work patterns and role directions worth testing in real life."],
           ].map(([title, body]) => (
@@ -98,7 +98,7 @@ export default function MethodologyPage() {
             <h2 className={headingClass}>How a result is formed</h2>
             <ol className="mt-4 grid gap-3 text-sm leading-relaxed text-[#405f72] sm:grid-cols-2">
               {[
-                "You answer the 28 prompts based on your usual work pattern—not an ideal self or one unusual week.",
+                "You answer the 30 prompts based on your usual work pattern—not an ideal self or one unusual week.",
                 "Answers contribute weighted signals to the four interpretation lenses above.",
                 "The result compares stronger and closer signals, then turns them into plain-English work patterns and role-direction hypotheses.",
                 "The report explains a leading direction, supporting evidence, nearby possibilities, and a practical experiment where available.",
@@ -110,10 +110,10 @@ export default function MethodologyPage() {
               ))}
             </ol>
             <p className="mt-5 rounded-2xl border border-[#d9a441]/35 bg-[#fff5d8] p-4 text-sm leading-relaxed text-[#5a451a]">
-              <strong>Important:</strong> research on the Big Five does not validate this exact 28-question KYR implementation, its weighting, or any individual role recommendation. We do not publish an accuracy percentage because we do not have evidence to support one.
+              <strong>Important:</strong> research on the Big Five does not validate this exact 30-question KYR implementation, its weighting, or any individual role recommendation. We do not publish an accuracy percentage because we do not have evidence to support one.
             </p>
             <p className="mt-5 text-sm leading-relaxed text-[#405f72]">
-              Ready to compare these ideas with your own answers? <Link href="/quiz" className="font-semibold text-[#315f74] underline underline-offset-4 hover:text-[#a3402b]">Take the free 28-question work-style quiz</Link> and use the result as one input to a real-world experiment.
+              Ready to compare these ideas with your own answers? <Link href="/quiz" className="font-semibold text-[#315f74] underline underline-offset-4 hover:text-[#a3402b]">Take the free 30-question work-style quiz</Link> and use the result as one input to a real-world experiment.
             </p>
           </section>
 

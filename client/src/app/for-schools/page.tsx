@@ -7,7 +7,7 @@ import { publicPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = publicPageMetadata("/for-schools");
 
 const principles = [
-  ["A conversation starter", "KnowYouRole uses a fixed 28-question reflection to give students language for discussing interests, work preferences, strengths, and possible directions to explore."],
+  ["A conversation starter", "KnowYouRole uses a fixed 30-question reflection to give students language for discussing interests, work preferences, strengths, and possible directions to explore."],
   ["Not a label or decision tool", "It is not a clinical assessment, diagnosis, official MBTI instrument, hiring tool, admissions screen, prediction engine, or substitute for professional judgment."],
   ["Private by default", "Students can complete the quiz without creating an account or providing an email address. Analytics is optional and only loads after affirmative cookie consent."],
   ["Built for guided use", "A counselor, teacher, or caregiver can sit with a student, clarify questions, and use the result as one input to a broader conversation—not as an answer about who the student is."],
@@ -21,7 +21,7 @@ export default function ForSchoolsPage() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#a3402b]">For schools, counselors & educators</p>
         <h1 className="mt-4 max-w-4xl font-display text-4xl font-bold leading-[0.98] tracking-[-0.05em] sm:text-6xl">A short, structured way to start a better student conversation.</h1>
         <p className="mt-6 max-w-3xl text-lg leading-relaxed text-[#405f72] sm:text-xl">
-          KnowYouRole is a free work-style reflection and career-exploration tool. In about 15 minutes, students answer 28 fixed questions and receive practical language they can discuss with a counselor, teacher, parent, or caregiver.
+          KnowYouRole is a free work-style reflection and career-exploration tool. In about 15 minutes, students answer 30 fixed questions and receive practical language they can discuss with a counselor, teacher, parent, or caregiver.
         </p>
 
         <section className="mt-12 grid gap-4 sm:grid-cols-2" aria-label="How KnowYouRole is intended to be used">

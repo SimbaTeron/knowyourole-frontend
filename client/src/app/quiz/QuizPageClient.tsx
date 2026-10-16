@@ -64,7 +64,7 @@ export default function QuizPage() {
 
   // Direct-start quiz: age/mood setup screens are hidden. Default to adult tier when missing.
   useEffect(() => {
-    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: 28 });
+    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: 30 });
   }, []);
 
   useEffect(() => {
@@ -200,6 +200,15 @@ export default function QuizPage() {
       sessionId: payload.sessionId,
       responseCount: scores.responses.length,
     });
+    // Dev-only: per-question timings actually sent (seconds). Enable on a built site with
+    // localStorage.setItem("kyr:debug-timing", "1").
+    try {
+      if (process.env.NODE_ENV !== "production" || (typeof window !== "undefined" && window.localStorage.getItem("kyr:debug-timing") === "1")) {
+        console.info("[kyr timing] seconds per question", scores.responses.map((r) => (typeof r.timeSpent === "number" ? Math.round(r.timeSpent * 10) / 10 : null)));
+      }
+    } catch {
+      /* storage unavailable */
+    }
 
     try {
       const response = await fetch("/api/results/compute", {
@@ -886,7 +895,7 @@ export default function QuizPage() {
             </div>
             <h1 className="mb-3 text-3xl font-black tracking-tight">Analyzing<span className="analysis-dots" aria-hidden="true" /></h1>
             <p className="analysis-message mx-auto mb-7 max-w-sm text-sm leading-6 text-white/72" role="status" aria-live="polite">
-              Analyzing your 28 answers to build your work-style profile, career-fit signals, and role directions.
+              Analyzing your 30 answers to build your work-style profile, career-fit signals, and role directions.
             </p>
 
             <div className="mb-5 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10" aria-label="Results analysis progress">

@@ -2,16 +2,24 @@
 export const SCORING_VERSION_V2 = "shortform-v2-scoring-v2";
 export const SCORING_VERSION_V3 = "shortform-v2-scoring-v3";
 export const SCORING_VERSION_V4 = "shortform-v2-scoring-v4";
+export const SCORING_VERSION_V5 = "shortform-v2-scoring-v5";
 export const CAREER_MATCH_VERSION_V2 = "work-lanes-v2";
 export const CAREER_MATCH_VERSION_V3 = "work-lanes-v3-leadership";
 export const CAREER_MATCH_VERSION_V4 = "work-lanes-v4-coord";
+export const CAREER_MATCH_VERSION_V5 = "work-interest-lanes-v5";
 export const NARRATIVE_VERSION_V3 = "result-narrative-v3";
 export const NARRATIVE_VERSION_V4 = "result-narrative-v4";
+export const NARRATIVE_VERSION_V5 = "result-narrative-v5";
 
 export function isScoringV3(version: string | null | undefined): boolean {
   return version === SCORING_VERSION_V3 || version === "v3" || isScoringV4(version);
 }
 
+/** True for v4 and later (v5 keeps every v4 display feature). */
 export function isScoringV4(version: string | null | undefined): boolean {
-  return version === SCORING_VERSION_V4 || version === "v4";
+  return version === SCORING_VERSION_V4 || version === "v4" || isScoringV5(version);
+}
+
+export function isScoringV5(version: string | null | undefined): boolean {
+  return version === SCORING_VERSION_V5 || version === "v5";
 }

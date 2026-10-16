@@ -193,6 +193,16 @@ const CAREER_SIGNAL_LABELS: Record<CareerKey, string> = {
   autonomy: "autonomy",
   deepFocus: "deep focus",
   pace: "fast-paced work",
+  trades: "hands-on trade work",
+  artDesign: "art and design",
+  creator: "video and online content",
+  research: "research and science",
+  tech: "technology",
+  care: "caring for people",
+  teaching: "teaching and coaching",
+  business: "selling and business",
+  leading: "leading people",
+  organizing: "organizing and running things",
 };
 
 // Raw career totals are not comparable because some signals appear in more answer
@@ -520,7 +530,7 @@ export function calculateResult(scores: QuizScores, forceMBTI?: string | null): 
   const disc = scores.disc;
 
   const b5 = scores.bigFive;
-  const isCalibratedShortformV2 = scores.quizVersion === "shortform-v2-fixed-28"
+  const isCalibratedShortformV2 = (scores.quizVersion === "shortform-v2-fixed-28" || scores.quizVersion === "shortform-v2-fixed-30")
     || (Boolean(scores.career) && scores.responses?.length === SHORTFORM_V2_QUESTIONS.length);
   // Big Five inputs can arrive in three shapes during the ResultDTO migration:
   // 1. Fixed-28 shortform scores are explicitly opportunity/variance calibrated.

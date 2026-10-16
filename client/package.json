@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
-    "test:unit": "npx tsx --test tests/unit/resultClarity.test.mjs tests/unit/mbtiConfidence.test.mjs tests/unit/personaHarness.test.mjs tests/unit/computePersistenceFallback.test.mjs tests/unit/resultDecisionBrief.test.mjs tests/unit/clarityConsistency.test.mjs",
+    "test:unit": "npx tsx --test tests/unit/resultClarity.test.mjs tests/unit/mbtiConfidence.test.mjs tests/unit/personaHarness.test.mjs tests/unit/computePersistenceFallback.test.mjs tests/unit/resultDecisionBrief.test.mjs tests/unit/clarityConsistency.test.mjs tests/unit/personaHarnessV5.test.mjs tests/unit/resultWording.test.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {
