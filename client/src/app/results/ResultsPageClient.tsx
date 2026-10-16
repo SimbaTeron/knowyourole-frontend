@@ -5096,6 +5096,7 @@ function OrbitalGlassV2Results({
             </article>
             <ResultDecisionBrief
               result={canonicalResult}
+              clarityLevel={clarity.level}
               fallback={{
                 directionTitle: roleDirection.title,
                 rationale: roleDirection.rationale,
