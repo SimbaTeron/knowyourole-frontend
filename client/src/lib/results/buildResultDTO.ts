@@ -2,6 +2,10 @@ import { SCORING_VERSION_V3, CAREER_MATCH_VERSION_V3, NARRATIVE_VERSION_V3, isSc
 import { deriveWorkDirectionV3, deriveWorkLaneScores } from "@/lib/results/workLanes";
 import { calculatePersonality, validateInput, type ScoresData } from "@/lib/scoring";
 import { calculateResult, findBestRoleMatch, type PersonalityResult } from "@/components/results/resultsData";
+import { isScoringV5 } from "@/lib/quiz/scoringVersions";
+import { resolveFinalClarity } from "@/lib/results/finalClarity";
+import { lifeStageFromResponses } from "@/lib/quiz/shortformV5Adjustments";
+import { deriveWorkDirectionV5 } from "@/lib/results/workDirectionV5";
 
 /**
  * Canonical Autonomous Results Engine DTO builder.
@@ -227,6 +231,10 @@ export interface CareerDirectionDTO {
   title: string;
   examples: CareerMatchDTO[];
   rationale: string;
+  /** v5+: plain-English next steps matched to life stage. */
+  nextSteps?: string[];
+  /** v5+: answers were very quick or scattered; result shown as Broad. */
+  answerNote?: string;
 }
 
 export interface CareerMatchDTO {
@@ -449,7 +457,35 @@ function buildAdaptive(scores: ScoresData, mbti: MBTIResult, disc: DISCResult, b
   };
 }
 
-function buildCareerDirection(legacy: PersonalityResult, scores: ScoresData): CareerDirectionDTO {
+function buildCareerDirection(legacy: PersonalityResult, scores: ScoresData, tier?: unknown): CareerDirectionDTO {
+  const scoringVersion = (scores as any).scoringVersion;
+  if (isScoringV5(scoringVersion)) {
+    const responses = (scores.responses ?? []) as any[];
+    const career = (scores.career ?? {}) as Record<string, number>;
+    const maxCareer = Math.max(0, ...Object.values(career).map((n) => Number(n) || 0));
+    const clarity = resolveFinalClarity(scores.bigFive as unknown as Record<string, number>, responses, scoringVersion, maxCareer, career);
+    const stage = lifeStageFromResponses(responses, typeof tier === "string" ? tier : undefined);
+    const v5 = deriveWorkDirectionV5(career, stage, {
+      broad: clarity.level === "broad",
+      forceBroad: Boolean(clarity.v5?.randomLike || (clarity.v5?.fast && clarity.v5?.quickOrScattered)),
+      entrepreneurship: career.entrepreneurship,
+    });
+    return {
+      laneKey: v5.laneKey,
+      title: v5.title,
+      rationale: v5.rationale,
+      nextSteps: v5.nextSteps,
+      ...(clarity.v5Note ? { answerNote: clarity.v5Note } : {}),
+      examples: v5.examples.map((title, index) => ({
+        roleId: slugify(title),
+        title,
+        matchPercent: pct(Math.max(60, 88 - index * 6)),
+        reasoning: v5.rationale,
+        drivers: v5.lanes.map(String),
+        nextSteps: index === 0 ? v5.nextSteps : undefined,
+      })),
+    };
+  }
   const roleMatch = findBestRoleMatch(
     legacy.mbtiType,
     legacy.discStyle,
@@ -556,7 +592,7 @@ export function buildResultDTO(input: BuildResultDTOInput): BuildResultDTOOutput
   const bigFive = buildBigFive(input.scores, legacy);
   const bipolarBars = buildBipolarBars(mbti);
   const adaptive = buildAdaptive(input.scores, mbti, disc, bigFive, advanced);
-  const careerDirection = buildCareerDirection(legacy, input.scores);
+  const careerDirection = buildCareerDirection(legacy, input.scores, input.tier);
   const scores: PersonalityScoresDTO = { mbti, disc, bigFive, bipolarBars, adaptive, extensions: { legacyAdvanced: advanced } };
   const overallConfidence = pct((mbti.confidence + disc.confidence + bigFive.confidence + adaptive.completionConfidence) / 4);
 
@@ -589,8 +625,8 @@ export function buildResultDTO(input: BuildResultDTOInput): BuildResultDTOOutput
       status: "not_started",
       goalType: "career",
       targets: [legacy.primaryRole?.title || "Clarify best-fit career direction"],
-      recommendedActions: [{ id: "career-reflection-1", title: "Test your top role", description: "Compare your top career match against your current interests, skills, and energy patterns.", effort: "low", timeframe: "this_week" }],
-      weeklyCheckins: [{ week: 1, prompt: "Did your top role feel energizing, realistic, and worth exploring?", metric: "career_fit_confidence" }],
+      recommendedActions: [{ id: "career-reflection-1", title: "Try one of these directions", description: "Pick one example and take a small step this week: a class, a conversation with someone who does the work, or a short project.", effort: "low", timeframe: "this_week" }],
+      weeklyCheckins: [{ week: 1, prompt: "Did the direction you tried feel energizing, realistic, and worth exploring?", metric: "career_fit_confidence" }],
     },
     energyProductivity: { pattern: `${mbti.type}/${disc.primary} productivity pattern`, recommendations: ["Use this result to identify work conditions that protect energy and increase follow-through."] },
     audit: { overallConfidence, warnings: adaptive.weakSignals.length ? [`Weak signals: ${adaptive.weakSignals.join(", ")}`] : [], recoverableErrors: [], usedFallbacks: mbti.type === "XXXX", fallbackFields: mbti.type === "XXXX" ? ["scores.mbti.type"] : [], trace: { requestId: input.requestId, computeId: resultId }, scoringAudit: { totalQuestions: input.scores.responses?.length ?? 0, scoredQuestions: input.scores.responses?.length ?? 0, skippedQuestions: 0, hybridDimensions: Object.values(mbti.dimensions).filter((d) => d.isHybrid).map((d) => d.dimension), normalizationApplied: true } },

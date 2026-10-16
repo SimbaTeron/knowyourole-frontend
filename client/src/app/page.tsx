@@ -316,10 +316,10 @@ export default function Home() {
                 Discover your work style, uncover your strengths, and find career paths to explore next.
               </h1>
               <p className="hero-subtitle">
-                A private, 28-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.
+                A private, 30-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.
               </p>
               <a className="primary-cta" href="/quiz">Take the free quiz</a>
-              <p className="quiz-facts">28 questions · Private by default · No account required</p>
+              <p className="quiz-facts">30 questions · Private by default · No account required</p>
             </div>
 
             <aside className="result-preview" aria-label="Example KnowYouRole result">
@@ -370,7 +370,7 @@ export default function Home() {
             <ol className="how-steps">
               <li className="how-step">
                 <span className="how-step-number">STEP 01</span>
-                <h3>Answer 28 questions</h3>
+                <h3>Answer 30 questions</h3>
                 <p>Respond for your usual work, study, or project pattern—not the version of you that sounds most impressive.</p>
               </li>
               <li className="how-step">
@@ -406,7 +406,7 @@ export default function Home() {
           <div className="home-shell">
             <div className="final-panel testimonial-card">
               <div>
-                <h2 id="final-title" className="final-title section-title">Get a useful starting point in 28 questions.</h2>
+                <h2 id="final-title" className="final-title section-title">Get a useful starting point in 30 questions.</h2>
                 <p className="final-copy section-copy">Private by default. No account required.</p>
               </div>
               <a className="primary-cta" href="/quiz">Take the free quiz</a>

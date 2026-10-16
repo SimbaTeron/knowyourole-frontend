@@ -8,7 +8,7 @@ import { useState } from "react";
 const FAQ_ITEMS = [
   {
     question: "What is the current KnowYouRole quiz?",
-    answer: "KnowYouRole is a free 28-prompt self-reflection quiz for work style and role exploration. It turns your answers into a practical report on preferences, work behavior, trait signals, and career directions worth testing. It is not designed to reduce a person to one permanent label."
+    answer: "KnowYouRole is a free 30-prompt self-reflection quiz for work style and role exploration. It turns your answers into a practical report on preferences, work behavior, trait signals, and career directions worth testing. It is not designed to reduce a person to one permanent label."
   },
   {
     question: "What do I get when I finish?",
@@ -16,7 +16,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "How long does the quiz take?",
-    answer: "The current quiz has 28 focused prompts. There is no timer and no trick question. Take enough time to answer for what is usually true in your day-to-day work, study, or project life—not what sounds most impressive."
+    answer: "The current quiz has 30 focused prompts. There is no timer and no trick question. Take enough time to answer for what is usually true in your day-to-day work, study, or project life—not what sounds most impressive."
   },
   {
     question: "Are there right or wrong answers?",

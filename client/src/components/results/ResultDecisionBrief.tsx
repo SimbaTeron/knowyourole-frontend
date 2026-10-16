@@ -16,6 +16,8 @@ type ResultDecisionBriefProps = {
     watchOut: string;
   };
   onExploreRole: () => void;
+  /** The result card above already lists the examples and the "why" line: don't repeat them. */
+  hideRepeats?: boolean;
 };
 
 type EvidenceState = {
@@ -70,7 +72,7 @@ export function getEvidenceState(result?: ResultDTO, clarityLevel?: ClarityLevel
   };
 }
 
-export function ResultDecisionBrief({ result, clarityLevel, fallback, onExploreRole }: ResultDecisionBriefProps) {
+export function ResultDecisionBrief({ result, clarityLevel, fallback, onExploreRole, hideRepeats = false }: ResultDecisionBriefProps) {
   const direction = result?.careerDirection;
   const roles = direction?.examples.map((role) => ({ title: role.title, reasoning: role.reasoning })) ?? fallback.examples;
   const action = result?.growthPlan.recommendedActions[0];
@@ -91,24 +93,31 @@ export function ResultDecisionBrief({ result, clarityLevel, fallback, onExploreR
         <p style={bodyStyle}>{evidence.body}</p>
       </div>
 
-      <div style={gridStyle}>
-        <article style={cardStyle}>
-          <div style={smallLabelStyle}>Why it surfaced</div>
-          <p style={bodyStyle}>{direction?.rationale || fallback.rationale}</p>
-        </article>
+      {hideRepeats ? (
         <article style={cardStyle}>
           <div style={smallLabelStyle}>Try this week</div>
           <p style={bodyStyle}>{starterMove}</p>
         </article>
-      </div>
+      ) : (
+        <div style={gridStyle}>
+          <article style={cardStyle}>
+            <div style={smallLabelStyle}>Why it surfaced</div>
+            <p style={bodyStyle}>{direction?.rationale || fallback.rationale}</p>
+          </article>
+          <article style={cardStyle}>
+            <div style={smallLabelStyle}>Try this week</div>
+            <p style={bodyStyle}>{starterMove}</p>
+          </article>
+        </div>
+      )}
 
-      <article style={cardStyle}>
+      {!hideRepeats && <article style={cardStyle}>
         <div style={smallLabelStyle}>Adjacent examples to compare</div>
         <div style={roleListStyle}>
           {roles.slice(0, 3).map((role) => <span key={role.title} style={rolePillStyle}>{role.title}</span>)}
         </div>
         <p style={{ ...bodyStyle, marginTop: 10 }}>Compare the day-to-day work, entry route, and conditions—not just the title.</p>
-      </article>
+      </article>}
 
       <article style={{ ...cardStyle, borderColor: "rgba(201,95,70,.32)", background: "#fff3ed" }}>
         <div style={{ ...smallLabelStyle, color: "#a94635" }}>Career-context caveat</div>
