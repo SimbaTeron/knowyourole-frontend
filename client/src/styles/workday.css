@@ -316,10 +316,11 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
 .workday-header__mark { width: 33px; height: 33px; display: grid; place-items: center; border-radius: 10px; color: #12263a; background: #ffca42; box-shadow: 3px 3px 0 rgba(18,38,58,.14); }
 .workday-header__mark svg { width: 20px; height: 20px; }
 .workday-header__menu { display: none; position: relative; margin-left: auto; }
-.workday-header__menu summary { list-style: none; cursor: pointer; color: #12263a; font: 750 12px/1 "IBM Plex Sans", sans-serif; padding: 8px 10px; border-radius: 10px; }
+.workday-header__menu summary { list-style: none; cursor: pointer; color: #12263a; font: 800 13px/1 "IBM Plex Sans", sans-serif; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; min-width: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(18,38,58,.28); background: #fffdf8; }
+.workday-header__menu summary:focus-visible { outline: 3px solid #ffca42; outline-offset: 2px; }
 .workday-header__menu summary::-webkit-details-marker { display: none; }
 .workday-header__menu nav { position: absolute; right: 0; top: calc(100% + 6px); display: grid; gap: 4px; min-width: 160px; padding: 8px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(18,38,58,.15); z-index: 50; }
-.workday-header__menu nav a { color: #12263a; text-decoration: none; font: 700 13px/1.2 "IBM Plex Sans", sans-serif; padding: 9px 10px; border-radius: 8px; }
+.workday-header__menu nav a { color: #12263a; text-decoration: none; font: 700 14px/1.2 "IBM Plex Sans", sans-serif; padding: 13px 12px; min-height: 44px; display: flex; align-items: center; border-radius: 8px; }
 .workday-header__links { display: flex; align-items: center; gap: 18px; margin-left: auto; }
 .workday-header__links a { color: #536e82; text-decoration: none; font: 750 12px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.015em; }
 .workday-header__links a:hover { color: #12263a; }

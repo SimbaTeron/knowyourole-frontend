@@ -2,6 +2,7 @@
 
 import { AppHeader } from "@/components/layout/AppHeader";
 import { COOKIE_PREFERENCES_EVENT } from "@/components/CookieConsentBanner";
+import { AppFooter } from "@/components/layout/AppFooter";
 
 const sectionClass = "space-y-3";
 const headingClass = "text-lg font-semibold text-warm-gray dark:text-[#F8FAFC]";
@@ -37,7 +38,7 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Information we collect</h2>
             <ul className={listClass}>
-              <li>Quiz answers, score outputs, result pages viewed, and result identifiers.</li>
+              <li>Quiz answers, score outputs, result pages viewed, and result identifiers. These are saved on our servers with no name or account attached, so we can show and recover your result. We never sell quiz results.</li>
               <li>Age tier selection so quiz copy and experience can be age-appropriate.</li>
               <li>Email address, selected result-summary fields, consent, and delivery status when you explicitly request that a result summary be emailed.</li>
               <li>Feedback you submit voluntarily.</li>
@@ -144,6 +145,7 @@ export default function Privacy() {
           </section>
         </div>
       </main>
+      <AppFooter />
     </div>
   );
 }

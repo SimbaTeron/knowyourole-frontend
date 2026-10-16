@@ -50,7 +50,7 @@ const quizFaqJsonLd = {
       name: "Are my quiz answers private?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Quiz completion data can be saved to generate and recover your result. KnowYouRole does not sell quiz results; see the Privacy Policy for current storage and consent details.",
+        text: "Your answers and result are saved on our servers, with no name or account attached, so we can show and recover your result. We never sell quiz results. See the Privacy Policy for details.",
       },
     },
   ],

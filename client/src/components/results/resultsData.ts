@@ -869,7 +869,7 @@ export const COMPATIBILITY_MATRIX: Record<string, { match: string; score: number
     { match: "ENFP", score: 80, tip: "Social butterflies together" },
   ],
   "ISTP": [
-    { match: "ESTJ", score: 81, tip: "You fix it, they ship it" },
+    { match: "ESTJ", score: 81, tip: "You fix it, they finish it" },
     { match: "ESFJ", score: 82, tip: "Structure meets spontaneity" },
     { match: "ESTP", score: 78, tip: "Adventure buddies with skills" },
   ],

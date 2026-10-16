@@ -487,10 +487,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       </div>
 
       <div className="fixed left-3 right-3 top-3 z-40 flex items-center justify-between pointer-events-none sm:left-4 sm:right-4 sm:top-4">
-        <button onClick={onExit} className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#0b1020]/80 text-white/70 shadow-[0_18px_48px_rgba(0,0,0,0.35)] backdrop-blur-xl transition hover:bg-white/[0.1] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 sm:h-10 sm:w-10" aria-label="Exit quiz">
+        <button onClick={onExit} className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#0b1020]/80 text-white/70 shadow-[0_18px_48px_rgba(0,0,0,0.35)] backdrop-blur-xl transition hover:bg-white/[0.1] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 sm:h-11 sm:w-11" aria-label="Exit quiz">
           <X className="h-4 w-4" />
         </button>
-        <button onClick={goBack} disabled={currentIndex === 0 || Boolean(selectedAnswer)} className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#0b1020]/80 text-white/70 shadow-[0_18px_48px_rgba(0,0,0,0.35)] backdrop-blur-xl transition enabled:hover:bg-white/[0.1] enabled:hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:opacity-30 sm:h-10 sm:w-10" aria-label="Go back and change the previous answer" title="Go back and change the previous answer">
+        <button onClick={goBack} disabled={currentIndex === 0 || Boolean(selectedAnswer)} className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#0b1020]/80 text-white/70 shadow-[0_18px_48px_rgba(0,0,0,0.35)] backdrop-blur-xl transition enabled:hover:bg-white/[0.1] enabled:hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:opacity-30 sm:h-11 sm:w-11" aria-label="Go back and change the previous answer" title="Go back and change the previous answer">
           <ChevronLeft className="h-4 w-4" />
         </button>
       </div>
