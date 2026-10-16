@@ -1,0 +1,159 @@
+{
+  "id": "P32",
+  "persona": "Dev, 17, HS senior robotics lead. Organized, decisive, introverted-but-leads, calm.",
+  "expected": "High C, low N, I-lean leader; INTJ/ISTJ; DISC C/D; engineering lead role.",
+  "qa_fit_reason": "round4",
+  "envelope": {
+    "mbti_ok": [
+      "INTJ",
+      "ISTJ"
+    ],
+    "disc": [
+      "C",
+      "D"
+    ]
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 2,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 3,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 4,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 5,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 6,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 7,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 8,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 9,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 10,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 11,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 12,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 13,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 14,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 15,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 16,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 17,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 18,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 19,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 20,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 21,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 22,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 23,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 24,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 25,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 26,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 27,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ],
+  "qa_fit_score": 5
+}

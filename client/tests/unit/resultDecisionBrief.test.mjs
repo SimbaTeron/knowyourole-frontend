@@ -32,3 +32,10 @@ test("Clear with strong confidence shows clearer signal", () => {
   assert.match(e.title, /useful direction/i);
   assert.equal(e.label, "Clearer signal");
 });
+
+test("Clear never shows 'Mixed evidence' even with weak signals; Mixed does", () => {
+  const weak = fakeResult({ confidence: 39, weakSignals: ["EI", "SN"], hybrids: ["EI", "TF"] });
+  assert.notEqual(getEvidenceState(weak, "clear").label, "Mixed evidence");
+  assert.equal(getEvidenceState(weak, "clear").label, "Clearer signal");
+  assert.equal(getEvidenceState(weak, "mixed").label, "Mixed evidence");
+});

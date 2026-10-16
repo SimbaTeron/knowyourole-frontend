@@ -2,7 +2,7 @@
   "id": "P03",
   "persona": "Jordan, 16, HS junior. Team captain, decisive, competitive, blunt, likes being in charge, impatient with long discussions.",
   "expected": "High extraversion, low agreeableness-ish; ESTJ/ENTJ; DISC D; leader/driver role.",
-  "qa_fit_score": 3,
+  "qa_fit_score": 5,
   "qa_fit_reason": "DISC D right, but ESTP instead of ESTJ/ENTJ; decisive in-charge captain read as improviser; role skews emergency ops not leadership",
   "envelope": {
     "mbti_ok": [
@@ -67,8 +67,8 @@
     },
     {
       "questionId": 9,
-      "choice": 3,
-      "letter": "D"
+      "choice": 2,
+      "letter": "C"
     },
     {
       "questionId": 10,

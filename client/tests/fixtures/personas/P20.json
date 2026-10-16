@@ -1,0 +1,159 @@
+{
+  "id": "P20",
+  "persona": "High E, moderate A, low-moderate C, low N; ESTP; DISC D/I; active hands-on or team role.",
+  "expected": "High E, moderate A, low-moderate C, low N; ESTP; DISC D/I; active hands-on or team role.",
+  "qa_fit_score": 4,
+  "qa_fit_reason": "ESTP/D right; role leadership vs hands-on/team",
+  "envelope": {
+    "notes": "High E, moderate A, low-moderate C, low N; ESTP; DISC D/I; active hands-on or team role.",
+    "mbti_ok": [
+      "ESTP"
+    ],
+    "disc": [
+      "D",
+      "I"
+    ]
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 2,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 3,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 4,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 5,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 6,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 7,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 8,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 9,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 10,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 13,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 14,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 15,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 16,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 17,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 18,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 19,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 20,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 21,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 22,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 23,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 24,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 25,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 26,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 27,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 28,
+      "choice": 1,
+      "letter": "B"
+    }
+  ]
+}

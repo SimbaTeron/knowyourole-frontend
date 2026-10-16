@@ -1,0 +1,159 @@
+{
+  "id": "P31",
+  "persona": "Sofia, 12, 7th grader. Curious, chatty, kind, scattered, loves science experiments.",
+  "expected": "High O/E/A, low C; ENFP; DISC I; exploratory/science-communication role.",
+  "qa_fit_reason": "round4",
+  "envelope": {
+    "mbti_ok": [
+      "ENFP",
+      "ENFJ",
+      "ESFP"
+    ],
+    "disc": [
+      "I"
+    ]
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 2,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 3,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 4,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 5,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 6,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 7,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 8,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 9,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 10,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 11,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 12,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 13,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 14,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 15,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 16,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 17,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 18,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 19,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 20,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 21,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 22,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 23,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 24,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 25,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 26,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 27,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 28,
+      "choice": 1,
+      "letter": "B"
+    }
+  ],
+  "qa_fit_score": 5
+}

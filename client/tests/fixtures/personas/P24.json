@@ -1,0 +1,161 @@
+{
+  "id": "P24",
+  "persona": "Low C, low N, high A, moderate-high E; ESFP; DISC I/S; social service or hospitality role.",
+  "expected": "Low C, low N, high A, moderate-high E; ESFP; DISC I/S; social service or hospitality role.",
+  "qa_fit_score": 5,
+  "qa_fit_reason": "ENFP not ESFP; low C/low N ok, people role fine",
+  "envelope": {
+    "notes": "Low C, low N, high A, moderate-high E; ESFP; DISC I/S; social service or hospitality role.",
+    "mbti_ok": [
+      "ESFP",
+      "ESFJ",
+      "ENFP"
+    ],
+    "disc": [
+      "S",
+      "I"
+    ]
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 2,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 3,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 4,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 5,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 6,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 7,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 8,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 9,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 10,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 11,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 12,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 13,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 14,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 15,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 16,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 17,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 18,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 19,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 20,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 21,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 22,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 23,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 24,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 25,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 26,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 27,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 28,
+      "choice": 1,
+      "letter": "B"
+    }
+  ]
+}

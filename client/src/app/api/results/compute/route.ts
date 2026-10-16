@@ -9,7 +9,8 @@ import { buildQuizResultReportingProjection } from "@/lib/results/quizResultRepo
 import type { ScoresData } from "@/lib/scoring";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
 import { applyV3RawDeltas, computeV3RawDeltas } from "@/lib/quiz/shortformV3Adjustments";
-import { SCORING_VERSION_V3, CAREER_MATCH_VERSION_V3, NARRATIVE_VERSION_V3 } from "@/lib/quiz/scoringVersions";
+import { SCORING_VERSION_V4, CAREER_MATCH_VERSION_V4, NARRATIVE_VERSION_V4 } from "@/lib/quiz/scoringVersions";
+import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
 import {
   getShortformV2Question,
   recomputeShortformV2ScoreMaps,
@@ -176,27 +177,26 @@ function recomputeAuthoritativeShortformScores(rawResponses: unknown): BuildResu
     };
   });
 
-  const v3Maps = applyV3RawDeltas(
-    rawScoreMaps,
-    computeV3RawDeltas(responses.map((r) => ({ questionId: r.questionId, choice: r.choice }))),
-  );
+  const evidence = responses.map((r) => ({ questionId: r.questionId, choice: r.choice as 0 | 1 | 2 | 3 }));
+  const v3Maps = applyV3RawDeltas(rawScoreMaps, computeV3RawDeltas(evidence));
+  const v4Maps = applyV4OptionRemaps({ ...v3Maps, career: { ...rawScoreMaps.career } }, evidence);
   const scoreInput = {
-    ...v3Maps,
+    ...v4Maps,
     responses: canonicalResponses,
     swipeTimes,
     averageSwipeTime,
     currentDifficulty: averageSwipeTime < 2 ? "hard" as const : averageSwipeTime < 5 ? "medium" as const : "easy" as const,
     engagement: canonicalResponses.length,
     wildcardBoost: false,
-    criticalWildcard: v3Maps.mbti.T >= v3Maps.mbti.F && v3Maps.bigFive.O > 0 ? 1 : 0,
-    firstPrinciplesWildcard: v3Maps.mbti.N >= v3Maps.mbti.S && v3Maps.bigFive.O > 0 ? 1 : 0,
+    criticalWildcard: v4Maps.mbti.T >= v4Maps.mbti.F && v4Maps.bigFive.O > 0 ? 1 : 0,
+    firstPrinciplesWildcard: v4Maps.mbti.N >= v4Maps.mbti.S && v4Maps.bigFive.O > 0 ? 1 : 0,
     hybridTypes: [],
     quizVersion: "shortform-v2-fixed-28",
     questionDatabase: "shortformV2Questions.ts",
     deterministicResult: true,
-    scoringVersion: SCORING_VERSION_V3,
-    careerMatchVersion: CAREER_MATCH_VERSION_V3,
-    narrativeVersion: NARRATIVE_VERSION_V3,
+    scoringVersion: SCORING_VERSION_V4,
+    careerMatchVersion: CAREER_MATCH_VERSION_V4,
+    narrativeVersion: NARRATIVE_VERSION_V4,
   };
 
   // Calibrate against v2 bank profiles after v3 raw deltas (J/N rebalance).

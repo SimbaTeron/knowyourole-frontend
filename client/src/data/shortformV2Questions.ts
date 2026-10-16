@@ -68,7 +68,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
       { id: "A", text: "Quiet time where nobody needs anything from me.", supportingText: "You reset through solitude, privacy, and lower stimulation.", resultSignal: "Deep-focus recovery", scores: { mbti: { I: 3 }, disc: { C: 1 }, bigFive: { E: -2, C: 1 }, career: { deepFocus: 3, analysis: 1 } } },
       { id: "B", text: "A good conversation with someone who energizes me.", supportingText: "You recover through connection, reaction, and shared momentum.", resultSignal: "Connection recharge", scores: { mbti: { E: 3, F: 1 }, disc: { I: 2 }, bigFive: { E: 3, A: 1 }, career: { people: 2, service: 1 } } },
       { id: "C", text: "Doing something active or practical so I can reset physically.", supportingText: "You clear your head through movement, tasks, or tangible action.", resultSignal: "Practical reset", scores: { mbti: { S: 2, P: 1 }, disc: { D: 1, S: 1 }, bigFive: { E: 1, N: -1 }, career: { handsOn: 3, operations: 1, pace: 1 } } },
-      { id: "D", text: "Switching into a creative or interesting project that absorbs me.", supportingText: "You recover by following curiosity into something absorbing.", resultSignal: "Creative immersion", scores: { mbti: { N: 2, P: 1, I: 1 }, disc: { I: 1 }, bigFive: { O: 3 }, career: { creative: 3, autonomy: 1 } } },
+      { id: "D", text: "Quietly sinking into a creative or interesting project on my own.", supportingText: "You recover by following curiosity into something absorbing.", resultSignal: "Creative immersion", scores: { mbti: { N: 2, P: 1, I: 1 }, disc: { I: 1 }, bigFive: { O: 3 }, career: { creative: 3, autonomy: 1 } } },
     ],
   },
   {
@@ -180,7 +180,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
       { id: "A", text: "I finish it because reliability matters.", supportingText: "Commitment carries you when novelty disappears.", resultSignal: "Duty follow-through", scores: { mbti: { J: 2, S: 1 }, disc: { S: 2, C: 1 }, bigFive: { C: 3 }, career: { stability: 2, operations: 2 } } },
       { id: "B", text: "I finish it if I can make the system cleaner or smarter.", supportingText: "Improvement gives the dull work a reason to exist.", resultSignal: "Systems follow-through", scores: { mbti: { T: 2, J: 1, N: 1 }, disc: { C: 2 }, bigFive: { C: 2, O: 1 }, career: { systems: 3, analysis: 2 } } },
       { id: "C", text: "I push through if other people are counting on me.", supportingText: "Responsibility to people activates your persistence.", resultSignal: "Relational follow-through", scores: { mbti: { F: 2, J: 1 }, disc: { S: 2 }, bigFive: { A: 2, C: 1 }, career: { people: 2, service: 2 } } },
-      { id: "D", text: "I look for a faster or more energizing way to get it done.", supportingText: "You preserve momentum by redesigning the route.", resultSignal: "Adaptive efficiency", scores: { mbti: { P: 2, N: 1 }, disc: { D: 1, I: 1 }, bigFive: { O: 2, C: -1 }, career: { entrepreneurship: 2, autonomy: 2, pace: 1 } } },
+      { id: "D", text: "I look for a more interesting angle or shortcut, even if it means leaving the usual plan.", supportingText: "You stay engaged by changing the approach rather than grinding the checklist.", resultSignal: "Adaptive efficiency", scores: { mbti: { P: 2, N: 1 }, disc: { D: 1, I: 1 }, bigFive: { O: 2, C: -1 }, career: { entrepreneurship: 2, autonomy: 2, pace: 1 } } },
     ],
   },
   {
@@ -263,7 +263,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     answers: [
       { id: "A", text: "I get sharper and more decisive.", supportingText: "Pressure focuses you into action.", resultSignal: "Pressure commander", scores: { mbti: { E: 1, T: 2, J: 1 }, disc: { D: 3 }, bigFive: { C: 2, N: -2 }, career: { leadership: 3, pace: 2 } } },
       { id: "B", text: "I become quieter and more analytical.", supportingText: "Pressure sends you inward toward diagnosis.", resultSignal: "Pressure analyst", scores: { mbti: { I: 3, T: 2 }, disc: { C: 3 }, bigFive: { C: 1, N: -1 }, career: { analysis: 3, deepFocus: 2 } } },
-      { id: "C", text: "I look for reassurance, alignment, or support.", supportingText: "You regulate pressure through trusted connection.", resultSignal: "Pressure connector", scores: { mbti: { F: 2, E: 1 }, disc: { S: 2, I: 1 }, bigFive: { A: 2, N: 2 }, career: { people: 2, service: 1 } } },
+      { id: "C", text: "I check in with people I trust so we stay on the same page.", supportingText: "Connection helps you stay steady — not because you are falling apart.", resultSignal: "Pressure connector", scores: { mbti: { F: 2, E: 1 }, disc: { S: 2, I: 1 }, bigFive: { A: 2, N: 2 }, career: { people: 2, service: 1 } } },
       { id: "D", text: "I feel scattered unless I can simplify the next step.", supportingText: "You need the chaos reduced into one handleable move.", resultSignal: "Pressure simplifier", scores: { mbti: { P: 1, S: 1 }, disc: { S: 1 }, bigFive: { N: 3, C: -1 }, career: { operations: 1, stability: 1 } } },
     ],
   },
@@ -332,7 +332,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     guidance: "Choose your default when the project needs a decision.",
     answers: [
       { id: "A", text: "Ship it if it solves the real problem.", supportingText: "You value usefulness over polishing the doorknob on a house fire.", resultSignal: "Pragmatic shipper", scores: { mbti: { T: 1, P: 2 }, disc: { D: 3 }, bigFive: { C: 0, E: 1 }, career: { entrepreneurship: 3, pace: 2, leadership: 1 } } },
-      { id: "B", text: "Improve the weak spots before others see it.", supportingText: "Your standards protect the work’s credibility.", resultSignal: "Quality finisher", scores: { mbti: { J: 3, S: 1 }, disc: { C: 4 }, bigFive: { C: 4 }, career: { operations: 3, systems: 2 } } },
+      { id: "B", text: "I keep fixing small flaws because shipping imperfect work makes me uneasy.", supportingText: "High standards and worry both push you to polish before others judge it.", resultSignal: "Quality finisher", scores: { mbti: { J: 3, S: 1 }, disc: { C: 4 }, bigFive: { C: 4 }, career: { operations: 3, systems: 2 } } },
       { id: "C", text: "Get feedback from people who will use it.", supportingText: "You want reality from the user, not theory from the conference room.", resultSignal: "User-feedback builder", scores: { mbti: { F: 1, E: 1, P: 1 }, disc: { I: 2, S: 1 }, bigFive: { A: 2, O: 1 }, career: { people: 2, service: 1, creative: 1 } } },
       { id: "D", text: "Reframe the goal if the current version misses the point.", supportingText: "You zoom out when optimization is solving the wrong problem.", resultSignal: "Strategic reframer", scores: { mbti: { N: 3, T: 1 }, disc: { C: 1, D: 1 }, bigFive: { O: 3 }, career: { systems: 3, analysis: 2, creative: 1 } } },
     ],

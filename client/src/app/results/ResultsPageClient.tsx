@@ -1,9 +1,8 @@
 'use client';
-import { resolveResultClarityDisplay, formatTopTraitLabel } from "@/lib/results/resultClarity";
-import { isScoringV3 } from "@/lib/quiz/scoringVersions";
+import { formatTopTraitLabel } from "@/lib/results/resultClarity";
+import { resolveFinalClarity, shouldShowStressSecondary } from "@/lib/results/finalClarity";
+import { isScoringV3, isScoringV4 } from "@/lib/quiz/scoringVersions";
 import { getMbtiConfidence } from "@/lib/quiz/mbtiConfidence";
-import { recomputeShortformV2ScoreMaps } from "@/lib/quiz/shortformV2Scoring";
-import { applyV3RawDeltas, computeV3RawDeltas, V3_ALL } from "@/lib/quiz/shortformV3Adjustments";
 
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
@@ -4916,35 +4915,34 @@ function OrbitalGlassV2Results({
   const scoringVersion = (rawScores as any)?.scoringVersion || canonicalResult?.version?.scoringVersion;
   const v3 = isScoringV3(scoringVersion);
   const maxCareer = rawScores?.career ? Math.max(...Object.values(rawScores.career as Record<string, number>).map((n) => Number(n) || 0)) : undefined;
-  const clarityDisplay = resolveResultClarityDisplay(bigFive, rawScores?.responses, v3 ? { version: "v3", maxCareer } : {});
+  // One final clarity value for every view (main, Big Five tab, decision brief, report).
+  const finalClarity = resolveFinalClarity(bigFive as unknown as Record<string, number>, rawScores?.responses, scoringVersion, maxCareer);
+  const clarityDisplay = finalClarity.display;
+  const clarityDisplayShown = clarityDisplay;
   const clarity = clarityDisplay.clarity;
+  const clarityLevelForBrief = finalClarity.level;
   const topTraitDisplay = formatTopTraitLabel(clarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
   const mbtiConfidenceScores = (rawScores?.mbti as Record<string, number> | undefined) || {};
   const hasMbtiScores = ["E","I","S","N","T","F","J","P"].every((k) => typeof mbtiConfidenceScores[k] === "number");
-  // Derive raw MBTI from answer evidence so the dual close-letter threshold (cal + raw) matches the harness.
-  let rawMbtiForConfidence: Record<string, number> | undefined;
-  if (v3 && Array.isArray(rawScores?.responses) && rawScores!.responses!.length >= 28) {
-    try {
-      const evidence = rawScores!.responses!
-        .filter((r) => typeof r?.questionId === "number" && typeof r?.choice === "number")
-        .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
-      if (evidence.length >= 28) {
-        const maps = recomputeShortformV2ScoreMaps(evidence);
-        rawMbtiForConfidence = applyV3RawDeltas(maps, computeV3RawDeltas(evidence, V3_ALL)).mbti;
-      }
-    } catch {
-      rawMbtiForConfidence = undefined;
-    }
-  }
+  const rawMbtiForConfidence = finalClarity.rawMbti;
+  const v4 = isScoringV4(scoringVersion);
+  const inconsistencyNote = finalClarity.report && (finalClarity.report.flagged || finalClarity.report.guarded) ? finalClarity.report.note : "";
   const mbtiConfidenceResolved = v3 && hasMbtiScores
-    ? getMbtiConfidence(mbtiConfidenceScores, rawMbtiForConfidence, { broad: clarity.level === "broad" })
+    ? getMbtiConfidence(mbtiConfidenceScores, rawMbtiForConfidence, { broad: clarity.level === "broad" || !!inconsistencyNote })
     : v3 && clarity.level === "broad"
       ? { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "This type is a directional sketch — your trait pattern was broad, so treat it as a starting point, not a hard label.", badge: "directional sketch" }
       : { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "", badge: "" };
+  if (inconsistencyNote) {
+    mbtiConfidenceResolved.note = inconsistencyNote;
+    if (!mbtiConfidenceResolved.badge) mbtiConfidenceResolved.badge = "rough sketch";
+  }
   // Always show the full 4-letter type (never X). Close letters get a light-lean marker + note.
   const displayMbti = mbtiType;
   const typeBadge = v3 ? mbtiConfidenceResolved.badge : "";
   const typeConfidenceNote = v3 ? mbtiConfidenceResolved.note : "";
+  const stressSecondaryNote = shouldShowStressSecondary(bigFive as unknown as Record<string, number>, scoringVersion)
+    ? "Second signal: Stress Reactivity is also high. You may push hard on the outside while feeling pressure on the inside — build in recovery and smaller pressure steps."
+    : "";
   const lightLeanLetters = new Set(v3 ? mbtiConfidenceResolved.lightLeanLetters : []);
   const resultSummaryLine = buildResultSummaryLine({
     roleTitle: roleDirection.title,
@@ -5092,11 +5090,11 @@ function OrbitalGlassV2Results({
               <div className="shareline"><b>Snapshot</b><p>“{shareLine}”</p></div>
               <div className="role-card"><small>{clarity.level === "broad" && v3 ? "Directions to explore" : "Best-fit direction"}</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>Strong examples</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}{clarity.level === "broad" && v3 && adjacentRoles.length > 0 && <div className="direction-examples" data-testid="broad-alt-roles"><b>Also explore</b>{adjacentRoles.slice(0,2).map(role => <span key={role.title}>• {role.title}</span>)}</div>}</div>
               <div className="mini-stats"><div className="stat"><small>Mind</small><strong>{mbtiType}</strong><span>{stripLeadingThe(arch)}</span></div><div className="stat"><small>Work style</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>{clarity.blended ? "Top traits" : "Top trait"}</small><strong>{leanBand(topTrait[1])}</strong><span>{topTraitDisplay}</span></div></div>
-              {typeConfidenceNote && <p className="mbti-confidence-note" data-testid="mbti-confidence-note">{typeConfidenceNote}</p>}<div className={`clarity-note clarity-${clarityDisplay.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplay.heading}</b><p>{clarityDisplay.body}</p></div>
+              {typeConfidenceNote && <p className="mbti-confidence-note" data-testid="mbti-confidence-note">{typeConfidenceNote}</p>}<div className={`clarity-note clarity-${clarityDisplayShown.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplayShown.heading}</b><p>{clarityDisplayShown.body}</p></div>{stressSecondaryNote && <p className="mbti-confidence-note" data-testid="stress-secondary-note">{stressSecondaryNote}</p>}
             </article>
             <ResultDecisionBrief
               result={canonicalResult}
-              clarityLevel={clarity.level}
+              clarityLevel={clarityLevelForBrief}
               fallback={{
                 directionTitle: roleDirection.title,
                 rationale: roleDirection.rationale,
@@ -5231,7 +5229,9 @@ export default function ResultsPage() {
   const career = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
   const topBigFive = (Object.entries(bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
   const topBigFiveLabel = TRAIT_DEEP_DIVE[topBigFive[0]]?.label || topBigFive[0];
-  const reportClarityDisplay = resolveResultClarityDisplay(bigFive, rawScores?.responses);
+  const reportScoringVersion = (rawScores as any)?.scoringVersion;
+  const reportMaxCareer = rawScores?.career ? Math.max(...Object.values(rawScores.career as Record<string, number>).map((n) => Number(n) || 0)) : undefined;
+  const reportClarityDisplay = resolveFinalClarity(bigFive as unknown as Record<string, number>, rawScores?.responses, reportScoringVersion, reportMaxCareer).display;
   const reportClarity = reportClarityDisplay.clarity;
   const reportTopTraitDisplay = formatTopTraitLabel(reportClarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
   const reportRoleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career, (rawScores as any)?.scoringVersion);

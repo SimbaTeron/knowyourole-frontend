@@ -1,0 +1,159 @@
+{
+  "id": "P34",
+  "persona": "Paul, 55, factory worker retraining as an electrician. Practical, steady, reserved, conventional.",
+  "expected": "High C, low O, introverted, low N; ISTJ; DISC S/C; hands-on technical role.",
+  "qa_fit_reason": "round4",
+  "envelope": {
+    "mbti_ok": [
+      "ISTJ",
+      "ISFJ"
+    ],
+    "disc": [
+      "S",
+      "C"
+    ]
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 2,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 3,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 4,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 5,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 6,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 7,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 8,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 9,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 10,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 13,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 14,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 15,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 16,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 17,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 18,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 19,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 20,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 21,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 22,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 23,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 24,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 25,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 26,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 27,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 28,
+      "choice": 1,
+      "letter": "B"
+    }
+  ],
+  "qa_fit_score": 5
+}

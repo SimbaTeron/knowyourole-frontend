@@ -1,0 +1,160 @@
+{
+  "id": "P29",
+  "persona": "Moderate-to-low clarity, reserved thinker lean (ISTJ/INTP); the result should hedge rather than overclaim.",
+  "expected": "Moderate-to-low clarity, reserved thinker lean (ISTJ/INTP); the result should hedge rather than overclaim.",
+  "qa_fit_score": 2,
+  "qa_fit_reason": "guarded answers produced a Clear confident ISTJ",
+  "envelope": {
+    "notes": "Moderate-to-low clarity, reserved thinker lean (ISTJ/INTP); the result should hedge rather than overclaim.",
+    "mbti_ok": [
+      "ISTJ",
+      "INTP"
+    ],
+    "clarity_not": [
+      "clear"
+    ],
+    "expect_inconsistency_or_hedge": true
+  },
+  "answers": [
+    {
+      "questionId": 1,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 2,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 3,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 4,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 5,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 6,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 7,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 8,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 9,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 10,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 11,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 12,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 13,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 14,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 15,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 16,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 17,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 18,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 19,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 20,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 21,
+      "choice": 3,
+      "letter": "D"
+    },
+    {
+      "questionId": 22,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 23,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 24,
+      "choice": 2,
+      "letter": "C"
+    },
+    {
+      "questionId": 25,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 26,
+      "choice": 1,
+      "letter": "B"
+    },
+    {
+      "questionId": 27,
+      "choice": 0,
+      "letter": "A"
+    },
+    {
+      "questionId": 28,
+      "choice": 3,
+      "letter": "D"
+    }
+  ]
+}
