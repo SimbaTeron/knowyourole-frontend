@@ -414,7 +414,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
             <li className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-sm leading-6 text-white/75"><strong className="block text-white">A practical result</strong> A work-style snapshot, communication clues, pressure patterns, and exploratory role directions.</li>
           </ul>
           <p className="mt-5 text-sm leading-6 text-white/58">Your responses are interpreted as work-style and career-exploration signals—not a diagnosis, hiring screen, or career prescription.</p>
-          <button type="button" onClick={handleStart} className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-300 px-5 py-3 text-sm font-black text-[#06101f] shadow-[0_16px_42px_rgba(34,211,238,0.25)] transition hover:brightness-105 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-cyan-200 sm:w-auto">Start the 28 questions</button>
+          <button type="button" onClick={handleStart} className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-300 px-5 py-3 text-sm font-black text-[#06101f] shadow-[0_16px_42px_rgba(34,211,238,0.25)] transition hover:brightness-105 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-cyan-200 sm:w-auto">Start the 30 questions</button>
         </section>
       </div>
     );

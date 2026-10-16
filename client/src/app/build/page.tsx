@@ -14,7 +14,7 @@ const sections = [
   {
     icon: Database,
     title: "Architecture",
-    body: "The public app is a Next.js application. A fixed 28-question bank submits answer evidence to a server route, which recomputes the interpretation, builds one canonical result record, and persists it through Supabase before the result is shown.",
+    body: "The public app is a Next.js application. A fixed 30-question bank submits answer evidence to a server route, which recomputes the interpretation, builds one canonical result record, and persists it through Supabase before the result is shown.",
   },
   {
     icon: ShieldCheck,
@@ -65,7 +65,7 @@ export default function BuildPage() {
         <section className="mt-12 rounded-3xl bg-[#12263a] p-6 text-white sm:p-9">
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#67E8F9]">System flow</p>
           <ol className="mt-5 grid gap-3 text-sm leading-relaxed sm:grid-cols-4">
-            {["28 fixed prompts", "Answer evidence", "Server recomputation", "Persisted result + reflection"].map((step, index) => <li key={step} className="rounded-2xl border border-white/15 bg-white/5 p-4"><span className="text-[#67E8F9]">0{index + 1}</span><p className="mt-2 font-bold">{step}</p></li>)}
+            {["30 fixed prompts", "Answer evidence", "Server recomputation", "Persisted result + reflection"].map((step, index) => <li key={step} className="rounded-2xl border border-white/15 bg-white/5 p-4"><span className="text-[#67E8F9]">0{index + 1}</span><p className="mt-2 font-bold">{step}</p></li>)}
           </ol>
         </section>
 

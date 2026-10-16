@@ -534,14 +534,17 @@ function fitBand(value: number): string {
   return "Stretch fit";
 }
 
-function buildResultSummaryLine({ roleTitle, identity, mbtiType, discLabel, topTraitLabel, broad = false }: {
+function buildResultSummaryLine({ roleTitle, identity, mbtiType, discLabel, topTraitLabel, broad = false, workClear = false }: {
   broad?: boolean;
+  /** v5: personality pattern is broad, but the work-interest answers clearly pointed one way. */
+  workClear?: boolean;
   roleTitle: string;
   identity: string;
   mbtiType: string;
   discLabel: string;
   topTraitLabel: string;
 }) {
+  if (broad && workClear) return `A broad, balanced personality pattern, but your work answers pointed clearly to ${roleTitle.toLowerCase()}. Your answers leaned a little toward ${mbtiType} thinking and ${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style.`;
   if (broad) return `A broad, balanced pattern. Several directions are worth trying, including ${roleTitle.toLowerCase()}. Your answers leaned a little toward ${mbtiType} thinking and ${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style.`;
   return `${identity}. A direction worth testing: ${roleTitle}. Your leading signals are ${mbtiType} thinking, ${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style, and ${topTraitLabel.toLowerCase()}.`;
 }
@@ -4955,6 +4958,7 @@ function OrbitalGlassV2Results({
     ? "Second signal: Stress Reactivity is also high. You may push hard on the outside while feeling pressure on the inside — build in recovery and smaller pressure steps."
     : "";
   const lightLeanLetters = new Set(v3 ? mbtiConfidenceResolved.lightLeanLetters : []);
+  const v5Direction = typeof canonicalCareerDirection?.laneKey === "string" && canonicalCareerDirection.laneKey.startsWith("v5:");
   const resultSummaryLine = buildResultSummaryLine({
     roleTitle: roleDirection.title,
     identity,
@@ -4962,8 +4966,8 @@ function OrbitalGlassV2Results({
     discLabel,
     topTraitLabel: topTraitMeta.label,
     broad: v3 && clarity.level === "broad",
+    workClear: v5Direction && canonicalCareerDirection?.laneKey !== "v5:broad",
   });
-  const v5Direction = typeof canonicalCareerDirection?.laneKey === "string" && canonicalCareerDirection.laneKey.startsWith("v5:");
   const v5NextSteps = v5Direction ? canonicalCareerDirection?.nextSteps ?? [] : [];
   const v5AnswerNote = v5Direction ? canonicalCareerDirection?.answerNote : undefined;
   const isBroadResult = v5Direction ? canonicalCareerDirection?.laneKey === "v5:broad" : v3 && clarity.level === "broad";
