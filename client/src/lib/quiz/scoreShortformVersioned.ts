@@ -10,11 +10,16 @@ import {
   V3_ALL,
 } from "@/lib/quiz/shortformV3Adjustments";
 import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
+import { applyV5Raw, applyV5StressGate, lifeStageFromResponses, type LifeStage } from "@/lib/quiz/shortformV5Adjustments";
+import { adjustClarityV5 } from "@/lib/quiz/clarityV5";
+import { deriveWorkDirectionV5, type V5Direction } from "@/lib/results/workDirectionV5";
 import { detectInconsistency, adjustClarityV41, RESULT_CLARITY_COPY_V41, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
 import {
   SCORING_VERSION_V2,
   SCORING_VERSION_V3,
   SCORING_VERSION_V4,
+  SCORING_VERSION_V5,
+  CAREER_MATCH_VERSION_V5,
   CAREER_MATCH_VERSION_V2,
   CAREER_MATCH_VERSION_V3,
   CAREER_MATCH_VERSION_V4,
@@ -30,7 +35,7 @@ import {
 import { getResultClarity, detectFlatAnswerPattern, resolveResultClarityDisplay } from "@/lib/results/resultClarity";
 import { getMbtiConfidence, type MbtiConfidence } from "@/lib/quiz/mbtiConfidence";
 
-export type ScoreVersion = "v2" | "v3" | "v4";
+export type ScoreVersion = "v2" | "v3" | "v4" | "v5";
 export type VersionedResponse = { questionId: number; choice: 0 | 1 | 2 | 3; timeSpent?: number };
 
 export type VersionedScoreMaps = {
@@ -153,6 +158,9 @@ export type VersionedResult = {
   nTier: "low" | "medium" | "high";
   mbtiConfidence: MbtiConfidence;
   inconsistency: InconsistencyReport;
+  v5Direction?: V5Direction;
+  stage?: LifeStage;
+  quickOrScattered?: boolean;
 };
 
 export function scoreShortformVersioned(
@@ -161,6 +169,9 @@ export function scoreShortformVersioned(
   flags: V3Flags = V3_ALL,
 ): VersionedResult {
   let raw = recompute(responses, SHORTFORM_V2_QUESTIONS);
+  if (version === "v5") {
+    return scoreV5(responses, raw);
+  }
   if (version === "v3" || version === "v4") {
     raw = applyV3RawDeltas(raw, computeV3RawDeltas(responses, flags));
   }
@@ -253,4 +264,60 @@ function buildAltDirections(
     if (d.title !== primary.title) alts.push(d);
   }
   return alts.slice(0, 2);
+}
+
+
+function scoreV5(responses: VersionedResponse[], rawIn: VersionedScoreMaps): VersionedResult {
+  const raw = applyV5Raw(rawIn as any, responses) as VersionedScoreMaps;
+  const calibrated = calibrate(raw);
+  calibrated.bigFive = applyV5StressGate(calibrated.bigFive, responses) as VersionedScoreMaps["bigFive"];
+  const maxCareer = Math.max(...Object.values(calibrated.career).map((v) => Number(v) || 0));
+  const clarityOpts = { version: "v3" as const, maxCareer };
+  let clarity = getResultClarity(calibrated.bigFive, clarityOpts);
+  const flat = detectFlatAnswerPattern(responses);
+  const inconsistency = detectInconsistency(responses.filter((r) => r.questionId <= 28));
+  const adj = adjustClarityV5(clarity.level, inconsistency, calibrated.bigFive, raw.mbti, responses);
+  if (adj.level !== clarity.level) clarity = { ...clarity, level: adj.level, label: RESULT_CLARITY_COPY_V41[adj.level].label, body: RESULT_CLARITY_COPY_V41[adj.level].body };
+  let clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
+  if (clarityDisplay.kind !== "flat" && clarityDisplay.kind !== clarity.level) {
+    const copy = RESULT_CLARITY_COPY_V41[clarity.level];
+    clarityDisplay = { ...clarityDisplay, kind: clarity.level, heading: `Result clarity: ${copy.label}`, body: copy.body };
+  }
+  const type = mbtiType(calibrated.mbti, false);
+  const mbtiConfidence = getMbtiConfidence(calibrated.mbti, raw.mbti, { broad: clarity.level === "broad" });
+  if (adj.quickOrScattered) {
+    mbtiConfidence.note = adj.note;
+    mbtiConfidence.badge = mbtiConfidence.badge || "rough sketch";
+  } else if ((inconsistency.flagged || inconsistency.guarded) && inconsistency.note && !mbtiConfidence.note) {
+    mbtiConfidence.note = inconsistency.note;
+    mbtiConfidence.badge = mbtiConfidence.badge || "rough sketch";
+  }
+  const ranked = (Object.entries(calibrated.bigFive) as [string, number][]).sort((a, b) => b[1] - a[1]);
+  const stage = lifeStageFromResponses(responses);
+  const v5Direction = deriveWorkDirectionV5(calibrated.career, stage, { broad: clarity.level === "broad" });
+  const direction: WorkDirection = { laneKey: v5Direction.laneKey as any, title: v5Direction.title, examples: v5Direction.examples };
+  const n = calibrated.bigFive.N;
+  return {
+    version: "v5",
+    scoringVersion: SCORING_VERSION_V5,
+    careerMatchVersion: CAREER_MATCH_VERSION_V5,
+    raw,
+    calibrated,
+    mbtiType: type,
+    mbtiDisplay: mbtiConfidence.type,
+    discPrimary: discPrimary(calibrated.disc),
+    topTrait: ranked[0][0],
+    topTraits: ranked.map(([k]) => k),
+    clarity,
+    flat,
+    clarityDisplay,
+    direction,
+    altDirections: v5Direction.broad ? v5Direction.lanes.slice(1).map((l) => ({ laneKey: `v5:${l}` as any, title: l, examples: [] })) : [],
+    nTier: n >= 67 ? "high" : n <= 33 ? "low" : "medium",
+    mbtiConfidence,
+    inconsistency,
+    v5Direction,
+    stage,
+    quickOrScattered: adj.quickOrScattered,
+  };
 }

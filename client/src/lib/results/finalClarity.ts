@@ -4,7 +4,8 @@
  * scores + answer evidence; never changes scores.
  */
 import { resolveResultClarityDisplay, type ResultClarityDisplay } from "@/lib/results/resultClarity";
-import { isScoringV3, isScoringV4 } from "@/lib/quiz/scoringVersions";
+import { isScoringV3, isScoringV4, isScoringV5 } from "@/lib/quiz/scoringVersions";
+import { adjustClarityV5 } from "@/lib/quiz/clarityV5";
 import { detectInconsistency, adjustClarityV41, RESULT_CLARITY_COPY_V41, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
 import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
 import { recomputeShortformV2ScoreMaps } from "@/lib/quiz/shortformV2Scoring";
@@ -18,6 +19,8 @@ export type FinalClarity = {
   level: FinalClarityLevel;
   report: InconsistencyReport | null;
   rawMbti?: Record<string, number>;
+  /** v5: note shown when answers were very quick or scattered. */
+  v5Note?: string;
 };
 
 type Resp = { questionId?: unknown; choice?: unknown };
@@ -34,6 +37,7 @@ export function resolveFinalClarity(
   let display = base;
   let report: InconsistencyReport | null = null;
   let rawMbti: Record<string, number> | undefined;
+  let v5Note: string | undefined;
   const evidence = (responses ?? [])
     .filter((r) => typeof r?.questionId === "number" && typeof r?.choice === "number")
     .map((r) => ({ questionId: r.questionId as number, choice: r.choice as 0 | 1 | 2 | 3 }));
@@ -46,11 +50,17 @@ export function resolveFinalClarity(
   }
   if (isScoringV4(scoringVersion) && evidence.length >= 28) {
     try {
-      report = detectInconsistency(evidence);
+      report = detectInconsistency(evidence.filter((r) => r.questionId <= 28));
       if (rawMbti) {
         rawMbti = applyV4OptionRemaps({ mbti: { ...rawMbti }, disc: {}, bigFive: {}, career: {} }, evidence).mbti;
       }
-      level = adjustClarityV41(level, report, bigFive, rawMbti);
+      if (isScoringV5(scoringVersion)) {
+        const v5 = adjustClarityV5(level, report, bigFive, rawMbti, responses);
+        level = v5.level;
+        v5Note = v5.note || undefined;
+      } else {
+        level = adjustClarityV41(level, report, bigFive, rawMbti);
+      }
       if (base.kind !== "flat" && level !== base.clarity.level) {
         const copy = RESULT_CLARITY_COPY_V41[level];
         display = {
@@ -67,7 +77,7 @@ export function resolveFinalClarity(
       /* keep base */
     }
   }
-  return { display, level, report, rawMbti };
+  return { display, level, report, rawMbti, v5Note };
 }
 
 /** Stress secondary note: N high AND not the top or co-top (within 5 pts) trait. */

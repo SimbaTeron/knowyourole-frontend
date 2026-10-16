@@ -19,6 +19,7 @@ export type QuizResultReportingProjection = {
   big_five: string;
 } & Record<QuestionColumn, number>;
 
+const REPORTING_COLUMN_COUNT = 28;
 const BIG_FIVE_CODES = ["O", "C", "E", "A", "N"] as const;
 
 export function buildQuizResultReportingProjection(result: ResultDTO): QuizResultReportingProjection {
@@ -42,7 +43,9 @@ export function buildQuizResultReportingProjection(result: ResultDTO): QuizResul
       .join(";"),
   } as QuizResultReportingProjection;
 
-  for (const question of SHORTFORM_V2_QUESTIONS) {
+  // The quiz_results table has fixed columns q1..q28 (no DB change). Later questions
+  // (v5: Q29 Saturday class, Q30 life stage) live only in the canonical DTO jsonb.
+  for (const question of SHORTFORM_V2_QUESTIONS.filter((q) => q.id <= REPORTING_COLUMN_COUNT)) {
     const choice = answersByQuestionId.get(String(question.id))?.choice;
     if (!Number.isInteger(choice) || choice === undefined || choice < 0 || choice > 3) {
       throw new Error(`Canonical ResultDTO has no valid selected answer for question ${question.id}`);
@@ -50,8 +53,8 @@ export function buildQuizResultReportingProjection(result: ResultDTO): QuizResul
     projection[`q${question.id}`] = choice + 1;
   }
 
-  if (SHORTFORM_V2_QUESTIONS.length !== 28) {
-    throw new Error("Reporting projections require exactly 28 fixed Shortform V2 questions");
+  if (Object.keys(projection).filter((k) => /^q\d+$/.test(k)).length !== REPORTING_COLUMN_COUNT) {
+    throw new Error("Reporting projections require exactly 28 answer columns");
   }
 
   return projection;

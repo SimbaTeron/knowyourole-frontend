@@ -8,9 +8,8 @@ import { readPersistedQuizResultDTO } from "@/lib/results/persistedQuizResult";
 import { buildQuizResultReportingProjection } from "@/lib/results/quizResultReportingProjection";
 import type { ScoresData } from "@/lib/scoring";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
-import { applyV3RawDeltas, computeV3RawDeltas } from "@/lib/quiz/shortformV3Adjustments";
-import { SCORING_VERSION_V4, CAREER_MATCH_VERSION_V4, NARRATIVE_VERSION_V4 } from "@/lib/quiz/scoringVersions";
-import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
+import { SCORING_VERSION_V5, CAREER_MATCH_VERSION_V5, NARRATIVE_VERSION_V5 } from "@/lib/quiz/scoringVersions";
+import { applyV5Raw, applyV5StressGate } from "@/lib/quiz/shortformV5Adjustments";
 import {
   getShortformV2Question,
   recomputeShortformV2ScoreMaps,
@@ -178,8 +177,8 @@ function recomputeAuthoritativeShortformScores(rawResponses: unknown): BuildResu
   });
 
   const evidence = responses.map((r) => ({ questionId: r.questionId, choice: r.choice as 0 | 1 | 2 | 3 }));
-  const v3Maps = applyV3RawDeltas(rawScoreMaps, computeV3RawDeltas(evidence));
-  const v4Maps = applyV4OptionRemaps({ ...v3Maps, career: { ...rawScoreMaps.career } }, evidence);
+  // v5: legacy v3/v4 option rules (skipping items whose meaning changed) + v5 deltas.
+  const v4Maps = applyV5Raw({ ...rawScoreMaps, career: { ...rawScoreMaps.career } } as any, evidence) as typeof rawScoreMaps;
   const scoreInput = {
     ...v4Maps,
     responses: canonicalResponses,
@@ -191,16 +190,17 @@ function recomputeAuthoritativeShortformScores(rawResponses: unknown): BuildResu
     criticalWildcard: v4Maps.mbti.T >= v4Maps.mbti.F && v4Maps.bigFive.O > 0 ? 1 : 0,
     firstPrinciplesWildcard: v4Maps.mbti.N >= v4Maps.mbti.S && v4Maps.bigFive.O > 0 ? 1 : 0,
     hybridTypes: [],
-    quizVersion: "shortform-v2-fixed-28",
+    quizVersion: "shortform-v2-fixed-30",
     questionDatabase: "shortformV2Questions.ts",
     deterministicResult: true,
-    scoringVersion: SCORING_VERSION_V4,
-    careerMatchVersion: CAREER_MATCH_VERSION_V4,
-    narrativeVersion: NARRATIVE_VERSION_V4,
+    scoringVersion: SCORING_VERSION_V5,
+    careerMatchVersion: CAREER_MATCH_VERSION_V5,
+    narrativeVersion: NARRATIVE_VERSION_V5,
   };
 
-  // Calibrate against v2 bank profiles after v3 raw deltas (J/N rebalance).
-  return calibrateShortformV2Scores(scoreInput) as ScoresData;
+  // Calibrate against bank profiles, then gate Stress Reactivity on explicit evidence (v5).
+  const calibrated = calibrateShortformV2Scores(scoreInput) as ScoresData;
+  return { ...calibrated, bigFive: applyV5StressGate(calibrated.bigFive as unknown as Record<string, number>, evidence) as unknown as ScoresData["bigFive"] } as ScoresData;
 }
 
 async function persistResultDTOSafely(result: ResultDTO): Promise<

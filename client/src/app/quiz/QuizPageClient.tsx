@@ -64,7 +64,7 @@ export default function QuizPage() {
 
   // Direct-start quiz: age/mood setup screens are hidden. Default to adult tier when missing.
   useEffect(() => {
-    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: 28 });
+    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: 30 });
   }, []);
 
   useEffect(() => {

@@ -15,7 +15,18 @@ export type CareerKey =
   | "stability"
   | "autonomy"
   | "deepFocus"
-  | "pace";
+  | "pace"
+  // v5 work-interest signals (set only by work-content items)
+  | "trades"
+  | "artDesign"
+  | "creator"
+  | "research"
+  | "tech"
+  | "care"
+  | "teaching"
+  | "business"
+  | "leading"
+  | "organizing";
 
 export interface ShortformV2Answer {
   id: "A" | "B" | "C" | "D";
@@ -54,7 +65,20 @@ export const CAREER_SCORE_KEYS: CareerKey[] = [
   "autonomy",
   "deepFocus",
   "pace",
+  "trades",
+  "artDesign",
+  "creator",
+  "research",
+  "tech",
+  "care",
+  "teaching",
+  "business",
+  "leading",
+  "organizing",
 ];
+
+/** v5 work-interest keys (drive the v5 role engine). */
+export const INTEREST_KEYS: CareerKey[] = ["trades", "artDesign", "creator", "research", "tech", "care", "teaching", "business", "leading", "organizing"];
 
 export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
   {
@@ -163,10 +187,10 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     prompt: "Which task would you choose if they all mattered the same?",
     guidance: "This is about what you enjoy, not what sounds impressive.",
     answers: [
-      { id: "A", text: "Analyze a complex issue and explain the clean answer.", supportingText: "You like turning mess into clarity.", resultSignal: "Figure it out", scores: { mbti: { I: 1, N: 1, T: 3 }, disc: { C: 2 }, bigFive: { O: 1, C: 1 }, career: { analysis: 4, systems: 1, deepFocus: 1 } } },
-      { id: "B", text: "Coordinate moving parts so the whole thing works smoothly.", supportingText: "You like making things run smoothly.", resultSignal: "Keep things running", scores: { mbti: { J: 3, S: 1 }, disc: { S: 1, C: 2 }, bigFive: { C: 3 }, career: { operations: 4, systems: 2, stability: 1 } } },
-      { id: "C", text: "Convince people to get behind a useful idea or opportunity.", supportingText: "You like getting people excited to act.", resultSignal: "Convince people", scores: { mbti: { E: 3, N: 1 }, disc: { I: 2, D: 1 }, bigFive: { E: 3, O: 1 }, career: { people: 2, leadership: 2, entrepreneurship: 2 } } },
-      { id: "D", text: "Help someone solve a real problem directly.", supportingText: "You like impact you can see in another person’s life.", resultSignal: "Help directly", scores: { mbti: { F: 3, S: 1 }, disc: { S: 2 }, bigFive: { A: 3 }, career: { service: 4, people: 2, handsOn: 1 } } },
+      { id: "A", text: "Analyze a complex issue and explain the clean answer.", supportingText: "You like turning mess into clarity.", resultSignal: "Figure it out", scores: { mbti: { I: 1, N: 1, T: 3 }, disc: { C: 2 }, bigFive: { O: 1, C: 1 }, career: { analysis: 4, systems: 1, deepFocus: 1, research: 2, tech: 1 } } },
+      { id: "B", text: "Coordinate moving parts so the whole thing works smoothly.", supportingText: "You like making things run smoothly.", resultSignal: "Keep things running", scores: { mbti: { J: 3, S: 1 }, disc: { S: 1, C: 2 }, bigFive: { C: 3 }, career: { operations: 4, systems: 2, stability: 1, organizing: 3 } } },
+      { id: "C", text: "Convince people to get behind a useful idea or opportunity.", supportingText: "You like getting people excited to act.", resultSignal: "Convince people", scores: { mbti: { E: 3, N: 1 }, disc: { I: 2, D: 1 }, bigFive: { E: 3, O: 1 }, career: { people: 2, leadership: 2, entrepreneurship: 2, business: 3 } } },
+      { id: "D", text: "Help someone solve a real problem directly.", supportingText: "You like impact you can see in another person’s life.", resultSignal: "Help directly", scores: { mbti: { F: 3, S: 1 }, disc: { S: 2 }, bigFive: { A: 3 }, career: { service: 4, people: 2, handsOn: 1, care: 2, teaching: 1 } } },
     ],
   },
   {
@@ -205,10 +229,10 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     prompt: "What kind of learning do you enjoy most?",
     guidance: "Pick the learning you would do even if no one assigned it.",
     answers: [
-      { id: "A", text: "Learning a practical skill I can use quickly.", supportingText: "You like learning things you can use right away.", resultSignal: "Useful skills", scores: { mbti: { S: 2, P: 1 }, disc: { D: 1 }, bigFive: { O: 1, C: 1 }, career: { handsOn: 3, operations: 1 } } },
-      { id: "B", text: "Understanding a deep idea or system.", supportingText: "You want to know how things really work underneath.", resultSignal: "How things work", scores: { mbti: { N: 2, T: 2, I: 1 }, disc: { C: 2 }, bigFive: { O: 3 }, career: { analysis: 3, systems: 3, deepFocus: 1 } } },
-      { id: "C", text: "Exploring something creative, unusual, or new.", supportingText: "You get excited by new and different ideas.", resultSignal: "New ideas", scores: { mbti: { N: 3, P: 1 }, disc: { I: 1 }, bigFive: { O: 4 }, career: { creative: 4, autonomy: 1 } } },
-      { id: "D", text: "Learning through people, stories, and lived experience.", supportingText: "Human context makes knowledge stick.", resultSignal: "Learn from people", scores: { mbti: { F: 2, E: 1 }, disc: { I: 2, S: 1 }, bigFive: { A: 2, E: 1, O: 1 }, career: { people: 3, service: 1 } } },
+      { id: "A", text: "Learning a practical skill I can use quickly.", supportingText: "You like learning things you can use right away.", resultSignal: "Useful skills", scores: { mbti: { S: 2, P: 1 }, disc: { D: 1 }, bigFive: { O: 1, C: 1 }, career: { handsOn: 3, operations: 1, trades: 2 } } },
+      { id: "B", text: "Understanding a deep idea or system.", supportingText: "You want to know how things really work underneath.", resultSignal: "How things work", scores: { mbti: { N: 2, T: 2, I: 1 }, disc: { C: 2 }, bigFive: { O: 3 }, career: { analysis: 3, systems: 3, deepFocus: 1, research: 2, tech: 1 } } },
+      { id: "C", text: "Exploring something creative, unusual, or new.", supportingText: "You get excited by new and different ideas.", resultSignal: "New ideas", scores: { mbti: { N: 3, P: 1 }, disc: { I: 1 }, bigFive: { O: 4 }, career: { creative: 4, autonomy: 1, artDesign: 1, creator: 1 } } },
+      { id: "D", text: "Learning through people, stories, and lived experience.", supportingText: "Human context makes knowledge stick.", resultSignal: "Learn from people", scores: { mbti: { F: 2, E: 1 }, disc: { I: 2, S: 1 }, bigFive: { A: 2, E: 1, O: 1 }, career: { people: 3, service: 1, teaching: 2, care: 1 } } },
     ],
   },
   {
@@ -222,7 +246,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
       { id: "A", text: "A lively room where ideas and reactions move fast.", supportingText: "High interaction sharpens you.", resultSignal: "Busy and social", scores: { mbti: { E: 4, P: 1 }, disc: { I: 3 }, bigFive: { E: 4 }, career: { people: 3, pace: 2 } } },
       { id: "B", text: "A small trusted group with thoughtful exchange.", supportingText: "You like close, meaningful conversations.", resultSignal: "Small group", scores: { mbti: { I: 1, F: 2, N: 1 }, disc: { S: 2 }, bigFive: { A: 2, E: 1 }, career: { people: 2, service: 1 } } },
       { id: "C", text: "A quiet environment where I can focus deeply.", supportingText: "You do your strongest work when interruption is low.", resultSignal: "Quiet focus", scores: { mbti: { I: 4, J: 1 }, disc: { C: 2 }, bigFive: { E: -3, C: 1 }, career: { deepFocus: 4, analysis: 1 } } },
-      { id: "D", text: "A hands-on setting where I can move, test, or fix things.", supportingText: "You come alive through practical engagement.", resultSignal: "Hands-on", scores: { mbti: { S: 3, P: 1 }, disc: { D: 1, S: 1 }, bigFive: { E: 1 }, career: { handsOn: 4, operations: 1, pace: 1 } } },
+      { id: "D", text: "A hands-on setting where I can move, test, or fix things.", supportingText: "You come alive through practical engagement.", resultSignal: "Hands-on", scores: { mbti: { S: 3, P: 1 }, disc: { D: 1, S: 1 }, bigFive: { E: 1 }, career: { handsOn: 4, operations: 1, pace: 1, trades: 2 } } },
     ],
   },
   {
@@ -289,7 +313,7 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     prompt: "A group is stuck and the deadline is getting close. What do you naturally do?",
     guidance: "Choose what you would do even if you were not the leader.",
     answers: [
-      { id: "A", text: "Make the call and get people moving.", supportingText: "You convert uncertainty into action.", resultSignal: "Make the call", scores: { mbti: { E: 1, T: 2, J: 1 }, disc: { D: 4 }, bigFive: { C: 1, E: 1 }, career: { leadership: 4, pace: 2 } } },
+      { id: "A", text: "Make the call and get people moving.", supportingText: "You convert uncertainty into action.", resultSignal: "Make the call", scores: { mbti: { E: 1, T: 2, J: 1 }, disc: { D: 4 }, bigFive: { C: 1, E: 1 }, career: { leadership: 4, pace: 2, leading: 2 } } },
       { id: "B", text: "Cheer the group on and get everyone excited again.", supportingText: "You know a group works better when people feel good.", resultSignal: "Cheer people on", scores: { mbti: { E: 3, F: 1 }, disc: { I: 4 }, bigFive: { E: 3, A: 1 }, career: { people: 3, leadership: 1 } } },
       { id: "C", text: "Calm the room and create a steady path.", supportingText: "You get things moving again by making them calmer.", resultSignal: "Calm and steady", scores: { mbti: { F: 1, J: 2, S: 1 }, disc: { S: 4 }, bigFive: { A: 2, C: 2, N: -1 }, career: { stability: 3, operations: 2, service: 1 } } },
       { id: "D", text: "Check the facts so the next move is correct.", supportingText: "You stop the group from rushing into a mistake.", resultSignal: "Check the facts", scores: { mbti: { I: 1, T: 2, S: 1 }, disc: { C: 4 }, bigFive: { C: 3 }, career: { analysis: 3, systems: 2 } } },
@@ -345,10 +369,10 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     prompt: "Which responsibility would you rather own?",
     guidance: "Choose the responsibility you would accept even when it gets hard.",
     answers: [
-      { id: "A", text: "Making the final decision when the path is unclear.", supportingText: "You can carry ambiguity and still move.", resultSignal: "Final decision", scores: { mbti: { T: 2, J: 1, E: 1 }, disc: { D: 4 }, bigFive: { C: 1, N: -1 }, career: { leadership: 4, entrepreneurship: 2 } } },
-      { id: "B", text: "Keeping the process organized and dependable.", supportingText: "You like being the reason things do not fall apart.", resultSignal: "Keep it organized", scores: { mbti: { S: 2, J: 3 }, disc: { C: 3, S: 1 }, bigFive: { C: 4 }, career: { operations: 4, systems: 2, stability: 2 } } },
-      { id: "C", text: "Making sure people stay informed and engaged.", supportingText: "You keep everyone in the loop and involved.", resultSignal: "Keep people involved", scores: { mbti: { E: 2, F: 2 }, disc: { I: 3, S: 1 }, bigFive: { E: 2, A: 2 }, career: { people: 4, leadership: 1 } } },
-      { id: "D", text: "Solving the hardest technical problem or toughest idea.", supportingText: "You want the hard puzzle, not the easy task.", resultSignal: "Hardest problem", scores: { mbti: { I: 1, N: 2, T: 3 }, disc: { C: 3 }, bigFive: { O: 2, C: 1 }, career: { analysis: 4, systems: 3, deepFocus: 2 } } },
+      { id: "A", text: "Making the final decision when the path is unclear.", supportingText: "You can carry ambiguity and still move.", resultSignal: "Final decision", scores: { mbti: { T: 2, J: 1, E: 1 }, disc: { D: 4 }, bigFive: { C: 1, N: -1 }, career: { leadership: 4, entrepreneurship: 2, leading: 2 } } },
+      { id: "B", text: "Keeping the process organized and dependable.", supportingText: "You like being the reason things do not fall apart.", resultSignal: "Keep it organized", scores: { mbti: { S: 2, J: 3 }, disc: { C: 3, S: 1 }, bigFive: { C: 4 }, career: { operations: 4, systems: 2, stability: 2, organizing: 2 } } },
+      { id: "C", text: "Making sure people stay informed and engaged.", supportingText: "You keep everyone in the loop and involved.", resultSignal: "Keep people involved", scores: { mbti: { E: 2, F: 2 }, disc: { I: 3, S: 1 }, bigFive: { E: 2, A: 2 }, career: { people: 4, leadership: 1, teaching: 1, business: 1 } } },
+      { id: "D", text: "Solving the hardest technical problem or toughest idea.", supportingText: "You want the hard puzzle, not the easy task.", resultSignal: "Hardest problem", scores: { mbti: { I: 1, N: 2, T: 3 }, disc: { C: 3 }, bigFive: { O: 2, C: 1 }, career: { analysis: 4, systems: 3, deepFocus: 2, tech: 1, research: 1 } } },
     ],
   },
   {
@@ -356,13 +380,13 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     key: "work-material-preference",
     group: "Career-fit vector",
     signal: "Work material",
-    prompt: "What would you most want to work with every week?",
+    prompt: "What would you most like to work with every week?",
     guidance: "Pick what you would actually want to work with again and again.",
     answers: [
-      { id: "A", text: "Data, systems, research, or complex information.", supportingText: "You are drawn toward complexity that can be understood.", resultSignal: "Data and systems", scores: { mbti: { I: 1, N: 1, T: 2 }, disc: { C: 3 }, bigFive: { O: 2, C: 1 }, career: { analysis: 4, systems: 4, deepFocus: 1 } } },
-      { id: "B", text: "People, needs, relationships, or communication.", supportingText: "You want human context in the work, not just abstract output.", resultSignal: "People", scores: { mbti: { E: 1, F: 3 }, disc: { I: 2, S: 2 }, bigFive: { A: 3, E: 1 }, career: { people: 4, service: 3 } } },
-      { id: "C", text: "Tools, machines, products, or hands-on practical problems.", supportingText: "You like work you can touch and see results from.", resultSignal: "Hands-on", scores: { mbti: { S: 3, T: 1 }, disc: { C: 1, D: 1, S: 1 }, bigFive: { C: 1 }, career: { handsOn: 4, operations: 3, systems: 1 } } },
-      { id: "D", text: "Ideas, stories, designs, or future possibilities.", supportingText: "You want work that uses your imagination.", resultSignal: "Ideas and creativity", scores: { mbti: { N: 3, P: 1 }, disc: { I: 2 }, bigFive: { O: 4 }, career: { creative: 4, autonomy: 2 } } },
+      { id: "A", text: "Numbers, data, research, or computers.", supportingText: "You are drawn toward complexity that can be understood.", resultSignal: "Data and systems", scores: { mbti: { I: 1, N: 1, T: 2 }, disc: { C: 3 }, bigFive: { O: 2, C: 1 }, career: { analysis: 4, systems: 4, deepFocus: 1, research: 2, tech: 2, organizing: 1 } } },
+      { id: "B", text: "People: helping, teaching, or caring for them.", supportingText: "You want human context in the work, not just abstract output.", resultSignal: "People", scores: { mbti: { E: 1, F: 3 }, disc: { I: 2, S: 2 }, bigFive: { A: 3, E: 1 }, career: { people: 4, service: 3, care: 2, teaching: 2 } } },
+      { id: "C", text: "Tools, machines, engines, wiring, wood, or metal.", supportingText: "You like work you can touch and see results from.", resultSignal: "Hands-on", scores: { mbti: { S: 3, T: 1 }, disc: { C: 1, D: 1, S: 1 }, bigFive: { C: 1 }, career: { handsOn: 4, operations: 3, systems: 1, trades: 4 } } },
+      { id: "D", text: "Art, design, video, music, or stories.", supportingText: "You want work that uses your imagination.", resultSignal: "Ideas and creativity", scores: { mbti: { N: 3, P: 1 }, disc: { I: 2 }, bigFive: { O: 4 }, career: { creative: 4, autonomy: 2, artDesign: 3, creator: 2 } } },
     ],
   },
   {
@@ -373,10 +397,10 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     prompt: "Which kind of work could you keep doing for months without getting worn out?",
     guidance: "Ignore what sounds impressive. Choose what you could keep doing.",
     answers: [
-      { id: "A", text: "Improving a system until it runs better.", supportingText: "Making something a little better each time keeps you interested.", resultSignal: "Improving systems", scores: { mbti: { T: 2, J: 2 }, disc: { C: 3 }, bigFive: { C: 3, O: 1 }, career: { systems: 4, operations: 3, analysis: 1 } } },
-      { id: "B", text: "Helping people solve personal or practical problems.", supportingText: "Helping people keeps you going.", resultSignal: "Helping people", scores: { mbti: { F: 3, S: 1 }, disc: { S: 3 }, bigFive: { A: 4 }, career: { service: 4, people: 3 } } },
-      { id: "C", text: "Building, fixing, or testing something real you can touch.", supportingText: "Seeing real, physical progress keeps you going.", resultSignal: "Building and fixing", scores: { mbti: { S: 3, P: 1 }, disc: { D: 1, C: 1 }, bigFive: { C: 1 }, career: { handsOn: 4, operations: 2, pace: 1 } } },
-      { id: "D", text: "Creating ideas, art, videos, content, or experiences.", supportingText: "Making new things keeps the work fun.", resultSignal: "Creating", scores: { mbti: { N: 3, E: 1, P: 1 }, disc: { I: 3 }, bigFive: { O: 4, E: 1 }, career: { creative: 4, entrepreneurship: 1, autonomy: 1 } } },
+      { id: "A", text: "Making a system, team, or business run better.", supportingText: "Making something a little better each time keeps you interested.", resultSignal: "Improving systems", scores: { mbti: { T: 2, J: 2 }, disc: { C: 3 }, bigFive: { C: 3, O: 1 }, career: { systems: 4, operations: 3, analysis: 1, organizing: 3, business: 1 } } },
+      { id: "B", text: "Helping, teaching, or caring for people.", supportingText: "Helping people keeps you going.", resultSignal: "Helping people", scores: { mbti: { F: 3, S: 1 }, disc: { S: 3 }, bigFive: { A: 4 }, career: { service: 4, people: 3, care: 3, teaching: 2 } } },
+      { id: "C", text: "Building, fixing, or installing real things like cars, homes, or wiring.", supportingText: "Seeing real, physical progress keeps you going.", resultSignal: "Building and fixing", scores: { mbti: { S: 3, P: 1 }, disc: { D: 1, C: 1 }, bigFive: { C: 1 }, career: { handsOn: 4, operations: 2, pace: 1, trades: 4 } } },
+      { id: "D", text: "Making art, videos, or content for people to see.", supportingText: "Making new things keeps the work fun.", resultSignal: "Creating", scores: { mbti: { N: 3, E: 1, P: 1 }, disc: { I: 3 }, bigFive: { O: 4, E: 1 }, career: { creative: 4, entrepreneurship: 1, autonomy: 1, artDesign: 2, creator: 3 } } },
     ],
   },
   {
@@ -384,13 +408,13 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     key: "environment-preference",
     group: "Career-fit vector",
     signal: "Best environment",
-    prompt: "Which environment would probably help you perform best?",
-    guidance: "Choose the environment that protects your best work.",
+    prompt: "Where would you most like to spend your work or school day?",
+    guidance: "Pick the place where you would do your best work.",
     answers: [
-      { id: "A", text: "Quiet focus, clear ownership, minimal interruption.", supportingText: "You thrive when attention is protected.", resultSignal: "Quiet focus", scores: { mbti: { I: 4, J: 1 }, disc: { C: 2 }, bigFive: { E: -3, C: 2 }, career: { deepFocus: 4, autonomy: 2, analysis: 1 } } },
-      { id: "B", text: "Working together, talking often, and making progress as a group.", supportingText: "You do well when you work with other people.", resultSignal: "Team energy", scores: { mbti: { E: 4, F: 1 }, disc: { I: 3 }, bigFive: { E: 4, A: 1 }, career: { people: 3, leadership: 1, pace: 1 } } },
-      { id: "C", text: "Structured expectations, stable routines, reliable systems.", supportingText: "You do strong work when the rules are clear.", resultSignal: "Clear routine", scores: { mbti: { S: 2, J: 3 }, disc: { S: 2, C: 2 }, bigFive: { C: 3, N: -1 }, career: { stability: 4, operations: 3 } } },
-      { id: "D", text: "Dynamic setting with variety, urgency, and real-time problem solving.", supportingText: "You like things that change a lot and keep you on your toes.", resultSignal: "Fast and changing", scores: { mbti: { E: 2, P: 2 }, disc: { D: 2, I: 1 }, bigFive: { E: 2, O: 1 }, career: { pace: 4, entrepreneurship: 3, leadership: 1 } } },
+      { id: "A", text: "A quiet desk, office, or lab where I can focus.", supportingText: "You do your best work with quiet and focus.", resultSignal: "Desk or lab", scores: { mbti: { I: 4, J: 1 }, disc: { C: 2 }, bigFive: { E: -3, C: 2 }, career: { deepFocus: 4, autonomy: 2, analysis: 1, research: 1, tech: 1, organizing: 1 } } },
+      { id: "B", text: "A team space with lots of talking and working together.", supportingText: "You do well when you work with other people.", resultSignal: "Team space", scores: { mbti: { E: 4, F: 1 }, disc: { I: 3 }, bigFive: { E: 4, A: 1 }, career: { people: 3, leadership: 1, pace: 1, business: 2, care: 1, teaching: 1, leading: 1 } } },
+      { id: "C", text: "A workshop, garage, job site, or outdoors.", supportingText: "You like work you can see, touch, and move around in.", resultSignal: "Workshop or outdoors", scores: { mbti: { S: 2, J: 3 }, disc: { S: 2, C: 2 }, bigFive: { C: 3, N: -1 }, career: { stability: 4, operations: 3, trades: 4 } } },
+      { id: "D", text: "A studio, a stage, or in front of a camera.", supportingText: "You like creating things for people to see or hear.", resultSignal: "Studio or on camera", scores: { mbti: { E: 2, P: 2 }, disc: { D: 2, I: 1 }, bigFive: { E: 2, O: 1 }, career: { pace: 4, entrepreneurship: 3, leadership: 1, artDesign: 2, creator: 3 } } },
     ],
   },
   {
@@ -401,10 +425,10 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
     prompt: "What makes work feel most worth it to you?",
     guidance: "Choose the reward that would still matter after the newness wears off.",
     answers: [
-      { id: "A", text: "Mastering something difficult and becoming excellent.", supportingText: "Getting really good at something keeps you going.", resultSignal: "Getting really good", scores: { mbti: { I: 1, T: 2, J: 1 }, disc: { C: 3 }, bigFive: { C: 3, O: 1 }, career: { analysis: 2, systems: 2, deepFocus: 2 } } },
-      { id: "B", text: "Seeing people benefit because I helped.", supportingText: "Impact is most real when another person is better off.", resultSignal: "Helping others", scores: { mbti: { F: 4 }, disc: { S: 3 }, bigFive: { A: 4 }, career: { service: 4, people: 3 } } },
-      { id: "C", text: "Reaching goals you can measure and keeping progress going.", supportingText: "Progress you can count really motivates you.", resultSignal: "Reaching goals", scores: { mbti: { E: 1, T: 2, J: 1 }, disc: { D: 4 }, bigFive: { C: 2, E: 1 }, career: { leadership: 3, entrepreneurship: 3, pace: 1 } } },
-      { id: "D", text: "Making something original, useful, or meaningful exist.", supportingText: "Creation itself is the reward.", resultSignal: "Making something new", scores: { mbti: { N: 3, P: 1 }, disc: { I: 2 }, bigFive: { O: 4 }, career: { creative: 4, autonomy: 2, entrepreneurship: 1 } } },
+      { id: "A", text: "Getting really good at a skill or craft.", supportingText: "Getting really good at something keeps you going.", resultSignal: "Getting really good", scores: { mbti: { I: 1, T: 2, J: 1 }, disc: { C: 3 }, bigFive: { C: 3, O: 1 }, career: { analysis: 2, systems: 2, deepFocus: 2, trades: 1, research: 1, tech: 1, artDesign: 1 } } },
+      { id: "B", text: "Seeing people do better because I helped.", supportingText: "Impact is most real when another person is better off.", resultSignal: "Helping others", scores: { mbti: { F: 4 }, disc: { S: 3 }, bigFive: { A: 4 }, career: { service: 4, people: 3, care: 2, teaching: 2 } } },
+      { id: "C", text: "Reaching big goals, winning, or growing a business.", supportingText: "Progress you can count really motivates you.", resultSignal: "Reaching goals", scores: { mbti: { E: 1, T: 2, J: 1 }, disc: { D: 4 }, bigFive: { C: 2, E: 1 }, career: { leadership: 3, entrepreneurship: 3, pace: 1, business: 2, leading: 2 } } },
+      { id: "D", text: "Making something original that people see or use.", supportingText: "Creation itself is the reward.", resultSignal: "Making something new", scores: { mbti: { N: 3, P: 1 }, disc: { I: 2 }, bigFive: { O: 4 }, career: { creative: 4, autonomy: 2, entrepreneurship: 1, artDesign: 2, creator: 2 } } },
     ],
   },
   {
@@ -447,6 +471,34 @@ export const SHORTFORM_V2_QUESTIONS: ShortformV2Question[] = [
       { id: "B", text: "Work with rigid rules and no room to improve anything.", supportingText: "Being stuck with pointless rules wears you out fast.", resultSignal: "Too many rules", scores: { mbti: { N: 2, P: 2 }, disc: { I: 1, D: 1 }, bigFive: { O: 3 }, career: { creative: 2, autonomy: 3, entrepreneurship: 1, stability: -1 } } },
       { id: "C", text: "Work with heavy conflict, pressure, or emotional tension.", supportingText: "Constant tension wears you down.", resultSignal: "Too much conflict", scores: { mbti: { F: 2, I: 1 }, disc: { S: 3 }, bigFive: { A: 2, N: 2 }, career: { service: 1, stability: 2, leadership: -1, pace: -1 } } },
       { id: "D", text: "Work with vague expectations and no clear standard for success.", supportingText: "Not knowing what counts as good work is frustrating.", resultSignal: "Unclear goals", scores: { mbti: { J: 3, T: 1 }, disc: { C: 3 }, bigFive: { C: 3, N: 1 }, career: { operations: 2, systems: 2, stability: 2, autonomy: -1 } } },
+    ],
+  },
+  {
+    id: 29,
+    key: "free-class-pick",
+    group: "Career-fit vector",
+    signal: "Free class pick",
+    prompt: "You get one free Saturday class. Which would you pick?",
+    guidance: "Pick the one you would actually look forward to.",
+    answers: [
+      { id: "A", text: "Fixing cars, welding, or building with wood.", supportingText: "You like learning with your hands and tools.", resultSignal: "Hands-on trade class", scores: { career: { handsOn: 2, trades: 4 } } },
+      { id: "B", text: "Drawing, design, photography, or music.", supportingText: "You like making things that look or sound good.", resultSignal: "Art and design class", scores: { career: { creative: 2, artDesign: 4 } } },
+      { id: "C", text: "Making videos, streaming, or growing an online channel.", supportingText: "You like creating for an audience.", resultSignal: "Video and creator class", scores: { career: { creative: 1, entrepreneurship: 1, creator: 4 } } },
+      { id: "D", text: "Coding, robotics, or a science lab.", supportingText: "You like figuring out how things work.", resultSignal: "Science and tech class", scores: { career: { analysis: 1, systems: 1, tech: 3, research: 3 } } },
+    ],
+  },
+  {
+    id: 30,
+    key: "life-stage",
+    group: "Calibration",
+    signal: "Where you are now",
+    prompt: "Last one: which best describes you right now?",
+    guidance: "This only changes the next steps we suggest. It does not change your result type.",
+    answers: [
+      { id: "A", text: "I'm in middle school.", supportingText: "We'll suggest classes, clubs, and things to try.", resultSignal: "Middle school", scores: {} },
+      { id: "B", text: "I'm in high school.", supportingText: "We'll suggest electives, programs, and first jobs.", resultSignal: "High school", scores: {} },
+      { id: "C", text: "I'm in college, trade school, or training.", supportingText: "We'll suggest majors, programs, and internships.", resultSignal: "College or training", scores: {} },
+      { id: "D", text: "I'm working, changing careers, or something else.", supportingText: "We'll suggest roles and ways to test them.", resultSignal: "Working or other", scores: {} },
     ],
   },
 ];
