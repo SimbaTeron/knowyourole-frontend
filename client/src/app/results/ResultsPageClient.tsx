@@ -4395,7 +4395,6 @@ function Page3PremiumNexus({ type, bigFive, disc, mbtiType, primaryDisc, isDemo,
   if (isDemo) {
     return (
       <div style={{ background: C.bg, minHeight: "100dvh", fontFamily: "Inter, sans-serif", color: C.text, overflowX: "hidden" }}>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
         <AuroraBg />
         <TopNav premium={true} />
         <div style={{ padding: "10px 20px", textAlign: "center" }}>
@@ -5090,7 +5089,6 @@ function OrbitalGlassV2Results({
 
   return (
     <div className="orbital-results-v2" style={orbStyle}>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
       <style>{`
         .orbital-results-v2 { --ink:#f8fbff; --muted:rgba(232,244,255,.72); --faint:rgba(232,244,255,.48); --line:rgba(255,255,255,.14); min-height:100dvh; color:var(--ink); font-family:Inter,system-ui,sans-serif; background:radial-gradient(circle at 10% 0%, rgba(82,241,255,.30), transparent 34%), radial-gradient(circle at 94% 4%, rgba(167,119,255,.31), transparent 32%), radial-gradient(circle at 70% 86%, rgba(255,99,207,.18), transparent 36%), linear-gradient(145deg,#050711 0%,#09101f 48%,#13081d 100%); overflow-x:hidden; }
         .orbital-results-v2 * { box-sizing:border-box; }

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { QUESTION_COUNT } from "../../src/lib/quiz/quizConfig";
 
 test.describe("quiz interaction polish", () => {
   test("removes pre-quiz content once the active question flow starts", async ({ page }) => {
@@ -9,7 +10,7 @@ test.describe("quiz interaction polish", () => {
     });
     await expect(explainer).toBeVisible();
 
-    await page.getByRole("button", { name: "Start the 28 questions" }).click();
+    await page.getByRole("button", { name: `Start the ${QUESTION_COUNT} questions` }).click();
 
     await expect(page.getByRole("heading", {
       name: "After a demanding day, what most reliably helps you feel like yourself again?",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Database, ShieldCheck, Workflow } from "lucide-react";
 import { publicPageMetadata } from "@/lib/seo";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 export const metadata: Metadata = publicPageMetadata("/build");
 
@@ -14,7 +15,7 @@ const sections = [
   {
     icon: Database,
     title: "Architecture",
-    body: "The public app is a Next.js application. A fixed 30-question bank submits answer evidence to a server route, which recomputes the interpretation, builds one canonical result record, and persists it through Supabase before the result is shown.",
+    body: `The public app is a Next.js application. A fixed ${QUESTION_COUNT}-question bank submits answer evidence to a server route, which recomputes the interpretation, builds one canonical result record, and persists it through Supabase before the result is shown.`,
   },
   {
     icon: ShieldCheck,
@@ -65,7 +66,7 @@ export default function BuildPage() {
         <section className="mt-12 rounded-3xl bg-[#12263a] p-6 text-white sm:p-9">
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#67E8F9]">System flow</p>
           <ol className="mt-5 grid gap-3 text-sm leading-relaxed sm:grid-cols-4">
-            {["30 fixed prompts", "Answer evidence", "Server recomputation", "Persisted result + reflection"].map((step, index) => <li key={step} className="rounded-2xl border border-white/15 bg-white/5 p-4"><span className="text-[#67E8F9]">0{index + 1}</span><p className="mt-2 font-bold">{step}</p></li>)}
+            {[`${QUESTION_COUNT} fixed prompts`, "Answer evidence", "Server recomputation", "Persisted result + reflection"].map((step, index) => <li key={step} className="rounded-2xl border border-white/15 bg-white/5 p-4"><span className="text-[#67E8F9]">0{index + 1}</span><p className="mt-2 font-bold">{step}</p></li>)}
           </ol>
         </section>
 

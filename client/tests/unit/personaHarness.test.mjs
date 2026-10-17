@@ -18,6 +18,9 @@ const reportDir = join(root, "../results-v4.1");
 const { scoreShortformVersioned } = await import(
   pathToFileURL(join(root, "src/lib/quiz/scoreShortformVersioned.ts")).href
 );
+const { LEGACY_V2_QUESTION_COUNT } = await import(
+  pathToFileURL(join(root, "src/lib/quiz/legacyQuestionCounts.ts")).href
+);
 
 function loadPersonas() {
   return readdirSync(fixturesDir)
@@ -165,13 +168,19 @@ function evaluatePersona(fixture, version, flags) {
   };
 }
 
-function runSimulation(version, n = 1000) {
+/** Deterministic LCG so every CI run sees the same answer sets. */
+function makeRng(seed) {
+  let state = seed >>> 0;
+  return () => ((state = (Math.imul(state, 1664525) + 1013904223) >>> 0) / 4294967296);
+}
+
+function runSimulation(version, n = 1000, rand = makeRng(20261016)) {
   const dist = {};
   let tie = 0, near = 0, mid = 0, flips = 0, flipN = 0, flags = 0;
   for (let r = 0; r < n; r++) {
-    const answers = Array.from({ length: 28 }, (_, i) => ({
+    const answers = Array.from({ length: LEGACY_V2_QUESTION_COUNT }, (_, i) => ({
       questionId: i + 1,
-      choice: /** @type {0|1|2|3} */ (Math.floor(Math.random() * 4)),
+      choice: /** @type {0|1|2|3} */ (Math.floor(rand() * 4)),
     }));
     const scored = scoreShortformVersioned(answers, version);
     dist[scored.topTrait] = (dist[scored.topTrait] || 0) + 1;
@@ -181,7 +190,7 @@ function runSimulation(version, n = 1000) {
     if (ranked[0][1] - ranked[1][1] <= 5) near++;
     if (Object.values(scored.calibrated.bigFive).every((v) => v > 33 && v < 67)) mid++;
     for (let t = 0; t < 2; t++) {
-      const qi = Math.floor(Math.random() * 28);
+      const qi = Math.floor(rand() * LEGACY_V2_QUESTION_COUNT);
       for (let c = 0; c < 4; c++) {
         if (c === answers[qi].choice) continue;
         const alt = answers.map((a, i) => (i === qi ? { ...a, choice: /** @type {0|1|2|3} */ (c) } : a));
@@ -205,12 +214,11 @@ function runSimulation(version, n = 1000) {
 
 function realisticCloseLetterRate(personas, version, flipsPer = 3) {
   // Seeded so CI is deterministic (Math.random made this test flaky around the 0.22 line).
-  let seed = 20260 >>> 0;
-  const rand = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
+  const rand = makeRng(20260);
   let close = 0, total = 0;
   for (const p of personas) {
     for (let t = 0; t < flipsPer; t++) {
-      const qi = Math.floor(rand() * 28);
+      const qi = Math.floor(rand() * LEGACY_V2_QUESTION_COUNT);
       const c = /** @type {0|1|2|3} */ ((p.answers[qi].choice + 1 + Math.floor(rand() * 3)) % 4);
       const alt = p.answers.map((a, i) => (i === qi ? { ...a, choice: c } : a));
       total++;
@@ -220,12 +228,12 @@ function realisticCloseLetterRate(personas, version, flipsPer = 3) {
   return close / total;
 }
 
-function realisticFlagRate(personas, version, flipsPer = 5) {
+function realisticFlagRate(personas, version, flipsPer = 5, rand = makeRng(20262)) {
   let flagged = 0, total = 0;
   for (const p of personas) {
     for (let t = 0; t < flipsPer; t++) {
-      const qi = Math.floor(Math.random() * 28);
-      const c = /** @type {0|1|2|3} */ ((p.answers[qi].choice + 1 + Math.floor(Math.random() * 3)) % 4);
+      const qi = Math.floor(rand() * LEGACY_V2_QUESTION_COUNT);
+      const c = /** @type {0|1|2|3} */ ((p.answers[qi].choice + 1 + Math.floor(rand() * 3)) % 4);
       const alt = p.answers.map((a, i) => (i === qi ? { ...a, choice: c } : a));
       total++;
       if (scoreShortformVersioned(alt, version).inconsistency?.flagged) flagged++;

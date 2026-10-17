@@ -1,3 +1,5 @@
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
+
 export type SeoFaq = { q: string; a: string };
 
 export type SeoPage = {
@@ -21,7 +23,7 @@ const standardFaqs: SeoFaq[] = [
   { q: "Is KnowYouRole free?", a: "Yes. Everything currently available on KnowYouRole is free and no result or content is locked behind a paywall. The quiz gives a practical result focused on personality, work style, communication, and career-fit direction." },
   { q: "Is this an official MBTI or DISC test?", a: "No. KnowYouRole uses MBTI-style and DISC-style language for clarity, then combines those signals with Big Five-informed trait patterns and role-fit guidance." },
   { q: "Is this clinical or diagnostic?", a: "No. KnowYouRole is a self-reflection and career-fit tool, not a clinical assessment, diagnosis, hiring screen, or medical instrument." },
-  { q: "How long does the quiz take?", a: "The current short-form quiz uses 30 focused prompts designed to be fast while still collecting useful personality, work-style, and role-fit signals." },
+  { q: "How long does the quiz take?", a: `The current short-form quiz uses ${QUESTION_COUNT} focused prompts designed to be fast while still collecting useful personality, work-style, and role-fit signals.` },
 ];
 
 export const landingPages: SeoPage[] = [
@@ -54,8 +56,8 @@ export const landingPages: SeoPage[] = [
   },
   {
     path: "/work-style-quiz", slug: "work-style-quiz", phase: "landing",
-    title: "Work Style Quiz for Communication, Focus & Team Fit | KnowYouRole",
-    description: "Take a work style quiz that explains communication, focus, decision style, pressure behavior, team fit, Big Five traits, MBTI-style patterns, and DISC behavior.",
+    title: "Work Style Quiz for Students & Teams: Free, No Sign-Up | KnowYouRole",
+    description: "A free work style quiz for students and working adults. See how you focus, communicate, decide and handle pressure, with Big Five, MBTI-style and DISC signals. No account needed.",
     h1: "Work Style Quiz for Communication, Focus, and Team Fit",
     eyebrow: "Work style",
     intro: "Your work style is the practical side of personality: how you make decisions, handle pressure, communicate, focus, collaborate, and recover energy. KnowYouRole turns those patterns into language you can actually use.",
@@ -80,8 +82,8 @@ export const landingPages: SeoPage[] = [
   },
   {
     path: "/free-personality-test", slug: "free-personality-test", phase: "landing",
-    title: "Free Personality Test for Work Style & Self-Discovery | KnowYouRole",
-    description: "Take a free personality test for work style, strengths, communication, Big Five traits, MBTI-style preferences, DISC behavior, and career-fit guidance.",
+    title: "Free Personality Test, No Sign-Up: Work Style & Strengths | KnowYouRole",
+    description: `Take a free personality test with no sign-up, email or name. ${QUESTION_COUNT} questions on work style, strengths and communication, with Big Five, MBTI-style and DISC signals.`,
     h1: "Free Personality Test for Work Style and Self-Discovery",
     eyebrow: "Free personality test",
     intro: "KnowYouRole gives you a free personality test experience designed for real-world use: self-understanding, role direction, communication clarity, and a better read on how you operate under normal conditions and pressure.",
@@ -106,8 +108,8 @@ export const landingPages: SeoPage[] = [
   },
   {
     path: "/personality-quiz-for-students", slug: "personality-quiz-for-students", phase: "landing",
-    title: "Personality Quiz for Students Choosing Career Direction | KnowYouRole",
-    description: "A personality quiz for students exploring strengths, work style, communication, Big Five traits, MBTI-style patterns, DISC behavior, and career-fit clues.",
+    title: "Free Career & Personality Quiz for Students, No Sign-Up | KnowYouRole",
+    description: "A free career and work style quiz for middle school, high school and college students. No account or name needed. Explore strengths and career directions, from trades to creative work.",
     h1: "Personality Quiz for Students Choosing Direction",
     eyebrow: "Students",
     intro: "Students are often asked to choose majors, activities, internships, and early career paths before they have much real-world data. KnowYouRole helps translate personality and work-style clues into better questions and clearer next steps.",

@@ -4,12 +4,15 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import PathCanvas from "@/components/PathCanvas";
 import Quiz, { QuizScores } from "@/components/Quiz";
-import Results from "@/components/Results";
+import dynamic from "next/dynamic";
+// Results is only shown after the last answer, so keep it out of the first-load bundle.
+const Results = dynamic(() => import("@/components/Results"), { ssr: false });
 import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { trackKyrEvent } from "@/lib/analytics";
 import { Brain, Sparkles, Target } from "lucide-react";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -895,7 +898,7 @@ export default function QuizPage() {
             </div>
             <h1 className="mb-3 text-3xl font-black tracking-tight">Analyzing<span className="analysis-dots" aria-hidden="true" /></h1>
             <p className="analysis-message mx-auto mb-7 max-w-sm text-sm leading-6 text-white/72" role="status" aria-live="polite">
-              Analyzing your 30 answers to build your work-style profile, career-fit signals, and role directions.
+              {`Analyzing your ${QUESTION_COUNT} answers to build your work-style profile, career-fit signals, and role directions.`}
             </p>
 
             <div className="mb-5 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10" aria-label="Results analysis progress">

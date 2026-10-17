@@ -1,4 +1,5 @@
 import { SHORTFORM_V2_QUESTIONS } from "@/data/shortformV2Questions";
+import { LEGACY_REPORTING_ANSWER_COLUMNS } from "@/lib/quiz/legacyQuestionCounts";
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
 
 type QuestionColumn = `q${number}`;
@@ -19,7 +20,7 @@ export type QuizResultReportingProjection = {
   big_five: string;
 } & Record<QuestionColumn, number>;
 
-const REPORTING_COLUMN_COUNT = 28;
+const REPORTING_COLUMN_COUNT = LEGACY_REPORTING_ANSWER_COLUMNS;
 const BIG_FIVE_CODES = ["O", "C", "E", "A", "N"] as const;
 
 export function buildQuizResultReportingProjection(result: ResultDTO): QuizResultReportingProjection {
@@ -43,8 +44,8 @@ export function buildQuizResultReportingProjection(result: ResultDTO): QuizResul
       .join(";"),
   } as QuizResultReportingProjection;
 
-  // The quiz_results table has fixed columns q1..q28 (no DB change). Later questions
-  // (v5: Q29 Saturday class, Q30 life stage) live only in the canonical DTO jsonb.
+  // The quiz_results table has one column per LEGACY_REPORTING_ANSWER_COLUMNS (no DB change).
+  // Later questions (v5: Q29 Saturday class, Q30 life stage) live only in the canonical DTO jsonb.
   for (const question of SHORTFORM_V2_QUESTIONS.filter((q) => q.id <= REPORTING_COLUMN_COUNT)) {
     const choice = answersByQuestionId.get(String(question.id))?.choice;
     if (!Number.isInteger(choice) || choice === undefined || choice < 0 || choice > 3) {
@@ -54,7 +55,7 @@ export function buildQuizResultReportingProjection(result: ResultDTO): QuizResul
   }
 
   if (Object.keys(projection).filter((k) => /^q\d+$/.test(k)).length !== REPORTING_COLUMN_COUNT) {
-    throw new Error("Reporting projections require exactly 28 answer columns");
+    throw new Error(`Reporting projections require exactly ${LEGACY_REPORTING_ANSWER_COLUMNS} answer columns`);
   }
 
   return projection;

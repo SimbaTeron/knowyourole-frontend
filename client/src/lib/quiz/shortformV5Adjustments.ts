@@ -1,5 +1,5 @@
 /**
- * Scoring v5: 30-question bank (Q29 free-class pick, Q30 life stage).
+ * Scoring v5 question bank (Q29 free-class pick, Q30 life stage).
  *
  * Trait weights for Q1–Q28 in the bank are unchanged, so v4 results re-derive exactly.
  * v5 tuning lives here as small deltas on chosen options:

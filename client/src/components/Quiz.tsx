@@ -12,6 +12,7 @@ import questionsData from "@/data/questions.json";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { trackKyrEvent } from "@/lib/analytics";
 import ShortformV2Quiz from "./ShortformV2Quiz";
+import { LEGACY_V2_QUESTION_COUNT } from "@/lib/quiz/legacyQuestionCounts";
 
 type IconKey =
   | "creative"
@@ -668,12 +669,10 @@ function RecapSpinWheel({ currentIndex, scores, questionsRemaining, onContinue, 
 }
 
 const getQuizConfig = (_tier: string) => {
-  // Controlled short-form quiz config:
-  // 28 scored core questions + lightweight calibration interludes.
-  // This is the local-dev implementation of the short-form direction; the
-  // deeper 3–5 adaptive tie-breaker engine still needs a dedicated v2 item bank.
+  // Unreachable legacy shell below the ShortformV2Quiz return. Kept so old
+  // checkpoints still name LEGACY_V2_QUESTION_COUNT instead of the live bank.
   return {
-    totalQuestions: 28,
+    totalQuestions: LEGACY_V2_QUESTION_COUNT,
     checkpoint1After: 7,
     superpowerAfter: 12,
     checkpoint2After: 17,

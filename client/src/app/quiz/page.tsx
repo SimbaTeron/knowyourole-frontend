@@ -1,6 +1,5 @@
-export const dynamic = 'force-dynamic';
-
 import QuizPageClient from './QuizPageClient';
+import { breadcrumbJsonLd, SITE_URL } from '@/lib/seo';
 
 const quizJsonLd = {
   "@context": "https://schema.org",
@@ -18,43 +17,12 @@ const quizJsonLd = {
     "communication style",
   ],
   isAccessibleForFree: true,
-  provider: {
-    "@type": "Organization",
-    name: "KnowYouRole",
-    url: "https://knowyourole.com",
-  },
+  url: `${SITE_URL}/quiz`,
+  // Reference the site-wide Organization from BaseJsonLd instead of re-declaring it.
+  provider: { "@id": `${SITE_URL}/#organization` },
 };
 
-const quizFaqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "What will I get from the free personality quiz?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "You get a practical result that combines personality pattern, work style, communication clues, pressure behavior, and career-fit direction.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Does KnowYouRole use Big Five, MBTI-style, and DISC?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. KnowYouRole combines Big Five trait signals, MBTI-style preference language, and DISC-style work behavior into one readable profile.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Are my quiz answers private?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Your answers and result are saved on our servers, with no name or account attached, so we can show and recover your result. We never sell quiz results. See the Privacy Policy for details.",
-      },
-    },
-  ],
-};
+const quizBreadcrumbJsonLd = breadcrumbJsonLd([{ name: "Quiz", path: "/quiz" }]);
 
 export default function QuizPage() {
   return (
@@ -65,9 +33,9 @@ export default function QuizPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(quizJsonLd).replace(/</g, "\\u003c") }}
       />
       <script
-        id="kyr-quiz-faq-json-ld"
+        id="kyr-quiz-breadcrumb-json-ld"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(quizFaqJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(quizBreadcrumbJsonLd).replace(/</g, "\\u003c") }}
       />
       <QuizPageClient />
     </>

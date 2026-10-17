@@ -1,8 +1,10 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { assertSafeSupabaseTarget } from '@/lib/env/dbGuard.mjs';
 
 function getSupabaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!url) throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set');
+  assertSafeSupabaseTarget(process.env);
   return url;
 }
 
