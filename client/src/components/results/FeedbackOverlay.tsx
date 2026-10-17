@@ -141,6 +141,10 @@ export function FeedbackOverlay({ s }: { s: FeedbackState }) {
                 />
               </div>
 
+              <p className="text-center text-xs leading-relaxed text-warm-gray/70 dark:text-[#94A3B8]">
+                No names needed. Linked to this result, not to you by name.
+              </p>
+
               <Button
                 onClick={s.handleFeedbackSubmit}
                 disabled={!s.allFeedbackAnswered || s.isSubmittingFeedback}

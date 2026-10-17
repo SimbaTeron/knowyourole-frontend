@@ -47,14 +47,24 @@ test("guard rejects hardcoded count phrases and allows the legacy constant name"
   const hyphen = "30" + "-question";
   const grounded = "30" + " grounded questions";
   const prompts = "30" + " fixed prompts";
+  const eventLiteral = "total_questions: " + "30";
+  const assignLiteral = "questionCount = " + "30";
+  const spacedAssign = "question_count = " + "28";
   assert.deepEqual(bannedPhrasesInLine(`Start the ${questions} now`), [questions]);
   assert.deepEqual(bannedPhrasesInLine(`Analyzing your ${answers} today`), [answers]);
   assert.deepEqual(bannedPhrasesInLine(`Free ${hyphen} quiz`), [hyphen]);
   assert.deepEqual(bannedPhrasesInLine(grounded), [grounded]);
   assert.deepEqual(bannedPhrasesInLine(prompts), [prompts]);
+  assert.deepEqual(bannedPhrasesInLine(eventLiteral), [eventLiteral]);
+  assert.deepEqual(bannedPhrasesInLine(assignLiteral), [assignLiteral]);
+  assert.deepEqual(bannedPhrasesInLine(spacedAssign), [spacedAssign]);
+  assert.deepEqual(bannedPhrasesInLine("fontSize: " + "30"), []);
+  assert.deepEqual(bannedPhrasesInLine("total_questions: totalQuestions"), []);
 
   const legacyLine = `was ${"28"} questions via LEGACY_V2_QUESTION_COUNT`;
+  const legacyAssign = `questionCount = ${"30"} // LEGACY_V2_QUESTION_COUNT`;
   assert.deepEqual(bannedPhrasesInLine(legacyLine), []);
+  assert.deepEqual(bannedPhrasesInLine(legacyAssign), []);
 
   const sample = ["// intro", `label: "${questions}"`].join("\n");
   const hits = bannedPhrasesInSource("sample.tsx", sample);

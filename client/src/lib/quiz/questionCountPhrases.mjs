@@ -1,7 +1,9 @@
 // @ts-check
 /**
- * Fails CI when source or copy hard-codes a quiz length phrase.
+ * Fails CI when source or copy hard-codes a quiz length.
  * The live length belongs in quizConfig.ts (QUESTION_COUNT = questions.length).
+ * Caught shapes: a count word beside question, answer, or prompt, and a
+ * count name set to a bare 28 or 30 (total_questions, questionCount, and similar).
  * Lines that name LEGACY_V2_QUESTION_COUNT or LEGACY_REPORTING_ANSWER_COLUMNS are allowed.
  *
  * Open PR #15 (feat/schools-trust-pack) owns a few files that still contain
@@ -40,17 +42,27 @@ function phrasePattern() {
   );
 }
 
+/** A count-shaped name set with : or = to a bare 28 or 30. */
+function literalCountPattern() {
+  const counts = COUNT_WORDS.join("|");
+  return new RegExp(
+    `\\b(?:total_?questions|question_?count|num_?questions|quiz_?length)\\s*[:=]\\s*(?:${counts})\\b`,
+    "gi",
+  );
+}
+
 /**
  * @param {string} line
  * @returns {string[]}
  */
 export function bannedPhrasesInLine(line) {
   if (LEGACY_COUNT_NAMES.some((name) => line.includes(name))) return [];
-  const pattern = phrasePattern();
   /** @type {string[]} */
   const hits = [];
-  let match;
-  while ((match = pattern.exec(line))) hits.push(match[0]);
+  for (const pattern of [phrasePattern(), literalCountPattern()]) {
+    let match;
+    while ((match = pattern.exec(line))) hits.push(match[0]);
+  }
   return hits;
 }
 

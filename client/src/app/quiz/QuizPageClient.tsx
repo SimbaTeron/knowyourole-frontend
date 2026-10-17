@@ -67,7 +67,7 @@ export default function QuizPage() {
 
   // Direct-start quiz: age/mood setup screens are hidden. Default to adult tier when missing.
   useEffect(() => {
-    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: 30 });
+    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: QUESTION_COUNT });
   }, []);
 
   useEffect(() => {
@@ -1033,20 +1033,6 @@ export default function QuizPage() {
               </article>
             </div>
 
-            <div className="mt-8 grid gap-3 md:grid-cols-2">
-              <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">
-                <h3 className="text-sm font-black text-white">Is this a free personality quiz?</h3>
-                <p className="mt-2 text-sm leading-6 text-white/60">
-                  Yes. Everything on KnowYouRole today is free. Nothing is locked or paywalled right now, and your full result is included.
-                </p>
-              </article>
-              <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">
-                <h3 className="text-sm font-black text-white">How do the models work together?</h3>
-                <p className="mt-2 text-sm leading-6 text-white/60">
-                  Big Five gives trait depth, MBTI-style language makes patterns easier to understand, and DISC helps describe workplace behavior.
-                </p>
-              </article>
-            </div>
           </div>
         </section>}
       </main>
