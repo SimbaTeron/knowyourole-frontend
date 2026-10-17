@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { QUESTION_COUNT } from "../../src/lib/quiz/quizConfig";
 
 /**
  * Quiz stress test: rapid clicks, double clicks, clicks during the auto-advance
@@ -18,13 +19,13 @@ async function setup(page: Page) {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("/quiz");
-  await page.getByRole("button", { name: /Start the 30 questions/ }).click();
+  await page.getByRole("button", { name: new RegExp(`Start the ${QUESTION_COUNT} questions`) }).click();
   return { computeBodies, pageErrors };
 }
 
 async function questionNumber(page: Page) {
   const text = await page.locator("body").innerText();
-  const match = text.match(/Question (\d+) of 30/i);
+  const match = text.match(new RegExp(`Question (\\d+) of ${QUESTION_COUNT}`, "i"));
   return match ? Number(match[1]) : null;
 }
 
@@ -39,7 +40,7 @@ async function finish(page: Page, computeBodies: Array<{ responses?: unknown[] }
   expect(computeBodies.length).toBe(1);
   const responses = (computeBodies[0] as { responses?: unknown[]; scores?: { responses?: unknown[] } });
   const count = responses.responses?.length ?? responses.scores?.responses?.length;
-  if (count !== undefined) expect(count).toBe(30);
+  if (count !== undefined) expect(count).toBe(QUESTION_COUNT);
   await assertHealthy(page, pageErrors);
 }
 
@@ -54,17 +55,17 @@ for (let run = 0; run < REPEAT; run++) {
 
   test(`double clicks answer one question at a time (run ${run + 1})`, async ({ page }) => {
     const { computeBodies, pageErrors } = await setup(page);
-    for (let q = 1; q <= 30; q++) {
+    for (let q = 1; q <= QUESTION_COUNT; q++) {
       await expect.poll(() => questionNumber(page)).toBe(q);
       await page.locator('[role="radio"]').nth(q % 4).dblclick();
-      if (q < 30) await expect.poll(() => questionNumber(page)).toBe(q + 1);
+      if (q < QUESTION_COUNT) await expect.poll(() => questionNumber(page)).toBe(q + 1);
     }
     await finish(page, computeBodies, pageErrors);
   });
 
   test(`clicking during the transition is ignored (run ${run + 1})`, async ({ page }) => {
     const { computeBodies, pageErrors } = await setup(page);
-    for (let q = 1; q <= 30; q++) {
+    for (let q = 1; q <= QUESTION_COUNT; q++) {
       await expect.poll(() => questionNumber(page)).toBe(q);
       await page.locator('[role="radio"]').nth(0).click();
       await page.waitForTimeout(150);
@@ -76,7 +77,7 @@ for (let run = 0; run < REPEAT; run++) {
 
   test(`back button and reload mid-quiz resume correctly (run ${run + 1})`, async ({ page }) => {
     const { computeBodies, pageErrors } = await setup(page);
-    for (let q = 1; q <= 30; q++) {
+    for (let q = 1; q <= QUESTION_COUNT; q++) {
       await expect.poll(() => questionNumber(page)).toBe(q);
       if (q === 6) {
         const back = page.getByRole("button", { name: /back|previous/i }).first();

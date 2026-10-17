@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppHeader } from "@/components/layout/AppHeader";
 import type { SeoPage } from "@/lib/seo-pages";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 function jsonLd(page: SeoPage) {
   const url = `https://knowyourole.com${page.path === "/" ? "" : page.path}`;
@@ -54,7 +55,7 @@ export function SeoContentPage({ page, indexPages = [] }: { page: SeoPage; index
           {page.faqs?.length ? <section className="workday-content-section"><p className="workday-content-count">FAQ</p><h2>Common questions</h2><div className="workday-content-faq">{page.faqs.map((faq) => <details key={faq.q}><summary>{faq.q}</summary><p>{faq.a}</p></details>)}</div></section> : null}
         </article>
         <aside className="workday-content-aside">
-          <div className="workday-content-next"><p>One practical next step</p><h2>Get your work-style picture.</h2><span>30 questions. No account required to start.</span><Link href="/quiz">Start the quiz <b>↗</b></Link></div>
+          <div className="workday-content-next"><p>One practical next step</p><h2>Get your work-style picture.</h2><span>{`${QUESTION_COUNT} questions. No account required to start.`}</span><Link href="/quiz">Start the quiz <b>↗</b></Link></div>
           {page.related?.length ? <nav className="workday-content-related" aria-label="Related pages"><p>Related reading</p>{page.related.map((href) => <Link key={href} href={href}>{relatedLabel(href)} <span>↗</span></Link>)}</nav> : null}
           <p className="workday-content-trust">Built for self-reflection and career-fit exploration—not diagnosis, hiring decisions, or a life sentence.</p>
         </aside>

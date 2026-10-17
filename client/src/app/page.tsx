@@ -1,6 +1,5 @@
-'use client';
-
 import { AppHeader } from "@/components/layout/AppHeader";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 export default function Home() {
   return (
@@ -316,10 +315,10 @@ export default function Home() {
                 Discover your work style, uncover your strengths, and find career paths to explore next.
               </h1>
               <p className="hero-subtitle">
-                A free, 30-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.
+                {`A free, ${QUESTION_COUNT}-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.`}
               </p>
               <a className="primary-cta" href="/quiz">Take the free quiz</a>
-              <p className="quiz-facts">30 questions · No account or name needed · <a href="/privacy">What we store</a></p>
+              <p className="quiz-facts">{`${QUESTION_COUNT} questions · No account or name needed · `}<a href="/privacy">What we store</a></p>
             </div>
 
             <aside className="result-preview" aria-label="Example KnowYouRole result">
@@ -370,7 +369,7 @@ export default function Home() {
             <ol className="how-steps">
               <li className="how-step">
                 <span className="how-step-number">STEP 01</span>
-                <h3>Answer 30 questions</h3>
+                <h3>{`Answer ${QUESTION_COUNT} questions`}</h3>
                 <p>Respond for your usual work, study, or project pattern—not the version of you that sounds most impressive.</p>
               </li>
               <li className="how-step">
@@ -406,7 +405,7 @@ export default function Home() {
           <div className="home-shell">
             <div className="final-panel testimonial-card">
               <div>
-                <h2 id="final-title" className="final-title section-title">Get a useful starting point in 30 questions.</h2>
+                <h2 id="final-title" className="final-title section-title">{`Get a useful starting point in ${QUESTION_COUNT} questions.`}</h2>
                 <p className="final-copy section-copy">No account or name needed. Your result is saved without your name so you can come back to it.</p>
               </div>
               <a className="primary-cta" href="/quiz">Take the free quiz</a>

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SHORTFORM_V2_QUESTIONS } from "../../src/data/shortformV2Questions";
+import { QUESTION_COUNT } from "../../src/lib/quiz/quizConfig";
 import {
   ShortformV2ResponseValidationError,
   recomputeShortformV2ScoreMaps,
@@ -14,9 +15,9 @@ const completeResponses = () => SHORTFORM_V2_QUESTIONS.map((question, index) => 
 }));
 
 test.describe("canonical quiz result integrity", () => {
-  test("accepts exactly the fixed 28 active answers and recomputes deterministic score maps", () => {
+  test("accepts exactly the live question bank and recomputes deterministic score maps", () => {
     const responses = validateShortformV2Responses(completeResponses());
-    expect(responses).toHaveLength(28);
+    expect(responses).toHaveLength(QUESTION_COUNT);
 
     const first = recomputeShortformV2ScoreMaps(responses);
     const second = recomputeShortformV2ScoreMaps(responses);

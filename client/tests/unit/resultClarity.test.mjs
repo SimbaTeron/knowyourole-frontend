@@ -7,6 +7,7 @@ import {
   resolveResultClarityDisplay,
   FLAT_PATTERN_NOTE,
 } from "../../src/lib/results/resultClarity.ts";
+import { LEGACY_V2_QUESTION_COUNT } from "../../src/lib/quiz/legacyQuestionCounts.ts";
 
 test("clear when top trait leads by more than 5 and not all medium", () => {
   const c = getResultClarity({ O: 80, C: 60, E: 50, A: 45, N: 30 });
@@ -30,22 +31,22 @@ test("broad with close top two still blends label", () => {
   assert.equal(c.level, "broad"); assert.equal(c.blended, true);
 });
 test("flat pattern flagged at 20 same letters", () => {
-  const r = Array.from({ length: 28 }, (_, i) => ({ choice: i < 20 ? 0 : 1 }));
+  const r = Array.from({ length: LEGACY_V2_QUESTION_COUNT }, (_, i) => ({ choice: i < 20 ? 0 : 1 }));
   const f = detectFlatAnswerPattern(r);
   assert.equal(f.flagged, true); assert.equal(f.dominantLetter, "A"); assert.ok(f.note);
 });
 test("19 same letters not flagged", () => {
-  const r = Array.from({ length: 28 }, (_, i) => ({ choice: i < 19 ? 3 : i % 3 }));
+  const r = Array.from({ length: LEGACY_V2_QUESTION_COUNT }, (_, i) => ({ choice: i < 19 ? 3 : i % 3 }));
   assert.equal(detectFlatAnswerPattern(r).flagged, false);
 });
 test("varied answers and missing data are safe", () => {
-  assert.equal(detectFlatAnswerPattern(Array.from({ length: 28 }, (_, i) => ({ choice: i % 4 }))).flagged, false);
+  assert.equal(detectFlatAnswerPattern(Array.from({ length: LEGACY_V2_QUESTION_COUNT }, (_, i) => ({ choice: i % 4 }))).flagged, false);
   assert.equal(detectFlatAnswerPattern(undefined).flagged, false);
   assert.equal(detectFlatAnswerPattern([{ choice: "x" }, {}]).total, 0);
 });
 
-const flatResponses = Array.from({ length: 28 }, () => ({ choice: 0 }));
-const variedResponses = Array.from({ length: 28 }, (_, i) => ({ choice: i % 4 }));
+const flatResponses = Array.from({ length: LEGACY_V2_QUESTION_COUNT }, () => ({ choice: 0 }));
+const variedResponses = Array.from({ length: LEGACY_V2_QUESTION_COUNT }, (_, i) => ({ choice: i % 4 }));
 
 test("flat pattern replaces Clear", () => {
   const d = resolveResultClarityDisplay({ O: 80, C: 60, E: 50, A: 45, N: 30 }, flatResponses);
