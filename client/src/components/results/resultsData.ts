@@ -207,7 +207,7 @@ const CAREER_SIGNAL_LABELS: Record<CareerKey, string> = {
 
 // Raw career totals are not comparable because some signals appear in more answer
 // options than others. Normalize against each signal's attainable maximum in the
-// active 28-question shortform before using the vector for role selection.
+// active shortform before using the vector for role selection.
 const CAREER_OPPORTUNITY_MAX = CAREER_SCORE_KEYS.reduce((totals, key) => {
   totals[key] = SHORTFORM_V2_QUESTIONS.reduce((sum, question) => {
     const bestAnswer = Math.max(0, ...question.answers.map(answer => answer.scores.career?.[key] ?? 0));

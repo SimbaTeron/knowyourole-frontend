@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Brain, ChevronLeft, Sparkles, X } from "lucide-react";
 import type { QuizScores } from "./Quiz";
 import { CAREER_SCORE_KEYS, SHORTFORM_V2_QUESTIONS, type CareerKey, type ShortformV2Answer } from "@/data/shortformV2Questions";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 import { trackKyrEvent } from "@/lib/analytics";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
 import { recomputeShortformV2ScoreMaps, validateShortformV2Responses } from "@/lib/quiz/shortformV2Scoring";
@@ -407,14 +408,14 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_16%,rgba(34,211,238,0.18),transparent_31%),radial-gradient(circle_at_82%_72%,rgba(168,85,247,0.18),transparent_35%)]" />
         <section aria-labelledby="shortform-welcome-heading" className="relative mx-auto w-full max-w-2xl rounded-[30px] border border-white/15 bg-[#0b1222]/92 p-5 shadow-[0_28px_92px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:rounded-[38px] sm:p-9">
           <p className="quiz-welcome-kicker text-[11px] font-black uppercase tracking-[0.28em] text-cyan-200">KnowYouRole · work-style exploration</p>
-          <h2 id="shortform-welcome-heading" className="mt-4 max-w-xl text-3xl font-black tracking-[-0.055em] text-white sm:text-5xl">30 grounded questions. One practical starting point.</h2>
+          <h2 id="shortform-welcome-heading" className="mt-4 max-w-xl text-3xl font-black tracking-[-0.055em] text-white sm:text-5xl">{`${QUESTION_COUNT} grounded questions. One practical starting point.`}</h2>
           <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-white/72 sm:text-base sm:leading-7">Answer for your usual work pattern—not your ideal day or the answer that sounds impressive. There are no right answers.</p>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2" aria-label="What to expect">
             <li className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-sm leading-6 text-white/75"><strong className="block text-white">A calm, fixed flow</strong> One question at a time, with back navigation if you want to change an answer.</li>
             <li className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-sm leading-6 text-white/75"><strong className="block text-white">A practical result</strong> A work-style snapshot, communication clues, pressure patterns, and exploratory role directions.</li>
           </ul>
           <p className="mt-5 text-sm leading-6 text-white/58">Your responses are interpreted as work-style and career-exploration signals—not a diagnosis, hiring screen, or career prescription.</p>
-          <button type="button" onClick={handleStart} className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-300 px-5 py-3 text-sm font-black text-[#06101f] shadow-[0_16px_42px_rgba(34,211,238,0.25)] transition hover:brightness-105 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-cyan-200 sm:w-auto">Start the 30 questions</button>
+          <button type="button" onClick={handleStart} className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-300 px-5 py-3 text-sm font-black text-[#06101f] shadow-[0_16px_42px_rgba(34,211,238,0.25)] transition hover:brightness-105 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-cyan-200 sm:w-auto">{`Start the ${QUESTION_COUNT} questions`}</button>
         </section>
       </div>
     );

@@ -37,7 +37,7 @@ function calibrateValue(raw: number, profile: ScoreProfile): number {
 }
 
 /**
- * Corrects unequal scoring opportunities in the fixed 28-question shortform.
+ * Corrects unequal scoring opportunities across the shortform bank.
  * Random/neutral choices center near 50 for every signal; strong evidence can
  * move toward 8 or 92. Career totals remain raw because role matching applies
  * separate opportunity normalization to the 13-dimensional career vector.

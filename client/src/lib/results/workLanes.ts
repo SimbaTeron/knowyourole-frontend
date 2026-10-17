@@ -29,7 +29,7 @@ export const WORK_LANE_LABELS: Record<WorkLaneKey, string> = {
 
 // The fixed Shortform V2 question bank already collects direct work-preference
 // evidence. These lane weights make that evidence interpretable by work material
-// and environment without mutating the stable 28-question response contract.
+// and environment without mutating the stored response contract.
 const WORK_LANE_CAREER_WEIGHTS: Record<WorkLaneKey, Partial<Record<CareerKey, number>>> = {
   knowledgeStrategy: { analysis: 0.34, systems: 0.24, deepFocus: 0.2, autonomy: 0.12, creative: 0.1 },
   practicalField: { handsOn: 0.36, operations: 0.2, pace: 0.16, autonomy: 0.12, stability: 0.08, systems: 0.08 },

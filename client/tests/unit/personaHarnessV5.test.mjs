@@ -2,7 +2,7 @@
  * Persona harness for scoring v5 (shortform-v2-scoring-v5).
  *  - personas.json: 102 harness personas (72 prior P01–P80 minus non-native readers + 30 new P81–P110).
  *  - quizqa-round8.json: QuizQA's independent Round 8 answer sets (P111–P150 + 10 Round 6 re-runs),
- *    answered by QuizQA on the current 30-question bank, with expectations transcribed from QuizQA's
+ *    answered by QuizQA on the current question bank, with expectations transcribed from QuizQA's
  *    persona notes. The only change is listed in `overrides` (P145 Q15, where QuizQA's notes and data disagree).
  * Mechanical 1–5 rubric. Targets: fit >= 4.3, relevancy >= 4.0, Leadership/Sales/Ops <= 45% of roles.
  * Answers are timed at a realistic ~6 s/question (with jitter) unless a test says otherwise.
@@ -19,6 +19,7 @@ const fx = (f) => JSON.parse(readFileSync(join(root, "tests/fixtures/personas-v5
 const personas = fx("personas.json");
 const quizqa = fx("quizqa-round8.json");
 const { scoreShortformVersioned } = await import(pathToFileURL(join(root, "src/lib/quiz/scoreShortformVersioned.ts")).href);
+const { QUESTION_COUNT } = await import(pathToFileURL(join(root, "src/lib/quiz/quizConfig.ts")).href);
 const { V5_LANE_COPY, V5_MERGED, V5_COMBO_TITLES } = await import(pathToFileURL(join(root, "src/lib/results/workDirectionV5.ts")).href);
 
 const FAM = { leading: "leadership", business: "sales", organizing: "operations", artDesign: "creative", creator: "creative", creative: "creative", care: "care", teaching: "care", people: "care", research: "research", stem: "research", tech: "technical", trades: "trades", broad: "broad" };
@@ -153,7 +154,7 @@ test("v5: scattered / patterned check — false positives cleared, random, patte
   for (const id of ["P118", "P149", "R6-P46"]) assert.equal(qqById[id].r.clarity.level, "broad", id);
   assert.notEqual(qqById["R6-P60"].r.clarity.level, "clear");
   // A-B-C-D cycling and straight-lining are caught on any answer content.
-  const cyc = run(Array.from({ length: 30 }, (_, i) => (i + 1) % 4));
+  const cyc = run(Array.from({ length: QUESTION_COUNT }, (_, i) => (i + 1) % 4));
   assert.equal(cyc.clarity.level, "broad");
   assert.ok(cyc.inconsistency.flagged);
   const flaggedHarness = harness.filter(({ p, r }) => r.inconsistency.flagged && p.fam[0] !== "any").length;
@@ -195,7 +196,7 @@ test("v5: specific directions — animal care, music, law, medicine, school lead
 
 test("v5: no 'not sure' option — every question is forced-choice with 4 options", async () => {
   const { SHORTFORM_V2_QUESTIONS } = await import(pathToFileURL(join(root, "src/data/shortformV2Questions.ts")).href);
-  assert.equal(SHORTFORM_V2_QUESTIONS.length, 30);
+  assert.equal(SHORTFORM_V2_QUESTIONS.length, QUESTION_COUNT);
   for (const q of SHORTFORM_V2_QUESTIONS) {
     assert.equal(q.answers.length, 4, `Q${q.id}`);
     for (const o of q.answers) assert.ok(!/not sure|don't know|unsure/i.test(o.text), `Q${q.id}${o.id}`);

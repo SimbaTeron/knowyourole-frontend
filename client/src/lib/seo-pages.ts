@@ -1,3 +1,5 @@
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
+
 export type SeoFaq = { q: string; a: string };
 
 export type SeoPage = {
@@ -21,7 +23,7 @@ const standardFaqs: SeoFaq[] = [
   { q: "Is KnowYouRole free?", a: "Yes. Everything currently available on KnowYouRole is free and no result or content is locked behind a paywall. The quiz gives a practical result focused on personality, work style, communication, and career-fit direction." },
   { q: "Is this an official MBTI or DISC test?", a: "No. KnowYouRole uses MBTI-style and DISC-style language for clarity, then combines those signals with Big Five-informed trait patterns and role-fit guidance." },
   { q: "Is this clinical or diagnostic?", a: "No. KnowYouRole is a self-reflection and career-fit tool, not a clinical assessment, diagnosis, hiring screen, or medical instrument." },
-  { q: "How long does the quiz take?", a: "The current short-form quiz uses 30 focused prompts designed to be fast while still collecting useful personality, work-style, and role-fit signals." },
+  { q: "How long does the quiz take?", a: `The current short-form quiz uses ${QUESTION_COUNT} focused prompts designed to be fast while still collecting useful personality, work-style, and role-fit signals.` },
 ];
 
 export const landingPages: SeoPage[] = [
@@ -81,7 +83,7 @@ export const landingPages: SeoPage[] = [
   {
     path: "/free-personality-test", slug: "free-personality-test", phase: "landing",
     title: "Free Personality Test, No Sign-Up: Work Style & Strengths | KnowYouRole",
-    description: "Take a free personality test with no sign-up, email or name. 30 questions on work style, strengths and communication, with Big Five, MBTI-style and DISC signals.",
+    description: `Take a free personality test with no sign-up, email or name. ${QUESTION_COUNT} questions on work style, strengths and communication, with Big Five, MBTI-style and DISC signals.`,
     h1: "Free Personality Test for Work Style and Self-Discovery",
     eyebrow: "Free personality test",
     intro: "KnowYouRole gives you a free personality test experience designed for real-world use: self-understanding, role direction, communication clarity, and a better read on how you operate under normal conditions and pressure.",
