@@ -1,5 +1,6 @@
 'use client';
 import { DISC_LABELS, TRAIT_LABELS, buildResultView, leanBand } from "@/lib/results/resultViewModel";
+import { fitWrappedText, SHARE_SIGNAL_BOX, SHARE_WHY_BOX } from "@/lib/results/shareCardLayout";
 import { ResultBigFiveView } from "@/app/results/views/ResultBigFiveView";
 import { ResultPortrait } from "@/app/results/views/ResultPortrait";
 import { ResultShareView } from "@/app/results/views/ResultShareView";
@@ -2294,6 +2295,31 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
       }
       if (line && lines < maxLines) ctx.fillText(line, x, y + lines * lineHeight);
     };
+    const drawFitted = (
+      text: string,
+      x: number,
+      y: number,
+      box: { maxWidth: number; maxHeight: number; startSize: number; minSize: number; lineHeightRatio: number },
+      weight: string,
+      family: string,
+      fill: string,
+    ) => {
+      const fitted = fitWrappedText({
+        text,
+        maxWidth: box.maxWidth,
+        maxHeight: box.maxHeight,
+        startSize: box.startSize,
+        minSize: box.minSize,
+        lineHeightRatio: box.lineHeightRatio,
+        measure: (sample, fontSize) => {
+          ctx.font = `${weight} ${fontSize}px ${family}`;
+          return ctx.measureText(sample).width;
+        },
+      });
+      ctx.font = `${weight} ${fitted.fontSize}px ${family}`;
+      ctx.fillStyle = fill;
+      fitted.lines.forEach((line, index) => ctx.fillText(line, x, y + index * fitted.lineHeight));
+    };
 
     const bg = ctx.createLinearGradient(0, 0, 1080, 1350);
     bg.addColorStop(0, "#fffdf7");
@@ -2354,14 +2380,22 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     drawText(report.career.salary || "", 126, 916, 780, 27, 2, "800 27px 'IBM Plex Sans', Arial, sans-serif", "#456174");
     ctx.font = "800 20px 'IBM Plex Sans', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
-    ctx.fillText("WHY THIS DIRECTION", 126, 964);
-    drawText(report.career.summary || `A direction that pairs ${report.mbtiType} preferences with ${report.primaryDisc} ${discLabel.toLowerCase()} energy.`, 126, 994, 810, 24, 3, "700 22px 'IBM Plex Sans', Arial, sans-serif", "#29495c");
+    ctx.fillText("WHY THIS DIRECTION", 126, 956);
+    drawFitted(
+      report.career.summary || `A direction that pairs ${report.mbtiType} preferences with ${report.primaryDisc} ${discLabel.toLowerCase()} energy.`,
+      126,
+      982,
+      SHARE_WHY_BOX,
+      "700",
+      "'IBM Plex Sans', Arial, sans-serif",
+      "#29495c",
+    );
 
     fillRoundRect(72, 1100, 936, 150, 34, "#eaf5f6", "#9bc8cf");
     ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
-    ctx.fillText("MY OPERATING SIGNAL", 122, 1150);
-    drawText(shareInsight, 122, 1194, 800, 34, 2, "800 29px 'Space Grotesk', Arial, sans-serif", "#12263a");
+    ctx.fillText("MY OPERATING SIGNAL", 122, 1134);
+    drawFitted(shareInsight, 122, 1172, SHARE_SIGNAL_BOX, "800", "'Space Grotesk', Arial, sans-serif", "#12263a");
     ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
     ctx.fillStyle = "#315f74";
     ctx.fillText(BRAND_SHARE_HOST, 122, 1310);

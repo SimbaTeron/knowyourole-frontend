@@ -11,7 +11,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { scoreShortformVersioned } from "../../src/lib/quiz/scoreShortformVersioned.ts";
 import { QUESTION_COUNT } from "../../src/lib/quiz/quizConfig.ts";
-import { buildResultViewFromVersioned, renderResultCopy, resultViewViolations } from "../../src/lib/results/resultViewModel.ts";
+import { buildResultViewFromVersioned, renderResultCopy, resultViewViolations, NO_LEAD_CAPTION } from "../../src/lib/results/resultViewModel.ts";
+import { fitWrappedText, SHARE_SIGNAL_BOX, SHARE_WHY_BOX } from "../../src/lib/results/shareCardLayout.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -104,5 +105,65 @@ test("golden result copy matches the locked personas", () => {
   for (const block of blocks) {
     const { view } = viewFor("v5", byId[block.id].answers);
     assert.equal(renderResultCopy(view).trim(), block.body.trim(), block.id);
+  }
+});
+
+const personasById = Object.fromEntries([...v5Personas, ...quizqa].map((persona) => [persona.id, persona]));
+
+test("clear results do not pair stood-out copy with no single standout", () => {
+  for (const id of ["P114", "P123", "P131", "R6-P53"]) {
+    const { view } = viewFor("v5", personasById[id].answers);
+    assert.equal(view.clarity, "clear", id);
+    assert.match(view.clarityNote.body, /stood out/, id);
+    assert.equal(view.lead.kind, "relative", id);
+    assert.equal(view.lead.caption, "Structure / Follow-through", id);
+    assert.notEqual(view.lead.caption, NO_LEAD_CAPTION, id);
+    assert.doesNotMatch(view.bigFiveLead, /^No single/, id);
+    assert.doesNotMatch(view.imageTraitLine, /No single standout/, id);
+    assert.doesNotMatch(view.pdfTraitLine, /No single standout/, id);
+    assert.doesNotMatch(view.shareMeta, /No single standout/, id);
+    assert.equal(resultViewViolations(view).length, 0, id);
+  }
+
+  const { view } = viewFor("v5", personasById.P114.answers);
+  const broken = {
+    ...view,
+    lead: { kind: "none", statLabel: "Top trait", statBand: "Balanced", caption: NO_LEAD_CAPTION },
+    bigFiveLead: "No single Big Five trait stands out: your traits landed close together, so read them as light leans.",
+    imageTraitLine: NO_LEAD_CAPTION,
+    pdfTraitLine: NO_LEAD_CAPTION,
+    bigFiveSubtitle: NO_LEAD_CAPTION,
+    shareMeta: `${view.mbtiType} · ${view.discLabel} · ${NO_LEAD_CAPTION}`,
+  };
+  const problems = resultViewViolations(broken);
+  assert.ok(problems.includes("clear stood-out note is paired with no single standout"), problems.join("; "));
+  assert.ok(problems.includes("clear result has no standout trait"));
+});
+
+function measureLikeSans(text, fontSize) {
+  return text.length * fontSize * 0.56;
+}
+
+test("share card why and signal text fit inside their boxes", () => {
+  const why = `${viewFor("v5", personasById.P149.answers).view.whyLine} Try your own result at knowyourole.com.`;
+  const signal = "I make good work repeatable, reliable, and built to last. My Dominant style adds direct, decisive movement.";
+  const samples = [
+    ["P149 why", why, SHARE_WHY_BOX],
+    ["P114 signal", signal, SHARE_SIGNAL_BOX],
+  ];
+  for (const [label, text, box] of samples) {
+    const fitted = fitWrappedText({
+      text,
+      maxWidth: box.maxWidth,
+      maxHeight: box.maxHeight,
+      startSize: box.startSize,
+      minSize: box.minSize,
+      lineHeightRatio: box.lineHeightRatio,
+      measure: measureLikeSans,
+    });
+    assert.equal(fitted.lines.join(" "), text, label);
+    assert.equal(fitted.fits, true, `${label} font ${fitted.fontSize} lines ${fitted.lines.length}`);
+    assert.ok(fitted.lines.length * fitted.lineHeight <= box.maxHeight, label);
+    assert.ok(fitted.lines.every((line) => measureLikeSans(line, fitted.fontSize) <= box.maxWidth), label);
   }
 });

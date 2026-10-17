@@ -124,11 +124,23 @@ export type LeadTraits =
       readonly caption: string;
     }
   | {
+      readonly kind: "relative";
+      /** Highest trait on a Clear result that did not cross the named-trait line (55). */
+      readonly trait: { readonly key: TraitKey; readonly label: TraitLabel; readonly score: number };
+      readonly label: TraitLabel;
+      readonly statLabel: "Top trait";
+      readonly statBand: "Balanced" | "Light lean";
+      readonly caption: TraitLabel;
+    }
+  | {
       readonly kind: "none";
       readonly statLabel: "Top trait";
       readonly statBand: "Balanced";
       readonly caption: typeof NO_LEAD_CAPTION;
     };
+
+/** A Clear result names its strongest trait. It cannot use the empty lead. */
+export type ClearLead = Exclude<LeadTraits, { kind: "none" }>;
 
 export type StressSecondary =
   | { readonly band: "high"; readonly role: "lead" | "second"; readonly text: string }
@@ -201,8 +213,7 @@ type SharedView = {
   readonly ogDescription: string;
 };
 
-export type ClearOrMixedView = SharedView & {
-  readonly clarity: "clear" | "mixed";
+type IdentityFields = {
   readonly headline: string;
   readonly archetype: string;
   readonly chipSuffix: string;
@@ -210,6 +221,18 @@ export type ClearOrMixedView = SharedView & {
   readonly emoji: string;
   readonly showCrown: true;
 };
+
+export type ClearView = Omit<SharedView, "lead"> & IdentityFields & {
+  readonly clarity: "clear";
+  readonly lead: ClearLead;
+};
+
+export type MixedView = SharedView & IdentityFields & {
+  readonly clarity: "mixed";
+};
+
+/** @deprecated Use ClearView | MixedView. Kept so older imports still name the pair. */
+export type ClearOrMixedView = ClearView | MixedView;
 
 export type BroadView = SharedView & {
   readonly clarity: "broad";
@@ -221,7 +244,7 @@ export type BroadView = SharedView & {
   readonly showCrown: false;
 };
 
-export type ResultView = ClearOrMixedView | BroadView;
+export type ResultView = ClearView | MixedView | BroadView;
 
 export type ResultDirectionInput = {
   laneKey?: string;
@@ -398,10 +421,51 @@ function buildLead(bigFive: Record<TraitKey, number>, mbtiType: string, clarity:
   };
 }
 
+function relativeLead(bigFive: Record<TraitKey, number>, mbtiType: string): ClearLead {
+  const ranked = (Object.keys(TRAIT_LABELS) as TraitKey[])
+    .filter((key) => !traitBlocked(key, mbtiType))
+    .map((key) => [key, Number(bigFive[key] ?? 0)] as const)
+    .sort((a, b) => b[1] - a[1]);
+  const [key, score] = ranked[0];
+  const named = namedTrait(key, score);
+  if (named) {
+    return {
+      kind: "single",
+      trait: named,
+      label: named.label,
+      statLabel: "Top trait",
+      statBand: named.meter,
+      caption: named.label,
+    };
+  }
+  const label = TRAIT_LABELS[key];
+  return {
+    kind: "relative",
+    trait: { key, label, score },
+    label,
+    statLabel: "Top trait",
+    statBand: score >= 45 ? "Balanced" : "Light lean",
+    caption: label,
+  };
+}
+
+function asClearLead(lead: LeadTraits): ClearLead {
+  if (lead.kind === "none") {
+    throw new Error("A clear result cannot say there is no standout trait.");
+  }
+  return lead;
+}
+
 function leadPhrase(lead: LeadTraits): string {
-  if (lead.kind === "none") return "";
+  if (lead.kind === "none" || lead.kind === "relative") return "";
   if (lead.kind === "single") return lead.trait.phrase;
   return lead.traits[0].phrase;
+}
+
+function bigFiveSentence(lead: LeadTraits): string {
+  if (lead.kind === "none") return BIG_FIVE_LEAD.none;
+  if (lead.kind === "blend") return BIG_FIVE_LEAD.blend(lead.label);
+  return BIG_FIVE_LEAD.single(lead.label);
 }
 
 export function buildResultView(input: ResultViewInput): ResultView {
@@ -436,7 +500,12 @@ export function buildResultView(input: ResultViewInput): ResultView {
     ? examples.slice(0, 3)
     : uniqueTitles([input.direction.title, ...alsoExplore, ...adjacent]).slice(0, 3);
 
-  const lead = buildLead(input.bigFive, mbtiType, clarity);
+  const builtLead = buildLead(input.bigFive, mbtiType, clarity);
+  // Clear means the strongest trait stood out. Name that trait even when it
+  // stayed under 55, so the page cannot also say nothing stood out.
+  const lead: LeadTraits = level === "clear" && builtLead.kind === "none"
+    ? relativeLead(input.bigFive, mbtiType)
+    : builtLead;
   const rankedTop = (Object.entries(input.bigFive) as [TraitKey, number][])
     .filter(([key]) => key in TRAIT_LABELS)
     .sort((a, b) => b[1] - a[1])[0];
@@ -554,9 +623,9 @@ export function buildResultView(input: ResultViewInput): ResultView {
   const imageTraitLine = lead.kind === "none" ? NO_LEAD_CAPTION : `${lead.caption} · ${lead.statBand}`;
   const pdfTraitLine = lead.kind === "none"
     ? NO_LEAD_CAPTION
-    : lead.kind === "single"
-      ? `${lead.trait.label} ${Math.round(lead.trait.score)}%`
-      : lead.caption;
+    : lead.kind === "blend"
+      ? lead.caption
+      : `${lead.trait.label} ${Math.round(lead.trait.score)}%`;
   const pdfArchetype = level === "broad" ? `${mbtiType}-leaning pattern` : fullArchetype;
   const pdfSubtitle = level === "broad" ? `${mbtiType}-leaning pattern` : `${mbtiType} — ${fullArchetype}`;
   const bigFiveSubtitle = lead.kind === "none" ? NO_LEAD_CAPTION : `${lead.caption} · ${lead.statBand.toLowerCase()}`;
@@ -580,7 +649,7 @@ export function buildResultView(input: ResultViewInput): ResultView {
     whyLine,
     clarityNote,
     lead,
-    bigFiveLead: lead.kind === "none" ? BIG_FIVE_LEAD.none : lead.kind === "blend" ? BIG_FIVE_LEAD.blend(lead.label) : BIG_FIVE_LEAD.single(lead.label),
+    bigFiveLead: bigFiveSentence(lead),
     stressSecondary,
     stressSupport,
     roles,
@@ -617,17 +686,19 @@ export function buildResultView(input: ResultViewInput): ResultView {
     };
   }
 
-  return {
-    ...shared,
-    clarity: level,
+  const identityView = {
     headline: identity,
     archetype: strippedArchetype,
     chipSuffix: strippedArchetype,
     mindCaption: strippedArchetype,
     emoji: MBTI_EMOJIS[mbtiType] || "◈",
-    showCrown: true,
+    showCrown: true as const,
     ogTitle: identity,
   };
+  if (level === "clear") {
+    return { ...shared, ...identityView, clarity: "clear", lead: asClearLead(lead) };
+  }
+  return { ...shared, ...identityView, clarity: "mixed" };
 }
 
 /** Build the view from a versioned scoring result. Tests and harnesses use this. */
@@ -742,6 +813,14 @@ export function resultViewViolations(view: ResultView): string[] {
   if (view.lead.kind === "none") {
     push(view.lead.caption === NO_LEAD_CAPTION && view.lead.statBand === "Balanced", "empty lead is not the standout caption");
     push(!BANNED_LEAD.test(view.bigFiveLead) || view.bigFiveLead.startsWith("No single"), "empty lead is described as a Balanced trait");
+  } else if (view.lead.kind === "relative") {
+    push(view.clarity === "clear", "relative lead is only for a clear result");
+    push(view.lead.trait.score < 55, "relative lead crossed the named-trait line");
+    push(view.lead.caption === view.lead.label && view.lead.label === TRAIT_LABELS[view.lead.trait.key], "relative caption is not the trait name");
+    push(view.lead.statLabel === "Top trait", "relative lead is labeled plural");
+    const expectBand = view.lead.trait.score >= 45 ? "Balanced" : "Light lean";
+    push(view.lead.statBand === expectBand, "relative meter does not match the score");
+    push(!traitBlocked(view.lead.trait.key, view.mbtiType), "relative lead uses a blocked trait");
   } else if (view.lead.kind === "single") {
     push(view.lead.trait.score >= 55, "lead trait is below the named-trait line");
     push(!/balanced/i.test(view.lead.trait.label), "lead trait is named Balanced");
@@ -798,6 +877,16 @@ export function resultViewViolations(view: ResultView): string[] {
     const pair = axis ? `${axis[1]}${axis[2]}` : "";
     const index = ["EI", "SN", "TF", "JP"].indexOf(pair);
     if (index >= 0) push(view.lightLeanLetters.includes(view.mbtiType[index]), "badge axis does not mark the type letter");
+  }
+
+  if (view.clarity === "clear") {
+    const stoodOut = /stood out/i.test(view.clarityNote.body);
+    const leadKind = view.lead.kind as LeadTraits["kind"];
+    const surfaces = [view.lead.caption, view.bigFiveLead, view.imageTraitLine, view.pdfTraitLine, view.shareMeta, view.bigFiveSubtitle];
+    push(leadKind !== "none", "clear result has no standout trait");
+    push(!surfaces.some((line) => line.includes(NO_LEAD_CAPTION)), "clear result still shows no single standout trait");
+    push(!view.bigFiveLead.startsWith("No single"), "clear Big Five sentence says no trait stands out");
+    push(!(stoodOut && surfaces.some((line) => /no single standout/i.test(line))), "clear stood-out note is paired with no single standout");
   }
 
   push(view.shareMeta.includes(view.lead.kind === "none" ? NO_LEAD_CAPTION : view.lead.caption), "share line uses a different lead");
