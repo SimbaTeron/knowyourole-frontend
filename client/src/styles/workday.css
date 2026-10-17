@@ -324,7 +324,7 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
 .workday-header__links { display: flex; align-items: center; gap: 18px; margin-left: auto; }
 .workday-header__links a { color: #536e82; text-decoration: none; font: 750 12px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.015em; }
 .workday-header__links a:hover { color: #12263a; }
-.workday-header__cta { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 15px; border-radius: 999px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.02em; box-shadow: 3px 3px 0 #ffca42; }
+.workday-header__cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; min-width: 44px; padding: 0 15px; border-radius: 999px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.02em; box-shadow: 3px 3px 0 #ffca42; }
 .workday-header__cta:hover { transform: translate(-1px, -1px); }
 
 @media (max-width: 760px) {
@@ -344,7 +344,7 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
   .workday-header__links { display: none; }
   .workday-header__menu { display: block; }
   .workday-header__mark { width: 29px; height: 29px; border-radius: 8px; }
-  .workday-header__cta { min-height: 34px; padding-inline: 11px; font-size: 11px; }
+  .workday-header__cta { min-height: 44px; min-width: 44px; padding-inline: 12px; font-size: 12px; }
   html.kyr-workday .kyr-home-page .hero-section { min-height: auto; }
   html.kyr-workday .kyr-home-page .hero-grid { padding-top: 42px; }
   html.kyr-workday .kyr-home-page .sample-card { transform: none !important; }
@@ -372,7 +372,7 @@ html.kyr-workday {
 .workday-footer__grid { width: min(1120px, 100%); margin: 0 auto; display: grid; grid-template-columns: minmax(220px, 1.6fr) repeat(3, minmax(130px, 1fr)); gap: clamp(26px, 5vw, 64px); }
 .workday-footer__brand { display: inline-flex; gap: 8px; align-items: center; color: #f8f3e8; text-decoration: none; font: 800 21px/1 "IBM Plex Sans", sans-serif; letter-spacing: -.055em; }
 .workday-footer__brand span { color: #ffca42; font-size: 25px; }.workday-footer p { max-width: 310px; margin: 15px 0 0; color: #c5d8dc; font: 500 13px/1.6 "IBM Plex Sans", sans-serif; }
-.workday-footer h2 { margin: 3px 0 14px; color: #ffca42; font: 800 10px/1 "IBM Plex Sans", sans-serif; letter-spacing: .13em; text-transform: uppercase; }.workday-footer ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }.workday-footer a:not(.workday-footer__brand) { color: #f8f3e8; text-decoration-color: rgba(255,202,66,.5); font: 600 13px/1.4 "IBM Plex Sans", sans-serif; }.workday-footer a:hover { color: #ffca42; }.workday-footer__bottom { width: min(1120px,100%); margin: 40px auto 0; padding-top: 18px; border-top: 1px solid rgba(255,253,248,.18); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; color: #c5d8dc; font: 700 10px/1.4 "IBM Plex Sans",sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.workday-footer h2 { margin: 3px 0 14px; color: #ffca42; font: 800 10px/1 "IBM Plex Sans", sans-serif; letter-spacing: .13em; text-transform: uppercase; }.workday-footer ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; }.workday-footer a:not(.workday-footer__brand) { display: flex; align-items: center; min-height: 44px; min-width: 44px; padding: 0 4px; color: #f8f3e8; text-decoration-color: rgba(255,202,66,.5); font: 600 13px/1.4 "IBM Plex Sans", sans-serif; }.workday-footer a:hover { color: #ffca42; }.workday-footer__bottom { width: min(1120px,100%); margin: 40px auto 0; padding-top: 18px; border-top: 1px solid rgba(255,253,248,.18); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; color: #c5d8dc; font: 700 10px/1.4 "IBM Plex Sans",sans-serif; letter-spacing: .08em; text-transform: uppercase; }
 @media (max-width: 760px) { .workday-footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }.workday-footer__intro { grid-column: 1 / -1; }.workday-footer__bottom { margin-top: 30px; } }
 @media (prefers-reduced-motion: reduce) { .workday-header, .workday-header__bar, .workday-header__cta { transition: none !important; } }
 

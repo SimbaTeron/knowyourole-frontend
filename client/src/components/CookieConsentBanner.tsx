@@ -27,9 +27,9 @@ const defaultConsent: CookieConsentState = {
 };
 
 export function readCookieConsent(): CookieConsentState | null {
-  if (typeof window === "undefined") return null;
+  if (typeof globalThis.window === "undefined") return null;
   try {
-    const stored = window.localStorage.getItem(COOKIE_CONSENT_KEY);
+    const stored = globalThis.window.localStorage.getItem(COOKIE_CONSENT_KEY);
     if (!stored) return null;
     const parsed = JSON.parse(stored) as Partial<CookieConsentState>;
     return {

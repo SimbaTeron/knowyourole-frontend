@@ -10,7 +10,7 @@ import CelestialProgressTracker from "./CelestialProgressTracker";
 import QuizOnboardingOverlay from "./QuizOnboarding";
 import questionsData from "@/data/questions.json";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
-import { trackKyrEvent } from "@/lib/analytics";
+import { crossedQuizMilestones, trackKyrEvent } from "@/lib/analytics";
 import ShortformV2Quiz from "./ShortformV2Quiz";
 import { LEGACY_V2_QUESTION_COUNT } from "@/lib/quiz/legacyQuestionCounts";
 
@@ -1012,21 +1012,19 @@ export default function Quiz({ tier: rawTier, mood, funMode, landmark, theme, on
     if (questions.length === 0 || currentIndex === 0 || quizCompletedTrackedRef.current) return;
 
     const completedQuestions = Math.min(currentIndex, questions.length);
-    const milestones = [1, 5, 10, 15, 30, questions.length];
-    const nextMilestone = milestones.find(
-      milestone => completedQuestions >= milestone && !progressMilestonesTrackedRef.current.has(milestone),
-    );
-
-    if (!nextMilestone) return;
-    progressMilestonesTrackedRef.current.add(nextMilestone);
-    trackKyrEvent("quiz_progress_milestone", {
-      tier,
-      completed_questions: completedQuestions,
-      milestone: nextMilestone,
-      total_questions: questions.length,
-      percent_complete: Math.round((completedQuestions / questions.length) * 100),
-      current_phase: quizPhase,
-    });
+    const milestones = crossedQuizMilestones(completedQuestions, progressMilestonesTrackedRef.current);
+    if (milestones.length === 0) return;
+    for (const milestone of milestones) {
+      progressMilestonesTrackedRef.current.add(milestone);
+      trackKyrEvent("quiz_progress_milestone", {
+        tier,
+        completed_questions: completedQuestions,
+        milestone,
+        total_questions: questions.length,
+        percent_complete: Math.round((completedQuestions / questions.length) * 100),
+        current_phase: quizPhase,
+      });
+    }
   }, [currentIndex, questions.length, quizPhase, tier]);
 
   useEffect(() => {

@@ -114,6 +114,7 @@ export function DirectionFeedbackCard({ resultId, sessionId, directionTitle, rec
       <div style={eyebrowStyle}>Early pilot · 60 seconds</div>
       <h3 id="direction-feedback-title" style={headingStyle}>Does this work direction feel accurate?</h3>
       <p style={copyStyle}>Your result is visible above. One rating is enough; the optional details help us improve the recommendations.</p>
+      <p style={privacyNoteStyle}>No names needed. Linked to this result, not to you by name.</p>
 
       <div role="radiogroup" aria-label="Direction accuracy" style={ratingGridStyle}>
         {RATINGS.map((option) => (
@@ -177,6 +178,7 @@ const cardStyle = { marginTop: 14, border: "1px solid rgba(18,38,58,.22)", borde
 const eyebrowStyle = { color: "#315f74", fontSize: 10, fontWeight: 950, letterSpacing: ".14em", textTransform: "uppercase" as const } as const;
 const headingStyle = { margin: "8px 0 6px", color: "#12263a", fontFamily: "Fraunces, Georgia, serif", fontSize: "clamp(21px,4vw,27px)", lineHeight: 1.02, letterSpacing: "-.04em" } as const;
 const copyStyle = { margin: 0, color: "#405f72", fontSize: 13, lineHeight: 1.5, maxWidth: 580 } as const;
+const privacyNoteStyle = { margin: "8px 0 0", color: "#29495c", fontSize: 13, lineHeight: 1.45, fontWeight: 700, maxWidth: 580 } as const;
 const ratingGridStyle = { display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 7, marginTop: 15 } as const;
 const ratingButtonStyle = { minHeight: 86, padding: "8px 5px", border: "1px solid rgba(18,38,58,.22)", borderRadius: 3, color: "#12263a", background: "#fffdf8", cursor: "pointer", textAlign: "center" as const, font: "inherit" } as const;
 const selectedRatingButtonStyle = { borderColor: "#12263a", color: "#fffdf8", background: "#315f74", boxShadow: "3px 3px 0 #c95f46", transform: "translate(-1px,-1px)" } as const;
