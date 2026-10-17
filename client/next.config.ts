@@ -1,4 +1,13 @@
 import type { NextConfig } from "next";
+import { checkSupabaseTarget } from "./src/lib/env/dbGuard.mjs";
+
+// Local/box/CI dev and builds must never point at the hosted Supabase project.
+// (On Vercel, previews still build; the server-side guard in api/_lib/supabase.ts
+// refuses the hosted project at runtime outside production.)
+if (process.env.VERCEL !== "1") {
+  const dbTarget = checkSupabaseTarget(process.env);
+  if (!dbTarget.ok) throw new Error(dbTarget.reason);
+}
 
 const auth0Domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN;
 const connectSources = [
