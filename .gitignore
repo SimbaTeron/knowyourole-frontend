@@ -43,3 +43,9 @@ vite.config.ts.*
 .env*
 !.env.example
 results-v3/
+
+# Local test/harness output
+results-v4/
+results-v4.1/
+client/test-results/
+client/playwright-report/
