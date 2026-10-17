@@ -16,6 +16,8 @@ type ReportPayload = {
   archetype?: string;
   primaryDisc?: string;
   population?: string;
+  /** Page lead line, for example "Openness 72%" or "No single standout trait". */
+  leadTraitLine?: string;
   career?: { title?: string; salary?: string; summary?: string };
   bigFive?: Record<string, number>;
   disc?: Record<string, number>;
@@ -148,6 +150,7 @@ export async function POST(req: NextRequest) {
     const discLabel = DISC_LABELS[primaryDisc] || 'Operating Style';
     const [topBigFiveKey, topBigFiveScore] = topEntry(payload.bigFive, ['O', 0]);
     const topBigFiveLabel = BIG_FIVE_LABELS[topBigFiveKey] || topBigFiveKey;
+    const leadTraitLine = cleanText(payload.leadTraitLine || `${topBigFiveLabel} ${topBigFiveScore}%`);
     const careerTitle = cleanText(payload.career?.title || 'Career Direction');
     const careerSalary = cleanText(payload.career?.salary || '');
     const careerSummary = cleanText(payload.career?.summary || `Strong match for your ${mbtiType} pattern, ${primaryDisc} operating style, and ${topBigFiveLabel} signal.`);
@@ -272,7 +275,7 @@ export async function POST(req: NextRequest) {
     const tileWidth = (contentWidth - tileGap * 2) / 3;
     const tiles = [
       ['DISC SIGNAL', `${primaryDisc} ${discLabel}`, discAccent],
-      ['TOP TRAIT', `${topBigFiveLabel} ${topBigFiveScore}%`, 'cyan'],
+      ['TOP TRAIT', leadTraitLine, 'cyan'],
       ['TYPE RARITY', payload.population ? `${payload.population} of people` : 'Personal signal', 'gold'],
     ] as const;
     tiles.forEach(([label, value, accent], index) => {
@@ -346,7 +349,7 @@ export async function POST(req: NextRequest) {
     page.drawText('PRACTICAL NOTES', { x: margin + 20, y: reflectionTop - 25, size: 9, font: bold, color: color('ink') });
     const notes = suppliedSections.length ? suppliedSections : [
       { title: 'How to use this', body: `Use ${careerTitle} as a direction to investigate, not a promise. Compare it with tasks you enjoy, environments where you do good work, and feedback from people who know your contribution.` },
-      { title: 'Strongest signal', body: `${topBigFiveLabel} (${topBigFiveScore}%) and ${primaryDisc} ${discLabel} are the clearest signals in this result. Look for settings that reward those tendencies while giving you room to develop the rest.` },
+      { title: 'Strongest signal', body: `${leadTraitLine} and ${primaryDisc} ${discLabel} are the clearest signals in this result. Look for settings that reward those tendencies while giving you room to develop the rest.` },
     ];
     let noteY = reflectionTop - 50;
     notes.forEach((section) => {
