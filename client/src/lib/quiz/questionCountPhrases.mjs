@@ -3,9 +3,6 @@
  * Fails CI when source or copy hard-codes a quiz length phrase.
  * The live length belongs in quizConfig.ts (QUESTION_COUNT = questions.length).
  * Lines that name LEGACY_V2_QUESTION_COUNT or LEGACY_REPORTING_ANSWER_COLUMNS are allowed.
- *
- * Open PR #15 (feat/schools-trust-pack) owns a few files that still contain
- * those phrases. They are reported separately and are not edited here.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -15,17 +12,6 @@ const NOUNS = ["question", "answer", "prompt"];
 
 /** @type {readonly string[]} */
 export const LEGACY_COUNT_NAMES = ["LEGACY_V2_QUESTION_COUNT", "LEGACY_REPORTING_ANSWER_COLUMNS"];
-
-/**
- * Paths relative to client/ that this change must not edit.
- * Drop a path once that file no longer contains a banned phrase.
- * @type {readonly string[]}
- */
-export const FROZEN_PR15_FILES = [
-  "src/app/terms/page.tsx",
-  "src/app/for-schools/page.tsx",
-  "src/lib/seo.ts",
-];
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".md", ".mdx"]);
 const SKIP_DIRS = new Set(["node_modules", ".next", "dist", "coverage", "build"]);
@@ -92,7 +78,7 @@ function walk(dir, out) {
 
 /**
  * @param {string} clientRoot
- * @returns {{ violations: { file: string, line: number, phrase: string, text: string }[], frozen: { file: string, line: number, phrase: string, text: string }[] }}
+ * @returns {{ file: string, line: number, phrase: string, text: string }[]}
  */
 export function scanQuestionCountPhrases(clientRoot) {
   /** @type {string[]} */
@@ -100,19 +86,15 @@ export function scanQuestionCountPhrases(clientRoot) {
   for (const folder of ["src", "tests"]) {
     walk(join(clientRoot, folder), files);
   }
-  const frozenSet = new Set(FROZEN_PR15_FILES);
   /** @type {{ file: string, line: number, phrase: string, text: string }[]} */
   const violations = [];
-  /** @type {{ file: string, line: number, phrase: string, text: string }[]} */
-  const frozen = [];
   for (const file of files) {
     const rel = relative(clientRoot, file).split("\\").join("/");
     const source = readFileSync(file, "utf8");
     const hits = bannedPhrasesInSource(rel, source).map((hit) => ({ ...hit, file: rel }));
-    if (frozenSet.has(rel)) frozen.push(...hits);
-    else violations.push(...hits);
+    violations.push(...hits);
   }
-  return { violations, frozen };
+  return violations;
 }
 
 /**

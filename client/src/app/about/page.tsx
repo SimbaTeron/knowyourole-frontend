@@ -28,6 +28,7 @@ export default function About() {
           </h2>
           <div className="space-y-3 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             <p>
+              {/* TODO(owner): expand the founder bio (background, why KnowYouRole was built). Content intentionally not invented. */}
               <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of KnowYouRole, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person. Questions or corrections: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline underline-offset-4">info@knowyourole.com</a>.
             </p>
           </div>
