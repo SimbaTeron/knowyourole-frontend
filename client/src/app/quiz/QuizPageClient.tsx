@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import PathCanvas from "@/components/PathCanvas";
-import Quiz, { QuizScores } from "@/components/Quiz";
+import type { QuizScores } from "@/components/Quiz";
+import ShortformV2Quiz from "@/components/ShortformV2Quiz";
 import dynamic from "next/dynamic";
 // Results is only shown after the last answer, so keep it out of the first-load bundle.
 const Results = dynamic(() => import("@/components/Results"), { ssr: false });
@@ -986,7 +987,7 @@ export default function QuizPage() {
           </p>
         </section>
 
-        <Quiz
+        <ShortformV2Quiz
           tier={ageTier}
           mood={mood}
           funMode={funMode}

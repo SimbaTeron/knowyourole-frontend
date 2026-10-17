@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 const groups = [
-  { title: "Explore", links: [["Take the quiz", "/quiz"], ["Career paths", "/careers"], ["Learn", "/learn"], ["Method", "/methodology"]] },
-  { title: "About", links: [["About KnowYouRole", "/about"], ["For schools & counselors", "/for-schools"], ["How it was built", "/build"], ["Questions", "/faq"], ["Contact", "/contact"]] },
+  { title: "Explore", links: [["Take the quiz", "/quiz"], ["Career paths", "/careers"], ["Trades quiz", "/careers/trades-career-quiz"], ["Creator quiz", "/careers/creator-careers-quiz"], ["Quiz for teens", "/career-quiz-for-teens"], ["Learn", "/learn"], ["Method", "/methodology"]] },
+  { title: "About", links: [["About KnowYouRole", "/about"], ["For schools & counselors", "/for-schools"], ["For parents", "/for-parents"], ["For counselors", "/for-counselors"], ["How it was built", "/build"], ["Questions", "/faq"], ["Contact", "/contact"]] },
   { title: "Your choices", links: [["Privacy", "/privacy"], ["Cookie settings", "/privacy#cookie-preferences"], ["Terms", "/terms"]] },
 ] as const;
 

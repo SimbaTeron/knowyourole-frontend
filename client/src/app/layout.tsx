@@ -5,9 +5,12 @@ import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { BaseJsonLd } from "@/components/seo/BaseJsonLd";
 import { publicPageMetadata } from "@/lib/seo";
-import Providers from "./providers";
 
-export const metadata: Metadata = publicPageMetadata("/");
+// Home robots live on page.tsx. Leaving them here also stamps index,follow onto the 404,
+// which Next already marks noindex, so the missing page shipped two robots tags.
+const { robots: _homeRobots, ...rootMetadata } = publicPageMetadata("/");
+void _homeRobots;
+export const metadata: Metadata = rootMetadata;
 
 export default function RootLayout({
   children,
@@ -19,7 +22,7 @@ export default function RootLayout({
       <body className="kyr-page">
         <GoogleAnalytics />
         <BaseJsonLd />
-        <Providers>{children}</Providers>
+        {children}
         <CookieConsentBanner />
       </body>
     </html>
