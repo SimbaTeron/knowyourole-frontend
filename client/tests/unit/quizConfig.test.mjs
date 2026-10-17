@@ -6,7 +6,6 @@ import { QUESTION_COUNT, QUIZ_CONFIG, QUIZ_QUESTIONS, questionIsScored } from ".
 import { SHORTFORM_V2_QUESTIONS } from "../../src/data/shortformV2Questions.ts";
 import { LEGACY_REPORTING_ANSWER_COLUMNS, LEGACY_V2_QUESTION_COUNT } from "../../src/lib/quiz/legacyQuestionCounts.ts";
 import {
-  FROZEN_PR15_FILES,
   bannedPhrasesInLine,
   bannedPhrasesInSource,
   formatQuestionCountHits,
@@ -67,12 +66,10 @@ test("guard rejects hardcoded count phrases and allows the legacy constant name"
 });
 
 test("client source and tests do not hard-code question-count phrases", () => {
-  const { violations, frozen } = scanQuestionCountPhrases(clientRoot);
+  const violations = scanQuestionCountPhrases(clientRoot);
   assert.equal(
     violations.length,
     0,
     `Hard-coded question count:\n${formatQuestionCountHits(violations)}`,
   );
-  const frozenFiles = [...new Set(frozen.map((hit) => hit.file))].sort();
-  assert.deepEqual(frozenFiles, [...FROZEN_PR15_FILES].sort());
 });

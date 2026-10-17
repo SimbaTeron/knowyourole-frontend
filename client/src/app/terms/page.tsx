@@ -1,6 +1,7 @@
 'use client';
 
 import { AppHeader } from "@/components/layout/AppHeader";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 export default function Terms() {
   return (
@@ -21,7 +22,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Description of Service</h2>
             <p>
-              KnowYouRole provides a 30-question self-reflection experience that uses Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-exploration guidance. It is not the official MBTI assessment, a clinical instrument, or a selection tool. The Service includes age-tiered copy where available.
+              KnowYouRole provides a {QUESTION_COUNT}-question self-reflection experience that uses Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-exploration guidance. It is not the official MBTI assessment, a clinical instrument, or a selection tool. The Service includes age-tiered copy where available.
             </p>
           </section>
 
