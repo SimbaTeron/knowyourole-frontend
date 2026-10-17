@@ -26,7 +26,7 @@ export default function Privacy() {
             KnowYouRole saves quiz completions so your result can be generated and recovered. We do not sell quiz results. Analytics is optional; advertising technology is not active today.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
-            Schools, parents and students: see <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a> for what we store, how long we keep it, and how to ask for deletion.
+            Schools, parents and students: see <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a> for what we store, how long we keep it, and how to ask for deletion. Quiz results not linked to an account are deleted automatically after 30 days.
           </p>
         </div>
 

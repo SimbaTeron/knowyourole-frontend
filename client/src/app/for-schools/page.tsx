@@ -40,7 +40,7 @@ export default function ForSchoolsPage() {
             <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.035em]">What we keep, and what we don&apos;t.</h2>
             <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[#405f72]">
               <li>No accounts, no names, no student IDs.</li>
-              <li>We store quiz answers and the result with a random session ID, kept for 12 months.</li>
+              <li>We store quiz answers and the result with a random session ID, deleted automatically after 30 days.</li>
               <li>Schools and parents can ask for deletion at info@knowyourole.com.</li>
               <li>No selling, no ads, no marketing profiles.</li>
               <li>Under 13: teacher-led use, and no email or personal details.</li>

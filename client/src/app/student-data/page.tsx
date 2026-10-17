@@ -10,12 +10,14 @@ export const metadata: Metadata = publicPageMetadata("/student-data");
  * LEGAL REVIEW REQUIRED: this page is a plain-English draft, not legal advice.
  * A lawyer should review the FERPA, COPPA, SOPIPA / AB 1584 and NY Ed Law 2-d
  * statements before schools rely on them.
- * OWNER TO CONFIRM: retention period (12 months), deletion window (30 days),
- * data controller name, and mailing address. See OWNER_VALUES below.
+ * Retention (30 days) and deletion window (30 days) confirmed by the owner.
+ * Retention matches purge_expired_anonymous_result_data() (supabase/migrations/006),
+ * run daily by the Vercel cron in client/vercel.json. Change both together.
+ * OWNER TO CONFIRM: data controller name and mailing address. See OWNER_VALUES below.
  */
 const OWNER_VALUES = {
-  retention: "12 months", // OWNER TO CONFIRM
-  deletionWindow: "30 days", // OWNER TO CONFIRM
+  retention: "30 days", // must match INTERVAL '30 days' in purge_expired_anonymous_result_data()
+  deletionWindow: "30 days",
   controller: "KnowYouRole", // OWNER TO CONFIRM: legal entity or owner name
   contact: "info@knowyourole.com",
 } as const;
@@ -66,7 +68,7 @@ export default function StudentDataPage() {
           <section className={sectionClass}>
             <h2 className={h2Class}>How long we keep it</h2>
             <p className={pClass}>
-              Quiz results are kept for <strong>{OWNER_VALUES.retention}</strong>, then deleted. Because results have no name attached, we use them only to show a result again and to improve the quiz.
+              Quiz results are kept for <strong>{OWNER_VALUES.retention}</strong>, then deleted automatically by a daily cleanup. Because results have no name attached, we use them only to show a result again and to improve the quiz.
             </p>
           </section>
 
