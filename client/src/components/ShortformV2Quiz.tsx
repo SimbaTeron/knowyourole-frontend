@@ -7,7 +7,7 @@ import { Brain, ChevronLeft, Sparkles, X } from "lucide-react";
 import type { QuizScores } from "./Quiz";
 import { CAREER_SCORE_KEYS, SHORTFORM_V2_QUESTIONS, type CareerKey, type ShortformV2Answer } from "@/data/shortformV2Questions";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
-import { trackKyrEvent } from "@/lib/analytics";
+import { quizProgressMilestone, trackKyrEvent } from "@/lib/analytics";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
 import { recomputeShortformV2ScoreMaps, validateShortformV2Responses } from "@/lib/quiz/shortformV2Scoring";
 
@@ -251,6 +251,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const advancingRef = useRef(false);
   const advanceTimerRef = useRef<number | null>(null);
   const completedRef = useRef(false);
+  const progressMilestonesRef = useRef(new Set<number>());
   useEffect(() => () => {
     if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
   }, []);
@@ -331,6 +332,20 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
 
     setSelectedAnswer(answer.id);
     setScores(updatedScores);
+
+    if (!isReviewingAnswer) {
+      const milestone = quizProgressMilestone(responses.length);
+      if (milestone !== null && !progressMilestonesRef.current.has(milestone)) {
+        progressMilestonesRef.current.add(milestone);
+        trackKyrEvent("quiz_progress_milestone", {
+          source: "shortform_v2",
+          completed_questions: responses.length,
+          milestone,
+          total_questions: totalQuestions,
+          percent_complete: Math.round((responses.length / totalQuestions) * 100),
+        });
+      }
+    }
 
     trackKyrEvent("quiz_answer_selected", {
       source: "shortform_v2",
