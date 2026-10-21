@@ -1,3 +1,5 @@
+import { randomIdToken } from "@/lib/randomId";
+
 // ─── Validation Schemas (duplicated from server — no server deps) ─────────────
 
 export const MBTI_LABELS: Record<string, { title: string; spark: string }> = {
@@ -418,7 +420,7 @@ export function calculatePersonality(data: InputData) {
     overall: resultConfidenceLabel(modelConfidence.overall),
   };
 
-  const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+  const sessionId = `quiz-${Date.now()}-${randomIdToken(8)}`;
 
   return {
     sessionId,

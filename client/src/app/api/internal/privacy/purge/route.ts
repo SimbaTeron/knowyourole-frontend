@@ -1,18 +1,93 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
+import {
+  anonymousResultRetentionCutoff,
+  purgeExpiredAnonymousResults,
+  type AnonymousSessionForPurge,
+} from "@/lib/privacy/retentionPolicy";
 
 export const dynamic = "force-dynamic";
+
+const PAGE = 500;
+
+type SessionRow = { id: string; user_id: string | null; created_at: string };
+type ResultRow = { session_id: string | null };
+
+function noStore(body: unknown, status = 200) {
+  return NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
+}
+
+/**
+ * Sessions older than the shared retention constant.
+ * Ownership is enforced again inside delete_anonymous_result_data, the same
+ * lock the on-request delete uses, so an account-linked row is left in place.
+ */
+async function listExpiredAnonymousSessions(now: Date): Promise<AnonymousSessionForPurge[]> {
+  const supabase = getSupabaseAdmin();
+  const cutoff = anonymousResultRetentionCutoff(now).toISOString();
+  const sessions: SessionRow[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("quiz_sessions")
+      .select("id, user_id, created_at")
+      .is("user_id", null)
+      .lt("created_at", cutoff)
+      .order("id", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(error.message);
+    const page = (data ?? []) as SessionRow[];
+    sessions.push(...page);
+    if (page.length < PAGE) break;
+  }
+
+  const resultCounts = new Map<string, number>();
+  const ids = sessions.map((session) => session.id);
+  for (let index = 0; index < ids.length; index += 100) {
+    const chunk = ids.slice(index, index + 100);
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await supabase
+        .from("quiz_results")
+        .select("session_id")
+        .in("session_id", chunk)
+        .is("user_id", null)
+        .range(from, from + 999);
+      if (error) throw new Error(error.message);
+      const page = (data ?? []) as ResultRow[];
+      for (const row of page) {
+        if (!row.session_id) continue;
+        resultCounts.set(row.session_id, (resultCounts.get(row.session_id) ?? 0) + 1);
+      }
+      if (page.length < 1000) break;
+    }
+  }
+
+  return sessions.map((session) => ({
+    id: session.id,
+    userId: session.user_id,
+    createdAt: session.created_at,
+    ownedByUser: false,
+    anonymousResultCount: resultCounts.get(session.id) ?? 0,
+  }));
+}
 
 export async function GET(req: NextRequest) {
   const configuredSecret = process.env.CRON_SECRET;
   const authorization = req.headers.get("authorization");
   if (!configuredSecret || authorization !== `Bearer ${configuredSecret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: { "Cache-Control": "no-store" } });
+    return noStore({ error: "Unauthorized" }, 401);
   }
-  const { data, error } = await getSupabaseAdmin().rpc("purge_expired_anonymous_result_data");
-  if (error) {
+  try {
+    const now = new Date();
+    const rows = await listExpiredAnonymousSessions(now);
+    const supabase = getSupabaseAdmin();
+    const purge = await purgeExpiredAnonymousResults(rows, async (id) => {
+      const { data, error } = await supabase.rpc("delete_anonymous_result_data", { p_session_id: id });
+      if (error) throw new Error(error.message);
+      return data === true;
+    }, now);
+    return noStore({ success: true, purge: [purge] });
+  } catch (error) {
     console.error("[anonymous retention purge] failed", error);
-    return NextResponse.json({ error: "Purge failed" }, { status: 500, headers: { "Cache-Control": "no-store" } });
+    return noStore({ error: "Purge failed" }, 500);
   }
-  return NextResponse.json({ success: true, purge: data }, { headers: { "Cache-Control": "no-store" } });
 }
