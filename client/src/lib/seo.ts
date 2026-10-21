@@ -1,5 +1,6 @@
 import type { Metadata, MetadataRoute } from "next";
 import { allSeoPages } from "@/lib/seo-pages";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 export const SITE_URL = "https://knowyourole.com";
 export const SITE_NAME = "KnowYouRole";
@@ -15,7 +16,7 @@ export type PublicPage = {
   lastModified?: string;
 };
 
-/** Bump when site-wide copy changes (v5 scoring + 30-question copy shipped 2026-10-16). */
+/** Bump when site-wide copy changes (v5 scoring and question-count copy shipped 2026-10-16). */
 export const CONTENT_LAST_UPDATED = "2026-10-16";
 
 const foundationPages: PublicPage[] = [
@@ -23,15 +24,15 @@ const foundationPages: PublicPage[] = [
     path: "/",
     title: "Free Work Style & Career Quiz for Students and Adults | KnowYouRole",
     description:
-      "A free 30-question work style and personality quiz with no sign-up. Blends Big Five, MBTI-style and DISC signals into career directions to explore, from trades to creative work.",
+      `A free ${QUESTION_COUNT}-question work style and personality quiz with no sign-up. Blends Big Five, MBTI-style and DISC signals into career directions to explore, from trades to creative work.`,
     changeFrequency: "weekly",
     priority: 1,
   },
   {
     path: "/quiz",
-    title: "Take the Free Work Style Quiz | 30 Questions, No Sign-Up | KnowYouRole",
+    title: `Take the Free Work Style Quiz | ${QUESTION_COUNT} Questions, No Sign-Up | KnowYouRole`,
     description:
-      "Start the free 30-question work style quiz. No account or name needed. Get Big Five, MBTI-style and DISC signals plus career directions to explore, including trades and creative paths.",
+      `Start the free ${QUESTION_COUNT}-question work style quiz. No account or name needed. Get Big Five, MBTI-style and DISC signals plus career directions to explore, including trades and creative paths.`,
     changeFrequency: "weekly",
     priority: 0.95,
   },
@@ -50,6 +51,14 @@ const foundationPages: PublicPage[] = [
       "A transparent product and engineering case study: KnowYouRole's problem, architecture, validation, privacy decisions, and lessons learned.",
     changeFrequency: "monthly",
     priority: 0.55,
+  },
+  {
+    path: "/student-data",
+    title: "Student Data & Privacy | KnowYouRole for Schools",
+    description:
+      "What KnowYouRole stores and doesn't, how long quiz results are kept, how schools and parents can request deletion, and our FERPA, COPPA and state student-privacy approach.",
+    changeFrequency: "monthly",
+    priority: 0.6,
   },
   {
     path: "/for-schools",
