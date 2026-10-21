@@ -804,6 +804,8 @@ export const THINKING_QUESTIONS: ThinkingQuestion[] = [
 // Helper function to get random questions avoiding recent ones
 export function getRandomQuestions(count: number = 5, excludeIds: string[] = []): ThinkingQuestion[] {
   const available = THINKING_QUESTIONS.filter(q => !excludeIds.includes(q.id));
+  // Existing question order. Replacing this draw would change which prompts appear.
+  // eslint-disable-next-line no-restricted-syntax
   const shuffled = [...available].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 }
@@ -868,6 +870,7 @@ export function getAdaptiveQuestions(
   // Weighted shuffle
   const weightedQuestions = available.map(q => ({
     question: q,
+    // eslint-disable-next-line no-restricted-syntax
     weight: weights[q.category] * Math.random()
   }));
   
@@ -895,6 +898,7 @@ export function getAdaptiveQuestions(
   }
   
   // Shuffle result for variety
+  // eslint-disable-next-line no-restricted-syntax
   return result.sort(() => Math.random() - 0.5);
 }
 

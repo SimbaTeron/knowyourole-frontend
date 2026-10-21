@@ -234,7 +234,6 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     setStartedAt(Date.now());
     setHasStarted(true);
     onQuizStarted?.();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
