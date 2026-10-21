@@ -18,6 +18,11 @@ function relatedLabel(href: string) {
     "/results/types": "Results types",
     "/personality-quiz": "Personality quiz",
     "/career-personality-quiz": "Career personality quiz",
+    "/career-quiz-for-teens": "Career quiz for teens",
+    "/for-parents": "For parents",
+    "/for-counselors": "For counselors",
+    "/careers/trades-career-quiz": "Trades career quiz",
+    "/careers/creator-careers-quiz": "Creator careers quiz",
   };
   return labels[href] ?? href.split("/").filter(Boolean).map((part) => part.replaceAll("-", " ")).join(" · ");
 }
@@ -52,7 +57,7 @@ export function SeoContentPage({ page, indexPages = [] }: { page: SeoPage; index
             </section>
           ))}
           {indexPages.length ? <section className="workday-content-section"><p className="workday-content-count">Library</p><h2>Keep exploring</h2><div className="workday-content-library">{indexPages.map((item) => <Link key={item.path} href={item.path}><span>{item.eyebrow}</span><strong>{item.h1}</strong><em>{item.description}</em></Link>)}</div></section> : null}
-          {page.faqs?.length ? <section className="workday-content-section"><p className="workday-content-count">FAQ</p><h2>Common questions</h2><div className="workday-content-faq">{page.faqs.map((faq) => <details key={faq.q}><summary>{faq.q}</summary><p>{faq.a}</p></details>)}</div></section> : null}
+          {page.faqs?.length ? <section className="workday-content-section"><p className="workday-content-count">FAQ</p><h2>Common questions</h2><div className="workday-content-faq">{page.faqs.map((faq) => <details key={faq.q} open><summary>{faq.q}</summary><p>{faq.a}</p></details>)}</div></section> : null}
         </article>
         <aside className="workday-content-aside">
           <div className="workday-content-next"><p>One practical next step</p><h2>Get your work-style picture.</h2><span>{`${QUESTION_COUNT} questions. No account required to start.`}</span><Link href="/quiz">Start the quiz <b>↗</b></Link></div>

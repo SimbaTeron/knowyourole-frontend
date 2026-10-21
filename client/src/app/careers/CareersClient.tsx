@@ -99,6 +99,11 @@ export default function CareersClient({ roles, loadError }: CareersClientProps) 
           {isReady && <p className="mt-3 max-w-2xl text-sm leading-relaxed text-warm-gray/60 dark:text-[#94A3B8]">
             Use this as a comparison set: shortlist roles that match your preferred problems, environment, training path, and constraints—then test those hypotheses with real conversations and small projects.
           </p>}
+          <p className="mt-3 text-sm leading-relaxed">
+            <Link href="/careers/trades-career-quiz" className="font-semibold underline underline-offset-4">Trades career quiz</Link>
+            <span aria-hidden="true"> · </span>
+            <Link href="/careers/creator-careers-quiz" className="font-semibold underline underline-offset-4">Creator careers quiz</Link>
+          </p>
         </div>
 
         {isReady && (
