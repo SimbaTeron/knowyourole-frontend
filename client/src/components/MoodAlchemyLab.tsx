@@ -537,9 +537,13 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
       newParticles.push({
         id: Date.now() + i,
         angle: (Math.PI * 2 * i) / 15,
+        // Particle motion only. Not an id.
+        // eslint-disable-next-line no-restricted-syntax
         radius: 60 + Math.random() * 40,
         color: i % 2 === 0 ? color1 : color2,
+        // eslint-disable-next-line no-restricted-syntax
         size: 3 + Math.random() * 4,
+        // eslint-disable-next-line no-restricted-syntax
         speed: 0.08 + Math.random() * 0.06
       });
     }
@@ -550,6 +554,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
     const newParticles: Particle[] = [];
     for (let i = 0; i < 24; i++) {
       const angle = (Math.PI * 2 * i) / 24;
+      // eslint-disable-next-line no-restricted-syntax
       const speed = 2.5 + Math.random() * 3;
       newParticles.push({
         id: Date.now() + i,
@@ -558,6 +563,7 @@ export default function MoodAlchemyLab({ onMoodBrewed, onSkip }: MoodAlchemyLabP
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - 2,
         color: i % 2 === 0 ? color1 : color2,
+        // eslint-disable-next-line no-restricted-syntax
         size: 4 + Math.random() * 6,
         life: 1
       });

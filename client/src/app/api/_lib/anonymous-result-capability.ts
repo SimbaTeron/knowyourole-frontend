@@ -2,9 +2,10 @@ import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { NextRequest } from "next/server";
 import { getOptionalAuthUser } from "@/app/api/_lib/auth";
 import { getSupabaseAdmin } from "@/app/api/_lib/supabase";
+import { deletionOnRequestWindowMs } from "@/lib/privacy/retentionPolicy";
 
 const CAPABILITY_HEADER = "x-kyr-anonymous-capability";
-const CAPABILITY_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const CAPABILITY_TTL_MS = deletionOnRequestWindowMs();
 
 export function createAnonymousCapability(): { token: string; tokenHash: string; expiresAt: string } {
   const token = randomBytes(32).toString("base64url");

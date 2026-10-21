@@ -101,6 +101,8 @@ export function getFakeScores(tier: string, forceMBTI?: string | null) {
     responses: Array.from({ length: 25 }, (_, i) => ({
       questionId: i + 1,
       response: i % 2 === 0 ? 0 : 1,
+      // Preview fixture timing. Not an id.
+      // eslint-disable-next-line no-restricted-syntax
       time: 4000 + Math.random() * 3000,
     })),
     swipeTimes: [],
