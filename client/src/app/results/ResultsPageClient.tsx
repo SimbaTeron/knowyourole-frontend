@@ -1,9 +1,9 @@
 'use client';
-import { resultWording } from "@/lib/results/resultWording";
-import { formatTopTraitLabel } from "@/lib/results/resultClarity";
-import { resolveFinalClarity, shouldShowStressSecondary } from "@/lib/results/finalClarity";
-import { isScoringV3, isScoringV4 } from "@/lib/quiz/scoringVersions";
-import { getMbtiConfidence } from "@/lib/quiz/mbtiConfidence";
+import { DISC_LABELS, TRAIT_LABELS, buildResultView, leanBand } from "@/lib/results/resultViewModel";
+import { fitWrappedText, SHARE_SIGNAL_BOX, SHARE_WHY_BOX } from "@/lib/results/shareCardLayout";
+import { ResultBigFiveView } from "@/app/results/views/ResultBigFiveView";
+import { ResultPortrait } from "@/app/results/views/ResultPortrait";
+import { ResultShareView } from "@/app/results/views/ResultShareView";
 
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
@@ -472,7 +472,6 @@ function buildLearningPlan({ mbtiType, primaryDisc, bigFive }: { mbtiType: strin
 
 
 const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#f59e0b", S: "#22c55e", C: "#3b82f6" };
-const DISC_LABELS: Record<string, string> = { D: "Dominant", I: "Influential", S: "Steady", C: "Conscientious" };
 const DISC_EMOJIS: Record<string, string> = { D: "🔥", I: "⚡", S: "🌿", C: "🧠" };
 const BRAND_SHARE_URL = "https://knowyourole.com";
 const BRAND_SHARE_HOST = "knowyourole.com";
@@ -510,14 +509,6 @@ function normalizeDiscProfile(rawDisc: DiscProfile): DiscProfile {
   }, { D: 0, I: 0, S: 0, C: 0 } as DiscProfile);
 }
 
-/** Display-only banding so results don't imply measurement precision (see /methodology). Scoring is unchanged. */
-function leanBand(value: number): string {
-  if (value >= 70) return "Strong lean";
-  if (value >= 55) return "Moderate lean";
-  if (value >= 45) return "Balanced";
-  return "Light lean";
-}
-
 /** DISC normalized values are share-of-mix (~25–55). Do not use Big Five cutoffs. */
 function discLeanBand(value: number, isPrimary: boolean, secondBest: number): string {
   const lead = value - secondBest;
@@ -535,25 +526,6 @@ function fitBand(value: number): string {
   return "Stretch fit";
 }
 
-function buildResultSummaryLine({ roleTitle, identity, mbtiType, discLabel, topTraitLabel, broad = false, workClear = false, sampleTitles }: {
-  /** Example roles to name when the direction itself is "several directions". */
-  sampleTitles?: string[];
-  broad?: boolean;
-  /** v5: personality pattern is broad, but the work-interest answers clearly pointed one way. */
-  workClear?: boolean;
-  roleTitle: string;
-  identity: string;
-  mbtiType: string;
-  discLabel: string;
-  topTraitLabel: string;
-}) {
-  const workStyle = `${/^[aeiou]/i.test(discLabel) ? "an" : "a"} ${discLabel.toLowerCase()} work style`;
-  if (broad && workClear) return `A broad, balanced personality pattern, but your work answers pointed clearly to ${roleTitle.toLowerCase()}. Your answers leaned a little toward the ${mbtiType} type and ${workStyle}.`;
-  if (/^several directions/i.test(roleTitle)) return `${broad ? "A broad, balanced pattern. " : ""}Several directions are worth trying${sampleTitles?.length ? `, such as ${sampleTitles.slice(0, 3).map((t) => t.toLowerCase()).join(", ")}` : ""}. Your answers leaned a little toward the ${mbtiType} type and ${workStyle}.`;
-  if (broad) return `A broad, balanced pattern. Several directions are worth trying, including ${roleTitle.toLowerCase()}. Your answers leaned a little toward the ${mbtiType} type and ${workStyle}.`;
-  const traitPart = topTraitLabel ? `, ${workStyle}, and ${topTraitLabel}` : ` and ${workStyle}`;
-  return `${identity}. A direction worth testing: ${roleTitle}. Your strongest signals are the ${mbtiType} type${traitPart}.`;
-}
 type RoleFitCategory = "leadership" | "technical" | "creative" | "care" | "operations" | "influence" | "generalist";
 
 type RoleFitProfile = {
@@ -981,11 +953,11 @@ const DISC_DEEP_DIVE: Record<string, { move: string; risk: string }> = {
 };
 
 const TRAIT_DEEP_DIVE: Record<keyof BigFiveProfile, { label: string; strength: string; environment: string; watchout: string }> = {
-  O: { label: "Openness", strength: "idea range", environment: "novelty and conceptual room", watchout: "staying too narrow when the problem needs imagination" },
-  C: { label: "Structure / Follow-through", strength: "follow-through", environment: "clear goals and standards", watchout: "leaving structure and follow-through implicit" },
-  E: { label: "Extraversion", strength: "visible energy", environment: "interaction and fast feedback", watchout: "keeping useful energy or visibility too private" },
-  A: { label: "Agreeableness", strength: "empathy and cooperation", environment: "trust and respectful collaboration", watchout: "skipping the step of getting people on board when they need context" },
-  N: { label: "Stress Reactivity", strength: "risk detection", environment: "predictable recovery time", watchout: "missing early stress or risk signals" },
+  O: { label: TRAIT_LABELS.O, strength: "idea range", environment: "novelty and conceptual room", watchout: "staying too narrow when the problem needs imagination" },
+  C: { label: TRAIT_LABELS.C, strength: "follow-through", environment: "clear goals and standards", watchout: "leaving structure and follow-through implicit" },
+  E: { label: TRAIT_LABELS.E, strength: "visible energy", environment: "interaction and fast feedback", watchout: "keeping useful energy or visibility too private" },
+  A: { label: TRAIT_LABELS.A, strength: "empathy and cooperation", environment: "trust and respectful collaboration", watchout: "skipping the step of getting people on board when they need context" },
+  N: { label: TRAIT_LABELS.N, strength: "risk detection", environment: "predictable recovery time", watchout: "missing early stress or risk signals" },
 };
 
 function getRankedTraits(bigFive: BigFiveProfile) {
@@ -2179,6 +2151,10 @@ function FullPortraitSection({ step, eyebrow, title, subtitle, accent = C.cyan, 
 type ShareReportPayload = {
   /** Same headline as the main result card (follows clarity). */
   headline?: string;
+  /** Share-image trait line from the result view. */
+  imageTraitLine?: string;
+  /** PDF top-trait tile from the result view. */
+  leadTraitLine?: string;
   sessionId?: string;
   title: string;
   subtitle: string;
@@ -2279,6 +2255,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     const discColor = DISC_COLORS[report.primaryDisc] || C.cyan;
     const topBigFive = (Object.entries(report.bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
     const topBigFiveName = topBigFive[0] === "O" ? "Openness" : topBigFive[0] === "C" ? "Structure / Follow-through" : topBigFive[0] === "E" ? "Extraversion" : topBigFive[0] === "A" ? "Agreeableness" : "Stress Reactivity";
+    const traitLine = report.imageTraitLine || `${topBigFiveName} · ${leanBand(topBigFive[1])}`;
 
     const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
       ctx.beginPath();
@@ -2317,6 +2294,31 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
         }
       }
       if (line && lines < maxLines) ctx.fillText(line, x, y + lines * lineHeight);
+    };
+    const drawFitted = (
+      text: string,
+      x: number,
+      y: number,
+      box: { maxWidth: number; maxHeight: number; startSize: number; minSize: number; lineHeightRatio: number },
+      weight: string,
+      family: string,
+      fill: string,
+    ) => {
+      const fitted = fitWrappedText({
+        text,
+        maxWidth: box.maxWidth,
+        maxHeight: box.maxHeight,
+        startSize: box.startSize,
+        minSize: box.minSize,
+        lineHeightRatio: box.lineHeightRatio,
+        measure: (sample, fontSize) => {
+          ctx.font = `${weight} ${fontSize}px ${family}`;
+          return ctx.measureText(sample).width;
+        },
+      });
+      ctx.font = `${weight} ${fitted.fontSize}px ${family}`;
+      ctx.fillStyle = fill;
+      fitted.lines.forEach((line, index) => ctx.fillText(line, x, y + index * fitted.lineHeight));
     };
 
     const bg = ctx.createLinearGradient(0, 0, 1080, 1350);
@@ -2369,7 +2371,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     ctx.fillText("TOP TRAIT", 548, 642);
     ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
     ctx.fillStyle = "#a76d24";
-    drawText(`${topBigFiveName} · ${leanBand(topBigFive[1])}`, 548, 672, 300, 24, 2, "900 25px 'Space Grotesk', Arial, sans-serif", "#a76d24");
+    drawText(traitLine, 548, 672, 300, 24, 2, "900 25px 'Space Grotesk', Arial, sans-serif", "#a76d24");
 
     ctx.font = "800 24px 'IBM Plex Sans', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
@@ -2378,14 +2380,22 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     drawText(report.career.salary || "", 126, 916, 780, 27, 2, "800 27px 'IBM Plex Sans', Arial, sans-serif", "#456174");
     ctx.font = "800 20px 'IBM Plex Sans', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
-    ctx.fillText("WHY THIS DIRECTION", 126, 964);
-    drawText(report.career.summary || `A direction that pairs ${report.mbtiType} preferences with ${report.primaryDisc} ${discLabel.toLowerCase()} energy.`, 126, 994, 810, 24, 3, "700 22px 'IBM Plex Sans', Arial, sans-serif", "#29495c");
+    ctx.fillText("WHY THIS DIRECTION", 126, 956);
+    drawFitted(
+      report.career.summary || `A direction that pairs ${report.mbtiType} preferences with ${report.primaryDisc} ${discLabel.toLowerCase()} energy.`,
+      126,
+      982,
+      SHARE_WHY_BOX,
+      "700",
+      "'IBM Plex Sans', Arial, sans-serif",
+      "#29495c",
+    );
 
     fillRoundRect(72, 1100, 936, 150, 34, "#eaf5f6", "#9bc8cf");
     ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
-    ctx.fillText("MY OPERATING SIGNAL", 122, 1150);
-    drawText(shareInsight, 122, 1194, 800, 34, 2, "800 29px 'Space Grotesk', Arial, sans-serif", "#12263a");
+    ctx.fillText("MY OPERATING SIGNAL", 122, 1134);
+    drawFitted(shareInsight, 122, 1172, SHARE_SIGNAL_BOX, "800", "'Space Grotesk', Arial, sans-serif", "#12263a");
     ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
     ctx.fillStyle = "#315f74";
     ctx.fillText(BRAND_SHARE_HOST, 122, 1310);
@@ -4858,7 +4868,6 @@ function OrbitalGlassV2Results({
   canonicalCareerDirection,
   sessionId,
   discDesc,
-  onShare,
 }: {
   bigFive: BigFiveProfile;
   disc: DiscProfile;
@@ -4869,8 +4878,8 @@ function OrbitalGlassV2Results({
   canonicalCareerDirection?: ResultDTO["careerDirection"];
   sessionId?: string;
   discDesc?: string;
-  onShare: (source?: string) => void;
 }) {
+  const [shareOpen, setShareOpen] = useState(false);
   const [view, setView] = useState<OrbitalResultView>(() => {
     if (typeof window === "undefined") return "main";
     return parseOrbitalResultView(new URLSearchParams(window.location.search).get("page"));
@@ -4889,9 +4898,15 @@ function OrbitalGlassV2Results({
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }, [view]);
 
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("devShare") !== "true") return;
+    setShareOpen(true);
+    url.searchParams.delete("devShare");
+    window.history.replaceState({}, "", url.toString());
+  }, []);
+
   const arch = getArchetype(mbtiType);
-  const identity = humanizeResultLabel(SOCIAL_IDENTITY_TITLES[mbtiType] || `${stripLeadingThe(arch)} Builder`);
-  const emoji = MBTI_EMOJIS[mbtiType] || "◈";
   const discLabel = DISC_LABELS[primaryDisc] || primaryDisc;
   const canonicalRoles = canonicalCareerDirection?.examples.map(role => ({ title: role.title, salary: role.marketData?.salaryRange || "", desc: role.reasoning })) ?? [];
   const roleMatch: CareerRoleMatch = canonicalCareerDirection
@@ -4931,117 +4946,91 @@ function OrbitalGlassV2Results({
   const adjacentRoles = roleCards.slice(1).filter(role => !exampleTitles.has(role.title.toLowerCase()) && role.title !== roleDirection.title).slice(0, 3);
   const laneExamples = roleMatch.laneExamples?.filter(lane => lane.roles.length > 0).slice(0, 2) ?? [];
   const laneConfidence = (score: number, mixed = false) => mixed ? "Mixed evidence" : score >= 65 ? "Clear pull" : score >= 45 ? "Strong pull" : "Worth exploring";
-  const rankedTraits = (Object.entries(bigFive) as [keyof BigFiveProfile, number][]).sort((a, b) => b[1] - a[1]);
-  const topTrait = rankedTraits[0];
-  const topTraitMeta = TRAIT_DEEP_DIVE[topTrait[0]];
-  const scoringVersion = (rawScores as any)?.scoringVersion || canonicalResult?.version?.scoringVersion;
-  const v3 = isScoringV3(scoringVersion);
-  const maxCareer = rawScores?.career ? Math.max(...Object.values(rawScores.career as Record<string, number>).map((n) => Number(n) || 0)) : undefined;
-  // One final clarity value for every view (main, Big Five tab, decision brief, report).
-  const finalClarity = resolveFinalClarity(bigFive as unknown as Record<string, number>, rawScores?.responses, scoringVersion, maxCareer, rawScores?.career as Record<string, number> | undefined);
-  const clarityDisplay = finalClarity.display;
-  const clarityDisplayShown = clarityDisplay;
-  const clarity = clarityDisplay.clarity;
-  const clarityLevelForBrief = finalClarity.level;
-  const topTraitDisplay = formatTopTraitLabel(clarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
-  const mbtiConfidenceScores = (rawScores?.mbti as Record<string, number> | undefined) || {};
-  const hasMbtiScores = ["E","I","S","N","T","F","J","P"].every((k) => typeof mbtiConfidenceScores[k] === "number");
-  const rawMbtiForConfidence = finalClarity.rawMbti;
-  const v4 = isScoringV4(scoringVersion);
-  // v5: the answer note comes from the server-scored result when present, so the page always
-  // matches the API (same timing data, same rules); the client recompute is only a fallback.
+  const scoringVersion = (rawScores as { scoringVersion?: string } | undefined)?.scoringVersion || canonicalResult?.version?.scoringVersion;
   const serverAnswerNote = typeof canonicalCareerDirection?.laneKey === "string" && canonicalCareerDirection.laneKey.startsWith("v5:")
-    ? (canonicalCareerDirection as { answerNote?: string }).answerNote ?? ""
+    ? canonicalCareerDirection.answerNote ?? ""
     : undefined;
-  const inconsistencyNote = finalClarity.v5
-    ? (serverAnswerNote ?? finalClarity.v5Note) || (finalClarity.report?.guarded ? finalClarity.report.note : "")
-    : finalClarity.report && (finalClarity.report.flagged || finalClarity.report.guarded) ? finalClarity.report.note : "";
-  const mbtiConfidenceResolved = v3 && hasMbtiScores
-    ? getMbtiConfidence(mbtiConfidenceScores, rawMbtiForConfidence, { broad: clarity.level === "broad", displayType: mbtiType })
-    : v3 && clarity.level === "broad"
-      ? { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "This type is a directional sketch — your trait pattern was broad, so treat it as a starting point, not a hard label.", badge: "directional sketch" }
-      : { type: mbtiType, weakAxes: [] as string[], lightLeanLetters: [] as string[], note: "", badge: "" };
-  // v5: "rough sketch" only for real answer problems (pattern, random, contradictory, fast + uneven),
-  // never for the soft speed note and never on a Clear result.
-  const roughSketch = finalClarity.v5
-    ? Boolean(finalClarity.v5.quickOrScattered) && finalClarity.level !== "clear"
-    : Boolean(inconsistencyNote);
-  if (inconsistencyNote) mbtiConfidenceResolved.note = inconsistencyNote;
-  if (roughSketch && !mbtiConfidenceResolved.badge) mbtiConfidenceResolved.badge = "rough sketch";
-  // Every letter the MBTI tab calls close (under 55%) also gets the light-lean marker.
-  const closeAxisLetters = v3 && hasMbtiScores
-    ? ([["E", "I"], ["S", "N"], ["T", "F"], ["J", "P"]] as const).flatMap(([a, b], i) => {
-        const dom = mbtiType[i];
-        const total = (mbtiConfidenceScores[a] ?? 50) + (mbtiConfidenceScores[b] ?? 50) || 1;
-        return ((mbtiConfidenceScores[dom] ?? 50) / total) * 100 < 55 ? [dom] : [];
-      })
-    : [];
-  const extraClose = closeAxisLetters.filter((l) => !mbtiConfidenceResolved.lightLeanLetters.includes(l));
-  if (extraClose.length) {
-    mbtiConfidenceResolved.lightLeanLetters = [...mbtiConfidenceResolved.lightLeanLetters, ...extraClose];
-    if (!mbtiConfidenceResolved.badge) {
-      const axisOf = (l: string) => (["E", "I"].includes(l) ? "E/I" : ["S", "N"].includes(l) ? "S/N" : ["T", "F"].includes(l) ? "T/F" : "J/P");
-      mbtiConfidenceResolved.badge = mbtiConfidenceResolved.lightLeanLetters.length === 1 ? `light lean on ${axisOf(mbtiConfidenceResolved.lightLeanLetters[0])}` : "some light leans";
-    }
-  }
-  // Always show the full 4-letter type (never X). Close letters get a light-lean marker + note.
-  const displayMbti = mbtiType;
-  const typeBadge = v3 ? mbtiConfidenceResolved.badge : "";
-  const typeConfidenceNote = v3 ? mbtiConfidenceResolved.note : "";
-  const stressIsTop = topTrait[0] === "N";
-  const stressValue = Number(bigFive.N ?? 0);
-  // Wording follows the bar label: "high" only for a Strong lean (70+), otherwise "showed up too".
-  const stressSecondaryNote = shouldShowStressSecondary(bigFive as unknown as Record<string, number>, scoringVersion) && !(finalClarity.v5 && roughSketch)
-    ? stressIsTop && stressValue >= 70
-      ? "Stress Reactivity came out high. You may feel pressure more than other people can see — build in recovery time and break big tasks into smaller steps."
-      : stressValue >= 70
-        ? "Second signal: Stress Reactivity is also high. You may push hard on the outside while feeling pressure on the inside — build in recovery and smaller pressure steps."
-        : "Second signal: Stress Reactivity showed up too. You may feel pressure more than you show — build in recovery time and take big tasks in smaller steps."
-    : "";
-  // Leading trait: never one that only reached "Balanced", and never one that contradicts the type letters.
-  const leadTrait = rankedTraits.find(([key, value]) => value >= 55 && !(key === "E" && mbtiType[0] === "I"));
-  const leadTraitLabel = leadTrait
-    ? (leadTrait[0] === clarity.topKey && clarity.blended && Number(bigFive[clarity.secondKey as keyof BigFiveProfile] ?? 0) >= 55 && !(clarity.secondKey === "E" && mbtiType[0] === "I")
-      ? topTraitDisplay
-      : TRAIT_DEEP_DIVE[leadTrait[0]].label)
-    : "";
-  // Snapshot says "high X" only for a Strong lean; otherwise "a lean toward X".
-  const leadTraitPhrase = leadTrait ? `${leadTrait[1] >= 70 ? "high" : "a lean toward"} ${TRAIT_DEEP_DIVE[leadTrait[0]].label.toLowerCase()}` : "";
-  // Stress already named in the top traits: skip the extra "second signal" line.
-  const stressInTop = Boolean(leadTrait) && leadTraitLabel.includes(TRAIT_DEEP_DIVE.N.label);
-  const stressSupportShown = (bigFive.N ?? 0) >= (finalClarity.v5 ? 64 : 67) && !(finalClarity.v5 && roughSketch);
-  const lightLeanLetters = new Set(v3 ? mbtiConfidenceResolved.lightLeanLetters : []);
-  const v5Direction = typeof canonicalCareerDirection?.laneKey === "string" && canonicalCareerDirection.laneKey.startsWith("v5:");
-  const resultSummaryLine = buildResultSummaryLine({
-    roleTitle: roleDirection.title,
-    identity,
+  const directionLaneKey = "laneKey" in roleDirection ? roleDirection.laneKey : undefined;
+  const resultView = buildResultView({
+    bigFive,
+    disc,
     mbtiType,
-    discLabel,
-    topTraitLabel: leadTraitPhrase,
-    broad: v3 && clarity.level === "broad",
-    workClear: v5Direction && canonicalCareerDirection?.laneKey !== "v5:broad",
-    sampleTitles: roleDirection.examples.map((role) => role.title),
+    primaryDisc,
+    scoringVersion,
+    responses: rawScores?.responses,
+    career: rawScores?.career,
+    mbtiScores: rawScores?.mbti,
+    direction: {
+      laneKey: directionLaneKey,
+      title: roleDirection.title,
+      rationale: roleDirection.rationale,
+      examples: roleDirection.examples,
+      nextSteps: canonicalCareerDirection?.nextSteps,
+      serverAnswerNote,
+    },
+    extraLaneLabels: laneExamples.slice(1).map((lane) => lane.label),
+    adjacentTitles: adjacentRoles.map((role) => role.title),
   });
-  const v5NextSteps = v5Direction ? canonicalCareerDirection?.nextSteps ?? [] : [];
-  const isBroadResult = v5Direction ? canonicalCareerDirection?.laneKey === "v5:broad" : v3 && clarity.level === "broad";
-  const broadDirections = v5Direction ? roleDirection.examples.map(role => role.title).slice(0, 3) : Array.from(new Set([roleDirection.title, ...laneExamples.slice(1).map(lane => lane.label), ...adjacentRoles.map(role => role.title)])).slice(0, 3);
-  const shareLine = resultSummaryLine;
-  // Broad results: no crown/archetype badge ("ENTJ Commander"); describe it as a leaning pattern.
-  // Broad wording (headline, chip, share title) follows CLARITY. A broad work direction on a
-  // Mixed/Clear result only changes the examples header ("Directions to sample").
-  const wording = resultWording({ clarityLevel: clarity.level, directionBroad: isBroadResult, mbtiType, identity, arch: stripLeadingThe(arch) });
-  const clarityBroad = wording.broad;
-  const broadLook = clarityBroad;
-  const shownEmoji = broadLook ? "◈" : emoji;
-  const shownArch = broadLook ? `${mbtiType}-leaning pattern` : stripLeadingThe(arch);
-  const headlineText = wording.headline;
-  const identityWordCount = identity.trim().split(/\s+/).filter(Boolean).length;
-  const identityScale: CSSProperties = identity.length >= 22
-    ? { fontSize: "clamp(34px, 10vw, 58px)", lineHeight: 0.92, letterSpacing: "-0.068em" }
-    : identity.length >= 17
-      ? { fontSize: "clamp(38px, 11vw, 64px)", lineHeight: 0.9, letterSpacing: "-0.072em" }
-      : { fontSize: "clamp(42px, 13vw, 74px)" };
-  const identityWords = identity.trim().split(/\s+/).filter(Boolean);
+  const lightLeanLetters = new Set(resultView.lightLeanLetters);
+  const broadLook = resultView.clarity === "broad";
+  const shownArch = resultView.clarity === "broad" ? resultView.leaningPattern : resultView.chipSuffix;
+  const leadTrait = resultView.lead.kind !== "none";
+  const leadTraitLabel = resultView.lead.kind === "none" ? "" : resultView.lead.caption;
+  const isBroadResult = resultView.workDirectionBroad;
+  const v5Direction = resultView.isV5Direction;
+  const v5NextSteps = resultView.nextSteps;
+  const fallbackCareer = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
+  const salaryRole = canonicalCareerDirection
+    ? buildPremiumRoleMatchCards({
+        roleMatch: findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career, scoringVersion),
+        mbtiType,
+        primaryDisc,
+        disc,
+        bigFive,
+      })[0]
+    : roleCards[0];
+  const reportSalary = salaryRole?.salary || fallbackCareer.salary;
+  const reportPayload: ShareReportPayload = {
+    sessionId,
+    headline: resultView.headline,
+    imageTraitLine: resultView.imageTraitLine,
+    leadTraitLine: resultView.pdfTraitLine,
+    title: `KnowYouRole Result — ${resultView.headline}`,
+    subtitle: resultView.pdfSubtitle,
+    mbtiType,
+    archetype: resultView.pdfArchetype,
+    primaryDisc,
+    population: POPULATION_RATES[mbtiType] || "2.4%",
+    career: {
+      title: resultView.direction.title,
+      salary: reportSalary,
+      summary: `${resultView.whyLine} Try your own result at knowyourole.com.`,
+    },
+    bigFive,
+    disc,
+    sections: [
+      {
+        title: "MBTI",
+        subtitle: resultView.pdfSubtitle,
+        body: "MBTI is your navigation app: it suggests the route you may tend to reach for. Try your own result at knowyourole.com.",
+      },
+      {
+        title: "DISC",
+        subtitle: `${primaryDisc} — ${discLabel}`,
+        body: discDesc || `Your primary DISC style is ${primaryDisc}, which describes your visible work behavior around pace, pressure, and standards.`,
+      },
+      {
+        title: "Big Five",
+        subtitle: resultView.bigFiveSubtitle,
+        body: resultView.bigFiveReportBody,
+      },
+    ],
+  };
+  const onShare = (source = "orbital_share") => {
+    trackKyrEvent("share_modal_opened", { result_page: "orbital_glass_v2", source, mbti_type: mbtiType, primary_disc: primaryDisc });
+    setShareOpen(true);
+  };
+
   const mbtiScoreMap: Record<string, number> = {
     E: rawScores?.mbti.E ?? 50,
     I: rawScores?.mbti.I ?? 50,
@@ -5088,6 +5077,7 @@ function OrbitalGlassV2Results({
   };
 
   return (
+    <>
     <div className="orbital-results-v2" style={orbStyle}>
       <style>{`
         .orbital-results-v2 { --ink:#f8fbff; --muted:rgba(232,244,255,.72); --faint:rgba(232,244,255,.48); --line:rgba(255,255,255,.14); min-height:100dvh; color:var(--ink); font-family:Inter,system-ui,sans-serif; background:radial-gradient(circle at 10% 0%, rgba(82,241,255,.30), transparent 34%), radial-gradient(circle at 94% 4%, rgba(167,119,255,.31), transparent 32%), radial-gradient(circle at 70% 86%, rgba(255,99,207,.18), transparent 36%), linear-gradient(145deg,#050711 0%,#09101f 48%,#13081d 100%); overflow-x:hidden; }
@@ -5168,19 +5158,12 @@ function OrbitalGlassV2Results({
         {view === "main" && (
           <section>
             <article className="portrait-card">
-              <div className="card-head"><div className="eyebrow">Your result</div><div className="avatar">{shownEmoji}</div></div>
-              <div className="glass-tile"><div className="type-chip" data-testid="mbti-type-chip">{shownEmoji} <span className="mbti-letters">{displayMbti.split("").map((letter, i) => <span key={i} className={lightLeanLetters.has(letter) ? "mbti-letter light-lean" : "mbti-letter"} title={lightLeanLetters.has(letter) ? "light lean" : undefined}>{letter}</span>)}</span>{typeBadge ? <span className="type-badge" data-testid="mbti-confidence-badge">{typeBadge}</span> : null} <small>{shownArch}</small></div>{clarityBroad ? <h1 className="orb-h1" style={{ fontSize: "clamp(34px, 10vw, 58px)", lineHeight: 0.92, letterSpacing: "-0.068em" }} data-testid="broad-headline"><span>A broad,</span><span>balanced</span><span>pattern</span></h1> : <h1 className="orb-h1" style={identityScale}>{identityWordCount > 1 ? identityWords.map((word) => <span key={word}>{word}</span>) : identity}</h1>}</div>
-              <div className="shareline"><b>Snapshot</b><p>“{shareLine}”</p></div>
-              {isBroadResult && clarityBroad ? <div className="role-card" data-testid="broad-directions"><small>Directions to sample</small><h2>Several directions are worth trying</h2><p>Your answers did not point strongly one way, so try a few of these and see which feels right.</p><div className="direction-examples" data-testid="broad-alt-roles"><b>Try exploring</b>{broadDirections.map(title => <span key={title}>• {title}</span>)}</div></div> : <div className="role-card"><small>A direction worth testing</small><h2>{roleDirection.title}</h2><p>{roleDirection.rationale}</p>{roleDirection.examples.length > 0 && <div className="direction-examples"><b>{isBroadResult ? "Directions to sample" : "Examples"}</b>{roleDirection.examples.map(role => <span key={role.title}>• {role.title}</span>)}</div>}{!v5Direction && laneExamples.length > 1 && <div className="lane-preview" aria-label="Your additional work direction">{laneExamples.slice(1).map(lane => <span key={lane.key}>Also explore: {lane.label}</span>)}</div>}</div>}
-              {v5NextSteps.length > 0 && <div className="role-card next-steps-card" data-testid="next-steps"><small>Next steps</small><ul className="next-steps-list">{v5NextSteps.map(step => <li key={step}>{step}</li>)}</ul></div>}
-
-
-              <div className="mini-stats"><div className="stat"><small>Mind</small><strong>{mbtiType}</strong><span>{broadLook ? "leaning pattern" : stripLeadingThe(arch)}</span></div><div className="stat"><small>Work style</small><strong>{primaryDisc}</strong><span>{discLabel}</span></div><div className="stat"><small>{clarity.blended ? "Top traits" : "Top trait"}</small><strong>{leadTrait ? leanBand(leadTrait[1]) : "Balanced"}</strong><span>{leadTrait ? leadTraitLabel : "No single standout trait"}</span></div></div>
-              {typeConfidenceNote && <p className="mbti-confidence-note" data-testid="mbti-confidence-note">{typeConfidenceNote}</p>}<div className={`clarity-note clarity-${clarityDisplayShown.kind}`} role="note" data-testid="result-clarity"><b>{clarityDisplayShown.heading}</b><p>{clarityDisplayShown.body}</p></div>{stressSecondaryNote && !stressInTop && <p className="mbti-confidence-note" data-testid="stress-secondary-note">{stressSecondaryNote}</p>}
+              <div className="card-head"><div className="eyebrow">Your result</div><div className="avatar">{resultView.emoji}</div></div>
+              <ResultPortrait view={resultView} />
             </article>
             <ResultDecisionBrief
               result={canonicalResult}
-              clarityLevel={clarityLevelForBrief}
+              clarityLevel={resultView.clarity}
               hideRepeats={v5Direction}
               fallback={{
                 directionTitle: roleDirection.title,
@@ -5239,11 +5222,11 @@ function OrbitalGlassV2Results({
 
         {view === "mbti" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>MBTI</h2><p>Your preferred mental route: how you plan, process, decide, and build.</p></div></div><div className="detail-card"><h3>{broadLook ? shownArch : <>{mbtiType}: {stripLeadingThe(arch)} mode</>}</h3><p>{MBTI_TAGLINES[mbtiType] || "Personality pattern"}. This describes the route you may tend to reach for when making sense of people, problems, and plans.</p><div className="analogy"><b>Analogy</b>MBTI is your navigation app: it does not choose the destination, but it suggests the route you may tend to reach for.</div></div><div className="detail-card"><h3>Cognitive flow</h3><div className="meter-list">{mbtiDimensions.map((axis) => <div key={axis.label}><div className="meter-top"><span>{axis.label} · {axis.words[axis.dominant as keyof typeof axis.words]}</span><span>{lightLeanLetters.has(axis.dominant) ? "Light lean" : leanBand(axis.pct)}</span></div><div className="bar"><div className="fill" style={{ "--v": `${axis.pct}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>Use it well</h3><p>Give yourself the conditions that tend to suit this pattern. The point is not a label; it is a better way to decide.</p></div><div className="detail-card"><FrameworkReference kind="mbti" mbtiAxes={mbtiDimensions.map(axis => ({ label: axis.label, leftLetter: axis.leftLetter, rightLetter: axis.rightLetter, leftWord: axis.words[axis.leftLetter as keyof typeof axis.words], rightWord: axis.words[axis.rightLetter as keyof typeof axis.words], leftDescription: axis.leftLetter === "E" ? "Processes through interaction and external engagement." : axis.leftLetter === "S" ? "Notices concrete facts and proven methods." : axis.leftLetter === "T" ? "Prioritizes analysis, consistency, and trade-offs." : "Prefers structure, closure, and planned progress.", rightDescription: axis.rightLetter === "I" ? "Processes internally and restores energy through reflection." : axis.rightLetter === "N" ? "Notices patterns, possibilities, and what could change." : axis.rightLetter === "F" ? "Prioritizes values, people impact, and alignment." : "Prefers flexibility and adapting as new information appears.", dominant: axis.dominant, leftPct: axis.dominant === axis.leftLetter ? axis.pct : 100 - axis.pct, rightPct: axis.dominant === axis.rightLetter ? axis.pct : 100 - axis.pct, isClose: axis.pct < 60 || lightLeanLetters.has(axis.dominant) }))} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "mbti", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "bigfive" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>Big Five</h2><p>Your trait climate: what reliably pulls, drains, stabilizes, or amplifies you.</p></div></div><div className="detail-card"><h3>Trait gravity</h3><div className="meter-list">{rankedTraits.map(([key, value]) => <div key={key}><div className="meter-top"><span>{TRAIT_DEEP_DIVE[key].label}</span><span>{leanBand(value)}</span></div><div className="bar"><div className="fill" style={{ "--v": `${value}%` } as CSSProperties} /></div></div>)}</div></div><div className="detail-card"><h3>What it means</h3><p>{!leadTrait ? <>No single Big Five trait stands out: your traits landed close together, so read them as light leans.</> : leadTraitLabel.includes(" + ") ? <>Your leading Big Five signals are {leadTraitLabel}, which came out close together. That does not define your entire personality, but it may shape where your effort tends to pay off.</> : <>Your leading Big Five signal is {leadTraitLabel}. That does not define your entire personality, but it may shape where your effort tends to pay off.</>}</p>{v3 && stressSupportShown && <p className="clarity-inline" data-testid="stress-support-note">{(bigFive.N ?? 0) >= 70 ? "Stress sensitivity came out high." : "Stress sensitivity showed up at a moderate level."} That can mean you notice risk and care deeply — use supportive routines and smaller pressure steps rather than treating it as a problem to fix.</p>}<p className="clarity-inline" data-testid="result-clarity-inline"><b>{clarityDisplay.heading}{clarityDisplay.kind === "flat" ? "" : "."}</b> {clarityDisplay.body}</p><div className="analogy"><b>Analogy</b>Big Five is your climate report. MBTI is route preference; DISC is driving behavior; Big Five is the weather system you operate inside.</div></div><div className="detail-card"><FrameworkReference kind="bigFive" bigFive={bigFive} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "big_five", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
+        {view === "bigfive" && <ResultBigFiveView view={resultView} bigFive={bigFive} onBack={() => go("main", "back")} onOpenFramework={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "big_five", mbti_type: mbtiType, primary_disc: primaryDisc })} />}
 
         {view === "disc" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>DISC</h2><p>Your visible work behavior: pace, pressure, communication, and standards.</p></div></div><div className="detail-card"><h3>Work behavior map</h3><div className="disc-grid">{(["D", "I", "S", "C"] as const).map((key) => <div className={`quad ${primaryDisc === key ? "active" : ""}`} key={key}><b>{key}</b><span>{DISC_LABELS[key]} · {discLeanBand(disc[key], primaryDisc === key, secondaryDiscEntry?.[1] ?? 0)}</span></div>)}</div></div><div className="detail-card"><h3>{discLabel} strength</h3><p>{discDesc || `Your ${discLabel.toLowerCase()} style describes how you tend to move when work involves pressure, standards, and other people.`}</p><div className="analogy"><b>Analogy</b>DISC is your dashboard while driving with other people in the car: speed, steering, braking, and how aggressively you take corners.</div></div><div className="detail-card"><h3>Second signal</h3><p>Your next strongest DISC signal is {DISC_LABELS[secondaryDiscEntry?.[0] || "C"] || secondaryDiscEntry?.[0]} ({discLeanBand(secondaryDiscEntry?.[1] ?? 0, false, discEntries[0]?.[1] ?? 0).toLowerCase()}). That secondary style colors how your primary style shows up.</p></div><div className="detail-card"><FrameworkReference kind="disc" primaryDisc={primaryDisc} disc={disc} onOpen={() => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework: "disc", mbti_type: mbtiType, primary_disc: primaryDisc })} /></div></section>}
 
-        {view === "share" && <section><div className="detail-head"><button className="back back-to-results" data-testid="back-to-results-top" onClick={() => go("main", "back")}>← Back to my results</button><div><h2>Share</h2><p>Export a polished result card as an image or PDF, then send by text or email.</p></div></div><div className="detail-card"><div className="share-preview"><div className="eyebrow">Instant Portrait</div><h2>{headlineText}</h2><p>“{shareLine}”</p><div className="role-card"><small>{isBroadResult ? "Directions to sample" : "A direction worth testing"}</small><h2>{isBroadResult ? broadDirections.join(" · ") : roleDirection.title}</h2><p>{broadLook ? shownArch : mbtiType} · {discLabel} · {leadTrait ? leadTraitLabel : "No single standout trait"}</p></div><p className="share-disclaimer" data-testid="share-disclaimer" style={{ margin: "12px 0 0", fontSize: 12, lineHeight: 1.4, color: "#29495c" }}>A reflection starting point, not a diagnosis or prediction.</p></div></div><div className="detail-card"><h3>Share options</h3><p data-testid="share-contents-note">This card shows your result type and direction only. It does not include your answers or any personal information. It ends with a link to <b>knowyourole.com</b>.</p><div className="share-actions"><button className="share-btn primary" onClick={() => onShare("image_action")}>Image</button><button className="share-btn primary" onClick={() => onShare("pdf_action")}>PDF</button><button className="share-btn" onClick={() => onShare("text_action")}>Text</button><button className="share-btn" onClick={() => onShare("email_action")}>Email</button></div></div></section>}
+        {view === "share" && <ResultShareView view={resultView} onBack={() => go("main", "back")} onShare={onShare} />}
 
         <footer className="result-home-exit" aria-label="Finish viewing your results">
           <p><strong>Finished exploring?</strong><br />Your result is saved without your name. To keep your own copy, use Share to save an image or PDF.</p>
@@ -5260,6 +5243,8 @@ function OrbitalGlassV2Results({
         {view !== "main" && <nav className="bottom-nav" aria-label="Mobile result navigation">{navItems.map((item) => <button key={item.id} className={view === item.id ? "active" : ""} onClick={() => go(item.id, "bottom_nav")}><i>{item.icon}</i>{item.label}</button>)}</nav>}
       </main>
     </div>
+    <ShareResultsModal open={shareOpen} onClose={() => setShareOpen(false)} report={reportPayload} />
+    </>
   );
 }
 
@@ -5267,7 +5252,6 @@ function OrbitalGlassV2Results({
 export default function ResultsPage() {
   const [mounted, setMounted] = useState(false);
   const [realResults, setRealResults] = useState<ReturnType<typeof useRealResults>>(null);
-  const [shareOpen, setShareOpen] = useState(false);
   const lastResultViewEventKey = useRef("");
 
   useEffect(() => {
@@ -5294,15 +5278,6 @@ export default function ResultsPage() {
     });
   }, [mounted, realResults]);
 
-  useEffect(() => {
-    if (!mounted || !realResults) return;
-    const url = new URL(window.location.href);
-    if (url.searchParams.get("devShare") !== "true") return;
-    setShareOpen(true);
-    url.searchParams.delete("devShare");
-    window.history.replaceState({}, "", url.toString());
-  }, [mounted, realResults]);
-
   if (!realResults) {
     return (
       <main className="workday-empty-result">
@@ -5318,80 +5293,10 @@ export default function ResultsPage() {
   }
 
   const { bigFive, disc, mbtiType, primaryDisc, rawScores, discDesc } = realResults;
-  const arch = getArchetype(mbtiType);
-  const career = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
-  const topBigFive = (Object.entries(bigFive) as [keyof BigFiveProfile, number][]).reduce((a, b) => a[1] > b[1] ? a : b);
-  const topBigFiveLabel = TRAIT_DEEP_DIVE[topBigFive[0]]?.label || topBigFive[0];
-  const reportScoringVersion = (rawScores as any)?.scoringVersion;
-  const reportMaxCareer = rawScores?.career ? Math.max(...Object.values(rawScores.career as Record<string, number>).map((n) => Number(n) || 0)) : undefined;
-  const reportClarityDisplay = resolveFinalClarity(bigFive as unknown as Record<string, number>, rawScores?.responses, reportScoringVersion, reportMaxCareer, rawScores?.career as Record<string, number> | undefined).display;
-  const reportClarity = reportClarityDisplay.clarity;
-  const reportTopTraitDisplay = formatTopTraitLabel(reportClarity, (key) => TRAIT_DEEP_DIVE[key as keyof BigFiveProfile]?.label || key);
-  const reportRoleMatch = findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career, (rawScores as any)?.scoringVersion);
-  const [reportPrimaryRole] = buildPremiumRoleMatchCards({ roleMatch: reportRoleMatch, mbtiType, primaryDisc, disc, bigFive });
-  const reportRoleTitle = realResults.canonicalResult?.careerDirection.title || reportPrimaryRole?.title || career.title;
-  const reportRoleSalary = reportPrimaryRole?.salary || career.salary;
-  const reportIdentity = SOCIAL_IDENTITY_TITLES[mbtiType] || `${stripLeadingThe(arch)} Builder`;
-  // Share card follows CLARITY, exactly like the main headline.
-  const reportWording = resultWording({ clarityLevel: reportClarity.level, directionBroad: false, mbtiType, identity: humanizeResultLabel(reportIdentity), arch });
-  const reportBroad = reportWording.broad;
-  const reportHeadline = reportWording.headline;
-  const reportArch = reportWording.archetype;
-  const reportSummary = buildResultSummaryLine({
-    roleTitle: reportRoleTitle,
-    identity: reportIdentity,
-    mbtiType,
-    discLabel: DISC_LABELS[primaryDisc] || primaryDisc,
-    topTraitLabel: topBigFiveLabel,
-    broad: reportBroad,
-  });
   const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const sessionId = searchParams?.get("sessionId") || undefined;
 
-  const reportPayload: ShareReportPayload = {
-    sessionId,
-    headline: reportHeadline,
-    title: `KnowYouRole Result — ${reportHeadline}`,
-    subtitle: reportBroad ? reportArch : `${mbtiType} — ${arch}`,
-    mbtiType,
-    archetype: reportArch,
-    primaryDisc,
-    population: POPULATION_RATES[mbtiType] || "2.4%",
-    career: {
-      title: reportRoleTitle,
-      salary: reportRoleSalary,
-      summary: `${reportSummary} Try your own result at knowyourole.com.`,
-    },
-    bigFive,
-    disc,
-    sections: [
-      {
-        title: "MBTI",
-        subtitle: `${mbtiType} — ${arch}`,
-        body: `MBTI is your navigation app: it suggests the route you may tend to reach for. Try your own result at knowyourole.com.`,
-      },
-      {
-        title: "DISC",
-        subtitle: `${primaryDisc} — ${DISC_LABELS[primaryDisc] || "Primary Style"}`,
-        body: discDesc || `Your primary DISC style is ${primaryDisc}, which describes your visible work behavior around pace, pressure, and standards.`,
-      },
-      {
-        title: "Big Five",
-        subtitle: `${reportTopTraitDisplay} · ${leanBand(topBigFive[1]).toLowerCase()}`,
-        body: `Big Five is your climate report: the trait environment you operate inside. ${reportClarityDisplay.heading}${reportClarityDisplay.kind === "flat" ? "" : "."} ${reportClarityDisplay.body}`,
-      },
-    ],
-  };
-
-  const openShareModal = (source = "orbital_share") => {
-    trackKyrEvent("share_modal_opened", { result_page: "orbital_glass_v2", source, mbti_type: mbtiType, primary_disc: primaryDisc });
-    setShareOpen(true);
-  };
-
   return (
-    <>
-      <OrbitalGlassV2Results bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} rawScores={rawScores} canonicalResult={realResults.canonicalResult} canonicalCareerDirection={realResults.canonicalResult?.careerDirection} sessionId={realResults.canonicalResult?.meta.sessionId || sessionId} discDesc={discDesc} onShare={openShareModal} />
-      <ShareResultsModal open={shareOpen} onClose={() => setShareOpen(false)} report={reportPayload} />
-    </>
+    <OrbitalGlassV2Results bigFive={bigFive} disc={disc} mbtiType={mbtiType} primaryDisc={primaryDisc} rawScores={rawScores} canonicalResult={realResults.canonicalResult} canonicalCareerDirection={realResults.canonicalResult?.careerDirection} sessionId={realResults.canonicalResult?.meta.sessionId || sessionId} discDesc={discDesc} />
   );
 }
