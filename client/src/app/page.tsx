@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
+import { publicPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = publicPageMetadata("/");
 
 export default function Home() {
   return (
@@ -278,6 +282,11 @@ export default function Home() {
         .final-panel .primary-cta { margin: 0; flex: 0 0 auto; }
 
         .home-footer { padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.08); color: rgba(248,251,255,0.46); font-size: 12px; }
+        .guide-section { padding: 28px 0 8px; background: #f8f3e8; color: #12263a; }
+        .guide-section h2 { margin: 0; font-family: "Space Grotesk", Arial, sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.04em; }
+        .guide-section p { margin: 8px 0 0; color: #405f72; font-size: 15px; line-height: 1.5; }
+        .guide-links { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+        .guide-links a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border: 1px solid rgba(18,38,58,.2); background: #fffdf8; color: #12263a; text-decoration: none; font-weight: 800; font-size: 13px; }
         .footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 18px; }
         .footer-links { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
         .footer-links a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 0 8px; color: rgba(248,251,255,0.52); text-decoration: none; }
@@ -402,6 +411,20 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="guide-section" aria-labelledby="guide-title">
+          <div className="home-shell">
+            <h2 id="guide-title">Guides for a specific question</h2>
+            <p>The same free quiz, with a page for the decision in front of you. Each one explains what the quiz can and cannot tell you.</p>
+            <ul className="guide-links">
+              <li><a href="/careers/trades-career-quiz">Trades career quiz</a></li>
+              <li><a href="/careers/creator-careers-quiz">Creator careers quiz</a></li>
+              <li><a href="/career-quiz-for-teens">Career quiz for teens</a></li>
+              <li><a href="/for-parents">For parents</a></li>
+              <li><a href="/for-counselors">For counselors</a></li>
+            </ul>
+          </div>
+        </section>
+
         <section className="final-section testimonial-section" aria-labelledby="final-title">
           <div className="home-shell">
             <div className="final-panel testimonial-card">
@@ -425,7 +448,12 @@ export default function Home() {
             <a href="/terms">Terms</a>
             <a href="/faq">FAQ</a>
             <a href="/about">About</a>
-            <a href="/for-schools">For schools &amp; counselors</a>
+            <a href="/for-schools">For schools</a>
+            <a href="/for-parents">For parents</a>
+            <a href="/for-counselors">For counselors</a>
+            <a href="/career-quiz-for-teens">Quiz for teens</a>
+            <a href="/careers/trades-career-quiz">Trades</a>
+            <a href="/careers/creator-careers-quiz">Creators</a>
           </nav>
         </div>
       </footer>

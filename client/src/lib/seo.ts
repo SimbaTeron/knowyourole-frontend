@@ -1,5 +1,6 @@
 import type { Metadata, MetadataRoute } from "next";
 import { allSeoPages } from "@/lib/seo-pages";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 export const SITE_URL = "https://knowyourole.com";
 export const SITE_NAME = "KnowYouRole";
@@ -21,17 +22,17 @@ export const CONTENT_LAST_UPDATED = "2026-10-16";
 const foundationPages: PublicPage[] = [
   {
     path: "/",
-    title: "Free Work Style & Career Quiz for Students and Adults | KnowYouRole",
+    title: "Free Work Style & Career Quiz for Students | KnowYouRole",
     description:
-      "A free 30-question work style and personality quiz with no sign-up. Blends Big Five, MBTI-style and DISC signals into career directions to explore, from trades to creative work.",
+      `A free ${QUESTION_COUNT}-question work style and personality quiz. No sign-up. Big Five, MBTI-style, and DISC signals, plus career directions from trades to creative work.`,
     changeFrequency: "weekly",
     priority: 1,
   },
   {
     path: "/quiz",
-    title: "Take the Free Work Style Quiz | 30 Questions, No Sign-Up | KnowYouRole",
+    title: "Take the Free Work Style Quiz, No Sign-Up | KnowYouRole",
     description:
-      "Start the free 30-question work style quiz. No account or name needed. Get Big Five, MBTI-style and DISC signals plus career directions to explore, including trades and creative paths.",
+      `Start the free ${QUESTION_COUNT}-question work style quiz. No account or name needed. Big Five, MBTI-style, and DISC signals, plus career directions.`,
     changeFrequency: "weekly",
     priority: 0.95,
   },
@@ -53,7 +54,7 @@ const foundationPages: PublicPage[] = [
   },
   {
     path: "/for-schools",
-    title: "KnowYouRole for Schools & Counselors | Student Career Reflection",
+    title: "Schools and Counselors Career Reflection | KnowYouRole",
     description:
       "A plain-language guide for educators and IT teams: what KnowYouRole is, appropriate student use, privacy choices, and technical access information.",
     changeFrequency: "monthly",
@@ -61,7 +62,7 @@ const foundationPages: PublicPage[] = [
   },
   {
     path: "/about",
-    title: "About KnowYouRole | Personality Quiz for Work & Career Clarity",
+    title: "About KnowYouRole | Work Style and Career Quiz",
     description:
       "Learn how KnowYouRole helps people turn personality quiz results into clearer self-understanding, communication language, and career reflection.",
     changeFrequency: "monthly",

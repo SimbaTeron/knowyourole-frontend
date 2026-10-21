@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const COOKIE_CONSENT_KEY = "kyr_cookie_consent";
@@ -158,14 +156,20 @@ export function CookieConsentBanner() {
   const buttonClassName = "min-h-11 text-xs";
 
   return (
-    <AnimatePresence>
+    <>
+      <style>{`
+        @keyframes kyr-cookie-enter {
+          from { transform: translateY(100px); opacity: 0; }
+          to { transform: none; opacity: 1; }
+        }
+        .kyr-cookie-enter { animation: kyr-cookie-enter 0.25s ease-out; }
+        @media (prefers-reduced-motion: reduce) {
+          .kyr-cookie-enter { animation: none; }
+        }
+      `}</style>
       {showBanner && !isQuizRoute && !isQuizOnboardingActive && (
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className={shellClassName}
+        <div
+          className={`${shellClassName} kyr-cookie-enter`}
           role="region"
           aria-label="Cookie consent"
         >
@@ -174,7 +178,10 @@ export function CookieConsentBanner() {
               <>
                 <div className="mb-3 flex items-start gap-3 sm:mb-4">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#dcedf0] text-[#315f74] sm:h-10 sm:w-10">
-                    <ShieldCheck className="h-5 w-5" />
+                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                      <path d="m9 12 2 2 4-4" />
+                    </svg>
                   </div>
                   <div>
                     <h2 className="mb-1 text-base font-semibold">Cookie choices</h2>
@@ -254,9 +261,9 @@ export function CookieConsentBanner() {
               </>
             )}
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
 
