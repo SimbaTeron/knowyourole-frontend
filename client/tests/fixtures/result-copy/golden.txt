@@ -1,0 +1,203 @@
+===== P08 clear =====
+clarity: clear
+headline: Spark Connector
+emoji: ✨
+chip: ENFP Campaigner
+badge: light lean on E/I
+mind: ENFP / Campaigner
+light leans: E
+type note: Your E/I (energy) lean was light — both sides showed up, so that letter is a soft preference.
+work style: I Influential
+lead: Top trait: Strong lean / Openness
+snapshot: Spark Connector. A direction worth testing: Creative work: art, design, music, and video. Your strongest signals are the ENFP type, an influential work style, and high openness.
+direction: focused
+direction title: Creative work: art, design, music, and video
+direction why: Your answers about the work you enjoy pointed most to art, design, music, and making videos or content for people to see or hear.
+examples header: Examples
+examples: Graphic designer | Video editor | Content creator or streamer | Illustrator or animator | Music producer or sound engineer | Photographer or videographer | Makeup artist or cosmetologist
+also explore: 
+role header: Roles to look into
+next steps: Make 3 small portfolio pieces in the area you like most | Take a short course in a design tool | Publish 6 pieces of content on a schedule
+clarity heading: Result clarity: Clear
+clarity body: Your answers were consistent, and your strongest traits stood out from the rest.
+stress: 
+stress support: 
+big five: Your leading Big Five signal is Openness. That does not define your entire personality, but it may shape where your effort tends to pay off.
+big five clarity: Result clarity: Clear. Your answers were consistent, and your strongest traits stood out from the rest.
+share eyebrow: A direction worth testing
+share title: Creative work: art, design, music, and video
+share meta: ENFP · Influential · Openness
+image trait: Openness · Strong lean
+pdf trait: Openness 85%
+pdf archetype: The Campaigner
+pdf subtitle: ENFP — The Campaigner
+roles: Graphic designer | Video editor | Content creator or streamer | Illustrator or animator | Music producer or sound engineer | Photographer or videographer | Makeup artist or cosmetologist
+
+===== P34 clear =====
+clarity: clear
+headline: Reliable Detail Guardian
+emoji: 📋
+chip: ISTJ Logistician
+badge: 
+mind: ISTJ / Logistician
+light leans: 
+type note: 
+work style: C Conscientious
+lead: Top trait: Strong lean / Structure / Follow-through
+snapshot: Reliable Detail Guardian. A direction worth testing: Skilled trades: building, fixing, and installing. Your strongest signals are the ISTJ type, a conscientious work style, and high structure / follow-through.
+direction: focused
+direction title: Skilled trades: building, fixing, and installing
+direction why: Your answers about the work you enjoy pointed most to building and fixing real things with tools.
+examples header: Examples
+examples: Electrician apprentice | Automotive technician | Welding technician | Lineworker apprentice
+also explore: 
+role header: Roles to look into
+next steps: Look at apprenticeships (electrical, plumbing, HVAC) that pay while you learn | Try a community college or trade-school certificate | Spend a day shadowing someone in the trade
+clarity heading: Result clarity: Clear
+clarity body: Your answers were consistent, and your strongest traits stood out from the rest.
+stress: 
+stress support: 
+big five: Your leading Big Five signal is Structure / Follow-through. That does not define your entire personality, but it may shape where your effort tends to pay off.
+big five clarity: Result clarity: Clear. Your answers were consistent, and your strongest traits stood out from the rest.
+share eyebrow: A direction worth testing
+share title: Skilled trades: building, fixing, and installing
+share meta: ISTJ · Conscientious · Structure / Follow-through
+image trait: Structure / Follow-through · Strong lean
+pdf trait: Structure / Follow-through 83%
+pdf archetype: The Logistician
+pdf subtitle: ISTJ — The Logistician
+roles: Electrician apprentice | Automotive technician | Welding technician | Lineworker apprentice
+
+===== P53 mixed =====
+clarity: mixed
+headline: Reliable Detail Guardian
+emoji: 📋
+chip: ISTJ Logistician
+badge: light lean on J/P
+mind: ISTJ / Logistician
+light leans: J
+type note: Your J/P (structure) lean was light — both sides showed up, so that letter is a soft preference.
+work style: D Dominant
+lead: Top trait: Balanced / No single standout trait
+snapshot: Reliable Detail Guardian. A direction worth testing: Skilled trades: building, fixing, and installing. Your strongest signals are the ISTJ type and a dominant work style.
+direction: focused
+direction title: Skilled trades: building, fixing, and installing
+direction why: Your answers about the work you enjoy pointed most to building and fixing real things with tools.
+examples header: Examples
+examples: Electrician | Auto mechanic | Welder | Robotics or electronics technician
+also explore: 
+role header: Roles to look into
+next steps: Take shop, auto, or construction class if your school has it | Join a robotics, build, or maker club | Ask about career and technical (CTE) programs or trade-school visits
+clarity heading: Result clarity: Mixed
+clarity body: Your answers leaned in more than one direction, so read your top trait and type as a lean, not a fixed label.
+stress: 
+stress support: 
+big five: No single Big Five trait stands out: your traits landed close together, so read them as light leans.
+big five clarity: Result clarity: Mixed. Your answers leaned in more than one direction, so read your top trait and type as a lean, not a fixed label.
+share eyebrow: A direction worth testing
+share title: Skilled trades: building, fixing, and installing
+share meta: ISTJ · Dominant · No single standout trait
+image trait: No single standout trait
+pdf trait: No single standout trait
+pdf archetype: The Logistician
+pdf subtitle: ISTJ — The Logistician
+roles: Electrician | Auto mechanic | Welder | Robotics or electronics technician
+
+===== P125 mixed =====
+clarity: mixed
+headline: Care Connector
+emoji: 🤝
+chip: ESFJ Caregiver
+badge: 
+mind: ESFJ / Caregiver
+light leans: 
+type note: 
+work style: S Steady
+lead: Top traits: Moderate lean / Agreeableness + Stress Reactivity
+snapshot: Several directions are worth trying, such as electrician apprentice, teaching assistant, nursing student. Your answers leaned a little toward the ESFJ type and a steady work style.
+direction: focused
+direction title: Several directions are worth trying
+direction why: Your answers did not point strongly one way. The closest matches were building and fixing real things with tools and teaching, coaching, and helping people learn. Try a little of each and notice which one you want more of.
+examples header: Directions to sample
+examples: Electrician apprentice | Teaching assistant | Nursing student
+also explore: 
+role header: Directions to sample
+next steps: Look at apprenticeships (electrical, plumbing, HVAC) that pay while you learn | Tutor or be a teaching assistant | Shadow a nurse, vet, therapist, or counselor
+clarity heading: Result clarity: Mixed
+clarity body: Your answers leaned in more than one direction, so read your top trait and type as a lean, not a fixed label.
+stress: 
+stress support: 
+big five: Your leading Big Five signals are Agreeableness + Stress Reactivity, which came out close together. That does not define your entire personality, but it may shape where your effort tends to pay off.
+big five clarity: Result clarity: Mixed. Your answers leaned in more than one direction, so read your top trait and type as a lean, not a fixed label.
+share eyebrow: Directions to sample
+share title: Electrician apprentice · Teaching assistant · Nursing student
+share meta: ESFJ · Steady · Agreeableness + Stress Reactivity
+image trait: Agreeableness + Stress Reactivity · Moderate lean
+pdf trait: Agreeableness + Stress Reactivity
+pdf archetype: The Caregiver
+pdf subtitle: ESFJ — The Caregiver
+roles: Electrician apprentice | Teaching assistant | Nursing student
+
+===== P05 broad =====
+clarity: broad
+headline: A broad, balanced pattern
+emoji: ◈
+chip: ISFJ ISFJ-leaning pattern
+badge: light lean on T/F
+mind: ISFJ / leaning pattern
+light leans: FIJ
+type note: Your answers didn't settle into one clear pattern, so this is only a rough sketch. If you rushed or guessed, try again when you can answer slowly.
+work style: S Steady
+lead: Top trait: Balanced / No single standout trait
+snapshot: A broad, balanced pattern. Several directions are worth trying, such as software developer, scientist, business owner. Your answers leaned a little toward the ISFJ type and a steady work style.
+direction: sample
+direction title: Several directions are worth trying
+direction body: Your answers did not point strongly one way, so try a few of these and see which feels right.
+explore: Software developer | Scientist | Business owner
+next steps: Take a computer science class | Take a science or statistics class | Join DECA, FBLA, or a business club
+clarity heading: Result clarity: Broad
+clarity body: Your answers didn't settle into one clear pattern, so read your top trait and type as a light lean, not a label.
+stress: 
+stress support: 
+big five: No single Big Five trait stands out: your traits landed close together, so read them as light leans.
+big five clarity: Result clarity: Broad. Your answers didn't settle into one clear pattern, so read your top trait and type as a light lean, not a label.
+share eyebrow: Directions to sample
+share title: Software developer · Scientist · Business owner
+share meta: ISFJ-leaning pattern · Steady · No single standout trait
+image trait: No single standout trait
+pdf trait: No single standout trait
+pdf archetype: ISFJ-leaning pattern
+pdf subtitle: ISFJ-leaning pattern
+roles: Software developer | Scientist | Business owner
+
+===== P149 broad =====
+clarity: broad
+headline: A broad, balanced pattern
+emoji: ◈
+chip: ISTJ ISTJ-leaning pattern
+badge: directional sketch
+mind: ISTJ / leaning pattern
+light leans: IS
+type note: Your answers followed a repeating pattern (like A, B, C, D), so this result can't say much about you. Try again and pick what really fits.
+work style: D Dominant
+lead: Top trait: Balanced / No single standout trait
+snapshot: A broad, balanced pattern. Several directions are worth trying, such as electrician, team captain, graphic designer. Your answers leaned a little toward the ISTJ type and a dominant work style.
+direction: sample
+direction title: Several directions are worth trying
+direction body: Your answers did not point strongly one way, so try a few of these and see which feels right.
+explore: Electrician | Team captain | Graphic designer
+next steps: Take shop, auto, or construction class if your school has it | Run for a club or student government role | Take art, music, design, or photography class
+clarity heading: Result clarity: Broad
+clarity body: Your answers didn't settle into one clear pattern, so read your top trait and type as a light lean, not a label.
+stress: 
+stress support: 
+big five: No single Big Five trait stands out: your traits landed close together, so read them as light leans.
+big five clarity: Result clarity: Broad. Your answers didn't settle into one clear pattern, so read your top trait and type as a light lean, not a label.
+share eyebrow: Directions to sample
+share title: Electrician · Team captain · Graphic designer
+share meta: ISTJ-leaning pattern · Dominant · No single standout trait
+image trait: No single standout trait
+pdf trait: No single standout trait
+pdf archetype: ISTJ-leaning pattern
+pdf subtitle: ISTJ-leaning pattern
+roles: Electrician | Team captain | Graphic designer
