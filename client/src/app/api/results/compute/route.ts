@@ -15,6 +15,7 @@ import {
   recomputeShortformV2ScoreMaps,
   validateShortformV2Responses,
 } from "@/lib/quiz/shortformV2Scoring";
+import { randomIdToken } from "@/lib/randomId";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,7 @@ const responseHeaders = { "Cache-Control": "no-store" };
  * quiz completion; UI wiring will move here incrementally after this lands.
  */
 export async function POST(req: NextRequest) {
-  const requestId = req.headers.get("x-request-id") || `compute-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const requestId = req.headers.get("x-request-id") || `compute-${Date.now()}-${randomIdToken(8)}`;
 
   try {
     let body: unknown;
@@ -207,7 +208,7 @@ async function persistResultDTOSafely(result: ResultDTO): Promise<
   | { ok: true; resultId: string; persistenceAttemptId: string; created: boolean; result: ResultDTO }
   | { ok: false; resultId: null; persistenceAttemptId: string; error: string; created: false }
 > {
-  const persistenceAttemptId = `persist-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const persistenceAttemptId = `persist-${Date.now()}-${randomIdToken(8)}`;
   try {
     return await persistResultDTO(result, persistenceAttemptId);
   } catch (error) {

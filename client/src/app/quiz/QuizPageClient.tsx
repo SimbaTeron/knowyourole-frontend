@@ -14,6 +14,7 @@ import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { trackKyrEvent } from "@/lib/analytics";
 import { Brain, Sparkles, Target } from "lucide-react";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
+import { randomIdToken } from "@/lib/randomId";
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -102,7 +103,7 @@ export default function QuizPage() {
       return;
     }
 
-    const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const sessionId = `quiz-${Date.now()}-${randomIdToken(10)}`;
     quizSessionIdRef.current = sessionId;
     setQuizSessionId(sessionId);
     sessionStorage.setItem("kyr_active_quiz_session_id", sessionId);

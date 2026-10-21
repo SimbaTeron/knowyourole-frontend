@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SHORTFORM_V2_QUESTIONS } from "@/data/shortformV2Questions";
+import { randomIdToken } from "@/lib/randomId";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +45,7 @@ async function runSmoke(req: NextRequest) {
   const requestedSessionId = req.nextUrl.searchParams.get("sessionId");
   const sessionId = requestedSessionId && /^smoke-[a-zA-Z0-9-]{1,140}$/.test(requestedSessionId)
     ? requestedSessionId
-    : `smoke-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    : `smoke-${Date.now()}-${randomIdToken(8)}`;
   const payload = {
     tier: "19-25",
     mood: "focused",
