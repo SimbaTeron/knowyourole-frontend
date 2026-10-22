@@ -203,7 +203,7 @@ html:has(.kyr-design-review--evidence) {
   --review-card-shadow: 6px 6px 0 #d7503b;
   --review-button-shadow: none;
   --font-sans: "DM Mono", ui-monospace, monospace;
-  --font-serif: "Space Grotesk", "DM Mono", sans-serif;
+  --font-serif: "Space Grotesk", "Space Grotesk Fallback", "DM Mono", sans-serif;
   --radius: 0;
 }
 html:has(.kyr-design-review--evidence) .kyr-home-page .selected-pill::before { border-radius: 0; background: #d7503b; box-shadow: none; }
@@ -248,8 +248,8 @@ html:has(.kyr-design-review--simulator) {
   --review-cta-text: #edf4f4;
   --review-card-shadow: 0 12px 36px rgba(14, 28, 45, .09);
   --review-button-shadow: none;
-  --font-sans: "Space Grotesk", "Outfit", sans-serif;
-  --font-serif: "Space Grotesk", "Outfit", sans-serif;
+  --font-sans: "Space Grotesk", "Space Grotesk Fallback", "Outfit", sans-serif;
+  --font-serif: "Space Grotesk", "Space Grotesk Fallback", "Outfit", sans-serif;
   --radius: 1rem;
 }
 html:has(.kyr-design-review--simulator) .kyr-home-page .model-card { border-top: 6px solid var(--review-accent) !important; }

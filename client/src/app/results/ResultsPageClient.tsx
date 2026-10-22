@@ -20,6 +20,7 @@ import { ResultFitFeedback } from "@/components/results/ResultFitFeedback";
 import { ResultDecisionBrief } from "@/components/results/ResultDecisionBrief";
 import { FrameworkReference } from "@/components/results/FrameworkReference";
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
+import { toSavedResultId } from "@/lib/results/savedResultId";
 
 // ─── Workday report tokens ───────────────────────────────────────────────────
 // Result data and interactions stay intact; this is the presentation contract for
@@ -2342,44 +2343,44 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
     ctx.fillStyle = "#bf7c12";
     ctx.fillRect(0, 0, 650, 14);
 
-    ctx.font = "800 38px 'Space Grotesk', Arial, sans-serif";
+    ctx.font = "800 38px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif";
     ctx.fillStyle = "#315f74";
     ctx.fillText("KnowYouRole", 72, 96);
-    ctx.font = "700 20px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.font = "700 20px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
     ctx.fillText("Full Portrait share card", 72, 132);
 
     fillRoundRect(72, 190, 936, 870, 42, "rgba(255,253,247,0.84)", "#d8c9ae");
-    ctx.font = "800 28px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.font = "800 28px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
     ctx.fillText("MY PERSONALITY SIGNAL", 122, 270);
-    ctx.font = "900 150px 'Space Grotesk', Arial, sans-serif";
+    ctx.font = "900 150px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif";
     ctx.fillStyle = "#12263a";
     ctx.fillText(report.mbtiType, 118, 430);
-    drawText(report.archetype, 126, 488, 560, 50, 2, "800 42px 'Space Grotesk', Arial, sans-serif", "#c95f46");
+    drawText(report.archetype, 126, 488, 560, 50, 2, "800 42px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif", "#c95f46");
 
     fillRoundRect(126, 610, 360, 88, 24, "#eaf5f6", "#9bc8cf");
-    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.font = "800 22px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
     ctx.fillText("DISC", 154, 642);
-    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
+    ctx.font = "900 30px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif";
     ctx.fillStyle = discColor;
-    drawText(`${report.primaryDisc} - ${discLabel}`, 154, 678, 300, 28, 2, "900 28px 'Space Grotesk', Arial, sans-serif", discColor);
+    drawText(`${report.primaryDisc} - ${discLabel}`, 154, 678, 300, 28, 2, "900 28px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif", discColor);
 
     fillRoundRect(520, 610, 360, 88, 24, "#fff4d9", "#e6c36e");
-    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.font = "800 22px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
     ctx.fillText("TOP TRAIT", 548, 642);
-    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
+    ctx.font = "900 30px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif";
     ctx.fillStyle = "#a76d24";
-    drawText(traitLine, 548, 672, 300, 24, 2, "900 25px 'Space Grotesk', Arial, sans-serif", "#a76d24");
+    drawText(traitLine, 548, 672, 300, 24, 2, "900 25px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif", "#a76d24");
 
-    ctx.font = "800 24px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.font = "800 24px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
     ctx.fillText("A DIRECTION WORTH TESTING", 126, 770);
-    drawText(report.career.title, 126, 828, 780, 46, 2, "900 46px 'Space Grotesk', Arial, sans-serif", "#12263a");
-    drawText(report.career.salary || "", 126, 916, 780, 27, 2, "800 27px 'IBM Plex Sans', Arial, sans-serif", "#456174");
-    ctx.font = "800 20px 'IBM Plex Sans', Arial, sans-serif";
+    drawText(report.career.title, 126, 828, 780, 46, 2, "900 46px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif", "#12263a");
+    drawText(report.career.salary || "", 126, 916, 780, 27, 2, "800 27px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif", "#456174");
+    ctx.font = "800 20px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
     ctx.fillText("WHY THIS DIRECTION", 126, 956);
     drawFitted(
@@ -2388,19 +2389,19 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
       982,
       SHARE_WHY_BOX,
       "700",
-      "'IBM Plex Sans', Arial, sans-serif",
+      "'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif",
       "#29495c",
     );
 
     fillRoundRect(72, 1100, 936, 150, 34, "#eaf5f6", "#9bc8cf");
-    ctx.font = "800 22px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.font = "800 22px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
     ctx.fillText("MY OPERATING SIGNAL", 122, 1134);
-    drawFitted(shareInsight, 122, 1172, SHARE_SIGNAL_BOX, "800", "'Space Grotesk', Arial, sans-serif", "#12263a");
-    ctx.font = "900 30px 'Space Grotesk', Arial, sans-serif";
+    drawFitted(shareInsight, 122, 1172, SHARE_SIGNAL_BOX, "800", "'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif", "#12263a");
+    ctx.font = "900 30px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif";
     ctx.fillStyle = "#315f74";
     ctx.fillText(BRAND_SHARE_HOST, 122, 1310);
-    ctx.font = "700 19px 'IBM Plex Sans', Arial, sans-serif";
+    ctx.font = "700 19px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#456174";
     ctx.textAlign = "right";
     ctx.fillText("A reflection starting point, not a diagnosis.", 1008, 1310);
@@ -2547,7 +2548,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
 
           <div style={{ position: "relative" }}>
             <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.8, color: sharePalette.gold, textTransform: "uppercase", marginBottom: 7 }}>Your Full Portrait</div>
-            <div style={{ fontFamily: "'Space Grotesk', Arial, sans-serif", fontSize: 30, lineHeight: 0.98, fontWeight: 800, marginBottom: 8, letterSpacing: -1.2, color: sharePalette.ink }}>Share your result</div>
+            <div style={{ fontFamily: "'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif", fontSize: 30, lineHeight: 0.98, fontWeight: 800, marginBottom: 8, letterSpacing: -1.2, color: sharePalette.ink }}>Share your result</div>
             {report.headline && <div data-testid="share-modal-title" style={{ fontSize: 15, fontWeight: 800, color: sharePalette.ink, marginBottom: 6 }}>{report.headline}</div>}
             <div style={{ fontSize: 13, lineHeight: 1.5, color: sharePalette.muted, maxWidth: 360 }}>Send a visual card now, or keep the full report as a PDF.</div>
             <div data-testid="share-modal-note" style={{ fontSize: 12, lineHeight: 1.45, color: sharePalette.muted, maxWidth: 360, marginTop: 6 }}>The card shows your result type and direction only, with no answers or personal information. It is a reflection starting point, not a diagnosis.</div>
@@ -2579,7 +2580,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
             </button>
           </div>
 
-          <button type="button" onClick={() => setShowMoreOptions((value) => !value)} aria-expanded={showMoreOptions} style={{ border: 0, background: "transparent", color: sharePalette.cyan, cursor: "pointer", padding: "5px 2px 2px", fontFamily: "'IBM Plex Sans', Arial, sans-serif", fontSize: 12, fontWeight: 800, textAlign: "center" }}>
+          <button type="button" onClick={() => setShowMoreOptions((value) => !value)} aria-expanded={showMoreOptions} style={{ border: 0, background: "transparent", color: sharePalette.cyan, cursor: "pointer", padding: "5px 2px 2px", fontFamily: "'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif", fontSize: 12, fontWeight: 800, textAlign: "center" }}>
             {showMoreOptions ? "Hide other options" : "More sharing options"}
           </button>
 
@@ -5176,11 +5177,11 @@ function OrbitalGlassV2Results({
               onExploreRole={() => go("role", "decision_brief")}
             />
             <ResultFitFeedback
-              resultId={canonicalResult?.meta.resultId}
+              savedResultId={toSavedResultId(canonicalResult?.meta)}
               sessionId={canonicalResult?.meta.sessionId || sessionId}
             />
             <DirectionFeedbackCard
-              resultId={canonicalResult?.meta.resultId}
+              savedResultId={toSavedResultId(canonicalResult?.meta)}
               sessionId={canonicalResult?.meta.sessionId || sessionId}
               directionTitle={roleDirection.title}
               recommendations={roleDirection.examples.map((role) => role.title)}

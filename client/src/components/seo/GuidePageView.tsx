@@ -84,22 +84,22 @@ export function GuidePageView({ page }: { page: GuidePage }) {
   };
 
   return (
-    <main className="workday-content-page guide-page">
+    <main className={`workday-content-page guide-page guide-page--${page.slug}`}>
       <AppHeader />
       {jsonScript(`${page.slug}-article`, article)}
       {jsonScript(`${page.slug}-breadcrumb`, breadcrumbJsonLd(page.breadcrumbs))}
       {jsonScript(`${page.slug}-faq`, faq)}
       <style>{`
-        .guide-updated { margin: 14px 0 0; color: #28475d; font: 700 13px/1.4 "IBM Plex Sans", sans-serif; }
-        .guide-note { margin-top: 22px; max-width: 720px; padding: 14px 16px; border-left: 4px solid #12263a; background: rgba(255,253,248,.82); color: #12263a; font: 650 14px/1.5 "IBM Plex Sans", sans-serif; }
-        .guide-crumbs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; color: #12263a; font: 700 12px/1.4 "IBM Plex Sans", sans-serif; }
+        .guide-updated { margin: 14px 0 0; color: #28475d; font: 700 13px/1.4 "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif; }
+        .guide-note { margin-top: 22px; max-width: 720px; padding: 14px 16px; border-left: 4px solid #12263a; background: rgba(255,253,248,.82); color: #12263a; font: 650 14px/1.5 "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif; }
+        .guide-crumbs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; color: #12263a; font: 700 12px/1.4 "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif; }
         .guide-crumbs a { color: #12263a; }
-        .guide-privacy { margin: 14px 0 0; max-width: 680px; color: #28475d; font: 650 14px/1.5 "IBM Plex Sans", sans-serif; }
+        .guide-privacy { margin: 14px 0 0; max-width: 680px; color: #28475d; font: 650 14px/1.5 "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif; }
         .guide-kit { margin-top: 18px; padding: 18px; border: 1px dashed rgba(18,38,58,.35); background: #fffdf8; }
-        .guide-kit h3 { margin: 18px 0 8px; font: 700 1.15rem/1.2 "Space Grotesk", Arial, sans-serif; }
+        .guide-kit h3 { margin: 18px 0 8px; font: 700 1.15rem/1.2 "Space Grotesk", "Space Grotesk Fallback", Arial, sans-serif; }
         .guide-kit ol, .guide-kit ul { margin: 8px 0 0; padding-left: 1.2rem; }
-        .guide-kit li { margin: 6px 0; color: #28475d; font: 600 14px/1.5 "IBM Plex Sans", sans-serif; }
-        .guide-print { margin-top: 12px; min-height: 44px; padding: 0 16px; border: 0; background: #12263a; color: #f8f3e8; font: 800 13px/1 "IBM Plex Sans", sans-serif; cursor: pointer; }
+        .guide-kit li { margin: 6px 0; color: #28475d; font: 600 14px/1.5 "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif; }
+        .guide-print { margin-top: 12px; min-height: 44px; padding: 0 16px; border: 0; background: #12263a; color: #f8f3e8; font: 800 13px/1 "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif; cursor: pointer; }
         @media print {
           .workday-header, .workday-footer, .guide-aside, .no-print { display: none !important; }
           .guide-page { background: #fff !important; }

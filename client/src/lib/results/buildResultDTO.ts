@@ -67,6 +67,11 @@ export interface ResultPersistenceMeta {
   updatedAt: ISODateString;
   /** Soft-delete state. Mirrors future Supabase deleted. */
   deleted: boolean;
+  /**
+   * Set when the compute response is built. "saved" means quiz_results has this id.
+   * "local" means scoring succeeded and the row was not written. Absent on older DTOs.
+   */
+  storage?: "saved" | "local";
   /** Optional deployment/debug context. */
   runtime?: { environment?: "local" | "preview" | "production"; domain?: string; buildId?: string; commitSha?: string };
 }

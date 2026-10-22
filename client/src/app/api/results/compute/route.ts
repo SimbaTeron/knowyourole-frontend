@@ -4,6 +4,7 @@ import { getOptionalAuthUser } from "@/app/api/_lib/auth";
 import { createAnonymousCapability } from "@/app/api/_lib/anonymous-result-capability";
 import { buildResultDTO, type BuildResultDTOInput, type ResultDTO } from "@/lib/results/buildResultDTO";
 import { buildUnpersistedComputeSuccess } from "@/lib/results/computePersistenceFallback";
+import { markResultSaved } from "@/lib/results/savedResultId";
 import { readPersistedQuizResultDTO } from "@/lib/results/persistedQuizResult";
 import { buildQuizResultReportingProjection } from "@/lib/results/quizResultReportingProjection";
 import type { ScoresData } from "@/lib/scoring";
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         requestId,
-        result: persistence.result,
+        result: markResultSaved(persistence.result),
         validation,
         persistence: {
           ok: true,
