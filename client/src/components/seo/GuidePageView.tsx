@@ -84,7 +84,7 @@ export function GuidePageView({ page }: { page: GuidePage }) {
   };
 
   return (
-    <main className="workday-content-page guide-page">
+    <main className={`workday-content-page guide-page guide-page--${page.slug}`}>
       <AppHeader />
       {jsonScript(`${page.slug}-article`, article)}
       {jsonScript(`${page.slug}-breadcrumb`, breadcrumbJsonLd(page.breadcrumbs))}

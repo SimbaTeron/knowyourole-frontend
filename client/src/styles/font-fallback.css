@@ -72,21 +72,3 @@
   descent-override: 27.91%;
   line-gap-override: 0%;
 }
-
-/*
- * Hold the metric fallback until the font-swap script has reserved each
- * wrapping block. A late web-font swap then cannot change line breaks.
- * The class is on <html> for the first paint and removed once the fitted
- * size is in place.
- */
-html.font-lock .workday-content-page :where(p, li, a, span, button, summary, label, small, strong, em, h1, h2, h3),
-html.font-lock .workday-simple-page :where(p, li, a, span, button, summary, label, small, strong, em, h1, h2, h3),
-html.font-lock .kyr-home-page :where(p, li, a, span, button, summary, label, small, strong, em, h1, h2, h3) {
-  font-family: "IBM Plex Sans Fallback", Arial, sans-serif !important;
-}
-
-html.font-lock .workday-content-page :where(h1, h2, h3),
-html.font-lock .workday-simple-page :where(h1, h2, h3),
-html.font-lock .kyr-home-page :where(h1, h2, h3, .hero-title, .sample-title, .how-heading, .final-title, .trust-title) {
-  font-family: "Space Grotesk Fallback", Arial, sans-serif !important;
-}

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "@/styles/fonts";
 import "../index.css";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
-import { FontSwapFit } from "@/components/fonts/FontSwapFit";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { BaseJsonLd } from "@/components/seo/BaseJsonLd";
 import { publicPageMetadata } from "@/lib/seo";
@@ -19,15 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="kyr-workday font-lock" suppressHydrationWarning>
+    <html lang="en" className="kyr-workday" suppressHydrationWarning>
       <body className="kyr-page">
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{["500","600","700"].forEach(function(w){document.fonts.load(w+' 16px "Space Grotesk"')});["400","500","600","700"].forEach(function(w){document.fonts.load(w+' 16px "IBM Plex Sans"')})}catch(e){}`,
-          }}
-        />
-        <script src="/font-swap-fit.js" defer />
-        <FontSwapFit />
         <GoogleAnalytics />
         <BaseJsonLd />
         {children}

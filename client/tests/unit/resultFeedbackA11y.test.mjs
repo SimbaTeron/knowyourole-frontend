@@ -112,7 +112,11 @@ test("the fit card is hidden unless the result id was saved, and its rating is a
   const fit = readFileSync(join(clientRoot, "src/components/results/ResultFitFeedback.tsx"), "utf8");
   assert.equal(fit.includes('disabled={phase === "saving"}'), false);
   assert.match(fit, /aria-disabled=\{phase === "saving"/);
-  assert.equal(fit.includes("errorRef"), false);
-  assert.equal(fit.includes("<legend"), false);
-  assert.equal(fit.includes("<fieldset"), false);
+  assert.match(fit, /errorRef\.current\?\.focus\(\)/);
+  assert.match(fit, /<fieldset className="result-fit-rating-set">/);
+  assert.match(fit, /<legend id="result-fit-rating-legend"/);
+  assert.match(fit, /ref=\{errorRef\} role="alert" tabIndex=\{-1\}/);
+  const direction = readFileSync(join(clientRoot, "src/components/results/DirectionFeedbackCard.tsx"), "utf8");
+  assert.match(direction, /errorRef\.current\?\.focus\(\)/);
+  assert.match(direction, /ref=\{errorRef\} role="alert" tabIndex=\{-1\}/);
 });

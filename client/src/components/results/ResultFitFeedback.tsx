@@ -58,7 +58,9 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
   const [rating, setRating] = useState<ResultFitRating | null>(null);
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
+  const [errorTick, setErrorTick] = useState(0);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const mountedPhase = useRef(phase);
   const alive = useRef(true);
   const sending = useRef(false);
@@ -77,6 +79,16 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
     headingRef.current?.focus();
   }, [phase]);
 
+  useEffect(() => {
+    if (!error) return;
+    errorRef.current?.focus();
+  }, [error, errorTick]);
+
+  const reportError = (message: string) => {
+    setError(message);
+    setErrorTick((tick) => tick + 1);
+  };
+
   const postFit = async (nextFit: ResultFit, extra?: { rating: ResultFitRating | null; comment: string | null }) => {
     const payload = parseResultFitFeedbackRequest({
       resultId,
@@ -85,7 +97,7 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
       comment: extra?.comment ?? null,
     });
     if (!payload.ok) {
-      setError(RESULT_FIT_COPY.error);
+      reportError(RESULT_FIT_COPY.error);
       return false;
     }
     let capability: string | null = null;
@@ -103,12 +115,12 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
       body: JSON.stringify(payload.value),
     });
     if (response.status === 429) {
-      setError(RESULT_FIT_COPY.wait);
+      reportError(RESULT_FIT_COPY.wait);
       return false;
     }
     const body = await response.json().catch(() => null) as { success?: boolean } | null;
     if (!response.ok || body?.success !== true) {
-      setError(RESULT_FIT_COPY.error);
+      reportError(RESULT_FIT_COPY.error);
       return false;
     }
     setError("");
@@ -133,7 +145,7 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
       setPhase("extra");
     } catch {
       if (!alive.current) return;
-      setError(RESULT_FIT_COPY.error);
+      reportError(RESULT_FIT_COPY.error);
       setPhase("choose");
     } finally {
       sending.current = false;
@@ -162,7 +174,7 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
       finish(saved);
     } catch {
       if (!alive.current) return;
-      setError(RESULT_FIT_COPY.error);
+      reportError(RESULT_FIT_COPY.error);
     } finally {
       sending.current = false;
     }
@@ -211,8 +223,8 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
           {phase === "extra" && fit ? (
             <div className="result-fit-extra">
               <p className="result-fit-copy">{resultFitAnsweredLabel(fit)} {RESULT_FIT_COPY.extraLead}</p>
-              <div className="result-fit-rating-set">
-                <p id="result-fit-rating-legend" className="result-fit-label">{RESULT_FIT_COPY.ratingLegend}</p>
+              <fieldset className="result-fit-rating-set">
+                <legend id="result-fit-rating-legend" className="result-fit-label">{RESULT_FIT_COPY.ratingLegend}</legend>
                 <p className="result-fit-scale" id="result-fit-scale">{RESULT_FIT_COPY.ratingScale}</p>
                 <RatingRadios
                   labelledBy="result-fit-rating-legend"
@@ -230,7 +242,7 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
                     children: value,
                   }))}
                 />
-              </div>
+              </fieldset>
               <label className="result-fit-label" htmlFor="result-fit-comment">
                 {RESULT_FIT_COPY.commentLabel}
                 <textarea
@@ -263,7 +275,7 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
               </div>
             </div>
           ) : null}
-          {error ? <p role="alert" className="result-fit-error">{error}</p> : null}
+          {error ? <p ref={errorRef} role="alert" tabIndex={-1} className="result-fit-error">{error}</p> : null}
         </>
       )}
     </section>
@@ -287,7 +299,7 @@ const RESULT_FIT_CSS = `
 .result-fit-choice[aria-disabled="true"] { cursor: wait; opacity: .8; }
 .result-fit-extra { display: grid; gap: 8px; margin-top: 14px; }
 .result-fit-rating-set { margin: 0; padding: 0; border: 0; min-width: 0; }
-.result-fit-label { display: grid; gap: 6px; margin: 0; color: #12263a; font-size: 16px; line-height: 1.3; font-weight: 800; }
+.result-fit-label { display: grid; gap: 6px; color: #12263a; font-size: 16px; line-height: 1.3; font-weight: 800; }
 .result-fit-scale, .result-fit-hint, .result-fit-count { margin: 0; color: #29495c; font-size: 14px; line-height: 1.4; font-weight: 650; }
 .result-fit-count { font-variant-numeric: tabular-nums; }
 .result-fit textarea { box-sizing: border-box; width: 100%; min-height: 88px; resize: vertical; border: 1px solid rgba(18,38,58,.28); border-radius: 4px; padding: 12px; color: #12263a; background: #fffdf8; font: inherit; font-size: 16px; font-weight: 600; line-height: 1.4; }

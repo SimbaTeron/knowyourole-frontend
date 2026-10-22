@@ -327,6 +327,15 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
 .workday-header__cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; min-width: 44px; padding: 0 15px; border-radius: 999px; background: #12263a; color: #f8f3e8; text-decoration: none; font: 800 12px/1 "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif; letter-spacing: -.02em; box-shadow: 3px 3px 0 #ffca42; }
 .workday-header__cta:hover { transform: translate(-1px, -1px); }
 
+/*
+ * The teens headline still gains a line when Space Grotesk swaps in below
+ * 490px. 5lh matches the swapped line count, so the reserve scales with
+ * zoom and does not leave an empty line after the web font loads.
+ */
+@media (max-width: 489px) {
+  .guide-page--career-quiz-for-teens .workday-content-hero h1 { min-height: 5lh; }
+}
+
 @media (max-width: 760px) {
   .workday-content-wrap { width: min(100% - 28px, 1120px); }
   .workday-content-hero { padding: 106px 0 52px; background: linear-gradient(155deg, #9ed8e6 0 50%, #f8f3e8 50% 72%, #e98268 72% 100%); }

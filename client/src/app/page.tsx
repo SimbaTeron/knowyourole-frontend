@@ -312,6 +312,10 @@ export default function Home() {
           .final-panel { align-items: stretch; border-radius: 24px; }
           .final-panel .primary-cta { width: 100%; }
         }
+
+        @media (max-width: 360px) {
+          .hero-title { min-height: 7lh; }
+        }
       `}</style>
 
       <AppHeader />
