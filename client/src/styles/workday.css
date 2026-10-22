@@ -330,7 +330,11 @@ html.kyr-workday .kyr-home-page .model-card .model-eyebrow {
 @media (max-width: 760px) {
   .workday-content-wrap { width: min(100% - 28px, 1120px); }
   .workday-content-hero { padding: 106px 0 52px; background: linear-gradient(155deg, #9ed8e6 0 50%, #f8f3e8 50% 72%, #e98268 72% 100%); }
-  .workday-content-hero h1 { font-size: clamp(2.75rem, 14vw, 4.5rem); }
+  /* 14vw and a 1rem intro sit on a wrap boundary: Space Grotesk and IBM Plex
+     swap in one line taller or shorter than the fallback on the teen and parent
+     heroes. These sizes keep the same line count before and after the font loads. */
+  .workday-content-hero h1 { font-size: clamp(2.75rem, 13.6vw, 4.5rem); }
+  .workday-content-intro { font-size: 0.96875rem; }
   .workday-content-grid { grid-template-columns: 1fr; padding-top: 32px; }
   .workday-content-aside { position: static; }
   .workday-content-section { padding: 23px 19px; }

@@ -20,6 +20,7 @@ import { ResultFitFeedback } from "@/components/results/ResultFitFeedback";
 import { ResultDecisionBrief } from "@/components/results/ResultDecisionBrief";
 import { FrameworkReference } from "@/components/results/FrameworkReference";
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
+import { toSavedResultId } from "@/lib/results/savedResultId";
 
 // ─── Workday report tokens ───────────────────────────────────────────────────
 // Result data and interactions stay intact; this is the presentation contract for
@@ -5176,11 +5177,11 @@ function OrbitalGlassV2Results({
               onExploreRole={() => go("role", "decision_brief")}
             />
             <ResultFitFeedback
-              resultId={canonicalResult?.meta.resultId}
+              savedResultId={toSavedResultId(canonicalResult?.meta)}
               sessionId={canonicalResult?.meta.sessionId || sessionId}
             />
             <DirectionFeedbackCard
-              resultId={canonicalResult?.meta.resultId}
+              savedResultId={toSavedResultId(canonicalResult?.meta)}
               sessionId={canonicalResult?.meta.sessionId || sessionId}
               directionTitle={roleDirection.title}
               recommendations={roleDirection.examples.map((role) => role.title)}
