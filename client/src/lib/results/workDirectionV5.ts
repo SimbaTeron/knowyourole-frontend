@@ -45,9 +45,11 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   trades: {
     title: "Skilled trades: building, fixing, and installing",
     phrase: "building and fixing real things with tools",
-    adult: ["Electrician", "Welder", "Electrical lineworker", "Auto or diesel mechanic", "Carpenter", "Plumber", "HVAC technician"],
-    teen: ["Electrician", "Auto mechanic", "Welder", "Robotics or electronics technician", "Carpenter"],
-    college: ["Electrician apprentice", "Automotive technician", "Welding technician", "Lineworker apprentice", "HVAC technician"],
+    // Core trades lead. A short prefix used to stop at lineworker and auto work,
+    // so carpenter, plumber, and HVAC never reached the result.
+    adult: ["Electrician", "Carpenter", "Plumber", "Welder", "Auto or diesel mechanic", "HVAC technician", "Electrical lineworker"],
+    teen: ["Electrician", "Carpenter", "Plumber", "Welder", "Auto mechanic", "Robotics or electronics technician"],
+    college: ["Electrician apprentice", "Carpenter apprentice", "Plumbing apprentice", "Welding technician", "Automotive technician", "HVAC technician", "Lineworker apprentice"],
     teenSteps: ["Take shop, auto, or construction class if your school has it", "Join a robotics, build, or maker club", "Ask about career and technical (CTE) programs or trade-school visits", "Fix or build one real project at home and take photos of it"],
     collegeSteps: ["Look at apprenticeships (electrical, plumbing, HVAC) that pay while you learn", "Try a community college or trade-school certificate", "Spend a day shadowing someone in the trade"],
     adultSteps: ["Look up union or employer apprenticeships near you", "Take one short certificate course (for example welding or electrical basics)", "Talk to two people working in the trade about their week"],
@@ -316,9 +318,15 @@ export function deriveWorkDirectionV5(
   ];
   const baseList = merged ? V5_MERGED[merged][sk] : examplesFor(first, stage);
   const base = baseList.filter((e) => !lead.includes(e));
-  const examples = merged
-    ? [...lead, ...base].slice(0, Math.max(7, lead.length + 4))
-    : [...lead, ...base].slice(0, Math.max(4, Math.min(5, lead.length + 3)));
+  // Other lanes stay at a short sample. Trades keeps the catalog (plus a combo
+  // lead, if any) so carpenter, plumber, welder, mechanic, and electrician all
+  // remain visible for the same hands-on answers.
+  const exampleCap = merged
+    ? Math.max(7, lead.length + 4)
+    : first === "trades"
+      ? Math.min(8, lead.length + base.length)
+      : Math.max(4, Math.min(5, lead.length + 3));
+  const examples = [...lead, ...base].slice(0, exampleCap);
   const extraStep = combo?.step?.[sk] ?? (ownStreak && own ? own.step : undefined);
   const baseSteps = merged ? [...stepsFor(first, stage).slice(0, 2), stepsFor(second, stage)[0]] : stepsFor(first, stage).slice(0, 3);
   const nextSteps = extraStep ? [extraStep, ...baseSteps.slice(0, 2)] : baseSteps;
