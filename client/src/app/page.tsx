@@ -14,7 +14,7 @@ export default function Home() {
           overflow-x: hidden;
           background: #03040d;
           color: #f8fbff;
-          font-family: 'IBM Plex Sans', Arial, sans-serif;
+          font-family: 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif;
         }
 
         .kyr-home-page * { box-sizing: border-box; }
@@ -97,7 +97,7 @@ export default function Home() {
           max-width: 690px;
           margin: 0;
           color: #f8fbff !important;
-          font-family: 'Space Grotesk', Arial, sans-serif;
+          font-family: 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif;
           font-size: clamp(3.025rem, 5.8vw, 5.3rem);
           line-height: 0.9;
           letter-spacing: -0.076em;
@@ -283,7 +283,7 @@ export default function Home() {
 
         .home-footer { padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.08); color: rgba(248,251,255,0.46); font-size: 12px; }
         .guide-section { padding: 28px 0 8px; background: #f8f3e8; color: #12263a; }
-        .guide-section h2 { margin: 0; font-family: "Space Grotesk", Arial, sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.04em; }
+        .guide-section h2 { margin: 0; font-family: "Space Grotesk", "Space Grotesk Fallback", Arial, sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.04em; }
         .guide-section p { margin: 8px 0 0; color: #405f72; font-size: 15px; line-height: 1.5; }
         .guide-links { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
         .guide-links a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border: 1px solid rgba(18,38,58,.2); background: #fffdf8; color: #12263a; text-decoration: none; font-weight: 800; font-size: 13px; }

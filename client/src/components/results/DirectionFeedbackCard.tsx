@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { trackKyrEvent } from "@/lib/analytics";
 import { RatingRadios } from "@/components/results/RatingRadios";
 import type { SavedResultId } from "@/lib/results/savedResultId";
@@ -33,8 +33,6 @@ export function DirectionFeedbackCard({ savedResultId: resultId, sessionId, dire
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [errorTick, setErrorTick] = useState(0);
-  const errorRef = useRef<HTMLParagraphElement>(null);
 
   const options = useMemo(
     () => Array.from(new Set([directionTitle, ...recommendations].filter(Boolean))).slice(0, 8),
@@ -51,16 +49,6 @@ export function DirectionFeedbackCard({ savedResultId: resultId, sessionId, dire
     trackKyrEvent("direction_relevance_prompted", { pilot_feedback: true });
   }, [canCollectFeedback, resultId]);
 
-  useEffect(() => {
-    if (!errorMessage) return;
-    errorRef.current?.focus();
-  }, [errorMessage, errorTick]);
-
-  const reportError = (message: string) => {
-    setErrorMessage(message);
-    setErrorTick((tick) => tick + 1);
-  };
-
   if (!canCollectFeedback) return null;
 
   const chooseRating = (value: number) => {
@@ -72,7 +60,7 @@ export function DirectionFeedbackCard({ savedResultId: resultId, sessionId, dire
   const submit = async () => {
     if (!rating || !resultId || !sessionId || status === "submitting") return;
     if (mostUseful && leastUseful && mostUseful === leastUseful) {
-      reportError("Choose different recommendations for most and least useful.");
+      setErrorMessage("Choose different recommendations for most and least useful.");
       return;
     }
 
@@ -109,7 +97,7 @@ export function DirectionFeedbackCard({ savedResultId: resultId, sessionId, dire
       setStatus("submitted");
     } catch (error) {
       setStatus("error");
-      reportError(error instanceof Error ? error.message : "Could not save feedback. Please try again.");
+      setErrorMessage(error instanceof Error ? error.message : "Could not save feedback. Please try again.");
     }
   };
 
@@ -189,7 +177,7 @@ export function DirectionFeedbackCard({ savedResultId: resultId, sessionId, dire
         </div>
       )}
 
-      {errorMessage && <p ref={errorRef} role="alert" tabIndex={-1} style={errorStyle}>{errorMessage}</p>}
+      {errorMessage && <p role="alert" style={errorStyle}>{errorMessage}</p>}
     </section>
   );
 }
