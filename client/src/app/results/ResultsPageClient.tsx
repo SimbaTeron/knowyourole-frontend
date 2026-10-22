@@ -16,6 +16,7 @@ import rolesData from "@/data/roles.json";
 import { trackKyrEvent } from "@/lib/analytics";
 import { calculateMbtiAxisConfidence, resultConfidenceLabel as getResultConfidenceLabel } from "@/lib/scoring";
 import { DirectionFeedbackCard } from "@/components/results/DirectionFeedbackCard";
+import { ResultFitFeedback } from "@/components/results/ResultFitFeedback";
 import { ResultDecisionBrief } from "@/components/results/ResultDecisionBrief";
 import { FrameworkReference } from "@/components/results/FrameworkReference";
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
@@ -5173,6 +5174,10 @@ function OrbitalGlassV2Results({
                 watchOut: primaryRole.skill,
               }}
               onExploreRole={() => go("role", "decision_brief")}
+            />
+            <ResultFitFeedback
+              resultId={canonicalResult?.meta.resultId}
+              sessionId={canonicalResult?.meta.sessionId || sessionId}
             />
             <DirectionFeedbackCard
               resultId={canonicalResult?.meta.resultId}

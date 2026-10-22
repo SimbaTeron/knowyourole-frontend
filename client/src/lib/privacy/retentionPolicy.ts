@@ -71,3 +71,26 @@ export async function purgeExpiredAnonymousResults(
   }
   return { deleted_sessions, deleted_results };
 }
+
+export type AnonymousFitFeedbackForPurge = {
+  id: string;
+  userId: string | null;
+  createdAt: string;
+};
+
+/**
+ * Anonymous fit feedback older than the same window as anonymous quiz results.
+ * Account-linked rows stay until the account or the result is deleted.
+ */
+export function selectAnonymousFitFeedbackForPurge(
+  rows: readonly AnonymousFitFeedbackForPurge[],
+  now: Date,
+  retentionDays = ANONYMOUS_RESULT_RETENTION_DAYS,
+): AnonymousFitFeedbackForPurge[] {
+  const cutoff = anonymousResultRetentionCutoff(now, retentionDays).getTime();
+  return rows.filter((row) => {
+    if (row.userId != null) return false;
+    const created = Date.parse(row.createdAt);
+    return Number.isFinite(created) && created < cutoff;
+  });
+}

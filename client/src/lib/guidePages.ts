@@ -1,9 +1,10 @@
+import { RESULT_FIT_STUDENT_DATA_SENTENCE } from "@/lib/feedback/resultFitCopy";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 import type { SeoFaq, SeoPage } from "@/lib/seo-pages";
 
 /** Visible and schema date for these guides. Bump when the copy changes. */
-export const GUIDE_UPDATED = "2026-10-17";
-export const GUIDE_UPDATED_LABEL = "October 17, 2026";
+export const GUIDE_UPDATED = "2026-10-22";
+export const GUIDE_UPDATED_LABEL = "October 22, 2026";
 
 export type GuideSection = {
   heading: string;
@@ -464,7 +465,7 @@ const counselors: GuidePage = {
     {
       heading: "Student data at a glance",
       paragraphs: [
-        "Students can finish without an account and without a name. Quiz completions are saved so a result can be shown and recovered. We do not sell quiz results. Analytics is optional and off until someone accepts it.",
+        `Students can finish without an account and without a name. Quiz completions are saved so a result can be shown and recovered. We do not sell quiz results. Analytics is optional and off until someone accepts it. ${RESULT_FIT_STUDENT_DATA_SENTENCE}`,
         "The [privacy policy](/privacy) is the page that lists what is stored and how to email a deletion request. This lesson page does not add a separate promise. Schools should follow their own rules on top of that.",
       ],
     },

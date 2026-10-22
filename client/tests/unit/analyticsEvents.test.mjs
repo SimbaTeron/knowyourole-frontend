@@ -77,4 +77,12 @@ test("analytics events stay silent until analytics consent", () => {
   assert.equal("email" in recorded.params, false);
   assert.equal(JSON.stringify(recorded).includes("secret-answer"), false);
   assert.equal(JSON.stringify(recorded).includes("person@example.com"), false);
+
+  trackKyrEvent("result_fit_tapped", { fit: "yes", comment: "my name is Ada", note: "secret note" });
+  const fitEvent = globalThis.window.__kyrAnalyticsEvents.at(-1);
+  assert.equal(fitEvent.name, "kyr_result_fit_tapped");
+  assert.equal(fitEvent.params.fit, "yes");
+  assert.equal("comment" in fitEvent.params, false);
+  assert.equal("note" in fitEvent.params, false);
+  assert.equal(JSON.stringify(fitEvent).includes("Ada"), false);
 });
