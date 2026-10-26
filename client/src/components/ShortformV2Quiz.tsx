@@ -8,6 +8,7 @@ import type { QuizScores } from "./Quiz";
 import { CAREER_SCORE_KEYS, SHORTFORM_V2_QUESTIONS, type CareerKey, type ShortformV2Answer } from "@/data/shortformV2Questions";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 import { quizProgressMilestone, trackKyrEvent } from "@/lib/analytics";
+import { closeCurrentQuizAttempt, quizPlacementParams, recordQuizFunnelEvent } from "@/lib/analytics/quizFunnel";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
 import { recomputeShortformV2ScoreMaps, validateShortformV2Responses } from "@/lib/quiz/shortformV2Scoring";
 
@@ -227,6 +228,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     restoredRef.current = true;
     const saved = readSavedProgress();
     if (!saved) return;
+    recordQuizFunnelEvent("quiz_landing_viewed", quizPlacementParams(), true);
     const rebuilt = rebuildScoresFromResponses(saved.responses);
     setScores({ ...rebuilt, responses: saved.responses });
     setCurrentIndex(Math.min(saved.currentIndex, saved.responses.length));
@@ -281,7 +283,6 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     setStartedAt(Date.now());
     setHasStarted(true);
     onQuizStarted?.();
-    trackKyrEvent("quiz_started", { source: "shortform_v2", tier, total_questions: totalQuestions });
   };
 
   const handleAnswer = (answer: ShortformV2Answer, optionIndex: number) => {
@@ -338,7 +339,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       if (milestone !== null && !progressMilestonesRef.current.has(milestone)) {
         progressMilestonesRef.current.add(milestone);
         trackKyrEvent("quiz_progress_milestone", {
-          source: "shortform_v2",
+          link_location: "shortform_v2",
           completed_questions: responses.length,
           milestone,
           total_questions: totalQuestions,
@@ -348,7 +349,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     }
 
     trackKyrEvent("quiz_answer_selected", {
-      source: "shortform_v2",
+      link_location: "shortform_v2",
       tier,
       question_id: currentQuestion.id,
       answer_id: answer.id,
@@ -363,8 +364,9 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       if (answeredIndex >= totalQuestions - 1) {
         if (completedRef.current) return;
         completedRef.current = true;
+        onQuizStarted?.();
         trackKyrEvent("quiz_completed", {
-          source: "shortform_v2",
+          link_location: "shortform_v2",
           tier,
           total_questions: totalQuestions,
           average_response_time: Math.round(averageSwipeTime * 10) / 10,
@@ -376,6 +378,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
           ...authoritativeScoreMaps,
         });
         clearSavedProgress();
+        closeCurrentQuizAttempt();
         onComplete(authoritativeScores);
         return;
       }
@@ -409,7 +412,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     setSelectedAnswer(answerId);
     setStartedAt(Date.now());
     trackKyrEvent("quiz_answer_reviewed", {
-      source: "shortform_v2",
+      link_location: "shortform_v2",
       tier,
       question_id: responseBeingRevisited.questionId,
       remaining_answers: scores.responses.length,

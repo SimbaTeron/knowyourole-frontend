@@ -25,7 +25,7 @@ test.describe("public surface", () => {
     expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
   });
 
-  test("cookie preferences gate Google Analytics until explicit analytics opt-in", async ({ page, context }) => {
+  test("localhost does not load Google Analytics even after analytics opt-in", async ({ page, context }) => {
     const analyticsRequests: string[] = [];
     page.on("request", (request) => {
       if (/googletagmanager\.com|google-analytics\.com/.test(request.url())) analyticsRequests.push(request.url());
@@ -37,8 +37,8 @@ test.describe("public surface", () => {
     if (await accept.count()) {
       await accept.click();
       await page.reload({ waitUntil: "networkidle" });
-      expect(analyticsRequests.length).toBeGreaterThan(0);
     }
+    expect(analyticsRequests).toEqual([]);
   });
 
   test("funnel events require analytics consent and strip quiz-result identifiers", async ({ page }) => {
@@ -60,7 +60,10 @@ test.describe("public surface", () => {
     await accept.click();
     await page.goto("/quiz", { waitUntil: "networkidle" });
     const events = await getEvents();
-    expect(events.some((event) => event.name === "kyr_quiz_landing_viewed")).toBeTruthy();
+    const landing = events.find((event) => event.name === "kyr_quiz_landing_viewed");
+    expect(landing).toBeTruthy();
+    expect(landing?.params.link_location).toBe("shortform_v2");
+    expect(landing?.params.source).toBeUndefined();
     for (const event of events) {
       expect(Object.keys(event.params)).not.toEqual(expect.arrayContaining([
         "answer_id", "question_id", "mbti_type", "primary_disc", "direction_title", "session_id", "result_id",

@@ -12,6 +12,7 @@ import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
 import { trackKyrEvent } from "@/lib/analytics";
+import { flushPendingQuizFunnel, quizPlacementParams, recordQuizFunnelEvent, watchQuizFunnelConsent } from "@/lib/analytics/quizFunnel";
 import { Brain, Sparkles, Target } from "lucide-react";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 import { randomIdToken } from "@/lib/randomId";
@@ -67,9 +68,13 @@ export default function QuizPage() {
   const landmarkData = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-landmark") : null;
   const sessionLandmark = landmarkData ? JSON.parse(landmarkData) : null;
 
-  // Direct-start quiz: age/mood setup screens are hidden. Default to adult tier when missing.
+  // One landing event per attempt, including a direct /quiz visit or deep link.
+  // Strict-mode remounts and consent granted later are deduped in the attempt record.
   useEffect(() => {
-    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: QUESTION_COUNT });
+    const savedProgress = Boolean(window.sessionStorage.getItem("kyr_quiz_progress_v1"));
+    watchQuizFunnelConsent();
+    recordQuizFunnelEvent("quiz_landing_viewed", quizPlacementParams(), savedProgress);
+    flushPendingQuizFunnel();
   }, []);
 
   useEffect(() => {
@@ -93,6 +98,8 @@ export default function QuizPage() {
 
   const handleQuizStarted = () => {
     setIsQuizInProgress(true);
+    const savedProgress = typeof window !== "undefined" && Boolean(window.sessionStorage.getItem("kyr_quiz_progress_v1"));
+    recordQuizFunnelEvent("quiz_started", quizPlacementParams(ageTier), savedProgress);
     if (quizSessionIdRef.current) return;
 
     // Resuming after a remount/reload: keep the original session id and start timestamp.

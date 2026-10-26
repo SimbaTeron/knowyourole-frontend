@@ -1,6 +1,8 @@
 "use client";
 
 import { hasAnalyticsConsent } from "@/components/CookieConsentBanner";
+import { analyticsCollectionAllowed } from "@/lib/analytics/collectionGate";
+import { scrubCampaignParams } from "@/lib/analytics/internalLink";
 
 export type AnalyticsParams = Record<string, string | number | boolean | null | undefined>;
 
@@ -25,7 +27,8 @@ const EVENT_CATEGORY_BY_NAME: Array<[RegExp, string]> = [
  * Consent-gated events. Google Analytics receives `kyr_` plus the name.
  * Counts and page labels only: no names, emails, answers, or result text.
  *
- * - quiz_started
+ * - quiz_started (once per attempt; queued until analytics consent)
+ * - quiz_landing_viewed (once per attempt, on the quiz route)
  * - quiz_progress_milestone (every 5 answers, for drop-off)
  * - quiz_completed
  * - result_viewed
@@ -113,12 +116,20 @@ function browserWindow(): Window | undefined {
   return globalThis.window;
 }
 
+function analyticsRuntime(browser: Window) {
+  return {
+    hostname: browser.location?.hostname ?? "",
+    nodeEnv: process.env.NODE_ENV,
+    vercelEnv: process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.VERCEL_ENV || "",
+  };
+}
+
 export function trackKyrEvent(eventName: string, params: AnalyticsParams = {}) {
   const browser = browserWindow();
   if (!browser || !hasAnalyticsConsent()) return;
 
   const sanitizedParams = {
-    ...sanitizeAnalyticsParams(params),
+    ...scrubCampaignParams(sanitizeAnalyticsParams(params)),
     event_category: eventCategoryFor(eventName),
     non_interaction: false,
   };
@@ -126,6 +137,7 @@ export function trackKyrEvent(eventName: string, params: AnalyticsParams = {}) {
 
   // Consent-gated local verification sink. It never persists or transmits data;
   // it lets browser tests verify the same aggregate events that GA would receive.
+  // Local and non-production sessions still record here, and do not call gtag.
   browser.__kyrAnalyticsEvents = browser.__kyrAnalyticsEvents || [];
   browser.__kyrAnalyticsEvents.push({
     name: prefixedName,
@@ -133,6 +145,7 @@ export function trackKyrEvent(eventName: string, params: AnalyticsParams = {}) {
     timestamp: new Date().toISOString(),
   });
 
+  if (!analyticsCollectionAllowed(analyticsRuntime(browser))) return;
   if (typeof browser.gtag !== "function") return;
   browser.gtag("event", prefixedName, sanitizedParams);
 }
