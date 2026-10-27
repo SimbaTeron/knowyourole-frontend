@@ -1,13 +1,16 @@
 "use client";
 
 import Script from "next/script";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { COOKIE_CONSENT_EVENT, hasAnalyticsConsent } from "@/components/CookieConsentBanner";
 import { analyticsCollectionAllowed, buildMeasurementConfig, type AnalyticsRuntime } from "@/lib/analytics/collectionGate";
-import { analyticsHitLocation, BARE_CAMPAIGN_QUERY_KEYS } from "@/lib/analytics/internalLink";
+import { analyticsHitLocation } from "@/lib/analytics/internalLink";
+import { KYR_GTAG_READY_EVENT } from "@/lib/analytics/gtagReady";
+import { claimNavigationPageView, installTagConfig } from "@/lib/analytics/pageView";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-QGQ9STMV74";
+const INSTALL_CONFIG_JSON = JSON.stringify(installTagConfig());
 
 declare global {
   interface Window {
@@ -26,19 +29,29 @@ function runtimeAnalyticsInput(): AnalyticsRuntime {
 
 function GoogleAnalyticsPageView({ enabled }: { enabled: boolean }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (!enabled || !GA_MEASUREMENT_ID || typeof window.gtag !== "function") return;
-    const runtime = runtimeAnalyticsInput();
-    if (!analyticsCollectionAllowed(runtime)) return;
+  useLayoutEffect(() => {
+    const send = () => {
+      if (!enabled || !GA_MEASUREMENT_ID || typeof window.gtag !== "function") return;
+      const runtime = runtimeAnalyticsInput();
+      if (!analyticsCollectionAllowed(runtime)) return;
 
-    const hit = analyticsHitLocation(window.location.href);
-    const decision = buildMeasurementConfig({ ...runtime, ...hit, page_title: document.title });
-    if (!decision.load) return;
+      const hit = analyticsHitLocation(window.location.href);
+      const decision = buildMeasurementConfig({ ...runtime, ...hit, page_title: document.title });
+      if (!decision.load || !decision.config.page_location) return;
+      if (!claimNavigationPageView(decision.config.page_location)) return;
 
-    window.gtag("config", GA_MEASUREMENT_ID, decision.config);
-  }, [enabled, pathname, searchParams]);
+      window.gtag("config", GA_MEASUREMENT_ID, decision.config);
+    };
+
+    window.__kyrSendPageView = send;
+    send();
+    window.addEventListener(KYR_GTAG_READY_EVENT, send);
+    return () => {
+      window.removeEventListener(KYR_GTAG_READY_EVENT, send);
+      if (window.__kyrSendPageView === send) delete window.__kyrSendPageView;
+    };
+  }, [enabled, pathname]);
 
   return null;
 }
@@ -61,8 +74,6 @@ export function GoogleAnalytics() {
 
   if (!GA_MEASUREMENT_ID || !enabled || !allowed) return null;
 
-  const bareCampaignKeys = JSON.stringify(BARE_CAMPAIGN_QUERY_KEYS);
-
   return (
     <>
       <Script
@@ -75,23 +86,11 @@ export function GoogleAnalytics() {
           function gtag(){dataLayer.push(arguments);}
           window.gtag = gtag;
           gtag('js', new Date());
-          var pageUrl = new URL(window.location.href);
-          ${bareCampaignKeys}.forEach(function (key) {
-            Array.from(pageUrl.searchParams.keys()).forEach(function (present) {
-              if (present.toLowerCase() === key) pageUrl.searchParams.delete(present);
-            });
-          });
-          gtag('config', '${GA_MEASUREMENT_ID}', {
-            page_path: pageUrl.pathname + pageUrl.search,
-            page_location: pageUrl.origin + pageUrl.pathname + pageUrl.search + pageUrl.hash,
-            page_title: document.title,
-            anonymize_ip: true
-          });
+          gtag('config', '${GA_MEASUREMENT_ID}', ${INSTALL_CONFIG_JSON});
+          window.dispatchEvent(new Event('${KYR_GTAG_READY_EVENT}'));
         `}
       </Script>
-      <Suspense fallback={null}>
-        <GoogleAnalyticsPageView enabled={enabled} />
-      </Suspense>
+      <GoogleAnalyticsPageView enabled={enabled} />
     </>
   );
 }

@@ -1,20 +1,32 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const analytics = await import(pathToFileURL(join(root, "src/lib/analytics.ts")).href);
 const gate = await import(pathToFileURL(join(root, "src/lib/analytics/collectionGate.ts")).href);
+const hosts = await import(pathToFileURL(join(root, "src/lib/analytics/productionHost.ts")).href);
+const pageViews = await import(pathToFileURL(join(root, "src/lib/analytics/pageView.ts")).href);
+const gtagReady = await import(pathToFileURL(join(root, "src/lib/analytics/gtagReady.ts")).href);
+const bannerModule = await import(pathToFileURL(join(root, "src/components/CookieConsentBanner.tsx")).href);
 const links = await import(pathToFileURL(join(root, "src/lib/analytics/internalLink.ts")).href);
 const attempts = await import(pathToFileURL(join(root, "src/lib/analytics/quizAttempt.ts")).href);
+const funnel = await import(pathToFileURL(join(root, "src/lib/analytics/quizFunnel.ts")).href);
 const { crossedQuizMilestones, forSchoolsClickEvent, quizProgressMilestone, trackKyrEvent } = analytics;
 const {
   analyticsCollectionAllowed,
   buildMeasurementConfig,
   internalTrafficFallback,
+  isCanonicalAnalyticsHost,
+  isLanAnalyticsHost,
   isLocalAnalyticsHost,
+  isVercelAppHost,
 } = gate;
+const { canonicalHostRedirect, canonicalHostRedirects } = hosts;
+const { claimNavigationPageView, installTagConfig, navigationPagePath, resetNavigationPageViews } = pageViews;
+const { KYR_GTAG_READY_EVENT } = gtagReady;
+const { cookieBannerPlacement, shouldShowCookieBanner } = bannerModule;
 const { analyticsHitLocation, buildInternalHref, readLinkLocation, scrubCampaignParams } = links;
 const {
   QUIZ_ATTEMPT_MAX_AGE_MS,
@@ -24,6 +36,7 @@ const {
   loadQuizAttempt,
   noteQuizFunnelEvent,
 } = attempts;
+const { flushPendingQuizFunnel, recordQuizFunnelEvent } = funnel;
 
 test("quiz progress milestones land on every fifth answer", () => {
   assert.equal(quizProgressMilestone(4), null);
@@ -143,7 +156,7 @@ test("analytics events stay silent until analytics consent", () => {
   assert.equal(JSON.stringify(fitEvent).includes("Ada"), false);
 });
 
-test("collection is blocked on local hosts and outside production", () => {
+test("collection is blocked off the canonical production host", () => {
   for (const hostname of ["localhost", "127.0.0.1", "::1", "[::1]", "0:0:0:0:0:0:0:1", "foo.local", "Foo.LOCAL", "app.localhost"]) {
     assert.equal(isLocalAnalyticsHost(hostname), true, hostname);
     assert.equal(analyticsCollectionAllowed({ hostname, nodeEnv: "production", vercelEnv: "production" }), false, hostname);
@@ -151,13 +164,17 @@ test("collection is blocked on local hosts and outside production", () => {
   assert.equal(isLocalAnalyticsHost("knowyourole.com"), false);
   assert.equal(isLocalAnalyticsHost("preview.knowyourole.com"), false);
 
+  assert.equal(isCanonicalAnalyticsHost("knowyourole.com"), true);
+  assert.equal(isCanonicalAnalyticsHost("www.knowyourole.com"), false);
   assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "production" }), true);
   assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "" }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "development", vercelEnv: "" }), false);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "test", vercelEnv: "" }), false);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "preview" }), false);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "development" }), false);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "", vercelEnv: "" }), false);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "development", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "test", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "preview" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "development" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.vercel.app", nodeEnv: "production", vercelEnv: "production" }), false);
+  assert.equal(analyticsCollectionAllowed({ hostname: "192.168.1.8", nodeEnv: "production", vercelEnv: "production" }), false);
 
   assert.deepEqual(internalTrafficFallback({ hostname: "127.0.0.1", nodeEnv: "production", vercelEnv: "production" }), { traffic_type: "internal" });
   assert.equal(internalTrafficFallback({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "production" }), null);
@@ -225,7 +242,7 @@ test("internal links rename source to link_location and never set utm params", (
   });
 });
 
-test("gtag is silent off production and renames source when it transmits", () => {
+test("gtag is silent off the production hostname and renames source when it transmits", () => {
   withAnalyticsEnv(PRODUCTION_ENV, () => {
     const local = installWindow({ analytics: true }, { hostname: "127.0.0.1", href: "http://127.0.0.1:5180/quiz?source=shortform_v2" });
     trackKyrEvent("quiz_started", { source: "shortform_v2", total_questions: 5, email: "person@example.com" });
@@ -236,8 +253,8 @@ test("gtag is silent off production and renames source when it transmits", () =>
     assert.equal(local.gtagCalls.length, 0);
   });
 
-  withAnalyticsEnv({ NODE_ENV: "production", VERCEL_ENV: "preview", NEXT_PUBLIC_VERCEL_ENV: "preview" }, () => {
-    const preview = installWindow({ analytics: true }, { hostname: "knowyourole.com" });
+  withAnalyticsEnv(PRODUCTION_ENV, () => {
+    const preview = installWindow({ analytics: true }, { hostname: "knowyourole-git-preview.vercel.app" });
     trackKyrEvent("quiz_completed", { link_location: "quiz_result" });
     assert.equal(preview.events.length, 1);
     assert.equal(preview.gtagCalls.length, 0);
@@ -390,4 +407,289 @@ test("quiz landing and start fire once per attempt, including consent, resume, a
     createId: () => "late-3",
     now: now + 6,
   }).emit.length, 0);
+});
+
+const GTAG_READY_EVENT = KYR_GTAG_READY_EVENT;
+const BANNER_BODY = "KnowYouRole uses essential browser storage for quiz progress and consent choices. Google Analytics loads only if you allow analytics. No advertising technology is active today.";
+
+function eventBus() {
+  const listeners = new Map();
+  return {
+    addEventListener(type, fn) {
+      const list = listeners.get(type) ?? [];
+      list.push(fn);
+      listeners.set(type, list);
+    },
+    removeEventListener(type, fn) {
+      const list = listeners.get(type) ?? [];
+      listeners.set(type, list.filter((item) => item !== fn));
+    },
+    dispatchEvent(event) {
+      for (const fn of [...(listeners.get(event.type) ?? [])]) fn(event);
+      return true;
+    },
+  };
+}
+
+function installFunnelWindow({ hostname, consent, href }) {
+  const gtagCalls = [];
+  const events = [];
+  const storage = memoryStorage();
+  let consentState = consent;
+  let gtag = null;
+  const bus = eventBus();
+  const windowStub = {
+    location: {
+      hostname,
+      href: href ?? `https://${hostname}/quiz`,
+      pathname: "/quiz",
+      search: "",
+    },
+    sessionStorage: storage,
+    localStorage: {
+      getItem(key) {
+        if (key !== "kyr_cookie_consent" || !consentState) return null;
+        return JSON.stringify({
+          necessary: true,
+          analytics: Boolean(consentState.analytics),
+          marketing: false,
+          timestamp: "2026-10-17T00:00:00.000Z",
+          version: 1,
+        });
+      },
+      setItem() {},
+    },
+    addEventListener: bus.addEventListener,
+    removeEventListener: bus.removeEventListener,
+    dispatchEvent: bus.dispatchEvent,
+    __kyrAnalyticsEvents: events,
+  };
+  Object.defineProperty(windowStub, "gtag", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return gtag ?? undefined;
+    },
+    set(value) {
+      gtag = value;
+    },
+  });
+  globalThis.window = windowStub;
+  return {
+    events,
+    gtagCalls,
+    storage,
+    setConsent(next) {
+      consentState = next;
+    },
+    installGtag() {
+      windowStub.gtag = (...args) => {
+        gtagCalls.push(args);
+      };
+    },
+    markGtagReady() {
+      windowStub.dispatchEvent({ type: GTAG_READY_EVENT });
+    },
+  };
+}
+
+test("queued quiz_started and quiz_landing_viewed flush only after gtag is ready", () => {
+  withAnalyticsEnv(PRODUCTION_ENV, () => {
+    const harness = installFunnelWindow({ hostname: "knowyourole.com", consent: null });
+    const landing = { link_location: "shortform_v2", total_questions: 5 };
+    const started = { link_location: "shortform_v2", tier: "25+", total_questions: 5 };
+    recordQuizFunnelEvent("quiz_landing_viewed", landing);
+    recordQuizFunnelEvent("quiz_started", started);
+
+    const queued = loadQuizAttempt(harness.storage);
+    assert.deepEqual(queued.sent, []);
+    assert.deepEqual(queued.pending.map((event) => event.name), ["quiz_landing_viewed", "quiz_started"]);
+
+    harness.setConsent({ analytics: true });
+    flushPendingQuizFunnel();
+
+    const beforeTag = loadQuizAttempt(harness.storage);
+    assert.deepEqual(beforeTag.sent, [], "consent must not mark the queue sent before gtag exists");
+    assert.deepEqual(beforeTag.pending.map((event) => event.name), ["quiz_landing_viewed", "quiz_started"]);
+    assert.equal(harness.gtagCalls.length, 0);
+    assert.equal(harness.events.length, 0);
+
+    harness.installGtag();
+    harness.markGtagReady();
+
+    const afterTag = loadQuizAttempt(harness.storage);
+    assert.deepEqual(afterTag.sent, ["quiz_landing_viewed", "quiz_started"]);
+    assert.deepEqual(afterTag.pending, []);
+    assert.deepEqual(harness.gtagCalls.map((call) => call[1]), ["kyr_quiz_landing_viewed", "kyr_quiz_started"]);
+    assert.equal(harness.gtagCalls[1][2].tier, "25+");
+    assert.equal(harness.events.length, 2);
+
+    harness.markGtagReady();
+    flushPendingQuizFunnel();
+    assert.equal(harness.gtagCalls.length, 2);
+  });
+});
+
+test("page_view is sent before the queued funnel events on the same page", () => {
+  withAnalyticsEnv(PRODUCTION_ENV, () => {
+    const harness = installFunnelWindow({ hostname: "knowyourole.com", consent: null });
+    recordQuizFunnelEvent("quiz_landing_viewed", { link_location: "shortform_v2", total_questions: 5 });
+    recordQuizFunnelEvent("quiz_started", { link_location: "shortform_v2", tier: "25+", total_questions: 5 });
+    harness.setConsent({ analytics: true });
+    flushPendingQuizFunnel();
+    const order = [];
+    globalThis.window.__kyrSendPageView = () => order.push("page_view");
+    harness.installGtag();
+    const current = globalThis.window.gtag;
+    globalThis.window.gtag = (...args) => {
+      order.push(args[1]);
+      current(...args);
+    };
+    harness.markGtagReady();
+    assert.deepEqual(order, ["page_view", "kyr_quiz_landing_viewed", "kyr_quiz_started"]);
+  });
+});
+
+test("consent already stored still waits for gtag, and reject or blocked hosts never transmit", () => {
+  withAnalyticsEnv(PRODUCTION_ENV, () => {
+    const early = installFunnelWindow({ hostname: "knowyourole.com", consent: { analytics: true } });
+    recordQuizFunnelEvent("quiz_landing_viewed", { link_location: "shortform_v2", total_questions: 5 });
+    assert.deepEqual(loadQuizAttempt(early.storage).sent, []);
+    assert.equal(early.gtagCalls.length, 0);
+    early.installGtag();
+    early.markGtagReady();
+    assert.deepEqual(early.gtagCalls.map((call) => call[1]), ["kyr_quiz_landing_viewed"]);
+    assert.equal(loadQuizAttempt(early.storage).sent.includes("quiz_landing_viewed"), true);
+
+    const rejected = installFunnelWindow({ hostname: "knowyourole.com", consent: null });
+    recordQuizFunnelEvent("quiz_started", { link_location: "shortform_v2", tier: "25+", total_questions: 5 });
+    rejected.setConsent({ analytics: false });
+    rejected.installGtag();
+    flushPendingQuizFunnel();
+    rejected.markGtagReady();
+    assert.equal(rejected.gtagCalls.length, 0);
+    assert.deepEqual(loadQuizAttempt(rejected.storage).sent, []);
+
+    for (const hostname of ["127.0.0.1", "192.168.1.40", "10.1.2.3", "172.16.4.4", "knowyourole.vercel.app", "my-app-git-preview.vercel.app", "www.knowyourole.com"]) {
+      const blocked = installFunnelWindow({ hostname, consent: null, href: `http://${hostname}/quiz` });
+      recordQuizFunnelEvent("quiz_landing_viewed", { link_location: "shortform_v2", total_questions: 5 });
+      recordQuizFunnelEvent("quiz_started", { link_location: "shortform_v2", tier: "13-18", total_questions: 5 });
+      blocked.setConsent({ analytics: true });
+      blocked.installGtag();
+      flushPendingQuizFunnel();
+      blocked.markGtagReady();
+      assert.equal(blocked.gtagCalls.length, 0, hostname);
+    }
+  });
+});
+
+test("collection follows the production hostname, not the build environment", () => {
+  const productionEnv = { nodeEnv: "production", vercelEnv: "production" };
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", ...productionEnv }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "KnowYouRole.com", ...productionEnv }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com.", nodeEnv: "development", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "www.knowyourole.com", ...productionEnv }), false);
+  assert.equal(isVercelAppHost("knowyourole.vercel.app"), true);
+  assert.equal(isVercelAppHost("my-app-git-feature-team.vercel.app"), true);
+  assert.equal(isLanAnalyticsHost("192.168.0.12"), true);
+  assert.equal(isLanAnalyticsHost("10.0.0.8"), true);
+  assert.equal(isLanAnalyticsHost("172.16.0.1"), true);
+  assert.equal(isLanAnalyticsHost("172.31.255.4"), true);
+  assert.equal(isLanAnalyticsHost("169.254.1.1"), true);
+  assert.equal(isLanAnalyticsHost("::ffff:192.168.1.20"), true);
+  assert.equal(isLanAnalyticsHost("fd12:3456::1"), true);
+  assert.equal(isLanAnalyticsHost("172.15.0.1"), false);
+  assert.equal(isLanAnalyticsHost("172.32.0.1"), false);
+  assert.equal(isLanAnalyticsHost("11.0.0.1"), false);
+  assert.equal(isLanAnalyticsHost("knowyourole.com"), false);
+  for (const hostname of [
+    "knowyourole.vercel.app",
+    "knowyourole-abc123.vercel.app",
+    "my-app-git-feature-team.vercel.app",
+    "localhost",
+    "127.0.0.1",
+    "192.168.0.12",
+    "10.0.0.8",
+    "172.31.255.4",
+    "172.15.0.1",
+    "169.254.1.1",
+    "preview.knowyourole.com",
+    "www.knowyourole.com",
+  ]) {
+    assert.equal(analyticsCollectionAllowed({ hostname, ...productionEnv }), false, hostname);
+  }
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "development", vercelEnv: "preview" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "test", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "", nodeEnv: "production", vercelEnv: "production" }), false);
+});
+
+test("quiz visits show the existing consent banner without a second page_view config", () => {
+  const banner = readFileSync(join(root, "src/components/CookieConsentBanner.tsx"), "utf8");
+  const analyticsComponent = readFileSync(join(root, "src/components/GoogleAnalytics.tsx"), "utf8");
+  const layout = readFileSync(join(root, "src/app/layout.tsx"), "utf8");
+  const nextConfig = readFileSync(join(root, "next.config.ts"), "utf8");
+  assert.equal(banner.includes("!isQuizRoute"), false);
+  assert.equal(banner.includes(BANNER_BODY), true);
+  assert.equal(cookieBannerPlacement("/quiz"), "quiz-flow");
+  assert.equal(cookieBannerPlacement("/quiz/start"), "quiz-flow");
+  assert.equal(cookieBannerPlacement("/results"), "results-sheet");
+  assert.equal(cookieBannerPlacement("/"), "bottom-dock");
+  assert.match(banner, /kyr-cookie-quiz-flow relative w-full/);
+  assert.equal(banner.includes("kyr-cookie-quiz-dock"), false);
+  assert.equal(banner.includes("data-kyr-consent"), false);
+  assert.equal(banner.includes("fixed inset-x-0"), false);
+  assert.equal(shouldShowCookieBanner({ showBanner: true, onboardingActive: false }), true);
+  assert.equal(shouldShowCookieBanner({ showBanner: true, onboardingActive: true }), false);
+  assert.match(analyticsComponent, /INSTALL_CONFIG_JSON/);
+  assert.match(analyticsComponent, /KYR_GTAG_READY_EVENT/);
+  assert.match(analyticsComponent, /claimNavigationPageView/);
+  assert.match(analyticsComponent, /__kyrSendPageView/);
+  assert.equal(analyticsComponent.includes("useSearchParams"), false);
+  assert.equal(analyticsComponent.includes("page_path: pageUrl.pathname"), false);
+  assert.equal(installTagConfig().send_page_view, false);
+  assert.equal(installTagConfig().anonymize_ip, true);
+  assert.equal(KYR_GTAG_READY_EVENT, "kyr-gtag-ready");
+  assert.equal(layout.includes("kyr-consent-reserve"), false);
+  assert.equal(layout.includes("data-kyr-consent"), false);
+  assert.match(nextConfig, /canonicalHostRedirects/);
+  const decision = buildMeasurementConfig({
+    hostname: "knowyourole.com",
+    nodeEnv: "production",
+    vercelEnv: "production",
+    page_path: "/quiz",
+    page_location: "https://knowyourole.com/quiz",
+    page_title: "Quiz",
+  });
+  assert.equal(decision.load, true);
+  assert.equal(decision.config.send_page_view, true);
+  assert.equal(decision.config.anonymize_ip, true);
+
+  resetNavigationPageViews();
+  const home = "https://knowyourole.com/";
+  const quiz = "https://knowyourole.com/quiz?utm_source=newsletter";
+  assert.equal(navigationPagePath(quiz), "/quiz");
+  assert.equal(claimNavigationPageView(home), true);
+  assert.equal(claimNavigationPageView(home), false);
+  assert.equal(claimNavigationPageView(quiz), true);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/quiz?page=2"), false);
+  assert.equal(claimNavigationPageView(home), true);
+  resetNavigationPageViews();
+
+  assert.equal(claimNavigationPageView("https://knowyourole.com/quiz"), true);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results"), true);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=main"), false);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=role"), false);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=mbti"), false);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=disc#share"), false);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/quiz"), true);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=share"), true);
+  resetNavigationPageViews();
+
+  assert.equal(canonicalHostRedirect("www.knowyourole.com", "/quiz", "?page=1"), "https://knowyourole.com/quiz?page=1");
+  assert.equal(canonicalHostRedirect("WWW.KnowYouRole.com.", "/", ""), "https://knowyourole.com/");
+  assert.equal(canonicalHostRedirect("knowyourole.com", "/quiz", ""), null);
+  assert.equal(canonicalHostRedirect("knowyourole.vercel.app", "/", ""), null);
+  const rules = canonicalHostRedirects();
+  assert.equal(rules.every((rule) => rule.permanent && rule.has[0].value === "www.knowyourole.com"), true);
+  assert.match(rules.map((rule) => rule.destination).join(" "), /https:\/\/knowyourole\.com/);
 });
