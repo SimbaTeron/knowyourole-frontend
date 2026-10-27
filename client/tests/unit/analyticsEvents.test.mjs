@@ -3,15 +3,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import vm from "node:vm";
-
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const analytics = await import(pathToFileURL(join(root, "src/lib/analytics.ts")).href);
 const gate = await import(pathToFileURL(join(root, "src/lib/analytics/collectionGate.ts")).href);
 const hosts = await import(pathToFileURL(join(root, "src/lib/analytics/productionHost.ts")).href);
 const pageViews = await import(pathToFileURL(join(root, "src/lib/analytics/pageView.ts")).href);
 const gtagReady = await import(pathToFileURL(join(root, "src/lib/analytics/gtagReady.ts")).href);
-const reserve = await import(pathToFileURL(join(root, "src/lib/analytics/consentReserve.ts")).href);
 const bannerModule = await import(pathToFileURL(join(root, "src/components/CookieConsentBanner.tsx")).href);
 const links = await import(pathToFileURL(join(root, "src/lib/analytics/internalLink.ts")).href);
 const attempts = await import(pathToFileURL(join(root, "src/lib/analytics/quizAttempt.ts")).href);
@@ -27,10 +24,9 @@ const {
   isVercelAppHost,
 } = gate;
 const { canonicalHostRedirect, canonicalHostRedirects } = hosts;
-const { claimNavigationPageView, installTagConfig, resetNavigationPageViews } = pageViews;
+const { claimNavigationPageView, installTagConfig, navigationPagePath, resetNavigationPageViews } = pageViews;
 const { KYR_GTAG_READY_EVENT } = gtagReady;
-const { QUIZ_CONSENT_RESERVE_CSS, quizConsentReserveScript } = reserve;
-const { COOKIE_CONSENT_KEY, cookieBannerPlacement, shouldShowCookieBanner } = bannerModule;
+const { cookieBannerPlacement, shouldShowCookieBanner } = bannerModule;
 const { analyticsHitLocation, buildInternalHref, readLinkLocation, scrubCampaignParams } = links;
 const {
   QUIZ_ATTEMPT_MAX_AGE_MS,
@@ -534,6 +530,26 @@ test("queued quiz_started and quiz_landing_viewed flush only after gtag is ready
   });
 });
 
+test("page_view is sent before the queued funnel events on the same page", () => {
+  withAnalyticsEnv(PRODUCTION_ENV, () => {
+    const harness = installFunnelWindow({ hostname: "knowyourole.com", consent: null });
+    recordQuizFunnelEvent("quiz_landing_viewed", { link_location: "shortform_v2", total_questions: 5 });
+    recordQuizFunnelEvent("quiz_started", { link_location: "shortform_v2", tier: "25+", total_questions: 5 });
+    harness.setConsent({ analytics: true });
+    flushPendingQuizFunnel();
+    const order = [];
+    globalThis.window.__kyrSendPageView = () => order.push("page_view");
+    harness.installGtag();
+    const current = globalThis.window.gtag;
+    globalThis.window.gtag = (...args) => {
+      order.push(args[1]);
+      current(...args);
+    };
+    harness.markGtagReady();
+    assert.deepEqual(order, ["page_view", "kyr_quiz_landing_viewed", "kyr_quiz_started"]);
+  });
+});
+
 test("consent already stored still waits for gtag, and reject or blocked hosts never transmit", () => {
   withAnalyticsEnv(PRODUCTION_ENV, () => {
     const early = installFunnelWindow({ hostname: "knowyourole.com", consent: { analytics: true } });
@@ -614,22 +630,27 @@ test("quiz visits show the existing consent banner without a second page_view co
   const nextConfig = readFileSync(join(root, "next.config.ts"), "utf8");
   assert.equal(banner.includes("!isQuizRoute"), false);
   assert.equal(banner.includes(BANNER_BODY), true);
-  assert.equal(cookieBannerPlacement("/quiz"), "quiz-dock");
-  assert.equal(cookieBannerPlacement("/quiz/start"), "quiz-dock");
+  assert.equal(cookieBannerPlacement("/quiz"), "quiz-flow");
+  assert.equal(cookieBannerPlacement("/quiz/start"), "quiz-flow");
   assert.equal(cookieBannerPlacement("/results"), "results-sheet");
   assert.equal(cookieBannerPlacement("/"), "bottom-dock");
+  assert.match(banner, /kyr-cookie-quiz-flow relative w-full/);
+  assert.equal(banner.includes("kyr-cookie-quiz-dock"), false);
+  assert.equal(banner.includes("data-kyr-consent"), false);
+  assert.equal(banner.includes("fixed inset-x-0"), false);
   assert.equal(shouldShowCookieBanner({ showBanner: true, onboardingActive: false }), true);
   assert.equal(shouldShowCookieBanner({ showBanner: true, onboardingActive: true }), false);
   assert.match(analyticsComponent, /INSTALL_CONFIG_JSON/);
   assert.match(analyticsComponent, /KYR_GTAG_READY_EVENT/);
   assert.match(analyticsComponent, /claimNavigationPageView/);
+  assert.match(analyticsComponent, /__kyrSendPageView/);
+  assert.equal(analyticsComponent.includes("useSearchParams"), false);
   assert.equal(analyticsComponent.includes("page_path: pageUrl.pathname"), false);
   assert.equal(installTagConfig().send_page_view, false);
   assert.equal(installTagConfig().anonymize_ip, true);
   assert.equal(KYR_GTAG_READY_EVENT, "kyr-gtag-ready");
-  assert.match(layout, /<script id="kyr-consent-reserve"/);
-  assert.match(QUIZ_CONSENT_RESERVE_CSS, /html\[data-kyr-consent="pending"\] \[data-kyr-quiz-root\]/);
-  assert.match(layout, /QUIZ_CONSENT_RESERVE_CSS/);
+  assert.equal(layout.includes("kyr-consent-reserve"), false);
+  assert.equal(layout.includes("data-kyr-consent"), false);
   assert.match(nextConfig, /canonicalHostRedirects/);
   const decision = buildMeasurementConfig({
     hostname: "knowyourole.com",
@@ -646,10 +667,22 @@ test("quiz visits show the existing consent banner without a second page_view co
   resetNavigationPageViews();
   const home = "https://knowyourole.com/";
   const quiz = "https://knowyourole.com/quiz?utm_source=newsletter";
+  assert.equal(navigationPagePath(quiz), "/quiz");
   assert.equal(claimNavigationPageView(home), true);
   assert.equal(claimNavigationPageView(home), false);
   assert.equal(claimNavigationPageView(quiz), true);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/quiz?page=2"), false);
   assert.equal(claimNavigationPageView(home), true);
+  resetNavigationPageViews();
+
+  assert.equal(claimNavigationPageView("https://knowyourole.com/quiz"), true);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results"), true);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=main"), false);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=role"), false);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=mbti"), false);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=disc#share"), false);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/quiz"), true);
+  assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=share"), true);
   resetNavigationPageViews();
 
   assert.equal(canonicalHostRedirect("www.knowyourole.com", "/quiz", "?page=1"), "https://knowyourole.com/quiz?page=1");
@@ -659,19 +692,4 @@ test("quiz visits show the existing consent banner without a second page_view co
   const rules = canonicalHostRedirects();
   assert.equal(rules.every((rule) => rule.permanent && rule.has[0].value === "www.knowyourole.com"), true);
   assert.match(rules.map((rule) => rule.destination).join(" "), /https:\/\/knowyourole\.com/);
-
-  const runReserve = (pathname, stored) => {
-    const attrs = new Map();
-    vm.runInNewContext(quizConsentReserveScript(COOKIE_CONSENT_KEY), {
-      location: { pathname },
-      localStorage: { getItem: () => stored },
-      document: { documentElement: { setAttribute: (name, value) => attrs.set(name, value) } },
-    });
-    return attrs.get("data-kyr-consent") ?? null;
-  };
-  assert.equal(runReserve("/quiz", null), "pending");
-  assert.equal(runReserve("/quiz/start", null), "pending");
-  assert.equal(runReserve("/", null), null);
-  assert.equal(runReserve("/results", null), null);
-  assert.equal(runReserve("/quiz", "{\"analytics\":false}"), null);
 });

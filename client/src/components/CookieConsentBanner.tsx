@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { COOKIE_CONSENT_STORAGE_KEY } from "@/lib/analytics/consentReserve";
 
-export const COOKIE_CONSENT_KEY = COOKIE_CONSENT_STORAGE_KEY;
+export const COOKIE_CONSENT_KEY = "kyr_cookie_consent";
 export const COOKIE_CONSENT_EVENT = "kyr-cookie-consent-updated";
 export const COOKIE_PREFERENCES_EVENT = "kyr-open-cookie-preferences";
 
@@ -57,7 +56,7 @@ function persistConsent(nextConsent: CookieConsentState) {
   window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: nextConsent }));
 }
 
-export type CookieBannerPlacement = "quiz-dock" | "results-sheet" | "bottom-dock";
+export type CookieBannerPlacement = "quiz-flow" | "results-sheet" | "bottom-dock";
 
 /** Quiz is included. Onboarding still hides the banner so it cannot cover that overlay. */
 export function shouldShowCookieBanner(input: { showBanner: boolean; onboardingActive: boolean }): boolean {
@@ -66,7 +65,7 @@ export function shouldShowCookieBanner(input: { showBanner: boolean; onboardingA
 
 export function cookieBannerPlacement(pathname: string): CookieBannerPlacement {
   if (pathname.startsWith("/results")) return "results-sheet";
-  if (pathname === "/quiz" || pathname.startsWith("/quiz/")) return "quiz-dock";
+  if (pathname === "/quiz" || pathname.startsWith("/quiz/")) return "quiz-flow";
   return "bottom-dock";
 }
 
@@ -131,14 +130,6 @@ export function CookieConsentBanner() {
     return () => observer.disconnect();
   }, []);
 
-  useLayoutEffect(() => {
-    const root = document.documentElement;
-    const undecided = readCookieConsent() === null;
-    const reserve = placement === "quiz-dock" && !isQuizOnboardingActive && (undecided || showBanner);
-    if (reserve) root.setAttribute("data-kyr-consent", "pending");
-    else root.removeAttribute("data-kyr-consent");
-  }, [placement, isQuizOnboardingActive, showBanner]);
-
   const summary = useMemo(() => {
     if (consent.analytics && consent.marketing) return "All optional cookies enabled";
     if (!consent.analytics && !consent.marketing) return "Only essential cookies enabled";
@@ -157,15 +148,13 @@ export function CookieConsentBanner() {
   // stay out of the way—not create an unreadable layer collision.
   const shellClassName = placement === "results-sheet"
     ? "fixed inset-0 z-[9000] flex items-end justify-center bg-[#12263a]/65 px-3 pb-[calc(10px+env(safe-area-inset-bottom,0px))] pt-3 backdrop-blur-sm pointer-events-none sm:p-4"
-    : placement === "quiz-dock"
-      ? "kyr-cookie-quiz-dock fixed inset-x-0 bottom-0 z-[9000] overflow-y-auto overscroll-contain px-3 pt-2 pointer-events-none"
+    : placement === "quiz-flow"
+      ? "kyr-cookie-quiz-flow relative w-full px-3 py-4"
       : "fixed bottom-0 left-0 right-0 z-[9000] p-4 pointer-events-none";
 
   const panelClassName = placement === "results-sheet"
     ? "mx-auto w-full max-w-md rounded-2xl border border-[#12263a]/20 bg-[#fffdf8] p-3 text-[#12263a] shadow-2xl pointer-events-auto max-h-[calc(100dvh-1.5rem)] overflow-y-auto sm:max-h-[min(72dvh,420px)] sm:p-5"
-    : placement === "quiz-dock"
-      ? "mx-auto w-full max-w-2xl rounded-2xl border border-[#12263a]/20 bg-[#fffdf8] p-3 text-[#12263a] shadow-none pointer-events-auto"
-      : "mx-auto max-w-2xl rounded-2xl border border-[#12263a]/20 bg-[#fffdf8]/95 p-5 text-[#12263a] shadow-2xl backdrop-blur-xl pointer-events-auto";
+    : "mx-auto max-w-2xl rounded-2xl border border-[#12263a]/20 bg-[#fffdf8]/95 p-5 text-[#12263a] shadow-2xl backdrop-blur-xl pointer-events-auto";
 
   const primaryActionsClassName = placement === "results-sheet"
     ? "grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-end"
@@ -181,6 +170,7 @@ export function CookieConsentBanner() {
           to { transform: none; opacity: 1; }
         }
         .kyr-cookie-enter { animation: kyr-cookie-enter 0.25s ease-out; }
+        .kyr-cookie-quiz-flow { overflow-anchor: none; }
         @media (prefers-reduced-motion: reduce) {
           .kyr-cookie-enter { animation: none; }
         }

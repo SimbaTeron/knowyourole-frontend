@@ -1,8 +1,8 @@
 "use client";
 
 import Script from "next/script";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { COOKIE_CONSENT_EVENT, hasAnalyticsConsent } from "@/components/CookieConsentBanner";
 import { analyticsCollectionAllowed, buildMeasurementConfig, type AnalyticsRuntime } from "@/lib/analytics/collectionGate";
 import { analyticsHitLocation } from "@/lib/analytics/internalLink";
@@ -29,9 +29,8 @@ function runtimeAnalyticsInput(): AnalyticsRuntime {
 
 function GoogleAnalyticsPageView({ enabled }: { enabled: boolean }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const send = () => {
       if (!enabled || !GA_MEASUREMENT_ID || typeof window.gtag !== "function") return;
       const runtime = runtimeAnalyticsInput();
@@ -45,10 +44,14 @@ function GoogleAnalyticsPageView({ enabled }: { enabled: boolean }) {
       window.gtag("config", GA_MEASUREMENT_ID, decision.config);
     };
 
+    window.__kyrSendPageView = send;
     send();
     window.addEventListener(KYR_GTAG_READY_EVENT, send);
-    return () => window.removeEventListener(KYR_GTAG_READY_EVENT, send);
-  }, [enabled, pathname, searchParams]);
+    return () => {
+      window.removeEventListener(KYR_GTAG_READY_EVENT, send);
+      if (window.__kyrSendPageView === send) delete window.__kyrSendPageView;
+    };
+  }, [enabled, pathname]);
 
   return null;
 }
@@ -87,9 +90,7 @@ export function GoogleAnalytics() {
           window.dispatchEvent(new Event('${KYR_GTAG_READY_EVENT}'));
         `}
       </Script>
-      <Suspense fallback={null}>
-        <GoogleAnalyticsPageView enabled={enabled} />
-      </Suspense>
+      <GoogleAnalyticsPageView enabled={enabled} />
     </>
   );
 }

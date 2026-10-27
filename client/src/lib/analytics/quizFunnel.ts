@@ -5,6 +5,7 @@ import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 import { trackKyrEvent } from "@/lib/analytics";
 import { analyticsCollectionAllowed } from "@/lib/analytics/collectionGate";
 import { KYR_GTAG_READY_EVENT } from "@/lib/analytics/gtagReady";
+import { sendRegisteredPageView } from "@/lib/analytics/pageView";
 import {
   closeQuizAttempt,
   flushQuizFunnel,
@@ -74,6 +75,7 @@ export function recordQuizFunnelEvent(name: QuizFunnelEventName, params: QuizFun
       armGtagFlush(window);
       return;
     }
+    sendRegisteredPageView(window);
     emitFunnel(decision.emit);
   } catch {
     /* sessionStorage unavailable: the quiz still runs, analytics stays quiet */
@@ -87,6 +89,7 @@ export function flushPendingQuizFunnel() {
     return;
   }
   try {
+    sendRegisteredPageView(window);
     const flushed = flushQuizFunnel(window.sessionStorage, { consent: true });
     emitFunnel(flushed.emit);
   } catch {
