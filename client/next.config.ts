@@ -34,6 +34,11 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // VERCEL_ENV is server-only unless it is inlined. Preview builds must be able
+  // to see "preview" in the browser or they would load the production GA tag.
+  env: {
+    NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? "",
+  },
   reactStrictMode: true,
   async headers() {
     return [{

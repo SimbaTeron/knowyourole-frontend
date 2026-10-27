@@ -3004,7 +3004,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
     event.preventDefault();
     setLeadStatus("submitting");
     setLeadMessage("");
-    trackKyrEvent("email_capture_submitted", { result_page: "full_portrait", source: "batch4_result_cta", mbti_type: mbtiType, primary_disc: primary });
+    trackKyrEvent("email_capture_submitted", { result_page: "full_portrait", link_location: "batch4_result_cta", mbti_type: mbtiType, primary_disc: primary });
     try {
       const response = await fetch("/api/results/email-lead", {
         method: "POST",
@@ -3027,11 +3027,11 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
       }
       setLeadStatus("success");
       setLeadMessage("Sent. Check your inbox for your result summary.");
-      trackKyrEvent("email_capture_completed", { result_page: "full_portrait", source: "batch4_result_cta", status: "success", delivery_status: data?.deliveryStatus || "unknown", mbti_type: mbtiType, primary_disc: primary });
+      trackKyrEvent("email_capture_completed", { result_page: "full_portrait", link_location: "batch4_result_cta", status: "success", delivery_status: data?.deliveryStatus || "unknown", mbti_type: mbtiType, primary_disc: primary });
     } catch (error) {
       setLeadStatus("error");
       setLeadMessage(error instanceof Error ? error.message : "Could not save your email yet.");
-      trackKyrEvent("email_capture_completed", { result_page: "full_portrait", source: "batch4_result_cta", status: "error", mbti_type: mbtiType, primary_disc: primary });
+      trackKyrEvent("email_capture_completed", { result_page: "full_portrait", link_location: "batch4_result_cta", status: "error", mbti_type: mbtiType, primary_disc: primary });
     }
   };
 
@@ -3675,7 +3675,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
               setLeadEmail(event.target.value);
               if (leadStatus !== "submitting") setLeadStatus("idle");
             }}
-            onFocus={() => trackKyrEvent("email_capture_started", { result_page: "full_portrait", source: "batch4_result_cta", mbti_type: mbtiType, primary_disc: primary })}
+            onFocus={() => trackKyrEvent("email_capture_started", { result_page: "full_portrait", link_location: "batch4_result_cta", mbti_type: mbtiType, primary_disc: primary })}
             placeholder="you@example.com"
             aria-label="Email address"
             style={{
@@ -5028,8 +5028,8 @@ function OrbitalGlassV2Results({
       },
     ],
   };
-  const onShare = (source = "orbital_share") => {
-    trackKyrEvent("share_modal_opened", { result_page: "orbital_glass_v2", source, mbti_type: mbtiType, primary_disc: primaryDisc });
+  const onShare = (linkLocation = "orbital_share") => {
+    trackKyrEvent("share_modal_opened", { result_page: "orbital_glass_v2", link_location: linkLocation, mbti_type: mbtiType, primary_disc: primaryDisc });
     setShareOpen(true);
   };
 
@@ -5056,9 +5056,9 @@ function OrbitalGlassV2Results({
   const discEntries = (Object.entries(disc) as [keyof DiscProfile, number][]).sort((a, b) => b[1] - a[1]);
   const secondaryDiscEntry = discEntries.find(([key]) => key !== primaryDisc) || discEntries[1] || discEntries[0];
 
-  const go = (next: OrbitalResultView, source = "orbital_v2") => {
-    trackKyrEvent("result_section_clicked", { result_page: view, target_page: next, source, mbti_type: mbtiType, primary_disc: primaryDisc });
-    if (next === "role") trackKyrEvent("role_fit_opened", { result_page: view, source, mbti_type: mbtiType, primary_disc: primaryDisc });
+  const go = (next: OrbitalResultView, linkLocation = "orbital_v2") => {
+    trackKyrEvent("result_section_clicked", { result_page: view, target_page: next, link_location: linkLocation, mbti_type: mbtiType, primary_disc: primaryDisc });
+    if (next === "role") trackKyrEvent("role_fit_opened", { result_page: view, link_location: linkLocation, mbti_type: mbtiType, primary_disc: primaryDisc });
     setView(next);
   };
 
@@ -5278,7 +5278,7 @@ export default function ResultsPage() {
       page_number: "orbital-v2",
       mbti_type: realResults.mbtiType,
       primary_disc: realResults.primaryDisc,
-      source: params.get("test") === "true" ? "test_route" : realResults.isDemo ? "demo" : "quiz_result",
+      link_location: params.get("test") === "true" ? "test_route" : realResults.isDemo ? "demo" : "quiz_result",
       has_session_id: Boolean(params.get("sessionId")),
       has_result_id: Boolean(params.get("resultId")),
     });
