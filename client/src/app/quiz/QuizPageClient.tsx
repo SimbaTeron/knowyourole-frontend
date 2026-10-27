@@ -889,7 +889,7 @@ export default function QuizPage() {
 
   if (isAnalyzingResults) {
     return (
-      <div className={`min-h-screen relative overflow-hidden ${getThemeClass()}`} data-testid="quiz-analysis-screen">
+      <div className={`min-h-screen relative overflow-hidden ${getThemeClass()}`} data-testid="quiz-analysis-screen" data-kyr-quiz-root="">
         <PathCanvas />
         <main className="relative z-10 min-h-screen flex items-center justify-center px-5 py-10">
           <section className="w-full max-w-md rounded-[32px] border border-white/15 bg-black/55 px-6 py-8 text-center text-white shadow-2xl backdrop-blur-xl">
@@ -983,7 +983,7 @@ export default function QuizPage() {
   }
 
   return (
-    <div className={`min-h-screen relative overflow-hidden ${getThemeClass()}`}>
+    <div className={`min-h-screen relative overflow-hidden ${getThemeClass()}`} data-kyr-quiz-root="">
       <PathCanvas />
       
       <main className="relative z-10">
