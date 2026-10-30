@@ -128,6 +128,7 @@ export function ResultSummary({
   const also = view.direction.kind === "focused" ? view.direction.alsoExplore : [];
   return (
     <div className="result-simple">
+      <style>{RESULT_SIMPLE_CSS}</style>
       <header className="result-hero">
         <p className="result-kicker">Your result</p>
         <h1 data-testid="result-name">{view.emoji} {view.headline}</h1>
@@ -261,13 +262,12 @@ export function ResultSummary({
           />
         </Disclosure>
       </div>
-      <style>{RESULT_SIMPLE_CSS}</style>
     </div>
   );
 }
 
 const RESULT_SIMPLE_CSS = `
-.result-simple { display: grid; gap: 14px; color: #12263a; }
+.result-simple { display: grid; gap: 14px; color: #12263a; font-family: "IBM Plex Sans Fallback", ui-sans-serif, system-ui, sans-serif; }
 .result-hero { padding: 4px 2px 2px; }
 .result-kicker { margin: 0 0 6px; color: #315f74; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .result-simple h1 { margin: 0; font-family: Fraunces, Georgia, serif; font-size: clamp(34px, 9vw, 58px); line-height: .96; letter-spacing: -.045em; overflow-wrap: break-word; text-wrap: balance; }
