@@ -7,6 +7,7 @@ import {
   consumeFeedbackRate,
   feedbackRateKey,
   feedbackRequestSchema,
+  feedbackRowHasRatingOrFit,
   requestedResultId,
   toFeedbackInsert,
   type FeedbackInsert,
@@ -139,7 +140,7 @@ export async function postPublicFeedback(req: NextRequest, deps?: FeedbackDeps) 
         }
         row = linkScaleFeedbackToResult(row, { id: found.row.id, sessionId: found.row.session_id });
       }
-    } else if (Object.values(row).every((value) => value == null || value === "")) {
+    } else if (!feedbackRowHasRatingOrFit(row)) {
       return json({ error: 'Invalid feedback payload' }, 400);
     }
 

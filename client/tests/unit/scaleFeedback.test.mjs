@@ -16,8 +16,10 @@ import {
 import {
   SCALE_FEEDBACK_PRIVACY_SENTENCE,
   SCALE_QUESTIONS,
+  BLANK_SCALE_NOTE,
   emptyScaleAnswers,
   leaveFeedbackPath,
+  scaleAnswersAreEmpty,
   linkScaleFeedbackToResult,
   normalizeScaleRatings,
   parseFeedbackLink,
@@ -50,6 +52,26 @@ test("the feedback page asks five optional questions and one submit", () => {
   const privacy = readFileSync(join(clientRoot, "src/app/privacy/page.tsx"), "utf8");
   assert.equal(privacy.includes("SCALE_FEEDBACK_PRIVACY_SENTENCE"), true);
   assert.equal(privacy.includes(SCALE_FEEDBACK_PRIVACY_SENTENCE), false);
+});
+
+test("a blank feedback form stays on the page and says to answer one question", () => {
+  assert.equal(BLANK_SCALE_NOTE, "Answering at least one question helps.");
+  assert.equal(scaleAnswersAreEmpty(emptyScaleAnswers()), true);
+  assert.equal(scaleAnswersAreEmpty({ ...emptyScaleAnswers(), quizEase: 1 }), false);
+  const page = readFileSync(join(clientRoot, "src/app/feedback/page.tsx"), "utf8");
+  const guard = page.indexOf("if (scaleAnswersAreEmpty(answers))");
+  const sendCall = page.indexOf("await send(");
+  assert.ok(guard > -1 && sendCall > guard);
+  const beforeSend = page.slice(guard, sendCall);
+  assert.match(beforeSend, /setNotice\(BLANK_SCALE_NOTE\)/);
+  assert.match(beforeSend, /return;/);
+  assert.equal(beforeSend.includes("fetch("), false);
+  const note = page.slice(page.indexOf('id="feedback-blank-note"'), page.indexOf('id="feedback-blank-note"') + 280);
+  assert.match(note, /role="status"/);
+  assert.equal(note.includes("role=\"alert\""), false);
+  assert.equal(note.includes("tabIndex"), false);
+  assert.equal(note.includes("focus("), false);
+  assert.equal((page.match(/id="feedback-blank-note"/g) || []).length, 1);
 });
 
 test("scale ratings are optional 1 to 5 values and link to a saved result id", () => {

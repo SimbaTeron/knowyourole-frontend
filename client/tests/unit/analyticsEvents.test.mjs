@@ -705,6 +705,13 @@ test("quiz visits show the existing consent banner without a second page_view co
   assert.equal(KYR_GTAG_READY_EVENT, "kyr-gtag-ready");
   assert.equal(layout.includes("kyr-consent-reserve"), false);
   assert.equal(layout.includes("data-kyr-consent"), false);
+  assert.match(layout, /ConsentBeforePaint/);
+  const beforePaint = readFileSync(join(root, "src/components/ConsentBeforePaint.tsx"), "utf8");
+  assert.match(beforePaint, /kyr_cookie_consent/);
+  assert.match(beforePaint, /data-kyr-consent/);
+  assert.match(beforePaint, /--kyr-consent-bar/);
+  assert.match(banner, /if \(readCookieConsent\(\)\)/);
+  assert.match(banner, /reserved !== height/);
   assert.match(nextConfig, /canonicalHostRedirects/);
   const decision = buildMeasurementConfig({
     hostname: "knowyourole.com",

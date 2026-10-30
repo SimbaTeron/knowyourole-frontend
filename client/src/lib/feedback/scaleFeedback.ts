@@ -48,6 +48,13 @@ export function emptyScaleAnswers(): ScaleAnswers {
   };
 }
 
+/** Shown on /feedback when every rating is still blank. The page does not POST. */
+export const BLANK_SCALE_NOTE = "Answering at least one question helps.";
+
+export function scaleAnswersAreEmpty(answers: ScaleAnswers): boolean {
+  return SCALE_QUESTIONS.every((question) => answers[question.key] == null);
+}
+
 export function scaleChoiceLabel(value: number): string {
   if (value === 1) return "1, low";
   if (value === 5) return "5, high";

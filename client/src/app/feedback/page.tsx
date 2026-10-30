@@ -5,9 +5,11 @@ import { AppFooter } from '@/components/layout/AppFooter';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { RatingRadios } from '@/components/results/RatingRadios';
 import {
+  BLANK_SCALE_NOTE,
   SCALE_QUESTIONS,
   emptyScaleAnswers,
   readFeedbackLink,
+  scaleAnswersAreEmpty,
   scaleChoiceLabel,
   scalePayload,
   writeFeedbackLink,
@@ -28,6 +30,7 @@ export default function FeedbackPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [errorTick, setErrorTick] = useState(0);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const thanksRef = useRef<HTMLHeadingElement>(null);
@@ -65,6 +68,7 @@ export default function FeedbackPage() {
   const setRating = (key: ScaleKey, value: number) => {
     setAnswers((current) => ({ ...current, [key]: current[key] === value ? null : value }));
     setError('');
+    setNotice('');
   };
 
   const send = async (linkedResultId: string | null) => {
@@ -89,8 +93,14 @@ export default function FeedbackPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (submitting) return;
+    if (scaleAnswersAreEmpty(answers)) {
+      setError('');
+      setNotice(BLANK_SCALE_NOTE);
+      return;
+    }
     setSubmitting(true);
     setError('');
+    setNotice('');
     try {
       let response = await send(resultId);
       if (resultId && (response.status === 403 || response.status === 404)) {
@@ -156,6 +166,13 @@ export default function FeedbackPage() {
               {error ? (
                 <p ref={errorRef} role="alert" tabIndex={-1} className="text-sm font-semibold text-[#9d3e2b]">{error}</p>
               ) : null}
+              <p
+                id="feedback-blank-note"
+                role="status"
+                className={notice ? "text-sm leading-relaxed text-[#29495c]" : "sr-only"}
+              >
+                {notice}
+              </p>
               <button
                 type="submit"
                 className="min-h-11 rounded border border-[#12263a] bg-[#12263a] px-5 text-base font-bold text-[#fffdf8]"

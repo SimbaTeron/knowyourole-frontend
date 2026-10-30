@@ -7,6 +7,7 @@ import {
   FEEDBACK_RATE_LIMIT,
   consumeFeedbackRate,
   feedbackRequestSchema,
+  feedbackRowHasRatingOrFit,
   resetFeedbackRateLimits,
   toFeedbackInsert,
 } from "../../src/lib/feedback/feedbackSubmission.ts";
@@ -122,4 +123,119 @@ test("POST rejects a bad email, an oversized body, and a foreign origin before a
 
 test("GET /api/feedback is not implemented", () => {
   assert.equal(feedbackRoute.GET, undefined);
+});
+
+function noDatabase(inserted = []) {
+  return {
+    async findResult() {
+      throw new Error("lookup should not run");
+    },
+    async canAccess() {
+      throw new Error("access should not run");
+    },
+    async insert(row) {
+      inserted.push(row);
+      return { ok: true, id: "feedback-row" };
+    },
+  };
+}
+
+function postFeedback(body, ip) {
+  return feedbackRoute.POST(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": ip },
+    body: JSON.stringify(body),
+  }));
+}
+
+test("old feedback rows need a rating or a yes/no fit answer", async () => {
+  resetFeedbackRateLimits();
+  const freeText = {
+    suggestions: "shorter intro",
+    anything_else: "just a note",
+    first_reaction: "loved_it",
+    first_reaction_text: "I had a thought",
+    most_valuable_feature: "career_matches",
+    college_suggestions: "more internships",
+    bugs_issues: "the button",
+    email: "student@university.edu",
+    quiz_type: "full",
+    mbti_type: "INTJ",
+    disc_style: "C",
+    primary_role: "Analyst",
+    tier: "25+",
+    session_id: "quiz-1",
+    fun_mode: false,
+  };
+  assert.equal(feedbackRowHasRatingOrFit(toFeedbackInsert(feedbackRequestSchema.parse(freeText))), false);
+  const textOnly = await feedbackRoute.postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.40" },
+    body: JSON.stringify(freeText),
+  }), noDatabase());
+  assert.equal(textOnly.status, 400);
+  assert.deepEqual(await textOnly.json(), { error: "Invalid feedback payload" });
+
+  const suggestionsOnly = await postFeedback({ suggestions: "only this" }, "198.51.100.41");
+  assert.equal(suggestionsOnly.status, 400);
+
+  const blank = await postFeedback({}, "198.51.100.42");
+  assert.equal(blank.status, 400);
+
+  const outOfRange = await postFeedback({ personality_rating: 6, suggestions: "nope" }, "198.51.100.43");
+  assert.equal(outOfRange.status, 400);
+
+  const commentInFitColumn = await postFeedback({ useful_app: "please add a dark mode" }, "198.51.100.44");
+  assert.equal(commentInFitColumn.status, 400);
+
+  const inserted = [];
+  const rated = await feedbackRoute.postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.45" },
+    body: JSON.stringify({ career_rating: 4, suggestions: "shorter intro" }),
+  }), noDatabase(inserted));
+  assert.equal(rated.status, 200);
+  assert.equal(inserted[0].career_rating, 4);
+  assert.equal(inserted[0].suggestions, "shorter intro");
+
+  const legacy = await feedbackRoute.postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.46" },
+    body: JSON.stringify(legacyModal),
+  }), noDatabase(inserted));
+  assert.equal(legacy.status, 200);
+  assert.equal(inserted.at(-1).useful_app, "yes");
+  assert.equal(inserted.at(-1).would_share, "no");
+
+  const fitOnly = await feedbackRoute.postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.47" },
+    body: JSON.stringify({ retake_quiz: "Yes", college_suggestions: "more internships" }),
+  }), noDatabase(inserted));
+  assert.equal(fitOnly.status, 200);
+  assert.equal(inserted.at(-1).retake_quiz, "Yes");
+
+  const accuracy = await feedbackRoute.postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.48" },
+    body: JSON.stringify({ accuracy_score: 8, anything_else: "close" }),
+  }), noDatabase(inserted));
+  assert.equal(accuracy.status, 200);
+  assert.equal(inserted.at(-1).accuracy_score, 8);
+
+  const nps = await feedbackRoute.postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.49" },
+    body: JSON.stringify({ nps_score: 0 }),
+  }), noDatabase(inserted));
+  assert.equal(nps.status, 200);
+  assert.equal(inserted.at(-1).nps_score, 0);
+
+  const live = await feedbackRoute.postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.50" },
+    body: JSON.stringify(liveForm),
+  }), noDatabase(inserted));
+  assert.equal(live.status, 200);
+  assert.equal(inserted.at(-1).accuracy_score, 5);
 });
