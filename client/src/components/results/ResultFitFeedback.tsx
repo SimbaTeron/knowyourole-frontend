@@ -83,7 +83,7 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
 
   const choose = async (nextFit: ResultFit) => {
     if (sending.current || phase === "saving" || phase === "thanks") return;
-    const payload = parseResultFitFeedbackRequest({ resultId, fit: nextFit, rating: null, comment: null });
+    const payload = parseResultFitFeedbackRequest({ resultId, fit: nextFit });
     if (!payload.ok) {
       reportError(RESULT_FIT_COPY.error);
       return;
@@ -133,9 +133,7 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
   };
 
   const title = phase === "thanks" ? RESULT_FIT_COPY.thanksTitle : RESULT_FIT_COPY.title;
-  const statusMessage = phase === "thanks"
-    ? `${RESULT_FIT_COPY.thanksTitle} ${RESULT_FIT_COPY.thanksDetail}`
-    : "";
+  const statusMessage = phase === "thanks" ? RESULT_FIT_COPY.thanksDetail : "";
 
   return (
     <section

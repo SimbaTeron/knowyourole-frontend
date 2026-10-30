@@ -67,8 +67,6 @@ const requestSchema = z
   .object({
     resultId: z.string().trim().min(8).max(160),
     fit: z.enum(RESULT_FIT_CHOICES),
-    rating: z.union([z.number().int().min(1).max(5), z.null()]).optional(),
-    comment: z.union([z.string().trim().max(RESULT_FIT_COMMENT_MAX), z.literal(""), z.null()]).optional(),
   })
   .strict();
 
@@ -79,32 +77,16 @@ export type ResultFitFeedbackRequest = {
   comment: string | null;
 };
 
-function isRating(value: number): value is ResultFitRating {
-  return (RESULT_FIT_RATINGS as readonly number[]).includes(value);
-}
-
-function normalizeComment(value: string | null | undefined): string | null {
-  if (value == null) return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  if (resultFitCommentLength(trimmed) > RESULT_FIT_COMMENT_MAX) return null;
-  return trimmed;
-}
-
 export function parseResultFitFeedbackRequest(input: unknown): { ok: true; value: ResultFitFeedbackRequest } | { ok: false } {
   const parsed = requestSchema.safeParse(input);
   if (!parsed.success) return { ok: false };
-  const rating = parsed.data.rating ?? null;
-  if (rating != null && !isRating(rating)) return { ok: false };
-  const comment = normalizeComment(parsed.data.comment);
-  if (typeof parsed.data.comment === "string" && parsed.data.comment.trim() && comment == null) return { ok: false };
   return {
     ok: true,
     value: {
       resultId: parsed.data.resultId,
       fit: parsed.data.fit,
-      rating,
-      comment,
+      rating: null,
+      comment: null,
     },
   };
 }

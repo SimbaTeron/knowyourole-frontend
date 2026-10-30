@@ -57,28 +57,22 @@ test("the fit choice is yes or no, and the copy stays plain", () => {
   assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "yes", resultType: "INTJ" }).ok, false);
 });
 
-test("a tap is valid without a rating or comment, and the note is capped at 500 characters", () => {
+test("a tap is yes or no only, with no rating, note, or extra field", () => {
   const tap = parseResultFitFeedbackRequest({ resultId, fit: "yes" });
   assert.equal(tap.ok, true);
   assert.equal(tap.value.rating, null);
   assert.equal(tap.value.comment, null);
 
-  const blank = parseResultFitFeedbackRequest({ resultId, fit: "no", comment: "   ", rating: null });
-  assert.equal(blank.ok, true);
-  assert.equal(blank.value.comment, null);
-
-  const note = "n".repeat(RESULT_FIT_COMMENT_MAX);
-  const capped = parseResultFitFeedbackRequest({ resultId, fit: "yes", rating: 4, comment: note });
-  assert.equal(capped.ok, true);
-  assert.equal(capped.value.comment, note);
-  assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "yes", comment: `${note}x` }).ok, false);
+  assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "no", comment: "   ", rating: null }).ok, false);
+  assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "yes", rating: 4, comment: "n".repeat(RESULT_FIT_COMMENT_MAX) }).ok, false);
+  assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "yes", comment: "felt right" }).ok, false);
   assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "yes", rating: 0 }).ok, false);
   assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "yes", rating: 6 }).ok, false);
   assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "yes", email: "student@example.com" }).ok, false);
 });
 
 test("the stored row uses the saved result type and scoring version", () => {
-  const requestValue = parseResultFitFeedbackRequest({ resultId, fit: "yes", comment: "  felt right  " }).value;
+  const requestValue = { resultId, fit: "yes", rating: null, comment: "felt right" };
   const row = buildResultFitFeedbackRow(requestValue, link, resultId);
   assert.deepEqual(row, {
     result_id: resultId,
@@ -108,7 +102,7 @@ test("a follow-up can add a rating or note and cannot replace the first choice",
 
   const existing = { id: "fit-1", fit: "yes", rating: null, comment: null };
   const withNote = buildResultFitFeedbackRow(
-    parseResultFitFeedbackRequest({ resultId, fit: "yes", comment: "too broad" }).value,
+    { resultId, fit: "yes", rating: null, comment: "too broad" },
     link,
     resultId,
   );
@@ -131,7 +125,7 @@ test("a follow-up can add a rating or note and cannot replace the first choice",
   assert.equal(planResultFitWrite(existing, different).action, "conflict");
 
   const rated = buildResultFitFeedbackRow(
-    parseResultFitFeedbackRequest({ resultId, fit: "yes", rating: 2 }).value,
+    { resultId, fit: "yes", rating: 2, comment: null },
     link,
     resultId,
   );
@@ -242,10 +236,10 @@ test("POST stores the server result link and does not require a follow-up", asyn
     fit: "yes",
     rating: 5,
     comment: "close",
-  }, { "x-forwarded-for": "198.51.100.30" }), deps);
-  assert.equal(extra.status, 200);
-  assert.equal(saved[0].rating, 5);
-  assert.equal(saved[0].comment, "close");
+  }, { "x-forwarded-for": "198.51.100.31" }), deps);
+  assert.equal(extra.status, 400);
+  assert.equal(saved[0].rating, null);
+  assert.equal(saved[0].comment, null);
   assert.equal(saved[0].result_type, "INTJ");
 });
 

@@ -41,6 +41,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test tests/e2e/quiz-stress.spec.ts --project=desktop --workers=2
+      - run: npx playwright test tests/e2e/quiz-stress.spec.ts tests/e2e/cookie-bar-clearance.spec.ts --project=desktop --workers=2
         env:
           QUIZ_STRESS_REPEAT: "2"

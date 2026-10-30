@@ -206,6 +206,27 @@ test("production measurement keeps utm acquisition and drops bare campaign keys"
   assert.equal(measured.searchParams.get("utm_source"), "newsletter");
   assert.equal(decision.config.traffic_type, undefined);
   assert.equal(decision.config.anonymize_ip, true);
+
+  const leaked = analyticsHitLocation("https://knowyourole.com/feedback?resultId=result-1&sessionId=session-1&result_id=result-2&session_id=session-2&utm_source=newsletter");
+  const leakedHit = JSON.stringify(leaked);
+  assert.equal(leakedHit.includes("resultId"), false);
+  assert.equal(leakedHit.includes("sessionId"), false);
+  assert.equal(leakedHit.includes("result_id"), false);
+  assert.equal(leakedHit.includes("session_id"), false);
+  assert.equal(leakedHit.includes("result-1"), false);
+  assert.equal(leakedHit.includes("session-1"), false);
+  assert.match(leaked.page_location, /utm_source=newsletter/);
+  const leakedConfig = buildMeasurementConfig({
+    hostname: "knowyourole.com",
+    nodeEnv: "production",
+    vercelEnv: "production",
+    ...leaked,
+  });
+  const serialized = JSON.stringify(leakedConfig);
+  assert.equal(serialized.includes("resultId"), false);
+  assert.equal(serialized.includes("sessionId"), false);
+  assert.equal(serialized.includes("result-1"), false);
+  assert.equal(serialized.includes("session-1"), false);
 });
 
 test("internal links rename source to link_location and never set utm params", () => {
@@ -642,8 +663,11 @@ test("quiz visits show the existing consent banner without a second page_view co
   assert.match(banner, /position: fixed/);
   assert.match(banner, /padding-bottom: var\(--kyr-consent-bar, 0px\)/);
   assert.match(banner, /data-kyr-consent/);
-  assert.match(banner, /kyr-quiz-viewport/);
-  assert.match(banner, /max-height: 740px/);
+  const quizSource = readFileSync(join(root, "src/components/ShortformV2Quiz.tsx"), "utf8");
+  assert.match(quizSource, /kyr-quiz-viewport/);
+  assert.equal(banner.includes("overflow-y: auto"), false);
+  assert.match(banner, /quiz-question-screen/);
+  assert.match(banner, /overflow: hidden !important/);
   assert.match(banner, /scroll-margin-bottom: calc\(var\(--kyr-consent-bar, 0px\) \+ 12px\)/);
   assert.match(banner, /focusMainContent\(document, window\)/);
   assert.equal(cookieBannerPlacement("/quiz"), "bottom-bar");

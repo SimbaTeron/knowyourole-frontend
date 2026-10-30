@@ -90,7 +90,7 @@ export function focusMainContent(
   view: { scrollY: number; scrollTo: (x: number, y: number) => void },
 ): boolean {
   const y = view.scrollY;
-  const main = doc.querySelector("main") as FocusableMain | null;
+  const main = doc.querySelector("main, [data-kyr-focus-root]") as FocusableMain | null;
   if (!main || typeof main.focus !== "function") return false;
   if (typeof main.tabIndex !== "number" || main.tabIndex < 0) main.tabIndex = -1;
   main.focus({ preventScroll: true });
@@ -170,49 +170,123 @@ export function CookieConsentBanner() {
     <>
       <style>{`
         html[data-kyr-consent="open"] {
-          scroll-padding-bottom: var(--kyr-consent-bar, 0px);
+          scroll-padding-bottom: calc(var(--kyr-consent-bar, 0px) + 12px);
         }
         html[data-kyr-consent="open"] body {
           padding-bottom: var(--kyr-consent-bar, 0px);
         }
-        html[data-kyr-consent="open"] .kyr-quiz-viewport {
-          box-sizing: border-box;
-          align-items: flex-start !important;
-          height: calc(100dvh - var(--kyr-consent-bar, 0px)) !important;
-          min-height: 0 !important;
-          max-height: calc(100dvh - var(--kyr-consent-bar, 0px)) !important;
-          overflow-x: hidden !important;
-          overflow-y: auto !important;
-          padding-bottom: 12px !important;
-          scroll-padding-bottom: 12px;
-        }
-        html[data-kyr-consent="open"] .kyr-quiz-viewport main {
-          min-height: 0 !important;
-        }
-        html[data-kyr-consent="open"] .primary-cta {
+        html[data-kyr-consent="open"] .primary-cta,
+        html[data-kyr-consent="open"] .shortform-v2-answer-button,
+        html[data-kyr-consent="open"] .quiz-welcome-card button {
           scroll-margin-bottom: calc(var(--kyr-consent-bar, 0px) + 12px);
         }
         @media (max-width: 414px) {
-          html[data-kyr-consent="open"] .kyr-home-page .hero-title {
+          html[data-kyr-consent="open"]:has(.quiz-question-screen) body,
+          html[data-kyr-consent="open"]:has(.quiz-welcome-screen) body {
+            padding-bottom: 0;
+            overflow: hidden;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen,
+          html[data-kyr-consent="open"] .quiz-welcome-screen {
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            height: calc(100dvh - var(--kyr-consent-bar, 0px)) !important;
+            min-height: 0 !important;
+            max-height: calc(100dvh - var(--kyr-consent-bar, 0px)) !important;
+            overflow: hidden !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen > main {
+            flex: 1 1 auto;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
+            padding-bottom: 10px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-layout {
+            flex: 1 1 auto;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 0 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-card,
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-body {
+            min-height: 0 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-card {
+            flex: 1 1 auto;
+            overflow: hidden;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-grid {
+            flex: 0 0 auto;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-button {
             min-height: 0 !important;
           }
         }
         @media (max-width: 414px) and (max-height: 740px) {
-          html[data-kyr-consent="open"] .kyr-home-page .hero-title {
-            font-size: 1.65rem !important;
-            line-height: 0.95 !important;
-            letter-spacing: -0.04em !important;
+          html[data-kyr-consent="open"] .quiz-question-screen > main {
+            padding-top: 46px !important;
+            padding-bottom: 6px !important;
           }
-          html[data-kyr-consent="open"] .kyr-home-page .hero-subtitle {
-            margin-top: 10px !important;
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-layout {
+            gap: 6px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-card {
+            padding: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-title {
+            font-size: 1.05rem !important;
+            line-height: 1.05 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-grid {
+            gap: 6px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-button {
+            padding: 6px 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-button h2 {
             font-size: 0.9rem !important;
+            line-height: 1.15 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-screen {
+            padding-top: 12px !important;
+            padding-bottom: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+          }
+        }
+        @media (max-width: 414px) and (max-height: 740px) {
+          html[data-kyr-consent="open"] .quiz-welcome-card {
+            padding: 12px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card h2 {
+            margin-top: 8px !important;
+            font-size: 1.35rem !important;
+            line-height: 1.05 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card p,
+          html[data-kyr-consent="open"] .quiz-welcome-card li {
+            margin-top: 8px !important;
+            font-size: 12px !important;
             line-height: 1.35 !important;
           }
-          html[data-kyr-consent="open"] .kyr-home-page .eyebrow {
-            margin-bottom: 8px !important;
+          html[data-kyr-consent="open"] .quiz-welcome-card ul {
+            margin-top: 8px !important;
+            gap: 6px !important;
           }
-          html[data-kyr-consent="open"] .kyr-home-page .hero-section .primary-cta {
-            margin-top: 12px !important;
+          html[data-kyr-consent="open"] .quiz-welcome-card li {
+            padding: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card button {
+            margin-top: 10px !important;
           }
         }
         .kyr-cookie-bar {
