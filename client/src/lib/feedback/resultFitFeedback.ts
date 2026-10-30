@@ -7,9 +7,13 @@ export {
   RESULT_FIT_STUDENT_DATA_SENTENCE,
 } from "@/lib/feedback/resultFitCopy";
 
-/** One tap is the whole required answer. There is no "not sure" choice. */
-export const RESULT_FIT_CHOICES = ["yes", "somewhat", "no"] as const;
+/** One optional tap. There is no "somewhat" choice on new answers. */
+export const RESULT_FIT_CHOICES = ["yes", "no"] as const;
 export type ResultFit = (typeof RESULT_FIT_CHOICES)[number];
+
+/** Rows saved before Somewhat was removed can still be read. New taps cannot send it. */
+export const STORED_RESULT_FITS = ["yes", "somewhat", "no"] as const;
+export type StoredResultFit = (typeof STORED_RESULT_FITS)[number];
 
 export const RESULT_FIT_RATINGS = [1, 2, 3, 4, 5] as const;
 export type ResultFitRating = (typeof RESULT_FIT_RATINGS)[number];
@@ -24,13 +28,11 @@ export const RESULT_FIT_TAP_EVENT = "result_fit_tapped";
 
 const choiceLabel: Record<ResultFit, string> = {
   yes: RESULT_FIT_COPY.yes,
-  somewhat: RESULT_FIT_COPY.somewhat,
   no: RESULT_FIT_COPY.no,
 };
 
 const answeredLabel: Record<ResultFit, string> = {
   yes: RESULT_FIT_COPY.answeredYes,
-  somewhat: RESULT_FIT_COPY.answeredSomewhat,
   no: RESULT_FIT_COPY.answeredNo,
 };
 
@@ -175,7 +177,7 @@ export function buildResultFitFeedbackRow(
 
 export type ExistingResultFit = {
   id: string;
-  fit: ResultFit;
+  fit: StoredResultFit;
   rating: ResultFitRating | null;
   comment: string | null;
 };

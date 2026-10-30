@@ -1,6 +1,7 @@
 'use client';
 
 import { RESULT_FIT_PRIVACY_SENTENCE } from "@/lib/feedback/resultFitCopy";
+import { SCALE_FEEDBACK_PRIVACY_SENTENCE } from "@/lib/feedback/scaleFeedback";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { COOKIE_PREFERENCES_EVENT } from "@/components/CookieConsentBanner";
 import { AppFooter } from "@/components/layout/AppFooter";
@@ -44,6 +45,7 @@ export default function Privacy() {
               <li>Email address, selected result-summary fields, consent, and delivery status when you explicitly request that a result summary be emailed.</li>
               <li>Feedback you submit voluntarily.</li>
               <li>{RESULT_FIT_PRIVACY_SENTENCE}</li>
+              <li>{SCALE_FEEDBACK_PRIVACY_SENTENCE}</li>
               <li>Device, browser, referral, and performance data when analytics is enabled through cookie preferences.</li>
               <li>Browser storage used for quiz state, consent preferences, and session continuity.</li>
             </ul>

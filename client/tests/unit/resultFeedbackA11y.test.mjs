@@ -77,7 +77,10 @@ test("the fit card is hidden unless the result id was saved, and its rating is a
     sessionId: "session-1",
   }));
   assert.match(shown, /Did this fit you\?/);
-  assert.match(shown, /One tap is enough\. No name needed\./);
+  assert.match(shown, /Optional\. No name needed\./);
+  assert.match(shown, />Yes</);
+  assert.match(shown, />No</);
+  assert.equal(shown.includes("Somewhat"), false);
   assert.equal(/[\s]disabled=/.test(shown), false);
   assert.match(shown, /aria-pressed="false"/);
 
@@ -108,13 +111,16 @@ test("the fit card is hidden unless the result id was saved, and its rating is a
 
   const page = readFileSync(join(clientRoot, "src/app/results/ResultsPageClient.tsx"), "utf8");
   assert.equal(page.includes("resultId={canonicalResult?.meta.resultId}"), false);
-  assert.equal((page.match(/toSavedResultId\(canonicalResult\?\.meta\)/g) || []).length, 2);
+  assert.equal(page.includes("DirectionFeedbackCard"), false);
+  assert.equal(page.includes("Early pilot"), false);
+  assert.match(page, /Leave feedback/);
+  assert.equal((page.match(/toSavedResultId\(canonicalResult\?\.meta\)/g) || []).length, 1);
   const fit = readFileSync(join(clientRoot, "src/components/results/ResultFitFeedback.tsx"), "utf8");
   assert.equal(fit.includes('disabled={phase === "saving"}'), false);
+  assert.equal(fit.includes("Somewhat"), false);
+  assert.equal(fit.includes("result-fit-rating"), false);
   assert.match(fit, /aria-disabled=\{phase === "saving"/);
-  assert.match(fit, /errorRef\.current\?\.focus\(\)/);
-  assert.match(fit, /<fieldset className="result-fit-rating-set">/);
-  assert.match(fit, /<legend id="result-fit-rating-legend"/);
+  assert.match(fit, /errorRef\.current\?\.focus\(\{ preventScroll: true \}\)/);
   assert.match(fit, /ref=\{errorRef\} role="alert" tabIndex=\{-1\}/);
   const direction = readFileSync(join(clientRoot, "src/components/results/DirectionFeedbackCard.tsx"), "utf8");
   assert.match(direction, /errorRef\.current\?\.focus\(\)/);

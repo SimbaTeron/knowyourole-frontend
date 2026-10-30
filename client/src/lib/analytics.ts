@@ -32,7 +32,7 @@ const EVENT_CATEGORY_BY_NAME: Array<[RegExp, string]> = [
  * - quiz_progress_milestone (every 5 answers, for drop-off)
  * - quiz_completed
  * - result_viewed
- * - result_fit_tapped (yes, somewhat, or no only; never a comment)
+ * - result_fit_tapped (yes or no only; never a comment)
  * - for_schools_cta_clicked
  * - for_schools_contact_clicked
  */

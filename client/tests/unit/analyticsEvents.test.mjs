@@ -26,7 +26,7 @@ const {
 const { canonicalHostRedirect, canonicalHostRedirects } = hosts;
 const { claimNavigationPageView, installTagConfig, navigationPagePath, resetNavigationPageViews } = pageViews;
 const { KYR_GTAG_READY_EVENT } = gtagReady;
-const { cookieBannerPlacement, shouldShowCookieBanner } = bannerModule;
+const { cookieBannerPlacement, consentFromChoice, focusMainContent, shouldShowCookieBanner } = bannerModule;
 const { analyticsHitLocation, buildInternalHref, readLinkLocation, scrubCampaignParams } = links;
 const {
   QUIZ_ATTEMPT_MAX_AGE_MS,
@@ -410,7 +410,7 @@ test("quiz landing and start fire once per attempt, including consent, resume, a
 });
 
 const GTAG_READY_EVENT = KYR_GTAG_READY_EVENT;
-const BANNER_BODY = "KnowYouRole uses essential browser storage for quiz progress and consent choices. Google Analytics loads only if you allow analytics. No advertising technology is active today.";
+const BANNER_BODY = "We use optional analytics cookies.";
 
 function eventBus() {
   const listeners = new Map();
@@ -630,14 +630,44 @@ test("quiz visits show the existing consent banner without a second page_view co
   const nextConfig = readFileSync(join(root, "next.config.ts"), "utf8");
   assert.equal(banner.includes("!isQuizRoute"), false);
   assert.equal(banner.includes(BANNER_BODY), true);
-  assert.equal(cookieBannerPlacement("/quiz"), "quiz-flow");
-  assert.equal(cookieBannerPlacement("/quiz/start"), "quiz-flow");
-  assert.equal(cookieBannerPlacement("/results"), "results-sheet");
-  assert.equal(cookieBannerPlacement("/"), "bottom-dock");
-  assert.match(banner, /kyr-cookie-quiz-flow relative w-full/);
-  assert.equal(banner.includes("kyr-cookie-quiz-dock"), false);
-  assert.equal(banner.includes("data-kyr-consent"), false);
-  assert.equal(banner.includes("fixed inset-x-0"), false);
+  assert.match(banner, />\s*Reject\s*</);
+  assert.match(banner, />\s*Accept\s*</);
+  assert.equal((banner.match(/className="kyr-cookie-choice"/g) || []).length, 2);
+  assert.equal(banner.includes("Reject non-essential"), false);
+  assert.equal(banner.includes("Accept all"), false);
+  assert.equal(banner.includes("Manage preferences"), false);
+  assert.equal(banner.includes("kyr-cookie-quiz-flow"), false);
+  assert.equal(banner.includes("fixed inset-0"), false);
+  assert.equal(banner.includes("results-sheet"), false);
+  assert.match(banner, /position: fixed/);
+  assert.match(banner, /padding-bottom: var\(--kyr-consent-bar, 0px\)/);
+  assert.match(banner, /data-kyr-consent/);
+  assert.match(banner, /kyr-quiz-viewport/);
+  assert.match(banner, /max-height: 740px/);
+  assert.match(banner, /scroll-margin-bottom: calc\(var\(--kyr-consent-bar, 0px\) \+ 12px\)/);
+  assert.match(banner, /focusMainContent\(document, window\)/);
+  assert.equal(cookieBannerPlacement("/quiz"), "bottom-bar");
+  assert.equal(cookieBannerPlacement("/quiz/start"), "bottom-bar");
+  assert.equal(cookieBannerPlacement("/results"), "bottom-bar");
+  assert.equal(cookieBannerPlacement("/"), "bottom-bar");
+  assert.equal(consentFromChoice("accept", "2026-10-30T00:00:00.000Z").analytics, true);
+  assert.equal(consentFromChoice("accept", "2026-10-30T00:00:00.000Z").marketing, false);
+  assert.equal(consentFromChoice("reject", "2026-10-30T00:00:00.000Z").analytics, false);
+  assert.equal(consentFromChoice("reject", "2026-10-30T00:00:00.000Z").marketing, false);
+  assert.equal(consentFromChoice("reject", "2026-10-30T00:00:00.000Z").necessary, true);
+  const focused = [];
+  const view = {
+    scrollY: 240,
+    scrollTo(x, y) { this.scrollY = y; focused.push(`scroll:${x},${y}`); },
+  };
+  const main = {
+    tabIndex: -1,
+    focus(options) { focused.push(options); view.scrollY = 0; },
+  };
+  assert.equal(focusMainContent({ querySelector: () => main }, view), true);
+  assert.equal(main.tabIndex, -1);
+  assert.deepEqual(focused[0], { preventScroll: true });
+  assert.equal(view.scrollY, 240);
   assert.equal(shouldShowCookieBanner({ showBanner: true, onboardingActive: false }), true);
   assert.equal(shouldShowCookieBanner({ showBanner: true, onboardingActive: true }), false);
   assert.match(analyticsComponent, /INSTALL_CONFIG_JSON/);

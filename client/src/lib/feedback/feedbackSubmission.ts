@@ -79,6 +79,8 @@ export const feedbackRequestSchema = z
     anythingElse: optionalText,
     quiz_type: optionalText,
     quizType: optionalText,
+    resultId: z.string().trim().min(8).max(160).nullish(),
+    result_id: z.string().trim().min(8).max(160).nullish(),
   })
   .strict();
 
@@ -185,4 +187,11 @@ export function feedbackRateKey(headers: Headers): string {
   return headers.get("x-forwarded-for")?.split(",")[0]?.trim()
     || headers.get("x-real-ip")
     || "unknown";
+}
+
+export function requestedResultId(body: FeedbackRequest): string | null {
+  const id = body.resultId ?? body.result_id ?? null;
+  if (!id) return null;
+  const trimmed = id.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
