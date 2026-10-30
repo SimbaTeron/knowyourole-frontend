@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/fonts";
 import "../index.css";
+import { ConsentBeforePaint } from "@/components/ConsentBeforePaint";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { BaseJsonLd } from "@/components/seo/BaseJsonLd";
@@ -19,6 +20,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="kyr-workday" suppressHydrationWarning>
+      <head>
+        <ConsentBeforePaint />
+      </head>
       <body className="kyr-page">
         <GoogleAnalytics />
         <BaseJsonLd />

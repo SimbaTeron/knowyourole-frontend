@@ -3,6 +3,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  CONSENT_BAR_HEIGHT_PX,
+  CONSENT_BAR_WRAP_MAX_PX,
+  CONSENT_BAR_WRAPPED_HEIGHT_PX,
+} from "@/components/ConsentBeforePaint";
 
 export const COOKIE_CONSENT_KEY = "kyr_cookie_consent";
 export const COOKIE_CONSENT_EVENT = "kyr-cookie-consent-updated";
@@ -137,16 +142,21 @@ export function CookieConsentBanner() {
   useLayoutEffect(() => {
     const root = document.documentElement;
     if (!visible) {
-      root.style.removeProperty("--kyr-consent-bar");
-      root.removeAttribute("data-kyr-consent");
+      // The head script reserves the bar before paint. Clearing that here,
+      // before React has decided to show the bar, flashes the quiz full-height.
+      if (readCookieConsent()) {
+        root.style.removeProperty("--kyr-consent-bar");
+        root.removeAttribute("data-kyr-consent");
+      }
       return;
     }
     const bar = barRef.current;
     if (!bar) return;
     const apply = () => {
       const height = Math.ceil(bar.getBoundingClientRect().height);
-      root.style.setProperty("--kyr-consent-bar", `${height}px`);
-      root.setAttribute("data-kyr-consent", "open");
+      const reserved = Math.ceil(parseFloat(getComputedStyle(root).getPropertyValue("--kyr-consent-bar")) || 0);
+      if (reserved !== height) root.style.setProperty("--kyr-consent-bar", `${height}px`);
+      if (root.getAttribute("data-kyr-consent") !== "open") root.setAttribute("data-kyr-consent", "open");
     };
     apply();
     const observer = new ResizeObserver(apply);
@@ -289,6 +299,37 @@ export function CookieConsentBanner() {
             margin-top: 10px !important;
           }
         }
+        @media (max-width: ${CONSENT_BAR_WRAP_MAX_PX}px) {
+          html[data-kyr-consent="open"] .quiz-welcome-screen {
+            justify-content: center !important;
+            padding-top: 12px !important;
+            padding-bottom: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card {
+            padding: 12px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card h2 {
+            margin-top: 8px !important;
+            font-size: 1.35rem !important;
+            line-height: 1.05 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card p,
+          html[data-kyr-consent="open"] .quiz-welcome-card li {
+            margin-top: 8px !important;
+            font-size: 12px !important;
+            line-height: 1.35 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card ul {
+            margin-top: 8px !important;
+            gap: 6px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card li {
+            padding: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card button {
+            margin-top: 10px !important;
+          }
+        }
         .kyr-cookie-bar {
           position: fixed;
           left: 0;
@@ -301,12 +342,17 @@ export function CookieConsentBanner() {
           justify-content: space-between;
           gap: 8px;
           box-sizing: border-box;
+          height: calc(${CONSENT_BAR_HEIGHT_PX}px + env(safe-area-inset-bottom, 0px));
           padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
           border-top: 1px solid rgba(18, 38, 58, 0.22);
           background: #fffdf8;
           color: #12263a;
+          overflow: hidden;
           overflow-anchor: none;
           font: 600 14px/1.35 Manrope, Inter, system-ui, sans-serif;
+        }
+        @media (max-width: ${CONSENT_BAR_WRAP_MAX_PX}px) {
+          .kyr-cookie-bar { height: calc(${CONSENT_BAR_WRAPPED_HEIGHT_PX}px + env(safe-area-inset-bottom, 0px)); }
         }
         .kyr-cookie-line { margin: 0; flex: 1 1 180px; }
         .kyr-cookie-line a { color: #1f5e78; font-weight: 750; }

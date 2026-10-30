@@ -128,6 +128,51 @@ export type FeedbackInsert = {
   quiz_type: string | null;
 };
 
+const ONE_TO_FIVE_FIELDS = [
+  "personality_rating",
+  "career_rating",
+  "mood_lab_rating",
+  "visual_rating",
+  "share_card_rating",
+  "career_relevance",
+] as const;
+
+/** Legacy results modal choices, including the older "mostly" label. */
+const LEGACY_FIT = new Set(["yes", "no", "somewhat", "mostly"]);
+/** Old /feedback yes-no controls. Free text in these columns does not count. */
+const RETAKE_FIT = new Set(["yes", "no", "maybe"]);
+const SHARED_FIT = new Set(["yes", "no", "yes, already!", "plan to", "not really"]);
+const DESIGNED_FIT = new Set(["yes", "no", "yes, totally", "a little off", "not really", "mostly"]);
+
+function isIntegerInRange(value: number | null, min: number, max: number): boolean {
+  return typeof value === "number" && Number.isInteger(value) && value >= min && value <= max;
+}
+
+function choiceToken(value: string | null): string {
+  return value?.trim().toLowerCase() ?? "";
+}
+
+/**
+ * Old-style feedback rows need a real answer: a 1–5 rating (or the old
+ * accuracy 1–10 / recommend 0–10 scales) or a known yes/no fit choice.
+ * Free text, email, and result labels alone are not an answer.
+ */
+export function feedbackRowHasRatingOrFit(row: FeedbackInsert): boolean {
+  if (ONE_TO_FIVE_FIELDS.some((key) => isIntegerInRange(row[key], 1, 5))) return true;
+  if (isIntegerInRange(row.accuracy_score, 1, 10)) return true;
+  if (isIntegerInRange(row.nps_score, 0, 10)) return true;
+  if (/^[1-5]$/.test(choiceToken(row.questions_engaging))) return true;
+  if (/^[1-5]$/.test(choiceToken(row.would_share))) return true;
+  if (LEGACY_FIT.has(choiceToken(row.useful_app))) return true;
+  if (LEGACY_FIT.has(choiceToken(row.results_accurate))) return true;
+  if (LEGACY_FIT.has(choiceToken(row.questions_engaging))) return true;
+  if (LEGACY_FIT.has(choiceToken(row.would_share))) return true;
+  if (RETAKE_FIT.has(choiceToken(row.retake_quiz))) return true;
+  if (SHARED_FIT.has(choiceToken(row.shared_results))) return true;
+  if (DESIGNED_FIT.has(choiceToken(row.feels_designed_for_you))) return true;
+  return false;
+}
+
 export function toFeedbackInsert(body: FeedbackRequest): FeedbackInsert {
   const email = body.email?.trim() ?? "";
   return {
