@@ -40,32 +40,25 @@ function request(body, headers = {}) {
   });
 }
 
-test("the fit choice is yes, somewhat, or no, and the copy stays plain", () => {
+test("the fit choice is yes or no, and the copy stays plain", () => {
   assert.deepEqual(
-    [RESULT_FIT_COPY.yes, RESULT_FIT_COPY.somewhat, RESULT_FIT_COPY.no],
-    ["Yes", "Somewhat", "No"],
+    [RESULT_FIT_COPY.yes, RESULT_FIT_COPY.no],
+    ["Yes", "No"],
   );
   assert.equal(RESULT_FIT_COPY.title, "Did this fit you?");
-  assert.equal(RESULT_FIT_COPY.hint, "One tap is enough. No name needed.");
-  assert.equal(RESULT_FIT_COPY.extraLead, "Thanks. You can add more, or stop here.");
-  assert.equal(RESULT_FIT_COPY.ratingLegend, "How close was it? (optional)");
-  assert.equal(RESULT_FIT_COPY.ratingScale, "1 means not close. 5 means very close.");
-  assert.equal(RESULT_FIT_COPY.commentLabel, "Add a short note (optional)");
-  assert.equal(RESULT_FIT_COPY.commentHint, "Do not include your name, email, or other personal information.");
-  assert.equal(RESULT_FIT_COPY.commentPlaceholder, "What felt right or off?");
-  assert.equal(RESULT_FIT_COPY.send, "Send");
-  assert.equal(RESULT_FIT_COPY.skip, "No thanks");
+  assert.equal(RESULT_FIT_COPY.hint, "Optional. No name needed.");
   assert.equal(RESULT_FIT_COPY.thanksTitle, "Thank you.");
   assert.equal(RESULT_FIT_COPY.thanksDetail, "This helps us see what fits.");
   assert.equal(resultFitRatingLabel(1), "1, not close");
   assert.equal(resultFitRatingLabel(3), "3 of 5");
   assert.equal(resultFitRatingLabel(5), "5, very close");
   assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "not sure" }).ok, false);
+  assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "somewhat" }).ok, false);
   assert.equal(parseResultFitFeedbackRequest({ resultId, fit: "yes", resultType: "INTJ" }).ok, false);
 });
 
 test("a tap is valid without a rating or comment, and the note is capped at 500 characters", () => {
-  const tap = parseResultFitFeedbackRequest({ resultId, fit: "somewhat" });
+  const tap = parseResultFitFeedbackRequest({ resultId, fit: "yes" });
   assert.equal(tap.ok, true);
   assert.equal(tap.value.rating, null);
   assert.equal(tap.value.comment, null);

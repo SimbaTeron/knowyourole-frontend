@@ -15,12 +15,12 @@ import type { QuizScores } from "@/components/Quiz";
 import rolesData from "@/data/roles.json";
 import { trackKyrEvent } from "@/lib/analytics";
 import { calculateMbtiAxisConfidence, resultConfidenceLabel as getResultConfidenceLabel } from "@/lib/scoring";
-import { DirectionFeedbackCard } from "@/components/results/DirectionFeedbackCard";
 import { ResultFitFeedback } from "@/components/results/ResultFitFeedback";
 import { ResultDecisionBrief } from "@/components/results/ResultDecisionBrief";
 import { FrameworkReference } from "@/components/results/FrameworkReference";
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
 import { toSavedResultId } from "@/lib/results/savedResultId";
+import { leaveFeedbackPath } from "@/lib/feedback/scaleFeedback";
 
 // ─── Workday report tokens ───────────────────────────────────────────────────
 // Result data and interactions stay intact; this is the presentation contract for
@@ -4981,6 +4981,8 @@ function OrbitalGlassV2Results({
   const isBroadResult = resultView.workDirectionBroad;
   const v5Direction = resultView.isV5Direction;
   const v5NextSteps = resultView.nextSteps;
+  const savedResultId = toSavedResultId(canonicalResult?.meta);
+  const feedbackSessionId = canonicalResult?.meta.sessionId || sessionId;
   const fallbackCareer = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
   const salaryRole = canonicalCareerDirection
     ? buildPremiumRoleMatchCards({
@@ -5121,8 +5123,8 @@ function OrbitalGlassV2Results({
         .disc-grid { display:grid; grid-template-columns:repeat(2,1fr); border:1px solid rgba(255,255,255,.12); border-radius:23px; overflow:hidden; margin-top:12px; } .quad { min-height:96px; padding:13px; background:rgba(255,255,255,.055); display:flex; flex-direction:column; justify-content:space-between; } .quad.active { background:linear-gradient(135deg,rgba(255,99,207,.30),rgba(82,241,255,.08)); } .quad b { font-size:26px; } .quad span { color:var(--muted); font-size:12px; }
         .share-preview { border-radius:28px; padding:18px; background:linear-gradient(150deg,rgba(82,241,255,.22),rgba(167,119,255,.14),rgba(255,213,129,.12)); border:1px solid rgba(255,255,255,.18); } .share-preview h2 { margin:15px 0; font-size:54px; line-height:.82; letter-spacing:-.085em; } .share-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-top:13px; } .share-btn { border:1px solid rgba(255,255,255,.14); border-radius:17px; padding:13px 10px; color:white; background:rgba(255,255,255,.09); font-weight:900; cursor:pointer; } .share-btn.primary { color:#061018; background:linear-gradient(135deg,#52f1ff,#ffd581); } .share-btn:not(.primary) { color:#12263a !important; background:#f1eadb !important; border-color:rgba(18,38,58,.22) !important; } .share-btn:not(.primary):hover { background:#e6dcc7 !important; } .share-btn:focus-visible { outline:3px solid #12263a; outline-offset:2px; }
         .bottom-nav { position:relative; z-index:40; width:100%; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:8px; border-radius:25px; border:1px solid rgba(255,255,255,.14); background:rgba(5,7,17,.78); backdrop-filter:blur(20px); box-shadow:0 18px 60px rgba(0,0,0,.38); } .bottom-nav button { white-space:nowrap; min-height:44px; text-align:center; border:0; border-radius:18px; padding:8px 5px; color:var(--muted); background:transparent; font-size:10px; font-weight:950; cursor:pointer; } .bottom-nav button i { display:block; font-style:normal; font-size:19px; margin-bottom:3px; } .bottom-nav button.active { color:white; background:rgba(255,255,255,.105); }
-        .result-home-exit { margin:30px 0 18px; padding:20px 16px; text-align:center; border-top:1px solid rgba(18,38,58,.18); } .result-home-exit p { max-width:330px; margin:0 auto 14px; color:#456174; font-size:12px; line-height:1.48; } .result-home-exit p strong { color:#12263a; } .result-home-exit__actions { display:grid; grid-template-columns:1fr; gap:9px; max-width:360px; margin:0 auto; } .result-home-exit button { min-height:46px; border-radius:4px; padding:11px 14px; font:800 13px/1.2 Manrope,Inter,system-ui,sans-serif; cursor:pointer; } .result-home-exit__share { order:-1; min-height:52px !important; border:1px solid #9d3e2b; background:linear-gradient(135deg,#c95f46,#a84732); color:#fffdf8; box-shadow:4px 4px 0 rgba(18,38,58,.18); } .result-home-exit__share:hover { background:linear-gradient(135deg,#b84f38,#913825); transform:translate(-1px,-1px); box-shadow:5px 5px 0 rgba(18,38,58,.20); } .result-home-exit__home { border:1px solid rgba(18,38,58,.26); background:#fffdf8; color:#315f74; } .result-home-exit__home:hover { background:#fff3d7; color:#12263a; } .result-home-exit button:focus-visible { outline:3px solid #ffca42; outline-offset:3px; }
-        @media (min-width:500px) { .result-home-exit__actions { grid-template-columns:1fr 1fr; } .result-home-exit__share { order:0; } }
+        .result-home-exit { margin:30px 0 18px; padding:20px 16px; text-align:center; border-top:1px solid rgba(18,38,58,.18); } .result-home-exit p { max-width:330px; margin:0 auto 14px; color:#456174; font-size:12px; line-height:1.48; } .result-home-exit p strong { color:#12263a; } .result-home-exit__actions { display:grid; grid-template-columns:1fr; gap:9px; max-width:360px; margin:0 auto; } .result-home-exit button, .result-home-exit__feedback { min-height:46px; border-radius:4px; padding:11px 14px; font:800 13px/1.2 Manrope,Inter,system-ui,sans-serif; cursor:pointer; } .result-home-exit__feedback { display:flex; align-items:center; justify-content:center; text-align:center; text-decoration:none; box-sizing:border-box; border:1px solid rgba(18,38,58,.26); background:#fffdf8; color:#315f74; } .result-home-exit__feedback:hover { background:#fff3d7; color:#12263a; } .result-home-exit__share { order:-1; min-height:52px !important; border:1px solid #9d3e2b; background:linear-gradient(135deg,#c95f46,#a84732); color:#fffdf8; box-shadow:4px 4px 0 rgba(18,38,58,.18); } .result-home-exit__share:hover { background:linear-gradient(135deg,#b84f38,#913825); transform:translate(-1px,-1px); box-shadow:5px 5px 0 rgba(18,38,58,.20); } .result-home-exit__home { border:1px solid rgba(18,38,58,.26); background:#fffdf8; color:#315f74; } .result-home-exit__home:hover { background:#fff3d7; color:#12263a; } .result-home-exit button:focus-visible, .result-home-exit__feedback:focus-visible { outline:3px solid #ffca42; outline-offset:3px; }
+        @media (min-width:720px) { .result-home-exit__actions { grid-template-columns:1fr 1fr 1fr; } .result-home-exit__share { order:0; } }
         @media (min-width:760px) { .orbital-results-v2 { display:grid; place-items:start center; } .orb-stage { width:min(calc(100% - 48px),760px); margin-top:18px; min-height:calc(100vh - 36px); border-left:1px solid rgba(18,38,58,.12); border-right:1px solid rgba(18,38,58,.12); } }
 
         /* Workday report treatment: retained interactions, rebuilt visual language. */
@@ -5177,14 +5179,8 @@ function OrbitalGlassV2Results({
               onExploreRole={() => go("role", "decision_brief")}
             />
             <ResultFitFeedback
-              savedResultId={toSavedResultId(canonicalResult?.meta)}
+              savedResultId={savedResultId}
               sessionId={canonicalResult?.meta.sessionId || sessionId}
-            />
-            <DirectionFeedbackCard
-              savedResultId={toSavedResultId(canonicalResult?.meta)}
-              sessionId={canonicalResult?.meta.sessionId || sessionId}
-              directionTitle={roleDirection.title}
-              recommendations={roleDirection.examples.map((role) => role.title)}
             />
             <div className="link-stack">
               <button className="result-link" onClick={() => go("role")}><span className="icon">🏆</span><span><b>Role Fit</b><span>Career direction and adjacent roles.</span></span><span className="arrow">›</span></button>
@@ -5238,6 +5234,7 @@ function OrbitalGlassV2Results({
           <p><strong>Finished exploring?</strong><br />Your result is saved without your name. To keep your own copy, use Share to save an image or PDF.</p>
           <div className="result-home-exit__actions">
             <button className="result-home-exit__share" onClick={() => onShare("result_footer")}>Save or share your result</button>
+            <a className="result-home-exit__feedback" href={leaveFeedbackPath({ resultId: savedResultId, sessionId: feedbackSessionId })}>Leave feedback</a>
             <button className="result-home-exit__home" onClick={returnHome}>← Back to KnowYouRole home</button>
           </div>
           <nav aria-label="Result page links" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 12, fontSize: 12.5 }}>

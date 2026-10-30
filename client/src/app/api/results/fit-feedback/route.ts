@@ -12,10 +12,10 @@ import {
   resultFitLinkFromDto,
   resultFitRateKey,
   type ExistingResultFit,
-  type ResultFit,
   type ResultFitLink,
   type ResultFitRating,
   type ResultFitWritePlan,
+  type StoredResultFit,
 } from "@/lib/feedback/resultFitFeedback";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +42,7 @@ export type ResultFitDeps = {
   >;
 };
 
-function isFit(value: unknown): value is ResultFit {
+function isStoredFit(value: unknown): value is StoredResultFit {
   return value === "yes" || value === "somewhat" || value === "no";
 }
 
@@ -51,7 +51,7 @@ function isRating(value: unknown): value is ResultFitRating {
 }
 
 function existingFromRow(data: { id: string; fit: unknown; rating: number | null; comment: string | null }): ExistingResultFit | "error" {
-  if (!isFit(data.fit)) return "error";
+  if (!isStoredFit(data.fit)) return "error";
   if (data.rating != null && !isRating(data.rating)) return "error";
   return { id: data.id, fit: data.fit, rating: data.rating, comment: data.comment };
 }
