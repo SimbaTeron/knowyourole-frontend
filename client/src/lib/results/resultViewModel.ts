@@ -11,9 +11,10 @@
  */
 import { getMbtiConfidence } from "@/lib/quiz/mbtiConfidence";
 import { isScoringV3, isScoringV5 } from "@/lib/quiz/scoringVersions";
-import { V5_STRESS_SHOW } from "@/lib/quiz/shortformV5Adjustments";
+import { V5_STRESS_SHOW, lifeStageFromResponses, type LifeStage } from "@/lib/quiz/shortformV5Adjustments";
 import { resolveFinalClarity, shouldShowStressSecondary, type FinalClarity } from "@/lib/results/finalClarity";
 import { resultWording } from "@/lib/results/resultWording";
+import { deriveWorkDirectionV5, type CareerFieldBlurb } from "@/lib/results/workDirectionV5";
 
 export const TRAIT_LABELS = {
   O: "Openness",
@@ -181,6 +182,31 @@ export type FocusedDirection = {
   readonly shareTitle: string;
 };
 
+/** Open sections on the simplified results page. Detail labels stay out of these strings. */
+export const RESULT_SECTION_HEADINGS = {
+  work: "How you work best",
+  careers: "Good-fit careers",
+  week: "Try this week",
+  watch: "One thing to watch",
+} as const;
+
+/** Collapsed detail sections. The button label is the only text shown until opened. */
+export const RESULT_DISCLOSURE_LABELS = {
+  labels: "Style labels",
+  scores: "Trait scores",
+  roles: "More career ideas",
+  method: "How this result was read",
+} as const;
+
+export type ResultPageCopy = {
+  readonly summary: string;
+  readonly workBest: string;
+  readonly careers: readonly CareerFieldBlurb[];
+  readonly thisWeek: readonly string[];
+  /** Plain pressure note. Null when stress did not rise high enough to mention. */
+  readonly watch: string | null;
+};
+
 type SharedView = {
   readonly mbtiType: string;
   readonly lightLeanLetters: readonly string[];
@@ -199,6 +225,7 @@ type SharedView = {
   readonly workDirectionBroad: boolean;
   readonly isV5Direction: boolean;
   readonly nextSteps: readonly string[];
+  readonly page: ResultPageCopy;
   readonly traitMeters: readonly { key: TraitKey; label: TraitLabel; band: LeanBand; score: number }[];
   readonly shareEyebrow: "Directions to sample" | "A direction worth testing";
   readonly shareTitle: string;
@@ -468,6 +495,91 @@ function bigFiveSentence(lead: LeadTraits): string {
   return BIG_FIVE_LEAD.single(lead.label);
 }
 
+const DISC_PLAIN: Record<string, string> = {
+  D: "You like to take the lead and get things moving",
+  I: "You like being around people and keeping the energy up",
+  S: "You like a steady pace and staying with what you start",
+  C: "You like clear steps and getting the details right",
+};
+
+const WORK_LEAD: Record<"D" | "I" | "S" | "C", string> = {
+  D: "You do better when you can decide and move, instead of waiting through a long discussion.",
+  I: "You do better with people around and a chance to talk the idea out.",
+  S: "You do better at a steady pace, with people you trust and a plan that stays put.",
+  C: "You do better when the steps are clear and you can finish what you start.",
+};
+
+const WORK_STAGE: Record<"teen" | "college" | "adult", Record<"D" | "I" | "S" | "C", string>> = {
+  teen: {
+    D: "In class or a club, offer to run one part of the project and set the next step.",
+    I: "Study or practice with someone else when you can. Talking it out helps you start.",
+    S: "A set time for homework, with the same routine, will fit you better than rushing at the end.",
+    C: "Write a short checklist for the assignment and leave time to look it over before you turn it in.",
+  },
+  college: {
+    D: "In a group project, be the person who picks the deadline and the next step.",
+    I: "Use a study group, club, or office hours when a class feels stuck.",
+    S: "Put a weekly study block on your calendar. A steady plan will beat a last-minute cram.",
+    C: "Turn the assignment into a checklist and leave time to proof it before you submit.",
+  },
+  adult: {
+    D: "Ask to own one decision this week instead of waiting for a perfect plan.",
+    I: "Talk the task through with someone, then do a piece of it while it is still clear.",
+    S: "Keep a steady rhythm. You do better when the plan is not changing every hour.",
+    C: "Write the steps down and finish one before you start the next.",
+  },
+};
+
+const WATCH_COPY: Record<"teen" | "college" | "adult" | "unknown", string> = {
+  teen: "Pressure can pile up with school. Work in shorter blocks, and take a real break before you are wiped out.",
+  college: "Pressure can pile up around exams and deadlines. Work in shorter blocks, and plan a real break before you are wiped out.",
+  adult: "Pressure can pile up at work. Work in shorter blocks, and take a real break before you are wiped out.",
+  unknown: "Pressure can pile up. Work in shorter blocks, and take a real break before you are wiped out.",
+};
+
+const WEEK_FALLBACK = "Pick one career above and spend half an hour learning what a normal day in it looks like.";
+
+function discKey(code: string): "D" | "I" | "S" | "C" {
+  return code === "D" || code === "I" || code === "S" || code === "C" ? code : "C";
+}
+
+function stageBucket(stage: LifeStage): "teen" | "college" | "adult" | "unknown" {
+  if (stage === "middle" || stage === "high") return "teen";
+  if (stage === "college") return "college";
+  if (stage === "adult") return "adult";
+  return "unknown";
+}
+
+function summarySentence(discCode: string, discLabel: string, title: string, several: boolean): string {
+  const lead = DISC_PLAIN[discCode] ?? `You tend to work in a ${discLabel.toLowerCase()} way`;
+  if (several) return `${lead}, and your answers were close enough that a few kinds of work are worth trying.`;
+  return `${lead}, and the closest work fit from your answers is ${title}.`;
+}
+
+function workBestCopy(discCode: string, stage: LifeStage): string {
+  const key = discKey(discCode);
+  const bucket = stageBucket(stage);
+  const extra = bucket === "unknown"
+    ? "Pick one task this week and finish it before you add another."
+    : WORK_STAGE[bucket][key];
+  return `${WORK_LEAD[key]} ${extra}`;
+}
+
+function watchCopy(stage: LifeStage, show: boolean): string | null {
+  if (!show) return null;
+  return WATCH_COPY[stageBucket(stage)];
+}
+
+function legacyCareerFields(title: string, examples: readonly string[], rationale: string): CareerFieldBlurb[] {
+  const cleanTitle = title.trim();
+  const second = examples.find((item) => item.toLowerCase() !== cleanTitle.toLowerCase());
+  const fields: CareerFieldBlurb[] = [
+    { name: cleanTitle || "A direction to try", reason: rationale.trim() || "This matched your answers more than the other options." },
+  ];
+  if (second) fields.push({ name: second, reason: "This was the next closest match in your answers." });
+  return fields;
+}
+
 export function buildResultView(input: ResultViewInput): ResultView {
   const mbtiType = input.mbtiType || "XXXX";
   const scoringVersion = input.scoringVersion ?? null;
@@ -639,6 +751,29 @@ export function buildResultView(input: ResultViewInput): ResultView {
     .sort((a, b) => b.score - a.score)
     .map((trait) => ({ ...trait, band: leanBand(trait.score) }));
 
+  const stage = lifeStageFromResponses(input.responses);
+  const pageSteps = (isV5Direction ? uniqueTitles([...(input.direction.nextSteps ?? [])]) : []).slice(0, 3);
+  const several = workDirectionBroad || /^several directions/i.test(direction.title);
+  const shownCareerNames = direction.kind === "sample" ? direction.titles : direction.examples;
+  const careers = isV5Direction && input.career && isScoringV5(scoringVersion)
+    ? deriveWorkDirectionV5(input.career, stage, {
+        broad: level === "broad",
+        forceBroad: Boolean(finalClarity.v5?.randomLike || (finalClarity.v5?.fast && finalClarity.v5?.quickOrScattered)),
+        entrepreneurship: Number(input.career.entrepreneurship ?? 0),
+      }).closestFields
+    : legacyCareerFields(
+        direction.title,
+        shownCareerNames,
+        direction.kind === "focused" ? direction.rationale : direction.body,
+      );
+  const page: ResultPageCopy = {
+    summary: summarySentence(input.primaryDisc, discLabel, direction.title, several),
+    workBest: workBestCopy(input.primaryDisc, stage),
+    careers,
+    thisWeek: pageSteps.length > 0 ? pageSteps : [WEEK_FALLBACK],
+    watch: watchCopy(stage, Boolean(stressSecondary || stressSupport)),
+  };
+
   const shared: SharedView = {
     mbtiType,
     lightLeanLetters,
@@ -657,6 +792,7 @@ export function buildResultView(input: ResultViewInput): ResultView {
     workDirectionBroad,
     isV5Direction,
     nextSteps: isV5Direction ? uniqueTitles([...(input.direction.nextSteps ?? [])]) : [],
+    page,
     traitMeters,
     shareEyebrow,
     shareTitle,
@@ -756,6 +892,11 @@ export function renderResultCopy(view: ResultView): string {
   const lines = [
     `clarity: ${view.clarity}`,
     `headline: ${view.headline}`,
+    `page summary: ${view.page.summary}`,
+    `page work: ${view.page.workBest}`,
+    `page careers: ${view.page.careers.map((field) => `${field.name} — ${field.reason}`).join(" | ")}`,
+    `page week: ${view.page.thisWeek.join(" | ")}`,
+    `page watch: ${view.page.watch ?? ""}`,
     `emoji: ${view.emoji}`,
     `chip: ${view.mbtiType} ${view.chipSuffix}`,
     `badge: ${view.typeBadge}`,
@@ -889,6 +1030,13 @@ export function resultViewViolations(view: ResultView): string[] {
     push(!(stoodOut && surfaces.some((line) => /no single standout/i.test(line))), "clear stood-out note is paired with no single standout");
   }
 
+  push(view.page.summary.length > 0 && view.page.workBest.length > 0, "page summary is empty");
+  push(!/\b(MBTI|Big Five|DISC|Stress Reactivity)\b/.test(`${view.page.summary} ${view.page.workBest} ${view.page.watch ?? ""} ${view.page.careers.map((field) => field.reason).join(" ")}`), "plain page copy uses a method term");
+  push(view.page.thisWeek.length >= 1 && view.page.thisWeek.length <= 3, "try-this-week list is not 1 to 3 steps");
+  if (view.isV5Direction) push(view.page.careers.length === 2, "v5 page should show two career fields");
+  for (const field of view.page.careers) {
+    push(field.name.length > 0 && field.reason.length > 20 && field.reason.length < 320, "career field reason is not a short plain line");
+  }
   push(view.shareMeta.includes(view.lead.kind === "none" ? NO_LEAD_CAPTION : view.lead.caption), "share line uses a different lead");
   push(view.ogTitle === view.headline, "OG title does not match the headline");
   push(view.ogDescription === view.whyLine, "OG description does not match the snapshot");

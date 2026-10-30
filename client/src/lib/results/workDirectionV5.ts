@@ -61,7 +61,7 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
     teen: ["Graphic designer", "Illustrator", "Animator", "Musician or music producer", "Photographer"],
     college: ["Design intern", "Junior graphic designer", "Illustration or animation student", "Music production student", "Photo assistant"],
     teenSteps: ["Take art, music, design, or photography class", "Keep a sketchbook, playlist, or folder of your best work", "Join yearbook, the school paper, or theater crew", "Enter one art contest or show your work online"],
-    collegeSteps: ["Build a portfolio of 6–10 pieces you are proud of", "Try a design, art, or media class or major", "Look for a design internship or freelance project"],
+    collegeSteps: ["Build a portfolio of 6–10 pieces you are proud of", "Try a design, art, or media class or major", "Look for a design internship or a small project for a campus group"],
     adultSteps: ["Make 3 small portfolio pieces in the area you like most", "Take a short course in a design tool", "Take one small paid or volunteer design project"],
   },
   creator: {
@@ -69,9 +69,9 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
     phrase: "making videos and content for an audience",
     adult: ["Video editor", "YouTuber or streamer", "Broadcaster or radio host", "Social media producer", "Podcast producer", "Content creator"],
     teen: ["Video editor", "YouTuber or streamer", "Content creator", "Sports or radio broadcaster", "Podcast host"],
-    college: ["Video production student", "Social media assistant", "Junior video editor", "Content creator"],
+    college: ["Video production student", "Social media assistant", "Junior video editor", "Campus film or screen creator"],
     teenSteps: ["Join film, broadcast, or media club", "Make and post 5 short videos and see what you enjoy most", "Learn a free editing app", "Help a club or team with their videos or posts"],
-    collegeSteps: ["Try a film, media, or communications class", "Post on a schedule for 2 months and track what works", "Offer to edit videos for a club, team, or small business"],
+    collegeSteps: ["Try a film, media, or communications class", "Post on a schedule for a month and note what people watch", "Offer to edit videos for a campus group or a local business"],
     adultSteps: ["Publish 6 pieces of content on a schedule", "Learn one editing tool well", "Take a small paid project editing or making content for a business"],
   },
   research: {
@@ -111,7 +111,7 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
     teen: ["Teacher", "Coach", "Camp counselor", "Tutor"],
     college: ["Teaching assistant", "Tutor", "Youth program assistant", "Coach"],
     teenSteps: ["Tutor a younger student or help coach a team", "Be a camp counselor or youth volunteer", "Lead a club activity or workshop"],
-    collegeSteps: ["Tutor or be a teaching assistant", "Work at a camp or after-school program", "Try an education class"],
+    collegeSteps: ["Tutor or be a teaching assistant", "Help with a campus rec or after-school program", "Try an education or coaching class"],
     adultSteps: ["Volunteer to teach or coach once a week", "Run a short training at work", "Look into teaching or training certificates"],
   },
   business: {
@@ -146,6 +146,12 @@ export const V5_LANE_COPY: Record<V5Lane, LaneCopy> = {
   },
 };
 
+/** Two closest career fields, with a plain reason drawn from the work answers. */
+export type CareerFieldBlurb = {
+  name: string;
+  reason: string;
+};
+
 export type V5Direction = {
   laneKey: string;
   title: string;
@@ -155,6 +161,7 @@ export type V5Direction = {
   lanes: V5Lane[];
   broad: boolean;
   laneScores: V5LaneScores;
+  closestFields: readonly [CareerFieldBlurb, CareerFieldBlurb];
 };
 
 const MIN_EVIDENCE = 28;
@@ -220,13 +227,63 @@ function comboFor(first: V5Lane, second: V5Lane, stage: LifeStage = "unknown"): 
   return COMBOS.find((c) => c.first.includes(first) && c.second.includes(second) && (!c.adultOnly || stage === "adult"));
 }
 
-/** Business-ownership lanes: an independent streak adds an "own your own" example and step. */
-const OWNABLE: Partial<Record<V5Lane, { adult: string; teen: string; step: string }>> = {
-  trades: { adult: "Own a trades business", teen: "Own a trades business someday", step: "Write a one-page plan for your own trades business (services, prices, first customers)" },
-  artDesign: { adult: "Own a studio or creative business", teen: "Run an online art or design shop", step: "Sell or show 3 pieces and see what people want" },
-  creator: { adult: "Run your own creator business", teen: "Grow your own channel as a small business", step: "List three ways your content could earn money" },
-  care: { adult: "Own a care business (clinic, grooming, training)", teen: "Start a pet-sitting or tutoring service", step: "Look into what it takes to open a small care business" },
+/**
+ * Business-ownership lanes: an independent streak adds an "own your own" example and step.
+ * Middle school and high school share the teen line. College has its own line so it does not
+ * inherit the teen "someday" wording. The step for teens and adults stays shared.
+ */
+const OWNABLE: Partial<Record<V5Lane, { adult: string; teen: string; college: string; step: string; collegeStep: string }>> = {
+  trades: {
+    adult: "Own a trades business",
+    teen: "Own a trades business someday",
+    college: "Own a trades business after you finish training",
+    step: "Write a one-page plan for your own trades business (services, prices, first customers)",
+    collegeStep: "Talk with a trades business owner about licensing, pricing, and your first customers",
+  },
+  artDesign: {
+    adult: "Own a studio or creative business",
+    teen: "Run an online art or design shop",
+    college: "Start a small design business while you are in school",
+    step: "Sell or show 3 pieces and see what people want",
+    collegeStep: "Sell or show 3 pieces on campus or online and note what people ask to buy",
+  },
+  creator: {
+    adult: "Run your own creator business",
+    teen: "Grow your own channel as a small business",
+    college: "Turn your channel or client work into a small business",
+    step: "List three ways your content could earn money",
+    collegeStep: "List three ways your videos or posts could earn money while you are in school",
+  },
+  care: {
+    adult: "Own a care business (clinic, grooming, training)",
+    teen: "Start a pet-sitting or tutoring service",
+    college: "Start a campus care service, like tutoring or pet care",
+    step: "Look into what it takes to open a small care business",
+    collegeStep: "Look into the license and training you would need before you open a small care business",
+  },
 };
+
+function ownExample(own: NonNullable<(typeof OWNABLE)[V5Lane]>, stage: "teen" | "college" | "adult"): string {
+  if (stage === "adult") return own.adult;
+  if (stage === "college") return own.college;
+  return own.teen;
+}
+
+function ownStep(own: NonNullable<(typeof OWNABLE)[V5Lane]>, stage: "teen" | "college" | "adult"): string {
+  return stage === "college" ? own.collegeStep : own.step;
+}
+
+function careerFieldReason(phrase: string, place: "first" | "second", broad: boolean): string {
+  if (broad && place === "first") return `One of your closest matches: ${phrase}.`;
+  if (broad && place === "second") return `The other close match: ${phrase}.`;
+  if (place === "first") return `Your answers pointed here most: ${phrase}.`;
+  return `Next closest: ${phrase}.`;
+}
+
+function laneField(lane: V5Lane, place: "first" | "second", broad: boolean): CareerFieldBlurb {
+  const copy = V5_LANE_COPY[lane];
+  return { name: copy.title, reason: careerFieldReason(copy.phrase, place, broad) };
+}
 
 /**
  * Pairs of work areas that usually move together. When both lead and are close, the result
@@ -300,6 +357,7 @@ export function deriveWorkDirectionV5(
       lanes,
       broad: true,
       laneScores,
+      closestFields: [laneField(lanes[0], "first", true), laneField(lanes[1], "second", true)],
     };
   }
 
@@ -314,7 +372,7 @@ export function deriveWorkDirectionV5(
   const ownStreak = Boolean(own) && !merged && (laneScores.business >= 35 || Number(options.entrepreneurship ?? 0) >= 70) && !(combo && combo.second.includes("business"));
   const lead = [
     ...(combo ? combo[sk].slice(0, 2) : []),
-    ...(ownStreak && own ? [sk === "adult" ? own.adult : own.teen] : []),
+    ...(ownStreak && own ? [ownExample(own, sk)] : []),
   ];
   const baseList = merged ? V5_MERGED[merged][sk] : examplesFor(first, stage);
   const base = baseList.filter((e) => !lead.includes(e));
@@ -327,11 +385,21 @@ export function deriveWorkDirectionV5(
       ? Math.min(8, lead.length + base.length)
       : Math.max(4, Math.min(5, lead.length + 3));
   const examples = [...lead, ...base].slice(0, exampleCap);
-  const extraStep = combo?.step?.[sk] ?? (ownStreak && own ? own.step : undefined);
+  const extraStep = combo?.step?.[sk] ?? (ownStreak && own ? ownStep(own, sk) : undefined);
   const baseSteps = merged ? [...stepsFor(first, stage).slice(0, 2), stepsFor(second, stage)[0]] : stepsFor(first, stage).slice(0, 3);
   const nextSteps = extraStep ? [extraStep, ...baseSteps.slice(0, 2)] : baseSteps;
   const phrase = merged ? V5_MERGED[merged].phrase : V5_LANE_COPY[first].phrase;
   const pull = partnerStrong ? `, with some pull toward ${V5_LANE_COPY[partner].phrase}` : "";
+  const firstField: CareerFieldBlurb = combo?.title
+    ? {
+        name: combo.title,
+        reason: `Your answers pointed most to ${phrase}, and also toward ${V5_LANE_COPY[partner].phrase}.`,
+      }
+    : merged
+      ? { name: V5_MERGED[merged].title, reason: careerFieldReason(V5_MERGED[merged].phrase, "first", false) }
+      : laneField(first, "first", false);
+  // A merged pair, or a named combo, already covers the runner-up. The second field is the next area.
+  const secondLane = merged && combo?.title ? afterRunner : merged ? third : combo?.title ? afterRunner : second;
   return {
     laneKey: merged ? `v5:${merged}` : `v5:${first}`,
     // A combined direction gets a heading that matches its examples (e.g. law examples under "Law, policy, and research").
@@ -342,6 +410,7 @@ export function deriveWorkDirectionV5(
     lanes: [...primary, partner],
     broad: false,
     laneScores,
+    closestFields: [firstField, laneField(secondLane, "second", false)],
   };
 }
 

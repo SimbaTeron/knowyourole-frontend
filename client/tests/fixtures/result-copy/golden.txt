@@ -1,6 +1,11 @@
 ===== P08 clear =====
 clarity: clear
 headline: Spark Connector
+page summary: You like being around people and keeping the energy up, and the closest work fit from your answers is Creative work: art, design, music, and video.
+page work: You do better with people around and a chance to talk the idea out. Talk the task through with someone, then do a piece of it while it is still clear.
+page careers: Creative work: art, design, music, and video — Your answers pointed here most: art, design, music, and making videos or content for people to see or hear. | Health and caring for people — Next closest: helping and caring for people directly.
+page week: Make 3 small portfolio pieces in the area you like most | Take a short course in a design tool | Publish 6 pieces of content on a schedule
+page watch: 
 emoji: ✨
 chip: ENFP Campaigner
 badge: light lean on E/I
@@ -36,6 +41,11 @@ roles: Graphic designer | Video editor | Content creator or streamer | Illustrat
 ===== P34 clear =====
 clarity: clear
 headline: Reliable Detail Guardian
+page summary: You like clear steps and getting the details right, and the closest work fit from your answers is Skilled trades: building, fixing, and installing.
+page work: You do better when the steps are clear and you can finish what you start. Turn the assignment into a checklist and leave time to proof it before you submit.
+page careers: Skilled trades: building, fixing, and installing — Your answers pointed here most: building and fixing real things with tools. | Organizing and running operations — Next closest: organizing things and keeping them running smoothly.
+page week: Look at apprenticeships (electrical, plumbing, HVAC) that pay while you learn | Try a community college or trade-school certificate | Spend a day shadowing someone in the trade
+page watch: 
 emoji: 📋
 chip: ISTJ Logistician
 badge: 
@@ -71,6 +81,11 @@ roles: Electrician apprentice | Carpenter apprentice | Plumbing apprentice | Wel
 ===== P53 mixed =====
 clarity: mixed
 headline: Reliable Detail Guardian
+page summary: You like to take the lead and get things moving, and the closest work fit from your answers is Skilled trades: building, fixing, and installing.
+page work: You do better when you can decide and move, instead of waiting through a long discussion. In class or a club, offer to run one part of the project and set the next step.
+page careers: Skilled trades: building, fixing, and installing — Your answers pointed here most: building and fixing real things with tools. | Leading teams and projects — Next closest: taking charge and leading people.
+page week: Take shop, auto, or construction class if your school has it | Join a robotics, build, or maker club | Ask about career and technical (CTE) programs or trade-school visits
+page watch: 
 emoji: 📋
 chip: ISTJ Logistician
 badge: light lean on J/P
@@ -106,6 +121,11 @@ roles: Electrician | Carpenter | Plumber | Welder | Auto mechanic | Robotics or 
 ===== P125 mixed =====
 clarity: mixed
 headline: Care Connector
+page summary: You like a steady pace and staying with what you start, and your answers were close enough that a few kinds of work are worth trying.
+page work: You do better at a steady pace, with people you trust and a plan that stays put. Put a weekly study block on your calendar. A steady plan will beat a last-minute cram.
+page careers: Skilled trades: building, fixing, and installing — One of your closest matches: building and fixing real things with tools. | Teaching, coaching, and youth work — The other close match: teaching, coaching, and helping people learn.
+page week: Look at apprenticeships (electrical, plumbing, HVAC) that pay while you learn | Tutor or be a teaching assistant | Shadow a nurse, vet, therapist, or counselor
+page watch: 
 emoji: 🤝
 chip: ESFJ Caregiver
 badge: 
@@ -141,6 +161,11 @@ roles: Electrician apprentice | Teaching assistant | Nursing student
 ===== P05 broad =====
 clarity: broad
 headline: A broad, balanced pattern
+page summary: You like a steady pace and staying with what you start, and your answers were close enough that a few kinds of work are worth trying.
+page work: You do better at a steady pace, with people you trust and a plan that stays put. A set time for homework, with the same routine, will fit you better than rushing at the end.
+page careers: Technology and computers — One of your closest matches: computers, code, and technology. | Research and science — The other close match: figuring out how things work and finding answers.
+page week: Take a computer science class | Take a science or statistics class | Join DECA, FBLA, or a business club
+page watch: 
 emoji: ◈
 chip: ISFJ ISFJ-leaning pattern
 badge: light lean on T/F
@@ -173,6 +198,11 @@ roles: Software developer | Scientist | Business owner
 ===== P149 broad =====
 clarity: broad
 headline: A broad, balanced pattern
+page summary: You like to take the lead and get things moving, and your answers were close enough that a few kinds of work are worth trying.
+page work: You do better when you can decide and move, instead of waiting through a long discussion. In class or a club, offer to run one part of the project and set the next step.
+page careers: Skilled trades: building, fixing, and installing — One of your closest matches: building and fixing real things with tools. | Leading teams and projects — The other close match: taking charge and leading people.
+page week: Take shop, auto, or construction class if your school has it | Run for a club or student government role | Take art, music, design, or photography class
+page watch: 
 emoji: ◈
 chip: ISTJ ISTJ-leaning pattern
 badge: directional sketch

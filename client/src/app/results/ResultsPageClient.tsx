@@ -2,7 +2,7 @@
 import { DISC_LABELS, TRAIT_LABELS, buildResultView, leanBand } from "@/lib/results/resultViewModel";
 import { fitWrappedText, SHARE_SIGNAL_BOX, SHARE_WHY_BOX } from "@/lib/results/shareCardLayout";
 import { ResultBigFiveView } from "@/app/results/views/ResultBigFiveView";
-import { ResultPortrait } from "@/app/results/views/ResultPortrait";
+import { ResultSummary } from "@/app/results/views/ResultSummary";
 import { ResultShareView } from "@/app/results/views/ResultShareView";
 
 import { useState, useEffect, useRef } from "react";
@@ -16,7 +16,6 @@ import rolesData from "@/data/roles.json";
 import { trackKyrEvent } from "@/lib/analytics";
 import { calculateMbtiAxisConfidence, resultConfidenceLabel as getResultConfidenceLabel } from "@/lib/scoring";
 import { ResultFitFeedback } from "@/components/results/ResultFitFeedback";
-import { ResultDecisionBrief } from "@/components/results/ResultDecisionBrief";
 import { FrameworkReference } from "@/components/results/FrameworkReference";
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
 import { toSavedResultId } from "@/lib/results/savedResultId";
@@ -5157,37 +5156,48 @@ function OrbitalGlassV2Results({
           <span className="orb-pill">Your Result</span>
         </header>
 
-        <p className="result-disclaimer" role="note" style={{ margin: "8px auto 12px", maxWidth: 560, fontSize: 14, lineHeight: 1.45, color: "#12263a", fontWeight: 600, textAlign: "center" }}>A reflection starting point, not a diagnosis, hiring screen, or prediction. Bars show approximate leanings, not measurements. <a href="/methodology" style={{ color: "inherit", textDecoration: "underline" }}>How this works</a></p>
+        {view !== "main" && (
+          <p className="result-disclaimer" role="note" style={{ margin: "8px auto 12px", maxWidth: 560, fontSize: 14, lineHeight: 1.45, color: "#12263a", fontWeight: 600, textAlign: "center" }}>A reflection starting point, not a diagnosis, hiring screen, or prediction. Bars show approximate leanings, not measurements. <a href="/methodology" style={{ color: "inherit", textDecoration: "underline" }}>How this works</a></p>
+        )}
 
         {view === "main" && (
           <section>
-            <article className="portrait-card">
-              <div className="card-head"><div className="eyebrow">Your result</div><div className="avatar">{resultView.emoji}</div></div>
-              <ResultPortrait view={resultView} />
-            </article>
-            <ResultDecisionBrief
-              result={canonicalResult}
-              clarityLevel={resultView.clarity}
-              hideRepeats={v5Direction}
-              fallback={{
+            <ResultSummary
+              view={resultView}
+              notice={<p className="result-disclaimer" role="note" style={{ margin: "12px 0 0", maxWidth: 560, fontSize: 14, lineHeight: 1.45, color: "#12263a", fontWeight: 600 }}>A reflection starting point, not a diagnosis, hiring screen, or prediction. Bars show approximate leanings, not measurements. <a href="/methodology" style={{ color: "inherit", textDecoration: "underline" }}>How this works</a></p>}
+              bigFive={bigFive}
+              disc={disc}
+              primaryDisc={primaryDisc}
+              discDesc={discDesc}
+              discRows={(["D", "I", "S", "C"] as const).map((key) => ({
+                key,
+                label: DISC_LABELS[key],
+                band: discLeanBand(disc[key], primaryDisc === key, secondaryDiscEntry?.[1] ?? 0),
+              }))}
+              mbtiAxes={mbtiDimensions.map((axis) => ({
+                label: axis.label,
+                leftLetter: axis.leftLetter,
+                rightLetter: axis.rightLetter,
+                dominant: axis.dominant,
+                words: axis.words,
+                pct: axis.pct,
+                light: lightLeanLetters.has(axis.dominant),
+              }))}
+              decisionBrief={{
+                result: canonicalResult,
                 directionTitle: roleDirection.title,
                 rationale: roleDirection.rationale,
                 examples: roleDirection.examples.map((role) => ({ title: role.title, reasoning: role.desc })),
                 starterMove: primaryRole.firstMove,
                 watchOut: primaryRole.skill,
+                onExploreRole: () => go("role", "decision_brief"),
               }}
-              onExploreRole={() => go("role", "decision_brief")}
+              onOpenFramework={(framework) => trackKyrEvent("framework_reference_opened", { result_page: "orbital_glass_v2", framework, mbti_type: mbtiType, primary_disc: primaryDisc })}
             />
             <ResultFitFeedback
               savedResultId={savedResultId}
               sessionId={canonicalResult?.meta.sessionId || sessionId}
             />
-            <div className="link-stack">
-              <button className="result-link" onClick={() => go("role")}><span className="icon">🏆</span><span><b>Role Fit</b><span>Career direction and adjacent roles.</span></span><span className="arrow">›</span></button>
-              <button className="result-link" onClick={() => go("mbti")}><span className="icon">♟</span><span><b>MBTI-style</b><span>Your cognitive operating pattern.</span></span><span className="arrow">›</span></button>
-              <button className="result-link" onClick={() => go("bigfive")}><span className="icon">🌌</span><span><b>Big Five</b><span>Your trait gravity and environment fit.</span></span><span className="arrow">›</span></button>
-              <button className="result-link" onClick={() => go("disc")}><span className="icon">📊</span><span><b>DISC</b><span>Your visible work behavior.</span></span><span className="arrow">›</span></button>
-            </div>
           </section>
         )}
 
