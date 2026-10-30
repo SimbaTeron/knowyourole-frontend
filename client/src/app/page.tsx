@@ -316,6 +316,18 @@ export default function Home() {
         @media (max-width: 360px) {
           .hero-title { min-height: 7lh; }
         }
+
+        @media (max-width: 414px) and (max-height: 740px) {
+          .hero-title {
+            min-height: 0;
+            font-size: 1.65rem;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+          }
+          .hero-subtitle { margin-top: 10px; font-size: 0.9rem; line-height: 1.35; }
+          .eyebrow { margin-bottom: 8px; }
+          .hero-section .primary-cta { margin-top: 12px; }
+        }
       `}</style>
 
       <AppHeader />

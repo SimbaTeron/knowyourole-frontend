@@ -58,15 +58,85 @@ export function isScaleRating(value: number | null | undefined): value is 1 | 2 
   return value == null || (SCALE_VALUES as readonly number[]).includes(value);
 }
 
-/** Result and session ids from the results page. Omitted when the result was not saved. */
-export function leaveFeedbackPath(input: { resultId?: string | null; sessionId?: string | null }): string {
-  const params = new URLSearchParams();
-  const resultId = input.resultId?.trim() ?? "";
-  const sessionId = input.sessionId?.trim() ?? "";
-  if (resultId) params.set("resultId", resultId);
-  if (sessionId) params.set("sessionId", sessionId);
-  const query = params.toString();
-  return query ? `/feedback?${query}` : "/feedback";
+/** Leave feedback never puts a result or session id in the URL. */
+export function leaveFeedbackPath(): string {
+  return "/feedback";
+}
+
+export const FEEDBACK_LINK_KEY = "kyr_feedback_link";
+
+export type FeedbackLink = { resultId: string | null; sessionId: string | null };
+
+export function parseFeedbackLink(raw: string | null): FeedbackLink {
+  const empty: FeedbackLink = { resultId: null, sessionId: null };
+  if (!raw) return empty;
+  try {
+    const parsed = JSON.parse(raw) as { resultId?: unknown; sessionId?: unknown };
+    const resultId = typeof parsed.resultId === "string" ? parsed.resultId.trim() : "";
+    const sessionId = typeof parsed.sessionId === "string" ? parsed.sessionId.trim() : "";
+    return {
+      resultId: resultId.length >= 8 ? resultId : null,
+      sessionId: sessionId.length > 0 ? sessionId : null,
+    };
+  } catch {
+    return empty;
+  }
+}
+
+export function writeFeedbackLink(link: FeedbackLink): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (!link.resultId) {
+      sessionStorage.removeItem(FEEDBACK_LINK_KEY);
+      return;
+    }
+    sessionStorage.setItem(FEEDBACK_LINK_KEY, JSON.stringify({
+      resultId: link.resultId,
+      sessionId: link.sessionId,
+    }));
+  } catch {
+    /* private mode can reject storage; the ratings can still be saved without a link */
+  }
+}
+
+export function readFeedbackLink(): FeedbackLink {
+  if (typeof window === "undefined") return { resultId: null, sessionId: null };
+  try {
+    return parseFeedbackLink(sessionStorage.getItem(FEEDBACK_LINK_KEY));
+  } catch {
+    return { resultId: null, sessionId: null };
+  }
+}
+
+const SCALE_BODY_KEYS = new Set([
+  "quiz_type",
+  "quizType",
+  "questions_engaging",
+  "questionsEngaging",
+  "personality_rating",
+  "personalityRating",
+  "career_rating",
+  "careerRating",
+  "would_share",
+  "wouldShare",
+  "career_relevance",
+  "careerRelevance",
+  "resultId",
+  "result_id",
+]);
+
+/** Scale posts may only carry the five ratings and an optional saved-result id. */
+export function scaleBodyHasExtraFields(body: unknown): boolean {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return true;
+  return Object.keys(body).some((key) => !SCALE_BODY_KEYS.has(key));
+}
+
+export function scaleRatingsAreEmpty(row: ScaleRatingRow): boolean {
+  return row.questions_engaging == null
+    && row.personality_rating == null
+    && row.career_rating == null
+    && row.would_share == null
+    && row.career_relevance == null;
 }
 
 export function scalePayload(answers: ScaleAnswers, resultId: string | null) {

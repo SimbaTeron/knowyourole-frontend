@@ -9,6 +9,9 @@ export const BARE_CAMPAIGN_QUERY_KEYS = ["source", "medium", "campaign", "term",
 
 const BARE_CAMPAIGN_QUERY_KEY_SET = new Set<string>(BARE_CAMPAIGN_QUERY_KEYS);
 
+/** Result and session ids must never ride along on a GA page_location or page_path. */
+const PRIVATE_HIT_QUERY_KEYS = new Set(["resultid", "result_id", "sessionid", "session_id"]);
+
 export type InternalLinkParams = Record<string, string | number | boolean | null | undefined>;
 
 function isUtmKey(key: string): boolean {
@@ -75,11 +78,11 @@ export function buildInternalHref(path: string, params?: InternalLinkParams): st
   return `${url.origin}${relative}`;
 }
 
-/** URL attached to a GA hit. Keeps real utm_* acquisition and drops bare campaign keys. */
+/** URL attached to a GA hit. Keeps real utm_* acquisition and drops bare campaign keys and result or session ids. */
 export function analyticsHitLocation(href: string): { page_path: string; page_location: string } {
   const url = new URL(href);
   for (const key of [...url.searchParams.keys()]) {
-    if (isBareCampaignKey(key)) url.searchParams.delete(key);
+    if (isBareCampaignKey(key) || PRIVATE_HIT_QUERY_KEYS.has(key.toLowerCase())) url.searchParams.delete(key);
   }
   const query = url.searchParams.toString();
   const page_path = `${url.pathname}${query ? `?${query}` : ""}`;

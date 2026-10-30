@@ -76,6 +76,10 @@ test("the fit card is hidden unless the result id was saved, and its rating is a
     savedResultId: saved,
     sessionId: "session-1",
   }));
+  const fitSource = readFileSync(join(clientRoot, "src/components/results/ResultFitFeedback.tsx"), "utf8");
+  assert.match(fitSource, /phase === "thanks" \? RESULT_FIT_COPY\.thanksDetail/);
+  assert.equal(fitSource.includes("${RESULT_FIT_COPY.thanksTitle}"), false);
+
   assert.match(shown, /Did this fit you\?/);
   assert.match(shown, /Optional\. No name needed\./);
   assert.match(shown, />Yes</);

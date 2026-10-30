@@ -20,7 +20,7 @@ import { ResultDecisionBrief } from "@/components/results/ResultDecisionBrief";
 import { FrameworkReference } from "@/components/results/FrameworkReference";
 import type { ResultDTO } from "@/lib/results/buildResultDTO";
 import { toSavedResultId } from "@/lib/results/savedResultId";
-import { leaveFeedbackPath } from "@/lib/feedback/scaleFeedback";
+import { leaveFeedbackPath, writeFeedbackLink } from "@/lib/feedback/scaleFeedback";
 
 // ─── Workday report tokens ───────────────────────────────────────────────────
 // Result data and interactions stay intact; this is the presentation contract for
@@ -5234,7 +5234,7 @@ function OrbitalGlassV2Results({
           <p><strong>Finished exploring?</strong><br />Your result is saved without your name. To keep your own copy, use Share to save an image or PDF.</p>
           <div className="result-home-exit__actions">
             <button className="result-home-exit__share" onClick={() => onShare("result_footer")}>Save or share your result</button>
-            <a className="result-home-exit__feedback" href={leaveFeedbackPath({ resultId: savedResultId, sessionId: feedbackSessionId })}>Leave feedback</a>
+            <a className="result-home-exit__feedback" href={leaveFeedbackPath()} onClick={() => writeFeedbackLink({ resultId: savedResultId, sessionId: feedbackSessionId ?? null })}>Leave feedback</a>
             <button className="result-home-exit__home" onClick={returnHome}>← Back to KnowYouRole home</button>
           </div>
           <nav aria-label="Result page links" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 12, fontSize: 12.5 }}>

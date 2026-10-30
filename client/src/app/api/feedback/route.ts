@@ -15,6 +15,8 @@ import {
   SCALE_QUIZ_TYPE,
   linkScaleFeedbackToResult,
   normalizeScaleRatings,
+  scaleBodyHasExtraFields,
+  scaleRatingsAreEmpty,
 } from '@/lib/feedback/scaleFeedback';
 
 const corsHeaders = {
@@ -117,8 +119,9 @@ export async function postPublicFeedback(req: NextRequest, deps?: FeedbackDeps) 
 
     let row = toFeedbackInsert(parsed.data);
     if (isScale(parsed.data)) {
+      if (scaleBodyHasExtraFields(body)) return json({ error: 'Invalid feedback payload' }, 400);
       const ratings = normalizeScaleRatings(parsed.data);
-      if (!ratings.ok) return json({ error: 'Invalid feedback payload' }, 400);
+      if (!ratings.ok || scaleRatingsAreEmpty(ratings.value)) return json({ error: 'Invalid feedback payload' }, 400);
       row = { ...row, ...ratings.value, quiz_type: SCALE_QUIZ_TYPE };
       const resultId = requestedResultId(parsed.data);
       if (resultId) {
@@ -136,6 +139,8 @@ export async function postPublicFeedback(req: NextRequest, deps?: FeedbackDeps) 
         }
         row = linkScaleFeedbackToResult(row, { id: found.row.id, sessionId: found.row.session_id });
       }
+    } else if (Object.values(row).every((value) => value == null || value === "")) {
+      return json({ error: 'Invalid feedback payload' }, 400);
     }
 
     const saved = await (deps ?? defaultDeps()).insert(row);

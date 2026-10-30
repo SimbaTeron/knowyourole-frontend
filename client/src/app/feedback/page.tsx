@@ -1,14 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { AppFooter } from '@/components/layout/AppFooter';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { RatingRadios } from '@/components/results/RatingRadios';
 import {
   SCALE_QUESTIONS,
   emptyScaleAnswers,
+  readFeedbackLink,
   scaleChoiceLabel,
   scalePayload,
+  writeFeedbackLink,
   type ScaleAnswers,
   type ScaleKey,
 } from '@/lib/feedback/scaleFeedback';
@@ -30,12 +32,24 @@ export default function FeedbackPage() {
   const errorRef = useRef<HTMLParagraphElement>(null);
   const thanksRef = useRef<HTMLHeadingElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const stored = readFeedbackLink();
     const params = new URLSearchParams(window.location.search);
-    const result = params.get('resultId')?.trim() || '';
-    const session = params.get('sessionId')?.trim() || '';
-    setResultId(result.length >= 8 ? result : null);
-    setSessionId(session || null);
+    const fromUrlResult = params.get('resultId')?.trim() || params.get('result_id')?.trim() || '';
+    const fromUrlSession = params.get('sessionId')?.trim() || params.get('session_id')?.trim() || '';
+    const nextResult = stored.resultId || (fromUrlResult.length >= 8 ? fromUrlResult : null);
+    const nextSession = stored.sessionId || fromUrlSession || null;
+    setResultId(nextResult);
+    setSessionId(nextSession);
+    if (nextResult) writeFeedbackLink({ resultId: nextResult, sessionId: nextSession });
+    if (params.has('resultId') || params.has('result_id') || params.has('sessionId') || params.has('session_id')) {
+      params.delete('resultId');
+      params.delete('result_id');
+      params.delete('sessionId');
+      params.delete('session_id');
+      const query = params.toString();
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
+    }
   }, []);
 
   useEffect(() => {

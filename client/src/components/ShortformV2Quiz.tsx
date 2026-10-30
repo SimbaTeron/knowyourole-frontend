@@ -271,10 +271,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     const focusTimer = window.setTimeout(() => {
       if (restoreAnswerFocusRef.current) {
         restoreAnswerFocusRef.current = false;
-        answerButtonRefs.current[selectedIndex >= 0 ? selectedIndex : 0]?.focus();
+        answerButtonRefs.current[selectedIndex >= 0 ? selectedIndex : 0]?.focus({ preventScroll: true });
         return;
       }
-      questionHeadingRef.current?.focus();
+      questionHeadingRef.current?.focus({ preventScroll: true });
     }, 320);
     return () => window.clearTimeout(focusTimer);
   }, [currentIndex, currentQuestion.answers, hasStarted, selectedAnswer]);
@@ -421,10 +421,9 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
 
   if (!hasStarted) {
     return (
-      <div className="kyr-quiz-viewport relative flex min-h-[100dvh] items-center overflow-hidden bg-[#050510] px-4 py-8 text-white sm:px-6">
+      <div className="kyr-quiz-viewport quiz-welcome-screen relative flex min-h-[100dvh] items-center overflow-hidden bg-[#050510] px-4 py-8 text-white sm:px-6">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_16%,rgba(34,211,238,0.18),transparent_31%),radial-gradient(circle_at_82%_72%,rgba(168,85,247,0.18),transparent_35%)]" />
-        <main className="relative mx-auto w-full max-w-2xl" tabIndex={-1}>
-        <section aria-labelledby="shortform-welcome-heading" className="relative w-full rounded-[30px] border border-white/15 bg-[#0b1222]/92 p-5 shadow-[0_28px_92px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:rounded-[38px] sm:p-9">
+        <section data-kyr-focus-root="" tabIndex={-1} aria-labelledby="shortform-welcome-heading" className="quiz-welcome-card relative mx-auto w-full max-w-2xl rounded-[30px] border border-white/15 bg-[#0b1222]/92 p-5 shadow-[0_28px_92px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:rounded-[38px] sm:p-9">
           <p className="quiz-welcome-kicker text-[11px] font-black uppercase tracking-[0.28em] text-cyan-200">KnowYouRole · work-style exploration</p>
           <h2 id="shortform-welcome-heading" className="mt-4 max-w-xl text-3xl font-black tracking-[-0.055em] text-white sm:text-5xl">{`${QUESTION_COUNT} grounded questions. One practical starting point.`}</h2>
           <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-white/72 sm:text-base sm:leading-7">Answer for your usual work pattern—not your ideal day or the answer that sounds impressive. There are no right answers.</p>
@@ -435,13 +434,12 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
           <p className="mt-5 text-sm leading-6 text-white/58">Your responses are interpreted as work-style and career-exploration signals—not a diagnosis, hiring screen, or career prescription.</p>
           <button type="button" onClick={handleStart} className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-300 px-5 py-3 text-sm font-black text-[#06101f] shadow-[0_16px_42px_rgba(34,211,238,0.25)] transition hover:brightness-105 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-cyan-200 sm:w-auto">{`Start the ${QUESTION_COUNT} questions`}</button>
         </section>
-        </main>
       </div>
     );
   }
 
   return (
-    <div className="kyr-quiz-viewport shortform-v2-motion relative min-h-[100dvh] overflow-hidden bg-[#050510] text-white">
+    <div className="kyr-quiz-viewport quiz-question-screen shortform-v2-motion relative min-h-[100dvh] overflow-hidden bg-[#050510] text-white">
       <style>{`
         .shortform-v2-layout { grid-template-columns: 1fr; }
         .shortform-v2-timeline-grid {
@@ -525,11 +523,11 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
             transition={{ duration: 0.28, ease: "easeOut" }}
             className="shortform-v2-layout grid w-full gap-2.5 lg:items-stretch xl:gap-4"
           >
-            <section className="relative min-h-[214px] overflow-hidden rounded-[24px] border border-cyan-100/10 bg-[#070c18]/92 p-3.5 shadow-[0_24px_78px_rgba(0,0,0,0.46)] ring-1 ring-white/[0.04] backdrop-blur-2xl sm:min-h-[360px] sm:rounded-[28px] sm:p-5 lg:min-h-[430px] lg:p-6 xl:min-h-[470px]">
+            <section className="shortform-v2-question-card relative min-h-[214px] overflow-hidden rounded-[24px] border border-cyan-100/10 bg-[#070c18]/92 p-3.5 shadow-[0_24px_78px_rgba(0,0,0,0.46)] ring-1 ring-white/[0.04] backdrop-blur-2xl sm:min-h-[360px] sm:rounded-[28px] sm:p-5 lg:min-h-[430px] lg:p-6 xl:min-h-[470px]">
               <div className="absolute inset-x-0 top-0 h-16 bg-[linear-gradient(180deg,rgba(34,211,238,0.08),transparent)] sm:h-24" />
               <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.09)_1px,transparent_1px)] [background-size:34px_34px]" />
 
-              <div className="relative z-10 flex h-full min-h-[186px] flex-col pt-1 sm:min-h-[320px] lg:min-h-[378px] xl:min-h-[418px]">
+              <div className="shortform-v2-question-body relative z-10 flex h-full min-h-[186px] flex-col pt-1 sm:min-h-[320px] lg:min-h-[378px] xl:min-h-[418px]">
                 <div className={`mb-3 inline-flex h-7 max-w-full items-center gap-2 self-start rounded-full bg-gradient-to-r ${accent} px-3 text-[8.5px] font-black uppercase tracking-[0.16em] text-[#050510] shadow-[0_0_38px_rgba(34,211,238,0.18)] sm:mb-7 sm:h-9 sm:px-4 sm:text-[10px]`}>
                   <Sparkles className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                   <span className="truncate">{userFacingSection}</span>

@@ -20,7 +20,10 @@ import {
   leaveFeedbackPath,
   linkScaleFeedbackToResult,
   normalizeScaleRatings,
+  parseFeedbackLink,
+  scaleBodyHasExtraFields,
   scalePayload,
+  scaleRatingsAreEmpty,
 } from "../../src/lib/feedback/scaleFeedback.ts";
 import FeedbackPage from "../../src/app/feedback/page.tsx";
 
@@ -50,11 +53,10 @@ test("the feedback page asks five optional questions and one submit", () => {
 });
 
 test("scale ratings are optional 1 to 5 values and link to a saved result id", () => {
-  assert.equal(leaveFeedbackPath({}), "/feedback");
-  assert.equal(
-    leaveFeedbackPath({ resultId, sessionId }),
-    `/feedback?resultId=${resultId}&sessionId=${sessionId}`,
-  );
+  assert.equal(leaveFeedbackPath(), "/feedback");
+  assert.equal(parseFeedbackLink(JSON.stringify({ resultId, sessionId })).resultId, resultId);
+  assert.equal(parseFeedbackLink(JSON.stringify({ resultId, sessionId })).sessionId, sessionId);
+  assert.equal(parseFeedbackLink(JSON.stringify({ resultId: "short" })).resultId, null);
   const blank = scalePayload(emptyScaleAnswers(), null);
   assert.equal(feedbackRequestSchema.safeParse(blank).success, true);
   const parsedBlank = normalizeScaleRatings(feedbackRequestSchema.parse(blank));
@@ -115,7 +117,7 @@ test("scale feedback stores the saved result only when that result can be access
   const denied = await postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
     method: "POST",
     headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.71" },
-    body: JSON.stringify(scalePayload(emptyScaleAnswers(), resultId)),
+    body: JSON.stringify(scalePayload({ ...emptyScaleAnswers(), quizEase: 2 }, resultId)),
   }), {
     ...deps,
     async canAccess() { return false; },
@@ -126,7 +128,7 @@ test("scale feedback stores the saved result only when that result can be access
   const unlinked = await postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
     method: "POST",
     headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.72" },
-    body: JSON.stringify(scalePayload(emptyScaleAnswers(), null)),
+    body: JSON.stringify(scalePayload({ ...emptyScaleAnswers(), careerIdeas: 4 }, null)),
   }), {
     async findResult() { throw new Error("lookup should not run"); },
     async canAccess() { throw new Error("access should not run"); },
@@ -138,4 +140,35 @@ test("scale feedback stores the saved result only when that result can be access
   assert.equal(unlinked.status, 200);
   assert.equal(inserted.at(-1).suggestions, null);
   assert.equal(inserted.at(-1).session_id, null);
+
+  const blank = await postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.73" },
+    body: JSON.stringify(scalePayload(emptyScaleAnswers(), null)),
+  }), {
+    async findResult() { throw new Error("lookup should not run"); },
+    async canAccess() { throw new Error("access should not run"); },
+    async insert() { throw new Error("empty scale rows are not stored"); },
+  });
+  assert.equal(blank.status, 400);
+
+  const extra = await postPublicFeedback(new NextRequest("http://localhost/api/feedback", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.74" },
+    body: JSON.stringify({ ...scalePayload({ ...emptyScaleAnswers(), quizEase: 3 }, null), email: "student@example.com" }),
+  }), {
+    async findResult() { throw new Error("lookup should not run"); },
+    async canAccess() { throw new Error("access should not run"); },
+    async insert() { throw new Error("extra scale fields are not stored"); },
+  });
+  assert.equal(extra.status, 400);
+  assert.equal(scaleBodyHasExtraFields({ quiz_type: "scale", questions_engaging: "3", email: "student@example.com" }), true);
+  assert.equal(normalizeScaleRatings({ personality_rating: "4", questions_engaging: "3" }).ok, false);
+  assert.equal(scaleRatingsAreEmpty({
+    questions_engaging: null,
+    personality_rating: null,
+    career_rating: null,
+    would_share: null,
+    career_relevance: null,
+  }), true);
 });
