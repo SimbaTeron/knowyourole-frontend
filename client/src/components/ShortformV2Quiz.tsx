@@ -7,7 +7,7 @@ import { Brain, ChevronLeft, Sparkles, X } from "lucide-react";
 import type { QuizScores } from "./Quiz";
 import { CAREER_SCORE_KEYS, SHORTFORM_V2_QUESTIONS, type CareerKey, type ShortformV2Answer } from "@/data/shortformV2Questions";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
-import { quizProgressMilestone, trackKyrEvent } from "@/lib/analytics";
+import { quizProgressMilestone } from "@/lib/analytics";
 import { closeCurrentQuizAttempt, quizPlacementParams, recordQuizFunnelEvent } from "@/lib/analytics/quizFunnel";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
 import { recomputeShortformV2ScoreMaps, validateShortformV2Responses } from "@/lib/quiz/shortformV2Scoring";
@@ -338,7 +338,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       const milestone = quizProgressMilestone(responses.length);
       if (milestone !== null && !progressMilestonesRef.current.has(milestone)) {
         progressMilestonesRef.current.add(milestone);
-        trackKyrEvent("quiz_progress_milestone", {
+        recordQuizFunnelEvent("quiz_progress_milestone", {
           link_location: "shortform_v2",
           completed_questions: responses.length,
           milestone,
@@ -348,11 +348,9 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       }
     }
 
-    trackKyrEvent("quiz_answer_selected", {
+    recordQuizFunnelEvent("quiz_answer_selected", {
       link_location: "shortform_v2",
       tier,
-      question_id: currentQuestion.id,
-      answer_id: answer.id,
       group: currentQuestion.group,
       progress,
     });
@@ -411,10 +409,9 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     setCurrentIndex((index) => Math.max(0, index - 1));
     setSelectedAnswer(answerId);
     setStartedAt(Date.now());
-    trackKyrEvent("quiz_answer_reviewed", {
+    recordQuizFunnelEvent("quiz_answer_reviewed", {
       link_location: "shortform_v2",
       tier,
-      question_id: responseBeingRevisited.questionId,
       remaining_answers: scores.responses.length,
     });
   };

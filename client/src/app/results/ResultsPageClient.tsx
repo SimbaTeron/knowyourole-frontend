@@ -14,7 +14,7 @@ import { calculateResult, findBestRoleMatch, type CareerRoleMatch } from "@/comp
 import type { QuizScores } from "@/components/Quiz";
 import rolesData from "@/data/roles.json";
 import { trackKyrEvent } from "@/lib/analytics";
-import { watchQuizFunnelConsent } from "@/lib/analytics/quizFunnel";
+import { recordQuizFunnelEvent, watchQuizFunnelConsent } from "@/lib/analytics/quizFunnel";
 import { calculateMbtiAxisConfidence, resultConfidenceLabel as getResultConfidenceLabel } from "@/lib/scoring";
 import { ResultFitFeedback } from "@/components/results/ResultFitFeedback";
 import { FrameworkReference } from "@/components/results/FrameworkReference";
@@ -5219,11 +5219,9 @@ export default function ResultsPage({ initialResults = null }: { initialResults?
     const resultViewEventKey = `orbital-v2:${realResults.mbtiType}:${realResults.primaryDisc}:${params.get("sessionId") || "no-session"}:${params.get("resultId") || "no-result"}`;
     if (lastResultViewEventKey.current === resultViewEventKey) return;
     lastResultViewEventKey.current = resultViewEventKey;
-    trackKyrEvent("result_viewed", {
+    recordQuizFunnelEvent("result_viewed", {
       result_page: "orbital_glass_v2",
       page_number: "orbital-v2",
-      mbti_type: realResults.mbtiType,
-      primary_disc: realResults.primaryDisc,
       link_location: params.get("test") === "true" ? "test_route" : realResults.isDemo ? "demo" : "quiz_result",
       has_session_id: Boolean(params.get("sessionId")),
       has_result_id: Boolean(params.get("resultId")),
