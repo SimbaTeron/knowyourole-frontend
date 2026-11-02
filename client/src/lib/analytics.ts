@@ -30,7 +30,7 @@ const EVENT_CATEGORY_BY_NAME: Array<[RegExp, string]> = [
  * - quiz_started (once per attempt; queued until analytics consent)
  * - quiz_landing_viewed (once per attempt, on the quiz route)
  * - quiz_progress_milestone (every 5 answers, for drop-off)
- * - quiz_completed
+ * - quiz_completed (once per attempt; held until analytics consent, dropped if declined)
  * - result_viewed
  * - result_fit_tapped (yes or no only; never a comment)
  * - for_schools_cta_clicked
