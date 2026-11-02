@@ -14,6 +14,7 @@ import { calculateResult, findBestRoleMatch, type CareerRoleMatch } from "@/comp
 import type { QuizScores } from "@/components/Quiz";
 import rolesData from "@/data/roles.json";
 import { trackKyrEvent } from "@/lib/analytics";
+import { watchQuizFunnelConsent } from "@/lib/analytics/quizFunnel";
 import { calculateMbtiAxisConfidence, resultConfidenceLabel as getResultConfidenceLabel } from "@/lib/scoring";
 import { ResultFitFeedback } from "@/components/results/ResultFitFeedback";
 import { FrameworkReference } from "@/components/results/FrameworkReference";
@@ -5205,6 +5206,8 @@ export default function ResultsPage({ initialResults = null }: { initialResults?
     // Resolve browser-only storage and URL fixtures after hydration. This keeps
     // real completed quizzes, local fixtures, and result links on one path.
     // A server-rendered preview is already on screen; don't rebuild it here.
+    // A results reload must still flush a completion that was held for consent.
+    watchQuizFunnelConsent();
     const stored = getStoredResultDTO();
     if (stored || !initialResults) setRealResults(useRealResults(true));
     setMounted(true);

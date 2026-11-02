@@ -365,7 +365,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
         if (completedRef.current) return;
         completedRef.current = true;
         onQuizStarted?.();
-        trackKyrEvent("quiz_completed", {
+        recordQuizFunnelEvent("quiz_completed", {
           link_location: "shortform_v2",
           tier,
           total_questions: totalQuestions,

@@ -1,6 +1,6 @@
 "use client";
 
-import { COOKIE_CONSENT_EVENT, hasAnalyticsConsent } from "@/components/CookieConsentBanner";
+import { COOKIE_CONSENT_EVENT, hasAnalyticsConsent, readCookieConsent } from "@/components/CookieConsentBanner";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 import { trackKyrEvent } from "@/lib/analytics";
 import { analyticsCollectionAllowed } from "@/lib/analytics/collectionGate";
@@ -8,6 +8,7 @@ import { KYR_GTAG_READY_EVENT } from "@/lib/analytics/gtagReady";
 import { sendRegisteredPageView } from "@/lib/analytics/pageView";
 import {
   closeQuizAttempt,
+  dropDeclinedQuizCompletion,
   flushQuizFunnel,
   newQuizAttemptId,
   noteQuizFunnelEvent,
@@ -61,12 +62,14 @@ function armGtagFlush(browser: Window) {
 export function recordQuizFunnelEvent(name: QuizFunnelEventName, params: QuizFunnelParams, resume = false) {
   if (typeof window === "undefined") return;
   try {
-    const consent = hasAnalyticsConsent();
+    const stored = readCookieConsent();
+    const consent = stored?.analytics === true;
     const holdForTag = consent && mustWaitForTag(window);
     const decision = noteQuizFunnelEvent(window.sessionStorage, {
       name,
       params,
       consent: consent && !holdForTag,
+      declined: stored !== null && stored.analytics === false,
       resume,
       createId: () => newQuizAttemptId(),
       now: Date.now(),
@@ -111,7 +114,17 @@ let watchingConsent = false;
 export function watchQuizFunnelConsent() {
   if (watchingConsent || typeof window === "undefined") return;
   watchingConsent = true;
-  window.addEventListener(COOKIE_CONSENT_EVENT, () => {
+  window.addEventListener(COOKIE_CONSENT_EVENT, (event: Event) => {
+    const detail = (event as CustomEvent<{ analytics?: boolean }>).detail;
+    const analytics = detail && typeof detail.analytics === "boolean" ? detail.analytics : hasAnalyticsConsent();
+    if (!analytics) {
+      try {
+        dropDeclinedQuizCompletion(window.sessionStorage);
+      } catch {
+        /* sessionStorage unavailable */
+      }
+      return;
+    }
     flushPendingQuizFunnel();
   });
 }

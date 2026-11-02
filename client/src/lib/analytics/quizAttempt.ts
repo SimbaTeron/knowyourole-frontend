@@ -1,8 +1,9 @@
 /**
- * One quiz_landing_viewed and one quiz_started per attempt.
+ * One quiz_landing_viewed, quiz_started, and quiz_completed per attempt.
  * A reload or React strict-mode remount reuses the open attempt. Retake,
  * restart, and a closed attempt start a new one. Events noted before analytics
- * consent stay queued and flush once.
+ * consent stay queued and flush once. A declined analytics choice drops a
+ * queued completion so it is never sent later.
  */
 
 import { randomIdToken } from "@/lib/randomId";
@@ -10,7 +11,7 @@ import { randomIdToken } from "@/lib/randomId";
 export const QUIZ_ATTEMPT_STORAGE_KEY = "kyr_quiz_attempt_v1";
 export const QUIZ_ATTEMPT_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
-export type QuizFunnelEventName = "quiz_landing_viewed" | "quiz_started";
+export type QuizFunnelEventName = "quiz_landing_viewed" | "quiz_started" | "quiz_completed";
 export type QuizFunnelParams = Record<string, string | number | boolean>;
 
 export type StoredQuizAttempt = {
@@ -29,7 +30,10 @@ export type KeyValueStorage = {
 
 export type QuizFunnelEmission = { name: QuizFunnelEventName; params: QuizFunnelParams };
 
-const FUNNEL_EVENTS = new Set<QuizFunnelEventName>(["quiz_landing_viewed", "quiz_started"]);
+const FUNNEL_EVENTS = new Set<QuizFunnelEventName>(["quiz_landing_viewed", "quiz_started", "quiz_completed"]);
+
+/** Completion stays aggregate: placement, tier, length, and a timing summary. */
+const QUIZ_COMPLETED_PARAM_KEYS = new Set(["link_location", "entry_point", "tier", "total_questions", "average_response_time"]);
 
 function isFunnelEventName(value: unknown): value is QuizFunnelEventName {
   return typeof value === "string" && FUNNEL_EVENTS.has(value as QuizFunnelEventName);
@@ -67,6 +71,20 @@ function saveQuizAttempt(storage: KeyValueStorage, attempt: StoredQuizAttempt) {
   storage.setItem(QUIZ_ATTEMPT_STORAGE_KEY, JSON.stringify(attempt));
 }
 
+function paramsFor(name: QuizFunnelEventName, params: QuizFunnelParams): QuizFunnelParams {
+  if (name !== "quiz_completed") return params;
+  const safe: QuizFunnelParams = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (QUIZ_COMPLETED_PARAM_KEYS.has(key)) safe[key] = value;
+  }
+  return safe;
+}
+
+function settleWithoutSending(attempt: StoredQuizAttempt, name: QuizFunnelEventName) {
+  if (!attempt.sent.includes(name)) attempt.sent.push(name);
+  attempt.pending = attempt.pending.filter((item) => item.name !== name);
+}
+
 function blankAttempt(attemptId: string, now: number): StoredQuizAttempt {
   return { v: 1, attemptId, openedAt: now, closed: false, sent: [], pending: [] };
 }
@@ -90,6 +108,8 @@ export function noteQuizFunnelEvent(storage: KeyValueStorage, input: {
   name: QuizFunnelEventName;
   params: QuizFunnelParams;
   consent: boolean;
+  /** Explicit analytics refusal. Distinct from "no choice yet", which still queues. */
+  declined?: boolean;
   resume?: boolean;
   createId: () => string;
   now: number;
@@ -99,12 +119,19 @@ export function noteQuizFunnelEvent(storage: KeyValueStorage, input: {
     createId: input.createId,
     now: input.now,
   });
+  const params = paramsFor(input.name, input.params);
 
   if (attempt.sent.includes(input.name)) return { attempt, emit: [] };
 
+  if (!input.consent && input.declined && input.name === "quiz_completed") {
+    settleWithoutSending(attempt, input.name);
+    saveQuizAttempt(storage, attempt);
+    return { attempt, emit: [] };
+  }
+
   if (!input.consent) {
     if (!attempt.pending.some((item) => item.name === input.name)) {
-      attempt.pending.push({ name: input.name, params: input.params });
+      attempt.pending.push({ name: input.name, params });
       saveQuizAttempt(storage, attempt);
     }
     return { attempt, emit: [] };
@@ -113,7 +140,16 @@ export function noteQuizFunnelEvent(storage: KeyValueStorage, input: {
   attempt.sent.push(input.name);
   attempt.pending = attempt.pending.filter((item) => item.name !== input.name);
   saveQuizAttempt(storage, attempt);
-  return { attempt, emit: [{ name: input.name, params: input.params }] };
+  return { attempt, emit: [{ name: input.name, params }] };
+}
+
+/** Drop a queued completion after the visitor rejects analytics. Later grants do not revive it. */
+export function dropDeclinedQuizCompletion(storage: KeyValueStorage): StoredQuizAttempt | null {
+  const attempt = loadQuizAttempt(storage);
+  if (!attempt || !attempt.pending.some((item) => item.name === "quiz_completed")) return attempt;
+  settleWithoutSending(attempt, "quiz_completed");
+  saveQuizAttempt(storage, attempt);
+  return attempt;
 }
 
 export function flushQuizFunnel(storage: KeyValueStorage, input: {
