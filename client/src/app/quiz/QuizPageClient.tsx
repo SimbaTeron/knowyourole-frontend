@@ -11,7 +11,6 @@ const Results = dynamic(() => import("@/components/Results"), { ssr: false });
 import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
-import { trackKyrEvent } from "@/lib/analytics";
 import { flushPendingQuizFunnel, quizPlacementParams, recordQuizFunnelEvent, watchQuizFunnelConsent } from "@/lib/analytics/quizFunnel";
 import { Brain, Sparkles, Target } from "lucide-react";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
@@ -239,7 +238,7 @@ export default function QuizPage() {
       });
 
       if (!response.ok || !data?.success || !data?.result) {
-        trackKyrEvent("quiz_result_persist_failed", {
+        recordQuizFunnelEvent("quiz_result_persist_failed", {
           tier: ageTier,
           response_count: scores.responses.length,
           status: response.status,
@@ -257,13 +256,11 @@ export default function QuizPage() {
         sessionStorage.setItem(`kyr_anonymous_result_capability:${data.result.meta.sessionId}`, data.anonymousDeletionCapability);
       }
       const persistenceOk = data.persistence?.ok === true;
-      trackKyrEvent(persistenceOk ? "quiz_result_persisted" : "quiz_result_computed_unpersisted", {
+      recordQuizFunnelEvent(persistenceOk ? "quiz_result_persisted" : "quiz_result_computed_unpersisted", {
         tier: ageTier,
         response_count: scores.responses.length,
         result_id_present: Boolean(data.result.meta?.resultId),
         session_id_present: Boolean(data.result.meta?.sessionId),
-        mbti_type: data.result.scores?.mbti?.type,
-        primary_disc: data.result.scores?.disc?.primary,
       });
       console.log("[ResultDTO] Stored canonical ResultDTO in sessionStorage:kyr_result_dto", {
         resultId: data.result.meta?.resultId,
@@ -272,7 +269,7 @@ export default function QuizPage() {
 
       return data.result;
     } catch (error) {
-      trackKyrEvent("quiz_result_persist_failed", {
+      recordQuizFunnelEvent("quiz_result_persist_failed", {
         tier: ageTier,
         response_count: scores.responses.length,
         reason: "network_or_runtime_error",
@@ -285,10 +282,9 @@ export default function QuizPage() {
   const handleQuizComplete = async (scores: QuizScores) => {
     const minimumAnalysisTime = new Promise((resolve) => setTimeout(resolve, 3000));
     setIsAnalyzingResults(true);
-    trackKyrEvent("quiz_completion_processing_started", {
+    recordQuizFunnelEvent("quiz_completion_processing_started", {
       tier: ageTier,
       response_count: scores.responses.length,
-      mood: mood || "unset",
       fun_mode: funMode,
     });
 
@@ -310,13 +306,11 @@ export default function QuizPage() {
     quizSessionIdRef.current = sessionId;
     setQuizSessionId(sessionId);
 
-    trackKyrEvent("conversion_results_handoff", {
+    recordQuizFunnelEvent("conversion_results_handoff", {
       tier: ageTier,
       response_count: scores.responses.length,
       has_result_dto: true,
       session_id_present: true,
-      mbti_type: canonicalResult.scores.mbti.type,
-      primary_disc: canonicalResult.scores.disc.primary,
     });
 
     await minimumAnalysisTime;

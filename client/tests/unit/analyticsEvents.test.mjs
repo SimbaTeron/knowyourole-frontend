@@ -29,6 +29,7 @@ const { KYR_GTAG_READY_EVENT } = gtagReady;
 const { cookieBannerPlacement, consentFromChoice, focusMainContent, shouldShowCookieBanner } = bannerModule;
 const { analyticsHitLocation, buildInternalHref, readLinkLocation, scrubCampaignParams } = links;
 const {
+  HELD_REPEAT_EVENT_CAP,
   QUIZ_ATTEMPT_MAX_AGE_MS,
   QUIZ_ATTEMPT_STORAGE_KEY,
   beginQuizAttempt,
@@ -876,4 +877,168 @@ test("quiz completion is held until consent and never sent twice or after a decl
   });
   assert.deepEqual(startStillQueued.emit, []);
   assert.deepEqual(startStillQueued.attempt.pending.map((item) => item.name), ["quiz_started"]);
+});
+
+test("result views and other funnel events follow consent, and answer events stay capped", () => {
+  const now = 1_800_000_000_000;
+  const viewedParams = {
+    result_page: "orbital_glass_v2",
+    page_number: "orbital-v2",
+    link_location: "quiz_result",
+    has_session_id: false,
+    has_result_id: true,
+    mbti_type: "INTJ",
+    email: "person@example.com",
+    session_id: "quiz-session",
+    result_id: "result-1",
+    comment: "private note",
+  };
+
+  const held = memoryStorage();
+  noteQuizFunnelEvent(held, {
+    name: "quiz_completed",
+    params: { link_location: "shortform_v2", tier: "25+", total_questions: 5, average_response_time: 1 },
+    consent: false,
+    createId: () => "attempt-1",
+    now,
+  });
+  closeQuizAttempt(held);
+  const queuedView = noteQuizFunnelEvent(held, {
+    name: "result_viewed",
+    params: viewedParams,
+    consent: false,
+    createId: () => "attempt-should-not-replace",
+    now: now + 1,
+  });
+  assert.equal(queuedView.emit.length, 0);
+  assert.equal(queuedView.attempt.attemptId, "attempt-1");
+  assert.deepEqual(queuedView.attempt.pending.map((item) => item.name), ["quiz_completed", "result_viewed"]);
+  const granted = flushQuizFunnel(held, { consent: true });
+  assert.deepEqual(granted.emit.map((event) => event.name), ["quiz_completed", "result_viewed"]);
+  assert.equal(granted.emit[1].params.link_location, "quiz_result");
+  assert.equal(granted.emit[1].params.has_result_id, true);
+  assert.equal("email" in granted.emit[1].params, false);
+  assert.equal("mbti_type" in granted.emit[1].params, false);
+  assert.equal("session_id" in granted.emit[1].params, false);
+  assert.equal("result_id" in granted.emit[1].params, false);
+  assert.equal("comment" in granted.emit[1].params, false);
+  assert.equal(flushQuizFunnel(held, { consent: true }).emit.length, 0);
+  assert.equal(flushQuizFunnel(reloadAttempt(held), { consent: true }).emit.length, 0);
+  assert.equal(noteQuizFunnelEvent(held, {
+    name: "result_viewed",
+    params: viewedParams,
+    consent: true,
+    createId: () => "attempt-2",
+    now: now + 2,
+  }).emit.length, 0);
+
+  const declined = memoryStorage();
+  noteQuizFunnelEvent(declined, {
+    name: "result_viewed",
+    params: viewedParams,
+    consent: false,
+    createId: () => "declined-view",
+    now,
+  });
+  noteQuizFunnelEvent(declined, {
+    name: "quiz_result_persist_failed",
+    params: { tier: "25+", response_count: 5, reason: "compute_unsuccessful", answer_id: "secret-answer" },
+    consent: false,
+    createId: () => "unused",
+    now: now + 1,
+  });
+  dropDeclinedQuizCompletion(declined);
+  assert.equal(flushQuizFunnel(declined, { consent: true }).emit.length, 0);
+  assert.equal(flushQuizFunnel(declined, { consent: false }).emit.length, 0);
+  assert.equal(noteQuizFunnelEvent(declined, {
+    name: "result_viewed",
+    params: viewedParams,
+    consent: true,
+    createId: () => "unused-2",
+    now: now + 2,
+  }).emit.length, 0);
+  assert.equal(noteQuizFunnelEvent(declined, {
+    name: "quiz_result_persist_failed",
+    params: { tier: "25+", response_count: 5, reason: "compute_unsuccessful" },
+    consent: true,
+    declined: true,
+    createId: () => "unused-3",
+    now: now + 3,
+  }).emit.length, 0);
+
+  const already = memoryStorage();
+  const immediate = noteQuizFunnelEvent(already, {
+    name: "result_viewed",
+    params: { result_page: "orbital_glass_v2", link_location: "quiz_result" },
+    consent: true,
+    createId: () => "already-view",
+    now,
+  });
+  assert.equal(immediate.emit.length, 1);
+  const handoff = noteQuizFunnelEvent(already, {
+    name: "conversion_results_handoff",
+    params: { tier: "25+", response_count: 5, has_result_dto: true, session_id_present: true, primary_disc: "D" },
+    consent: true,
+    createId: () => "unused",
+    now: now + 1,
+  });
+  assert.equal(handoff.emit.length, 1);
+  assert.equal("primary_disc" in handoff.emit[0].params, false);
+  assert.equal(noteQuizFunnelEvent(already, {
+    name: "result_viewed",
+    params: viewedParams,
+    consent: true,
+    createId: () => "unused",
+    now: now + 2,
+  }).emit.length, 0);
+  assert.equal(flushQuizFunnel(already, { consent: true }).emit.length, 0);
+  assert.equal(flushQuizFunnel(reloadAttempt(already), { consent: true }).emit.length, 0);
+
+  const answers = memoryStorage();
+  for (let progress = 1; progress <= HELD_REPEAT_EVENT_CAP + 2; progress += 1) {
+    noteQuizFunnelEvent(answers, {
+      name: "quiz_answer_selected",
+      params: { link_location: "shortform_v2", tier: "25+", group: "Core operating style", progress, question_id: progress, answer_id: `a-${progress}` },
+      consent: false,
+      createId: () => "answers",
+      now: now + progress,
+    });
+  }
+  assert.equal(answers.getItem(QUIZ_ATTEMPT_STORAGE_KEY).includes("question_id"), false);
+  assert.equal(answers.getItem(QUIZ_ATTEMPT_STORAGE_KEY).includes("answer_id"), false);
+  const pendingAnswers = loadQuizAttempt(answers).pending.filter((item) => item.name === "quiz_answer_selected");
+  assert.equal(pendingAnswers.length, HELD_REPEAT_EVENT_CAP);
+  assert.deepEqual(pendingAnswers.map((item) => item.params.progress), [3, 4, 5, 6, 7]);
+  const flushedAnswers = flushQuizFunnel(answers, { consent: true });
+  assert.equal(flushedAnswers.emit.length, HELD_REPEAT_EVENT_CAP);
+  assert.equal(flushQuizFunnel(answers, { consent: true }).emit.length, 0);
+  assert.equal(noteQuizFunnelEvent(answers, {
+    name: "quiz_answer_selected",
+    params: { link_location: "shortform_v2", progress: 8 },
+    consent: true,
+    createId: () => "unused",
+    now: now + 20,
+  }).emit.length, 1);
+
+  const milestones = memoryStorage();
+  for (const milestone of [5, 10, 5]) {
+    noteQuizFunnelEvent(milestones, {
+      name: "quiz_progress_milestone",
+      params: { link_location: "shortform_v2", milestone, completed_questions: milestone, total_questions: 20, percent_complete: milestone * 5 },
+      consent: false,
+      createId: () => "milestones",
+      now: now + milestone,
+    });
+  }
+  assert.equal(loadQuizAttempt(milestones).pending.length, 2);
+  const flushedMilestones = flushQuizFunnel(milestones, { consent: true });
+  assert.deepEqual(flushedMilestones.emit.map((event) => event.params.milestone), [5, 10]);
+  assert.equal(flushQuizFunnel(milestones, { consent: true }).emit.length, 0);
+  assert.equal(noteQuizFunnelEvent(milestones, {
+    name: "quiz_progress_milestone",
+    params: { milestone: 5, completed_questions: 5, total_questions: 20, percent_complete: 25 },
+    consent: true,
+    createId: () => "unused",
+    now: now + 30,
+  }).emit.length, 0);
 });
