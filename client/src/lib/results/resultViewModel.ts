@@ -14,6 +14,7 @@ import { isScoringV3, isScoringV5 } from "@/lib/quiz/scoringVersions";
 import { V5_STRESS_SHOW, lifeStageFromResponses, type LifeStage } from "@/lib/quiz/shortformV5Adjustments";
 import { resolveFinalClarity, shouldShowStressSecondary, type FinalClarity } from "@/lib/results/finalClarity";
 import { resultWording } from "@/lib/results/resultWording";
+import { careerPayLines, formatMedianAnnual, PAY_SOURCE, payForCareer, type CareerPayLine } from "@/lib/results/publishedFigures";
 import { deriveWorkDirectionV5, type CareerFieldBlurb } from "@/lib/results/workDirectionV5";
 
 export const TRAIT_LABELS = {
@@ -202,6 +203,9 @@ export type ResultPageCopy = {
   readonly summary: string;
   readonly workBest: string;
   readonly careers: readonly CareerFieldBlurb[];
+  /** Sourced US median pay for the named careers that have a handbook match. */
+  readonly pay: readonly CareerPayLine[];
+  readonly paySource: { readonly text: string; readonly href: string } | null;
   readonly thisWeek: readonly string[];
   /** Plain pressure note. Null when stress did not rise high enough to mention. */
   readonly watch: string | null;
@@ -766,10 +770,13 @@ export function buildResultView(input: ResultViewInput): ResultView {
         shownCareerNames,
         direction.kind === "focused" ? direction.rationale : direction.body,
       );
+  const pay = careerPayLines(shownCareerNames);
   const page: ResultPageCopy = {
     summary: summarySentence(input.primaryDisc, discLabel, direction.title, several),
     workBest: workBestCopy(input.primaryDisc, stage),
     careers,
+    pay,
+    paySource: pay.length > 0 ? { text: PAY_SOURCE.line, href: PAY_SOURCE.url } : null,
     thisWeek: pageSteps.length > 0 ? pageSteps : [WEEK_FALLBACK],
     watch: watchCopy(stage, Boolean(stressSecondary || stressSupport)),
   };
@@ -895,6 +902,8 @@ export function renderResultCopy(view: ResultView): string {
     `page summary: ${view.page.summary}`,
     `page work: ${view.page.workBest}`,
     `page careers: ${view.page.careers.map((field) => `${field.name} — ${field.reason}`).join(" | ")}`,
+    `page pay: ${view.page.pay.map((item) => `${item.title} ${item.display}`).join(" | ")}`,
+    `page pay source: ${view.page.paySource?.text ?? ""}`,
     `page week: ${view.page.thisWeek.join(" | ")}`,
     `page watch: ${view.page.watch ?? ""}`,
     `emoji: ${view.emoji}`,
@@ -1036,6 +1045,17 @@ export function resultViewViolations(view: ResultView): string[] {
   if (view.isV5Direction) push(view.page.careers.length === 2, "v5 page should show two career fields");
   for (const field of view.page.careers) {
     push(field.name.length > 0 && field.reason.length > 20 && field.reason.length < 320, "career field reason is not a short plain line");
+  }
+  if (view.page.pay.length > 0) {
+    push(Boolean(view.page.paySource?.text.includes(String(PAY_SOURCE.dataYear))), "pay figures have no source year");
+    push(view.page.paySource?.href === PAY_SOURCE.url, "pay figures have no source link");
+    for (const line of view.page.pay) {
+      const row = payForCareer(line.title);
+      const matches = row !== null && line.medianAnnual === row.medianAnnual && line.display === formatMedianAnnual(row.medianAnnual);
+      push(matches, `pay for ${line.title} is not the sourced median`);
+    }
+  } else {
+    push(view.page.paySource === null, "a pay source is shown with no pay figure");
   }
   push(view.shareMeta.includes(view.lead.kind === "none" ? NO_LEAD_CAPTION : view.lead.caption), "share line uses a different lead");
   push(view.ogTitle === view.headline, "OG title does not match the headline");

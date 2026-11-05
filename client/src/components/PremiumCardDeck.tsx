@@ -12,6 +12,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
+import { formatMedianAnnual, PAY_SOURCE, payForCareer } from "@/lib/results/publishedFigures";
 import { 
   getRandomQuestions, 
   getAdaptiveQuestions, 
@@ -636,6 +637,11 @@ function RoleMatchesCard({
       <p className="text-xs text-warm-gray/60 dark:text-soft-cream/50 mb-2">
         {hasApiData ? "Personalized career matches for your profile" : "Tap a role to see why it matches your personality"}
       </p>
+      {roles.some((role) => role.title && payForCareer(role.title)) ? (
+        <p className="text-[11px] text-warm-gray/60 dark:text-soft-cream/50">
+          <a href={PAY_SOURCE.url}>{PAY_SOURCE.line}</a>
+        </p>
+      ) : null}
       {roles.map((role, idx) => (
         <div
           key={idx}
@@ -653,7 +659,10 @@ function RoleMatchesCard({
                 </div>
                 <div className="text-left">
                   <p className="font-semibold text-warm-gray dark:text-soft-cream text-sm">{role.title}</p>
-                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">{role.salary}</p>
+                  {(() => {
+                    const sourced = role.title ? payForCareer(role.title) : null;
+                    return sourced ? <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">{formatMedianAnnual(sourced.medianAnnual)}</p> : null;
+                  })()}
                 </div>
               </div>
               <div className="flex items-center gap-2">

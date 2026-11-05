@@ -97,14 +97,6 @@ function stripLeadingThe(label: string) {
   return label.replace(/^The\s+/i, "");
 }
 
-// Population prevalence rates per MBTI type (% of population)
-const POPULATION_RATES: Record<string, string> = {
-  INTJ: "2.4%", INTP: "2.5%", ENTJ: "1.8%", ENTP: "3.2%",
-  INFJ: "1.5%", INFP: "4.4%", ENFJ: "2.5%", ENFP: "8.1%",
-  ISTJ: "11.6%", ISFJ: "13.8%", ESTJ: "8.7%", ESFJ: "12.3%",
-  ISTP: "5.2%", ISFP: "8.8%", ESTP: "4.3%", ESFP: "8.5%",
-};
-
 // Short descriptor per MBTI type
 const MBTI_TAGLINES: Record<string, string> = {
   INTJ: "Strategic Planner", INTP: "Logical Analyzer", ENTJ: "Executive Leader", ENTP: "Debate Master",
@@ -217,45 +209,6 @@ function buildAnswerEvidenceSnippets({ rawScores, mbtiType, primaryDisc, topBigF
       color: C.cyan,
     },
   ];
-}
-
-// City suggestions by MBTI+primary DISC (placeholder — replace with real DB query)
-const CITY_MAP: Record<string, { city: string; openings: string; avgSalary: string }[]> = {
-  INTJ: [{ city: "San Francisco, CA", openings: "5,120", avgSalary: "$162K" }, { city: "Austin, TX", openings: "2,840", avgSalary: "$138K" }],
-  INTP: [{ city: "Boston, MA", openings: "3,200", avgSalary: "$145K" }, { city: "Seattle, WA", openings: "3,900", avgSalary: "$148K" }],
-  ENTJ: [{ city: "New York, NY", openings: "7,100", avgSalary: "$155K" }, { city: "San Francisco, CA", openings: "5,120", avgSalary: "$162K" }],
-  ENTP: [{ city: "Austin, TX", openings: "3,500", avgSalary: "$140K" }, { city: "Denver, CO", openings: "2,600", avgSalary: "$135K" }],
-  INFJ: [{ city: "Portland, OR", openings: "1,800", avgSalary: "$115K" }, { city: "Austin, TX", openings: "2,200", avgSalary: "$120K" }],
-  INFP: [{ city: "Denver, CO", openings: "2,100", avgSalary: "$118K" }, { city: "Portland, OR", openings: "1,900", avgSalary: "$112K" }],
-  ENFJ: [{ city: "Chicago, IL", openings: "4,300", avgSalary: "$125K" }, { city: "Miami, FL", openings: "2,800", avgSalary: "$118K" }],
-  ENFP: [{ city: "Los Angeles, CA", openings: "4,100", avgSalary: "$122K" }, { city: "Austin, TX", openings: "3,200", avgSalary: "$120K" }],
-  ISTJ: [{ city: "Dallas, TX", openings: "4,500", avgSalary: "$115K" }, { city: "Chicago, IL", openings: "5,100", avgSalary: "$118K" }],
-  ISFJ: [{ city: "Minneapolis, MN", openings: "3,100", avgSalary: "$108K" }, { city: "Phoenix, AZ", openings: "2,900", avgSalary: "$105K" }],
-  ESTJ: [{ city: "Houston, TX", openings: "5,200", avgSalary: "$120K" }, { city: "Dallas, TX", openings: "4,800", avgSalary: "$118K" }],
-  ESFJ: [{ city: "Atlanta, GA", openings: "3,800", avgSalary: "$110K" }, { city: "Chicago, IL", openings: "4,200", avgSalary: "$115K" }],
-  ISTP: [{ city: "Detroit, MI", openings: "2,700", avgSalary: "$108K" }, { city: "Seattle, WA", openings: "3,400", avgSalary: "$118K" }],
-  ISFP: [{ city: "Nashville, TN", openings: "1,900", avgSalary: "$98K" }, { city: "Portland, OR", openings: "2,100", avgSalary: "$102K" }],
-  ESTP: [{ city: "Las Vegas, NV", openings: "2,400", avgSalary: "$105K" }, { city: "Miami, FL", openings: "3,100", avgSalary: "$110K" }],
-  ESFP: [{ city: "Los Angeles, CA", openings: "4,300", avgSalary: "$108K" }, { city: "Orlando, FL", openings: "2,600", avgSalary: "$100K" }],
-};
-
-function getTopCities(mbtiType: string, count = 4): { rank: string; icon: string; name: string; jobs: string; salary: string }[] {
-  const cities = CITY_MAP[mbtiType] || [{ city: "Austin, TX", openings: "3,000", avgSalary: "$125K" }];
-  const icons: Record<string, string> = { "San Francisco, CA": "🌉", "Austin, TX": "🌵", "Seattle, WA": "🎸", "Denver, CO": "🏔️", "Boston, MA": "🏛️", "New York, NY": "🗽", "Portland, OR": "🌲", "Chicago, IL": "🌃", "Los Angeles, CA": "🌴", "Dallas, TX": "🤠", "Houston, TX": "🛢️", "Atlanta, GA": "🍑", "Miami, FL": "🌴", "Minneapolis, MN": "❄️", "Phoenix, AZ": "🌞", "Las Vegas, NV": "🎰", "Nashville, TN": "🎸", "Detroit, MI": "🚗", "Orlando, FL": "🎢" };
-  const allCities = [
-    { city: "Austin, TX", icon: "🌵", openings: "2,840", avgSalary: "$138K" },
-    { city: "San Francisco, CA", icon: "🌉", openings: "5,120", avgSalary: "$162K" },
-    { city: "Seattle, WA", icon: "🎸", openings: "3,900", avgSalary: "$148K" },
-    { city: "Denver, CO", icon: "🏔️", openings: "2,210", avgSalary: "$131K" },
-  ];
-  const base = cities.map(c => ({ icon: icons[c.city] || "🌍", name: c.city, jobs: `${c.openings} openings`, salary: c.avgSalary + " avg" }));
-  const result = base.slice(0, count);
-  // Pad with fallback cities
-  const fallback = allCities
-    .filter(a => !base.find(b => b.name === a.city))
-    .slice(0, count - result.length)
-    .map(c => ({ icon: c.icon, name: c.city, jobs: `${c.openings} openings`, salary: c.avgSalary + " avg" }));
-  return [...result, ...fallback].slice(0, count).map((c, i) => ({ rank: `#${i + 1}`, ...c }));
 }
 
 // P3 premium content — MBTI-specific side hustles and learning styles
@@ -2163,7 +2116,6 @@ type ShareReportPayload = {
   mbtiType: string;
   archetype: string;
   primaryDisc: string;
-  population: string;
   career: { title: string; salary: string; summary: string };
   bigFive: BigFiveProfile;
   disc: DiscProfile;
@@ -4983,17 +4935,6 @@ function OrbitalGlassV2Results({
   const v5NextSteps = resultView.nextSteps;
   const savedResultId = toSavedResultId(canonicalResult?.meta);
   const feedbackSessionId = canonicalResult?.meta.sessionId || sessionId;
-  const fallbackCareer = TOP_CAREER_MAP[mbtiType] || TOP_CAREER_MAP.INTP;
-  const salaryRole = canonicalCareerDirection
-    ? buildPremiumRoleMatchCards({
-        roleMatch: findBestRoleMatch(mbtiType, primaryDisc, bigFive, rawScores?.mbti, rawScores?.career, scoringVersion),
-        mbtiType,
-        primaryDisc,
-        disc,
-        bigFive,
-      })[0]
-    : roleCards[0];
-  const reportSalary = salaryRole?.salary || fallbackCareer.salary;
   const reportPayload: ShareReportPayload = {
     sessionId,
     headline: resultView.headline,
@@ -5004,10 +4945,9 @@ function OrbitalGlassV2Results({
     mbtiType,
     archetype: resultView.pdfArchetype,
     primaryDisc,
-    population: POPULATION_RATES[mbtiType] || "2.4%",
     career: {
       title: resultView.direction.title,
-      salary: reportSalary,
+      salary: "",
       summary: `${resultView.whyLine} Try your own result at knowyourole.com.`,
     },
     bigFive,

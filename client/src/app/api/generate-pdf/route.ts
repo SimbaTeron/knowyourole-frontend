@@ -276,7 +276,7 @@ export async function POST(req: NextRequest) {
     const tiles = [
       ['DISC SIGNAL', `${primaryDisc} ${discLabel}`, discAccent],
       ['TOP TRAIT', leadTraitLine, 'cyan'],
-      ['TYPE RARITY', payload.population ? `${payload.population} of people` : 'Personal signal', 'gold'],
+      ['STARTING POINT', 'Not a diagnosis', 'gold'],
     ] as const;
     tiles.forEach(([label, value, accent], index) => {
       const x = margin + index * (tileWidth + tileGap);

@@ -151,6 +151,21 @@ export function ResultSummary({
             </article>
           ))}
         </div>
+        {view.page.pay.length > 0 ? (
+          <ul className="result-pay" data-testid="career-pay">
+            {view.page.pay.map((item) => (
+              <li key={item.title}>
+                <span>{item.title}</span>{" "}
+                <span className="result-pay-amount">{item.display}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {view.page.paySource ? (
+          <p className="result-pay-source">
+            <a href={view.page.paySource.href}>{view.page.paySource.text}</a>
+          </p>
+        ) : null}
       </section>
 
       <section className="result-section" data-testid="section-week" aria-labelledby="try-this-week">
@@ -281,6 +296,11 @@ const RESULT_SIMPLE_CSS = `
 .result-fields { display: grid; gap: 10px; }
 .result-field { padding: 12px; border-radius: 4px; background: #fff7e4; border: 1px solid rgba(18,38,58,.12); }
 .result-field h3 { font-size: clamp(18px, 4.5vw, 22px); }
+.result-pay { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; }
+.result-pay li { font-size: 13px; line-height: 1.4; font-weight: 650; color: #29495c; }
+.result-pay-amount { font-weight: 750; color: #12263a; }
+.result-pay-source { margin: 8px 0 0; font-size: 12px; line-height: 1.35; font-weight: 600; color: #61717a; }
+.result-pay-source a { color: inherit; }
 .result-steps { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; color: #12263a; font-size: 16px; line-height: 1.4; font-weight: 650; }
 .result-disclosures { display: grid; gap: 10px; }
 .result-disclosure-heading { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.3; }

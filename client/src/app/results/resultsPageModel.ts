@@ -46,18 +46,6 @@ export function getArchetype(mbti: string) {
   return ARCHETYPES[mbti] || "The Architect";
 }
 
-// MBTI population frequencies (% of US population)
-const MBTI_POPULATION: Record<string, number> = {
-  ISTJ: 11.6, ISFJ: 13.8, INFJ: 1.5, INTJ: 2.1,
-  ISTP: 5.4, ISFP: 8.8, INFP: 4.4, INTP: 3.3,
-  ESTP: 4.3, ESFP: 8.5, ENFP: 8.1, ENTP: 3.2,
-  ESTJ: 8.7, ESFJ: 12.3, ENFJ: 2.5, ENTJ: 1.8,
-};
-
-export function getPopulationPct(mbti: string) {
-  return MBTI_POPULATION[mbti] ?? 2.1;
-}
-
 export const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#fbbf24", S: "#22c55e", C: "#3b82f6" };
 export const DISC_LABELS: Record<string, string> = { D: "Dominant", I: "Influential", S: "Steady", C: "Conscientious" };
 

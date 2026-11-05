@@ -1,6 +1,7 @@
 'use client';
 
 import { AppHeader } from "@/components/layout/AppHeader";
+import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 export default function Terms() {
   return (
@@ -21,7 +22,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Description of Service</h2>
             <p>
-              KnowYouRole provides a 30-question self-reflection experience that uses Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-exploration guidance. It is not the official MBTI assessment, a clinical instrument, or a selection tool. The Service includes age-tiered copy where available.
+              KnowYouRole provides a {QUESTION_COUNT}-question self-reflection experience that uses Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-exploration guidance. It is not the official MBTI assessment, a clinical instrument, or a selection tool. The Service includes age-tiered copy where available.
             </p>
           </section>
 
@@ -30,10 +31,25 @@ export default function Terms() {
             <p className="mb-2">You agree to:</p>
             <ul className="list-disc list-inside space-y-1 text-sm">
               <li>Provide accurate information when selecting your age tier</li>
-              <li>Use the Service for personal, non-commercial purposes</li>
+              <li>Use the Service for personal, non-commercial purposes, or for educational use as described in &quot;School and classroom use&quot; below</li>
               <li>Not attempt to manipulate or reverse-engineer our assessment algorithms</li>
               <li>Not use automated means to access or interact with the Service</li>
               <li>Respect the intellectual property rights of KnowYouRole</li>
+            </ul>
+          </section>
+
+          {/* LEGAL REVIEW: school/classroom-use clause drafted in plain English; have a lawyer review before relying on it. */}
+          <section id="school-use">
+            <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">School and classroom use</h2>
+            <p className="mb-2">
+              Schools, districts, teachers, counselors, libraries and youth programs may use the Service free of charge with students, including in classrooms, advisory periods, counseling sessions and career-day events. This educational use is allowed even though it is not &quot;personal&quot; use.
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm">
+              <li>You may show the site to a group, link to it, and ask students to take the quiz.</li>
+              <li>Students and educators may print or save results for classroom discussion.</li>
+              <li>You may not charge students for access, resell the Service, or present results as a diagnosis, grade, admissions screen or placement decision.</li>
+              <li>For students under 13, use should be teacher-led, and students should not enter an email address or other personal information. See <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a>.</li>
+              <li>If your district needs a signed data privacy agreement, contact info@knowyourole.com.</li>
             </ul>
           </section>
 

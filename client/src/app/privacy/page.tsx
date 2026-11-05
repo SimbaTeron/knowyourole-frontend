@@ -2,6 +2,7 @@
 
 import { RESULT_FIT_PRIVACY_SENTENCE } from "@/lib/feedback/resultFitCopy";
 import { SCALE_FEEDBACK_PRIVACY_SENTENCE } from "@/lib/feedback/scaleFeedback";
+import { ANONYMOUS_RESULT_RETENTION_DAYS, DELETION_ON_REQUEST_DAYS } from "@/lib/privacy/retentionPolicy";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { COOKIE_PREFERENCES_EVENT } from "@/components/CookieConsentBanner";
 import { AppFooter } from "@/components/layout/AppFooter";
@@ -26,6 +27,9 @@ export default function Privacy() {
           <h2 className={headingClass}>Plain-English summary</h2>
           <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
             KnowYouRole saves quiz completions so your result can be generated and recovered. We do not sell quiz results. Analytics is optional; advertising technology is not active today.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
+            Schools, parents and students: see <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a> for what we store, how long we keep it, and how to ask for deletion. Quiz results not linked to an account are deleted automatically after {ANONYMOUS_RESULT_RETENTION_DAYS} days. A deletion request is completed within {DELETION_ON_REQUEST_DAYS} days.
           </p>
         </div>
 
@@ -111,6 +115,9 @@ export default function Privacy() {
             <p>
               KnowYouRole is designed with age-aware quiz experiences. We do not knowingly collect personal information from children under 13 without appropriate consent. If you are under 13, do not provide an email address or other personal information without a parent or guardian. If a parent or guardian believes a child under 13 provided personal information, contact us and we will review deletion requests promptly.
             </p>
+            <p>
+              Schools using KnowYouRole with students, including students under 13, should follow our <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">student data and privacy guidance</a>.
+            </p>
           </section>
 
           <section className={sectionClass}>
@@ -144,7 +151,7 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Contact</h2>
             <p>
-              Questions or privacy requests: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline">info@knowyourole.com</a>.
+              KnowYouRole is the data controller. Questions or privacy requests: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline">info@knowyourole.com</a>.
             </p>
           </section>
         </div>

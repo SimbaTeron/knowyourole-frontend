@@ -29,7 +29,7 @@ const COLLEGE_STEP = {
 };
 
 const TEEN_OWN = {
-  trades: "Own a trades business someday",
+  trades: "Run your own trades business one day",
   artDesign: "Run an online art or design shop",
   creator: "Grow your own channel as a small business",
   care: "Start a pet-sitting or tutoring service",
@@ -48,6 +48,7 @@ test("college trades persona does not get the teen someday line", () => {
   const examples = scored.v5Direction.examples.join(" | ");
   assert.match(examples, /Own a trades business after you finish training/);
   assert.doesNotMatch(examples, /Own a trades business someday/);
+  assert.doesNotMatch(examples, /Run your own trades business one day/);
   assert.equal(scored.v5Direction.nextSteps[0], COLLEGE_STEP.trades);
   assert.match(examples, /weld/i);
   assert.match(examples, /electric/i);

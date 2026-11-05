@@ -235,7 +235,7 @@ function comboFor(first: V5Lane, second: V5Lane, stage: LifeStage = "unknown"): 
 const OWNABLE: Partial<Record<V5Lane, { adult: string; teen: string; college: string; step: string; collegeStep: string }>> = {
   trades: {
     adult: "Own a trades business",
-    teen: "Own a trades business someday",
+    teen: "Run your own trades business one day",
     college: "Own a trades business after you finish training",
     step: "Write a one-page plan for your own trades business (services, prices, first customers)",
     collegeStep: "Talk with a trades business owner about licensing, pricing, and your first customers",

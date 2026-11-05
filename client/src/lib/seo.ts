@@ -16,7 +16,7 @@ export type PublicPage = {
   lastModified?: string;
 };
 
-/** Bump when site-wide copy changes (v5 scoring + 30-question copy shipped 2026-10-16). */
+/** Bump when site-wide copy changes (v5 scoring and question-count copy shipped 2026-10-16). */
 export const CONTENT_LAST_UPDATED = "2026-10-16";
 
 const foundationPages: PublicPage[] = [
@@ -51,6 +51,14 @@ const foundationPages: PublicPage[] = [
       "A transparent product and engineering case study: KnowYouRole's problem, architecture, validation, privacy decisions, and lessons learned.",
     changeFrequency: "monthly",
     priority: 0.55,
+  },
+  {
+    path: "/student-data",
+    title: "Student Data & Privacy | KnowYouRole for Schools",
+    description:
+      "What KnowYouRole stores, how long results are kept, how to ask for deletion, and the FERPA, COPPA, and state student-privacy approach.",
+    changeFrequency: "monthly",
+    priority: 0.6,
   },
   {
     path: "/for-schools",
