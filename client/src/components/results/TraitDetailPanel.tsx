@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, TrendingUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import {
   TRAIT_LABELS, TRAIT_ICONS, TRAIT_COLORS, TRAIT_QUARTILE_DESCRIPTIONS,
-  getQuartileKey, calculatePercentile, getPercentileLabel,
+  getQuartileKey,
 } from "./resultsData";
 
 interface TraitDetailPanelProps {
@@ -63,13 +63,6 @@ export function TraitDetailPanel({
               <div className="flex items-center gap-2">
                 <div className="text-right">
                   <span className={`text-lg font-bold ${isSelected ? 'text-white' : colors.text}`}>{value}%</span>
-                  {(() => {
-                    const percentile = calculatePercentile(value, trait);
-                    const pLabel = getPercentileLabel(percentile);
-                    return (
-                      <p className={`text-[10px] ${isSelected ? 'text-white/80' : pLabel.color}`}>Top {100 - percentile}%</p>
-                    );
-                  })()}
                 </div>
                 <ChevronDown className={`w-4 h-4 transition-transform ${isSelected ? 'rotate-180 text-white' : 'text-warm-gray/40 dark:text-[#64748B]'}`} />
               </div>
@@ -96,17 +89,7 @@ export function TraitDetailPanel({
                         ({value <= 25 ? '0-25%' : value <= 50 ? '26-50%' : value <= 75 ? '51-75%' : '76-100%'})
                       </span>
                     </div>
-                    <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed mb-3">{quartileData.description}</p>
-                    {(() => {
-                      const percentile = calculatePercentile(value, trait);
-                      const pLabel = getPercentileLabel(percentile);
-                      return (
-                        <div className="flex items-center gap-2 pt-2 border-t border-warm-gray/10 dark:border-white/5">
-                          <TrendingUp className={`w-3.5 h-3.5 ${pLabel.color}`} />
-                          <span className={`text-xs font-medium ${pLabel.color}`}>{pLabel.label} — Top {100 - percentile}% of people</span>
-                        </div>
-                      );
-                    })()}
+                    <p className="text-sm text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">{quartileData.description}</p>
                   </div>
                 </motion.div>
               )}

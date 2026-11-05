@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { randomIdToken } from '@/lib/randomId';
 
 // =============================================================================
 // Zod Schemas (from schemas.ts)
@@ -508,7 +509,7 @@ export function calculatePersonality(data: Record<string, unknown>) {
     overall: resultConfidenceLabel(modelConfidence.overall),
   };
 
-  const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+  const sessionId = `quiz-${Date.now()}-${randomIdToken(8)}`;
 
   return {
     sessionId,

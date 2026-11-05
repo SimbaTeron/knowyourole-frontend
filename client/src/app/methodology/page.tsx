@@ -172,6 +172,17 @@ export default function MethodologyPage() {
               ))}
             </ol>
           </section>
+
+          <section className={cardClass}>
+            <h2 className={headingClass}>Guides that use this quiz</h2>
+            <p className="mt-3 text-sm leading-relaxed text-[#405f72]">Same quiz, different questions people bring to it. Each guide says what the result can and cannot do.</p>
+            <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[#405f72]">
+              <li><Link href="/careers/trades-career-quiz" className="font-semibold text-[#315f74] underline underline-offset-4">Trades career quiz</Link> for hands-on paths such as electrician, plumber, welder, carpenter, and mechanic.</li>
+              <li><Link href="/careers/creator-careers-quiz" className="font-semibold text-[#315f74] underline underline-offset-4">Creator careers quiz</Link> for art, video, design, music, and streaming.</li>
+              <li><Link href="/career-quiz-for-teens" className="font-semibold text-[#315f74] underline underline-offset-4">Career quiz for teens</Link>, with no account needed.</li>
+              <li><Link href="/for-parents" className="font-semibold text-[#315f74] underline underline-offset-4">For parents</Link> and <Link href="/for-counselors" className="font-semibold text-[#315f74] underline underline-offset-4">for counselors</Link>, including a free lesson plan you can print.</li>
+            </ul>
+          </section>
         </div>
       </main>
       <AppFooter />

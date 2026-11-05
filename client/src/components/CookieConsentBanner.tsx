@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
+import {
+  CONSENT_BAR_HEIGHT_PX,
+  CONSENT_BAR_WRAP_MAX_PX,
+  CONSENT_BAR_WRAPPED_HEIGHT_PX,
+} from "@/components/ConsentBeforePaint";
 
 export const COOKIE_CONSENT_KEY = "kyr_cookie_consent";
 export const COOKIE_CONSENT_EVENT = "kyr-cookie-consent-updated";
 export const COOKIE_PREFERENCES_EVENT = "kyr-open-cookie-preferences";
+export const COOKIE_BAR_LINE = "We use optional analytics cookies.";
 
 export type CookieConsentState = {
   necessary: true;
@@ -27,9 +31,9 @@ const defaultConsent: CookieConsentState = {
 };
 
 export function readCookieConsent(): CookieConsentState | null {
-  if (typeof window === "undefined") return null;
+  if (typeof globalThis.window === "undefined") return null;
   try {
-    const stored = window.localStorage.getItem(COOKIE_CONSENT_KEY);
+    const stored = globalThis.window.localStorage.getItem(COOKIE_CONSENT_KEY);
     if (!stored) return null;
     const parsed = JSON.parse(stored) as Partial<CookieConsentState>;
     return {
@@ -57,58 +61,68 @@ function persistConsent(nextConsent: CookieConsentState) {
   window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: nextConsent }));
 }
 
-function buildConsent(values: Pick<CookieConsentState, "analytics" | "marketing">): CookieConsentState {
+export type CookieBannerPlacement = "bottom-bar";
+
+/** Quiz is included. Onboarding still hides the banner so it cannot cover that overlay. */
+export function shouldShowCookieBanner(input: { showBanner: boolean; onboardingActive: boolean }): boolean {
+  return input.showBanner && !input.onboardingActive;
+}
+
+/** One fixed bar on every route, including home, quiz, and results. */
+export function cookieBannerPlacement(_pathname: string): CookieBannerPlacement {
+  return "bottom-bar";
+}
+
+/** Accept turns on analytics only. Reject keeps essential storage and sends nothing to analytics. */
+export function consentFromChoice(choice: "accept" | "reject", now = new Date().toISOString()): CookieConsentState {
   return {
     necessary: true,
-    analytics: values.analytics,
-    marketing: values.marketing,
-    timestamp: new Date().toISOString(),
+    analytics: choice === "accept",
+    marketing: false,
+    timestamp: now,
     version: 1,
   };
 }
 
+type FocusableMain = {
+  tabIndex: number;
+  focus: (options?: { preventScroll?: boolean }) => void;
+};
+
+/** Move focus to the page's main content without scrolling. */
+export function focusMainContent(
+  doc: { querySelector: (selector: string) => unknown },
+  view: { scrollY: number; scrollTo: (x: number, y: number) => void },
+): boolean {
+  const y = view.scrollY;
+  const main = doc.querySelector("main, [data-kyr-focus-root]") as FocusableMain | null;
+  if (!main || typeof main.focus !== "function") return false;
+  if (typeof main.tabIndex !== "number" || main.tabIndex < 0) main.tabIndex = -1;
+  main.focus({ preventScroll: true });
+  if (view.scrollY !== y) view.scrollTo(0, y);
+  return true;
+}
+
 export function CookieConsentBanner() {
+  const pathname = usePathname() ?? "";
+  const placement = cookieBannerPlacement(pathname);
+  const barRef = useRef<HTMLDivElement>(null);
   const [showBanner, setShowBanner] = useState(false);
-  const [showPreferences, setShowPreferences] = useState(false);
-  const [consent, setConsent] = useState<CookieConsentState>(defaultConsent);
-  const [isResultsRoute, setIsResultsRoute] = useState(false);
-  const [isQuizRoute, setIsQuizRoute] = useState(false);
   const [isQuizOnboardingActive, setIsQuizOnboardingActive] = useState(false);
+  const visible = shouldShowCookieBanner({ showBanner, onboardingActive: isQuizOnboardingActive });
 
-  useEffect(() => {
-    setIsResultsRoute(window.location.pathname.startsWith("/results"));
-    setIsQuizRoute(window.location.pathname.startsWith("/quiz"));
-
-    const openPreferences = () => {
-      setConsent(readCookieConsent() ?? defaultConsent);
-      setShowPreferences(true);
-      setShowBanner(true);
-    };
-
-    const stored = readCookieConsent();
-    if (stored) {
-      setConsent(stored);
-    } else {
-      const timer = window.setTimeout(() => setShowBanner(true), 700);
-      return () => window.clearTimeout(timer);
-    }
+  useLayoutEffect(() => {
+    if (!readCookieConsent()) setShowBanner(true);
   }, []);
 
   useEffect(() => {
-    const openPreferences = () => {
-      setConsent(readCookieConsent() ?? defaultConsent);
-      setShowPreferences(true);
-      setShowBanner(true);
-    };
-
+    const openPreferences = () => setShowBanner(true);
     const handleHashChange = () => {
       if (window.location.hash === "#cookie-preferences") openPreferences();
     };
-
     window.addEventListener(COOKIE_PREFERENCES_EVENT, openPreferences);
     window.addEventListener("hashchange", handleHashChange);
     handleHashChange();
-
     return () => {
       window.removeEventListener(COOKIE_PREFERENCES_EVENT, openPreferences);
       window.removeEventListener("hashchange", handleHashChange);
@@ -119,144 +133,264 @@ export function CookieConsentBanner() {
     const updateOnboardingState = () => {
       setIsQuizOnboardingActive(Boolean(document.querySelector("[data-testid='quiz-onboarding-overlay']")));
     };
-
     updateOnboardingState();
     const observer = new MutationObserver(updateOnboardingState);
     observer.observe(document.body, { childList: true, subtree: true });
-
     return () => observer.disconnect();
   }, []);
 
-  const summary = useMemo(() => {
-    if (consent.analytics && consent.marketing) return "All optional cookies enabled";
-    if (!consent.analytics && !consent.marketing) return "Only essential cookies enabled";
-    return "Some optional cookies enabled";
-  }, [consent.analytics, consent.marketing]);
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    if (!visible) {
+      // The head script reserves the bar before paint. Clearing that here,
+      // before React has decided to show the bar, flashes the quiz full-height.
+      if (readCookieConsent()) {
+        root.style.removeProperty("--kyr-consent-bar");
+        root.removeAttribute("data-kyr-consent");
+      }
+      return;
+    }
+    const bar = barRef.current;
+    if (!bar) return;
+    const apply = () => {
+      const height = Math.ceil(bar.getBoundingClientRect().height);
+      const reserved = Math.ceil(parseFloat(getComputedStyle(root).getPropertyValue("--kyr-consent-bar")) || 0);
+      if (reserved !== height) root.style.setProperty("--kyr-consent-bar", `${height}px`);
+      if (root.getAttribute("data-kyr-consent") !== "open") root.setAttribute("data-kyr-consent", "open");
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(bar);
+    window.addEventListener("resize", apply);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", apply);
+    };
+  }, [visible]);
 
-  const save = (nextConsent: CookieConsentState) => {
-    setConsent(nextConsent);
-    persistConsent(nextConsent);
+  const choose = (choice: "accept" | "reject") => {
+    const y = window.scrollY;
+    persistConsent(consentFromChoice(choice));
+    focusMainContent(document, window);
     setShowBanner(false);
-    setShowPreferences(false);
+    if (window.scrollY !== y) window.scrollTo(0, y);
   };
 
-  // Results are decision content. A translucent, fixed bottom sheet obscured the
-  // direction card on small screens; consent must clearly own the interaction or
-  // stay out of the way—not create an unreadable layer collision.
-  const shellClassName = isResultsRoute
-    ? "fixed inset-0 z-[9000] flex items-end justify-center bg-[#12263a]/65 px-3 pb-[calc(10px+env(safe-area-inset-bottom,0px))] pt-3 backdrop-blur-sm pointer-events-none sm:p-4"
-    : "fixed bottom-0 left-0 right-0 z-[9000] p-4 pointer-events-none";
-
-  const panelClassName = isResultsRoute
-    ? "mx-auto w-full max-w-md rounded-2xl border border-[#12263a]/20 bg-[#fffdf8] p-3 text-[#12263a] shadow-2xl pointer-events-auto max-h-[calc(100dvh-1.5rem)] overflow-y-auto sm:max-h-[min(72dvh,420px)] sm:p-5"
-    : "mx-auto max-w-2xl rounded-2xl border border-[#12263a]/20 bg-[#fffdf8]/95 p-5 text-[#12263a] shadow-2xl backdrop-blur-xl pointer-events-auto";
-
-  const primaryActionsClassName = isResultsRoute
-    ? "grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-end"
-    : "flex flex-wrap justify-end gap-2";
-
-  const buttonClassName = "min-h-11 text-xs";
-
   return (
-    <AnimatePresence>
-      {showBanner && !isQuizRoute && !isQuizOnboardingActive && (
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className={shellClassName}
-          role="region"
-          aria-label="Cookie consent"
-        >
-          <div className={panelClassName}>
-            {!showPreferences ? (
-              <>
-                <div className="mb-3 flex items-start gap-3 sm:mb-4">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#dcedf0] text-[#315f74] sm:h-10 sm:w-10">
-                    <ShieldCheck className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="mb-1 text-base font-semibold">Cookie choices</h2>
-                    <p className="text-xs leading-relaxed text-[#405f72] sm:text-sm">
-                      KnowYouRole uses essential browser storage for quiz progress and consent choices. Google Analytics loads only if you allow analytics. No advertising technology is active today.
-                    </p>
-                    <Link href="/privacy" className="mt-2 inline-block text-xs text-[#315f74] underline underline-offset-4 sm:text-sm">
-                      Read the Privacy Policy
-                    </Link>
-                  </div>
-                </div>
-                <div className={primaryActionsClassName}>
-                  <Button variant="outline" size="sm" onClick={() => setShowPreferences(true)} className={buttonClassName}>
-                    Manage preferences
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => save(buildConsent({ analytics: false, marketing: false }))} className={buttonClassName}>
-                    Reject non-essential
-                  </Button>
-                  <Button size="sm" onClick={() => save(buildConsent({ analytics: true, marketing: true }))} className={`bg-[#ffca42] text-[#12263a] hover:bg-[#f3b91d] ${buttonClassName}`}>
-                    Accept all
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="mb-4">
-                  <h2 className="text-base font-semibold">Manage cookie preferences</h2>
-                  <p className="mt-1 text-xs leading-relaxed text-[#405f72]">{summary}</p>
-                </div>
-
-                <div className="mb-4 space-y-3">
-                  <div className="rounded-xl border border-[#12263a]/15 bg-[#fffaf0] p-3">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-semibold text-[#12263a]">Essential</p>
-                        <p className="text-xs leading-relaxed text-[#405f72]">Required for quiz state, consent storage, and basic site functionality.</p>
-                      </div>
-                      <span className="rounded-full bg-[#dcedf0] px-3 py-1 text-xs font-semibold text-[#315f74]">Always on</span>
-                    </div>
-                  </div>
-
-                  {([
-                    ["analytics", "Analytics", "Loads Google Analytics to measure page views, quiz flow, and site performance. Quiz answers and email addresses are not intentionally sent to Google Analytics."],
-                    ["marketing", "Advertising", "No advertising technology is active today. This preference is saved so you can keep advertising disabled if that changes later."],
-                  ] as const).map(([key, label, description]) => (
-                    <div key={key} className="rounded-xl border border-[#12263a]/15 bg-[#fffaf0] p-3">
-                      <div className="flex items-center justify-between gap-4">
-                        <div>
-                          <p className="text-sm font-semibold text-[#12263a]">{label}</p>
-                          <p className="text-xs leading-relaxed text-[#405f72]">{description}</p>
-                        </div>
-                        <button
-                          type="button"
-                          aria-label={`${consent[key] ? "Disable" : "Enable"} ${label}`}
-                          aria-pressed={consent[key]}
-                          onClick={() => setConsent((prev) => ({ ...prev, [key]: !prev[key] }))}
-                          className={`flex h-7 w-12 items-center rounded-full p-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a3402b] ${consent[key] ? "justify-end bg-[#315f74]" : "justify-start bg-[#9eb3bd]"}`}
-                        >
-                          <span className="h-5 w-5 rounded-full bg-white shadow" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className={primaryActionsClassName}>
-                  <Button variant="outline" size="sm" onClick={() => setShowPreferences(false)} className={buttonClassName}>
-                    Back
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => save(buildConsent({ analytics: false, marketing: false }))} className={buttonClassName}>
-                    Reject non-essential
-                  </Button>
-                  <Button size="sm" onClick={() => save(buildConsent({ analytics: consent.analytics, marketing: consent.marketing }))} className={`bg-[#ffca42] text-[#12263a] hover:bg-[#f3b91d] ${buttonClassName}`}>
-                    Save choices
-                  </Button>
-                </div>
-              </>
-            )}
+    <>
+      <style>{`
+        html[data-kyr-consent="open"] {
+          scroll-padding-bottom: calc(var(--kyr-consent-bar, 0px) + 12px);
+        }
+        html[data-kyr-consent="open"] body {
+          padding-bottom: var(--kyr-consent-bar, 0px);
+        }
+        html[data-kyr-consent="open"] .primary-cta,
+        html[data-kyr-consent="open"] .shortform-v2-answer-button,
+        html[data-kyr-consent="open"] .quiz-welcome-card button {
+          scroll-margin-bottom: calc(var(--kyr-consent-bar, 0px) + 12px);
+        }
+        @media (max-width: 414px) {
+          html[data-kyr-consent="open"]:has(.quiz-question-screen) body,
+          html[data-kyr-consent="open"]:has(.quiz-welcome-screen) body {
+            padding-bottom: 0;
+            overflow: hidden;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen,
+          html[data-kyr-consent="open"] .quiz-welcome-screen {
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            height: calc(100dvh - var(--kyr-consent-bar, 0px)) !important;
+            min-height: 0 !important;
+            max-height: calc(100dvh - var(--kyr-consent-bar, 0px)) !important;
+            overflow: hidden !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen > main {
+            flex: 1 1 auto;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
+            padding-bottom: 10px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-layout {
+            flex: 1 1 auto;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 0 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-card,
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-body {
+            min-height: 0 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-card {
+            flex: 1 1 auto;
+            overflow: hidden;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-grid {
+            flex: 0 0 auto;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-button {
+            min-height: 0 !important;
+          }
+        }
+        @media (max-width: 414px) and (max-height: 740px) {
+          html[data-kyr-consent="open"] .quiz-question-screen > main {
+            padding-top: 46px !important;
+            padding-bottom: 6px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-layout {
+            gap: 6px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-card {
+            padding: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-question-title {
+            font-size: 1.05rem !important;
+            line-height: 1.05 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-grid {
+            gap: 6px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-button {
+            padding: 6px 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-question-screen .shortform-v2-answer-button h2 {
+            font-size: 0.9rem !important;
+            line-height: 1.15 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-screen {
+            padding-top: 12px !important;
+            padding-bottom: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+          }
+        }
+        @media (max-width: 414px) and (max-height: 740px) {
+          html[data-kyr-consent="open"] .quiz-welcome-card {
+            padding: 12px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card h2 {
+            margin-top: 8px !important;
+            font-size: 1.35rem !important;
+            line-height: 1.05 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card p,
+          html[data-kyr-consent="open"] .quiz-welcome-card li {
+            margin-top: 8px !important;
+            font-size: 12px !important;
+            line-height: 1.35 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card ul {
+            margin-top: 8px !important;
+            gap: 6px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card li {
+            padding: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card button {
+            margin-top: 10px !important;
+          }
+        }
+        @media (max-width: ${CONSENT_BAR_WRAP_MAX_PX}px) {
+          html[data-kyr-consent="open"] .quiz-welcome-screen {
+            justify-content: center !important;
+            padding-top: 12px !important;
+            padding-bottom: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card {
+            padding: 12px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card h2 {
+            margin-top: 8px !important;
+            font-size: 1.35rem !important;
+            line-height: 1.05 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card p,
+          html[data-kyr-consent="open"] .quiz-welcome-card li {
+            margin-top: 8px !important;
+            font-size: 12px !important;
+            line-height: 1.35 !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card ul {
+            margin-top: 8px !important;
+            gap: 6px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card li {
+            padding: 8px !important;
+          }
+          html[data-kyr-consent="open"] .quiz-welcome-card button {
+            margin-top: 10px !important;
+          }
+        }
+        .kyr-cookie-bar {
+          position: fixed;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 9000;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          box-sizing: border-box;
+          height: calc(${CONSENT_BAR_HEIGHT_PX}px + env(safe-area-inset-bottom, 0px));
+          padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+          border-top: 1px solid rgba(18, 38, 58, 0.22);
+          background: #fffdf8;
+          color: #12263a;
+          overflow: hidden;
+          overflow-anchor: none;
+          font: 600 14px/1.35 Manrope, Inter, system-ui, sans-serif;
+        }
+        @media (max-width: ${CONSENT_BAR_WRAP_MAX_PX}px) {
+          .kyr-cookie-bar { height: calc(${CONSENT_BAR_WRAPPED_HEIGHT_PX}px + env(safe-area-inset-bottom, 0px)); }
+        }
+        .kyr-cookie-line { margin: 0; flex: 1 1 180px; }
+        .kyr-cookie-line a { color: #1f5e78; font-weight: 750; }
+        .kyr-cookie-actions { display: flex; flex: 1 1 180px; gap: 8px; }
+        .kyr-cookie-choice {
+          flex: 1 1 0;
+          min-width: 0;
+          min-height: 44px;
+          border: 1px solid #12263a;
+          border-radius: 4px;
+          background: #fffdf8;
+          color: #12263a;
+          cursor: pointer;
+          font: 800 14px/1 Manrope, Inter, system-ui, sans-serif;
+        }
+        .kyr-cookie-choice:focus-visible,
+        .kyr-cookie-line a:focus-visible {
+          outline: 3px solid #12263a;
+          outline-offset: 2px;
+        }
+      `}</style>
+      {visible && placement === "bottom-bar" && (
+        <div ref={barRef} className="kyr-cookie-bar" role="region" aria-label="Cookie consent">
+          <p className="kyr-cookie-line">
+            {COOKIE_BAR_LINE}{" "}
+            <Link href="/privacy">Privacy</Link>
+          </p>
+          <div className="kyr-cookie-actions">
+            <button type="button" className="kyr-cookie-choice" onClick={() => choose("reject")}>
+              Reject
+            </button>
+            <button type="button" className="kyr-cookie-choice" onClick={() => choose("accept")}>
+              Accept
+            </button>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
 

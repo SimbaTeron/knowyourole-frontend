@@ -1,7 +1,7 @@
 /**
  * Display consistency: every results view must render the same final clarity.
- * Main page, Big Five tab, decision brief and report all go through resolveFinalClarity;
- * this asserts it matches the v4.1 scorer for all 40 fixtures.
+ * The page builds one result view; that view calls resolveFinalClarity once.
+ * This asserts the view level matches the v4.1 scorer for all 40 fixtures.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -60,9 +60,12 @@ test("stress secondary note: only when N high and not top/co-top", () => {
   assert.equal(show("P09"), false, "P09 calm");
 });
 
-test("results page never resolves clarity outside resolveFinalClarity", () => {
+test("results page builds one result view and does not resolve clarity itself", () => {
   const src = readFileSync(join(root, "src/app/results/ResultsPageClient.tsx"), "utf8");
+  const viewSrc = readFileSync(join(root, "src/lib/results/resultViewModel.ts"), "utf8");
   assert.ok(!/resolveResultClarityDisplay\(/.test(src), "direct resolveResultClarityDisplay call");
   assert.ok(!/getResultClarity\(/.test(src), "direct getResultClarity call");
-  assert.ok((src.match(/resolveFinalClarity\(/g) || []).length >= 2, "main + report use resolveFinalClarity");
+  assert.ok(!/resolveFinalClarity\(/.test(src), "page resolves clarity itself");
+  assert.equal((src.match(/buildResultView\(/g) || []).length, 1, "page builds the result view once");
+  assert.ok(/resolveFinalClarity\(/.test(viewSrc), "view model is the clarity caller");
 });

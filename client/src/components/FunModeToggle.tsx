@@ -29,6 +29,8 @@ export default function FunModeToggle({ enabled, onToggle }: FunModeToggleProps)
     for (let i = 0; i < 20; i++) {
       const piece = document.createElement("div");
       piece.className = "absolute w-2 h-2 rounded-full pointer-events-none";
+      // Confetti motion only. Not an id.
+      // eslint-disable-next-line no-restricted-syntax
       piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
       piece.style.left = "50%";
       piece.style.top = "50%";
@@ -38,7 +40,9 @@ export default function FunModeToggle({ enabled, onToggle }: FunModeToggleProps)
       container.appendChild(piece);
       pieces.push(piece);
 
+      // eslint-disable-next-line no-restricted-syntax
       const angle = (Math.PI * 2 * i) / 20 + Math.random() * 0.5;
+      // eslint-disable-next-line no-restricted-syntax
       const velocity = 60 + Math.random() * 40;
       const targetX = Math.cos(angle) * velocity;
       const targetY = Math.sin(angle) * velocity - 20;
@@ -49,11 +53,13 @@ export default function FunModeToggle({ enabled, onToggle }: FunModeToggleProps)
           opacity: 1 
         },
         { 
+          // eslint-disable-next-line no-restricted-syntax
           transform: `translate(calc(-50% + ${targetX}px), calc(-50% + ${targetY}px)) scale(1) rotate(${Math.random() * 360}deg)`, 
           opacity: 1,
           offset: 0.4
         },
         { 
+          // eslint-disable-next-line no-restricted-syntax
           transform: `translate(calc(-50% + ${targetX * 1.2}px), calc(-50% + ${targetY + 30}px)) scale(0.5) rotate(${Math.random() * 720}deg)`, 
           opacity: 0 
         }

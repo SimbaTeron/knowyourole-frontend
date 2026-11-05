@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
+import { resolveOgCardInput } from "@/app/og/ogCardInput";
 
 export const runtime = "edge";
 
@@ -23,8 +24,9 @@ function sectionLabel(path: string) {
 
 export function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const title = (searchParams.get("title") || "Discover your work style").slice(0, 110);
-  const path = searchParams.get("path") || "/";
+  const card = resolveOgCardInput(searchParams);
+  const title = card.title.slice(0, 110);
+  const path = card.path;
 
   return new ImageResponse(
     (

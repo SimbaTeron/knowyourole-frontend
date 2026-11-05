@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useDevStore, type DevMood, type DevTier } from '@/stores/devStore';
 import questionsData from '@/data/questions.json';
 import { getFakeScores } from '@/utils/devTest';
+import { randomIdToken } from '@/lib/randomId';
 
 const MBTI_OPTIONS = [
   'Auto',
@@ -108,10 +109,13 @@ const PRESETS: Record<PresetKey, {
 };
 
 function pickRandom<T>(items: readonly T[]): T {
+  // Dev-panel fixture picker. Not an id and not used in production renders.
+  // eslint-disable-next-line no-restricted-syntax
   return items[Math.floor(Math.random() * items.length)] ?? items[0];
 }
 
 function randomInt(min: number, max: number): number {
+  // eslint-disable-next-line no-restricted-syntax
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -469,7 +473,7 @@ export default function DevToolPanel() {
     const scores = buildScores(tier, mbti, disc, b5, 45);
     const mbtiType = getMbtiType(scores);
     const discStyle = getDiscStyle(scores);
-    const sessionId = `dev-${randomize ? 'random' : 'profile'}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const sessionId = `dev-${randomize ? 'random' : 'profile'}-${Date.now()}-${randomIdToken(8)}`;
     const tierParam = tierToParam(tier);
 
     setStatus('Saving ResultDTO…');
@@ -520,7 +524,7 @@ export default function DevToolPanel() {
   const runSupabaseSmoke = async () => {
     setStatus('Testing Supabase save…');
     const scores = buildScores(store.tier, store.mbtiOverride, discOverride, bigFive, 45);
-    const sessionId = `dev-db-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const sessionId = `dev-db-${Date.now()}-${randomIdToken(8)}`;
 
     try {
       const response = await fetch('/api/results/compute', {

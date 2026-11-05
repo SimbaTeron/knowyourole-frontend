@@ -11,9 +11,9 @@ import {
 } from "@/lib/quiz/shortformV3Adjustments";
 import { applyV4OptionRemaps } from "@/lib/quiz/shortformV4Adjustments";
 import { applyV5Raw, applyV5StressGate, lifeStageFromResponses, type LifeStage } from "@/lib/quiz/shortformV5Adjustments";
-import { adjustClarityV5, V5_CLEAR_BODY } from "@/lib/quiz/clarityV5";
 import { deriveWorkDirectionV5, type V5Direction } from "@/lib/results/workDirectionV5";
-import { detectInconsistency, adjustClarityV41, RESULT_CLARITY_COPY_V41, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
+import { detectInconsistency, type InconsistencyReport } from "@/lib/quiz/inconsistencyDetect";
+import { resolveFinalClarity } from "@/lib/results/finalClarity";
 import {
   SCORING_VERSION_V2,
   SCORING_VERSION_V3,
@@ -32,7 +32,7 @@ import {
   type WorkLaneKey,
   type WorkLaneScores,
 } from "@/lib/results/workLanes";
-import { getResultClarity, detectFlatAnswerPattern, resolveResultClarityDisplay } from "@/lib/results/resultClarity";
+import type { ResultClarity, ResultClarityDisplay, FlatPatternResult } from "@/lib/results/resultClarity";
 import { getMbtiConfidence, type MbtiConfidence } from "@/lib/quiz/mbtiConfidence";
 
 export type ScoreVersion = "v2" | "v3" | "v4" | "v5";
@@ -150,9 +150,9 @@ export type VersionedResult = {
   discPrimary: string;
   topTrait: string;
   topTraits: string[];
-  clarity: ReturnType<typeof getResultClarity>;
-  flat: ReturnType<typeof detectFlatAnswerPattern>;
-  clarityDisplay: ReturnType<typeof resolveResultClarityDisplay>;
+  clarity: ResultClarity;
+  flat: FlatPatternResult;
+  clarityDisplay: ResultClarityDisplay;
   direction: WorkDirection;
   altDirections: WorkDirection[];
   nTier: "low" | "medium" | "high";
@@ -183,23 +183,15 @@ export function scoreShortformVersioned(
   }
   const calibrated = calibrate(raw);
   const maxCareer = Math.max(...Object.values(calibrated.career).map((v) => Number(v) || 0));
-  const useV3Clarity = version === "v3" || version === "v4";
-  const clarityOpts = useV3Clarity ? { version: "v3" as const, maxCareer } : {};
-  let clarity = getResultClarity(calibrated.bigFive, clarityOpts);
-  const flat = detectFlatAnswerPattern(responses);
+  const scoringVersion =
+    version === "v4" ? SCORING_VERSION_V4 : version === "v3" ? SCORING_VERSION_V3 : SCORING_VERSION_V2;
+  const finalClarity = resolveFinalClarity(calibrated.bigFive, responses, scoringVersion, maxCareer, calibrated.career);
+  const clarity = { ...finalClarity.display.clarity, level: finalClarity.level };
+  const flat = finalClarity.display.flat;
+  const clarityDisplay = finalClarity.display;
   const inconsistency = version === "v4"
-    ? detectInconsistency(responses)
+    ? (finalClarity.report ?? detectInconsistency(responses))
     : { flagged: false, guarded: false, splitHalf: 0, meanCoherence: 1, coherence: [1, 1, 1, 1], reasons: [], contradictionPairs: 0, entropy: 0, safeDefaultCount: 0, note: "" };
-  // Guarded / contradictory patterns: do not leave a confident Clear label.
-  if (version === "v4") {
-    const adj = adjustClarityV41(clarity.level, inconsistency, calibrated.bigFive, raw.mbti);
-    if (adj !== clarity.level) clarity = { ...clarity, level: adj, label: RESULT_CLARITY_COPY_V41[adj].label, body: RESULT_CLARITY_COPY_V41[adj].body };
-  }
-  let clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
-  if (version === "v4" && clarityDisplay.kind !== "flat" && clarityDisplay.kind !== clarity.level) {
-    const copy = RESULT_CLARITY_COPY_V41[clarity.level];
-    clarityDisplay = { ...clarityDisplay, kind: clarity.level, heading: `Result clarity: ${copy.label}`, body: copy.body };
-  }
 
   const type = mbtiType(calibrated.mbti, false);
   const broadForConf = clarity.level === "broad" || (version === "v4" && (inconsistency.flagged || inconsistency.guarded));
@@ -225,8 +217,6 @@ export function scoreShortformVersioned(
       ? buildAltDirections(calibrated.career, lanes, direction)
       : [];
   const n = calibrated.bigFive.N;
-  const scoringVersion =
-    version === "v4" ? SCORING_VERSION_V4 : version === "v3" ? SCORING_VERSION_V3 : SCORING_VERSION_V2;
   const careerMatchVersion =
     version === "v4" ? CAREER_MATCH_VERSION_V4 : version === "v3" ? CAREER_MATCH_VERSION_V3 : CAREER_MATCH_VERSION_V2;
   return {
@@ -275,19 +265,19 @@ function scoreV5(responses: VersionedResponse[], rawIn: VersionedScoreMaps): Ver
   const calibrated = calibrate(raw);
   calibrated.bigFive = applyV5StressGate(calibrated.bigFive, responses) as VersionedScoreMaps["bigFive"];
   const maxCareer = Math.max(...Object.values(calibrated.career).map((v) => Number(v) || 0));
-  const clarityOpts = { version: "v3" as const, maxCareer };
-  let clarity = getResultClarity(calibrated.bigFive, clarityOpts);
-  const flat = detectFlatAnswerPattern(responses);
   const inconsistency = detectInconsistency(responses.filter((r) => r.questionId <= 28));
-  const adj = adjustClarityV5(clarity.level, inconsistency, calibrated.bigFive, raw.mbti, responses, calibrated.career);
-  if (adj.level !== clarity.level) clarity = { ...clarity, level: adj.level, label: RESULT_CLARITY_COPY_V41[adj.level].label, body: RESULT_CLARITY_COPY_V41[adj.level].body };
-  let clarityDisplay = resolveResultClarityDisplay(calibrated.bigFive, responses, clarityOpts);
-  // v5 always shows the clarity line (its own pattern detector replaces the old same-letter note).
-  if (clarityDisplay.kind !== clarity.level) {
-    const copy = RESULT_CLARITY_COPY_V41[clarity.level];
-    clarityDisplay = { ...clarityDisplay, kind: clarity.level, heading: `Result clarity: ${copy.label}`, body: copy.body };
-  }
-  if (clarity.level === "clear") clarityDisplay = { ...clarityDisplay, body: V5_CLEAR_BODY };
+  const finalClarity = resolveFinalClarity(calibrated.bigFive, responses, SCORING_VERSION_V5, maxCareer, calibrated.career);
+  const clarity = { ...finalClarity.display.clarity, level: finalClarity.level };
+  const flat = finalClarity.display.flat;
+  const clarityDisplay = finalClarity.display;
+  const adj = finalClarity.v5 ?? {
+    level: finalClarity.level,
+    quickOrScattered: false,
+    fast: false,
+    scattered: false,
+    randomLike: false,
+    note: "",
+  };
   const type = mbtiType(calibrated.mbti, false);
   const mbtiConfidence = getMbtiConfidence(calibrated.mbti, raw.mbti, { broad: clarity.level === "broad" });
   if (adj.quickOrScattered) {

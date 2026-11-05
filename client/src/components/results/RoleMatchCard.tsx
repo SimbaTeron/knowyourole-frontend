@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import {
   Sparkles, Target, Brain, Briefcase, TrendingUp,
-  ChevronDown, Zap, Crown, DollarSign
+  ChevronDown, Zap, Crown
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getRegionalSalary, shouldShowSalary } from "@/data/regionalSalaries";
+import { formatMedianAnnual, PAY_SOURCE, payForCareer } from "@/lib/results/publishedFigures";
 import type { JobMatch } from "./resultsData";
 
 interface RoleMatchCardProps {
@@ -18,8 +18,9 @@ interface RoleMatchCardProps {
   shouldReduceMotion: boolean | null;
 }
 
-export function TopCareerMatch({ topJobMatch, jobMatchLoading, cityName, stateName, isMiniExplorer, shouldReduceMotion }: RoleMatchCardProps) {
+export function TopCareerMatch({ topJobMatch, jobMatchLoading, isMiniExplorer, shouldReduceMotion }: RoleMatchCardProps) {
   if (isMiniExplorer) return null;
+  const sourcedPay = topJobMatch ? payForCareer(topJobMatch.roleName) : null;
 
   return (
     <motion.div
@@ -56,14 +57,14 @@ export function TopCareerMatch({ topJobMatch, jobMatchLoading, cityName, stateNa
                   <Target className="w-3 h-3 text-sage-green" />
                   <span className="text-xs text-sage-green font-medium">{topJobMatch.matchScore}% match</span>
                 </div>
-                {cityName && shouldShowSalary(cityName) && (
+                {sourcedPay ? (
                   <div className="flex items-center gap-1">
-                    <DollarSign className="w-3 h-3 text-amber-500" />
                     <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                      {getRegionalSalary(topJobMatch.roleName, cityName, stateName || undefined)?.salary || topJobMatch.salary}
+                      {formatMedianAnnual(sourcedPay.medianAnnual)}
                     </span>
+                    <a className="text-[10px] text-warm-gray/60 underline" href={PAY_SOURCE.url}>{PAY_SOURCE.line}</a>
                   </div>
-                )}
+                ) : null}
                 {topJobMatch.growth && (
                   <div className="flex items-center gap-1">
                     <TrendingUp className="w-3 h-3 text-dusty-blue" />

@@ -1,5 +1,8 @@
 'use client';
 
+import { RESULT_FIT_PRIVACY_SENTENCE } from "@/lib/feedback/resultFitCopy";
+import { SCALE_FEEDBACK_PRIVACY_SENTENCE } from "@/lib/feedback/scaleFeedback";
+import { ANONYMOUS_RESULT_RETENTION_DAYS, DELETION_ON_REQUEST_DAYS } from "@/lib/privacy/retentionPolicy";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { COOKIE_PREFERENCES_EVENT } from "@/components/CookieConsentBanner";
 import { AppFooter } from "@/components/layout/AppFooter";
@@ -18,7 +21,7 @@ export default function Privacy() {
       <AppHeader />
       <main className="workday-simple-wrap max-w-2xl px-6 py-32">
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-privacy-title">Privacy Policy</h1>
-        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last reviewed: July 27, 2026</p>
+        <p className="text-sm text-warm-gray/50 dark:text-[#64748B] mb-8">Last reviewed: October 22, 2026</p>
 
         <div className="p-4 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 mb-8" data-testid="section-data-promise">
           <h2 className={headingClass}>Plain-English summary</h2>
@@ -26,7 +29,7 @@ export default function Privacy() {
             KnowYouRole saves quiz completions so your result can be generated and recovered. We do not sell quiz results. Analytics is optional; advertising technology is not active today.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
-            Schools, parents and students: see <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a> for what we store, how long we keep it, and how to ask for deletion. Quiz results not linked to an account are deleted automatically after 30 days.
+            Schools, parents and students: see <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a> for what we store, how long we keep it, and how to ask for deletion. Quiz results not linked to an account are deleted automatically after {ANONYMOUS_RESULT_RETENTION_DAYS} days. A deletion request is completed within {DELETION_ON_REQUEST_DAYS} days.
           </p>
         </div>
 
@@ -45,6 +48,8 @@ export default function Privacy() {
               <li>Age tier selection so quiz copy and experience can be age-appropriate.</li>
               <li>Email address, selected result-summary fields, consent, and delivery status when you explicitly request that a result summary be emailed.</li>
               <li>Feedback you submit voluntarily.</li>
+              <li>{RESULT_FIT_PRIVACY_SENTENCE}</li>
+              <li>{SCALE_FEEDBACK_PRIVACY_SENTENCE}</li>
               <li>Device, browser, referral, and performance data when analytics is enabled through cookie preferences.</li>
               <li>Browser storage used for quiz state, consent preferences, and session continuity.</li>
             </ul>
@@ -146,7 +151,7 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Contact</h2>
             <p>
-              Questions or privacy requests: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline">info@knowyourole.com</a>.
+              KnowYouRole is the data controller. Questions or privacy requests: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline">info@knowyourole.com</a>.
             </p>
           </section>
         </div>

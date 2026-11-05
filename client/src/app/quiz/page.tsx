@@ -13,7 +13,6 @@ const quizJsonLd = {
     "MBTI-style preference patterns",
     "DISC-style work behavior",
     "work style",
-    "career fit",
     "communication style",
   ],
   isAccessibleForFree: true,

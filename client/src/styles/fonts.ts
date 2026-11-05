@@ -21,3 +21,4 @@ import "@fontsource/inter/latin-800.css";
 import "@fontsource/playfair-display/latin-400.css";
 import "@fontsource/playfair-display/latin-600.css";
 import "@fontsource/playfair-display/latin-700.css";
+import "./font-fallback.css";

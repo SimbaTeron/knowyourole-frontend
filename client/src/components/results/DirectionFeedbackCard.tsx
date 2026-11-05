@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { trackKyrEvent } from "@/lib/analytics";
+import { RatingRadios } from "@/components/results/RatingRadios";
+import type { SavedResultId } from "@/lib/results/savedResultId";
 
 type DirectionFeedbackCardProps = {
-  resultId?: string;
+  savedResultId?: SavedResultId | null;
   sessionId?: string;
   directionTitle: string;
   recommendations: string[];
@@ -24,13 +26,15 @@ function capabilityStorageKey(sessionId: string) {
   return `kyr_anonymous_result_capability:${sessionId}`;
 }
 
-export function DirectionFeedbackCard({ resultId, sessionId, directionTitle, recommendations }: DirectionFeedbackCardProps) {
+export function DirectionFeedbackCard({ savedResultId: resultId, sessionId, directionTitle, recommendations }: DirectionFeedbackCardProps) {
   const [rating, setRating] = useState<number | null>(null);
   const [mostUseful, setMostUseful] = useState("");
   const [leastUseful, setLeastUseful] = useState("");
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorTick, setErrorTick] = useState(0);
+  const errorRef = useRef<HTMLParagraphElement>(null);
 
   const options = useMemo(
     () => Array.from(new Set([directionTitle, ...recommendations].filter(Boolean))).slice(0, 8),
@@ -47,6 +51,16 @@ export function DirectionFeedbackCard({ resultId, sessionId, directionTitle, rec
     trackKyrEvent("direction_relevance_prompted", { pilot_feedback: true });
   }, [canCollectFeedback, resultId]);
 
+  useEffect(() => {
+    if (!errorMessage) return;
+    errorRef.current?.focus();
+  }, [errorMessage, errorTick]);
+
+  const reportError = (message: string) => {
+    setErrorMessage(message);
+    setErrorTick((tick) => tick + 1);
+  };
+
   if (!canCollectFeedback) return null;
 
   const chooseRating = (value: number) => {
@@ -58,7 +72,7 @@ export function DirectionFeedbackCard({ resultId, sessionId, directionTitle, rec
   const submit = async () => {
     if (!rating || !resultId || !sessionId || status === "submitting") return;
     if (mostUseful && leastUseful && mostUseful === leastUseful) {
-      setErrorMessage("Choose different recommendations for most and least useful.");
+      reportError("Choose different recommendations for most and least useful.");
       return;
     }
 
@@ -95,7 +109,7 @@ export function DirectionFeedbackCard({ resultId, sessionId, directionTitle, rec
       setStatus("submitted");
     } catch (error) {
       setStatus("error");
-      setErrorMessage(error instanceof Error ? error.message : "Could not save feedback. Please try again.");
+      reportError(error instanceof Error ? error.message : "Could not save feedback. Please try again.");
     }
   };
 
@@ -114,23 +128,25 @@ export function DirectionFeedbackCard({ resultId, sessionId, directionTitle, rec
       <div style={eyebrowStyle}>Early pilot · 60 seconds</div>
       <h3 id="direction-feedback-title" style={headingStyle}>Does this work direction feel accurate?</h3>
       <p style={copyStyle}>Your result is visible above. One rating is enough; the optional details help us improve the recommendations.</p>
+      <p style={privacyNoteStyle}>No names needed. Linked to this result, not to you by name.</p>
 
-      <div role="radiogroup" aria-label="Direction accuracy" style={ratingGridStyle}>
-        {RATINGS.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            role="radio"
-            aria-checked={rating === option.value}
-            onClick={() => chooseRating(option.value)}
-            style={{ ...ratingButtonStyle, ...(rating === option.value ? selectedRatingButtonStyle : {}) }}
-          >
-            <strong style={ratingValueStyle}>{option.value}</strong>
-            <span style={ratingLabelStyle}>{option.label}</span>
-            <small style={ratingDetailStyle}>{option.detail}</small>
-          </button>
-        ))}
-      </div>
+      <RatingRadios
+        label="Direction accuracy"
+        style={ratingGridStyle}
+        selected={rating}
+        onSelect={chooseRating}
+        options={RATINGS.map((option) => ({
+          value: option.value,
+          style: { ...ratingButtonStyle, ...(rating === option.value ? selectedRatingButtonStyle : {}) },
+          children: (
+            <>
+              <strong style={ratingValueStyle}>{option.value}</strong>
+              <span style={ratingLabelStyle}>{option.label}</span>
+              <small style={ratingDetailStyle}>{option.detail}</small>
+            </>
+          ),
+        }))}
+      />
 
       {rating !== null && (
         <div style={followUpStyle}>
@@ -162,14 +178,18 @@ export function DirectionFeedbackCard({ resultId, sessionId, directionTitle, rec
             />
             <span style={characterCountStyle}>{note.length}/500</span>
           </label>
-          <p style={{ margin: "8px 0 0", fontSize: 12, color: "#405f72" }}>No names needed. Linked to this result, not to you by name.</p>
-          <button type="button" onClick={submit} disabled={status === "submitting"} style={{ ...submitStyle, ...(status === "submitting" ? disabledSubmitStyle : {}) }}>
+          <button
+            type="button"
+            onClick={submit}
+            aria-disabled={status === "submitting" ? true : undefined}
+            style={{ ...submitStyle, ...(status === "submitting" ? disabledSubmitStyle : {}) }}
+          >
             {status === "submitting" ? "Saving feedback…" : "Send feedback"}
           </button>
         </div>
       )}
 
-      {errorMessage && <p role="alert" style={errorStyle}>{errorMessage}</p>}
+      {errorMessage && <p ref={errorRef} role="alert" tabIndex={-1} style={errorStyle}>{errorMessage}</p>}
     </section>
   );
 }
@@ -178,6 +198,7 @@ const cardStyle = { marginTop: 14, border: "1px solid rgba(18,38,58,.22)", borde
 const eyebrowStyle = { color: "#315f74", fontSize: 10, fontWeight: 950, letterSpacing: ".14em", textTransform: "uppercase" as const } as const;
 const headingStyle = { margin: "8px 0 6px", color: "#12263a", fontFamily: "Fraunces, Georgia, serif", fontSize: "clamp(21px,4vw,27px)", lineHeight: 1.02, letterSpacing: "-.04em" } as const;
 const copyStyle = { margin: 0, color: "#405f72", fontSize: 13, lineHeight: 1.5, maxWidth: 580 } as const;
+const privacyNoteStyle = { margin: "8px 0 0", color: "#29495c", fontSize: 13, lineHeight: 1.45, fontWeight: 700, maxWidth: 580 } as const;
 const ratingGridStyle = { display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 7, marginTop: 15 } as const;
 const ratingButtonStyle = { minHeight: 86, padding: "8px 5px", border: "1px solid rgba(18,38,58,.22)", borderRadius: 3, color: "#12263a", background: "#fffdf8", cursor: "pointer", textAlign: "center" as const, font: "inherit" } as const;
 const selectedRatingButtonStyle = { borderColor: "#12263a", color: "#fffdf8", background: "#315f74", boxShadow: "3px 3px 0 #c95f46", transform: "translate(-1px,-1px)" } as const;

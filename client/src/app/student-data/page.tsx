@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { RESULT_FIT_STUDENT_DATA_SENTENCE } from "@/lib/feedback/resultFitCopy";
+import { ANONYMOUS_RESULT_RETENTION_DAYS, DELETION_ON_REQUEST_DAYS } from "@/lib/privacy/retentionPolicy";
 import { publicPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata("/student-data");
@@ -10,15 +12,14 @@ export const metadata: Metadata = publicPageMetadata("/student-data");
  * LEGAL REVIEW REQUIRED: this page is a plain-English draft, not legal advice.
  * A lawyer should review the FERPA, COPPA, SOPIPA / AB 1584 and NY Ed Law 2-d
  * statements before schools rely on them.
- * Retention (30 days) and deletion window (30 days) confirmed by the owner.
- * Retention matches purge_expired_anonymous_result_data() (supabase/migrations/006),
- * run daily by the Vercel cron in client/vercel.json. Change both together.
- * OWNER TO CONFIRM: data controller name and mailing address. See OWNER_VALUES below.
+ * Data controller is KnowYouRole. Contact is info@knowyourole.com.
+ * No mailing address and no phone are published.
+ * Retention and deletion-on-request days come from retentionPolicy.ts.
  */
 const OWNER_VALUES = {
-  retention: "30 days", // must match INTERVAL '30 days' in purge_expired_anonymous_result_data()
-  deletionWindow: "30 days",
-  controller: "KnowYouRole", // OWNER TO CONFIRM: legal entity or owner name
+  retentionDays: ANONYMOUS_RESULT_RETENTION_DAYS,
+  deletionDays: DELETION_ON_REQUEST_DAYS,
+  controller: "KnowYouRole",
   contact: "info@knowyourole.com",
 } as const;
 
@@ -27,6 +28,7 @@ const stored = [
   "A random session ID so your result can be shown and recovered",
   "The age range you pick, so the wording fits your age",
   "Anonymous feedback, only if you choose to send it",
+  RESULT_FIT_STUDENT_DATA_SENTENCE,
 ];
 
 const notStored = [
@@ -68,14 +70,14 @@ export default function StudentDataPage() {
           <section className={sectionClass}>
             <h2 className={h2Class}>How long we keep it</h2>
             <p className={pClass}>
-              Quiz results are kept for <strong>{OWNER_VALUES.retention}</strong>, then deleted automatically by a daily cleanup. Because results have no name attached, we use them only to show a result again and to improve the quiz.
+              Quiz results are kept for <strong>{OWNER_VALUES.retentionDays} days</strong>, then deleted automatically by a daily cleanup. Because results have no name attached, we use them only to show a result again and to improve the quiz.
             </p>
           </section>
 
           <section className={sectionClass}>
             <h2 className={h2Class}>Deleting a result</h2>
             <p className={pClass}>
-              A school, parent, guardian or student can ask us to delete a result by emailing <a className={linkClass} href={`mailto:${OWNER_VALUES.contact}`}>{OWNER_VALUES.contact}</a>. Include the result link or session ID if you have it, since results have no name to search by. We delete it within <strong>{OWNER_VALUES.deletionWindow}</strong> and reply to confirm.
+              A school, parent, guardian or student can ask us to delete a result by emailing <a className={linkClass} href={`mailto:${OWNER_VALUES.contact}`}>{OWNER_VALUES.contact}</a>. Include the result link or session ID if you have it, since results have no name to search by. We delete it within <strong>{OWNER_VALUES.deletionDays} days</strong> and reply to confirm.
             </p>
           </section>
 

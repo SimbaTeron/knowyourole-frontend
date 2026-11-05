@@ -5,6 +5,7 @@ import { calculateResult, findBestRoleMatch, type PersonalityResult } from "@/co
 import { isScoringV5 } from "@/lib/quiz/scoringVersions";
 import { resolveFinalClarity } from "@/lib/results/finalClarity";
 import { lifeStageFromResponses } from "@/lib/quiz/shortformV5Adjustments";
+import { formatMedianAnnual, payForCareer } from "@/lib/results/publishedFigures";
 import { deriveWorkDirectionV5 } from "@/lib/results/workDirectionV5";
 
 /**
@@ -67,6 +68,11 @@ export interface ResultPersistenceMeta {
   updatedAt: ISODateString;
   /** Soft-delete state. Mirrors future Supabase deleted. */
   deleted: boolean;
+  /**
+   * Set when the compute response is built. "saved" means quiz_results has this id.
+   * "local" means scoring succeeded and the row was not written. Absent on older DTOs.
+   */
+  storage?: "saved" | "local";
   /** Optional deployment/debug context. */
   runtime?: { environment?: "local" | "preview" | "production"; domain?: string; buildId?: string; commitSha?: string };
 }
@@ -510,7 +516,7 @@ function buildCareerDirection(legacy: PersonalityResult, scores: ScoresData, tie
       matchPercent: pct(Math.max(60, 88 - index * 8)),
       reasoning: role.desc,
       drivers: roleMatch.careerSignals ?? [],
-      marketData: { salaryRange: role.salary },
+      ...handbookMarket(role.title),
     })),
   };
 }
@@ -519,8 +525,8 @@ function buildCareerMatches(legacy: PersonalityResult, scores: PersonalityScores
   const primaryTitle = legacy.primaryRole?.title || "Personalized Career Match";
   const secondaryTitle = legacy.secondaryRole?.title || "Secondary Career Match";
   return [
-    { roleId: slugify(primaryTitle), title: primaryTitle, matchPercent: pct(88), reasoning: legacy.primaryRole?.desc || `Strong fit for ${scores.mbti.type}/${scores.disc.primary} with ${scores.bigFive.dominantTrait} dominance.`, drivers: [scores.mbti.type, scores.disc.primary, scores.bigFive.dominantTrait], marketData: { salaryRange: legacy.primaryRole?.salary } },
-    { roleId: slugify(secondaryTitle), title: secondaryTitle, matchPercent: pct(76), reasoning: legacy.secondaryRole?.desc || "Secondary fit based on adjacent trait strengths.", drivers: [scores.mbti.type, scores.bigFive.topTraits[1] ?? scores.bigFive.dominantTrait], marketData: { salaryRange: legacy.secondaryRole?.salary } },
+    { roleId: slugify(primaryTitle), title: primaryTitle, matchPercent: pct(88), reasoning: legacy.primaryRole?.desc || `Strong fit for ${scores.mbti.type}/${scores.disc.primary} with ${scores.bigFive.dominantTrait} dominance.`, drivers: [scores.mbti.type, scores.disc.primary, scores.bigFive.dominantTrait], ...handbookMarket(primaryTitle) },
+    { roleId: slugify(secondaryTitle), title: secondaryTitle, matchPercent: pct(76), reasoning: legacy.secondaryRole?.desc || "Secondary fit based on adjacent trait strengths.", drivers: [scores.mbti.type, scores.bigFive.topTraits[1] ?? scores.bigFive.dominantTrait], ...handbookMarket(secondaryTitle) },
   ];
 }
 
@@ -536,6 +542,11 @@ function normalizeDISC(value: unknown): DISCStyle {
 function normalizeTier(value: unknown): AgeTier {
   if (value === "25+" || value === "25plus") return "25plus";
   return value === "7-12" || value === "13-18" || value === "19-25" ? value : "unknown";
+}
+
+function handbookMarket(title: string): { marketData: { salaryRange: string } } | Record<string, never> {
+  const row = payForCareer(title);
+  return row ? { marketData: { salaryRange: formatMedianAnnual(row.medianAnnual) } } : {};
 }
 
 function slugify(value: string): string {

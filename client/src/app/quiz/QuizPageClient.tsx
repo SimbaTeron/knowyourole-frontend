@@ -3,16 +3,18 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import PathCanvas from "@/components/PathCanvas";
-import Quiz, { QuizScores } from "@/components/Quiz";
+import type { QuizScores } from "@/components/Quiz";
+import ShortformV2Quiz from "@/components/ShortformV2Quiz";
 import dynamic from "next/dynamic";
 // Results is only shown after the last answer, so keep it out of the first-load bundle.
 const Results = dynamic(() => import("@/components/Results"), { ssr: false });
 import { ThemeMode } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalityTheme } from "@/contexts/LocalityThemeContext";
-import { trackKyrEvent } from "@/lib/analytics";
+import { flushPendingQuizFunnel, quizPlacementParams, recordQuizFunnelEvent, watchQuizFunnelConsent } from "@/lib/analytics/quizFunnel";
 import { Brain, Sparkles, Target } from "lucide-react";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
+import { randomIdToken } from "@/lib/randomId";
 
 interface APIScales {
   critical: { value: number; traits: string; quest: string };
@@ -65,9 +67,13 @@ export default function QuizPage() {
   const landmarkData = typeof window !== 'undefined' ? sessionStorage.getItem("knowrole-landmark") : null;
   const sessionLandmark = landmarkData ? JSON.parse(landmarkData) : null;
 
-  // Direct-start quiz: age/mood setup screens are hidden. Default to adult tier when missing.
+  // One landing event per attempt, including a direct /quiz visit or deep link.
+  // Strict-mode remounts and consent granted later are deduped in the attempt record.
   useEffect(() => {
-    trackKyrEvent("quiz_landing_viewed", { source: "shortform_v2", total_questions: 30 });
+    const savedProgress = Boolean(window.sessionStorage.getItem("kyr_quiz_progress_v1"));
+    watchQuizFunnelConsent();
+    recordQuizFunnelEvent("quiz_landing_viewed", quizPlacementParams(), savedProgress);
+    flushPendingQuizFunnel();
   }, []);
 
   useEffect(() => {
@@ -91,6 +97,8 @@ export default function QuizPage() {
 
   const handleQuizStarted = () => {
     setIsQuizInProgress(true);
+    const savedProgress = typeof window !== "undefined" && Boolean(window.sessionStorage.getItem("kyr_quiz_progress_v1"));
+    recordQuizFunnelEvent("quiz_started", quizPlacementParams(ageTier), savedProgress);
     if (quizSessionIdRef.current) return;
 
     // Resuming after a remount/reload: keep the original session id and start timestamp.
@@ -101,7 +109,7 @@ export default function QuizPage() {
       return;
     }
 
-    const sessionId = `quiz-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const sessionId = `quiz-${Date.now()}-${randomIdToken(10)}`;
     quizSessionIdRef.current = sessionId;
     setQuizSessionId(sessionId);
     sessionStorage.setItem("kyr_active_quiz_session_id", sessionId);
@@ -230,7 +238,7 @@ export default function QuizPage() {
       });
 
       if (!response.ok || !data?.success || !data?.result) {
-        trackKyrEvent("quiz_result_persist_failed", {
+        recordQuizFunnelEvent("quiz_result_persist_failed", {
           tier: ageTier,
           response_count: scores.responses.length,
           status: response.status,
@@ -248,13 +256,11 @@ export default function QuizPage() {
         sessionStorage.setItem(`kyr_anonymous_result_capability:${data.result.meta.sessionId}`, data.anonymousDeletionCapability);
       }
       const persistenceOk = data.persistence?.ok === true;
-      trackKyrEvent(persistenceOk ? "quiz_result_persisted" : "quiz_result_computed_unpersisted", {
+      recordQuizFunnelEvent(persistenceOk ? "quiz_result_persisted" : "quiz_result_computed_unpersisted", {
         tier: ageTier,
         response_count: scores.responses.length,
         result_id_present: Boolean(data.result.meta?.resultId),
         session_id_present: Boolean(data.result.meta?.sessionId),
-        mbti_type: data.result.scores?.mbti?.type,
-        primary_disc: data.result.scores?.disc?.primary,
       });
       console.log("[ResultDTO] Stored canonical ResultDTO in sessionStorage:kyr_result_dto", {
         resultId: data.result.meta?.resultId,
@@ -263,7 +269,7 @@ export default function QuizPage() {
 
       return data.result;
     } catch (error) {
-      trackKyrEvent("quiz_result_persist_failed", {
+      recordQuizFunnelEvent("quiz_result_persist_failed", {
         tier: ageTier,
         response_count: scores.responses.length,
         reason: "network_or_runtime_error",
@@ -276,10 +282,9 @@ export default function QuizPage() {
   const handleQuizComplete = async (scores: QuizScores) => {
     const minimumAnalysisTime = new Promise((resolve) => setTimeout(resolve, 3000));
     setIsAnalyzingResults(true);
-    trackKyrEvent("quiz_completion_processing_started", {
+    recordQuizFunnelEvent("quiz_completion_processing_started", {
       tier: ageTier,
       response_count: scores.responses.length,
-      mood: mood || "unset",
       fun_mode: funMode,
     });
 
@@ -301,13 +306,11 @@ export default function QuizPage() {
     quizSessionIdRef.current = sessionId;
     setQuizSessionId(sessionId);
 
-    trackKyrEvent("conversion_results_handoff", {
+    recordQuizFunnelEvent("conversion_results_handoff", {
       tier: ageTier,
       response_count: scores.responses.length,
       has_result_dto: true,
       session_id_present: true,
-      mbti_type: canonicalResult.scores.mbti.type,
-      primary_disc: canonicalResult.scores.disc.primary,
     });
 
     await minimumAnalysisTime;
@@ -986,7 +989,7 @@ export default function QuizPage() {
           </p>
         </section>
 
-        <Quiz
+        <ShortformV2Quiz
           tier={ageTier}
           mood={mood}
           funMode={funMode}
@@ -1033,20 +1036,6 @@ export default function QuizPage() {
               </article>
             </div>
 
-            <div className="mt-8 grid gap-3 md:grid-cols-2">
-              <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">
-                <h3 className="text-sm font-black text-white">Is this a free personality quiz?</h3>
-                <p className="mt-2 text-sm leading-6 text-white/60">
-                  Yes. Everything on KnowYouRole today is free. Nothing is locked or paywalled right now, and your full result is included.
-                </p>
-              </article>
-              <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">
-                <h3 className="text-sm font-black text-white">How do the models work together?</h3>
-                <p className="mt-2 text-sm leading-6 text-white/60">
-                  Big Five gives trait depth, MBTI-style language makes patterns easier to understand, and DISC helps describe workplace behavior.
-                </p>
-              </article>
-            </div>
           </div>
         </section>}
       </main>

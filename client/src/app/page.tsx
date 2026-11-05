@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
+import { publicPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = publicPageMetadata("/");
 
 export default function Home() {
   return (
@@ -10,7 +14,7 @@ export default function Home() {
           overflow-x: hidden;
           background: #03040d;
           color: #f8fbff;
-          font-family: 'IBM Plex Sans', Arial, sans-serif;
+          font-family: 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif;
         }
 
         .kyr-home-page * { box-sizing: border-box; }
@@ -93,7 +97,7 @@ export default function Home() {
           max-width: 690px;
           margin: 0;
           color: #f8fbff !important;
-          font-family: 'Space Grotesk', Arial, sans-serif;
+          font-family: 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif;
           font-size: clamp(3.025rem, 5.8vw, 5.3rem);
           line-height: 0.9;
           letter-spacing: -0.076em;
@@ -228,9 +232,10 @@ export default function Home() {
         .preview-detail-label { display: block; color: rgba(174,239,255,0.72); font-size: 8px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
         .preview-detail strong { display: block; margin-top: 5px; color: #fff; font-size: 13px; line-height: 1.2; }
         .preview-detail p { margin: 5px 0 0; color: rgba(248,251,255,0.68); font-size: 10px; line-height: 1.36; font-weight: 650; }
-        .trait-bars { display: grid; gap: 5px; margin-top: 7px; }
-        .trait-bar { display: grid; grid-template-columns: 1fr 32px; gap: 6px; align-items: center; color: rgba(248,251,255,0.72); font-size: 9px; font-weight: 800; }
-        .trait-bar i { display: block; height: 5px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,0.12); }
+        .trait-bars { display: grid; gap: 8px; margin-top: 7px; }
+        .trait-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; color: rgba(248,251,255,0.72); font-size: 11px; font-weight: 800; }
+        .trait-bar b { font-size: 11px; font-weight: 800; letter-spacing: 0; white-space: nowrap; }
+        .trait-bar i { grid-column: 1 / -1; display: block; height: 5px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,0.12); }
         .trait-bar i::after { content: ''; display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #48dcff, #a78bfa); }
         .trait-bar:nth-child(1) i::after { width: 82%; }.trait-bar:nth-child(2) i::after { width: 74%; }.trait-bar:nth-child(3) i::after { width: 68%; }
 
@@ -277,9 +282,14 @@ export default function Home() {
         .final-panel .primary-cta { margin: 0; flex: 0 0 auto; }
 
         .home-footer { padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.08); color: rgba(248,251,255,0.46); font-size: 12px; }
+        .guide-section { padding: 28px 0 8px; background: #f8f3e8; color: #12263a; }
+        .guide-section h2 { margin: 0; font-family: "Space Grotesk", "Space Grotesk Fallback", Arial, sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.04em; }
+        .guide-section p { margin: 8px 0 0; color: #405f72; font-size: 15px; line-height: 1.5; }
+        .guide-links { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+        .guide-links a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border: 1px solid rgba(18,38,58,.2); background: #fffdf8; color: #12263a; text-decoration: none; font-weight: 800; font-size: 13px; }
         .footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 18px; }
-        .footer-links { display: flex; flex-wrap: wrap; gap: 14px; }
-        .footer-links a { color: rgba(248,251,255,0.52); text-decoration: none; }
+        .footer-links { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+        .footer-links a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 0 8px; color: rgba(248,251,255,0.52); text-decoration: none; }
         .footer-links a:hover { color: #8deaff; }
 
         @media (max-width: 860px) {
@@ -301,6 +311,22 @@ export default function Home() {
           .trust-section, .how-section, .final-section { padding: 46px 0; }
           .final-panel { align-items: stretch; border-radius: 24px; }
           .final-panel .primary-cta { width: 100%; }
+        }
+
+        @media (max-width: 360px) {
+          .hero-title { min-height: 7lh; }
+        }
+
+        @media (max-width: 414px) and (max-height: 740px) {
+          .hero-title {
+            min-height: 0;
+            font-size: 1.65rem;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+          }
+          .hero-subtitle { margin-top: 10px; font-size: 0.9rem; line-height: 1.35; }
+          .eyebrow { margin-bottom: 8px; }
+          .hero-section .primary-cta { margin-top: 12px; }
         }
       `}</style>
 
@@ -339,10 +365,10 @@ export default function Home() {
                   </section>
                   <section className="preview-detail">
                     <span className="preview-detail-label">Trait signals</span>
-                    <div className="trait-bars" aria-label="Example trait signals">
-                      <span className="trait-bar">Curiosity <i aria-hidden="true" /><b>82</b></span>
-                      <span className="trait-bar">Structure <i aria-hidden="true" /><b>74</b></span>
-                      <span className="trait-bar">Independence <i aria-hidden="true" /><b>68</b></span>
+                    <div className="trait-bars" aria-label="Example trait signals, shown as leans rather than exact scores">
+                      <span className="trait-bar"><span>Curiosity</span><b>Strong lean</b><i aria-hidden="true" /></span>
+                      <span className="trait-bar"><span>Structure</span><b>Strong lean</b><i aria-hidden="true" /></span>
+                      <span className="trait-bar"><span>Independence</span><b>Moderate lean</b><i aria-hidden="true" /></span>
                     </div>
                   </section>
                   <section className="preview-detail">
@@ -401,6 +427,20 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="guide-section" aria-labelledby="guide-title">
+          <div className="home-shell">
+            <h2 id="guide-title">Guides for a specific question</h2>
+            <p>The same free quiz, with a page for the decision in front of you. Each one explains what the quiz can and cannot tell you.</p>
+            <ul className="guide-links">
+              <li><a href="/careers/trades-career-quiz">Trades career quiz</a></li>
+              <li><a href="/careers/creator-careers-quiz">Creator careers quiz</a></li>
+              <li><a href="/career-quiz-for-teens">Career quiz for teens</a></li>
+              <li><a href="/for-parents">For parents</a></li>
+              <li><a href="/for-counselors">For counselors</a></li>
+            </ul>
+          </div>
+        </section>
+
         <section className="final-section testimonial-section" aria-labelledby="final-title">
           <div className="home-shell">
             <div className="final-panel testimonial-card">
@@ -424,7 +464,12 @@ export default function Home() {
             <a href="/terms">Terms</a>
             <a href="/faq">FAQ</a>
             <a href="/about">About</a>
-            <a href="/for-schools">For schools &amp; counselors</a>
+            <a href="/for-schools">For schools</a>
+            <a href="/for-parents">For parents</a>
+            <a href="/for-counselors">For counselors</a>
+            <a href="/career-quiz-for-teens">Quiz for teens</a>
+            <a href="/careers/trades-career-quiz">Trades</a>
+            <a href="/careers/creator-careers-quiz">Creators</a>
           </nav>
         </div>
       </footer>

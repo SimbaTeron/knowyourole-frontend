@@ -7,7 +7,8 @@ import { Brain, ChevronLeft, Sparkles, X } from "lucide-react";
 import type { QuizScores } from "./Quiz";
 import { CAREER_SCORE_KEYS, SHORTFORM_V2_QUESTIONS, type CareerKey, type ShortformV2Answer } from "@/data/shortformV2Questions";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
-import { trackKyrEvent } from "@/lib/analytics";
+import { quizProgressMilestone } from "@/lib/analytics";
+import { closeCurrentQuizAttempt, quizPlacementParams, recordQuizFunnelEvent } from "@/lib/analytics/quizFunnel";
 import { calibrateShortformV2Scores } from "@/lib/results/calibrateShortformV2Scores";
 import { recomputeShortformV2ScoreMaps, validateShortformV2Responses } from "@/lib/quiz/shortformV2Scoring";
 
@@ -227,6 +228,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     restoredRef.current = true;
     const saved = readSavedProgress();
     if (!saved) return;
+    recordQuizFunnelEvent("quiz_landing_viewed", quizPlacementParams(), true);
     const rebuilt = rebuildScoresFromResponses(saved.responses);
     setScores({ ...rebuilt, responses: saved.responses });
     setCurrentIndex(Math.min(saved.currentIndex, saved.responses.length));
@@ -234,7 +236,6 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     setStartedAt(Date.now());
     setHasStarted(true);
     onQuizStarted?.();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -252,6 +253,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   const advancingRef = useRef(false);
   const advanceTimerRef = useRef<number | null>(null);
   const completedRef = useRef(false);
+  const progressMilestonesRef = useRef(new Set<number>());
   useEffect(() => () => {
     if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
   }, []);
@@ -269,10 +271,10 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     const focusTimer = window.setTimeout(() => {
       if (restoreAnswerFocusRef.current) {
         restoreAnswerFocusRef.current = false;
-        answerButtonRefs.current[selectedIndex >= 0 ? selectedIndex : 0]?.focus();
+        answerButtonRefs.current[selectedIndex >= 0 ? selectedIndex : 0]?.focus({ preventScroll: true });
         return;
       }
-      questionHeadingRef.current?.focus();
+      questionHeadingRef.current?.focus({ preventScroll: true });
     }, 320);
     return () => window.clearTimeout(focusTimer);
   }, [currentIndex, currentQuestion.answers, hasStarted, selectedAnswer]);
@@ -281,7 +283,6 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     setStartedAt(Date.now());
     setHasStarted(true);
     onQuizStarted?.();
-    trackKyrEvent("quiz_started", { source: "shortform_v2", tier, total_questions: totalQuestions });
   };
 
   const handleAnswer = (answer: ShortformV2Answer, optionIndex: number) => {
@@ -333,11 +334,23 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     setSelectedAnswer(answer.id);
     setScores(updatedScores);
 
-    trackKyrEvent("quiz_answer_selected", {
-      source: "shortform_v2",
+    if (!isReviewingAnswer) {
+      const milestone = quizProgressMilestone(responses.length);
+      if (milestone !== null && !progressMilestonesRef.current.has(milestone)) {
+        progressMilestonesRef.current.add(milestone);
+        recordQuizFunnelEvent("quiz_progress_milestone", {
+          link_location: "shortform_v2",
+          completed_questions: responses.length,
+          milestone,
+          total_questions: totalQuestions,
+          percent_complete: Math.round((responses.length / totalQuestions) * 100),
+        });
+      }
+    }
+
+    recordQuizFunnelEvent("quiz_answer_selected", {
+      link_location: "shortform_v2",
       tier,
-      question_id: currentQuestion.id,
-      answer_id: answer.id,
       group: currentQuestion.group,
       progress,
     });
@@ -349,8 +362,9 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
       if (answeredIndex >= totalQuestions - 1) {
         if (completedRef.current) return;
         completedRef.current = true;
-        trackKyrEvent("quiz_completed", {
-          source: "shortform_v2",
+        onQuizStarted?.();
+        recordQuizFunnelEvent("quiz_completed", {
+          link_location: "shortform_v2",
           tier,
           total_questions: totalQuestions,
           average_response_time: Math.round(averageSwipeTime * 10) / 10,
@@ -362,6 +376,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
           ...authoritativeScoreMaps,
         });
         clearSavedProgress();
+        closeCurrentQuizAttempt();
         onComplete(authoritativeScores);
         return;
       }
@@ -394,19 +409,18 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
     setCurrentIndex((index) => Math.max(0, index - 1));
     setSelectedAnswer(answerId);
     setStartedAt(Date.now());
-    trackKyrEvent("quiz_answer_reviewed", {
-      source: "shortform_v2",
+    recordQuizFunnelEvent("quiz_answer_reviewed", {
+      link_location: "shortform_v2",
       tier,
-      question_id: responseBeingRevisited.questionId,
       remaining_answers: scores.responses.length,
     });
   };
 
   if (!hasStarted) {
     return (
-      <div className="relative flex min-h-[100dvh] items-center overflow-hidden bg-[#050510] px-4 py-8 text-white sm:px-6">
+      <div className="kyr-quiz-viewport quiz-welcome-screen relative flex min-h-[100dvh] items-center overflow-hidden bg-[#050510] px-4 py-8 text-white sm:px-6">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_16%,rgba(34,211,238,0.18),transparent_31%),radial-gradient(circle_at_82%_72%,rgba(168,85,247,0.18),transparent_35%)]" />
-        <section aria-labelledby="shortform-welcome-heading" className="relative mx-auto w-full max-w-2xl rounded-[30px] border border-white/15 bg-[#0b1222]/92 p-5 shadow-[0_28px_92px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:rounded-[38px] sm:p-9">
+        <section data-kyr-focus-root="" tabIndex={-1} aria-labelledby="shortform-welcome-heading" className="quiz-welcome-card relative mx-auto w-full max-w-2xl rounded-[30px] border border-white/15 bg-[#0b1222]/92 p-5 shadow-[0_28px_92px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:rounded-[38px] sm:p-9">
           <p className="quiz-welcome-kicker text-[11px] font-black uppercase tracking-[0.28em] text-cyan-200">KnowYouRole · work-style exploration</p>
           <h2 id="shortform-welcome-heading" className="mt-4 max-w-xl text-3xl font-black tracking-[-0.055em] text-white sm:text-5xl">{`${QUESTION_COUNT} grounded questions. One practical starting point.`}</h2>
           <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-white/72 sm:text-base sm:leading-7">Answer for your usual work pattern—not your ideal day or the answer that sounds impressive. There are no right answers.</p>
@@ -422,7 +436,7 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
   }
 
   return (
-    <div className="shortform-v2-motion relative min-h-[100dvh] overflow-hidden bg-[#050510] text-white">
+    <div className="kyr-quiz-viewport quiz-question-screen shortform-v2-motion relative min-h-[100dvh] overflow-hidden bg-[#050510] text-white">
       <style>{`
         .shortform-v2-layout { grid-template-columns: 1fr; }
         .shortform-v2-timeline-grid {
@@ -506,11 +520,11 @@ export default function ShortformV2Quiz({ tier, mood, funMode, theme, onComplete
             transition={{ duration: 0.28, ease: "easeOut" }}
             className="shortform-v2-layout grid w-full gap-2.5 lg:items-stretch xl:gap-4"
           >
-            <section className="relative min-h-[214px] overflow-hidden rounded-[24px] border border-cyan-100/10 bg-[#070c18]/92 p-3.5 shadow-[0_24px_78px_rgba(0,0,0,0.46)] ring-1 ring-white/[0.04] backdrop-blur-2xl sm:min-h-[360px] sm:rounded-[28px] sm:p-5 lg:min-h-[430px] lg:p-6 xl:min-h-[470px]">
+            <section className="shortform-v2-question-card relative min-h-[214px] overflow-hidden rounded-[24px] border border-cyan-100/10 bg-[#070c18]/92 p-3.5 shadow-[0_24px_78px_rgba(0,0,0,0.46)] ring-1 ring-white/[0.04] backdrop-blur-2xl sm:min-h-[360px] sm:rounded-[28px] sm:p-5 lg:min-h-[430px] lg:p-6 xl:min-h-[470px]">
               <div className="absolute inset-x-0 top-0 h-16 bg-[linear-gradient(180deg,rgba(34,211,238,0.08),transparent)] sm:h-24" />
               <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.09)_1px,transparent_1px)] [background-size:34px_34px]" />
 
-              <div className="relative z-10 flex h-full min-h-[186px] flex-col pt-1 sm:min-h-[320px] lg:min-h-[378px] xl:min-h-[418px]">
+              <div className="shortform-v2-question-body relative z-10 flex h-full min-h-[186px] flex-col pt-1 sm:min-h-[320px] lg:min-h-[378px] xl:min-h-[418px]">
                 <div className={`mb-3 inline-flex h-7 max-w-full items-center gap-2 self-start rounded-full bg-gradient-to-r ${accent} px-3 text-[8.5px] font-black uppercase tracking-[0.16em] text-[#050510] shadow-[0_0_38px_rgba(34,211,238,0.18)] sm:mb-7 sm:h-9 sm:px-4 sm:text-[10px]`}>
                   <Sparkles className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                   <span className="truncate">{userFacingSection}</span>

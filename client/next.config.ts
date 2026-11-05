@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { canonicalHostRedirects } from "./src/lib/analytics/productionHost";
 import { checkSupabaseTarget } from "./src/lib/env/dbGuard.mjs";
 
 // Local/box/CI dev and builds must never point at the hosted Supabase project.
@@ -34,7 +35,15 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // Still inlined for diagnostics. Analytics collection is gated on the
+  // hostname (knowyourole.com), not on this value.
+  env: {
+    NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? "",
+  },
   reactStrictMode: true,
+  async redirects() {
+    return canonicalHostRedirects();
+  },
   async headers() {
     return [{
       source: "/(.*)",
