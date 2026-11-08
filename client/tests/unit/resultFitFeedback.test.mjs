@@ -20,6 +20,7 @@ import {
   resetResultFitRateLimits,
   resultFitLinkFromDto,
   resultFitRatingLabel,
+  resultFitTapBody,
   resultFitTapEvent,
 } from "../../src/lib/feedback/resultFitFeedback.ts";
 
@@ -177,6 +178,70 @@ test("POST rejects a bad choice, an oversized body, a foreign origin, and a burs
   }
   const blocked = await postResultFitFeedback(request({ resultId, fit: "yes" }, nowHeaders));
   assert.equal(blocked.status, 429);
+});
+
+test("the results-page yes/no tap posts only resultId and fit, and that body is stored", async () => {
+  resetResultFitRateLimits();
+  const parsed = parseResultFitFeedbackRequest({ resultId, fit: "yes" });
+  assert.equal(parsed.ok, true);
+  const body = resultFitTapBody(parsed.value);
+  assert.deepEqual(body, { resultId, fit: "yes" });
+  assert.equal("rating" in body, false);
+  assert.equal("comment" in body, false);
+
+  const component = readFileSync(join(clientRoot, "src/components/results/ResultFitFeedback.tsx"), "utf8");
+  assert.match(component, /JSON\.stringify\(resultFitTapBody\(payload\.value\)\)/);
+  assert.equal(component.includes("JSON.stringify(payload.value)"), false);
+
+  const saved = [];
+  const deps = {
+    async findResult() {
+      return {
+        ok: true,
+        row: {
+          id: resultId,
+          user_id: null,
+          session_id: link.sessionId,
+          responses: {},
+          deleted: false,
+        },
+      };
+    },
+    async canAccess() {
+      return true;
+    },
+    readLink() {
+      return link;
+    },
+    async loadExisting() {
+      return null;
+    },
+    async save(plan) {
+      if (plan.action !== "insert") return { ok: false };
+      saved.push(plan.row);
+      return { ok: true, id: "fit-tap-1" };
+    },
+  };
+
+  const rejected = await postResultFitFeedback(request(parsed.value, {
+    "x-forwarded-for": "198.51.100.50",
+  }), deps);
+  assert.equal(rejected.status, 400);
+  assert.equal(saved.length, 0);
+
+  const accepted = await postResultFitFeedback(request(body, {
+    "x-forwarded-for": "198.51.100.51",
+  }), deps);
+  assert.equal(accepted.status, 201);
+  const acceptedBody = await accepted.json();
+  assert.equal(acceptedBody.success, true);
+  assert.equal(acceptedBody.alreadySubmitted, false);
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].result_id, resultId);
+  assert.equal(saved[0].session_id, link.sessionId);
+  assert.equal(saved[0].fit, "yes");
+  assert.equal(saved[0].rating, null);
+  assert.equal(saved[0].comment, null);
 });
 
 test("POST stores the server result link and does not require a follow-up", async () => {

@@ -91,6 +91,11 @@ export function parseResultFitFeedbackRequest(input: unknown): { ok: true; value
   };
 }
 
+/** Wire body for a Yes/No tap. The route rejects every other field, including a null rating or comment. */
+export function resultFitTapBody(value: Pick<ResultFitFeedbackRequest, "resultId" | "fit">): { resultId: string; fit: ResultFit } {
+  return { resultId: value.resultId, fit: value.fit };
+}
+
 export type ResultFitLink = {
   resultType: string;
   scoringVersion: string;

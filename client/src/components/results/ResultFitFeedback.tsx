@@ -8,6 +8,7 @@ import {
   parseResultFitFeedbackRequest,
   resultFitChoiceLabel,
   resultFitSubmittedKey,
+  resultFitTapBody,
   resultFitTapEvent,
   type ResultFit,
 } from "@/lib/feedback/resultFitFeedback";
@@ -105,7 +106,7 @@ function ResultFitFeedbackForm({ resultId, sessionId }: { resultId: string; sess
           "Content-Type": "application/json",
           ...(capability ? { "x-kyr-anonymous-capability": capability } : {}),
         },
-        body: JSON.stringify(payload.value),
+        body: JSON.stringify(resultFitTapBody(payload.value)),
       });
       if (!alive.current) return;
       if (response.status === 429) {
