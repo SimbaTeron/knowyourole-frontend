@@ -65,7 +65,7 @@ export function SharePDFModal({ isOpen, onClose, sessionId, result, mood, tier }
   const [messageCopied, setMessageCopied] = useState(false);
   const { toast } = useToast();
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.origin : 'https://knowyourole.com';
+  const shareUrl = typeof window !== 'undefined' ? window.location.origin : 'https://whatcareerfits.com';
   
   const mbtiInfo = MBTI_SHARE_MESSAGES[result.mbtiType] || MBTI_SHARE_MESSAGES["INTP"];
   const discTrait = DISC_TRAITS[result.discStyle] || DISC_TRAITS["C"];
@@ -85,7 +85,7 @@ export function SharePDFModal({ isOpen, onClose, sessionId, result, mood, tier }
   };
 
   const personalizedMessage = useMemo(() => {
-    return `I just discovered I'm a ${result.mbtiType} (${mbtiInfo.tagline}) with ${mbtiInfo.trait}! My personality blend is ${discTrait} and ${bigFiveLabels[topBigFive[0]]}. Discover your unique personality at KnowYouRole!`;
+    return `I just discovered I'm a ${result.mbtiType} (${mbtiInfo.tagline}) with ${mbtiInfo.trait}! My personality blend is ${discTrait} and ${bigFiveLabels[topBigFive[0]]}. Discover your career fit at What Career Fits.`;
   }, [result.mbtiType, mbtiInfo, discTrait, topBigFive]);
 
   const shortMessage = `I'm a ${result.mbtiType} - ${mbtiInfo.tagline}! Discover your personality type:`;
@@ -105,7 +105,7 @@ export function SharePDFModal({ isOpen, onClose, sessionId, result, mood, tier }
     setIsLoading(true);
     try {
       const pdfBlob = await generatePDF();
-      const pdfFile = new File([pdfBlob], `KnowYouRole-Results-${sessionId.slice(-6)}.pdf`, { 
+      const pdfFile = new File([pdfBlob], `WhatCareerFits-Results-${sessionId.slice(-6)}.pdf`, { 
         type: 'application/pdf' 
       });
 
@@ -150,7 +150,7 @@ export function SharePDFModal({ isOpen, onClose, sessionId, result, mood, tier }
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `KnowYouRole-Results-${sessionId.slice(-6)}.pdf`;
+      a.download = `WhatCareerFits-Results-${sessionId.slice(-6)}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

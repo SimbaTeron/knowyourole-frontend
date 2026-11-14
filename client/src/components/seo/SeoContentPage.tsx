@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 import type { SeoPage } from "@/lib/seo-pages";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 function jsonLd(page: SeoPage) {
-  const url = `https://knowyourole.com${page.path === "/" ? "" : page.path}`;
+  const url = page.path === "/" ? SITE_URL : `${SITE_URL}${page.path}`;
   const breadcrumbParts = page.path.split("/").filter(Boolean);
   return [
-    { "@context": "https://schema.org", "@type": page.phase === "learn" || page.phase === "resource" || page.phase === "result" ? "Article" : "WebPage", headline: page.h1, name: page.h1, description: page.description, url, author: { "@id": "https://knowyourole.com/#organization" }, publisher: { "@id": "https://knowyourole.com/#organization" }, isPartOf: { "@id": "https://knowyourole.com/#website" }, mainEntityOfPage: url },
-    { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: "https://knowyourole.com" }, ...breadcrumbParts.map((part, index) => ({ "@type": "ListItem", position: index + 2, name: part.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "), item: `https://knowyourole.com/${breadcrumbParts.slice(0, index + 1).join("/")}` }))] },
+    { "@context": "https://schema.org", "@type": page.phase === "learn" || page.phase === "resource" || page.phase === "result" ? "Article" : "WebPage", headline: page.h1, name: page.h1, description: page.description, url, author: { "@id": `${SITE_URL}/#organization` }, publisher: { "@id": `${SITE_URL}/#organization` }, isPartOf: { "@id": `${SITE_URL}/#website` }, mainEntityOfPage: url },
+    { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: SITE_URL }, ...breadcrumbParts.map((part, index) => ({ "@type": "ListItem", position: index + 2, name: part.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "), item: `${SITE_URL}/${breadcrumbParts.slice(0, index + 1).join("/")}` }))] },
     ...(page.faqs?.length ? [{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: page.faqs.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })) }] : []),
   ];
 }
@@ -36,7 +37,7 @@ export function SeoContentPage({ page, indexPages = [] }: { page: SeoPage; index
       {schema.map((item, index) => <script key={`${page.path}-schema-${index}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item).replace(/</g, "\\u003c") }} />)}
       <section className="workday-content-hero">
         <div className="workday-content-wrap">
-          <Link href="/" className="workday-content-kicker">KnowYouRole <span>↗</span></Link>
+          <Link href="/" className="workday-content-kicker">{SITE_NAME} <span>↗</span></Link>
           <p className="workday-content-eyebrow">{page.eyebrow}</p>
           <h1>{page.h1}</h1>
           <p className="workday-content-intro">{page.intro}</p>

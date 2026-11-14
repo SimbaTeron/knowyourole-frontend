@@ -37,7 +37,7 @@ export default function Faq() {
       <AppHeader />
       <main className="workday-simple-wrap max-w-2xl px-6 py-32">
         <h1 className="text-3xl font-display font-bold mb-2" data-testid="text-faq-title">Frequently Asked Questions</h1>
-        <p className="text-warm-gray/60 dark:text-[#94A3B8] mb-8">Everything you need to know about KnowYouRole</p>
+        <p className="text-warm-gray/60 dark:text-[#94A3B8] mb-8">Everything you need to know about What Career Fits</p>
 
         <div className="space-y-0">
           {FAQ_ITEMS.map((item) => (

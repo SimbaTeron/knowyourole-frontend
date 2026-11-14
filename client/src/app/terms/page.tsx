@@ -15,14 +15,14 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Acceptance of Terms</h2>
             <p>
-              By accessing and using KnowYouRole ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
+              By accessing and using What Career Fits ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Description of Service</h2>
             <p>
-              KnowYouRole provides a {QUESTION_COUNT}-question self-reflection experience that uses Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-exploration guidance. It is not the official MBTI assessment, a clinical instrument, or a selection tool. The Service includes age-tiered copy where available.
+              What Career Fits provides a {QUESTION_COUNT}-question self-reflection experience that uses Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and career-exploration guidance. It is not the official MBTI assessment, a clinical instrument, or a selection tool. The Service includes age-tiered copy where available.
             </p>
           </section>
 
@@ -34,7 +34,7 @@ export default function Terms() {
               <li>Use the Service for personal, non-commercial purposes, or for educational use as described in &quot;School and classroom use&quot; below</li>
               <li>Not attempt to manipulate or reverse-engineer our assessment algorithms</li>
               <li>Not use automated means to access or interact with the Service</li>
-              <li>Respect the intellectual property rights of KnowYouRole</li>
+              <li>Respect the intellectual property rights of What Career Fits</li>
             </ul>
           </section>
 
@@ -49,14 +49,14 @@ export default function Terms() {
               <li>Students and educators may print or save results for classroom discussion.</li>
               <li>You may not charge students for access, resell the Service, or present results as a diagnosis, grade, admissions screen or placement decision.</li>
               <li>For students under 13, use should be teacher-led, and students should not enter an email address or other personal information. See <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a>.</li>
-              <li>If your district needs a signed data privacy agreement, contact info@knowyourole.com.</li>
+              <li>If your district needs a signed data privacy agreement, contact info@whatcareerfits.com.</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Assessment Results Disclaimer</h2>
             <p>
-              KnowYouRole results are for informational, educational, self-reflection, and career-exploration purposes only. They are not a psychological evaluation, medical advice, career counseling, hiring or admissions screen, job-performance prediction, or guarantee of satisfaction. Treat results as one input among skills, values, experience, opportunity, constraints, and qualified human advice—not as a definitive classification.
+              What Career Fits results are for informational, educational, self-reflection, and career-exploration purposes only. They are not a psychological evaluation, medical advice, career counseling, hiring or admissions screen, job-performance prediction, or guarantee of satisfaction. Treat results as one input among skills, values, experience, opportunity, constraints, and qualified human advice—not as a definitive classification.
             </p>
           </section>
 
@@ -70,14 +70,14 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Intellectual Property</h2>
             <p>
-              All content on KnowYouRole, including but not limited to text, graphics, logos, assessment questions, and algorithms, is the property of KnowYouRole and is protected by intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.
+              All content on What Career Fits, including but not limited to text, graphics, logos, assessment questions, and algorithms, is the property of What Career Fits and is protected by intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Limitation of Liability</h2>
             <p>
-              KnowYouRole is provided "as is" without warranties of any kind. We are not liable for any decisions you make based on your assessment results. In no event shall KnowYouRole be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service.
+              What Career Fits is provided "as is" without warranties of any kind. We are not liable for any decisions you make based on your assessment results. In no event shall What Career Fits be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service.
             </p>
           </section>
 
@@ -91,7 +91,7 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-warm-gray dark:text-[#F8FAFC] mb-2">Contact</h2>
             <p>
-              For questions about these Terms of Service, please contact us at info@knowyourole.com.
+              For questions about these Terms of Service, please contact us at info@whatcareerfits.com.
             </p>
           </section>
         </div>

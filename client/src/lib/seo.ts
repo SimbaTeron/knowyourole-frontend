@@ -2,8 +2,8 @@ import type { Metadata, MetadataRoute } from "next";
 import { allSeoPages } from "@/lib/seo-pages";
 import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
-export const SITE_URL = "https://knowyourole.com";
-export const SITE_NAME = "KnowYouRole";
+export const SITE_URL = "https://whatcareerfits.com";
+export const SITE_NAME = "What Career Fits";
 export const DEFAULT_OG_IMAGE = "/og-image.png";
 
 export type PublicPage = {
@@ -22,97 +22,97 @@ export const CONTENT_LAST_UPDATED = "2026-10-16";
 const foundationPages: PublicPage[] = [
   {
     path: "/",
-    title: "Free Work Style & Career Quiz for Students | KnowYouRole",
+    title: "Free Career Quiz: What Career Fits Me? | What Career Fits",
     description:
-      `A free ${QUESTION_COUNT}-question work style and personality quiz. No sign-up. Big Five, MBTI-style, and DISC signals, plus career directions from trades to creative work.`,
+      `A free ${QUESTION_COUNT}-question career quiz. No account or name needed. See what career fits you, with work-style clues from Big Five, MBTI-style, and DISC signals.`,
     changeFrequency: "weekly",
     priority: 1,
   },
   {
     path: "/quiz",
-    title: "Take the Free Work Style Quiz, No Sign-Up | KnowYouRole",
+    title: "Take the Free Career Quiz, No Sign-Up | What Career Fits",
     description:
-      `Start the free ${QUESTION_COUNT}-question work style quiz. No account or name needed. Big Five, MBTI-style, and DISC signals, plus career directions.`,
+      `Start the free ${QUESTION_COUNT}-question career quiz. No account or name needed. See what career fits you, plus work-style, communication, and role-fit clues.`,
     changeFrequency: "weekly",
     priority: 0.95,
   },
   {
     path: "/careers",
-    title: "Career Paths by Personality & Work Style | KnowYouRole",
+    title: "Career Paths by Personality & Work Style | What Career Fits",
     description:
-      "Explore career paths by personality and work style, then take the KnowYouRole quiz for practical career-fit guidance tailored to how you work.",
+      "Explore career paths by personality and work style, then take the What Career Fits quiz for practical career-fit guidance tailored to how you work.",
     changeFrequency: "weekly",
     priority: 0.85,
   },
   {
     path: "/build",
-    title: "How KnowYouRole Was Built | Product & Engineering Case Study",
+    title: "How We Built the Career Quiz | What Career Fits",
     description:
-      "A transparent product and engineering case study: KnowYouRole's problem, architecture, validation, privacy decisions, and lessons learned.",
+      "A transparent product and engineering case study: What Career Fits' problem, architecture, validation, privacy decisions, and lessons learned.",
     changeFrequency: "monthly",
     priority: 0.55,
   },
   {
     path: "/student-data",
-    title: "Student Data & Privacy | KnowYouRole for Schools",
+    title: "Student Data & Privacy for Schools | What Career Fits",
     description:
-      "What KnowYouRole stores, how long results are kept, how to ask for deletion, and the FERPA, COPPA, and state student-privacy approach.",
+      "What this career quiz stores, how long results are kept, how to ask for deletion, and the FERPA, COPPA, and state student-privacy approach.",
     changeFrequency: "monthly",
     priority: 0.6,
   },
   {
     path: "/for-schools",
-    title: "Schools and Counselors Career Reflection | KnowYouRole",
+    title: "Career Quiz for Schools and Counselors | What Career Fits",
     description:
-      "A plain-language guide for educators and IT teams: what KnowYouRole is, appropriate student use, privacy choices, and technical access information.",
+      "A plain-language guide for educators and IT teams: what this free career quiz is, how students can use it, privacy choices, and how to access the site.",
     changeFrequency: "monthly",
     priority: 0.7,
   },
   {
     path: "/about",
-    title: "About KnowYouRole | Work Style and Career Quiz",
+    title: "About the Free Career Quiz | What Career Fits",
     description:
-      "Learn how KnowYouRole helps people turn personality quiz results into clearer self-understanding, communication language, and career reflection.",
+      "Learn how What Career Fits helps people turn a short quiz into clearer self-understanding, communication language, and career reflection.",
     changeFrequency: "monthly",
     priority: 0.6,
   },
   {
     path: "/faq",
-    title: "Personality Quiz FAQ | KnowYouRole",
+    title: "Career Quiz FAQ | What Career Fits",
     description:
-      "Answers about KnowYouRole's free personality quiz, accuracy, Big Five, MBTI-style patterns, DISC-style communication insights, privacy, and career-fit results.",
+      "Answers about this free career quiz, what it can and cannot tell you, privacy, and how results are produced.",
     changeFrequency: "monthly",
     priority: 0.65,
   },
   {
     path: "/methodology",
-    title: "Personality Quiz Methodology | KnowYouRole",
+    title: "Career Quiz Methodology | What Career Fits",
     description:
-      "How KnowYouRole combines Big Five traits, MBTI-style personality language, DISC-style communication insights, and career-fit guidance for self-reflection.",
+      "How What Career Fits combines Big Five traits, MBTI-style personality language, DISC-style communication insights, and career-fit guidance for self-reflection.",
     changeFrequency: "monthly",
     priority: 0.75,
   },
   {
     path: "/privacy",
-    title: "Privacy Policy | KnowYouRole",
+    title: "Privacy Policy | What Career Fits",
     description:
-      "Read how KnowYouRole handles personality quiz answers, result data, analytics preferences, cookies, account data, export requests, and deletion requests.",
+      "Read how What Career Fits handles quiz answers, result data, analytics preferences, cookies, export requests, and deletion requests.",
     changeFrequency: "yearly",
     priority: 0.35,
   },
   {
     path: "/terms",
-    title: "Terms of Service | KnowYouRole",
+    title: "Terms of Service | What Career Fits",
     description:
-      "Review the terms for using KnowYouRole's personality quiz, career-fit guidance, self-reflection tools, accounts, content, and results.",
+      "Review the terms for using What Career Fits' personality quiz, career-fit guidance, self-reflection tools, accounts, content, and results.",
     changeFrequency: "yearly",
     priority: 0.35,
   },
   {
     path: "/contact",
-    title: "Contact KnowYouRole | Personality Quiz Support",
+    title: "Contact What Career Fits | Career Quiz Support",
     description:
-      "Contact KnowYouRole for questions about the personality quiz, privacy, methodology, career-fit results, partnerships, or support.",
+      "Contact What Career Fits about the career quiz, privacy, methodology, results, partnerships, or support.",
     changeFrequency: "yearly",
     priority: 0.3,
   },
@@ -142,12 +142,13 @@ export const noIndexPaths = [
 
 export function absoluteUrl(path = "/") {
   if (path.startsWith("http")) return path;
+  if (!path || path === "/") return SITE_URL;
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 /** Per-page social card rendered by /og (src/app/og/route.tsx). */
 export function ogImagePath(title: string, path = "/") {
-  const clean = title.replace(/\s*\|\s*KnowYouRole\s*$/, "").replace(/\s*\|\s*/g, " · ").trim();
+  const clean = title.replace(/\s*\|\s*What Career Fits\s*$/, "").replace(/\s*\|\s*/g, " · ").trim();
   const params = new URLSearchParams({ title: clean, path });
   return `/og?${params.toString()}`;
 }
@@ -210,7 +211,7 @@ export function pageMetadata({
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: "KnowYouRole personality quiz for work style and career fit",
+          alt: "What Career Fits free career quiz",
         },
       ],
     },
@@ -262,8 +263,8 @@ export function publicPageMetadata(path: string): Metadata {
 
 export function noIndexMetadata(
   path: string,
-  title = "KnowYouRole",
-  description = "A free work style and career reflection quiz. No account or name needed.",
+  title = "What Career Fits",
+  description = "A free career quiz. No account or name needed.",
   ogTitle?: string,
 ): Metadata {
   return pageMetadata({
@@ -286,8 +287,8 @@ export function baseJsonLd() {
       name: SITE_NAME,
       url,
       logo: absoluteUrl("/knowyourrole-target.png?v=20260808"),
-      description: "KnowYouRole is a free work-style reflection and career-exploration website for individuals, educators, and counselors.",
-      email: "info@knowyourole.com",
+      description: "What Career Fits is a free career-exploration website for students, parents, educators, and counselors. It uses work-style questions to suggest directions to explore.",
+      email: "info@whatcareerfits.com",
       sameAs: [],
     },
     {

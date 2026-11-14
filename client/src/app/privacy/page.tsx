@@ -26,7 +26,7 @@ export default function Privacy() {
         <div className="p-4 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 mb-8" data-testid="section-data-promise">
           <h2 className={headingClass}>Plain-English summary</h2>
           <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
-            KnowYouRole saves quiz completions so your result can be generated and recovered. We do not sell quiz results. Analytics is optional; advertising technology is not active today.
+            What Career Fits saves quiz completions so your result can be generated and recovered. We do not sell quiz results. Analytics is optional; advertising technology is not active today.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
             Schools, parents and students: see <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a> for what we store, how long we keep it, and how to ask for deletion. Quiz results not linked to an account are deleted automatically after {ANONYMOUS_RESULT_RETENTION_DAYS} days. A deletion request is completed within {DELETION_ON_REQUEST_DAYS} days.
@@ -37,7 +37,7 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Overview</h2>
             <p>
-              KnowYouRole ("we," "our," or "us") provides personality quiz results, career-fit guidance, and related self-reflection tools. This policy explains what information we collect, how we use it, and how you can ask us to access, correct, export, or delete it.
+              What Career Fits ("we," "our," or "us") provides personality quiz results, career-fit guidance, and related self-reflection tools. This policy explains what information we collect, how we use it, and how you can ask us to access, correct, export, or delete it.
             </p>
           </section>
 
@@ -69,7 +69,7 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Analytics tools</h2>
             <p>
-              KnowYouRole supports Google Analytics to understand aggregate site behavior, such as pages visited, quiz starts or completions, and page performance. The Google Analytics script is loaded only after you enable Analytics in cookie preferences. We do not intentionally send quiz answers, email addresses, medical data, or direct identifiers to Google Analytics.
+              What Career Fits supports Google Analytics to understand aggregate site behavior, such as pages visited, quiz starts or completions, and page performance. The Google Analytics script is loaded only after you enable Analytics in cookie preferences. We do not intentionally send quiz answers, email addresses, medical data, or direct identifiers to Google Analytics.
             </p>
           </section>
 
@@ -96,14 +96,14 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Advertising status</h2>
             <p>
-              KnowYouRole does not currently run advertising technology, advertising pixels, or ad-partner cookies. If that changes, we will update this policy and consent controls before activating it.
+              What Career Fits does not currently run advertising technology, advertising pixels, or ad-partner cookies. If that changes, we will update this policy and consent controls before activating it.
             </p>
           </section>
 
           <section className={sectionClass}>
             <h2 className={headingClass}>Requested result email</h2>
             <p>
-              If you choose “Email this result,” KnowYouRole stores your email address, result/session identifiers, the visible summary fields needed for the email (such as the MBTI-style pattern, DISC-style result, and primary role title), your explicit request to send the summary, and delivery status. Raw quiz answers are not included in the email-request record or the emailed summary.
+              If you choose “Email this result,” What Career Fits stores your email address, result/session identifiers, the visible summary fields needed for the email (such as the MBTI-style pattern, DISC-style result, and primary role title), your explicit request to send the summary, and delivery status. Raw quiz answers are not included in the email-request record or the emailed summary.
             </p>
             <p>
               This is a one-time result-delivery request, not marketing enrollment. Marketing consent is off by default and is not collected by this form. If result-email delivery is unavailable, the form tells you to use the existing PDF or sharing options instead of silently treating an email request as delivered.
@@ -113,10 +113,10 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Children and teens</h2>
             <p>
-              KnowYouRole is designed with age-aware quiz experiences. We do not knowingly collect personal information from children under 13 without appropriate consent. If you are under 13, do not provide an email address or other personal information without a parent or guardian. If a parent or guardian believes a child under 13 provided personal information, contact us and we will review deletion requests promptly.
+              What Career Fits is designed with age-aware quiz experiences. We do not knowingly collect personal information from children under 13 without appropriate consent. If you are under 13, do not provide an email address or other personal information without a parent or guardian. If a parent or guardian believes a child under 13 provided personal information, contact us and we will review deletion requests promptly.
             </p>
             <p>
-              Schools using KnowYouRole with students, including students under 13, should follow our <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">student data and privacy guidance</a>.
+              Schools using What Career Fits with students, including students under 13, should follow our <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">student data and privacy guidance</a>.
             </p>
           </section>
 
@@ -137,7 +137,7 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Data deletion, export, and correction requests</h2>
             <p>
-              To request deletion, export, or correction, email <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline">info@knowyourole.com</a>. Include enough detail for us to locate the relevant record, such as the result/session identifier if available. We may need to verify the request before acting on it.
+              To request deletion, export, or correction, email <a href="mailto:info@whatcareerfits.com" className="text-terracotta dark:text-[#A78BFA] underline">info@whatcareerfits.com</a>. Include enough detail for us to locate the relevant record, such as the result/session identifier if available. We may need to verify the request before acting on it.
             </p>
           </section>
 
@@ -151,7 +151,7 @@ export default function Privacy() {
           <section className={sectionClass}>
             <h2 className={headingClass}>Contact</h2>
             <p>
-              KnowYouRole is the data controller. Questions or privacy requests: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline">info@knowyourole.com</a>.
+              What Career Fits is the data controller. Questions or privacy requests: <a href="mailto:info@whatcareerfits.com" className="text-terracotta dark:text-[#A78BFA] underline">info@whatcareerfits.com</a>.
             </p>
           </section>
         </div>

@@ -36,7 +36,7 @@ const contentSecurityPolicy = [
 
 const nextConfig: NextConfig = {
   // Still inlined for diagnostics. Analytics collection is gated on the
-  // hostname (knowyourole.com), not on this value.
+  // hostname (whatcareerfits.com), not on this value.
   env: {
     NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? "",
   },

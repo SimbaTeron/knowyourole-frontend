@@ -9,8 +9,8 @@
 
 export const INTERNAL_TRAFFIC_TYPE = "internal";
 
-/** Apex host that may collect. www.knowyourole.com redirects here. */
-export const CANONICAL_ANALYTICS_HOST = "knowyourole.com";
+/** Apex host that may collect. www.whatcareerfits.com redirects here. */
+export const CANONICAL_ANALYTICS_HOST = "whatcareerfits.com";
 
 export type AnalyticsRuntime = {
   hostname?: string | null;

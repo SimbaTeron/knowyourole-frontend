@@ -45,7 +45,7 @@ export async function sendResultSummaryEmail(summary: ResultEmailSummary): Promi
         from: process.env.RESULT_EMAIL_FROM,
         to: summary.email,
         reply_to: process.env.RESULT_EMAIL_REPLY_TO || undefined,
-        subject: "Your KnowYouRole result summary",
+        subject: "Your What Career Fits result summary",
         text: buildResultSummaryText(summary),
         html: buildResultSummaryHtml(summary),
       }),
@@ -77,7 +77,7 @@ function buildResultSummaryText(summary: ResultEmailSummary) {
   const roleLine = summary.primaryRoleTitle ? `Primary career role: ${summary.primaryRoleTitle}` : "Primary career role: Not available";
 
   return [
-    "Your KnowYouRole result summary",
+    "Your What Career Fits result summary",
     "",
     mbtiLine,
     discLine,
@@ -85,7 +85,7 @@ function buildResultSummaryText(summary: ResultEmailSummary) {
     "",
     "This is a high-level snapshot, not a diagnosis or credential. Your full result stays available in the app after quiz completion.",
     "",
-    "KnowYouRole",
+    "What Career Fits",
   ].join("\n");
 }
 
@@ -96,9 +96,9 @@ function buildResultSummaryHtml(summary: ResultEmailSummary) {
 
   return `
     <div style="font-family: Inter, Arial, sans-serif; color: #111827; line-height: 1.55; max-width: 560px; margin: 0 auto; padding: 24px;">
-      <p style="font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #0891b2; margin: 0 0 8px;">KnowYouRole</p>
+      <p style="font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #0891b2; margin: 0 0 8px;">What Career Fits</p>
       <h1 style="font-size: 24px; line-height: 1.2; margin: 0 0 16px; color: #111827;">Your result summary</h1>
-      <p style="margin: 0 0 18px; color: #374151;">Here is the high-level snapshot you asked KnowYouRole to save with your email.</p>
+      <p style="margin: 0 0 18px; color: #374151;">Here is the high-level snapshot you asked What Career Fits to save with your email.</p>
       <div style="border: 1px solid #dbeafe; border-radius: 16px; padding: 16px; background: #f8fbff;">
         <p style="margin: 0 0 10px;"><strong>MBTI-style pattern:</strong> ${mbti}</p>
         <p style="margin: 0 0 10px;"><strong>DISC-style communication:</strong> ${disc}</p>

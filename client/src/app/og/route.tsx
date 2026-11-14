@@ -45,7 +45,7 @@ export function GET(request: Request) {
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <div style={{ width: 22, height: 22, borderRadius: 999, background: "#ffca42", border: "4px solid #12263a" }} />
-          <div style={{ fontSize: 32, fontWeight: 800 }}>KnowYouRole</div>
+          <div style={{ fontSize: 32, fontWeight: 800 }}>What Career Fits</div>
           <div style={{ marginLeft: "auto", fontSize: 24, fontWeight: 700, color: "#315f74", textTransform: "uppercase", letterSpacing: 3 }}>
             {sectionLabel(path)}
           </div>
@@ -54,7 +54,7 @@ export function GET(request: Request) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 26, color: "#456174" }}>
           <div>{`Free · ${QUESTION_COUNT} questions · No account or name needed`}</div>
           <div style={{ display: "flex", padding: "12px 26px", borderRadius: 999, background: "#12263a", color: "#f8f3e8", fontWeight: 800, boxShadow: "4px 4px 0 #ffca42" }}>
-            knowyourole.com
+            whatcareerfits.com
           </div>
         </div>
       </div>

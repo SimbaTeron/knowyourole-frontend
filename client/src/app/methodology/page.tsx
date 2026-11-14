@@ -46,7 +46,7 @@ export default function MethodologyPage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">
           <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm font-semibold text-[#315f74] underline-offset-4 transition hover:text-[#a3402b] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a3402b]">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Back to KnowYouRole
+            Back to What Career Fits
           </Link>
           <Link href="/quiz" className="methodology-primary-cta inline-flex min-h-11 items-center rounded-full bg-[#12263a] px-4 font-bold transition hover:bg-[#24455c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a3402b]">
             Take the quiz
@@ -60,9 +60,9 @@ export default function MethodologyPage() {
           A useful work-style read, not a verdict on a person.
         </h1>
         <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#405f72] sm:text-xl">
-          KnowYouRole turns a short set of self-reported work preferences into practical language for reflection and role exploration. It does not diagnose, rank, certify, hire, or predict a person&apos;s future.
+          What Career Fits turns a short set of self-reported work preferences into practical language for reflection and role exploration. It does not diagnose, rank, certify, hire, or predict a person&apos;s future.
         </p>
-        <p className="mt-4 text-sm font-medium text-[#536e82]">Last reviewed: July 27, 2026 · Questions or corrections: <a className="text-[#315f74] underline underline-offset-4 hover:text-[#a3402b]" href="mailto:info@knowyourole.com">info@knowyourole.com</a></p>
+        <p className="mt-4 text-sm font-medium text-[#536e82]">Last reviewed: July 27, 2026 · Questions or corrections: <a className="text-[#315f74] underline underline-offset-4 hover:text-[#a3402b]" href="mailto:info@whatcareerfits.com">info@whatcareerfits.com</a></p>
 
         <section className="mt-10 grid gap-4 sm:grid-cols-3" aria-label="Methodology summary">
           {[
@@ -160,7 +160,7 @@ export default function MethodologyPage() {
 
           <section className={cardClass}>
             <h2 className={headingClass}>Evidence and references</h2>
-            <p className="mt-3 text-sm leading-relaxed text-[#405f72]">These sources inform the way we describe established frameworks and their limits. They are not endorsements of KnowYouRole or proof of individual result accuracy.</p>
+            <p className="mt-3 text-sm leading-relaxed text-[#405f72]">These sources inform the way we describe established frameworks and their limits. They are not endorsements of What Career Fits or proof of individual result accuracy.</p>
             <ol className="mt-5 space-y-3 text-sm leading-relaxed text-[#405f72]">
               {citations.map((citation) => (
                 <li key={citation.href} className="flex gap-3">

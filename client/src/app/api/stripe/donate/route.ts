@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `KnowYouRole Donation - $${donationAmount}`,
-              description: 'Thank you for supporting KnowYouRole development!',
+              name: `What Career Fits Donation - $${donationAmount}`,
+              description: 'Thank you for supporting What Career Fits development!',
             },
             unit_amount: amount,
           },

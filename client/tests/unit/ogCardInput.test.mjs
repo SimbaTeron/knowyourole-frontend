@@ -9,7 +9,7 @@ import { OG_DEFAULT_PATH, OG_DEFAULT_TITLE, resolveOgCardInput } from "../../src
 const clientRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 function fromCard(title, path) {
-  const url = new URL(ogImagePath(title, path), "https://knowyourole.com");
+  const url = new URL(ogImagePath(title, path), "https://whatcareerfits.com");
   return resolveOgCardInput(url.searchParams);
 }
 
@@ -19,19 +19,19 @@ test("every public page card is accepted with its own title", () => {
     const resolved = fromCard(page.title, page.path);
     assert.equal(resolved.accepted, true, page.path);
     assert.equal(resolved.path, page.path);
-    const expected = new URL(ogImagePath(page.title, page.path), "https://knowyourole.com").searchParams.get("title");
+    const expected = new URL(ogImagePath(page.title, page.path), "https://whatcareerfits.com").searchParams.get("title");
     assert.equal(resolved.title, expected);
   }
 });
 
 test("noindex layouts keep the card they already request", () => {
   const pairs = [
-    ["/results", "My work style starting point"],
-    ["/auth", "Auth | KnowYouRole"],
-    ["/callback", "Auth Callback | KnowYouRole"],
-    ["/checkout-cancel", "Checkout Cancelled | KnowYouRole"],
-    ["/checkout-success", "Checkout Success | KnowYouRole"],
-    ["/profile", "Profile | KnowYouRole"],
+    ["/results", "My career-fit starting point"],
+    ["/auth", "Auth | What Career Fits"],
+    ["/callback", "Auth Callback | What Career Fits"],
+    ["/checkout-cancel", "Checkout Cancelled | What Career Fits"],
+    ["/checkout-success", "Checkout Success | What Career Fits"],
+    ["/profile", "Profile | What Career Fits"],
   ];
   for (const [path, title] of pairs) {
     const resolved = fromCard(title, path);
@@ -39,7 +39,7 @@ test("noindex layouts keep the card they already request", () => {
     assert.equal(resolved.path, path);
   }
   const resultsLayout = readFileSync(join(clientRoot, "src/app/results/layout.tsx"), "utf8");
-  assert.match(resultsLayout, /My work style starting point/);
+  assert.match(resultsLayout, /My career-fit starting point/);
 });
 
 test("arbitrary text, swapped titles, and unknown params fall back to the default card", () => {

@@ -167,20 +167,22 @@ test("collection is blocked off the canonical production host", () => {
   assert.equal(isLocalAnalyticsHost("knowyourole.com"), false);
   assert.equal(isLocalAnalyticsHost("preview.knowyourole.com"), false);
 
-  assert.equal(isCanonicalAnalyticsHost("knowyourole.com"), true);
-  assert.equal(isCanonicalAnalyticsHost("www.knowyourole.com"), false);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "production" }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "" }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "development", vercelEnv: "" }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "test", vercelEnv: "" }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "preview" }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "development" }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "", vercelEnv: "" }), true);
+  assert.equal(isCanonicalAnalyticsHost("whatcareerfits.com"), true);
+  assert.equal(isCanonicalAnalyticsHost("www.whatcareerfits.com"), false);
+  assert.equal(isCanonicalAnalyticsHost("knowyourole.com"), false);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "production", vercelEnv: "production" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "production", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "development", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "test", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "production", vercelEnv: "preview" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "production", vercelEnv: "development" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "production" }), false);
   assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.vercel.app", nodeEnv: "production", vercelEnv: "production" }), false);
   assert.equal(analyticsCollectionAllowed({ hostname: "192.168.1.8", nodeEnv: "production", vercelEnv: "production" }), false);
 
   assert.deepEqual(internalTrafficFallback({ hostname: "127.0.0.1", nodeEnv: "production", vercelEnv: "production" }), { traffic_type: "internal" });
-  assert.equal(internalTrafficFallback({ hostname: "knowyourole.com", nodeEnv: "production", vercelEnv: "production" }), null);
+  assert.equal(internalTrafficFallback({ hostname: "whatcareerfits.com", nodeEnv: "production", vercelEnv: "production" }), null);
 
   const blocked = buildMeasurementConfig({
     hostname: "quiz.local",
@@ -197,7 +199,7 @@ test("production measurement keeps utm acquisition and drops bare campaign keys"
   assert.equal(hit.page_path, "/quiz?utm_source=newsletter&utm_medium=email&page=1");
   assert.equal(hit.page_location, "https://knowyourole.com/quiz?utm_source=newsletter&utm_medium=email&page=1#start");
   const decision = buildMeasurementConfig({
-    hostname: "knowyourole.com",
+    hostname: "whatcareerfits.com",
     nodeEnv: "production",
     vercelEnv: "production",
     ...hit,
@@ -220,7 +222,7 @@ test("production measurement keeps utm acquisition and drops bare campaign keys"
   assert.equal(leakedHit.includes("session-1"), false);
   assert.match(leaked.page_location, /utm_source=newsletter/);
   const leakedConfig = buildMeasurementConfig({
-    hostname: "knowyourole.com",
+    hostname: "whatcareerfits.com",
     nodeEnv: "production",
     vercelEnv: "production",
     ...leaked,
@@ -285,7 +287,7 @@ test("gtag is silent off the production hostname and renames source when it tran
   });
 
   withAnalyticsEnv(PRODUCTION_ENV, () => {
-    const live = installWindow({ analytics: true }, { hostname: "knowyourole.com" });
+    const live = installWindow({ analytics: true }, { hostname: "whatcareerfits.com" });
     trackKyrEvent("result_section_clicked", { source: "bottom_nav", utm_source: "orbital_v2", medium: "nav" });
     assert.equal(live.gtagCalls.length, 1);
     assert.equal(live.gtagCalls[0][0], "event");
@@ -519,7 +521,7 @@ function installFunnelWindow({ hostname, consent, href }) {
 
 test("queued quiz_started and quiz_landing_viewed flush only after gtag is ready", () => {
   withAnalyticsEnv(PRODUCTION_ENV, () => {
-    const harness = installFunnelWindow({ hostname: "knowyourole.com", consent: null });
+    const harness = installFunnelWindow({ hostname: "whatcareerfits.com", consent: null });
     const landing = { link_location: "shortform_v2", total_questions: 5 };
     const started = { link_location: "shortform_v2", tier: "25+", total_questions: 5 };
     recordQuizFunnelEvent("quiz_landing_viewed", landing);
@@ -556,7 +558,7 @@ test("queued quiz_started and quiz_landing_viewed flush only after gtag is ready
 
 test("page_view is sent before the queued funnel events on the same page", () => {
   withAnalyticsEnv(PRODUCTION_ENV, () => {
-    const harness = installFunnelWindow({ hostname: "knowyourole.com", consent: null });
+    const harness = installFunnelWindow({ hostname: "whatcareerfits.com", consent: null });
     recordQuizFunnelEvent("quiz_landing_viewed", { link_location: "shortform_v2", total_questions: 5 });
     recordQuizFunnelEvent("quiz_started", { link_location: "shortform_v2", tier: "25+", total_questions: 5 });
     harness.setConsent({ analytics: true });
@@ -576,7 +578,7 @@ test("page_view is sent before the queued funnel events on the same page", () =>
 
 test("consent already stored still waits for gtag, and reject or blocked hosts never transmit", () => {
   withAnalyticsEnv(PRODUCTION_ENV, () => {
-    const early = installFunnelWindow({ hostname: "knowyourole.com", consent: { analytics: true } });
+    const early = installFunnelWindow({ hostname: "whatcareerfits.com", consent: { analytics: true } });
     recordQuizFunnelEvent("quiz_landing_viewed", { link_location: "shortform_v2", total_questions: 5 });
     assert.deepEqual(loadQuizAttempt(early.storage).sent, []);
     assert.equal(early.gtagCalls.length, 0);
@@ -585,7 +587,7 @@ test("consent already stored still waits for gtag, and reject or blocked hosts n
     assert.deepEqual(early.gtagCalls.map((call) => call[1]), ["kyr_quiz_landing_viewed"]);
     assert.equal(loadQuizAttempt(early.storage).sent.includes("quiz_landing_viewed"), true);
 
-    const rejected = installFunnelWindow({ hostname: "knowyourole.com", consent: null });
+    const rejected = installFunnelWindow({ hostname: "whatcareerfits.com", consent: null });
     recordQuizFunnelEvent("quiz_started", { link_location: "shortform_v2", tier: "25+", total_questions: 5 });
     rejected.setConsent({ analytics: false });
     rejected.installGtag();
@@ -594,7 +596,7 @@ test("consent already stored still waits for gtag, and reject or blocked hosts n
     assert.equal(rejected.gtagCalls.length, 0);
     assert.deepEqual(loadQuizAttempt(rejected.storage).sent, []);
 
-    for (const hostname of ["127.0.0.1", "192.168.1.40", "10.1.2.3", "172.16.4.4", "knowyourole.vercel.app", "my-app-git-preview.vercel.app", "www.knowyourole.com"]) {
+    for (const hostname of ["127.0.0.1", "192.168.1.40", "10.1.2.3", "172.16.4.4", "knowyourole.vercel.app", "my-app-git-preview.vercel.app", "www.knowyourole.com", "www.whatcareerfits.com", "knowyourole.com"]) {
       const blocked = installFunnelWindow({ hostname, consent: null, href: `http://${hostname}/quiz` });
       recordQuizFunnelEvent("quiz_landing_viewed", { link_location: "shortform_v2", total_questions: 5 });
       recordQuizFunnelEvent("quiz_started", { link_location: "shortform_v2", tier: "13-18", total_questions: 5 });
@@ -609,9 +611,11 @@ test("consent already stored still waits for gtag, and reject or blocked hosts n
 
 test("collection follows the production hostname, not the build environment", () => {
   const productionEnv = { nodeEnv: "production", vercelEnv: "production" };
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", ...productionEnv }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "KnowYouRole.com", ...productionEnv }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com.", nodeEnv: "development", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", ...productionEnv }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "WhatCareerFits.com", ...productionEnv }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com.", nodeEnv: "development", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "www.whatcareerfits.com", ...productionEnv }), false);
+  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", ...productionEnv }), false);
   assert.equal(analyticsCollectionAllowed({ hostname: "www.knowyourole.com", ...productionEnv }), false);
   assert.equal(isVercelAppHost("knowyourole.vercel.app"), true);
   assert.equal(isVercelAppHost("my-app-git-feature-team.vercel.app"), true);
@@ -639,11 +643,13 @@ test("collection follows the production hostname, not the build environment", ()
     "169.254.1.1",
     "preview.knowyourole.com",
     "www.knowyourole.com",
+    "www.whatcareerfits.com",
+    "knowyourole.com",
   ]) {
     assert.equal(analyticsCollectionAllowed({ hostname, ...productionEnv }), false, hostname);
   }
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "development", vercelEnv: "preview" }), true);
-  assert.equal(analyticsCollectionAllowed({ hostname: "knowyourole.com", nodeEnv: "test", vercelEnv: "" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "development", vercelEnv: "preview" }), true);
+  assert.equal(analyticsCollectionAllowed({ hostname: "whatcareerfits.com", nodeEnv: "test", vercelEnv: "" }), true);
   assert.equal(analyticsCollectionAllowed({ hostname: "", nodeEnv: "production", vercelEnv: "production" }), false);
 });
 
@@ -717,7 +723,7 @@ test("quiz visits show the existing consent banner without a second page_view co
   assert.match(banner, /reserved !== height/);
   assert.match(nextConfig, /canonicalHostRedirects/);
   const decision = buildMeasurementConfig({
-    hostname: "knowyourole.com",
+    hostname: "whatcareerfits.com",
     nodeEnv: "production",
     vercelEnv: "production",
     page_path: "/quiz",
@@ -749,13 +755,21 @@ test("quiz visits show the existing consent banner without a second page_view co
   assert.equal(claimNavigationPageView("https://knowyourole.com/results?page=share"), true);
   resetNavigationPageViews();
 
-  assert.equal(canonicalHostRedirect("www.knowyourole.com", "/quiz", "?page=1"), "https://knowyourole.com/quiz?page=1");
-  assert.equal(canonicalHostRedirect("WWW.KnowYouRole.com.", "/", ""), "https://knowyourole.com/");
-  assert.equal(canonicalHostRedirect("knowyourole.com", "/quiz", ""), null);
+  assert.equal(canonicalHostRedirect("www.whatcareerfits.com", "/quiz", "?page=1"), "https://whatcareerfits.com/quiz?page=1");
+  assert.equal(canonicalHostRedirect("WWW.WhatCareerFits.com.", "/", ""), "https://whatcareerfits.com/");
+  assert.equal(canonicalHostRedirect("whatcareerfits.com", "/quiz", ""), null);
+  assert.equal(canonicalHostRedirect("knowyourole.com", "/quiz", "?ref=test"), "https://whatcareerfits.com/quiz?ref=test");
+  assert.equal(canonicalHostRedirect("www.knowyourole.com", "/schools", ""), "https://whatcareerfits.com/for-schools");
+  assert.equal(canonicalHostRedirect("WWW.KnowYouRole.com.", "/", ""), "https://whatcareerfits.com/");
   assert.equal(canonicalHostRedirect("knowyourole.vercel.app", "/", ""), null);
   const rules = canonicalHostRedirects();
-  assert.equal(rules.every((rule) => rule.permanent && rule.has[0].value === "www.knowyourole.com"), true);
-  assert.match(rules.map((rule) => rule.destination).join(" "), /https:\/\/knowyourole\.com/);
+  assert.equal(rules.every((rule) => rule.permanent), true);
+  assert.deepEqual(
+    [...new Set(rules.map((rule) => rule.has?.[0].value))].sort(),
+    ["knowyourole.com", "www.knowyourole.com", "www.whatcareerfits.com", undefined].sort(),
+  );
+  assert.ok(rules.some((rule) => rule.source === "/schools" && rule.destination === "/for-schools"));
+  assert.match(rules.map((rule) => rule.destination).join(" "), /https:\/\/whatcareerfits\.com/);
 });
 
 function reloadAttempt(storage) {

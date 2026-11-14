@@ -10,11 +10,11 @@ export default function About() {
     <div className="workday-simple-page min-h-screen bg-soft-cream text-warm-gray">
       <AppHeader />
       <main className="workday-simple-wrap max-w-2xl px-6 py-32">
-        <h1 className="text-3xl font-display font-bold mb-6" data-testid="text-about-title">About KnowYouRole</h1>
+        <h1 className="text-3xl font-display font-bold mb-6" data-testid="text-about-title">About What Career Fits</h1>
 
         <section className="space-y-4 mb-10">
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            KnowYouRole helps people turn personality quiz results into clearer self-understanding, communication language, and career reflection. The goal is not to trap anyone inside a label; it is to give people a sharper mirror and better next questions.
+            What Career Fits helps people turn personality quiz results into clearer self-understanding, communication language, and career reflection. The goal is not to trap anyone inside a label; it is to give people a sharper mirror and better next questions.
           </p>
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             The site combines Big Five traits, MBTI-style patterns, DISC-style communication insights, and career-fit recommendations in a plain-English experience built for real people, not research jargon.
@@ -28,8 +28,8 @@ export default function About() {
           </h2>
           <div className="space-y-3 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             <p>
-              {/* TODO(owner): expand the founder bio (background, why KnowYouRole was built). Content intentionally not invented. */}
-              <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of KnowYouRole, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person. Questions or corrections: <a href="mailto:info@knowyourole.com" className="text-terracotta dark:text-[#A78BFA] underline underline-offset-4">info@knowyourole.com</a>.
+              {/* TODO(owner): expand the founder bio (background, why What Career Fits was built). Content intentionally not invented. */}
+              <span className="font-semibold text-warm-gray dark:text-[#F8FAFC]">Sim Teron</span> is the founder of What Career Fits, building practical personality and career-reflection tools that feel useful without pretending a quiz can explain a whole person. Questions or corrections: <a href="mailto:info@whatcareerfits.com" className="text-terracotta dark:text-[#A78BFA] underline underline-offset-4">info@whatcareerfits.com</a>.
             </p>
           </div>
         </section>
@@ -41,7 +41,7 @@ export default function About() {
           </h2>
           <div className="space-y-4 text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
             <p>
-              Many personality sites are either shallow entertainment, vague corporate language, or overly confident claims wrapped in pseudo-science. KnowYouRole exists to make self-discovery more practical: what energizes you, how you communicate, what environments fit you, and what career paths are worth exploring.
+              Many personality sites are either shallow entertainment, vague corporate language, or overly confident claims wrapped in pseudo-science. What Career Fits exists to make self-discovery more practical: what energizes you, how you communicate, what environments fit you, and what career paths are worth exploring.
             </p>
             <p>
               The product is intentionally plain about its limits. A personality quiz can support reflection; it cannot diagnose you, choose your career for you, or replace judgment from qualified professionals.
@@ -55,7 +55,7 @@ export default function About() {
             Mission
           </h2>
           <p className="text-warm-gray/80 dark:text-[#94A3B8] leading-relaxed">
-            KnowYouRole's mission is to help people understand their strengths, friction points, communication style, and career-fit themes earlier, so they can make better decisions with more self-awareness and less guesswork.
+            What Career Fits's mission is to help people understand their strengths, friction points, communication style, and career-fit themes earlier, so they can make better decisions with more self-awareness and less guesswork.
           </p>
         </section>
 
@@ -95,7 +95,7 @@ export default function About() {
             Important disclaimer
           </h2>
           <p className="text-sm text-warm-gray/80 dark:text-[#FDE68A] leading-relaxed">
-            KnowYouRole is for self-discovery and career reflection. It is not a medical, clinical, psychiatric, legal, financial, or employment-selection evaluation. Use it as a starting point for reflection, not as a final verdict on who you are or what you should do.
+            What Career Fits is for self-discovery and career reflection. It is not a medical, clinical, psychiatric, legal, financial, or employment-selection evaluation. Use it as a starting point for reflection, not as a final verdict on who you are or what you should do.
           </p>
         </section>
       </main>

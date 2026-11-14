@@ -9,7 +9,7 @@ import { publicPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = publicPageMetadata("/for-schools");
 
 const principles = [
-  ["A conversation starter", `KnowYouRole uses a fixed ${QUESTION_COUNT}-question reflection to give students language for discussing interests, work preferences, strengths, and possible directions to explore.`],
+  ["A conversation starter", `What Career Fits uses a fixed ${QUESTION_COUNT}-question reflection to give students language for discussing interests, work preferences, strengths, and possible directions to explore.`],
   ["Not a label or decision tool", "It is not a clinical assessment, diagnosis, official MBTI instrument, hiring tool, admissions screen, prediction engine, or substitute for professional judgment."],
   ["No account, no name needed", "Students can complete the quiz without creating an account or providing an email address. Analytics is optional and only loads after affirmative cookie consent."],
   ["Built for guided use", "A counselor, teacher, or caregiver can sit with a student, clarify questions, and use the result as one input to a broader conversation—not as an answer about who the student is."],
@@ -23,10 +23,10 @@ export default function ForSchoolsPage() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#a3402b]">For schools, counselors & educators</p>
         <h1 className="mt-4 max-w-4xl font-display text-4xl font-bold leading-[0.98] tracking-[-0.05em] sm:text-6xl">A short, structured way to start a better student conversation.</h1>
         <p className="mt-6 max-w-3xl text-lg leading-relaxed text-[#405f72] sm:text-xl">
-          KnowYouRole is a free work-style reflection and career-exploration tool. In about 15 minutes, students answer {QUESTION_COUNT} fixed questions and receive practical language they can discuss with a counselor, teacher, parent, or caregiver.
+          What Career Fits is a free career-exploration tool. In about 15 minutes, students answer {QUESTION_COUNT} fixed questions and receive practical language they can discuss with a counselor, teacher, parent, or caregiver.
         </p>
 
-        <section className="mt-12 grid gap-4 sm:grid-cols-2" aria-label="How KnowYouRole is intended to be used">
+        <section className="mt-12 grid gap-4 sm:grid-cols-2" aria-label="How What Career Fits is intended to be used">
           {principles.map(([title, body], index) => (
             <article key={title} className="rounded-3xl border border-[#12263a]/12 bg-white/75 p-6 shadow-[0_14px_35px_rgba(18,38,58,0.06)] sm:p-7">
               <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f7eddc] text-sm font-extrabold text-[#a3402b]">0{index + 1}</span>
@@ -43,7 +43,7 @@ export default function ForSchoolsPage() {
             <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[#405f72]">
               <li>No accounts, no names, no student IDs.</li>
               <li>We store quiz answers and the result with a random session ID, deleted automatically after {ANONYMOUS_RESULT_RETENTION_DAYS} days.</li>
-              <li>Schools and parents can ask for deletion at info@knowyourole.com.</li>
+              <li>Schools and parents can ask for deletion at info@whatcareerfits.com.</li>
               <li>No selling, no ads, no marketing profiles.</li>
               <li>Under 13: teacher-led use, and no email or personal details.</li>
             </ul>
@@ -77,23 +77,25 @@ export default function ForSchoolsPage() {
 
         <section className="mt-6 rounded-3xl border border-[#12263a]/12 bg-white/70 p-6 text-sm leading-relaxed text-[#405f72] sm:p-7">
           <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-[#12263a]">School contact</h2>
-          <p className="mt-3">Questions about a pilot, student data, deletion requests or a district data privacy agreement? Email <a className="font-semibold text-[#315f74] underline underline-offset-4" href="mailto:info@knowyourole.com">info@knowyourole.com</a>. Classroom use is free and allowed under our <Link className="font-semibold text-[#315f74] underline underline-offset-4" href="/terms#school-use">Terms</Link>.</p>
+          <p className="mt-3">Questions about a pilot, student data, deletion requests or a district data privacy agreement? Email <a className="font-semibold text-[#315f74] underline underline-offset-4" href="mailto:info@whatcareerfits.com">info@whatcareerfits.com</a>. Classroom use is free and allowed under our <Link className="font-semibold text-[#315f74] underline underline-offset-4" href="/terms#school-use">Terms</Link>.</p>
         </section>
 
         <section className="mt-12 grid gap-5 rounded-3xl border border-[#315f74]/20 bg-[#edf5f4] p-6 sm:grid-cols-[1.1fr_0.9fr] sm:p-9">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#315f74]">For technology teams</p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.035em]">What this website is—and is not.</h2>
-            <p className="mt-4 text-sm leading-relaxed text-[#405f72]">KnowYouRole is an HTTPS-protected public education and career-reflection website. It does not contain adult content, gambling, user-generated content, chat, or a user-facing generative-AI feature. It does not ask students to provide a name, school, address, or email to complete the quiz.</p>
+            <p className="mt-4 text-sm leading-relaxed text-[#405f72]">What Career Fits is an HTTPS-protected public education and career-reflection website. It does not contain adult content, gambling, user-generated content, chat, or a user-facing generative-AI feature. It does not ask students to provide a name, school, address, or email to complete the quiz.</p>
           </div>
           <div className="rounded-2xl border border-[#315f74]/15 bg-white/80 p-5 text-sm leading-relaxed text-[#405f72]">
             <h3 className="font-bold text-[#12263a]">If your network blocks the site</h3>
             <p className="mt-2">Please review or allowlist the canonical domains for educational and career-guidance use:</p>
             <ul className="mt-3 space-y-2 font-semibold text-[#315f74]">
-              <li>knowyourole.com</li>
-              <li>www.knowyourole.com</li>
+              <li>whatcareerfits.com</li>
+              <li>www.whatcareerfits.com</li>
+              <li>knowyourole.com (redirects to whatcareerfits.com)</li>
+              <li>www.knowyourole.com (redirects to whatcareerfits.com)</li>
             </ul>
-            <p className="mt-4">For a technical, privacy, or classification question, contact <a className="font-semibold text-[#315f74] underline underline-offset-4" href="mailto:info@knowyourole.com">info@knowyourole.com</a>.</p>
+            <p className="mt-4">For a technical, privacy, or classification question, contact <a className="font-semibold text-[#315f74] underline underline-offset-4" href="mailto:info@whatcareerfits.com">info@whatcareerfits.com</a>.</p>
           </div>
         </section>
 

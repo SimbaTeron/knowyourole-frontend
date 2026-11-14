@@ -52,12 +52,12 @@ test.describe("Career Paths", () => {
   test("has route-specific metadata rather than inherited home metadata", async ({ request }) => {
     const response = await request.get("/careers");
     const html = await response.text();
-    const title = "Career Paths by Personality &amp; Work Style | KnowYouRole";
+    const title = "Career Paths by Personality &amp; Work Style | What Career Fits";
 
     expect(html).toContain(`<title>${title}</title>`);
-    expect(html).toContain('rel="canonical" href="https://knowyourole.com/careers"');
+    expect(html).toContain('rel="canonical" href="https://whatcareerfits.com/careers"');
     expect(html).toContain(`property="og:title" content="${title}"`);
-    expect(html).not.toContain("<title>Free Personality Quiz for Work Style &amp; Career Fit | KnowYouRole</title>");
+    expect(html).not.toContain("<title>Free Career Quiz: What Career Fits Me? | What Career Fits</title>");
   });
 
   test("search works without horizontal overflow on every configured viewport", async ({ page, request }) => {

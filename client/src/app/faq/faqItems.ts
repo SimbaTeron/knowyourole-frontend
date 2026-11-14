@@ -2,8 +2,8 @@ import { QUESTION_COUNT } from "@/lib/quiz/quizConfig";
 
 export const FAQ_ITEMS = [
   {
-    question: "What is the current KnowYouRole quiz?",
-    answer: `KnowYouRole is a free ${QUESTION_COUNT}-prompt self-reflection quiz for work style and role exploration. It turns your answers into a practical report on preferences, work behavior, trait signals, and career directions worth testing. It is not designed to reduce a person to one permanent label.`
+    question: "What is the current What Career Fits quiz?",
+    answer: `What Career Fits is a free ${QUESTION_COUNT}-prompt self-reflection quiz for career exploration. It looks at work style and turns your answers into a practical report on preferences, work behavior, trait signals, and career directions worth testing. It is not designed to reduce a person to one permanent label.`
   },
   {
     question: "What do I get when I finish?",
@@ -19,11 +19,11 @@ export const FAQ_ITEMS = [
   },
   {
     question: "How are results calculated?",
-    answer: "Each answer contributes to several signals across Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and role-fit vectors. KnowYouRole recomputes the result from the complete answer set before showing the report, so the direction reflects the whole pattern rather than one answer or a client-side guess."
+    answer: "Each answer contributes to several signals across Big Five-informed traits, MBTI-style preferences, DISC-style work behavior, and role-fit vectors. What Career Fits recomputes the result from the complete answer set before showing the report, so the direction reflects the whole pattern rather than one answer or a client-side guess."
   },
   {
     question: "Is this an official MBTI, DISC, or clinical assessment?",
-    answer: "No. KnowYouRole uses MBTI-style and DISC-style language as accessible reflection lenses, alongside Big Five-informed trait signals. It is not an official MBTI or DISC instrument, a clinical assessment, a diagnosis, a hiring screen, or a prediction of job performance."
+    answer: "No. What Career Fits uses MBTI-style and DISC-style language as accessible reflection lenses, alongside Big Five-informed trait signals. It is not an official MBTI or DISC instrument, a clinical assessment, a diagnosis, a hiring screen, or a prediction of job performance."
   },
   {
     question: "How accurate is the quiz?",
@@ -39,10 +39,10 @@ export const FAQ_ITEMS = [
   },
   {
     question: "Do I need an account or have to pay?",
-    answer: "No. You can start and complete the quiz without an account, and everything on KnowYouRole today is free. Nothing is locked or paywalled right now, and you do not need a purchase to see your result."
+    answer: "No. You can start and complete the quiz without an account, and everything on What Career Fits today is free. Nothing is locked or paywalled right now, and you do not need a purchase to see your result."
   },
   {
     question: "How is my quiz data handled?",
-    answer: "Quiz completion data may be saved to generate and recover a result. KnowYouRole does not sell quiz results. Analytics loads only after you affirmatively opt in through cookie preferences; it does not use your answers, scores, role direction, or result labels. See the Privacy Policy for the current details."
+    answer: "Quiz completion data may be saved to generate and recover a result. What Career Fits does not sell quiz results. Analytics loads only after you affirmatively opt in through cookie preferences; it does not use your answers, scores, role direction, or result labels. See the Privacy Policy for the current details."
   },
 ];
