@@ -1,4 +1,5 @@
 import QuizPageClient from './QuizPageClient';
+import { QUESTION_COUNT } from '@/lib/quiz/quizConfig';
 import { breadcrumbJsonLd, SITE_URL } from '@/lib/seo';
 
 const quizJsonLd = {
@@ -24,7 +25,7 @@ const quizJsonLd = {
 const quizFaqs = [
   {
     q: "What career fits me?",
-    a: "Take this free 30-question quiz to get a starting picture of careers that may fit how you like to work. It is not a diagnosis or a decision. Use the result to explore a class, a conversation, or a small experiment.",
+    a: `Take this free ${QUESTION_COUNT}-question quiz to get a starting picture of careers that may fit how you like to work. It is not a diagnosis or a decision. Use the result to explore a class, a conversation, or a small experiment.`,
   },
   {
     q: "Is there a free career quiz for teens?",

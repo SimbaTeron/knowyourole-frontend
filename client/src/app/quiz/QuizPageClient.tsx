@@ -1041,7 +1041,7 @@ export default function QuizPage() {
               <div className="mt-4 grid gap-3">
                 <details className="rounded-3xl border border-white/10 bg-white/[0.045] p-4" open>
                   <summary className="cursor-pointer text-sm font-black text-white">What career fits me?</summary>
-                  <p className="mt-2 text-sm leading-6 text-white/70">Take this free 30-question quiz to get a starting picture of careers that may fit how you like to work. It is not a diagnosis or a decision. Use the result to explore a class, a conversation, or a small experiment.</p>
+                  <p className="mt-2 text-sm leading-6 text-white/70">{`Take this free ${QUESTION_COUNT}-question quiz to get a starting picture of careers that may fit how you like to work. It is not a diagnosis or a decision. Use the result to explore a class, a conversation, or a small experiment.`}</p>
                 </details>
                 <details className="rounded-3xl border border-white/10 bg-white/[0.045] p-4">
                   <summary className="cursor-pointer text-sm font-black text-white">Is there a free career quiz for teens?</summary>
