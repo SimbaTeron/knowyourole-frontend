@@ -1,6 +1,6 @@
 {
-  "name": "KnowYouRole",
-  "short_name": "KnowYouRole",
+  "name": "What Career Fits",
+  "short_name": "What Career Fits",
   "description": "Discover your personality path and career matches",
   "start_url": "/",
   "display": "standalone",

@@ -10,7 +10,7 @@ export const OG_DEFAULT_PATH = "/";
  * without rendering attacker-controlled text.
  */
 export function cleanOgTitle(title: string): string {
-  return title.replace(/\s*\|\s*KnowYouRole\s*$/, "").replace(/\s*\|\s*/g, " · ").trim();
+  return title.replace(/\s*\|\s*What Career Fits\s*$/, "").replace(/\s*\|\s*/g, " · ").trim();
 }
 
 /**
@@ -18,12 +18,12 @@ export function cleanOgTitle(title: string): string {
  * These match noIndexMetadata / results layout calls.
  */
 const EXTRA_OG_CARDS: readonly { path: string; title: string }[] = [
-  { path: "/results", title: "My work style starting point" },
-  { path: "/auth", title: "Auth | KnowYouRole" },
-  { path: "/callback", title: "Auth Callback | KnowYouRole" },
-  { path: "/checkout-cancel", title: "Checkout Cancelled | KnowYouRole" },
-  { path: "/checkout-success", title: "Checkout Success | KnowYouRole" },
-  { path: "/profile", title: "Profile | KnowYouRole" },
+  { path: "/results", title: "My career-fit starting point" },
+  { path: "/auth", title: "Auth | What Career Fits" },
+  { path: "/callback", title: "Auth Callback | What Career Fits" },
+  { path: "/checkout-cancel", title: "Checkout Cancelled | What Career Fits" },
+  { path: "/checkout-success", title: "Checkout Success | What Career Fits" },
+  { path: "/profile", title: "Profile | What Career Fits" },
 ];
 
 function cardAllowlist(): Map<string, Set<string>> {

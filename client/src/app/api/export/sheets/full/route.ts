@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     // Sheet 1: Overview
     const overviewRows = [
-      ['KnowYouRole Blueprint Export'],
+      ['What Career Fits Blueprint Export'],
       ['Generated', timestamp],
       ['Total Sessions', sessions.data?.length || 0],
       ['Total Feedback Entries', feedback.data?.length || 0],

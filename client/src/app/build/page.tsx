@@ -10,7 +10,7 @@ const sections = [
   {
     icon: Workflow,
     title: "Problem",
-    body: "Most personality products stop at a label. KnowYouRole was built to turn a short self-report into usable work-style language, pressure patterns, communication clues, and career directions worth testing in real life.",
+    body: "Most personality products stop at a label. What Career Fits was built to turn a short self-report into usable work-style language, pressure patterns, communication clues, and career directions worth testing in real life.",
   },
   {
     icon: Database,
@@ -42,7 +42,7 @@ export default function BuildPage() {
       <header className="sticky top-0 z-50 border-b border-[#12263a]/10 bg-[#fffaf0]/90 px-4 py-4 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
           <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm font-semibold text-[#315f74] underline-offset-4 transition hover:text-[#a3402b] hover:underline">
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to KnowYouRole
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to What Career Fits
           </Link>
           <Link href="/quiz" className="inline-flex min-h-11 items-center rounded-full bg-[#12263a] px-4 text-sm font-bold !text-white transition hover:bg-[#24455c]">
             Try the product <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
@@ -53,7 +53,7 @@ export default function BuildPage() {
       <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#a3402b]">Build case study</p>
         <h1 className="mt-3 max-w-4xl font-display text-4xl font-bold leading-[0.98] tracking-[-0.05em] sm:text-6xl">Building a career-reflection product that refuses to pretend it has all the answers.</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-relaxed text-[#405f72] sm:text-xl">KnowYouRole is a public product experiment in turning self-reported work preferences into practical reflection—while making the system, its limits, and its data responsibilities visible enough to inspect.</p>
+        <p className="mt-6 max-w-3xl text-lg leading-relaxed text-[#405f72] sm:text-xl">What Career Fits is a public product experiment in turning self-reported work preferences into practical reflection—while making the system, its limits, and its data responsibilities visible enough to inspect.</p>
 
         <section className="mt-12 grid gap-4 sm:grid-cols-2" aria-label="Build overview">
           {sections.map(({ icon: Icon, title, body }) => <article key={title} className="rounded-3xl border border-[#12263a]/12 bg-white/75 p-6 shadow-[0_14px_35px_rgba(18,38,58,0.06)]">

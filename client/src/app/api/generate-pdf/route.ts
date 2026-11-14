@@ -51,7 +51,7 @@ const DISC_LABELS: Record<string, string> = {
   C: 'Conscientiousness',
 };
 
-const BRAND_URL = 'knowyourole.com';
+const BRAND_URL = 'whatcareerfits.com';
 
 const BIG_FIVE_LABELS: Record<string, string> = {
   O: 'Openness',
@@ -126,10 +126,10 @@ export async function POST(req: NextRequest) {
     const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
 
     const pdfDoc = await PDFDocument.create();
-    pdfDoc.setTitle(cleanText(payload.title || 'KnowYouRole Full Portrait'));
-    pdfDoc.setSubject('Compact KnowYouRole Full Portrait share card');
-    pdfDoc.setCreator('KnowYouRole');
-    pdfDoc.setProducer('KnowYouRole');
+    pdfDoc.setTitle(cleanText(payload.title || 'What Career Fits Full Portrait'));
+    pdfDoc.setSubject('Compact What Career Fits Full Portrait share card');
+    pdfDoc.setCreator('What Career Fits');
+    pdfDoc.setProducer('What Career Fits');
 
     const regular = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -172,9 +172,9 @@ export async function POST(req: NextRequest) {
       page.drawCircle({ x: 490, y: 750, size: 48, color: color('gold'), opacity: 0.92 });
       page.drawCircle({ x: 585, y: 40, size: 120, color: color('cyan'), opacity: 0.24 });
       page.drawRectangle({ x: margin, y: 27, width: contentWidth, height: 1, color: color('border') });
-      page.drawText('KnowYouRole', { x: margin, y: 12, size: 8, font: bold, color: color('ink') });
+      page.drawText('What Career Fits', { x: margin, y: 12, size: 8, font: bold, color: color('ink') });
       page.drawText('A reflection starting point, not a diagnosis, hiring screen, or prediction.', { x: margin + 62, y: 12, size: 7, font: regular, color: color('muted') });
-      page.drawText('knowyourole.com', { x: pageSize[0] - margin - 78, y: 12, size: 8, font: bold, color: color('ink') });
+      page.drawText('whatcareerfits.com', { x: pageSize[0] - margin - 102, y: 12, size: 8, font: bold, color: color('ink') });
     };
 
     const truncateToWidth = (text: string, fontRef: typeof regular, size: number, maxWidth: number) => {
@@ -245,7 +245,7 @@ export async function POST(req: NextRequest) {
     paintBackground();
 
     // Mirrors the live result sequence: identity, direction, compact signals, then evidence.
-    page.drawText('KnowYouRole', { x: margin, y, size: 18, font: bold, color: color('text') });
+    page.drawText('What Career Fits', { x: margin, y, size: 18, font: bold, color: color('text') });
     page.drawText('FULL PORTRAIT', { x: pageSize[0] - margin - 72, y: y + 3, size: 8.4, font: bold, color: color('cyan') });
     y -= 42;
 
@@ -366,7 +366,7 @@ export async function POST(req: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename=KnowYouRole-Full-Portrait.pdf',
+        'Content-Disposition': 'attachment; filename=WhatCareerFits-Full-Portrait.pdf',
         'Cache-Control': 'no-store',
       },
     });

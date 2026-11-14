@@ -4,11 +4,11 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { AppFooter } from "@/components/layout/AppFooter";
 
 export const metadata: Metadata = {
-  title: "Page not found | KnowYouRole",
+  title: "Page not found | What Career Fits",
   description: "We couldn't find that page.",
   alternates: { canonical: null },
   openGraph: null,
-  twitter: { card: "summary", title: "Page not found | KnowYouRole", description: "We couldn't find that page.", images: [] },
+  twitter: { card: "summary", title: "Page not found | What Career Fits", description: "We couldn't find that page.", images: [] },
 };
 
 export default function NotFound() {

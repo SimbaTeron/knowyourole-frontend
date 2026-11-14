@@ -20,12 +20,12 @@ test("public titles stay within 60 characters and descriptions within 160", () =
   const home = publicPages.find((page) => page.path === "/");
   const quiz = publicPages.find((page) => page.path === "/quiz");
   assert.ok(home && quiz);
-  assert.ok(home.title.includes("Work Style"));
   assert.ok(home.title.includes("Career Quiz"));
-  assert.ok(quiz.title.includes("Work Style Quiz"));
+  assert.ok(home.title.includes("What Career Fits"));
+  assert.ok(quiz.title.includes("Career Quiz"));
   assert.ok(quiz.title.includes("No Sign-Up"));
-  assert.ok(home.description.includes(`${QUESTION_COUNT}-question work style`));
-  assert.ok(quiz.description.includes(`${QUESTION_COUNT}-question work style`));
+  assert.ok(home.description.includes(`${QUESTION_COUNT}-question career quiz`));
+  assert.ok(quiz.description.includes(`${QUESTION_COUNT}-question career quiz`));
 });
 
 test("generated SEO pages keep FAQ copy only on the guides that show a FAQ", () => {

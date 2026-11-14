@@ -57,7 +57,7 @@ export default function CompactHeader({
             </button>
           )}
           <h1 className="text-lg font-semibold compass-gradient-text dark:bg-gradient-to-r dark:from-[#A78BFA] dark:via-[#C4B5FD] dark:to-[#67E8F9] dark:bg-clip-text dark:text-transparent tracking-tight">
-            knowrole
+            What Career Fits
           </h1>
         </div>
 

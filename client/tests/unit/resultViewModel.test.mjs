@@ -145,7 +145,7 @@ function measureLikeSans(text, fontSize) {
 }
 
 test("share card why and signal text fit inside their boxes", () => {
-  const why = `${viewFor("v5", personasById.P149.answers).view.whyLine} Try your own result at knowyourole.com.`;
+  const why = `${viewFor("v5", personasById.P149.answers).view.whyLine} Try your own result at whatcareerfits.com.`;
   const signal = "I make good work repeatable, reliable, and built to last. My Dominant style adds direct, decisive movement.";
   const samples = [
     ["P149 why", why, SHARE_WHY_BOX],

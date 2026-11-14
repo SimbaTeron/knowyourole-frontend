@@ -336,18 +336,18 @@ export default function Home() {
         <section className="hero-section" aria-labelledby="home-hero-title">
           <div className="home-shell hero-grid">
             <div>
-              <p className="eyebrow">Free personality quiz for work style &amp; career fit</p>
+              <p className="eyebrow">Free career quiz for students</p>
               <h1 id="home-hero-title" className="hero-title">
-                Discover your work style, uncover your strengths, and find career paths to explore next.
+                {`Find out what career fits you, in ${QUESTION_COUNT} free questions.`}
               </h1>
               <p className="hero-subtitle">
-                {`A free, ${QUESTION_COUNT}-question personality quiz that combines Big Five traits, MBTI-style patterns, and DISC work behavior into one practical result.`}
+                {`A free, ${QUESTION_COUNT}-question career quiz. It looks at how you like to work — Big Five traits, MBTI-style patterns, and DISC work behavior — and suggests directions to explore.`}
               </p>
               <a className="primary-cta" href="/quiz">Take the free quiz</a>
               <p className="quiz-facts">{`${QUESTION_COUNT} questions · No account or name needed · `}<a href="/privacy">What we store</a></p>
             </div>
 
-            <aside className="result-preview" aria-label="Example KnowYouRole result">
+            <aside className="result-preview" aria-label="Example What Career Fits result">
               <span className="preview-label">An example of your result</span>
               <div className="sample-card">
                 <span className="sample-type">INTJ-style pattern</span>
@@ -420,7 +420,7 @@ export default function Home() {
             </div>
             <div>
               <p className="trust-copy section-copy">
-                KnowYouRole brings together Big Five trait language, familiar MBTI-style patterns, and DISC-style work behavior. It is built for reflection and role exploration—not diagnosis, hiring, or predicting your future.
+                What Career Fits brings together Big Five trait language, familiar MBTI-style patterns, and DISC-style work behavior. It is built for reflection and career exploration — not diagnosis, hiring, or predicting your future.
               </p>
               <a className="method-link" href="/methodology">Read the methodology</a>
             </div>
@@ -456,7 +456,7 @@ export default function Home() {
 
       <footer className="home-footer">
         <div className="home-shell footer-row">
-          <span>© 2026 KnowYouRole</span>
+          <span>© 2026 What Career Fits</span>
           <nav className="footer-links" aria-label="Footer links">
             <a href="/privacy">Privacy</a>
             <a href="/privacy#cookie-preferences">Cookie Settings</a>

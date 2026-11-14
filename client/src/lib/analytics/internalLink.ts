@@ -38,7 +38,7 @@ export function readLinkLocation(search: string): string | null {
 export function buildInternalHref(path: string, params?: InternalLinkParams): string {
   let url: URL;
   try {
-    url = new URL(path, "https://knowyourole.com");
+    url = new URL(path, "https://whatcareerfits.com");
   } catch {
     return path;
   }
@@ -74,7 +74,7 @@ export function buildInternalHref(path: string, params?: InternalLinkParams): st
 
   const query = kept.toString();
   const relative = `${url.pathname}${query ? `?${query}` : ""}${url.hash}`;
-  if (url.origin === "https://knowyourole.com") return relative;
+  if (url.origin === "https://whatcareerfits.com") return relative;
   return `${url.origin}${relative}`;
 }
 

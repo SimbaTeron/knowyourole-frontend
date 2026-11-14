@@ -31,7 +31,7 @@ export function ResultShareView({
       </div>
       <div className="detail-card">
         <h3>Share options</h3>
-        <p data-testid="share-contents-note">This card shows your result type and direction only. It does not include your answers or any personal information. It ends with a link to <b>knowyourole.com</b>.</p>
+        <p data-testid="share-contents-note">This card shows your result type and direction only. It does not include your answers or any personal information. It ends with a link to <b>whatcareerfits.com</b>.</p>
         <div className="share-actions">
           <button className="share-btn primary" onClick={() => onShare("image_action")}>Image</button>
           <button className="share-btn primary" onClick={() => onShare("pdf_action")}>PDF</button>

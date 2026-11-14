@@ -12,15 +12,15 @@ export const metadata: Metadata = publicPageMetadata("/student-data");
  * LEGAL REVIEW REQUIRED: this page is a plain-English draft, not legal advice.
  * A lawyer should review the FERPA, COPPA, SOPIPA / AB 1584 and NY Ed Law 2-d
  * statements before schools rely on them.
- * Data controller is KnowYouRole. Contact is info@knowyourole.com.
+ * Data controller is What Career Fits. Contact is info@whatcareerfits.com.
  * No mailing address and no phone are published.
  * Retention and deletion-on-request days come from retentionPolicy.ts.
  */
 const OWNER_VALUES = {
   retentionDays: ANONYMOUS_RESULT_RETENTION_DAYS,
   deletionDays: DELETION_ON_REQUEST_DAYS,
-  controller: "KnowYouRole",
-  contact: "info@knowyourole.com",
+  controller: "What Career Fits",
+  contact: "info@whatcareerfits.com",
 } as const;
 
 const stored = [
@@ -52,7 +52,7 @@ export default function StudentDataPage() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#a3402b]">For schools, parents & students</p>
         <h1 className="mt-4 font-display text-4xl font-bold leading-[1.02] tracking-[-0.05em] sm:text-5xl">Student data and privacy</h1>
         <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#405f72]">
-          KnowYouRole is a free work-style quiz. Students don&apos;t need an account and never give us their name. This page explains, in plain English, exactly what we keep and how a school or parent can ask us to delete it.
+          What Career Fits is a free career quiz. It looks at work style to suggest directions to explore. Students don&apos;t need an account and never give us their name. This page explains, in plain English, exactly what we keep and how a school or parent can ask us to delete it.
         </p>
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2" aria-label="What we store">

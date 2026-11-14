@@ -428,8 +428,8 @@ function buildLearningPlan({ mbtiType, primaryDisc, bigFive }: { mbtiType: strin
 
 const DISC_COLORS: Record<string, string> = { D: "#ef4444", I: "#f59e0b", S: "#22c55e", C: "#3b82f6" };
 const DISC_EMOJIS: Record<string, string> = { D: "🔥", I: "⚡", S: "🌿", C: "🧠" };
-const BRAND_SHARE_URL = "https://knowyourole.com";
-const BRAND_SHARE_HOST = "knowyourole.com";
+const BRAND_SHARE_URL = "https://whatcareerfits.com";
+const BRAND_SHARE_HOST = "whatcareerfits.com";
 
 type BigFiveProfile = { O: number; C: number; E: number; A: number; N: number };
 type DiscProfile = { D: number; I: number; S: number; C: number };
@@ -2150,13 +2150,13 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
   if (!open) return null;
 
   const discLabel = DISC_LABELS[report.primaryDisc] || "Primary Style";
-  const fileName = `KnowYouRole-Full-Portrait-${report.mbtiType}-${report.sessionId?.slice(-6) || "Report"}.pdf`;
-  const imageName = `KnowYouRole-Share-Card-${report.mbtiType}-${report.sessionId?.slice(-6) || "Result"}.png`;
+  const fileName = `WhatCareerFits-Full-Portrait-${report.mbtiType}-${report.sessionId?.slice(-6) || "Report"}.pdf`;
+  const imageName = `WhatCareerFits-Share-Card-${report.mbtiType}-${report.sessionId?.slice(-6) || "Result"}.png`;
   const shareUrl = BRAND_SHARE_URL;
   const mbtiInsight = MBTI_SHARE_INSIGHTS[report.mbtiType] || "I use my personality signal as a compass.";
   const shareInsight = getShareInsight(report.mbtiType, discLabel);
-  const shareText = `My KnowYouRole result: ${report.mbtiType} + ${report.primaryDisc} ${discLabel}. ${mbtiInsight} ${BRAND_SHARE_HOST}`;
-  const emailSubject = encodeURIComponent(`My KnowYouRole result: ${report.mbtiType}`);
+  const shareText = `My What Career Fits result: ${report.mbtiType} + ${report.primaryDisc} ${discLabel}. ${mbtiInsight} ${BRAND_SHARE_HOST}`;
+  const emailSubject = encodeURIComponent(`My What Career Fits result: ${report.mbtiType}`);
   const emailBody = encodeURIComponent(`${shareText}\n\nI can attach the PDF or social card too.`);
   const smsBody = encodeURIComponent(shareText);
   const shareEventParams = { result_page: "full_portrait", mbti_type: report.mbtiType, primary_disc: report.primaryDisc };
@@ -2297,7 +2297,7 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
 
     ctx.font = "800 38px 'Space Grotesk', 'Space Grotesk Fallback', Arial, sans-serif";
     ctx.fillStyle = "#315f74";
-    ctx.fillText("KnowYouRole", 72, 96);
+    ctx.fillText("What Career Fits", 72, 96);
     ctx.font = "700 20px 'IBM Plex Sans', 'IBM Plex Sans Fallback', Arial, sans-serif";
     ctx.fillStyle = "#61717a";
     ctx.fillText("Full Portrait share card", 72, 132);
@@ -2373,9 +2373,9 @@ function ShareResultsModal({ open, onClose, report }: { open: boolean; onClose: 
       const imageBlob = await makeSocialCard();
       const imageFile = new File([imageBlob], imageName, { type: "image/png" });
       if (navigator.canShare?.({ files: [imageFile] })) {
-        await navigator.share({ title: "My KnowYouRole result", text: shareText, files: [imageFile] });
+        await navigator.share({ title: "My What Career Fits result", text: shareText, files: [imageFile] });
       } else if (navigator.share) {
-        await navigator.share({ title: "My KnowYouRole result", text: shareText, url: shareUrl });
+        await navigator.share({ title: "My What Career Fits result", text: shareText, url: shareUrl });
         downloadBlob(imageBlob, imageName);
       } else {
         downloadBlob(imageBlob, imageName);
@@ -3650,7 +3650,7 @@ function Page1FullPortrait({ type, bigFive, disc, mbtiType, primaryDisc, rawScor
               onChange={(event) => setLeadConsent(event.target.checked)}
               style={{ marginTop: 2, width: 16, height: 16, accentColor: C.cyan, flexShrink: 0 }}
             />
-            <span>I agree to save my email so KnowYouRole can send this result summary.</span>
+            <span>I agree to save my email so What Career Fits can send this result summary.</span>
           </label>
           <button
             type="submit"
@@ -4940,7 +4940,7 @@ function OrbitalGlassV2Results({
     headline: resultView.headline,
     imageTraitLine: resultView.imageTraitLine,
     leadTraitLine: resultView.pdfTraitLine,
-    title: `KnowYouRole Result — ${resultView.headline}`,
+    title: `What Career Fits Result — ${resultView.headline}`,
     subtitle: resultView.pdfSubtitle,
     mbtiType,
     archetype: resultView.pdfArchetype,
@@ -4948,7 +4948,7 @@ function OrbitalGlassV2Results({
     career: {
       title: resultView.direction.title,
       salary: "",
-      summary: `${resultView.whyLine} Try your own result at knowyourole.com.`,
+      summary: `${resultView.whyLine} Try your own result at whatcareerfits.com.`,
     },
     bigFive,
     disc,
@@ -4956,7 +4956,7 @@ function OrbitalGlassV2Results({
       {
         title: "MBTI",
         subtitle: resultView.pdfSubtitle,
-        body: "MBTI is your navigation app: it suggests the route you may tend to reach for. Try your own result at knowyourole.com.",
+        body: "MBTI is your navigation app: it suggests the route you may tend to reach for. Try your own result at whatcareerfits.com.",
       },
       {
         title: "DISC",
@@ -5026,7 +5026,7 @@ function OrbitalGlassV2Results({
 
       <main className="orb-stage">
         <header className="orb-top">
-          <button className="orb-brand" onClick={() => go("main", "brand")}><span className="orb-mark">◈</span><span>KnowYouRole</span></button>
+          <button className="orb-brand" onClick={() => go("main", "brand")}><span className="orb-mark">◈</span><span>What Career Fits</span></button>
           <span className="orb-pill">Your Result</span>
         </header>
 
@@ -5119,7 +5119,7 @@ function OrbitalGlassV2Results({
           <div className="result-home-exit__actions">
             <button className="result-home-exit__share" onClick={() => onShare("result_footer")}>Save or share your result</button>
             <a className="result-home-exit__feedback" href={leaveFeedbackPath()} onClick={() => writeFeedbackLink({ resultId: savedResultId, sessionId: feedbackSessionId ?? null })}>Leave feedback</a>
-            <button className="result-home-exit__home" onClick={returnHome}>← Back to KnowYouRole home</button>
+            <button className="result-home-exit__home" onClick={returnHome}>← Back to What Career Fits home</button>
           </div>
           <nav aria-label="Result page links" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 12, fontSize: 12.5 }}>
             <a href="/methodology">Methodology</a><a href="/privacy">Privacy</a><a href="/faq">FAQ</a><a href="/quiz">Retake the quiz</a>

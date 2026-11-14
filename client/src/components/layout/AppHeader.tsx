@@ -38,29 +38,29 @@ export function AppHeader() {
       className={`workday-header${scrolled ? ' is-scrolled' : ''}${hidden ? ' is-hidden' : ''}`}
     >
       <div className="workday-header__bar">
-        <Link href="/" aria-label="KnowYouRole home" className="workday-header__brand">
+        <Link href="/" aria-label="What Career Fits home" className="workday-header__brand">
           <span className="workday-header__mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round">
               <circle cx="12" cy="12" r="8.5" />
               <path d="M12 3.5v17M3.5 12h17" />
             </svg>
           </span>
-          <span>KnowYouRole</span>
+          <span>What Career Fits</span>
         </Link>
-        <nav className="workday-header__links" aria-label="Explore KnowYouRole">
+        <nav className="workday-header__links" aria-label="Explore What Career Fits">
           <Link href="/careers">Career paths</Link>
           <Link href="/learn">Learn</Link>
           <Link href="/methodology">Method</Link>
         </nav>
         <details className="workday-header__menu">
           <summary aria-label="Menu: open site navigation"><span aria-hidden="true" className="workday-header__menu-icon">☰</span> Menu</summary>
-          <nav aria-label="Explore KnowYouRole (mobile)">
+          <nav aria-label="Explore What Career Fits (mobile)">
             <Link href="/careers">Career paths</Link>
             <Link href="/learn">Learn</Link>
             <Link href="/methodology">Method</Link>
           </nav>
         </details>
-        <Link href="/quiz" className="workday-header__cta" aria-label="Take the quiz: start the free KnowYouRole quiz">
+        <Link href="/quiz" className="workday-header__cta" aria-label="Take the quiz: start the free What Career Fits quiz">
           Take the quiz <span aria-hidden="true">↗</span>
         </Link>
       </div>

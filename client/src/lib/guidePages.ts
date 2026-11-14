@@ -39,7 +39,7 @@ const quizCount = QUESTION_COUNT;
 const trades: GuidePage = {
   path: "/careers/trades-career-quiz",
   slug: "trades-career-quiz",
-  title: "Trades Career Quiz: Hands-On Work | KnowYouRole",
+  title: "Trades Career Quiz: Hands-On Work | What Career Fits",
   description:
     "A free trades career quiz for electrician, plumber, welder, carpenter, and mechanic work. It suggests directions. It does not pick a job.",
   h1: "A trades career quiz for people who like to build and fix things",
@@ -54,7 +54,7 @@ const trades: GuidePage = {
     {
       heading: "What a trades career quiz can (and can't) tell you",
       paragraphs: [
-        "KnowYouRole is a free work-style quiz. It is informed by the Big Five, a common way to describe habits such as curiosity, follow-through, and social energy. It looks at how you like to focus, decide, and spend a day.",
+        "What Career Fits is a free career quiz. It is informed by the Big Five, a common way to describe habits such as curiosity, follow-through, and social energy. It looks at how you like to focus, decide, and spend a day.",
         "It can suggest that hands-on, practical work is worth a closer look. It cannot tell you to become an electrician, or tell you not to. A trade also depends on training, local jobs, the physical work, and what you want from a workday.",
         `The quiz is ${quizCount} questions. There is no account and no name needed. It is a reflection tool, not a test you pass.`,
       ],
@@ -145,7 +145,7 @@ const trades: GuidePage = {
 const creators: GuidePage = {
   path: "/careers/creator-careers-quiz",
   slug: "creator-careers-quiz",
-  title: "Content Creator Career Quiz for Teens | KnowYouRole",
+  title: "Content Creator Career Quiz for Teens | What Career Fits",
   description:
     "A free content creator career quiz for teens and adults. Video, design, music, writing, and streaming. It suggests directions. It does not promise an audience.",
   h1: "A creator careers quiz that treats making things as real work",
@@ -161,7 +161,7 @@ const creators: GuidePage = {
       heading: "Creator careers are more than going viral",
       paragraphs: [
         "A lot of creative work never shows up on a public page. Someone edits a video, draws a poster, writes a script, records a song, or designs a shirt. Some of that work is a job. Some of it is practice. Both count.",
-        "KnowYouRole will not tell you that you should be a YouTuber, a streamer, or a designer. It will not promise followers, money, or a break. It can help you notice whether making, revising, and sharing work fits your habits.",
+        "What Career Fits will not tell you that you should be a YouTuber, a streamer, or a designer. It will not promise followers, money, or a break. It can help you notice whether making, revising, and sharing work fits your habits.",
       ],
     },
     {
@@ -252,7 +252,7 @@ const creators: GuidePage = {
 const teens: GuidePage = {
   path: "/career-quiz-for-teens",
   slug: "career-quiz-for-teens",
-  title: "Free Career Quiz for Teens, No Sign-Up | KnowYouRole",
+  title: "Free Career Quiz for Teens, No Sign-Up | What Career Fits",
   description:
     "A free career quiz for middle school and high school students. No account or name needed. It suggests directions. It does not pick your job.",
   h1: "A free career quiz for teens, with no account needed",
@@ -264,7 +264,7 @@ const teens: GuidePage = {
     {
       heading: "A free career quiz for teens, with no account needed",
       paragraphs: [
-        `KnowYouRole is a free, ${quizCount}-question work-style quiz. It is informed by the Big Five, a common way to describe habits such as curiosity, follow-through, and social energy. It suggests directions. It does not tell you what job to do.`,
+        `What Career Fits is a free, ${quizCount}-question career quiz. It is informed by the Big Five, a common way to describe habits such as curiosity, follow-through, and social energy. It suggests directions. It does not tell you what job to do.`,
         "If you want the personality side in more detail, read the [personality quiz for students](/personality-quiz-for-students). This page stays on career exploration: what to try next, not a label to keep.",
       ],
     },
@@ -339,17 +339,17 @@ const teens: GuidePage = {
 const parents: GuidePage = {
   path: "/for-parents",
   slug: "for-parents",
-  title: "Career Quiz for Your Teenager | KnowYouRole for Parents",
+  title: "Career Quiz for Your Teenager | What Career Fits",
   description:
     "A plain guide for parents: what this free work-style quiz is, what it is not, and how family privacy works. No account or name is needed.",
   h1: "A career quiz for your teenager, explained for parents",
   eyebrow: "For parents",
   intro:
-    "You want something useful, and you want to know it is safe to let your teen try. KnowYouRole is a free work-style quiz. It suggests directions to explore. It does not tell your child what job to do, and it is not a diagnosis.",
+    "You want something useful, and you want to know it is safe to let your teen try. What Career Fits is a free career quiz. It suggests directions to explore. It does not tell your child what job to do, and it is not a diagnosis.",
   breadcrumbs: [{ name: "For parents", path: "/for-parents" }],
   sections: [
     {
-      heading: "What KnowYouRole is, and what it isn't",
+      heading: "What this quiz is, and what it isn't",
       paragraphs: [
         `It is a free, ${quizCount}-question quiz about how a person likes to work. It is informed by the Big Five, a common way to describe habits such as curiosity, follow-through, and social energy. The result is a starting point for a conversation.`,
         "It is not a clinical test, not a school placement tool, and not a verdict. A teen can disagree with it. You can too. The [method page](/methodology) explains the limits in more detail.",
@@ -359,7 +359,7 @@ const parents: GuidePage = {
       heading: "Privacy for families: no account or name needed, what is stored, how to ask for deletion",
       paragraphs: [
         "Your teen can take the quiz without an account and without entering a name. We save the quiz completion so the result can be shown and recovered. We do not sell quiz results. Optional analytics stays off until someone turns it on.",
-        "To ask for deletion, export, or a correction, email info@knowyourole.com. Include enough detail for us to find the record, such as a result identifier if you have one. We may need to verify the request before acting on it. The full wording is on the [privacy page](/privacy).",
+        "To ask for deletion, export, or a correction, email info@whatcareerfits.com. Include enough detail for us to find the record, such as a result identifier if you have one. We may need to verify the request before acting on it. The full wording is on the [privacy page](/privacy).",
       ],
     },
     {
@@ -405,7 +405,7 @@ const parents: GuidePage = {
     },
     {
       q: "How do I ask you to delete something?",
-      a: "Email info@knowyourole.com, as the privacy page describes. We may need to verify the request.",
+      a: "Email info@whatcareerfits.com, as the privacy page describes. We may need to verify the request.",
     },
   ],
   related: ["/quiz", "/privacy", "/career-quiz-for-teens", "/for-counselors", "/for-schools", "/methodology"],
@@ -415,13 +415,13 @@ const parents: GuidePage = {
 const counselors: GuidePage = {
   path: "/for-counselors",
   slug: "for-counselors",
-  title: "Free Career Lesson Plan for School Counselors | KnowYouRole",
+  title: "Free Career Lesson for School Counselors | What Career Fits",
   description:
     "A free career exploration lesson for class or a counseling group. No student accounts. Includes a lesson plan you can print. Not for placement or grades.",
   h1: "A free career exploration lesson for counselors and teachers",
   eyebrow: "For counselors",
   intro:
-    "This is a ready-to-run reflection lesson. Students take the free work-style quiz, talk in pairs, and leave with one next step. You do not collect student accounts. The lesson is not for placement, grading, or hiring.",
+    "This is a ready-to-run reflection lesson. Students take the free career quiz, talk in pairs, and leave with one next step. You do not collect student accounts. The lesson is not for placement, grading, or hiring.",
   breadcrumbs: [{ name: "For counselors", path: "/for-counselors" }],
   sections: [
     {
@@ -435,7 +435,7 @@ const counselors: GuidePage = {
       heading: "Before class: setup with no student accounts",
       paragraphs: [
         "Students open the quiz in a browser. They do not create an account, and they do not enter a name. Ask them not to put their name in any free-text answer.",
-        "Check that your network allows knowyourole.com. Read the [privacy policy](/privacy) and the [for schools](/for-schools) page before a group uses the site. Your district's own student-data rules still control.",
+        "Check that your network allows whatcareerfits.com. knowyourole.com redirects there. Read the [privacy policy](/privacy) and the [for schools](/for-schools) page before a group uses the site. Your district's own student-data rules still control.",
       ],
       bullets: [
         "One device per student, or pairs sharing a screen if devices are short.",
