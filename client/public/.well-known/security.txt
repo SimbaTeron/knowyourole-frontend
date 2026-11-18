@@ -1,0 +1,4 @@
+Contact: https://whatcareerfits.com/contact
+Expires: 2027-11-18T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://whatcareerfits.com/.well-known/security.txt
