@@ -26,7 +26,7 @@ export default function Privacy() {
         <div className="p-4 rounded-xl bg-terracotta/5 dark:bg-[#A78BFA]/5 border border-terracotta/10 dark:border-[#A78BFA]/15 mb-8" data-testid="section-data-promise">
           <h2 className={headingClass}>Plain-English summary</h2>
           <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
-            What Career Fits saves quiz completions so your result can be generated and recovered. We do not sell quiz results. Analytics is optional; advertising technology is not active today.
+            What Career Fits saves quiz completions so your result can be generated and recovered. We do not sell quiz results. Google Analytics runs only after consent. Vercel Web Analytics counts page visits without cookies or identifiers. Advertising technology is not active today.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-warm-gray/80 dark:text-[#94A3B8]">
             Schools, parents and students: see <a href="/student-data" className="text-terracotta dark:text-[#A78BFA] underline">Student data and privacy</a> for what we store, how long we keep it, and how to ask for deletion. Quiz results not linked to an account are deleted automatically after {ANONYMOUS_RESULT_RETENTION_DAYS} days. A deletion request is completed within {DELETION_ON_REQUEST_DAYS} days.
@@ -50,7 +50,7 @@ export default function Privacy() {
               <li>Feedback you submit voluntarily.</li>
               <li>{RESULT_FIT_PRIVACY_SENTENCE}</li>
               <li>{SCALE_FEEDBACK_PRIVACY_SENTENCE}</li>
-              <li>Device, browser, referral, and performance data when analytics is enabled through cookie preferences.</li>
+              <li>Device, browser, referral, and performance data from Google Analytics when it is enabled through cookie preferences. Vercel Web Analytics counts page visits without cookies or identifiers.</li>
               <li>Browser storage used for quiz state, consent preferences, and session continuity.</li>
             </ul>
           </section>
@@ -62,7 +62,7 @@ export default function Privacy() {
               <li>Send a requested result summary when delivery is available and you explicitly opt in to that one-time request.</li>
               <li>Maintain and improve quiz quality, accessibility, and product usability.</li>
               <li>Monitor site performance, abuse prevention, and basic security.</li>
-              <li>Measure aggregate usage, such as quiz starts, completions, page views, and share clicks, only when analytics consent is enabled.</li>
+              <li>Measure aggregate usage, such as quiz starts, completions, page views, and share clicks, with Google Analytics only when analytics consent is enabled. Vercel Web Analytics counts page visits without cookies or identifiers.</li>
             </ul>
           </section>
 

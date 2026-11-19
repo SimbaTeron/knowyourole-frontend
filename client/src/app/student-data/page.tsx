@@ -91,9 +91,9 @@ export default function StudentDataPage() {
           </section>
 
           <section className={sectionClass}>
-            <h2 className={h2Class}>Analytics only with consent</h2>
+            <h2 className={h2Class}>Google Analytics only with consent</h2>
             <p className={pClass}>
-              Google Analytics loads only after someone turns it on in cookie settings. It measures things like page visits and quiz completions. We don&apos;t send quiz answers, names or email addresses to it. Schools can leave it off; the quiz works the same either way.
+              Google Analytics loads only after someone turns it on in cookie settings. It measures things like page visits and quiz completions. We don&apos;t send quiz answers, names or email addresses to it. Schools can leave it off; the quiz works the same either way. Vercel Web Analytics counts page visits without cookies or identifiers.
             </p>
           </section>
 
