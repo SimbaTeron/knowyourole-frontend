@@ -71,6 +71,9 @@ export default function Privacy() {
             <p>
               What Career Fits supports Google Analytics to understand aggregate site behavior, such as pages visited, quiz starts or completions, and page performance. The Google Analytics script is loaded only after you enable Analytics in cookie preferences. We do not intentionally send quiz answers, email addresses, medical data, or direct identifiers to Google Analytics.
             </p>
+            <p>
+              We also use Vercel Web Analytics, which counts page visits without cookies and without identifying you.
+            </p>
           </section>
 
           <section className={sectionClass}>
