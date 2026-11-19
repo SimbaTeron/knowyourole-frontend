@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "@/styles/fonts";
 import "../index.css";
 import { ConsentBeforePaint } from "@/components/ConsentBeforePaint";
@@ -27,6 +28,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <BaseJsonLd />
         {children}
+        <Analytics />
         <CookieConsentBanner />
       </body>
     </html>
